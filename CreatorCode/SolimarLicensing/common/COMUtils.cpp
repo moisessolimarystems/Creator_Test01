@@ -10,46 +10,6 @@
 #include <oleauto.h>
 #include <objbase.h>
 
-/*
- * Sets the proxy blanket for the given itf. Also allows you to set the proxy blanket
- * on the IUnknown of that itf (The first param isn't the true IUnknown of the interface).
- * See article https://docs.microsoft.com/en-us/windows/win32/wmisdk/setting-authentication-using-c-
- * for an explanation of why the IUnknown of the Itf might need to be set. Usually you will
- * need to set the extra setIUnknown param for interfaces returned from CoCreateInstanceEx calls, and 
- * not set it for interfaces returned from QueryInterface calls.
- */
-HRESULT COMUtils::SetProxyBlanket(IUnknown* pItf, COAUTHINFO* pAuthInfo, bool setIUnknown)
-{
-	HRESULT hr = S_OK;
-
-	if (pAuthInfo)
-	{
-		hr = CoSetProxyBlanket(
-			pItf,
-			pAuthInfo->dwAuthnSvc,
-			pAuthInfo->dwAuthzSvc,
-			pAuthInfo->pwszServerPrincName,
-			pAuthInfo->dwAuthnLevel,
-			pAuthInfo->dwImpersonationLevel,
-			pAuthInfo->pAuthIdentityData,
-			pAuthInfo->dwCapabilities);
-
-		if (SUCCEEDED(hr) && setIUnknown)
-		{
-			// Set the proxy blanket on IUnkown to avoid ACCESS DENIED. Itf can be released immediately after.
-			// See the following microsoft article for an explanation: https://docs.microsoft.com/en-us/windows/win32/wmisdk/setting-authentication-using-c-
-			IUnknown* pIUnk = NULL;
-			hr = pItf->QueryInterface(__uuidof(IUnknown), (void**)&pIUnk);
-			if (SUCCEEDED(hr))
-			{
-				hr = COMUtils::SetProxyBlanket(pIUnk, pAuthInfo);
-				pIUnk->Release();
-			}
-		}
-	}
-
-	return hr;
-}
 
 /** Creates a multidimensional array of 
   * variants using variant safearrays of 

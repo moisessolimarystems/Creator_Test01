@@ -64,8 +64,6 @@ public:
 	/** Checks if the caller is in the specified role */
 	static HRESULT IsCallerInRole(BSTR role);
 
-	static HRESULT SetProxyBlanket(IUnknown* pItf, COAUTHINFO* pAuthInfo, bool setIUnknown = false);
-
 private:
 };
 
