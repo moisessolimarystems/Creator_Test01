@@ -338,7 +338,7 @@ HRESULT KeyMaster::initDriver()
 
    if(!SUCCEEDED(hr))
    {
-      Application->MessageBox("The Solimar License Server Is Not Running", "Key Message", MB_OK|MB_ICONERROR )
+      Application->MessageBox("The Solimar License Server Is Not Running", "Key Message", MB_OK|MB_ICONERROR );
       Application->Terminate();
       return hr;
    }
