@@ -137,7 +137,7 @@ def MakeCIdentifier(prefix,namelist):
 formats={'headers':[], 'products':[], 'regions':[]}
 
 dom = xml.dom.minidom.parse('.\\resources\\KeySpec.xml')
-root = dom.firstChild
+root = dom.documentElement
 
 XMLProcessKeyFormat(root, formats)
 

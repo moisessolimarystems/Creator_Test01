@@ -777,12 +777,20 @@ begin
    		LaunchAppAndWait(sentPath, sentOpts, WAIT);
    	endif;
 
-	//install new sentinel driver if necessary  	
-//    sentPath = INSTALLDIR + "\source\\Rainbow\\SPNComboInst1.0.2.exe";  
-    //MessageBox("The sent path is " + sentPath, MB_OK);
-	sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe";
-    sentOpts = " /v\"/q REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
-    LaunchAppAndWait(sentPath, sentOpts, WAIT);
+    if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
+    	nvSize = StrFind(svValue, "7.0.0") ;
+    	if(nvSize < 0) then //StrFind(svValue, "1.0.5") < 0) then
+			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
+			sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+   			sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
+   			LaunchAppAndWait(sentPath, sentOpts, WAIT);
+		endif;  
+	else
+		MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);	
+		sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+   		sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
+   		LaunchAppAndWait(sentPath, sentOpts, WAIT);
+	endif;
 end;    
 
 //=============================================================================  

@@ -393,6 +393,7 @@ short KeyMaster::program(SKeyRecord* key_record)
    HRESULT hr = 0;
    VARIANT ModuleArray;
    MultidimensionalSafeArray::DimensionsType dims, index;
+   bool hasOutputPool = false;
 
    //returned from AccessMultiDimensionalSafearray and is used to stuff the variants
    //into the safe array
@@ -431,17 +432,25 @@ short KeyMaster::program(SKeyRecord* key_record)
          }
       }
 
+      //SPD and iConvert Keys have an extra one for Output Pool
+      if((key_record->pkey->productId == SPD_PRODUCT) || (key_record->pkey->productId == ICONVERT_PRODUCT))
+      {
+         hasOutputPool = true;
+         NumModules++;
+      }
+
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
       dims.push_back(NumModules);
       dims.push_back(2);
+
 
       //create the multi dim safe array to look like Module_Array [NumModules][2]
       hr = MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
       char Buff[256];
       for(int i=0; i<NumModules; i++)
       {
-         AnsiString mod_name = module_detail[ModuleIds[i]]->name;
+         //AnsiString mod_name = module_detail[ModuleIds[i]]->name;
 
          index.push_back(i);
          index.push_back(0);
@@ -449,12 +458,18 @@ short KeyMaster::program(SKeyRecord* key_record)
          hr = MultidimensionalSafeArray::AccessMultidimensionalSafearray(&ModuleArray,
                                                                                  index,
                                                                                  &pVarArray
-                                                                                );
+                                                                                         );
+
          if(SUCCEEDED(hr))
          {
             //set the type of the variant
             pVarArray->vt = VT_UI4;
-            pVarArray->ulVal = module_detail[ModuleIds[i]]->id;
+
+            if((i == NumModules -1) && hasOutputPool)
+               pVarArray->ulVal = 128;
+            else
+               pVarArray->ulVal = module_detail[ModuleIds[i]]->id;
+
             hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
             ltoa(hr, Buff, 10);
            	OutputDebugString("**HR from first unaccess ");
@@ -472,7 +487,10 @@ short KeyMaster::program(SKeyRecord* key_record)
          {
             //set the type of the variant
             pVarArray->vt = VT_UI4;
-            pVarArray->ulVal = spd_key->getLicense(ModuleIds[i]);
+            if((i == NumModules -1) && hasOutputPool)
+               pVarArray->ulVal = spd_key->getOutputUnits();
+            else
+               pVarArray->ulVal = spd_key->getLicense(ModuleIds[i]);
             hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
             ltoa(hr, Buff, 10);
            	OutputDebugString("**HR from second unaccess ");
@@ -481,6 +499,9 @@ short KeyMaster::program(SKeyRecord* key_record)
          }
          index.pop_back();
          index.pop_back();
+
+         if(i == 128)
+            break;
       }
    }
    
