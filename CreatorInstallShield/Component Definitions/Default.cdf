@@ -82,7 +82,6 @@ _NO_SPLIT=
 _NO_SPLIT_BEFORE=
 VOLATILE=
 requiredby0=Main App
-filegroup0=Rainbow
 HANDLERONInstalling=
 HANDLERONInstalled=
 HANDLERONUnInstalling=

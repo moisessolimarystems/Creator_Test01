@@ -77,12 +77,12 @@ begin
     BOOL Program;
 end;  
 
-
     // your script function prototypes
     //prototype CreateODBC_SQLCreatorKey(); 
     prototype SetupFolders();
     prototype CheckRequirements(); 
     prototype InstallSentinelDriver();
+    prototype InstallLicensing(); 
     
     // your global variables   
     BOOL        	bIsShellExplorer;
@@ -104,7 +104,7 @@ function SetupFolders()
     STRING svPath, svIconPath;
 begin
 	//Add Solimar.exe to desktop
-    svPath = TARGETDIR ^ "Creator.exe";
+    svPath = TARGETDIR ^ "CreatorProject.exe";
     svIconPath = TARGETDIR ^ "tree.ico";
     LongPathToQuote ( svPath , TRUE );
     AddFolderIcon ( FOLDER_DESKTOP, "Creator" , svPath , TARGETDIR , svIconPath , 0 , "" , REPLACE );	
@@ -485,13 +485,18 @@ begin
     Disable(STATUSEX);
 
     ShowObjWizardPages(NEXT);
-
+/*
     if(bInstallSentinel) then 
   		SdShowMsg("Installing Sentinel Driver...Please wait.", TRUE);
         InstallSentinelDriver();                   
   		SdShowMsg("Sentinel Driver has been installed", TRUE);
 	endif;    
-
+*/
+    SdShowMsg("Installing Solimar Licensing", TRUE);
+    InstallLicensing();   
+    SdShowMsg("Installing Solimar Licensing", FALSE);                          
+    SdShowMsg("Solimar Licensing has been installed", TRUE);
+      
 	bOpt1  = FALSE;
     bOpt2  = TRUE;
     szMsg2 = "Setup has finished installing Creator on your system.\n\nSetup can launch the Read Me file if you wish.";                           
@@ -702,7 +707,45 @@ begin
   	
 end;
 
+//=============================================================================
+// 
+// Function    : InstallLicensing()
+// Purpose     :
+// Parameters  :
+// Description : 
+//
+//=============================================================================
+function InstallLicensing()
+	STRING szPath, szOpts, svValue;
+	INT nvSize, nResult, nvType;
+begin     
 
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
+	szPath = WINSYSDIR + "\msiexec.exe";
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","LicenseViewer", nvType, svValue, nvSize) == 0) then
+		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\LicenseViewer.msi /qn" ;  
+		 LaunchAppAndWait(szPath, szOpts, WAIT);
+    endif;                  
+    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\LicenseViewer.msi /qn" ; 
+    LaunchAppAndWait(szPath, szOpts, WAIT);     
+    
+	szPath = WINSYSDIR + "\msiexec.exe";
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarLicenseManager",nvType, svValue, nvSize) == 0) then 
+		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseManager.msi /qn" ;  
+		 LaunchAppAndWait(szPath, szOpts, WAIT);
+    endif; 
+    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseManager.msi /qn"  ;
+    LaunchAppAndWait(szPath, szOpts, WAIT);
+    
+    szPath = WINSYSDIR + "\msiexec.exe";
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarLicenseServer",nvType, svValue, nvSize) == 0) then
+		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseServer.msi /qn"  ; 
+		 LaunchAppAndWait(szPath, szOpts, WAIT);
+    endif; 
+    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseServer.msi /qn"  ;
+    LaunchAppAndWait(szPath, szOpts, WAIT);
+ 
+end;             
 //=============================================================================  
 //
 // Function: InstallSentinelDriver()

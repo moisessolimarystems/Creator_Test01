@@ -23,26 +23,7 @@ TARGET=<TARGETDIR>
 
 [FileGroups]
 group0=App Executables
-group1=Rainbow
-group2=OCX
-
-[Rainbow]
-LINKTYPE=Dynamic Link
-INFOTYPE=Standard
-UNINSTALLABLE=No
-FILETYPE=No
-SELFREGISTERING=No
-POTENTIALLY=Yes
-COMPRESS=No
-OPERATINGSYSTEM=
-LANGUAGE=
-COMMENT=Does not get installed by our program, is an install program itself
-COMPRESSDLL=
-HTTPLOCATION=
-FTPLOCATION=
-MISC=
-INSTALLATION=ALWAYSOVERWRITE
-TARGET=<TARGETDIR>
+group1=OCX
 
 [OCX]
 LINKTYPE=Dynamic Link
