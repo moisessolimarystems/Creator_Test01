@@ -1,6 +1,6 @@
 object ModuleEditorForm: TModuleEditorForm
-  Left = 139
-  Top = 153
+  Left = 169
+  Top = 300
   Width = 808
   Height = 402
   Caption = 'Module Editor'
@@ -12,17 +12,21 @@ object ModuleEditorForm: TModuleEditorForm
   Font.Style = []
   OldCreateOrder = False
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 14
   inline ModuleEditor1: TModuleEditor
-    Width = 800
-    Height = 375
+    Left = 0
+    Top = 0
+    Width = 839
+    Height = 397
     Align = alClient
     TabOrder = 2
     inherited ModuleFrame1: TModuleFrame
-      Width = 377
-      Height = 329
+      Left = 9
+      Width = 406
+      Height = 354
       inherited ModuleList: TListView
-        Height = 329
+        Width = 406
+        Height = 354
         Align = alClient
         OnDblClick = ModuleFrame1ModuleListDblClick
       end
@@ -33,19 +37,19 @@ object ModuleEditorForm: TModuleEditorForm
     end
   end
   object OK: TBitBtn
-    Left = 616
-    Top = 344
-    Width = 75
-    Height = 25
+    Left = 663
+    Top = 370
+    Width = 81
+    Height = 27
     Caption = 'OK'
     ModalResult = 1
     TabOrder = 0
   end
   object Cancel: TBitBtn
-    Left = 704
-    Top = 344
-    Width = 75
-    Height = 25
+    Left = 758
+    Top = 370
+    Width = 81
+    Height = 27
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 1

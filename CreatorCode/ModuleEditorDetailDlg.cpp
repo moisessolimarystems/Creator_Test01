@@ -65,6 +65,7 @@ void __fastcall TModuleEditorDetailsDlg::UpdateButtonClick(TObject *Sender)
      mod_type = ModTypeCombo->Text;
      mod_max = static_cast<unsigned short>(strtol(ModMaxEdit->Text.c_str(), &endptr, 10));
      mod_spd_def = ModSpdDefaultCheckBox->Checked;
+     mod_spde_def = ModSpdeDefaultCheckBox->Checked;
      mod_connect_def = ModConnectivityDefaultCheckBox->Checked;
      mod_connect_mod = ModConnectivityModuleCheckBox->Checked;
 
@@ -87,6 +88,7 @@ void __fastcall TModuleEditorDetailsDlg::UpdateButtonClick(TObject *Sender)
                                   mod_type,
                                   mod_max,
                                   mod_spd_def,
+                                  mod_spde_def,
                                   mod_connect_def,
                                   mod_connect_mod,
                                   mod_iConvert_def,
@@ -106,6 +108,7 @@ void __fastcall TModuleEditorDetailsDlg::UpdateButtonClick(TObject *Sender)
         lookup->updateMDVersionRemoved(mod_id, mod_version_removed);
         lookup->updateMDMax(mod_id, mod_max);
         lookup->updateMDSpdDefault(mod_id, mod_spd_def);
+        lookup->updateMDSpdeDefault(mod_id, mod_spde_def);
         lookup->updateMDConnectivityDefault(mod_id, mod_connect_def);
         lookup->updateMDConnectivityModule(mod_id, mod_connect_mod);
         lookup->updateMDAction(mod_id, mod_type);

@@ -15,8 +15,8 @@
 //------------------------------------------------------------------------------
 // Defines
 //------------------------------------------------------------------------------
-const int MAX_SOLIMAR_PRODUCTS = 13;    // 9 Products Total now
-
+const int MAX_SOLIMAR_PRODUCTS = 15;    // 9 Products Total, should be largest product ID + 1
+                                        // current largest product ID = 14
 struct SolimarProduct
 {
    SolimarProduct(){ version = 0x0000;}
@@ -44,6 +44,7 @@ public:
    int pid;                             //product id
    unsigned short id;                   //module id
    bool spd_default;                    //spd default
+   bool spde_default;                    //spde default
    bool con_module;                     //connectivity module
    bool con_default;                    //connectivity default
    bool iConvert_module;                //iConvert module
@@ -80,6 +81,7 @@ class CLookup
    ModuleDetail* m_solScriptModuleDetail[64];
    ModuleDetail* m_SDXDesignerModuleDetail[64];
    ModuleDetail* m_PDFUtilityModuleDetail[64];
+   ModuleDetail* m_SpdeModuleDetail[64];
 
   public:
    CLookup();
@@ -104,6 +106,7 @@ class CLookup
    void updateMDiConvertDefault(unsigned short module_id, bool biConvert_default);
    void updateMDiConvertModule(unsigned short module_id, bool biConvert_module);
    void updateMDSpdDefault(unsigned short module_id, bool bspd_default);
+   void updateMDSpdeDefault(unsigned short module_id, bool bspde_default);
    void updateMDConnectivityDefault(unsigned short module_id, bool bcon_default);
    void updateMDConnectivityModule(unsigned short module_id, bool bcon_module);
 
@@ -112,7 +115,7 @@ class CLookup
                         AnsiString module_engineer,
                         AnsiString module_partnumber, unsigned short module_version_added,
                         unsigned short module_version_removed, AnsiString module_type,
-                        unsigned short module_max, bool module_spd_def,
+                        unsigned short module_max, bool module_spd_def, bool module_spde_def,
                         bool module_connect_def, bool module_connect_mod,
                         bool module_iConvert_def, bool module_iConvert_mod);
 

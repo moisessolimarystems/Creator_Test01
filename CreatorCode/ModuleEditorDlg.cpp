@@ -304,6 +304,25 @@ bool TModuleEditorForm::getModuleSpdDefault()
 }
 
 //==============================================================================
+// Function:    getModuleSpdeDefault();
+// Purpose:     returns true or false depending whether SpdDefault is checked or not
+// Parameters:  None
+// Returns:     bool
+//==============================================================================
+bool TModuleEditorForm::getModuleSpdeDefault()
+{
+     TListItem* selected(ModuleEditor1->ModuleFrame1->ModuleList->Selected);
+     if(selected==NULL)
+        return false;
+
+     ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
+     if ( (detail->spde_default) == 1)
+        return true;
+     else
+        return false;
+}
+
+//==============================================================================
 // Function:    getModuleConnectivityDefault();
 // Purpose:     returns true or false depending whether mdConnectivityDefault is
 //              checked or not

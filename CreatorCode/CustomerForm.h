@@ -124,6 +124,8 @@ __published:	// IDE-managed Components
    TLabel *Label11;
    TLabel *licenseLabel;
         TMenuItem *ModuleEditor;
+        TListBox *ZoomDetailListBox;
+        TScrollBar *CellViewScrollBar;
 	void __fastcall Number1Click(TObject *Sender);
 	void __fastcall mmAllClick(TObject *Sender);
 	void __fastcall Name1Click(TObject *Sender);
@@ -144,6 +146,7 @@ __published:	// IDE-managed Components
         void __fastcall CustomerGridKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
         void __fastcall ModuleEditorClick(TObject *Sender);
+        void __fastcall CellViewScrollBarChange(TObject *Sender);
 private:	// User declarations
 	void __fastcall SetCustomerForm();
 public:		// User declarations
@@ -168,6 +171,9 @@ public:		// User declarations
         int cell;
         char* endptr;
         bool hex_view;
+
+private:
+        bool resetScroll;
 };
 //---------------------------------------------------------------------------
 extern TCustForm *CustForm;

@@ -37,6 +37,7 @@ __published:	// IDE-managed Components
         TLabel *ProductIDLabel;
         TCheckBox *ModiConvertDefaultCheckBox;
         TCheckBox *ModiConvertModuleCheckBox;
+        TCheckBox *ModSpdeDefaultCheckBox;
         void __fastcall UpdateButtonClick(TObject *Sender);
         void __fastcall ModConnectivityDefaultCheckBoxClick(
           TObject *Sender);
@@ -57,6 +58,7 @@ public:		// User declarations
         AnsiString mod_type;
         AnsiString mod_partnumber;
         bool mod_spd_def;
+        bool mod_spde_def;
         bool mod_connect_def;
         bool mod_connect_mod;
         bool mod_iConvert_def;

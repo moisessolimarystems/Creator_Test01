@@ -44,6 +44,7 @@ public:		// User declarations
         AnsiString getModuleEngineer();// returns engineer that worked on module
         AnsiString getModulePartNumber(); // returns part number associate w/ module
         bool getModuleSpdDefault(); // returns true if Spd Default
+        bool getModuleSpdeDefault(); // returns true if Spd Default
         bool getModuleiConvertDefault(); // returns true if iConvert Default
         bool getModuleiConvertModule(); // returns true if iConvert Module
         bool getModuleConnectivityDefault(); // returns true if Connectivity Default
@@ -62,6 +63,7 @@ public:		// User declarations
         AnsiString mod_engineer;
         AnsiString mod_partnumber;
         bool mod_spd_def;
+        bool mode_spde_def;
         bool mod_connect_def;
         bool mod_connect_mod;
         bool mod_iConvert_def;
