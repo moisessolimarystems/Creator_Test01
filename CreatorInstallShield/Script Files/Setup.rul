@@ -81,8 +81,9 @@ end;
     //prototype CreateODBC_SQLCreatorKey(); 
     prototype SetupFolders();
     prototype CheckRequirements(); 
-    prototype InstallSentinelDriver();
     prototype InstallLicensing(); 
+    prototype InstallSentinelDriver();
+    prototype InstallDotNet();
     
     // your global variables   
     BOOL        	bIsShellExplorer;
@@ -90,7 +91,6 @@ end;
     VARIANT			vDllString;   
     OSTYPE			gstructOSTYPE;
     UNINSTALLTYPE 	gstructUNINSTALLTYPE;
-    BOOL            bInstallSentinel;
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,6 @@ Dlg_ObjDialogs:
     SetStatusWindow(0, "");
     Enable(STATUSEX);
     StatusUpdate(ON, 100);
-    bInstallSentinel = TRUE;    //-EM
     return 0;
 end;
 
@@ -323,10 +322,6 @@ begin
     	// setup default status 
  		SetStatusWindow(0, "");    
  		
- 		//want to install the rainbow driver - set for unconditional installation -EM
- 		//if(ComponentIsItemSelected(MEDIA,"                                         
- 		bInstallSentinel = TRUE;
- 		
 		Enable(STATUSEX);
 		StatusUpdate(ON, 100); 
 	endif;
@@ -372,7 +367,6 @@ begin
                                      
 	//Create the ODBC_SQLCreator bde key...                                     
     //CreateODBC_SQLCreatorKey();         
-    bInstallSentinel = FALSE;
 end;
  
  ///////////////////////////////////////////////////////////////////////////////
@@ -485,17 +479,10 @@ begin
     Disable(STATUSEX);
 
     ShowObjWizardPages(NEXT);
-/*
-    if(bInstallSentinel) then 
-  		SdShowMsg("Installing Sentinel Driver...Please wait.", TRUE);
-        InstallSentinelDriver();                   
-  		SdShowMsg("Sentinel Driver has been installed", TRUE);
-	endif;    
-*/
-    SdShowMsg("Installing Solimar Licensing", TRUE);
+
+    SdShowMsg("Installing Solimar Licensing.....Please wait.", TRUE);
     InstallLicensing();   
-    SdShowMsg("Installing Solimar Licensing", FALSE);                          
-    SdShowMsg("Solimar Licensing has been installed", TRUE);
+    SdShowMsg("Installing Solimar Licensing.....Please wait.", FALSE);                          
       
 	bOpt1  = FALSE;
     bOpt2  = TRUE;
@@ -529,11 +516,7 @@ begin
  	bOpt1   = FALSE;
    	bOpt2   = FALSE;
    
-    //Not sure if this should go in here or not
-    //if(bInstallSentinel) then
-    //    InstallSentinelDriver();  
-	//endif;    
-   	   
+ 	   
     if ( gstructUNINSTALLTYPE.AddRemove ) then
     	szMsg1  = "Setup has finished removing " + @PRODUCT_NAME + " from your system.";
     	szTitle = "Uninstallation Complete.";
@@ -723,29 +706,31 @@ begin
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
 	szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","LicenseViewer", nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\LicenseViewer.msi /qn" ;  
+		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif;                  
-    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\LicenseViewer.msi /qn" ; 
+    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi /qn" ; 
     LaunchAppAndWait(szPath, szOpts, WAIT);     
     
 	szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarLicenseManager",nvType, svValue, nvSize) == 0) then 
-		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseManager.msi /qn" ;  
+		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseManager.msi /qn"  ;
+    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarInternalRelease",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ; 
+		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ; 
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ;
+    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
- 
+    
+    InstallSentinelDriver();
 end;             
+
 //=============================================================================  
 //
 // Function: InstallSentinelDriver()
@@ -783,13 +768,42 @@ begin
 	//install new sentinel driver if necessary  	
 //    sentPath = INSTALLDIR + "\source\\Rainbow\\SPNComboInst1.0.2.exe";  
     //MessageBox("The sent path is " + sentPath, MB_OK);
-	sentPath = SRCDIR + "\System\\SPNComboInst1.0.2.exe";
+	sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe";
     sentOpts = " /v\"/q REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
     LaunchAppAndWait(sentPath, sentOpts, WAIT);
-end;
+end;    
 
-
-
+//=============================================================================  
+//
+// Function: 	InstallDotNet()
+// Purpose:   	This function will call the executable that will install the 
+//				latest sentinel drivers for the rainbow protection keys.
+// Parameters:	None
+// Returns:		None
+//
+//=============================================================================      
+function InstallDotNet()	
+	STRING szSubKey, svPath;
+	INT nvType, nvSize; 
+begin                   
+    
+    /*if (RegDBKeyExist (szSubKey) < 0) then
+		AskYesNo("Do you want to install the Microsoft .NET Framework? Components to be installed are dependent on the framework " +  
+	 	         "to function. Please install the .NET Framework found in the installation setup directory " + 
+	           	 "or from Microsoft.com", YES); 	
+    endif;
+    */
+    //check if .net framework is needed
+    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);                                                                       
+    szSubKey = "SOFTWARE\\Microsoft\\.NETFramework\\policy\\v1.1";
+    // If the path in the registry does not exist
+    if (RegDBKeyExist (szSubKey) < 0) then
+	//check if .net framework is installed
+		svPath = SRCDIR ^ "Common\\SolimarLicensing" ^ "dotnetfx.exe";
+		LaunchAppAndWait(svPath, "/t:" + SUPPORTDIR + "\\tmpnet /c", WAIT);
+		LaunchAppAndWait(WINSYSDIR ^ "msiexec", "/i " + SUPPORTDIR + "\\tmpnet\\netfx.msi",WAIT);
+	endif;
+end;    
 
 // --- include script file section ---
 

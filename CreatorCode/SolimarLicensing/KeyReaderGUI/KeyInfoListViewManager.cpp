@@ -59,8 +59,7 @@ KeyInfoListViewManager::~KeyInfoListViewManager()
 
 bool KeyInfoListViewManager::PopulateView()
 {
-bool retbool;
-bool PopRetVal = true;
+   bool FillRowSuccess = true;
 	KeyInfoStructure TheKeyInfoStructure;
 	int numkeys = OurCommLink->GetNumKeys();
 
@@ -93,15 +92,9 @@ bool PopRetVal = true;
 		TheKeyInfoStructure.License.SetString(retval);
 
 		//fills the row with the info stored in the structure
-		retbool = FillRow(TheKeyInfoStructure);
-//#undef MessageBox
-		if(retbool == false)
-		{
-//			MessageBox::Show("Re-Insert the Key!");
-			PopRetVal = false;
-		}
+		FillRowSuccess = FillRow(TheKeyInfoStructure);
 	}
-	return PopRetVal;
+	return FillRowSuccess;
 }
 
 //maps the status id returned from the lower layer app
@@ -211,6 +204,9 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		listViewItem1->SubItems->Add(S"1");
 
 	char retval[10];
+
+   //Convert the hours left into Days Left as requested by Tech Support
+   TheKeyInfoStructure.HoursLeft /= 24;
 	sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
 	listViewItem1->SubItems->Add(retval);
 

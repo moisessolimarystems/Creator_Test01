@@ -1,5 +1,5 @@
 [General]
-Version=3.00.000
+Version=2.24.000003
 
 [Project:General]
 Version=4
@@ -21,7 +21,7 @@ EmailAddress=
 Copyright=
 Summary=
 Name=Creator
-Version=1.00.000
+Version=2.24.000003
 ExeFile=Creator.exe
 Comments=
 
