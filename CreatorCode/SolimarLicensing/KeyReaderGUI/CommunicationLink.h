@@ -51,6 +51,8 @@ public:
 	long GetTotalLicenses(Object* ModuleID, Object* KeyNumber);
 	long GetLicensesInUse(Object* ModuleID, Object* KeyNumber);
 
+   int GetProductID();
+
 	//checks to see if the password is valid
 	HRESULT CheckPassword(String* InputString);
 	HRESULT EnterPasswordPacket(VARIANT* TheData, BSTR* Verification_Code); 
@@ -75,6 +77,9 @@ private:
 
 	//the number of modules in the list
 	int NumModules;
+
+   //The current product id
+   int ProductID;
 
 	//A module in the module list
 	VARIANT* Module;
