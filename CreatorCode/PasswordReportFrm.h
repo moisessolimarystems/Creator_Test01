@@ -12,6 +12,7 @@
 #include <DBTables.hpp>
 #include <ExtCtrls.hpp>
 #include <Qrctrls.hpp>
+#include <DB.hpp>
 //----------------------------------------------------------------------------
 class TPasswordReport : public TQuickRep
 {

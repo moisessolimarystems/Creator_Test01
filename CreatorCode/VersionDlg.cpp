@@ -81,7 +81,7 @@ void __fastcall TDlgVersion::OKBtnClick(TObject *Sender)
       version = static_cast<unsigned short>(strtol(VersionEdit->Text.c_str(), &endptr, 16));
 
       //if user does not have permission to convert a dos key to an nt key, verify version
-      if( DOS_to_NT == False )
+      if( DOS_to_NT == false )
       {
    	   if( init_version < 0x4000 && version >= 0x4000 )
          {

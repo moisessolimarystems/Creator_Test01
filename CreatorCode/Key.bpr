@@ -2,17 +2,18 @@
 <!-- C++Builder XML Project -->
 <PROJECT>
   <MACROS>
-    <VERSION value="BCB.05.03"/>
+    <VERSION value="BCB.06.00"/>
     <PROJECT value="libs\Key.lib"/>
     <OBJFILES value="objs\SSKey.obj objs\Pkey.obj objs\Spdkey.obj objs\ssckey.obj 
       objs\Keymanag.obj"/>
     <RESFILES value=""/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES)"/>
-    <LIBFILES value="KEY\3prty\RAINBOW\WINNT\Spromeps.lib"/>
+    <LIBFILES value=""/>
     <LIBRARIES value=""/>
+    <SPARELIBS value=""/>
     <PACKAGES value=""/>
-    <PATHCPP value=".;KEY"/>
+    <PATHCPP value=".;KEY;KEY;KEY;KEY;KEY"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -24,17 +25,39 @@
     <LIBPATH value="KEY;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\spdCode\Spdnt\KEY\;&quot;E:\spdmain_5_12\&quot;"/>
     <WARNINGS value="-w-par"/>
     <LISTFILE value=""/>
+    <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
-    <PFLAGS value="-N2objs -N0objs -$Y- -$L- -$D- -v -JPHNE -M"/>
+    <CFLAG1 value="-O2 -H=c:\PROGRA~1\borland\CBUILD~2\lib\vcl60.csm -Hc -Vx -Ve -X- -a8 -b- 
+      -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-N2objs -N0objs -$Y- -$L- -$D- -$A8 -v -JPHNE -M"/>
     <AFLAGS value="/mx /w2 /zn"/>
     <LFLAGS value=""/>
+    <OTHERFILES value=""/>
   </OPTIONS>
   <LINKER>
     <ALLOBJ value="$(OBJFILES)"/>
     <ALLLIB value=""/>
+    <OTHERFILES value=""/>
   </LINKER>
+  <FILELIST>
+      <FILE FILENAME="Key.bpf" FORMNAME="" UNITNAME="Key" CONTAINERID="BPF" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\SSKey.cpp" FORMNAME="" UNITNAME="SSKey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\Pkey.cpp" FORMNAME="" UNITNAME="Pkey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\Spdkey.cpp" FORMNAME="" UNITNAME="Spdkey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\ssckey.cpp" FORMNAME="" UNITNAME="ssckey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\Keymanag.cpp" FORMNAME="" UNITNAME="Keymanag" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <FILES>
+    <FILE type="override" value="..\..\SpdNt\KEY\Keymanag.cpp" translator="Auto">
+      <CFLAG1 value=" -O2"/>
+      <INCLUDEPATH value=" $(BCB)\include;$(BCB)\include\vcl;..\spdnt\key\;&quot;..\spdnt\&quot;"/>
+    </FILE>
+  </FILES>
+
   <IDEOPTIONS>
 [Version Info]
 IncludeVerInfo=0
@@ -128,9 +151,14 @@ DebugSourceDirs=$(BCB)\source\vcl
 
 [Parameters]
 RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
 HostApplication=
 RemoteHost=
 RemotePath=
+RemoteLauncher=
+RemoteCWD=
 RemoteDebug=0
 
 [Compiler]
@@ -143,11 +171,4 @@ ActiveLang=
 ProjectLang=
 RootDir=
   </IDEOPTIONS>
-
-  <FILES>
-    <FILE type="override" value="..\..\SpdNt\KEY\Keymanag.cpp" translator="Auto">
-      <CFLAG1 value=" -O2"/>
-      <INCLUDEPATH value=" $(BCB)\include;$(BCB)\include\vcl;..\spdnt\key\;&quot;..\spdnt\&quot;"/>
-    </FILE>
-  </FILES>
 </PROJECT>

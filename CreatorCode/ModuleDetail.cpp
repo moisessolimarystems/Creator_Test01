@@ -200,6 +200,7 @@ void TModuleFrame::initialize(int mode, int productID, void(__closure *onModuleC
 
    //add columns and set their width
    SetupColumns();
+
    // disable the module popup for the key view
    m_bPopup = false;
    ModulePopup->Items->Items[0]->Visible = false;
@@ -484,11 +485,7 @@ void __fastcall TModuleFrame::ModuleListKeyPress(TObject *Sender,
 //==============================================================================
 bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
 {
-   //generate password by selecting a module... increments module count by one
-   //module has no associated purchase order
-
-   unsigned long password;
-   //int new_unit_value(1);
+   char password_string[128];
 
    //get selected list item, from list item get pointer to ModuleDetail structure
    TListItem* selected(ModuleList->Selected);
@@ -548,9 +545,14 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
             units = 0;
 
-         //spd_key->setLicense(new_module_id,0);
-         //password = keyMaster->getModZeroPassword(spd_key, detail->id, static_cast<ProductId>(spd_key->productId), spd_key->productVersion);
-         password = keyMaster->getModulePassword(spd_key, detail->id, static_cast<ProductId>(spd_key->productId), spd_key->productVersion, units);
+         keyMaster->getModulePassword(spd_key,
+                                      detail->id,
+                                      static_cast<ProductId>(spd_key->productId),
+                                      spd_key->productVersion,
+                                      units,
+                                      password_string
+                                     );
+
          //applies module password to key
          keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
       }
@@ -564,8 +566,13 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       int available(detail->max - units);
       if( available > 0 )
       {
-         password = keyMaster->getModulePassword(spd_key, (uchar)detail->id, static_cast<ProductId>(spd_key->productId), spd_key->productVersion, units);
-
+         keyMaster->getModulePassword(spd_key,
+                                      (uchar)detail->id,
+                                      static_cast<ProductId>(spd_key->productId),
+                                      spd_key->productVersion,
+                                      units,
+                                      password_string
+                                     );
          keyMaster->applyModPassword(key_record, detail->id, units);
       }
       else
@@ -576,13 +583,6 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    }
    else //- key_status not valid, do not generate a module password
       return false;
-
-   //convert password to string
-   char password_string[14];
-   if (bPasswordExt)
-      sprintf(password_string, "%8X-%d", password, units+1);
-   else
-      sprintf( password_string, "%8X", password);
 
    //execute stored procedure to update database
    try
@@ -662,8 +662,9 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
 //==============================================================================
 bool TModuleFrame::createPagesPerMinutePassword()
 {
+   char password_string[128];
+
    //generate password by selecting a module...
-   unsigned long password;
    int pages(0);
    int ext(0);
 
@@ -732,6 +733,35 @@ bool TModuleFrame::createPagesPerMinutePassword()
       Application->MessageBox("Invalid entry, number must \n\rrange from 1 to 500. \n\rAnything greater than 500 is unlimited", "Warning", MB_OK|MB_ICONWARNING );
       return false;
    }
+   long ppmModID;
+
+   //detail->pages_per_minute = pages;
+   //also translate the mod id to the Pages per minute mod id as specified in the xml file
+   switch(detail->id)
+   {
+        case XCH_IPDS_ID:
+                key_record->xch_ipds_ppm = pages;
+                ppmModID =  56;
+                break;
+        case XCH_PCL_ID:
+                key_record->xch_pcl_ppm = pages;
+                ppmModID = 58;
+                break;
+        case XCH_PS_ID:
+                key_record->xch_ps_ppm = pages;
+                ppmModID = 60;
+                break;
+        case XCH_PS_DBCS_ID:
+                key_record->xch_ps_dbcs_ppm = pages;
+                ppmModID = 64;
+                break;
+        case AFPDS_PS_ID:
+                key_record->afpds_ps_ppm = pages;
+                ppmModID = 66;
+                break;
+        default:
+                break;
+   }
 
    //check if module is default
    if( key_record->pkey->isOnTrial() )
@@ -747,7 +777,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       }
       else // ...otherwise create a password
       {
-         password = keyMaster->getPagesPerMinutePassword(spd_key, ext);
+         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
 
          //applies module password to key
          keyMaster->applyPagesPerMinutePassword(key_record);
@@ -760,8 +790,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       int available(ext < MAX_PPM_EXTENSIONS);  
       if( available > 0 )
       {
-         password = keyMaster->getPagesPerMinutePassword(spd_key, ext);
-
+         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
          keyMaster->applyPagesPerMinutePassword(key_record);
       }
       else
@@ -777,36 +806,9 @@ bool TModuleFrame::createPagesPerMinutePassword()
    // to the key.  The modules reflect the key information so we can't just update
    // the modules.
 
-   //detail->pages_per_minute = pages;
-   switch(detail->id)
-   {
-        case XCH_IPDS_ID:
-                key_record->xch_ipds_ppm = pages;
-                break;
-        case XCH_PCL_ID:
-                key_record->xch_pcl_ppm = pages;
-                break;
-        case XCH_PS_ID:
-                key_record->xch_ps_ppm = pages;
-                break;
-        case XCH_PS_DBCS_ID:
-                key_record->xch_ps_dbcs_ppm = pages;
-                break;
-        case AFPDS_PS_ID:
-                key_record->afpds_ps_ppm = pages;
-                break;
-        default:
-                break;
-   }
 
    // generate the last protion of the password
    int code =((ulong(detail->id)&0xFF) << 12) |  (ulong(pages)&0xFFF);
-
-
-   //convert password to string
-   char password_string[20];
-   sprintf( password_string, "%8X-%X", password, code);
-
 
    //execute stored procedure to update database
    try
@@ -893,6 +895,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       ModuleDetailQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
       ModuleDetailQuery->ParamByName("password")->AsString = password_string;
       ModuleDetailQuery->ParamByName("units")->AsInteger = pages;
+
       // ICONVERT products have an SDRid of 10XX, and therefore have to check
       // to see if the product is ICONVERT or other.
       ModuleDetailQuery->ParamByName("descid")->AsInteger = detail->id + 500;

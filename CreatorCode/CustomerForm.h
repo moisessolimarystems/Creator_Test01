@@ -28,6 +28,7 @@
 #include "ModuleDetail.h"
 #include <Forms.hpp>
 #include "ModuleEditor.h"
+#include <DB.hpp>
 
 #define MAX_KEYS                    0x100
 #define HEX_MODE                    16

@@ -850,10 +850,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
                         SSProtectionKey* ss_key;
                         ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-                        ZoomDetailTextDescription0->Visible = True;
+                        ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Index Servers";
 
-                        ZoomDetailValue0->Visible = True;
+                        ZoomDetailValue0->Visible = true;
                         itoa(ss_key->keyDataBlock.data[INDEX_SERVERS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
                 }
@@ -865,10 +865,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
                         SSProtectionKey* ss_key;
                         ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-                        ZoomDetailTextDescription0->Visible = True;
+                        ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Report Servers";
 
-                        ZoomDetailValue0->Visible = True;
+                        ZoomDetailValue0->Visible = true;
                         itoa(ss_key->keyDataBlock.data[REPORT_SERVERS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
                 }
@@ -880,10 +880,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
                         SSProtectionKey* ss_key;
                         ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-                        ZoomDetailTextDescription0->Visible = True;
+                        ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Aplication Databases";
 
-                        ZoomDetailValue0->Visible = True;
+                        ZoomDetailValue0->Visible = true;
                         itoa(ss_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
                 }
@@ -895,10 +895,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
                         SSProtectionKey* ss_key;
                         ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-                        ZoomDetailTextDescription0->Visible = True;
+                        ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Concurrent Users";
 
-                        ZoomDetailValue0->Visible = True;
+                        ZoomDetailValue0->Visible = true;
                         itoa(ss_key->keyDataBlock.data[CONCURRENT_USERS_25_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
                 }
@@ -909,10 +909,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    else if( cell == INITIAL_COUNTER_CELL )
    {
       //set used description fields to visible
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Initial Counter Cell";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
 
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
@@ -925,10 +925,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    else if( cell == EXTENDED_COUNTER_CELL )
    {
       //set used description fields to visible
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Extended Counter Cell";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
       else
@@ -939,10 +939,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    }
    else if( cell == EXPIRATION_DATE_CELL)
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Expiration Date";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       temp_time = (time_t*)(&(attached_key->pkey->keyDataBlock.data[EXPIRATION_DATE_CELL]));
       gmtime_x = gmtime(temp_time);
       strftime( my_time, 50, "%x", gmtime_x );
@@ -950,10 +950,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    }
    else if( cell == OUTPUT_UNIT_CELL)
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Max LU/Output Pool Value";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
       else
@@ -965,67 +965,67 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    }
    else if( cell == PRODUCT_ID_CELL)
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Product Type";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       ZoomDetailValue0->Text = attached_key->getProductText();
    }
    else if (cell == KEY_TYPE_CELL)
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Key Type";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       ZoomDetailValue0->Text = attached_key->getKeyTypeText(attached_key->pkey->keyType);
 
    }
    else if( cell == PRODUCT_VERSION_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Product Version";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       ZoomDetailValue0->Text = attached_key->getVersionText();
    }
    else if( cell == KEY_VERSION_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Key Version";
 
-      ZoomDetailValue0->Visible = False;
+      ZoomDetailValue0->Visible = false;
       //ZoomDetailValue->Text = attached_key->getVersionText();
    }
    else if( cell == KEY_USES_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Number of times programmed";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       ZoomDetailValue0->Text = attached_key->pkey->keyDataBlock.data[KEY_USES_CELL];
    }
    else if( cell == KEY_STATUS_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
+      ZoomDetailValue0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Status";
       ZoomDetailValue0->Text = attached_key->getStatusText();
    }
    else if( cell == CUSTOMER_NUMBER_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Customer Number";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       itoa(attached_key->pkey->keyDataBlock.data[CUSTOMER_NUMBER_CELL], cell_text, 16 );
       ZoomDetailValue0->Text = cell_text;
    }
    else if( cell == KEY_NUMBER_CELL )
    {
-      ZoomDetailTextDescription0->Visible = True;
+      ZoomDetailTextDescription0->Visible = true;
       ZoomDetailTextDescription0->Caption = "Key Number";
 
-      ZoomDetailValue0->Visible = True;
+      ZoomDetailValue0->Visible = true;
       itoa(attached_key->pkey->keyDataBlock.data[KEY_NUMBER_CELL], cell_text, 16 );
       ZoomDetailValue0->Text = cell_text;
    }
@@ -1036,10 +1036,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
          SSProtectionKey* ss_key;
          ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-         ZoomDetailTextDescription0->Visible = True;
+         ZoomDetailTextDescription0->Visible = true;
          ZoomDetailTextDescription0->Caption = "Master Not Found Cell";
 
-         ZoomDetailValue0->Visible = True;
+         ZoomDetailValue0->Visible = true;
          itoa(ss_key->keyDataBlock.data[MASTER_NOT_FOUND_COUNTER_CELL], cell_text, 16);
          ZoomDetailValue0->Text = cell_text;
       }
@@ -1051,10 +1051,10 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
          SSProtectionKey* ss_key;
          ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
-         ZoomDetailTextDescription0->Visible = True;
+         ZoomDetailTextDescription0->Visible = true;
          ZoomDetailTextDescription0->Caption = "Master/Slave Cell";
 
-         ZoomDetailValue0->Visible = True;
+         ZoomDetailValue0->Visible = true;
          ZoomDetailValue0->Text = (ss_key->isSlave()) ? "Slave" : "Master";
       }
    }*/

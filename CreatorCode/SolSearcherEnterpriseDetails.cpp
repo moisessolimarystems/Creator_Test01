@@ -104,7 +104,7 @@ void TSolSearcherDetails::GeneratePassword(int type)
 {
    int units(0);
    int descriptionId;
-   char password_string[14];
+   char password_string[128];
    AnsiString fieldName;
 
    //
@@ -113,7 +113,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
         return;
    unsigned short min(0);
    unsigned short max;
-   unsigned long ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
+//   unsigned long ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
+AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
    void ( __closure *ApplyPassword)(SKeyRecord* keyrec, unsigned short units_licensed);
 
    switch (type) {
@@ -178,8 +179,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
       }
 
       //generate password
-      unsigned long password = CreatePassword(m_pKey, units);
-      if(!password) {
+      AnsiString password = CreatePassword(m_pKey, units);
+      if(!password.c_str()) {
          Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
          return;
       }
@@ -188,8 +189,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
       ApplyPassword(m_pKeyRecord, units);
 
       //format password
-      sprintf( password_string, "%8X-%1d", password, units);
-
+//      sprintf( password_string, "%8X-%1d", password.c_str();, units);
+        sprintf( password_string, "%8s", password.c_str());
       //Update database
       try
       {

@@ -22,6 +22,7 @@
 #include <OleCtrls.hpp>
 #include <ComCtrls.hpp>
 #include <Menus.hpp>
+#include <DB.hpp>
 
 //------------------------------------------------------------------------------
 // Defines

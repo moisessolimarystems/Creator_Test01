@@ -128,6 +128,12 @@ public:
    int concurrent_users;
    bool slave;
 
+   int num_days;
+
+   //these two arrays match up such that the license count for mod_id[0] is = license_count[0];
+   int module_id_array[128];
+   int license_count_array[128];
+
 };
 
 #endif

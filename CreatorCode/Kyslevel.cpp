@@ -61,6 +61,9 @@ SKeyRecord::SKeyRecord() :
 {
    memset(description, 0, sizeof(description));
    activationDate = time(NULL);//set to current time
+   num_days = 0;
+   memset(module_id_array, 0, sizeof(module_id_array));
+   memset(license_count_array, 0, sizeof(license_count_array));
 }
 
 

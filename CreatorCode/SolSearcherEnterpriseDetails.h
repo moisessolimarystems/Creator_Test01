@@ -15,6 +15,7 @@
 #include <Menus.hpp>
 #include <Db.hpp>
 #include <DBTables.hpp>
+#include <DB.hpp>
 //---------------------------------------------------------------------------
 class TSolSearcherDetails : public TFrame
 {
