@@ -1497,7 +1497,7 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 			WriteLicense(ppm_module_id, ppm_pages);
 			
 			// Write the pages per minute extension count license
-			KeySpec::Module &extensions_module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][ppm_module_id]);
+			KeySpec::Module &extensions_module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][L"Pages Per Minute Extensions"]);
 			WriteBitsPhysical(extensions_module.offset, extensions_module.bits, _variant_t((long)ppm_extensions));
 			
 			// success 
@@ -1632,8 +1632,15 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 				password_generated = true;
 			}
-			// if the module is a pages per minute module
-			else if (module.id==56 || module.id==58 || module.id==60 || module.id==64 || module.id==66)
+			// if the module is a pages per minute module (andt he product is an spd or spd derivative)
+			else if
+			(
+				/* Spd Product */
+				(product.id==0 || product.id==6 || product.id==11)
+				&&
+				/* Pages Per Minute Module */
+				(module.id==68 || module.id==70 || module.id==160 || module.id==64 || module.id==66)
+			)
 			{
 				// The license_count parameter for pages per minute must consist of the following:
 				// bottom 4 bits: ppm extension

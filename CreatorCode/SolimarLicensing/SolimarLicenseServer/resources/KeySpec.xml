@@ -178,61 +178,61 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		<KeyLayout name="SPD">
 			<ModuleList>
 				<!-- regular modules -->
-				<Module id="2"	offset="0x084" bits="4" name="XCHANGE::IPDS"/>
-				<Module id="3"	offset="0x080" bits="4" name="Job Separator"/>
-				<Module id="4"	offset="0x09c" bits="4" name="XCHANGE::Metacode"/>
-				<Module id="5"	offset="0x098" bits="4" name="3211::ASCII"/>
+				<Module id="2"	offset="0x084" bits="4" name="XCHANGE::IPDS" unlimited ="1"/>
+				<Module id="3"	offset="0x080" bits="4" name="Job Separator" unlimited ="1"/>
+				<Module id="4"	offset="0x09c" bits="4" name="XCHANGE::Metacode" unlimited ="1"/>
+				<Module id="5"	offset="0x098" bits="4" name="3211::ASCII" unlimited ="1"/>
 				<Module id="6"	offset="0x094" bits="4" name="Twinax Input"/>
 				<Module id="7"	offset="0x090" bits="4" name="SCSI SDI Output"/>
 				<Module id="8"	offset="0x0ac" bits="4" name="Parallel Input"/>
-				<Module id="9"	offset="0x0a8" bits="4" name="ASCII::3211"/>
-				<Module id="10"	offset="0x0a4" bits="4" name="SCS::3211"/>
-				<Module id="11"	offset="0x0a0" bits="4" name="SCS::Metacode"/>
-				<Module id="12" offset="0x0bc" bits="4" name="PostScript::PostScript (Rip)"/>
-				<Module id="13" offset="0x0b8" bits="4" name="PDF::PostScript (Rip)"/>
-				<Module id="14"	offset="0x0b4" bits="4" name="PCL::Metacode"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="ASCII::3211" unlimited ="1"/>
+				<Module id="10"	offset="0x0a4" bits="4" name="SCS::3211" unlimited ="1"/>
+				<Module id="11"	offset="0x0a0" bits="4" name="SCS::Metacode" unlimited ="1"/>
+				<Module id="12" offset="0x0bc" bits="4" name="PostScript::PostScript (Rip)" unlimited ="2"/>
+				<Module id="13" offset="0x0b8" bits="4" name="PDF::PostScript (Rip)" unlimited ="2"/>
+				<Module id="14"	offset="0x0b4" bits="4" name="PCL::Metacode" unlimited ="1"/>
 				<Module id="15"	offset="0x0b0" bits="4" name="Bus/Tag Output (PCI)"/>
 				<Module id="16"	offset="0x0cc" bits="4" name="Bus/Tag Output (AT)"/>
-				<Module id="17"	offset="0x0c8" bits="4" name="File Queuer"/>
-				<Module id="18"	offset="0x0c4" bits="4" name="Disk Spooler"/>
-				<Module id="19"	offset="0x0c0" bits="4" name="Data Converter"/>
-				<Module id="20"	offset="0x0dc" bits="4" name="XRocks Printer Controller"/>
-				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
-				<Module id="22"	offset="0x0d4" bits="4" name="Novell Queuer"/>
+				<Module id="17"	offset="0x0c8" bits="4" name="File Queuer" unlimited ="1"/>
+				<Module id="18"	offset="0x0c4" bits="4" name="Disk Spooler" unlimited ="1"/>
+				<Module id="19"	offset="0x0c0" bits="4" name="Data Converter" unlimited ="1"/>
+				<Module id="20"	offset="0x0dc" bits="4" name="XRocks Printer Controller" unlimited ="1"/>
+				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode" unlimited ="2"/>
+				<Module id="22"	offset="0x0d4" bits="4" name="Novell Queuer" unlimited ="1"/>
 				<Module id="23"	offset="0x0d0" bits="4" name="Novell Spooler" pool="128" unlimited="1"/>
-				<Module id="24"	offset="0x0ec" bits="4" name="Blocker"/>
-				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
+				<Module id="24"	offset="0x0ec" bits="4" name="Blocker" unlimited ="1"/>
+				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS" unlimited ="2"/>
 				<Module id="26"	offset="0x0e4" bits="4" name="Windows Printer Spooler" pool="128" unlimited="1"/>
-				<Module id="27"	offset="0x0e0" bits="4" name="FTP Queuer"/>
+				<Module id="27"	offset="0x0e0" bits="4" name="FTP Queuer" unlimited ="1"/>
 				<Module id="28"	offset="0x0fc" bits="4" name="TCP/IP lpd Input"/>
 				<Module id="29"	offset="0x0f8" bits="4" name="TCP/IP lpr Output" pool="128" unlimited="1"/>
 				<Module id="30"	offset="0x0f4" bits="4" name="TCP/IP Input (DOS)"/>
 				<Module id="31"	offset="0x0f0" bits="4" name="TCP/IP Output (DOS)"/>
 				<Module id="32"	offset="0x10c" bits="4" name="Dummy"/>
-				<Module id="33"	offset="0x108" bits="4" name="Trash Can"/>
-				<Module id="34"	offset="0x104" bits="4" name="PostScript Printer"/>
-				<Module id="35"	offset="0x100" bits="4" name="XCHANGE::PCL"/>
-				<Module id="36"	offset="0x11c" bits="4" name="RJE/SNA::3211"/>
+				<Module id="33"	offset="0x108" bits="4" name="Trash Can" unlimited ="1"/>
+				<Module id="34"	offset="0x104" bits="4" name="PostScript Printer" unlimited ="1"/>
+				<Module id="35"	offset="0x100" bits="4" name="XCHANGE::PCL" unlimited ="1"/>
+				<Module id="36"	offset="0x11c" bits="4" name="RJE/SNA::3211" unlimited ="1"/>
 				<Module id="37"	offset="0x118" bits="4" name="Parallel Output"/>
 				<Module id="38"	offset="0x114" bits="4" name="Bus/Tag Input (polaris)"/>
-				<Module id="39"	offset="0x110" bits="4" name="XCHANGE::PS"/>
-				<Module id="40"	offset="0x12c" bits="4" name="XCHANGE::PDF"/>
-				<Module id="41"	offset="0x128" bits="4" name="IPDS Output"/>
-				<Module id="42"	offset="0x124" bits="4" name="Line Data::AFPDS"/>
+				<Module id="39"	offset="0x110" bits="4" name="XCHANGE::PS" unlimited ="1"/>
+				<Module id="40"	offset="0x12c" bits="4" name="XCHANGE::PDF" unlimited ="1"/>
+				<Module id="41"	offset="0x128" bits="4" name="IPDS Output" unlimited ="1"/>
+				<Module id="42"	offset="0x124" bits="4" name="Line Data::AFPDS" unlimited ="1"/>
 				<!-- pages per minute extensions -->
 				<Module id="43" offset="0x120" bits="4" name="Pages Per Minute Extensions" isLicense="false"/>
 				<Module id="44"	offset="0x13c" bits="4" name="XCHANGE::PS (DBCS)"/>
-				<Module id="45"	offset="0x138" bits="4" name="File Inserter"/>
-				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
-				<Module id="47"	offset="0x130" bits="4" name="AFPDS::PS"/>
-				<Module id="48"	offset="0x14c" bits="4" name="PDF::Metacode"/>
-				<Module id="49"	offset="0x148" bits="4" name="PDF::IPDS"/>
-				<Module id="50"	offset="0x144" bits="4" name="PDF::TIFF"/>
-				<Module id="51"	offset="0x140" bits="4" name="AFPDS::PDF"/>
-				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF"/>
-				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
-				<Module id="54"	offset="0x154" bits="4" name="Output Selector"/>
-				<Module id="55" offset="0x150" bits="4" name="PDF::PostScript"/>				
+				<Module id="45"	offset="0x138" bits="4" name="File Inserter" unlimited ="1"/>
+				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF" unlimited ="2"/>
+				<Module id="47"	offset="0x130" bits="4" name="AFPDS::PS" unlimited ="1"/>
+				<Module id="48"	offset="0x14c" bits="4" name="PDF::Metacode" unlimited ="1"/>
+				<Module id="49"	offset="0x148" bits="4" name="PDF::IPDS" unlimited ="1"/>
+				<Module id="50"	offset="0x144" bits="4" name="PDF::TIFF" unlimited ="1"/>
+				<Module id="51"	offset="0x140" bits="4" name="AFPDS::PDF" unlimited ="1"/>
+				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF" unlimited ="2"/>
+				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript" unlimited ="2"/>
+				<Module id="54"	offset="0x154" bits="4" name="Output Selector" unlimited ="1"/>
+				<Module id="55" offset="0x150" bits="4" name="PDF::PostScript" unlimited ="1"/>				
 				<Module id="56" offset="0x16c" bits="4" name="SMART" unlimited="1"/>
 				
 				<!-- regular modules -->
@@ -546,6 +546,160 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Product id="10" name="SDX Designer">
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="SPD">
+			<ModuleList>
+				<!-- Twinax Input -->
+				<!-- Bus/Tag Output (AT) -->
+				<!-- Novell Queuer -->
+				<!-- Novell Spooler -->
+				<!-- TCP/IP Input (DOS) -->
+				<!-- TCP/IP Output (DOS) -->
+				<!-- PostScript Printer -->
+				<!-- RJE/SNA::3211 -->
+				<!-- Dummy -->
+				<!-- 3770so -->
+				
+				
+				<!-- Module IDs identifying software -->
+				<Module id="0"  offset="0x083" bits="1" name="3211::ASCII" unlimited="1"/>
+				<Module id="1"  offset="0x082" bits="1" name="AFPDS::PDF" unlimited="1"/>
+				<Module id="2"  offset="0x081" bits="1" name="AFPDS::PS" unlimited="1"/>
+				<Module id="3"  offset="0x080" bits="1" name="ASCII::3211" unlimited="1"/>
+				
+				<Module id="4"  offset="0x087" bits="1" name="Blocker" unlimited="1"/>
+				<Module id="5"  offset="0x086" bits="1" name="Data Converter" unlimited="1"/>
+				<Module id="6"  offset="0x085" bits="1" name="Disk Spooler" unlimited="1"/> 
+				<Module id="7"  offset="0x084" bits="1" name="File Inserter" unlimited="1"/>
+				
+				<Module id="8"  offset="0x08B" bits="1" name="File Queuer" unlimited="1"/>
+				<Module id="9"  offset="0x08A" bits="1" name="FTP Queuer" unlimited="1"/>
+				<Module id="10" offset="0x089" bits="1" name="IPDS Output" unlimited="1"/>
+				<Module id="11" offset="0x088" bits="1" name="Job Separator" unlimited="1"/>
+				
+				<Module id="12" offset="0x08F" bits="1" name="Line Data::AFPDS" unlimited="1"/>
+				<Module id="13" offset="0x08E" bits="1" name="Output Selector" unlimited="1"/>
+				<Module id="14" offset="0x08D" bits="1" name="PCL::Metacode" unlimited="1"/>
+				<Module id="15"	offset="0x08C" bits="1" name="PDF::IPDS" unlimited="1"/>
+				
+				<Module id="16"	offset="0x093" bits="1" name="PDF::Metacode" unlimited="1"/> 
+				<Module id="17"	offset="0x092" bits="1" name="PDF::PostScript" unlimited="1"/>
+				<Module id="18"	offset="0x091" bits="1" name="PDF::PostScript (Rip)" unlimited="1"/>
+				<Module id="19"	offset="0x090" bits="1" name="PDF::TIFF" unlimited="1"/>
+				
+				<Module id="20"	offset="0x097" bits="1" name="PostScript::IPDS" unlimited="1"/>
+				<Module id="21"	offset="0x096" bits="1" name="PostScript::Metacode" unlimited="1"/>
+				<Module id="22"	offset="0x095" bits="1" name="PostScript::PDF" unlimited="1"/> 
+				<Module id="23"	offset="0x094" bits="1" name="PostScript::Postscript" unlimited="1"/> 
+				
+				<Module id="24"	offset="0x09B" bits="1" name="PostScript::Postscript (RIP)" unlimited="1"/>
+				<Module id="25"	offset="0x09A" bits="1" name="PostScript::TIFF" unlimited="1"/>
+				<Module id="26"	offset="0x099" bits="1" name="SCS::3211" unlimited="1"/>
+				<Module id="27"	offset="0x098" bits="1" name="SCS::Metacode" unlimited="1"/>
+				
+				<Module id="28"	offset="0x09F" bits="1" name="SMART" unlimited="1"/>
+				<Module id="29"	offset="0x09E" bits="1" name="Tape Input" unlimited="1"/>
+				<Module id="30"	offset="0x09D" bits="1" name="TCP/IP lpr Input" unlimited="1"/> 
+				<Module id="31"	offset="0x09C" bits="1" name="TCP/IP lpd Output" pool="240" unlimited="1"/> 
+				
+				<Module id="32"	offset="0x0A3" bits="1" name="Trash Can" unlimited="1"/>
+				<Module id="33"	offset="0x0A2" bits="1" name="Windows Printer Spooler" pool="240" unlimited="1"/>
+				<Module id="34"	offset="0x0A1" bits="1" name="XCHANGE::IPDS" unlimited="1"/> 
+				<Module id="35"	offset="0x0A0" bits="1" name="XCHANGE::Metacode" unlimited="1"/> 
+				
+				<Module id="36"	offset="0x0A7" bits="1" name="XCHANGE::PCL" unlimited="1"/>  
+				<Module id="37"	offset="0x0A6" bits="1" name="XCHANGE::PDF" unlimited="1"/>
+				<Module id="38"	offset="0x0A5" bits="1" name="XCHANGE::PS" unlimited="1"/>
+				<Module id="39"	offset="0x0A4" bits="1" name="XCHANGE::PS (DBCS)" unlimited="1"/>
+				
+				<Module id="40"	offset="0x0A8" bits="1" name="XRocks Printer Controller" unlimited="1"/>
+				
+				
+				<!-- Module IDs identifying hardware -->
+				<Module id="101"	offset="0x19c" bits="4" name="Bus/Tag Input (polaris)"/>
+				<Module id="102"	offset="0x198" bits="4" name="Bus/Tag Output (PCI)"/>
+				<Module id="103"	offset="0x194" bits="4" name="Parallel Input"/>
+				<Module id="104"	offset="0x190" bits="4" name="Parallel Output"/>
+				<Module id="105"	offset="0x18c" bits="4" name="SCSI SDI Output"/>
+				
+				<!-- Module IDs identifying resources -->
+				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
+				
+				<!-- Output Pool module -->
+				<Module id="240" offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
+				
+				<!-- pages per minute extensions -->
+				<Module id="300" offset="0x17C" bits="4" name="Pages Per Minute Extensions" isLicense="false"/>
+				
+				<!-- pages per minute modules -->
+				<Module id="301"   offset="0x318" bits="8" name="AFPDS::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="302"   offset="0x320" bits="8" name="XCHANGE::IPDS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="303"   offset="0x328" bits="8" name="XCHANGE::PCL PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="304"  offset="0x330" bits="8" name="XCHANGE::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="305"   offset="0x338" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+			</ModuleList>
+			
+			<ProductList>
+				<Product id="14" name="SPD Server">
+					<ModuleInclude id="0" default="1"/>
+					<ModuleInclude id="1" default="0"/>					
+					<ModuleInclude id="2" default="0"/>
+					<ModuleInclude id="3" default="1"/>
+					<ModuleInclude id="4" default="1"/>
+					<ModuleInclude id="5" default="1"/>
+					<ModuleInclude id="6" default="1"/>
+					<ModuleInclude id="7" default="1"/>
+					<ModuleInclude id="8" default="1"/>
+					<ModuleInclude id="9" default="0"/>
+					<ModuleInclude id="10" default="0"/>
+					<ModuleInclude id="11" default="1"/>
+					<ModuleInclude id="12" default="0"/>
+					<ModuleInclude id="13" default="1"/>
+					<ModuleInclude id="14" default="0"/>
+					<ModuleInclude id="15" default="0"/>
+					<ModuleInclude id="16" default="0"/>
+					<ModuleInclude id="17" default="0"/>
+					<ModuleInclude id="18" default="0"/>
+					<ModuleInclude id="19" default="0"/>
+					<ModuleInclude id="20" default="0"/>
+					<ModuleInclude id="21" default="0"/>
+					<ModuleInclude id="22" default="0"/>
+					<ModuleInclude id="23" default="0"/>
+					<ModuleInclude id="24" default="0"/>
+					<ModuleInclude id="25" default="0"/>
+					<ModuleInclude id="26" default="0"/>
+					<ModuleInclude id="27" default="0"/>
+					<ModuleInclude id="28" default="0"/>
+					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="30" default="0"/>
+					<ModuleInclude id="31" default="0"/>
+					<ModuleInclude id="32" default="1"/>
+					<ModuleInclude id="33" default="0"/>
+					<ModuleInclude id="34" default="0"/>
+					<ModuleInclude id="35" default="0"/>
+					<ModuleInclude id="36" default="0"/>
+					<ModuleInclude id="37" default="0"/>
+					<ModuleInclude id="38" default="0"/>
+					<ModuleInclude id="39" default="0"/>
+					<ModuleInclude id="40" default="1"/>
+					
+					<ModuleInclude id="101" default="0"/>
+					<ModuleInclude id="102" default="0"/>
+					<ModuleInclude id="103" default="0"/>
+					<ModuleInclude id="104" default="0"/>
+					<ModuleInclude id="105" default="0"/>
+					
+					<ModuleInclude id="200" default="0"/>
+					<ModuleInclude id="240" default="0"/>
+					
+					<ModuleInclude id="300" default="0"/>
+					<ModuleInclude id="301" default="0"/>
+					<ModuleInclude id="302" default="0"/>
+					<ModuleInclude id="303" default="0"/>
+					<ModuleInclude id="304" default="0"/>
+					<ModuleInclude id="305" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
