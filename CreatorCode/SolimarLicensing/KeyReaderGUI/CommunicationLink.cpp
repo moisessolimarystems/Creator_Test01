@@ -223,8 +223,6 @@ void CommunicationLink::GetKeyInfoStructure(KeyInfoStructure& TheKeyInfoStruct,
       //get the list of keys
 	   hr = pTheServer->KeyEnumerate(pKeyList);
 
-      ProductID = TheKeyInfoStruct.ProductID;
-
 		// SafeArrayAccessData and SafeArrayUnaccessData are win32 functions 
 		//needed to access safe array data
 		if (SUCCEEDED(SafeArrayAccessData(pKeyList->parray, (void**)&pKeyName)))
@@ -268,10 +266,6 @@ void CommunicationLink::GetKeyInfoStructure(KeyInfoStructure& TheKeyInfoStruct,
 		SafeArrayUnaccessData(pKeyList->parray);
 }
 
-int CommunicationLink::GetProductID()
-{
-   return ProductID;
-}
 //Fills the ModLicesne Struct with the values read from the key
 void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructure& TheModStruct,
 														 unsigned int ModuleIndex

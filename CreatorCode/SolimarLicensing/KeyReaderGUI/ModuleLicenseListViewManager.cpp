@@ -68,54 +68,12 @@ void ModuleLicenseListViewManager::FillRow(ModuleLicensingStructure TheModuleLic
 	listViewItem1->Text = TheModuleLicStructure.ModuleName.bstrVal;
 
 	char retval[10];
-	int product_id = OurCommLink->GetProductID();
-   bool unlimited = false;
-   int module_id = TheModuleLicStructure.ModuleID.intVal;
-
-   switch(product_id)
-   {
-      case SPD_PRODUCT:
-       	if((long)TheModuleLicStructure.TotalLicenses >= SPD_MAX_NUMBER_MODULES[module_id])
-         {
-            sprintf(retval, "%d", SPD_MAX_NUMBER_MODULES[module_id]);
-            listViewItem1->SubItems->Add(retval);
-            //listViewItem1->SubItems->Add(S"Unlimited");
-            unlimited = true;
-         } 
-	      break;
-
-      case ICONVERT_PRODUCT:
-         if((long)TheModuleLicStructure.TotalLicenses >= ICONVERT_MAX_NUMBER_MODULES[module_id])
-         {
-            sprintf(retval, "%d", ICONVERT_MAX_NUMBER_MODULES[module_id]);
-            listViewItem1->SubItems->Add(retval);
-            //listViewItem1->SubItems->Add(S"Unlimited");
-            unlimited = true;
-         }
-         break;
-
-      case SOLSCRIPT_PRODUCT:
-         if((long)TheModuleLicStructure.TotalLicenses >= SOLSCRIPT_MAX_NUMBER_MODULES[module_id])
-         {
-            sprintf(retval, "%d", SOLSCRIPT_MAX_NUMBER_MODULES[module_id]);
-            listViewItem1->SubItems->Add(retval);
-            //listViewItem1->SubItems->Add(S"Unlimited");
-            unlimited = true;
-         }
-         break;
-
-      case SDX_DESIGNER_PRODUCT:
-         if((long)TheModuleLicStructure.TotalLicenses >= SDX_DESIGNER_MAX_NUMBER_MODULES[module_id])
-         {
-            sprintf(retval, "%d", SDX_DESIGNER_MAX_NUMBER_MODULES[module_id]);
-            listViewItem1->SubItems->Add(retval);
-            //listViewItem1->SubItems->Add(S"Unlimited");
-            unlimited = true;
-         }
-         break;
-   }
-
-   if(!unlimited)
+	
+	if((long)TheModuleLicStructure.TotalLicenses == UnlimitedLicenses)
+	{
+		listViewItem1->SubItems->Add(S"Unlimited");
+	}
+	else
 	{
 		sprintf(retval, "%d", TheModuleLicStructure.TotalLicenses);
 		listViewItem1->SubItems->Add(retval);

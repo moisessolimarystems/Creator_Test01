@@ -1900,8 +1900,8 @@ void __fastcall TFCustomerKeys::mmProgramClick(TObject *Sender)
          // key_record should contain all information needed to program key
          // if programming is successful update record information in the database
          // create temp. key to represent customer key
-          if( keyMaster->found() )
-//         if( !keyMaster->programmed() && keyMaster->found() )
+//          if( keyMaster->found() )
+         if( !keyMaster->programmed() && keyMaster->found() )
          {
             // key is attached and unprogrammed, program key and save action in database
             if( keyMaster->program(key_record) == 0 )
