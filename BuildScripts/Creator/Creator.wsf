@@ -422,7 +422,7 @@ Sub CreateVersionTextAndExtractingFile(aType)
     For item = 0 To UBound(imgArray)
         g_Build.ImageDirPath = "Image\" & imgArray(item)         'Image dir is relative to the main project path
         g_Build.NewBuild.CreateBuildVersionTextFileInImageDir
-        g_Build.CreateSelfExtractingEXE g_Build.NewBuild.versionNum, extArray(item) 
+        g_Build.CreateSelfExtractingEXE g_Build.NewBuild.versionNum, extArray(item), "" 
     Next 
     g_Build.ImageDirPath = "Image"
    

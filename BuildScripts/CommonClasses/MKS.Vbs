@@ -79,6 +79,13 @@ Class CMKS
                                               Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + mBuild.MainProjPath + Chr(34))
                                 mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
                                                 + Chr(34) + mBuild.MainPJFile + Chr(34))
+			Case "Branch"
+			        mBuild.WriteToDlgAndFile "Creating new sandbox from existing development path"
+                                mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --devpath=" & mBuild.NewDevPath & _
+                                               " --project=" + Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + _
+                                                mBuild.MainProjPath + Chr(34))
+                                mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
+                                                + Chr(34) + mBuild.MainPJFile + Chr(34))
                         End Select
                 End If
     End Function
@@ -221,9 +228,14 @@ Class CMKS
     End Sub
 
     Sub Refresh(aSandbox, aProjPJ)
+		Dim Sandbox, ProjPJ, FSO
+                Set FSO = CreateObject("Scripting.FileSystemObject")
+
+		Sandbox = FSO.GetFile(aSandbox)
+		ProjPJ = FSO.GetFile(aProjPJ)
                 mBuild.WriteToDlgAndFile "Refreshing " + aProjPJ
                 mBuild.RunCmd "si resync --yes --overwriteChanged --populate --overwriteUnchanged --restoreTimestamp --quiet --recurse --sandbox=" _
-                              + Chr(34) + aSandbox + Chr(34) & " " & Chr(34) & aProjPJ & Chr(34)
+                              + Chr(34) + Sandbox + Chr(34) & " " & Chr(34) & ProjPJ & Chr(34)
     End Sub
 
     Sub RefreshFile(aProjPJ, aFile)

@@ -109,7 +109,7 @@ Class CProductBuild
             mNewBuild.mCodeBuildType = CodeBuildType
             mNewBuild.mExistingDevPath = ExistingDevPath   'This may not have been set
             mNewBuild.mVersionNum = versionNum
-            mNewBuild.mLicenseVersion = licenseVersion
+            mNewBuild.mLicenseVersion = StripPrefix(licenseVersion, "SolimarLicensing")
             
         ElseIf mBuildType = "R" Then  'doing a release
             Set mRelease = New CRelease
@@ -697,6 +697,33 @@ Class CProductBuild
         
     End Function
 
+    '*************************************************************************************************
+    '* Function:    UpdateInstallShieldProperty
+    '* Purpose:     Change a property in the 'Property Table' in installshield by opening the msi
+    '*              database.
+    '*             
+    '* Parameters : param_pathToIsm - path to installshield project
+    '*              aPropName       - name of property in property table
+    '*              aPropVal        - value to set property
+    '*************************************************************************************************
+    'This is the same function that is used in the SOLsearcher build
+    Function UpdateInstallShieldProperty(param_pathToIsm, aPropName, aPropVal)
+		Set oMSI = CreateObject("WindowsInstaller.Installer")
+
+		' open ISM file in transacted mode
+		Set oDB = oMSI.OpenDatabase(param_pathToIsm, 1)
+		' fetch the one and only samplesource record
+		Set oView = oDB.OpenView("SELECT * FROM `Property` WHERE `Property`=" & "'" & aPropName & "'")
+		oView.Execute
+		Set oRec = oView.Fetch
+		' change field 2, the Value field
+		oRec.StringData(2) = aPropVal
+		' update the changed record
+		oView.Modify 2, oRec
+		' close the view, commit changes, clean up
+		oView.Close: oDB.Commit: Set oMSI = Nothing       
+    End Function
+
 	'******************************************************************************
 	' Function    : CleanFolder
 	' Purpose     : remove an files from a folder except for exclusion files.
@@ -836,7 +863,7 @@ Class CProductBuild
     'had to create this function for SOLsearcher since that project creates 2 exes with different names than
         'what is used by CreateSelfExtractingEXE.  Probably should change the other projects to use this fctn instead
         'and just pass in the name so we don't have 2 functions with nearly identical code to maintain.
-    Function CreateSelfExtractingEXE(aVersionNum, aName)
+    Function CreateSelfExtractingEXE(aVersionNum, aName, aSetupName)
             Dim Path, Name, destinationFile, SourceWebPackageExe
             Path = "C:\Program Files\InstallShield\PackageForTheWeb 3"
             Name = VersionToNewTitle(aVersionNum, aName)
@@ -845,7 +872,10 @@ Class CProductBuild
             If mFSO.FileExists(destinationFile) Then
                     mFSO.DeleteFile destinationFile, 1
             End If
-            CreateWebProjectFile destinationFile, Name, aVersionNum, mProductName, Name + ".exe"
+	    If aSetupName = "" Then
+		aSetupName = "Setup.exe"
+	    End If
+            CreateWebProjectFile destinationFile, Name, aVersionNum, mProductName, Name + ".exe", aSetupName
 
             'Generate Web Self-Extracting EXE     '-a autobuild, -s silent mode
             SourceWebPackageExe = Path + "\pftwwiz.exe"
@@ -859,7 +889,7 @@ Class CProductBuild
             VersionToNewTitle = product & Replace(Version, ".", "_", 1, -1)
     End Function
 
-    Private Function CreateWebProjectFile(aFile, aTitle, aVersionNum, aProjName, aExeName)
+    Private Function CreateWebProjectFile(aFile, aTitle, aVersionNum, aProjName, aExeName, aSetupName)
         WriteToDlgAndFile "creating project file for self extracting exe"
         Set writeFile = mFSO.CreateTextFile(aFile)
         writeFile.writeLine "[PackageForTheWeb]"
@@ -888,7 +918,7 @@ Class CProductBuild
         writeFile.writeLine "Files="
         writeFile.writeLine ""
         writeFile.writeLine "[Engine]"
-        writeFile.writeLine "Setup=Setup.exe"
+        writeFile.writeLine "Setup=" & aSetupName
         writeFile.writeLine ""
         writeFile.writeLine "[Web Page]"
         writeFile.writeLine "Generate=1"
@@ -905,7 +935,7 @@ Class CProductBuild
         writeFile.writeLine "Language=English"
         writeFile.writeLine "WindowStyle=0"
         writeFile.writeLine "Options=35"
-        writeFile.writeLine "Execute=setup.exe"
+        writeFile.writeLine "Execute=" & aSetupName
         writeFile.writeLine "CmdLine=/SMS"
         writeFile.writeLine "[Extension]"
         writeFile.writeLine "Server="
@@ -940,6 +970,10 @@ Class CProductBuild
 
     Function GetBuildVersion(aPattern)
                 Dim output, readFile, writeFile
+	        Dim MKS
+	        Set MKS = New CMKS
+	        Set MKS.Build = Me
+		MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
                 Set readFile = mFSO.OpenTextFile(mInputFile)
                 Dim check, Line, pos
                 check = 0
@@ -955,6 +989,7 @@ Class CProductBuild
                         End If 
                 Loop
                 readFile.Close
+		Set MKS = Nothing
     End Function
     
     Function GetVersionFromFile(aFile, aPattern, aKey)

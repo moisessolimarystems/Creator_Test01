@@ -18,6 +18,7 @@
   g_Report.SetConnection g_Access
   
   SetProjPaths
+  g_Report.SetStartLabel
   If g_Report.PopDataBase <> "N" Then
     g_Report.PopulateDataBase g_Access
   End If
@@ -106,13 +107,13 @@
                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SolimarLicensingInstallSource", _
                                       "\SolimarLicensing\Configuration\SolimarLicensingRelease.txt", "SolimarLicensing", "SolimarLicensing"
         End If
-        If g_Report.Productchoice = "Spd52xx" Then
-             g_Report.SetProjPathsVar "Spd52xx", "Spd52xx", "F:\code\MKSCODE\Spd52xx", _
+        If g_Report.Productchoice = "SPD" Then
+             g_Report.SetProjPathsVar "SPD", "Spd52xx", "F:\code\MKSCODE\Spd52xx", _
 									  "S:\MKSCODE\Spd52xx\Spd52xxInstallSource\Spd52xxInstallSource.pj", _
                                       "S:\MKSCODE\Spd52xx\rcs\Spd52xx.pj", _
                                       "Spd52xx", "", "Spd52xxInstallSource", _
                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\Spd52xxInstallSource", _
-                                      "\Spd52xx\Configuration\Spd52xxRelease.txt", "Spd52xx", "Spd52xx"
+                                      "\Spd52xx\Configuration\Spd52xxRelease.txt", "Spd52xx", "SPD"
         End If
 End Sub
      

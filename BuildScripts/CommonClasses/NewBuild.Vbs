@@ -128,12 +128,20 @@ Class CNewBuild
         mBuild.FSO.CreateTextFile mBuild.ImageDirPath & "\" & TextFileName
         End Sub
 
+    Sub CreateLicenseVersionTextFileInImageDir()
+        Dim VersionNumberFormatted, TextFileName
+        VersionNumberFormatted = Replace(mLicenseVersion, ".", "_", 1, -1)
+        TextFileName = "Version - LicenseBuild_" & VersionNumberFormatted & ".txt"
+        mBuild.FSO.CreateTextFile mBuild.ImageDirPath & "\Common\SolimarLicensing\" & TextFileName
+    End Sub	
+
     Sub IncrementBuildNum(aPattern, aMKS)
     
            Dim output, readFile, writeFile, BuildScriptPJ
            output = mBuild.mBuildPath & "\temp.txt"
            mInputFile = mBuild.mBuildPath & "\BuildRegistry.txt"
-           aMKS.LockFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
+           aMKS.RefreshFile mBuild.mBuildPath & "\buildScript.pj", mInputFile
+	   aMKS.LockFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
            mBuild.RunCmd "attrib -r " & Chr(34) + mInputFile + Chr(34)
            
            Set readFile = mBuild.FSO.OpenTextFile(mInputFile)

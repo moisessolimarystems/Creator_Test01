@@ -31,9 +31,9 @@ Class CProductReport
         mDebug = "N"
         mStartTime = Time
         mPopDataBase = "N"
-		mFileNameCount = 0
+	mFileNameCount = 0
 		
- 		Dim CurrentDir
+ 	Dim CurrentDir
         CurrentDir = mShell.CurrentDirectory
         mReportPath = mFSO.GetFolder(CurrentDir & "\\")
         If mFSO.FileExists("..\Cancelled.txt") = True Then
@@ -118,7 +118,7 @@ Class CProductReport
                                 mDebug = wscript.Arguments(iParam + 1)
                  End Select
             Next
-			Set mMKS = aMKS
+	    Set mMKS = aMKS	
     End Sub
 
     Function SetProjPathsVar(aProductName, aProjectName, aProjPath, aInstallSrcArchive, aArchive, aPJFile, bPJFile, cPJFile, _
@@ -189,7 +189,7 @@ Class CProductReport
                         temp.writeLine "OUTPUT: "
                         temp.Write aOutput
                         temp.Close
-                End If
+        End If
     End Function
     
     Public Function WriteToDlgAndFile(Display)
@@ -259,15 +259,25 @@ Class CProductReport
        getHrMinSec = CStr(hrsPassed & " Hour(s), " & minsPassed & " Mins, " & secsPassed & " Secs")
    End Function
 
-   Function StripAllPrefix(Version)
-		Dim pos
-		For pos=1 To Len(Version)
-			If IsNumeric(Mid(Version, pos, 1)) Then
-				Exit For
-			End If
-		Next
-		StripAllPrefix = Mid(Version, pos)
-	End Function 
+    '***************************************************************************
+    ' Function    : StripAllPrefix
+    ' Parameters  : Version - the full label/version name 
+    ' Description : Removes the prefix from the label/version name using the 
+    '               VersionPrefix property set during initialization
+    '***************************************************************************
+    Function StripAllPrefix(Version)
+		Dim pos, prefix
+		If InStr(Version, VersionPrefix) <> 0 Then
+			StripAllPrefix = Right(Version, Len(Version) - Len(VersionPrefix))
+		Else
+			For pos=1 To Len(Version)
+				If IsNumeric(Mid(Version, pos, 1)) Then
+					Exit For
+				End If
+			Next
+			StripAllPrefix = Mid(Version, pos)
+		End If
+    End Function 
 	
     Function GetBuildVersion(aPattern)
                 Dim output, readFile, writeFile
@@ -506,7 +516,7 @@ Class CProductReport
         'returns 0 part of the main trunk, 1 if in a var devpath
         Function CheckProjectDetailed(filePath, pjName)
                 Dim line
-				line = mMKS.SandBoxInfo(filePath & "\" & pjName & ".pj")
+		line = mMKS.SandBoxInfo(filePath & "\" & pjName & ".pj")
                 WriteToDlgAndFile filePath & "\" & pjName & ".pj"
                 If (InStr(line, "Variant") = 0) Or (InStr(line, "Build") = 0) Then
                     CheckProjectDetailed = 0        'Main DevPath
@@ -718,8 +728,9 @@ Function GetEmailBody()
     Loop
 
     Dim buildNumber
-    buildNumber = Mid(lastBldLabel, Index, Len(lastBldLabel))
-      
+    'buildNumber = Mid(lastBldLabel, Index, Len(lastBldLabel))
+    buildNumber = Mid(lastBldLabel, InStr(lastBldLabel, ".") - 1, Len(lastBldLabel))
+  
     Dim FileString
     For Index = 0 To fileNameCount - 1 Step 1
         FileString = FileString & "        " & mFileNameArray(Index) & vbNewLine
@@ -794,7 +805,7 @@ Function SendEmail(Subject, Body, ReportPath, DescReportName, LabelReportName)
             .RemoteHost = "mail.corp.solimarsystems.com"
             .MailFromAddress = "achou@solimarsystems.com"
             .FromName = "achou@solimarsystems.com"
-            .AddRecipient "achou@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
+            .AddRecipient "all@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
             .Charset = 1
             .Subject = Subject
             .BodyText = Body
@@ -880,38 +891,51 @@ End Function
         End If
  End Sub
 
+Sub SetStartLabel()
+                If mLastBuild = "Y" Then         'Last Build
+                        mStartLabel = FindLabel("LBLB")
+                End If
+                If mLastRelease = "Y" Then       'Last Release
+                        mStartLabel = FindLabel("PLR")
+                End If
+                If mBegDevPath = "Y" Then        'Beginning of Dev Path
+                        mStartLabel = FindLabel("BDP")
+                End If
+                If mLastLabel = "Y" Then         'From Label
+                        mStartLabel = FindLabel("LBL")                  
+                End If
+                If mLastBuildLabel = "Y" Then    'Last Build Label, only used by 1-Step-Build
+                        mStartLabel = FindLabel("LBLB")            
+                End If
+End Sub
+
 Sub GenerateTextFile(g_Access)
 
                 WriteToDlgAndFile "Generating Reports"
                 mProject = CheckProject(mFilePathArray(0), mPJFileArray(0))  'check to see if is a variant project or not
                 mCancelDiag.UpdateDisplay "     Project=" & Project & "   0 = main trunk, 1 = var devpath"
                 If EndLabel = "" Then
-					mEndLabel = FindLabel("LB")
-				End If
+			mEndLabel = FindLabel("LB")
+		End If
 				
                 mCancelDiag.UpdateDisplay "     LastBuildLabel: " & lastBldLabel
                 If StartLabel <> "" Then
-					CreateDescAndLabelReports StartLabel, EndLabel
+			CreateDescAndLabelReports StartLabel, EndLabel
                 End If 	
                 If mLastBuild = "Y" Then         'Last Build
-                        mStartLabel = FindLabel("LBLB")
-						CreateDescAndLabelReports mStartLabel, mEndLabel
+			CreateDescAndLabelReports mStartLabel, mEndLabel
                 End If
                 If mLastRelease = "Y" Then       'Last Release
-                        mStartLabel = FindLabel("PLR")
 			mEndLabel = FindLabel("LR")
 			CreateDescAndLabelReports mStartLabel, mEndLabel
                 End If
                 If mBegDevPath = "Y" Then        'Beginning of Dev Path
-                        mStartLabel = FindLabel("BDP")
                         CreateDescAndLabelReports mStartLabel, mEndLabel
                 End If
                 If mLastLabel = "Y" Then         'From Label
-                        mStartLabel = FindLabel("LBL")
-						CreateDescAndLabelReports mStartLabel, mEndLabel                    
+			CreateDescAndLabelReports mStartLabel, mEndLabel                    
                 End If
                 If mLastBuildLabel = "Y" Then    'Last Build Label, only used by 1-Step-Build
-                        mStartLabel = FindLabel("LBLB")
                         CreateDescAndLabelReports mStartLabel, mEndLabel                   
                 End If
                
@@ -1052,8 +1076,13 @@ End Function
     Public Property Get StartLabel()
         StartLabel = mStartLabel
     End Property
+
     Public Property Get EndLabel()
         EndLabel = mEndLabel
+    End Property
+    
+    Public Property Get ProductName()
+        ProductName = mFilePathArray(2)
     End Property
     
     Public Property Get MainSrcProjPath()

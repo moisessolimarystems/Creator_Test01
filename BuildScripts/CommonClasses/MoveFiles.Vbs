@@ -30,13 +30,14 @@ Class CMoveFiles
 		Dim DestPath, tempDestPath
 		tempDestPath =  GetOutputPath + aDestFolder + "\Temp"
         DestPath = GetOutputPath + aDestFolder + "\" + aDestFolderName
-		mBuild.WriteToDlgAndFile "Copying CD image files to the network" 
+	mBuild.WriteToDlgAndFile "Copying CD image files to the network" 
         If mBuild.FSO.FolderExists(DestPath) Then 
 			DeleteFileOrFolder "Folder", DestPath, True
-		End If
+	End If
         mBuild.WriteToDlgAndFile "Creating: " & tempDestPath
-        mBuild.FSO.CreateFolder tempDestPath   
-		Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
+        'mBuild.FSO.CreateFolder tempDestPath   
+	CreateFileOrFolder "Folder", tempDestPath, True 
+	Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
             CopyFileOrFolder "Folder", mBuild.ImageDirPath & "\*", tempDestPath & "\", True
@@ -45,8 +46,9 @@ Class CMoveFiles
         If Files1.Count <> 0 Then
             CopyFileOrFolder "File", mBuild.ImageDirPath & "\*", tempDestPath & "\", True
         End If
-		mBuild.FSO.CreateFolder DestPath
-		Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
+	'mBuild.FSO.CreateFolder DestPath
+	CreateFileOrFolder "Folder", DestPath, True
+	Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
 			MoveFileOrFolder "Folder", tempDestPath & "\*", DestPath & "\"
@@ -62,7 +64,8 @@ Class CMoveFiles
     Sub MoveCDImageToImageDir(aImageSourcePath)
         mBuild.WriteToDlgAndFile "Moving Files to Image Directory"
         If (mBuild.FSO.FolderExists(mBuild.ImageDirPath) = False) Then
-       		 mBuild.FSO.CreateFolder (mBuild.ImageDirPath)
+       		 'mBuild.FSO.CreateFolder (mBuild.ImageDirPath)
+		 CreateFileOrFolder "Folder", mBuild.ImageDirPath, True
         End If
 
         Dim Folder1, SubFolders1, Files1
@@ -107,13 +110,13 @@ Class CMoveFiles
     End Function
 
     Public Function CreateFileOrFolder(aCreateType, aPath, aOverride)
-        mBuild.WriteToDlgAndFile "Deleting: " & aPath
+        mBuild.WriteToDlgAndFile "Creating: " & aPath
 	    Err.Clear
 	    On Error Resume Next
         If aCreateType = "File" Then
 	        mBuild.FSO.CreateTextFile aPath, aOverride
 	Else 
-	        mBuild.FSO.CreateFolder aPath, aOverride  'remove contents of the folder
+	        mBuild.FSO.CreateFolder aPath  'remove contents of the folder
 	End If
 	If Err Then
 		    mBuild.BuildError "Error attempting to create " + aCreateType + ": " + aPath
@@ -181,8 +184,9 @@ Class CMoveFiles
 			DeleteFileOrFolder "Folder", DestPath, True
 		End If
         mBuild.WriteToDlgAndFile "Creating: " & DestPath
-        mBuild.FSO.CreateFolder DestPath   
-		Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
+        'mBuild.FSO.CreateFolder DestPath   
+	CreateFileOrFolder "Folder", DestPath, True 
+	Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
             CopyFileOrFolder "Folder", mBuild.ImageDirPath & "\*", DestPath & "\", True
@@ -217,7 +221,8 @@ Class CMoveFiles
 			DeleteFileOrFolder "Folder", DestPath, True
 		End If
 		mBuild.WriteToDlgAndFile "Creating: " & DestPath
-        mBuild.FSO.CreateFolder DestPath	
+        'mBuild.FSO.CreateFolder DestPath	
+	CreateFileOrFolder "Folder", DestPath, True
 		Set Folder1 = mBuild.FSO.GetFolder(SrcPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
