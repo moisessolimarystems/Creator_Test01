@@ -233,7 +233,7 @@ void TModuleFrame::load(SKeyRecord* skeyrecord, bool all_modules)
    TListItem* new_item;
    key_record = skeyrecord;
 
-   lookup->getModuleList(m_productId);
+   //lookup->getModuleList(m_productId);
 
    ModuleList->Items->BeginUpdate();
    ModuleList->Items->Clear();
@@ -280,10 +280,9 @@ void TModuleFrame::load(SKeyRecord* skeyrecord, bool all_modules)
           // Otherwise check the key for the licensing.
           SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
 
-          if ((all_modules || (
-                    m_moduleDetail[idx]->isAvailableForProduct(spd_key->productId) &&
-                    m_moduleDetail[idx]->isAvailableForVersion(spd_key->productVersion) &&
-                    lookup->isAssignedModule(idx))))
+          if ( m_moduleDetail[idx]->isAvailableForProduct(spd_key->productId) &&
+               m_moduleDetail[idx]->isAvailableForVersion(spd_key->productVersion) &&
+               (all_modules  || lookup->isAssignedModule(idx)) )
           {
              new_item = ModuleList->Items->Add();
              new_item->Caption = m_moduleDetail[idx]->getActionText();
@@ -553,7 +552,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          //password = keyMaster->getModZeroPassword(spd_key, detail->id, static_cast<ProductId>(spd_key->productId), spd_key->productVersion);
          password = keyMaster->getModulePassword(spd_key, detail->id, static_cast<ProductId>(spd_key->productId), spd_key->productVersion, units);
          //applies module password to key
-         keyMaster->applyModZeroPassword(key_record, detail->id, units);
+         keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
       }
 
    }
