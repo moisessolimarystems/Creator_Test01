@@ -31,7 +31,7 @@
       bdertl.bpi vcldbx.bpi teeui.bpi teedb.bpi tee.bpi teeqr.bpi ibxpress.bpi 
       bcbie.bpi vclie.bpi inetdb.bpi inet.bpi nmfast.bpi dclocx.bpi 
       bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey"/>
+    <PATHCPP value=".;SolimarLicensing\common;KEY\NewKey"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
