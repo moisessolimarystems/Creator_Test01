@@ -497,7 +497,7 @@ void __fastcall TCustForm::SeekCustomer(TObject *Sender)
          //check key
          try
          {
-      	    UtilityQuery1->Close();
+      	   UtilityQuery1->Close();
             UtilityQuery1->SQL->Clear();
             UtilityQuery1->SQL->Add("SELECT * FROM SKeyRecord WHERE SKRnumber = :skr_number AND SCRnumber = :scr_number");
             UtilityQuery1->ParamByName("skr_number")->AsInteger = keyrec->pkey->keyNumber;

@@ -48,6 +48,9 @@ CLookup::CLookup()
       m_solScriptModuleDetail[mod_id] = new ModuleDetail();
       m_solScriptModuleDetail[mod_id]->id = mod_id;
 
+      m_PDFUtilityModuleDetail[mod_id] = new ModuleDetail();
+      m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
+
       ////initialize modules for SDX Designer module list
       //Create new structures,and assign new module id's to each one.
       m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
@@ -125,7 +128,7 @@ CLookup::~CLookup()
       delete iConvert_module_detail[mod_id];
 
       delete m_solScriptModuleDetail[mod_id];
-
+      delete m_PDFUtilityModuleDetail[mod_id];
       delete m_SDXDesignerModuleDetail[mod_id];
    }
 }
@@ -217,6 +220,8 @@ ModuleDetail** CLookup::getModuleList(int productID)
        return iConvert_module_detail;
    else if (productID == SOLSCRIPT_PRODUCT)
       return m_solScriptModuleDetail;
+   else if (productID == PDF_UTILITY)
+      return m_PDFUtilityModuleDetail;
    else if (productID == SDX_DESIGNER_PRODUCT)
       return m_SDXDesignerModuleDetail;
    else
@@ -254,6 +259,9 @@ bool CLookup::resetModuleList()
       *m_solScriptModuleDetail[mod_id] = unassigned_module;
       m_solScriptModuleDetail[mod_id]->id = mod_id;
 
+      *m_PDFUtilityModuleDetail[mod_id] = unassigned_module;
+      m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
+
       *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
@@ -280,6 +288,9 @@ bool CLookup::resetModuleList()
          //
          if (product_id==ICONVERT_PRODUCT) {
             pModuleList = iConvert_module_detail;
+         }
+         else if (product_id==PDF_UTILITY) {
+            pModuleList = m_PDFUtilityModuleDetail;
          }
          else if (product_id==SOLSCRIPT_PRODUCT) {
             pModuleList = m_solScriptModuleDetail;
@@ -1046,6 +1057,9 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
          break;
       case ICONVERT_PRODUCT:
          result = iConvert_module;   // supports iConvert modules.
+         break;
+      case PDF_UTILITY:
+         result = static_cast<bool>(max>0);
          break;
       case SOLSCRIPT_PRODUCT:
          result = static_cast<bool>(max>0);

@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 // Defines
 //------------------------------------------------------------------------------
-const int MAX_SOLIMAR_PRODUCTS = 12;    // 9 Products Total now
+const int MAX_SOLIMAR_PRODUCTS = 13;    // 9 Products Total now
 
 struct SolimarProduct
 {
@@ -79,6 +79,7 @@ class CLookup
    ModuleDetail* iConvert_module_detail[64];
    ModuleDetail* m_solScriptModuleDetail[64];
    ModuleDetail* m_SDXDesignerModuleDetail[64];
+   ModuleDetail* m_PDFUtilityModuleDetail[64];
 
   public:
    CLookup();

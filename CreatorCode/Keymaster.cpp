@@ -751,7 +751,8 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
    //
    // SOLSCRIPT_PRODUCT -
    if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
-       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||
+       keyrec->pkey->productId == PDF_UTILITY)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -860,7 +861,8 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
    //
    // SOLSCRIPT_PRODUCT -
    if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
-       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||
+       keyrec->pkey->productId == PDF_UTILITY)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -955,7 +957,8 @@ void KeyMaster::applyVersionPassword(SKeyRecord* keyrec, unsigned short version)
        keyrec->pkey->productId == CONNECT_PRODUCT ||
        keyrec->pkey->productId == QUANTUM_PRODUCT ||
        keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
-       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||
+       keyrec->pkey->productId == PDF_UTILITY)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* pSpdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -1193,7 +1196,8 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
       }
    }
    else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-            key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
+            key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+            key_record->pkey->productId == PDF_UTILITY) {
 
       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
 

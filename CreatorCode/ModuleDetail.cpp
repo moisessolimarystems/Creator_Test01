@@ -634,6 +634,8 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 1000;
       else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 3000;
+      else if(key_record->pkey->productId == PDF_UTILITY)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 4000;
       else
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
 

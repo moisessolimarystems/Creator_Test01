@@ -13,8 +13,8 @@
 TDlgVersion *DlgVersion;
 
 
-const int TDlgVersion::convertProductToIndex[] = { 0/*SPD_NT*/, 2/*XImage 3.1/95*/, 1/*XImage NT*/, 0, 0, 3/*Indexer*/, 4/*ConnectivityServer*/, 5/*iConvert*/, 6/*SS Enterprise*/, 7/*SOL Script*/, 8/*SDX Designer*/, 9/*Quantum Server*/  };
-const int TDlgVersion::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT };
+const int TDlgVersion::convertProductToIndex[] = { 0/*SPD_NT*/, 2/*XImage 3.1/95*/, 1/*XImage NT*/, 0, 0, 3/*Indexer*/, 4/*ConnectivityServer*/, 5/*iConvert*/, 6/*SS Enterprise*/, 7/*SOL Script*/, 8/*SDX Designer*/, 9/*Quantum Server*/, 10/*PDF UTILITY*/ };
+const int TDlgVersion::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, PDF_UTILITY };
 
 //==============================================================================
 // TDlgVersion() - Constructor
@@ -118,5 +118,7 @@ void __fastcall TDlgVersion::ApplyBtnClick(TObject *Sender)
    unsigned short tmp_version(static_cast<unsigned short>(strtol(VersionEdit->Text.c_str(), &endptr, 16)));
    lookup->updateVersion(convertIndexToProduct[ProductComboBox->ItemIndex], tmp_version);
 }
+
+
 
 

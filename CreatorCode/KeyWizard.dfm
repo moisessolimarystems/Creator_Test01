@@ -105,7 +105,8 @@ object KeyWizardFrm: TKeyWizardFrm
         'SOLsearcher Enterprise'
         'SOLscript'
         'SDX Designer'
-        'Quantum Server')
+        'Quantum Server'
+        'PDF Utility')
     end
     object keyTypeComboBox: TComboBox
       Left = 7

@@ -15,7 +15,8 @@
       objs\keyDateSearchDlg.obj objs\SolSearcherEnterpriseDetails.obj 
       objs\CryptoHelper.obj objs\ChallengeResponseHelper.obj 
       objs\ChallengeResponse.obj objs\MultidimensionalSafeArray.obj 
-      objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj"/>
+      objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj 
+      objs\sdxkey.obj objs\pdfkey.obj"/>
     <RESFILES value="CreatorProject.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) CustomerForm.dfm CreatorAbout.dfm CustQueryDlg.dfm 
@@ -95,6 +96,8 @@
       <FILE FILENAME="KEY\NewKey\Spdkey.cpp" FORMNAME="" UNITNAME="Spdkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\ssckey.cpp" FORMNAME="" UNITNAME="ssckey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\Pkey.cpp" FORMNAME="" UNITNAME="Pkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\NewKey\sdxkey.cpp" FORMNAME="" UNITNAME="sdxkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\NewKey\pdfkey.cpp" FORMNAME="" UNITNAME="pdfkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>

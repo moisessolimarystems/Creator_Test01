@@ -318,7 +318,9 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      }
 
      if ((PERMISSION_FLAG & permanent_pwd) &&
-         (key_record->pkey->productId == SOLSCRIPT_PRODUCT || key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+         (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
+         key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+         key_record->pkey->productId == PDF_UTILITY)
          )
      {
         KeyFormModuleFrame->mmViewAll->Enabled = false;
@@ -464,7 +466,8 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         PageControl1->Pages[2]->TabVisible = false;
                 }
                 else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT ||
-                         key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
+                         key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+                         key_record->pkey->productId == PDF_UTILITY) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
                         ProtectionKey* temp_key = ProtectionKey::newKey(key_record->pkey);
@@ -630,7 +633,8 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
     }
     else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-             key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
+             key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+             key_record->pkey->productId == PDF_UTILITY) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
         showModuleInfo(true);
@@ -1350,7 +1354,8 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                //setOutputUnitsDisplay( ((SpdProtectionKey*)(key_record->pkey))->outputUnits);
             }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-                     key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
+                     key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+                     key_record->pkey->productId == PDF_UTILITY) {
                KeyFormModuleFrame->load(key_record);
             }
             break;
