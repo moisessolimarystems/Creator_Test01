@@ -405,7 +405,17 @@ short KeyMaster::program(SKeyRecord* key_record)
    }
 
    ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
-   if(key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
+   if(key_record->pkey->productId == XIMAGENT_PRODUCT || key_record->pkey->productId == XIMAGE_PRODUCT )
+   {
+      //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
+      //2 fields (mod id and licesne count)
+      dims.push_back(0);
+      dims.push_back(2);
+
+      //create the multi dim safe array to look like Module_Array [NumModules][2]
+      hr = MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
+   }
+   else if(key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
    {
       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
       int NumModules = 0;
