@@ -139,7 +139,8 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
       case  CONCURRENT_USERS_25_CELL:
          if (!m_pKey->isOnTrial())
             min = m_pKey->getConcurrentUsers();
-         max = MAX_CONCURRENT_USERS_25;
+         //max = MAX_CONCURRENT_USERS_25;  RH CR 3742
+         max = MAX_CONCURRENT_USERS;
          fieldName = "SKRconcurrentUsers";
          descriptionId = 602;
          CreatePassword = keyMaster->getConcurrentUsersPassword;
