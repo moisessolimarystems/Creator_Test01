@@ -132,8 +132,6 @@ SpdProtectionKey::SpdProtectionKey() :
 }
 #endif
 
-
-
 /* copy constructor
 ---------------------------------------------------------------------------*/
 SpdProtectionKey::SpdProtectionKey(const SpdProtectionKey& pkey) :
