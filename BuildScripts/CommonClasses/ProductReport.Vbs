@@ -919,24 +919,20 @@ Sub GenerateTextFile(g_Access)
 		End If
 				
                 mCancelDiag.UpdateDisplay "     LastBuildLabel: " & lastBldLabel
-                If StartLabel <> "" Then
-			CreateDescAndLabelReports StartLabel, EndLabel
-                End If 	
-                If mLastBuild = "Y" Then         'Last Build
+
+                If mLastBuild = "Y" Then      			   'Last Build
 			CreateDescAndLabelReports mStartLabel, mEndLabel
-                End If
-                If mLastRelease = "Y" Then       'Last Release
+                ElseIf mLastRelease = "Y" Then      		   'Last Release
 			mEndLabel = FindLabel("LR")
 			CreateDescAndLabelReports mStartLabel, mEndLabel
-                End If
-                If mBegDevPath = "Y" Then        'Beginning of Dev Path
+                ElseIf mBegDevPath = "Y" Then      			   'Beginning of Dev Path
                         CreateDescAndLabelReports mStartLabel, mEndLabel
-                End If
-                If mLastLabel = "Y" Then         'From Label
+                ElseIf mLastLabel = "Y" Then        		   'From Label
 			CreateDescAndLabelReports mStartLabel, mEndLabel                    
-                End If
-                If mLastBuildLabel = "Y" Then    'Last Build Label, only used by 1-Step-Build
+                ElseIf mLastBuildLabel = "Y" Then   		   'Last Build Label, only used by 1-Step-Build
                         CreateDescAndLabelReports mStartLabel, mEndLabel                   
+		Else						   'startlabel <> "" case
+			CreateDescAndLabelReports StartLabel, EndLabel 	
                 End If
                
     End Sub

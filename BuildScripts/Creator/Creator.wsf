@@ -47,7 +47,7 @@
     Else
         Creator_Current = "E:\Creator_Current"   'constant branch
         Creator_Next = "E:\Creator_Next"   'constant trunk
-        ProductBuildFiles = "E:\BuildCommonClasses\Product_Build_Files"
+        ProductBuildFiles = g_Build.FSO.GetFolder(g_Build.Shell.CurrentDirectory & "\Product_Scripts\Creator\Configuration")
     End If
     
     Creator_NewDevPath = g_Build.MainProjPath
@@ -141,6 +141,7 @@ Sub CreateBranch()
     Set MKS.Build = g_Build
     MKS.CreateNewDevPath g_Build.MainProjPath, g_Build.MainPJFile
     g_Build.UpdateRegVersionVals "CreatorNextVersion", "CreatorCurrentVersion"
+    g_Build.SendEmail
     UpdateVersionInFiles (MKS) 'taken out since we dont have the trunk sandbox available
     Set MKS = Nothing
 End Sub
@@ -355,8 +356,8 @@ End Sub
 Sub SetAllCreatorObjects()
     Dim OrigFile, UpdatedFile, readfile
     
-    OrigFile = g_Build.Shell.CurrentDirectory + "\Product_Build_Files\CreatorObjectValues.txt"
-    UpdatedFile = g_Build.Shell.CurrentDirectory + "\Product_Build_Files\CreatorObjectValuesRevised.txt"
+    OrigFile = ProductBuildFiles & "\CreatorObjectValues.txt"
+    UpdatedFile = ProductBuildFiles & "\CreatorObjectValuesRevised.txt"
     
     Dim ValsInFile, ReplaceVals
     ValsInFile = Array("builder6Program", "builder6RootDir", "MainCodePath", "signCabFile", "mvs6_0Program", "mvsNet_Program")
@@ -546,8 +547,8 @@ End Function
     Sub SetAllCreatorInstallObjects(CD_IMAGE_CREATOR)
         Dim OrigFile, UpdatedFile, readfile
         
-        OrigFile = g_Build.Shell.CurrentDirectory + "\Product_Build_Files\CreatorInstallObjectValues.txt"
-        UpdatedFile = g_Build.Shell.CurrentDirectory + "\Product_Build_Files\CreatorInstallObjectValuesRevised.txt"
+        OrigFile = ProductBuildFiles & "\CreatorInstallObjectValues.txt"
+        UpdatedFile = ProductBuildFiles & "\CreatorInstallObjectValuesRevised.txt"
         
         Dim ValsInFile, ReplaceVals
         ValsInFile = Array("InstallShieldProjPath", "CD_IMAGE_CREATOR")

@@ -83,7 +83,7 @@ Class CProductBuild
                     Case "-PL"
 				      mPrevLabel = wscript.Arguments(iParam + 1)
                     Case "-NNV"
-					  mNewNextVersion = wscript.Arguments(iParam + 1)
+					  mBuild.NewDevPath = wscript.Arguments(iParam + 1)
                     Case "-NDP"
 					  mNewDevPath = wscript.Arguments(iParam + 1)
                     Case "-CBT"
@@ -414,22 +414,18 @@ Class CProductBuild
                    mShell.Run "net send " & NetSendArry(i) + " " + aMsg
             Next
         End If
-
     End Sub
 
         Function ReadRegistry(aPath)
-
-        Err.Clear
+		   Err.Clear
             On Error Resume Next
         Dim Value
                 Value = mShell.RegRead(aPath)
                 If Err.Number <> 0 Then
                     BuildError "Error reading registry path: " + aPath + ". " + Err.Description
                 End If
-        ReadRegistry = Value
-  
+		   ReadRegistry = Value
         End Function
-
 
         'fix checkPath later so all projects can use it. -emester
     'Public Function CheckPath(path)
@@ -969,11 +965,11 @@ Class CProductBuild
     End Sub
 
     Function GetBuildVersion(aPattern)
-                Dim output, readFile, writeFile
+            Dim output, readFile, writeFile
 	        Dim MKS
 	        Set MKS = New CMKS
 	        Set MKS.Build = Me
-		MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
                 Set readFile = mFSO.OpenTextFile(mInputFile)
                 Dim check, Line, pos
                 check = 0
@@ -989,7 +985,7 @@ Class CProductBuild
                         End If 
                 Loop
                 readFile.Close
-		Set MKS = Nothing
+			Set MKS = Nothing
     End Function
     
     Function GetVersionFromFile(aFile, aPattern, aKey)
@@ -1022,26 +1018,46 @@ Class CProductBuild
                  
     Private Function FormatNextVersionNum()
         Dim temp
-                temp = Replace(mNewNextVersion, "_", ".")  '%%%% fix this
-
+        temp = Replace(mNewNextVersion, "_", ".")  '%%%% fix this
     End Function
+    
+	Function GetEmailBody()
+		Dim oldDevPath, newDevPath
+		oldDevPath = GetBuildVersion(ProductName & "CurrentVersion")
+		newDevPath = GetBuildVersion(ProductName & "NextVersion")
+	           
+		GetEmailBody = "Hello," & vbNewLine _
+					& "    " & "Just wanted to remind everyone that since we just released " & oldDevPath & "." & vbNewLine _
+					& "Everyone should make their current development sandboxes for " & oldDevPath & "." & vbNewLine _
+				  	& "The new Next version is " & newDevPath & " which is now the main trunk. " & vbNewLine _
+					& "	   " & "I have an additional comment regarding the " & oldDevPath& " release. When we made " & vbNewLine _
+					& "the " * oldDevPath & " development path we branched off the " & PrevLabel & "label. This means" & vbNewLine _
+					& "that if you checked any files into " & oldDevPath & " after build " & PrevLabel & " your changes " & vbNewLine _
+					& "did not actually make it into the " & oldDevPath & " branch and need to be merged into " & newDevPath & "." & vbNewLine _
+					& "Please double check your changes for any files may need to be merged." _
+	End Function
 
-    Function SendEmail(Subject, Body)
+	Function GetEmailSubject()
+		Dim oldDevPath, newDevPath 
+		oldDevPath = GetBuildVersion(ProductName & "CurrentVersion")
+		GetEmailSubject = ProductName & oldDevPath & " release and your sandboxes." 
+	End Function
+	
+    Function SendEmail()
            WriteToDlgAndFile "Sending the email"
             Dim oSMTP
             Set oSMTP = wscript.CreateObject("SoftArtisans.SMTPMail") 'SMTPControl.SMTP")
     
             Error = False
-            Err.Clear
-    
+            Err.Clear    
              With oSMTP
              .RemoteHost = "mail.corp.solimarsystems.com"
              .MailFromAddress = "achou@solimarsystems.com"
              .FromName = "achou@solimarsystems.com"
-             .AddRecipient "engineering@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
+             .AddRecipient "achou@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
              .Charset = 1
-             .Subject = Subject
-             .BodyText = Body
+             .Subject = GetEmailSubject
+             .BodyText = GetEmailBody
              .SendMail
              End With
             
@@ -1051,7 +1067,7 @@ Class CProductBuild
             If Error = True Then
                 EndProgram eEmailSendError '"Error " & Err.Number & ": " & Err.Description
             End If
-
+	    Set oSMTP = Nothing
     End Function
 
     Function BuildError(aErrMsg)

@@ -140,7 +140,7 @@ Class CNewBuild
            Dim output, readFile, writeFile, BuildScriptPJ
            output = mBuild.mBuildPath & "\temp.txt"
            mInputFile = mBuild.mBuildPath & "\BuildRegistry.txt"
-           aMKS.RefreshFile mBuild.mBuildPath & "\buildScript.pj", mInputFile
+           'aMKS.RefreshFile mBuild.mBuildPath & "\buildScript.pj", mInputFile
 	   aMKS.LockFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
            mBuild.RunCmd "attrib -r " & Chr(34) + mInputFile + Chr(34)
            
