@@ -399,7 +399,10 @@ short KeyMaster::program(SKeyRecord* key_record)
    VARIANT* pVarArray;
 
    if(!SUCCEEDED(setHandle()))
+   {
+      Application->MessageBox("setHandle failed.", "Information", MB_OK);
       return 1;
+   }
 
    ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
    if(key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
@@ -425,7 +428,7 @@ short KeyMaster::program(SKeyRecord* key_record)
 
       //create the multi dim safe array to look like Module_Array [NumModules][2]
       hr = MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
-char Buff[256];
+      char Buff[256];
       for(int i=0; i<NumModules; i++)
       {
          AnsiString mod_name = module_detail[ModuleIds[i]]->name;

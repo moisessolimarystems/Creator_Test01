@@ -451,11 +451,13 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
 				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
 				<Module id="8"	offset="0x0ac" bits="4" name="Docserver Job Event"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="IPDS::2dBarCodes"/>
 				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
 				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
 				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PS"/>
 				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF"/>
 				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event"/>
+				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes"/>
 				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL"/>
 				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF"/>
 				<Module id="34"	offset="0x104" bits="4" name="AFP::PS"/>
@@ -478,11 +480,13 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="1" default="15"/>
 					<ModuleInclude id="2" default="15"/>
 					<ModuleInclude id="8" default="0"/>
+					<ModuleInclude id="9" default="0"/>
 					<ModuleInclude id="12" default="0"/>
 					<ModuleInclude id="13" default="0"/>
 					<ModuleInclude id="14" default="0"/>
 					<ModuleInclude id="15" default="0"/>
 					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="30" default="0"/>
 					<ModuleInclude id="32" default="0"/>
 					<ModuleInclude id="33" default="0"/>
 					<ModuleInclude id="34" default="0"/>

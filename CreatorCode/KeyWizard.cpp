@@ -627,6 +627,11 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
          active_panel->Visible = false;
          BackBtn->Enabled = true;
 
+         //check to see if it is test/dev
+         if(passwordComboBox->Enabled)
+         {
+            key_record->num_days = passwordComboBox->ItemIndex;
+         }
          //set physical key members
          setStartPanelMembers();
 
