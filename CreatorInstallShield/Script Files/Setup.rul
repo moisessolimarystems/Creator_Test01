@@ -364,7 +364,10 @@ begin
              abort;
          endif;
     endwhile;  
-                                     
+    
+    if(!MAINTENANCE) then 
+    	InstallDotNet();                                 
+    endif;
 	//Create the ODBC_SQLCreator bde key...                                     
     //CreateODBC_SQLCreatorKey();         
 end;
@@ -382,6 +385,8 @@ function CheckRequirements()
     NUMBER  nvResult, nvResultMaj, nvResultMin;
     STRING  svResult;
 	BOOL	bIs32BitSetup;
+	NUMBER  nvType, nvSize;
+	STRING  svValue;
 begin 
     // Initialize Global Struct   	
    	gstructOSTYPE.IsWindowsXP = FALSE;
@@ -458,7 +463,14 @@ begin
 					    " on this computer.  Please log off and log on as the administrator", SEVERE);
 			abort;  
 		endif;
-	endif; 
+	endif;    
+	
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
+	if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer","CurrentVersion",nvType, svValue, nvSize) == 0) then
+		MessageBox("Please uninstall Solimar License Server from this system before installing Creator " + 
+				   "which uses Solimar Internal Release.", SEVERE);
+		abort;
+	endif;
 end;
 
  
@@ -705,27 +717,27 @@ begin
 
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
 	szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","LicenseViewer", nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi /qn" ;  
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\LicenseViewer","CurrentVersion", nvType, svValue, nvSize) == 0) then
+		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif;                  
-    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi /qn" ; 
+    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ; 
     LaunchAppAndWait(szPath, szOpts, WAIT);     
     
 	szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarLicenseManager",nvType, svValue, nvSize) == 0) then 
-		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi /qn" ;  
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseManager","CurrentVersion",nvType, svValue, nvSize) == 0) then 
+		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\""+ " /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi /qn"  ;
+    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\"" + " /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarInternalRelease",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ; 
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease","CurrentVersion",nvType, svValue, nvSize) == 0) then
+		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ; 
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ;
+    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     InstallSentinelDriver();
