@@ -20,8 +20,6 @@ ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewM
 ModuleLicenseListViewManager::~ModuleLicenseListViewManager()
 {
 	//disconnect from the solimar license server
-   //new
-   OurCommLink->UnInitializeModuleLicenseConnection();
 	OurCommLink->Disconnect();
 	delete OurCommLink;
 	OurCommLink = 0;

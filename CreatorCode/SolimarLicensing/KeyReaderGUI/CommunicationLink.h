@@ -25,9 +25,7 @@ public:
 	bool IsModInitialized();
 
 	//Releases the safe array for the module list
-   HRESULT UnLockModuleList();
-
-	void UnInitializeModuleLicenseConnection();
+	HRESULT UnInitializeModuleLicenseConnection();
 
 	//Free up the memory
 	void UnInitializeKeyInfoConnection();

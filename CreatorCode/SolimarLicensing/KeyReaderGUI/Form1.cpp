@@ -75,8 +75,6 @@ Form1::Form1()
 	//now create the comparer for the mod list view
 	mlvwColumnSorter = new ModListViewComparer();
 	this->ModLicenseListView->ListViewItemSorter = mlvwColumnSorter;
-
-   UpdateKeyListView();
 }
 
 void Form1::Dispose(Boolean disposing)
@@ -197,7 +195,7 @@ void Form1::InitializeKeyInfoListView()
 	this->ProductVersion->Text = S"Product Version";
 	this->License->Text = S"License";
 	this->Active->Text = S"Active";
-	this->HoursLeft->Text = S"Days Left";
+	this->HoursLeft->Text = S"Hours Left";
 	this->ExpirationDate->Text = S"Expiration Date";
 
 
@@ -401,7 +399,7 @@ void Form1::openMenuItem_Click(Object* sender, System::EventArgs* e)
 void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e) 
 {
 	//updates the views
- 	UpdateViews();
+	UpdateViews();
 }
 
 void Form1::KeyList_RowChange(Object* sender, System::EventArgs* e)
@@ -524,7 +522,7 @@ void Form1::ModList_ColumnClick(Object* /*o*/, ColumnClickEventArgs* e)
 void Form1::TimerEventProcessor(Object* myObject,  EventArgs* myEventArgs)
 {
 	//update the key listviews
-//	UpdateKeyListView();
+	UpdateKeyListView();
 }
 
 void Form1::StartTimer()

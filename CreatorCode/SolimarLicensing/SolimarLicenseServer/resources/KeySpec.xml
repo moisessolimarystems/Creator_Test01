@@ -233,7 +233,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
 				<Module id="54"	offset="0x154" bits="4" name="Output Selector"/>
 				<Module id="55" offset="0x150" bits="4" name="PDF::PostScript"/>				
-				<Module id="56" offset="0x16c" bits="4" name="SMART" unlimited="1"/>
+				<Module id="56" offset="0x16c" bits="4" name="SMART"/>
 				
 				<!-- regular modules -->
 				<Module id="62"	offset="0x174" bits="4" name="Tape Input"/>
@@ -391,13 +391,13 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		<KeyLayout name="SolScript">
 			<ModuleList>
 				<!-- regular modules -->
-				<Module id="0" offset="0x08c" bits="4" name="Distiller" unlimited="1"/>
-				<Module id="1" offset="0x088" bits="4" name="GhostScript" unlimited="1"/>
-				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode" unlimited="1"/>
-				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS" unlimited="1"/>
-				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF" unlimited="1"/>
-				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF" unlimited="1"/>
-				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript" unlimited="1"/>
+				<Module id="0" offset="0x08c" bits="4" name="Distiller"/>
+				<Module id="1" offset="0x088" bits="4" name="GhostScript"/>
+				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
+				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
+				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
+				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF"/>
+				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
 			</ModuleList>
 			<ProductList>
 				<Product id="9" name="SolScript">

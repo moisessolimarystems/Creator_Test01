@@ -738,11 +738,11 @@ begin
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarLicenseServer",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseServer.msi /qn"  ; 
+    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing","SolimarInternalRelease",nvType, svValue, nvSize) == 0) then
+		 szOpts = " /x " + SRCDIR + "\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ; 
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarLicenseServer.msi /qn"  ;
+    szOpts = " /i " + SRCDIR + "\\SolimarLicensing\\SolimarInternalRelease.msi /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
  
 end;             
