@@ -3,7 +3,7 @@
 <PROJECT>
   <MACROS>
     <VERSION value="BCB.05.03"/>
-    <PROJECT value="..\Image\CreatorProject.exe"/>
+    <PROJECT value="Image\Creator.exe"/>
     <OBJFILES value="objs\CreatorProject.obj objs\Keymaster.obj objs\Kyslevel.obj 
       objs\customerform.obj objs\CreatorAbout.obj objs\CustQueryDlg.obj 
       objs\CustUpdateDlg.obj objs\keyform.obj objs\VersionDlg.obj 
@@ -22,7 +22,7 @@
       DevelopmentPasswordDlg.dfm keySearchDlg.dfm keyDateSearchDlg.dfm 
       SolSearcherEnterpriseDetails.dfm"/>
     <LIBFILES value="LIBS\Key.lib KEY\3prty\RAINBOW\WINNT\Spromeps.lib"/>
-    <LIBRARIES value="dclusr50.lib"/>
+    <LIBRARIES value="dclusr50.lib vcldb50.lib vclbde50.lib vclx50.lib Qrpt50.lib Vcl50.lib"/>
     <SPARELIBS value="Vcl50.lib Qrpt50.lib vclx50.lib vclbde50.lib vcldb50.lib dclusr50.lib"/>
     <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Qrpt50.bpi Vcldb50.bpi Vclbde50.bpi 
       vcldbx50.bpi TeeUI50.bpi TeeDB50.bpi Tee50.bpi TeeQR50.bpi VCLIB50.bpi 
@@ -36,7 +36,7 @@
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="tlink32"/>
     <USERDEFINES value=""/>
-    <SYSDEFINES value="NO_STRICT;USEPACKAGES"/>
+    <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="CreatorProject.cpp"/>
     <INCLUDEPATH value="$(BCB)\Projects;$BCB)\Bin;$(BCB)\Imports;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;&quot;E:\spdmain_5_12\&quot;"/>
     <LIBPATH value="$(BCB)\Projects;&quot;C:\Program Files\Borland\CBuilder5\Bin\&quot;;$(BCB)\Projects\Lib;$(BCB)\Imports;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;&quot;E:\spdmain_5_12\spdCode\Spdnt\&quot;"/>
@@ -50,7 +50,7 @@
     <LFLAGS value="-Iobjs -D&quot;&quot; -aa -Tpe -x -Gn"/>
   </OPTIONS>
   <LINKER>
-    <ALLOBJ value="c0w32.obj $(PACKAGES) sysinit.obj $(OBJFILES)"/>
+    <ALLOBJ value="c0w32.obj sysinit.obj $(OBJFILES)"/>
     <ALLRES value="$(RESFILES)"/>
     <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
   </LINKER>
@@ -136,9 +136,10 @@ Count=1
 Item0=objs
 
 [HistoryLists\hlFinalOutputDir]
-Count=2
-Item0=..\Image\
-Item1=..\Image
+Count=3
+Item0=Image\
+Item1=..\Image\
+Item2=..\Image
 
 [HistoryLists\hIBPIOutputDir]
 Count=4
