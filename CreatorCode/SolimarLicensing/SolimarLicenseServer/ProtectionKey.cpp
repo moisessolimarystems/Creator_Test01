@@ -607,6 +607,19 @@ HRESULT ProtectionKey::Format(BSTR *new_key_ident)
 	return S_OK;
 }
 
+
+
+void OutputFormattedDebugString(const wchar_t *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+	wchar_t buf[1024];
+	memset(buf, 0, sizeof(buf));
+	_vsnwprintf(buf, 1024, fmt, list);
+	OutputDebugStringW(buf);
+}
+
+
 // Programs a key
 	/*
 	VARIANT
@@ -625,6 +638,9 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 {
 	HRESULT hr = S_OK;
 	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program(%d, %d, %d, %d, %d, %d, %d, module_list size: %d, ?)", customer_number, key_number, product_ident, ver_major, ver_minor, key_type, days, (module_value_list.vt & VT_ARRAY) ? module_value_list.parray->rgsabound[0].cElements : 0);
+	
 	unsigned short product_version = (unsigned short)(Version::TinyVersion(Version::ModuleVersion(ver_major, ver_minor, 0, 0)).program);
 	
 	// lock the driver's key list so that these operations will not affect the key_ident we reference here until finished
@@ -633,16 +649,29 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	hr = Format();
 	if (FAILED(hr)) return hr;
 	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Product: %d, Version: %08x, Key Type: %d, Status: INITIAL_TRIAL", product_ident, product_version, key_type);
+	
 	// write the header data
 	WriteHeader(L"Product ID",(unsigned int)(unsigned short)product_ident);
 	WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
 	WriteHeader(L"Key Type",(unsigned int)(unsigned short)key_type);
 	WriteHeader(L"Status",(unsigned int)(unsigned short)INITIAL_TRIAL);
 	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteCounterDays(%d)", days);
+	
 	// write the initial/extended counter
 	hr = WriteCounterDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
+	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteExpirationDays(%d)", days);
+	
 	// write the expiration date
 	hr = WriteExpirationDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
+	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Customer: %x, Key Number %x)", customer_number, key_number);
 	
 	WriteHeader(L"Customer Number",(unsigned int)(unsigned short)customer_number);
 	WriteHeader(L"Key Number",(unsigned int)(unsigned short)key_number);
@@ -650,9 +679,15 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	// get the new key id for this key now that the customer number and key number are written
 	if (new_key_ident)
 	{
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentKeyIdent()");
+		
 	    hr = m_driver->ComputeCurrentKeyIdent(m_keyident, new_key_ident);
 		if (FAILED(hr)) throw _com_error(hr);
 	}
+	
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primary descriptor, primary password, secondary descriptor)");
 	
 	KeySpec::Header &header_primary_descriptor = m_keyspec->headers[L"Primary Descriptor"];
 	KeySpec::Header &header_secondary_descriptor = m_keyspec->headers[L"Secondary Descriptor"];
@@ -661,6 +696,9 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	WriteHeader(header_primary_password.id, header_primary_password.default_value);
 	WriteHeader(header_secondary_descriptor.id, header_secondary_descriptor.default_value);
 			
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data");
+	
 	// write the default module data if provided
 	//xxx I don't know if this is supposed to happen
 	//xxx review what happens when you program a key
@@ -668,9 +706,14 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	KeySpec::Product &product(m_keyspec->products[product_ident]);
 	for (KeySpec::Product::data_list_t::iterator module = product.data.begin(); module != product.data.end(); ++module)
 	{
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data (<%04x><%02d>  %08x)", module->offset, module->bits, (unsigned int)module->default_license);
 		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
 	}
-		
+	
+//xxx debug
+	OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides");
+	
 	// write the values specified in the module value list if appropriate
 	if (module_value_list.vt==(VT_ARRAY | VT_VARIANT))
 	{
@@ -702,19 +745,21 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 					KeySpec::Module &module(m_keyspec->products[product_ident][module_id]);
 					if (module.isLicense)
 					{
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteLicense(%d, %08x)", module_id, module_value);
 						WriteLicense(module_id, module_value);
 					}
 					else
 					{
+//xxx debug
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteModule(%d, %08x)", module_id, module_value);
 						WriteModule(module_id, module_value);
 					}
 				}
 				catch (_com_error &e)
 				{
-					//xxx debug message
-					wchar_t buf[128];
-					swprintf(buf, L"ProtectionKey::Program() Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
-					OutputDebugStringW(buf);
+					//xxx debug
+					OutputFormattedDebugString(L"ProtectionKey::Program() -- Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
 					return e.Error();
 				}
 			}
@@ -722,10 +767,8 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	}
 	else if (module_value_list.vt != VT_EMPTY)
 	{
-		//xxx debug message
-		wchar_t buf[128];
-		swprintf(buf, L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
-		OutputDebugStringW(buf);
+		//xxx debug
+		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
 		return E_INVALIDARG;
 	}
 	
