@@ -1059,8 +1059,12 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 						if (EnterSPDOutputPassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.units_licensed))
 							return S_OK;
 						
-						if (EnterSPDPagesPerMinutePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.pages_per_minute_struct))
-							return S_OK;
+						// if SPD, check for pages per minute password (no such thing on iconvert keys)
+						if (product_id==0 || product_id==6 || product_id==11)
+						{
+							if (EnterSPDPagesPerMinutePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.pages_per_minute_struct))
+								return S_OK;
+						}
 						
 						if (EnterSPDModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
 							return S_OK;
@@ -1105,8 +1109,11 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 				if (EnterSPDOutputPassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.units_licensed))
 					return S_OK;
 				
-				if (EnterSPDPagesPerMinutePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.pages_per_minute_struct))
-					return S_OK;
+				if (product_id==0 || product_id==6 || product_id==11)
+				{
+					if (EnterSPDPagesPerMinutePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.pages_per_minute_struct))
+						return S_OK;
+				}
 				
 				// check for module password (also covers 'zero module' passwords, whatever that means)
 				for (KeySpec::Product::data_list_t::iterator module = m_keyspec->products[product_id].data.begin(); module != m_keyspec->products[product_id].data.end(); ++module)
@@ -1356,9 +1363,17 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed)
 {
 	HRESULT hr = S_OK;
-
+	
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(_bstr_t(L"Product ID")).ulVal][module_id]);
-	if (GetSPDModulePassword(customer_number, key_number, module_id, (units_licensed < 0 ? 0 : units_licensed)) == user_password)
+	
+	// If units_licensed_decimal is set, that means the <password>-<units licensed>
+	// syntax was used to enter the password. Since getModulePassword()
+	// expects the current units licensed, not the desired units licensed,
+	// we subtract 1 from the units_licensed_decimal value. If units_
+	// licensed_decimal is not set, we simply pass the current units
+	// licensed for the module.
+	unsigned int mod_units_licensed = (units_licensed==0 ? 0 : units_licensed-1);	
+	if (GetSPDModulePassword(customer_number, key_number, module_id, mod_units_licensed) == user_password)
 	{
 		if (trial_key)
 		{
@@ -1380,7 +1395,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 		
 		if (trial_key || base_key)
 		{
-			try {WriteLicense(module_id, (units_licensed < 0 ? 0 : units_licensed));}
+			try {WriteLicense(module_id, units_licensed);}
 			catch(_com_error &e) {throw e;}
 			
 			// success
@@ -1668,7 +1683,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 			else
 			{
 				password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 				password_generated = true;
 			}
 			break;
@@ -1692,7 +1707,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		{
 			// for spd modules (all modules are currently legacy spd style modules)
 			password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 			password_generated = true;
 			break;
 		}
