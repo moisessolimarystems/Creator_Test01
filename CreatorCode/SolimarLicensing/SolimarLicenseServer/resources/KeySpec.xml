@@ -234,8 +234,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="54"	offset="0x154" bits="4" name="Output Selector" unlimited ="1"/>
 				<Module id="55" offset="0x150" bits="4" name="PDF::PostScript" unlimited ="1"/>				
 				<Module id="56" offset="0x16c" bits="4" name="SMART" unlimited="1"/>
-				
+				<Module id="57" offset="0x168" bits="4" name="AFPDS::IPDS" unlimited="1"/>
 				<!-- regular modules -->
+				
 				<Module id="62"	offset="0x174" bits="4" name="Tape Input"/>
 				<Module id="63"	offset="0x170" bits="4" name="3770so"/>
 				
@@ -306,6 +307,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="54" default="15"/>
 					<ModuleInclude id="55" default="0"/>
 					<ModuleInclude id="56" default="0"/>
+					<ModuleInclude id="57" default="0"/>
 					<ModuleInclude id="62" default="0"/>
 					<ModuleInclude id="63" default="0"/>
 					

@@ -1358,17 +1358,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 	HRESULT hr = S_OK;
 
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(_bstr_t(L"Product ID")).ulVal][module_id]);
-	// If units_licensed_decimal is set, that means the <password>-<units licensed>
-	// syntax was used to enter the password. Since getModulePassword()
-	// expects the current units licensed, not the desired units licensed,
-	// we subtract 1 from the units_licensed_decimal value. If units_
-	// licensed_decimal is not set, we simply pass the current units
-	// licensed for the module.
-	unsigned int mod_units_licensed = (
-		units_licensed && units_licensed <= ((unsigned int)0xFFFFFFFF >> (32-module.bits))
-		? units_licensed - 1
-		: 0);
-	if (GetSPDModulePassword(customer_number, key_number, module_id, mod_units_licensed) == user_password)
+	if (GetSPDModulePassword(customer_number, key_number, module_id, (units_licensed < 0 ? 0 : units_licensed)) == user_password)
 	{
 		if (trial_key)
 		{
@@ -1390,7 +1380,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 		
 		if (trial_key || base_key)
 		{
-			try {WriteLicense(module_id, mod_units_licensed+1);}
+			try {WriteLicense(module_id, (units_licensed < 0 ? 0 : units_licensed));}
 			catch(_com_error &e) {throw e;}
 			
 			// success
