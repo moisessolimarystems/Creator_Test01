@@ -21,12 +21,17 @@ void AboutBoxForm::InitializeComponent()
 	
 	RichTextBox* richTextBox1 = new RichTextBox();
 	richTextBox1->BackColor = System::Drawing::SystemColors::InactiveBorder;
-    richTextBox1->Dock = DockStyle::Fill;
+   richTextBox1->Dock = DockStyle::Fill;
 	richTextBox1->ReadOnly = true;
 	    
 	richTextBox1->SelectionFont = new System::Drawing::Font(S"Arial", 16, FontStyle::Bold);
 	richTextBox1->SelectionAlignment = HorizontalAlignment::Center;
 	richTextBox1->SelectedText = S"\n \n Key License Manager";
+
+  	richTextBox1->SelectionFont = new System::Drawing::Font(S"Arial", 12, FontStyle::Bold);
+	richTextBox1->SelectionAlignment = HorizontalAlignment::Center;
+
+	richTextBox1->AppendText(S"\n Version 1.2");
 
 	richTextBox1->SelectionFont = new System::Drawing::Font(S"Arial", 8);
 	richTextBox1->SelectionAlignment = HorizontalAlignment::Center;
