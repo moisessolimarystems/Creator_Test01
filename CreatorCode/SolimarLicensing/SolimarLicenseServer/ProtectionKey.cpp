@@ -2445,13 +2445,13 @@ HRESULT ProtectionKey::WriteCounterDays(unsigned short extend_days)
 	unsigned short key_status = ReadHeaderCache(L"Status").uiVal;
 	unsigned short key_type = ReadHeaderCache(L"Key Type").uiVal;
 	
-	if (key_type==KEYDevelopment && (extend_days==0 || extend_days-1 > sizeof(KDPasswordHours)/sizeof(KDPasswordHours[0])))
+	if (key_type==KEYDevelopment && (extend_days < 0 || extend_days >= sizeof(KDPasswordHours)/sizeof(KDPasswordHours[0])))
 		return E_INVALIDARG;
 	
 	if (key_type == KEYDevelopment)
 	{
-		initialCounter = KDPasswordHours[extend_days-1];
-		extendedCounter = KDPasswordHours[extend_days-1];
+		initialCounter = KDPasswordHours[extend_days];
+		extendedCounter = KDPasswordHours[extend_days];
 	}
 	else
 	{
@@ -2491,11 +2491,11 @@ HRESULT ProtectionKey::WriteExpirationDays(unsigned short extend_days)
 	unsigned short key_status = ReadHeaderCache(L"Status").uiVal;
 	unsigned short trial_days;
 	
-	if (key_type==KEYDevelopment && (extend_days==0 || extend_days-1 > sizeof(KDPasswordDays)/sizeof(KDPasswordDays[0])))
+	if (key_type==KEYDevelopment && (extend_days < 0 || extend_days >= sizeof(KDPasswordDays)/sizeof(KDPasswordDays[0])))
 		return E_INVALIDARG;
 	
 	if (key_type == KEYDevelopment)
-		trial_days = KDPasswordDays[extend_days-1];
+		trial_days = KDPasswordDays[extend_days];
 	else
 		trial_days = extend_days;
 	
