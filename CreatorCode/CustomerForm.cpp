@@ -7,7 +7,7 @@
 #include <vcl\vcl.h>
 #pragma hdrstop
 
-const int CREATOR_VERSION = 0x222;
+const int CREATOR_VERSION = 0x223;
 
 #include "CLookups.h"
 #include "CustomerForm.h"
@@ -881,7 +881,7 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
                         ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = True;
-                        ZoomDetailTextDescription0->Caption = "Aplications";
+                        ZoomDetailTextDescription0->Caption = "Aplication Databases";
 
                         ZoomDetailValue0->Visible = True;
                         itoa(ss_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );

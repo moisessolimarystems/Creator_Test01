@@ -111,14 +111,15 @@ void TSolSearcherDetails::GeneratePassword(int type)
    // If for some reason you're in this function and not a SSKey
    if (m_pKey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
         return;
-   unsigned short min;
+   unsigned short min(0);
    unsigned short max;
    unsigned long ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
    void ( __closure *ApplyPassword)(SKeyRecord* keyrec, unsigned short units_licensed);
 
    switch (type) {
       case  INDEX_SERVERS_CELL:
-         min = m_pKey->getIndexServers();
+         if (!m_pKey->isOnTrial())
+            min = m_pKey->getIndexServers();
          max = MAX_INDEX_SERVERS;
          fieldName = "SKRindexServers";
          descriptionId = 600;
@@ -126,7 +127,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
          ApplyPassword =  keyMaster->applyIndexServersPassword;
       break;
       case  REPORT_SERVERS_CELL:
-         min = m_pKey->getReportServers();
+         if (!m_pKey->isOnTrial())
+            min = m_pKey->getReportServers();
          max = MAX_REPORT_SERVERS;
          fieldName = "SKRreportServers";
          descriptionId = 601;
@@ -134,7 +136,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
          ApplyPassword =  keyMaster->applyReportServersPassword;
       break;
       case  CONCURRENT_USERS_25_CELL:
-         min = m_pKey->getConcurrentUsers();
+         if (!m_pKey->isOnTrial())
+            min = m_pKey->getConcurrentUsers();
          max = MAX_CONCURRENT_USERS_25;
          fieldName = "SKRconcurrentUsers";
          descriptionId = 602;
@@ -142,7 +145,8 @@ void TSolSearcherDetails::GeneratePassword(int type)
          ApplyPassword =  keyMaster->applyConcurrentUsersPassword;
       break;
       case  APPLICATIONS_CELL:
-         min =  m_pKey->getApplications();
+         if (!m_pKey->isOnTrial())
+            min =  m_pKey->getApplications();
          max = MAX_APPLICATIONS;
          descriptionId = 603;
          fieldName = "SKRapplications";
@@ -259,7 +263,7 @@ void TSolSearcherDetails::Load(SKeyRecord* pKeyRecord)
 
    //APPLICATIONS_CELL = 0x03;
    pItem = SolSearcherPropertyList->Items->Add();
-   pItem->Caption = "Servers";
+   pItem->Caption = "Application Databases";
    pItem->Data = (void*)APPLICATIONS_CELL;
    pItem->SubItems->Add(m_pKey->getApplications());
 
