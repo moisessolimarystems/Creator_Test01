@@ -147,7 +147,7 @@ HRESULT CommunicationLink::InitializeModuleLicenseConnection(Object* TheKeyNumbe
 }
 
 //Free up the memory allocated in the initialize function
-HRESULT CommunicationLink::UnInitializeModuleLicenseConnection()
+HRESULT CommunicationLink::UnLockModuleList()
 {
 	HRESULT hr = 0;
 
@@ -159,9 +159,12 @@ HRESULT CommunicationLink::UnInitializeModuleLicenseConnection()
       VariantClear(ModuleList);
 		delete ModuleList;
 	}
+   return hr;
+}
 
+void CommunicationLink::UnInitializeModuleLicenseConnection()
+{
 	ModInitialized = false;
-	return hr;
 }
 
 bool CommunicationLink::IsModInitialized()
@@ -203,7 +206,7 @@ int CommunicationLink::GetNumModules()
       
       // release the lock on the ModuleList
    	if(IsModInitialized())
-	   	UnInitializeModuleLicenseConnection();
+	   	UnLockModuleList();
    }
 
 	return numModules;
@@ -301,11 +304,7 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 
       // release the lock on the ModuleList
    	if(IsModInitialized())
-	   	   UnInitializeModuleLicenseConnection();
-
-		//SafeArrayUnaccessData(ModuleList->parray);
-		//VariantClear(ModuleList);
-      //delete ModuleList;
+	   	   UnLockModuleList();
 }
 
 long CommunicationLink::GetLicensesInUse(Object* ModuleID, Object* KeyNumber)

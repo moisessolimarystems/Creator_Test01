@@ -337,7 +337,11 @@ HRESULT KeyMaster::initDriver()
 	  		               );
 
    if(!SUCCEEDED(hr))
+   {
+      Application->MessageBox("The Solimar License Server Is Not Running", "Key Message", MB_OK|MB_ICONERROR )
+      Application->Terminate();
       return hr;
+   }
 
 
    ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));

@@ -629,7 +629,13 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       ModuleDetailQuery->ParamByName("units")->AsInteger = spd_key->getLicense(detail->id);
       // ICONVERT products have an SDRid of 10XX, and therefore have to check
       // to see if the product is ICONVERT or other.
-      ModuleDetailQuery->ParamByName("mod_id")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? detail->id + 1000 : detail->id;
+
+      if(key_record->pkey->productId == ICONVERT_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 1000;
+      else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 3000;
+      else
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
 
 
       ModuleDetailQuery->Prepare();
