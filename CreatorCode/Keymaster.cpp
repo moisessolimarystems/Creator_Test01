@@ -16,8 +16,12 @@
 //                                                            *
 //------------------------------------------------------------*
 
+
 #include "kyslevel.h"
 #include "Keymaster.h"
+#include "SolimarLicensing\SolimarLicenseServer\_SolimarLicenseServer_i.c"
+#include <windows.h>
+#include "SolimarLicensing\common\ChallengeResponseHelper.h"
 
 #define OVERPASSWORD1			0xC822
 #define OVERPASSWORD2			0x85A2
@@ -25,7 +29,13 @@
 // statusLineText codes
 #define OPERATING_ON_KEY            1
 
+BYTE challenge_key_manager_userauththis_public[] = {
+#include "..\..\SolimarLicensing\common\keys\SolimarLicenseServer.UserAuthThis.public.key.txt"
+};
 
+BYTE challenge_key_manager_thisauthuser_private[] = {
+#include "..\..\SolimarLicensing\common\keys\SolimarLicenseServer.ThisAuthUser.private.key.txt"
+};
 
 /*--------------------------------------------------------------------*
  *                                                                    *
@@ -34,6 +44,35 @@
  *   This class provides the Protection Key interface for the Creator.*
  *                                                                    *
  *--------------------------------------------------------------------*/
+//==============================================================================
+// Function:    Constructor()
+// Purpose:     Initialize all members.
+// Parameters:  None
+// Returns:     nothing
+// Note:
+//==============================================================================
+KeyMaster::KeyMaster()
+{
+        pKeyList = new VARIANT();
+        pTheServer = NULL;
+        CurrentKey = new ProtectionKey;
+}
+
+//==============================================================================
+// Function:    Destructor()
+// Purpose:     Uninitialize all members.
+// Parameters:  None
+// Returns:     nothing
+// Note:
+//==============================================================================
+KeyMaster::~KeyMaster()
+{
+   VariantClear(pKeyList);
+   delete pKeyList;
+
+   delete CurrentKey;
+   CurrentKey = NULL;
+}
 
 //==============================================================================
 // Function:    clear()
@@ -44,17 +83,21 @@
 //==============================================================================
 short KeyMaster::clear()
 {
-   if (setHandle(&scratchkey) ||
-         scratchkey.clearKeyData(OVERPASSWORD1, OVERPASSWORD2) == FAILURE)
+   if (SUCCEEDED(setHandle()))
+   {
+      if(pTheServer)
+      {
+         if(SUCCEEDED(CurrentKey->clearKeyData(CurrentKeyID, pTheServer)))
+            return 0;
+      }
+   }
    return 1;
-
-   return 0;
 }
 
 
 //==============================================================================
 // Function:    deactivate()
-// Purpose:     Initializes key and bump key uses variable.  Returns 0 for success,
+// Purpose:     Initializes key.  Returns 0 for success,
 //              1 otherwise.
 // Parameters:  None
 // Returns:     short
@@ -62,16 +105,7 @@ short KeyMaster::clear()
 //==============================================================================
 short KeyMaster::deactivate()
 {
-   if (setHandle(&scratchkey))
-      return 1;
-   if (scratchkey.readUses() == FAILURE)
-      return 1;
-   if (scratchkey.clearKeyData(OVERPASSWORD1, OVERPASSWORD2) == FAILURE)
-      return 1;
-   scratchkey.uses++;
-   if (scratchkey.writeUses() == FAILURE)
-      return 1;
-   return 0;
+   return clear();
 }
 
 
@@ -85,28 +119,17 @@ short KeyMaster::deactivate()
 //==============================================================================
 bool KeyMaster::found()
 {
-   ProtectionKey::sproInitialize(&packet, server_name);
-   return ProtectionKey::sproFindFirstUnit(&packet);
-}
+        VARIANT_BOOL IsPresent;
 
-//==============================================================================
-// Function:    hasModules()
-// Purpose:     Returns true or false depending on whether the product has
-//              Modules or not.  SPD, CONNECTIVITY SERVER, or ICONVERT
-// Parameters:  SKeyRecord* - keyrec
-// Returns:     bool
-// Note:
-//==============================================================================
-bool KeyMaster::hasModules(SKeyRecord* keyrec)
-{
-   if(keyrec->pkey->productId==SPD_PRODUCT ||
-      keyrec->pkey->productId==CONNECT_PRODUCT ||
-      keyrec->pkey->productId==QUANTUM_PRODUCT ||
-      keyrec->pkey->productId==ICONVERT_PRODUCT ||
-      keyrec->pkey->productId==SOLSCRIPT_PRODUCT)
-      return true;
-   else
-      return false;
+        if (SUCCEEDED(setHandle()))
+        {
+                if(pTheServer)
+                {
+                        pTheServer->KeyIsPresent(*CurrentKeyID, &IsPresent);
+                        return (IsPresent == VARIANT_TRUE ? true : false);
+                }
+        }
+        return false;
 }
 
 //==============================================================================
@@ -117,11 +140,10 @@ bool KeyMaster::hasModules(SKeyRecord* keyrec)
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getPermanentPassword(ProtectionKey* key)
+void KeyMaster::getPermanentPassword(ProtectionKey* key, char* Password_String)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getBasePassword();
+   if(pTheServer)
+      key->getBasePassword(pTheServer, Password_String);
 }
 
 
@@ -136,15 +158,16 @@ ulong KeyMaster::getPermanentPassword(ProtectionKey* key)
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getExtensionPassword(ProtectionKey* key,
+void KeyMaster::getExtensionPassword(ProtectionKey* key,
                                       uchar extension_days,
                                       ProductId product_id,
                                       ushort product_version,
-                                      ushort extension_num)
+                                      ushort extension_num,
+                                      char* Password_String)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getExtensionPassword(extension_days, product_id, product_version, extension_num);
+
+   if(pTheServer)
+      key->getExtensionPassword(extension_days, extension_num, pTheServer, Password_String);
 }
 
 
@@ -159,39 +182,21 @@ ulong KeyMaster::getExtensionPassword(ProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getModulePassword(SpdProtectionKey* key,
+void  KeyMaster::getModulePassword(SpdProtectionKey* key,
                                    uchar mod_id,
                                    ProductId product_id,
                                    ushort product_version,
-                                   ushort units)
+                                   ushort units,
+                                   char* Password_String)
 {
-   if (setHandle(key))
-      return 0;
-   //return key->getModulePassword(mod_id, key->getLicense(mod_id), product_id, product_version);
-   return key->getModulePassword(mod_id, units, product_id, product_version);
+   if(pTheServer)
+      key->getModulePassword(mod_id, units,
+                             product_id,
+                             product_version,
+                             pTheServer,
+                             Password_String
+                            );
 }
-
-
-//==============================================================================
-// Function:    getModZeroPassword()
-// Purpose:     Get zero password for module mod_id.  Returns password for success,
-//              0 otherwise.
-// Parameters:  ProtectionKey* - key
-//              uchar - mod_id
-//              ProductId - product_id
-//              ushort - product_version
-// Returns:     ulong
-// Note:
-//==============================================================================
-/*ulong KeyMaster::getModZeroPassword(SpdProtectionKey* key,
-                                    uchar mod_id,
-                                    ProductId product_id,
-                                    ushort product_version)
-{
-   if (setHandle(key))
-      return 0;
-   return key->getModZeroPassword(mod_id, product_id, product_version);
-}*/
 
 
 //==============================================================================
@@ -202,12 +207,12 @@ ulong KeyMaster::getModulePassword(SpdProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getOutputPassword(SpdProtectionKey* key,
-                                   ushort output_units )
+void KeyMaster::getOutputPassword(SpdProtectionKey* key,
+                                   ushort output_units,
+                                   char* Password_String )
 {
-   if(setHandle(key))
-   	return 0;
-   return key->getOutputPassword(output_units);
+   if(pTheServer)
+     key->getOutputPassword(output_units, pTheServer, Password_String);
 }
 
 //==============================================================================
@@ -218,12 +223,14 @@ ulong KeyMaster::getOutputPassword(SpdProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getPagesPerMinutePassword(SpdProtectionKey* key,
-                                           ushort ext )
+void KeyMaster::getPagesPerMinutePassword(SpdProtectionKey* key,
+                                           ushort ext,
+                                           ushort pages,
+                                           char* Password_String,
+                                           long ModID )
 {
-   if(setHandle(key))
-   	return 0;
-   return key->getPagesPerMinutePassword(ext);
+   if(pTheServer)
+      key->getPagesPerMinutePassword(ext, pages, pTheServer, Password_String, ModID);
 }
 
 //==============================================================================
@@ -235,12 +242,16 @@ ulong KeyMaster::getPagesPerMinutePassword(SpdProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getProductVersionPassword(ProtectionKey* key,
-                                           ushort product_version)
+void KeyMaster::getProductVersionPassword(ProtectionKey* key,
+                                          ushort product_version,
+                                          char* Password_String
+                                          )
 {
-   if (setHandle(key))
-      return 0;
-   return key->getProductVersionPassword(product_version);
+   if(pTheServer)
+      key->getProductVersionPassword(product_version,
+                                     pTheServer,
+                                     Password_String);
+
 }
 
 //==============================================================================
@@ -252,12 +263,13 @@ ulong KeyMaster::getProductVersionPassword(ProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getIndexServersPassword(SSProtectionKey* key,
+AnsiString KeyMaster::getIndexServersPassword(SSProtectionKey* key,
                                          ushort units_licensed)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getIndexServersPassword(units_licensed);
+   if(pTheServer)
+      return key->getIndexServersPassword(units_licensed, pTheServer);
+
+   return 0;
 }
 
 //==============================================================================
@@ -269,12 +281,13 @@ ulong KeyMaster::getIndexServersPassword(SSProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getReportServersPassword(SSProtectionKey* key,
+AnsiString KeyMaster::getReportServersPassword(SSProtectionKey* key,
                                           ushort units_licensed)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getReportServersPassword(units_licensed);
+   if(pTheServer)
+      return key->getReportServersPassword(units_licensed, pTheServer);
+
+   return 0;
 }
 
 //==============================================================================
@@ -286,20 +299,22 @@ ulong KeyMaster::getReportServersPassword(SSProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-ulong KeyMaster::getConcurrentUsersPassword(SSProtectionKey* key,
-                                            ushort units_licensed)
+AnsiString KeyMaster::getConcurrentUsersPassword(SSProtectionKey* key,
+                                                 ushort units_licensed)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getConcurrentUsersPassword(units_licensed);
+   if(pTheServer)
+      return key->getConcurrentUsersPassword(units_licensed, pTheServer);
+
+   return 0;
 }
 
-ulong KeyMaster::getApplicationServerPassword(SSProtectionKey* key,
+AnsiString KeyMaster::getApplicationServerPassword(SSProtectionKey* key,
                                               ushort units_licensed)
 {
-   if (setHandle(key))
-      return 0;
-   return key->getApplicationsPassword(units_licensed);
+   if(pTheServer)
+         return key->getApplicationsPassword(units_licensed, pTheServer);
+
+   return 0;
 }
 
 //==============================================================================
@@ -309,9 +324,37 @@ ulong KeyMaster::getApplicationServerPassword(SSProtectionKey* key,
 // Returns:     short
 // Note:
 //==============================================================================
-short KeyMaster::initDriver()
+HRESULT KeyMaster::initDriver()
 {
-   return ProtectionKey::sproInitialize(&packet, server_name);
+   HRESULT hr = 0;
+
+   //connects to the solimar license server
+	hr = CoCreateInstance(CLSID_CSolimarLicenseSvr,
+  			                NULL,
+    			             CLSCTX_LOCAL_SERVER,
+      			          IID_ISolimarLicenseSvr,
+			                (void**)&pTheServer
+	  		               );
+
+   if(!SUCCEEDED(hr))
+      return hr;
+
+
+   ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
+
+	hr = cr.AuthenticateServer(pTheServer);
+	if(!SUCCEEDED(hr))
+      return hr;
+
+	// let the license server authenticate this client
+	hr = cr.AuthenticateToServer(pTheServer);
+	if(!SUCCEEDED(hr))
+      return hr;
+
+   //get the list of keys
+   hr = pTheServer->KeyEnumerate(pKeyList);
+
+   return hr;
 }
 
 
@@ -325,23 +368,11 @@ short KeyMaster::initDriver()
 //==============================================================================
 ProtectionKey* KeyMaster::newKey()
 {
-   ProtectionKey::sproInitialize(&packet, server_name);
-   return ProtectionKey::allocFirstUnit(&packet);
-}
+   if(pTheServer)
+      if(SUCCEEDED(setHandle()))
+      	   return ProtectionKey::newKey(CurrentKeyID, pTheServer);
 
-//==============================================================================
-// Function:    newKey()
-// Purpose:     Return a new key object based on the product ID found in the
-//              KeyDataBlock passed as a parameter.
-// Parameters:  KeyDataBlock* - key_data_block
-// Returns:     ProtectionKey*
-// Note:
-//==============================================================================
-ProtectionKey* KeyMaster::newKey(KeyDataBlock* key_data_block)
-{
-   scratchkey.keyDataBlock = *key_data_block;
-   return ProtectionKey::newKey(ProductId(scratchkey.productId), &packet);
-   // Not here
+   return NULL;
 }
 
 //==============================================================================
@@ -351,14 +382,161 @@ ProtectionKey* KeyMaster::newKey(KeyDataBlock* key_data_block)
 // Returns:     short
 // Note:
 //==============================================================================
-short KeyMaster::program(ProtectionKey* key)
+short KeyMaster::program(SKeyRecord* key_record)
 {
-   if (setHandle(key) ||
-         key->clearKeyData(OVERPASSWORD1, OVERPASSWORD2) == FAILURE ||
-         key->writeKeyData() == FAILURE)
+   ProtectionKey* key = key_record->pkey;
+   short ret = 1;
+   HRESULT hr = 0;
+   VARIANT ModuleArray;
+   MultidimensionalSafeArray::DimensionsType dims, index;
+
+   //returned from AccessMultiDimensionalSafearray and is used to stuff the variants
+   //into the safe array
+   VARIANT* pVarArray;
+
+   if(!SUCCEEDED(setHandle()))
       return 1;
 
-   return 0;
+   ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
+   if(key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
+   {
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+      int NumModules = 0;
+      int ModuleIds[64];
+
+      for(int mod_id =0; mod_id<64;mod_id++)
+      {
+         if ((module_detail[mod_id]->bExistingMember))
+         {
+
+            ModuleIds[NumModules] = mod_id;
+            NumModules++;
+         }
+      }
+
+      //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
+      //2 fields (mod id and licesne count)
+      dims.push_back(NumModules);
+      dims.push_back(2);
+
+      //create the multi dim safe array to look like Module_Array [NumModules][2]
+      hr = MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
+char Buff[256];
+      for(int i=0; i<NumModules; i++)
+      {
+         AnsiString mod_name = module_detail[ModuleIds[i]]->name;
+
+         index.push_back(i);
+         index.push_back(0);
+
+         hr = MultidimensionalSafeArray::AccessMultidimensionalSafearray(&ModuleArray,
+                                                                                 index,
+                                                                                 &pVarArray
+                                                                                );
+         if(SUCCEEDED(hr))
+         {
+            //set the type of the variant
+            pVarArray->vt = VT_UI4;
+            pVarArray->ulVal = module_detail[ModuleIds[i]]->id;
+            hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
+            ltoa(hr, Buff, 10);
+           	OutputDebugString("**HR from first unaccess ");
+         	OutputDebugString(Buff);
+         	OutputDebugString("**\r\n");
+         }
+
+         index.pop_back();
+         index.push_back(1);
+
+         if(SUCCEEDED(MultidimensionalSafeArray::AccessMultidimensionalSafearray(&ModuleArray,
+                                                                                 index,
+                                                                                 &pVarArray
+                                                                                 )))
+         {
+            //set the type of the variant
+            pVarArray->vt = VT_UI4;
+            pVarArray->ulVal = spd_key->getLicense(ModuleIds[i]);
+            hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
+            ltoa(hr, Buff, 10);
+           	OutputDebugString("**HR from second unaccess ");
+         	OutputDebugString(Buff);
+         	OutputDebugString("**\r\n");
+         }
+         index.pop_back();
+         index.pop_back();
+      }
+   }
+   
+   //its an SSE key
+   else
+   {
+      //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
+      //2 fields (mod id and licesne count)
+      dims.push_back(4);
+      dims.push_back(2);
+
+      //create the multi dim safe array to look like Module_Array [NumModules][2]
+      MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
+
+      for( int mod_id=0; mod_id<4; mod_id++ )
+      {
+         SSProtectionKey* ss_key = ((SSProtectionKey*)(key_record->pkey));
+         index.push_back(mod_id);
+         index.push_back(0);
+
+         if(SUCCEEDED(MultidimensionalSafeArray::AccessMultidimensionalSafearray(&ModuleArray,
+                                                                                 index,
+                                                                                 &pVarArray
+                                                                                )))
+         {
+            //set the type of the variant
+            pVarArray->vt = VT_UI4;
+            pVarArray->ulVal = mod_id;
+            MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
+         }
+
+         index.pop_back();
+         index.push_back(1);
+         if(SUCCEEDED(MultidimensionalSafeArray::AccessMultidimensionalSafearray(&ModuleArray,
+                                                                                 index,
+                                                                                 &pVarArray
+                                                                                 )))
+         {
+            //set the type of the variant
+            pVarArray->vt = VT_UI4;
+
+            if(mod_id == 0)
+              pVarArray->ulVal = ss_key->getIndexServers();
+            else if(mod_id == 1)
+               pVarArray->ulVal = ss_key->getReportServers();
+            else if(mod_id == 2)
+               pVarArray->ulVal = ss_key->getConcurrentUsers();
+            else
+               pVarArray->ulVal = ss_key->getApplications();
+
+            MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
+         }
+         index.pop_back();
+         index.pop_back();
+      }
+   }
+   if(pTheServer)
+      ret = key->ProgramKey(pTheServer, CurrentKeyID, key_record->num_days, &ModuleArray);
+
+  	OutputDebugString("**Before Deleting multi dim");
+   hr = MultidimensionalSafeArray::DeleteMultidimensionalSafearray(&ModuleArray);
+   char Buffer[256];
+   ltoa(hr, Buffer, 10);
+  	OutputDebugString("**HR from deleting the multi dim array is ");
+	OutputDebugString(Buffer);
+	OutputDebugString("**\r\n");
+
+   if(!SUCCEEDED(hr))
+      ret = 1;
+
+   VariantClear(&ModuleArray);
+
+   return ret;
 }
 
 //==============================================================================
@@ -371,12 +549,19 @@ short KeyMaster::program(ProtectionKey* key)
 //==============================================================================
 bool KeyMaster::programmed()
 {
-   //
-   // Tries to find the first protection key & sets the handle
-   if (setHandle(&scratchkey) || scratchkey.readCustomerNumber() == FAILURE)
-      return false;
+   VARIANT_BOOL IsProgrammed;
+   HRESULT hr = 0;
 
-   return bool(scratchkey.customerNumber);
+   if (SUCCEEDED(setHandle()))
+   {
+      if(pTheServer)
+      {
+         hr = pTheServer->KeyIsProgrammed(*CurrentKeyID, &IsProgrammed);
+         if(SUCCEEDED(hr))
+            return (IsProgrammed == VARIANT_TRUE ? true : false);
+      }
+   }
+   return false;
 }
 
 
@@ -391,10 +576,13 @@ bool KeyMaster::programmed()
 //==============================================================================
 short KeyMaster::read(SKeyRecord* keyrec)
 {
+   if(!pTheServer)
+      return 1;
+
    if (keyrec->pkey)
       delete keyrec->pkey;
    keyrec->pkey = newKey();
-   if (!keyrec->pkey || keyrec->pkey->readKeyData() == FAILURE)
+   if (!keyrec->pkey || keyrec->pkey->readKeyData(pTheServer, CurrentKeyID) == FAILURE)
       return 1; // FAILURE
 
    return 0;    // SUCCESS
@@ -430,7 +618,7 @@ short KeyMaster::read(SKeyRecord* keyrec, ProductId productId)
    if (keyrec->pkey)
       delete keyrec->pkey;
    keyrec->pkey = newKey(productId);
-   if (!keyrec->pkey || keyrec->pkey->readKeyData() == FAILURE)
+   if (!keyrec->pkey || keyrec->pkey->readKeyData(pTheServer, CurrentKeyID) == FAILURE)
       return 1; // FAILURE
 
    return 0;    // SUCCESS
@@ -443,18 +631,26 @@ short KeyMaster::read(SKeyRecord* keyrec, ProductId productId)
 // Parameters:  ProtectionKey* key
 // Returns:     short
 //==============================================================================
-short KeyMaster::setHandle(ProtectionKey* key)
+HRESULT KeyMaster::setHandle()
 {
-   // call sproFindFirstUnit() to obtain packet handle (FAILURE)
-   ProtectionKey::sproInitialize(&packet, server_name);
-   if (!ProtectionKey::sproFindFirstUnit(&packet))
-      return 1;
+   if(pTheServer)
+   {
+      VARIANT* pKeyName;
 
-   //
-   // set key's packet handle (SUCCESS)
-   key->setPacket(&packet);
+      HRESULT hr = pTheServer->KeyEnumerate(pKeyList);
 
-   return 0;
+      // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions
+		//needed to access safe array data
+		if (SUCCEEDED(SafeArrayAccessData(pKeyList->parray, (void**)&pKeyName)))
+		{
+		   CurrentKeyID = &((BSTR)(pKeyName[0].bstrVal));
+
+			if (SUCCEEDED(SafeArrayUnaccessData(pKeyList->parray)))
+				return SUCCESS;
+		}
+   }
+
+   return E_FAIL;
 }
 
 //==============================================================================
@@ -481,6 +677,7 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
                 module_detail[mod_id]->isAvailableForProduct(spd_key->productId) )
          {
             spd_key->setLicense(mod_id, module_detail[mod_id]->max);
+            spd_key->getLicense(mod_id);
          }
          else
          {
@@ -546,7 +743,8 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
 
    //
    // SOLSCRIPT_PRODUCT -
-   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT )
+   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -654,7 +852,8 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
 
    //
    // SOLSCRIPT_PRODUCT -
-   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT )
+   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -748,7 +947,8 @@ void KeyMaster::applyVersionPassword(SKeyRecord* keyrec, unsigned short version)
    if( keyrec->pkey->productId == SPD_PRODUCT ||
        keyrec->pkey->productId == CONNECT_PRODUCT ||
        keyrec->pkey->productId == QUANTUM_PRODUCT ||
-       keyrec->pkey->productId == SOLSCRIPT_PRODUCT)
+       keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       keyrec->pkey->productId == SDX_DESIGNER_PRODUCT)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
       SpdProtectionKey* pSpdKey((SpdProtectionKey*)(keyrec->pkey));
@@ -820,7 +1020,6 @@ void KeyMaster::applyPagesPerMinutePassword(SKeyRecord* keyrec)
 // Parameters:  (SKeyRecord* key_record, int output_units)
 // Returns:     None
 //==============================================================================
-///void KeyMaster::applyOutputPassword(SKeyRecord* key_record, int output_units, ModuleDetail** module_detail)
 void KeyMaster::applyOutputPassword(SKeyRecord* key_record, int output_units)
 {
    // int mod_id_idx;
@@ -844,9 +1043,6 @@ void KeyMaster::applyOutputPassword(SKeyRecord* key_record, int output_units)
 void KeyMaster::applyModPassword(SKeyRecord* keyrec, unsigned char module_id, unsigned short units)
 {
    SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
-
-   // key status changed to permanent
-   //spd_key->status = 2; //applyModPassword should only be called if key status is already 2
 
    // increment module
    //spd_key->setLicense(module_id, spd_key->getLicense(module_id)+1);
@@ -989,7 +1185,8 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
             spd_key->setLicense(mod_idx, 0);
       }
    }
-   else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT) {
+   else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
+            key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
 
       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
 
@@ -1031,5 +1228,27 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
    key_record->pkey->status = 2;
 }
 
+HRESULT KeyMaster::InitPasswordPacket()
+{
+   return pTheServer->PasswordPacketInitialize();
+}
 
+HRESULT KeyMaster::FinalizePasswordPacket()
+{
+    return pTheServer->PasswordPacketFinalize();
+}
+
+HRESULT KeyMaster::AppendPasswordToPacket(VARIANT vtExpires, BSTR password)
+{
+   return pTheServer->PasswordPacketAppendPassword(vtExpires, password);
+}
+
+HRESULT KeyMaster::GetPasswordPacket(VARIANT* pvtPacketData)
+{
+   return pTheServer->PasswordPacketGetPacket(pvtPacketData);
+}
+HRESULT KeyMaster::GetVerificationCode(BSTR* VerificationCode)
+{
+   return pTheServer->PasswordPacketGetVerificationCode(VerificationCode);
+}
 

@@ -33,6 +33,7 @@
 #include "ModuleDetail.h"
 #include <Forms.hpp>
 #include "SolSearcherEnterpriseDetails.h"
+#include <DB.hpp>
 
 //------------------------------------------------------------------------------
 // Defines
@@ -116,6 +117,7 @@ __published:	// IDE-managed Components
 	TStatusBar *StatusBar1;
 	TBevel *Bevel1;
         TSpeedButton *PrintBtn;
+        TSpeedButton *ArchiveBtn;
         TGroupBox *Licensing;
         TLabel *StatusLabel;
         TLabel *PoolLabel;
@@ -207,6 +209,7 @@ __published:	// IDE-managed Components
 	void __fastcall mmPermanentClick(TObject *Sender);
 	void __fastcall OnTabChange(TObject *Sender);
 	void __fastcall PrintBtnClick(TObject *Sender);
+   void __fastcall ArchiveBtnClick(TObject *Sender);
 	void __fastcall Exit1Click(TObject *Sender);
 	void __fastcall mmSPDOutputClick(TObject *Sender);
 

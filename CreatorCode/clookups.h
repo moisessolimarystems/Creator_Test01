@@ -78,6 +78,7 @@ class CLookup
    ModuleDetail* module_detail[64];
    ModuleDetail* iConvert_module_detail[64];
    ModuleDetail* m_solScriptModuleDetail[64];
+   ModuleDetail* m_SDXDesignerModuleDetail[64];
 
   public:
    CLookup();

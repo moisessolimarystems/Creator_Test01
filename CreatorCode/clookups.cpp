@@ -10,7 +10,7 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include "key\key\keyprod.h"
+#include "key\newkey\keyprod.h"
 #include "kyslevel.h"
 #include "clookups.h"
 
@@ -47,6 +47,11 @@ CLookup::CLookup()
       //Create new structures,and assign new module id's to each one.
       m_solScriptModuleDetail[mod_id] = new ModuleDetail();
       m_solScriptModuleDetail[mod_id]->id = mod_id;
+
+      ////initialize modules for SDX Designer module list
+      //Create new structures,and assign new module id's to each one.
+      m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
+      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
 
 
@@ -120,6 +125,8 @@ CLookup::~CLookup()
       delete iConvert_module_detail[mod_id];
 
       delete m_solScriptModuleDetail[mod_id];
+
+      delete m_SDXDesignerModuleDetail[mod_id];
    }
 }
 
@@ -210,6 +217,8 @@ ModuleDetail** CLookup::getModuleList(int productID)
        return iConvert_module_detail;
    else if (productID == SOLSCRIPT_PRODUCT)
       return m_solScriptModuleDetail;
+   else if (productID == SDX_DESIGNER_PRODUCT)
+      return m_SDXDesignerModuleDetail;
    else
        return module_detail;
 }
@@ -244,6 +253,9 @@ bool CLookup::resetModuleList()
 
       *m_solScriptModuleDetail[mod_id] = unassigned_module;
       m_solScriptModuleDetail[mod_id]->id = mod_id;
+
+      *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
+      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
 
    //query module information
@@ -272,6 +284,8 @@ bool CLookup::resetModuleList()
          else if (product_id==SOLSCRIPT_PRODUCT) {
             pModuleList = m_solScriptModuleDetail;
          }
+         else if (product_id==SDX_DESIGNER_PRODUCT)
+            pModuleList = m_SDXDesignerModuleDetail;
          else
             pModuleList = module_detail;
 
@@ -1034,6 +1048,9 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
          result = iConvert_module;   // supports iConvert modules.
          break;
       case SOLSCRIPT_PRODUCT:
+         result = static_cast<bool>(max>0);
+         break;
+      case SDX_DESIGNER_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
       default:

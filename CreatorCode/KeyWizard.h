@@ -17,7 +17,7 @@
 #include <Mask.hpp>
 
 #include "clookups.h"
-#include "key\key\keyprod.h"
+#include "key\newkey\keyprod.h"
 #include "kyslevel.h"
 #include "SftTree_OCX.h"
 #include <Db.hpp>
@@ -27,6 +27,7 @@
 #include <ToolWin.hpp>
 #include <ImgList.hpp>
 #include "SolSearcherEnterpriseDetails.h"
+#include <DB.hpp>
 #include <stack>
 
 //------------------------------------------------------------------------------
@@ -202,7 +203,7 @@ private:
         void setStartPanelMembers();
         void setModulePanelMembers();
         void SetSSEMembers(){}
-        bool hasModuleLicenses(){if(key_record->pkey->productId==SPD_PRODUCT||key_record->pkey->productId==CONNECT_PRODUCT||key_record->pkey->productId==QUANTUM_PRODUCT||key_record->pkey->productId==ICONVERT_PRODUCT||key_record->pkey->productId==SOLSCRIPT_PRODUCT)return true;else return false;}
+        bool hasModuleLicenses(){if(key_record->pkey->productId==SPD_PRODUCT||key_record->pkey->productId==CONNECT_PRODUCT||key_record->pkey->productId==QUANTUM_PRODUCT||key_record->pkey->productId==ICONVERT_PRODUCT||key_record->pkey->productId==SOLSCRIPT_PRODUCT||key_record->pkey->productId==SDX_DESIGNER_PRODUCT)return true;else return false;}
 
         //
         // START PANEL

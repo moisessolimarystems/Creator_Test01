@@ -18,17 +18,16 @@
 #ifndef __MANAGERS
 #define __MANAGERS
 
-
+#include <windows.h>
 #include <fstream.h>             // file i/o functionality
-#include "key\key\keyprod.h"
-#include "key\3prty\rainbow\winnt\Spromeps.h"
-#include "key\key\pkey.h"
-#include "key\key\spdkey.h"
-#include "key\key\sskey.h"
+#include "key\newkey\keyprod.h"
+//#include "key\3prty\rainbow\winnt\Spromeps.h"
+#include "key\newkey\pkey.h"
+#include "key\newkey\spdkey.h"
+#include "key\newkey\sskey.h"
 #include "moduleDetail.h"
-
-//#include "keymaster.h"
-
+#include "SolimarLicensing\SolimarLicenseServer\_SolimarLicenseServer.h"
+#include "MultidimensionalSafeArray.h"
 
 #define MAXCOMMAND               256
 
@@ -48,26 +47,30 @@ class SSProtectionKey;
  *                                                                    *
  *--------------------------------------------------------------------*/
 class KeyMaster {
-   // packet member must come before everything else so it is DWORD aligned
-   RB_SPRO_APIPACKET packet;
-   const char* server_name;
+
 public:
-   KeyMaster() : scratchkey(&packet) {server_name = NULL;}
+   KeyMaster();
+   ~KeyMaster();
 
    //operate on ProtectionKey passed in
-   ulong getPermanentPassword(ProtectionKey*);
-   ulong getProductVersionPassword(ProtectionKey*, ushort);
-   ulong getExtensionPassword(ProtectionKey*, uchar, ProductId, ushort, ushort);
+   void getPermanentPassword(ProtectionKey*, char*);
+   void getProductVersionPassword(ProtectionKey*, ushort, char*);
+   void getExtensionPassword(ProtectionKey*,
+                             uchar,
+                             ProductId,
+                             ushort,
+                             ushort,
+                             char*
+                            );
 
-   ulong getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, ushort);
-   //ulong getModZeroPassword(SpdProtectionKey*, uchar, ProductId, ushort);
-   ulong getOutputPassword(SpdProtectionKey*, ushort);
-   ulong getPagesPerMinutePassword(SpdProtectionKey*, ushort);
+   void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, ushort, char*);
+   void getOutputPassword(SpdProtectionKey*, ushort, char*);
+   void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, long);
 
-   ulong getIndexServersPassword(SSProtectionKey*, ushort);
-   ulong getReportServersPassword(SSProtectionKey*, ushort);
-   ulong getConcurrentUsersPassword(SSProtectionKey*, ushort);
-   ulong getApplicationServerPassword(SSProtectionKey*, ushort);
+   AnsiString getIndexServersPassword(SSProtectionKey*, ushort);
+   AnsiString getReportServersPassword(SSProtectionKey*, ushort);
+   AnsiString getConcurrentUsersPassword(SSProtectionKey*, ushort);
+   AnsiString getApplicationServerPassword(SSProtectionKey*, ushort);
 
    //simulate applying password to ProtectionKey passed in
    void applyModZeroPassword(SKeyRecord* key_record, unsigned short mod_id, unsigned short units);
@@ -87,11 +90,11 @@ public:
    short clear();
    short deactivate();
    bool found();
-   short initDriver();
+   HRESULT initDriver();
    ProtectionKey* newKey(KeyDataBlock*);
-   ProtectionKey* newKey(ProductId product_id) {return ProtectionKey::newKey(product_id, &packet);}
+   ProtectionKey* newKey(ProductId product_id) {return ProtectionKey::newKey(product_id);}
    void resetKey(SKeyRecord*, ProductId);
-   short program(ProtectionKey*);
+   short program(SKeyRecord* key_record);
    bool programmed();
 
    //operate on specificed SKeyRecord
@@ -99,15 +102,26 @@ public:
    void initializeMinModules(SKeyRecord*);
    void initializeMaxValues(SKeyRecord*);
    void initializeMinValues(SKeyRecord*);
-   bool hasModules(SKeyRecord* keyrec);
    short read(SKeyRecord*);
    short read(SKeyRecord*, ProductId);
 
+   HRESULT InitPasswordPacket();
+   HRESULT FinalizePasswordPacket();
+   HRESULT AppendPasswordToPacket(VARIANT vtExpires, BSTR password);
+   HRESULT GetPasswordPacket(VARIANT* pvtPacketData);
+   HRESULT GetVerificationCode(BSTR* VerificationCode);
 protected:
    ProtectionKey* newKey();
-   short setHandle(ProtectionKey*);
+   HRESULT KeyMaster::setHandle();
 
-   ProtectionKey scratchkey;
+   //ptr to the server object. Used to access the lower layer code.
+   ISolimarLicenseSvr* pTheServer;
+
+   //The list of keys returned from the lower layer app
+   VARIANT* pKeyList;
+
+   ProtectionKey* CurrentKey;
+   BSTR*   	      CurrentKeyID;
 };
 
 extern KeyMaster* keyMaster;

@@ -317,7 +317,10 @@ void __fastcall TFCustomerKeys::setGUIOptions()
         mmReturned->Enabled = true;
      }
 
-     if ((PERMISSION_FLAG & permanent_pwd) && (key_record->pkey->productId == SOLSCRIPT_PRODUCT)) {
+     if ((PERMISSION_FLAG & permanent_pwd) &&
+         (key_record->pkey->productId == SOLSCRIPT_PRODUCT || key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+         )
+     {
         KeyFormModuleFrame->mmViewAll->Enabled = false;
         KeyFormModuleFrame->mmPagesPerMinute->Enabled = false;
      }
@@ -460,7 +463,8 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         PageControl1->Pages[1]->TabVisible = true;
                         PageControl1->Pages[2]->TabVisible = false;
                 }
-                else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT) {
+                else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT ||
+                         key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
                         ProtectionKey* temp_key = ProtectionKey::newKey(key_record->pkey);
@@ -625,7 +629,8 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
         PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
     }
-    else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT) {
+    else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
+             key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
         showModuleInfo(true);
@@ -1036,15 +1041,15 @@ void __fastcall TFCustomerKeys::mmVersionClick(TObject *Sender)
 //==============================================================================
 void TFCustomerKeys::createVersionPassword(unsigned short version)
 {
-   char password_string[14];
+   char password_string[128];
 
    if(!isAttachedKeyReady())
       return;
 
    //
    //generate password
-   unsigned long password = keyMaster->getProductVersionPassword(key_record->pkey, version);
-   if(!password)
+   keyMaster->getProductVersionPassword(key_record->pkey, version, password_string);
+   if(!password_string)
    {
       //Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
       return;
@@ -1053,10 +1058,6 @@ void TFCustomerKeys::createVersionPassword(unsigned short version)
    //
    //apply password to key
    keyMaster->applyVersionPassword(key_record, version);
-
-   //
-   //format password
-   sprintf( password_string, "%8X-%4X", password, version );
 
    //
    //Update database
@@ -1159,7 +1160,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 //==============================================================================
 void TFCustomerKeys::createExtensionPassword(unsigned char days)
 {
-   char password_string[14];
+   char password_string[128];
 
    //
    //check if key is attached
@@ -1168,8 +1169,14 @@ void TFCustomerKeys::createExtensionPassword(unsigned char days)
 
    //
    //generate password
-   unsigned long password = keyMaster->getExtensionPassword( key_record->pkey,  days, static_cast<ProductId>(key_record->pkey->productId), key_record->pkey->productVersion, key_record->getNextExtensionP());
-   if(!password)
+   keyMaster->getExtensionPassword(key_record->pkey,
+                                   days,
+                                   static_cast<ProductId>(key_record->pkey->productId),
+                                   key_record->pkey->productVersion,
+                                   key_record->getNextExtensionP(),
+                                   password_string
+                                   );
+   if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
    	return;
@@ -1178,10 +1185,6 @@ void TFCustomerKeys::createExtensionPassword(unsigned char days)
    //
    //apply password to key
    keyMaster->applyExtensionPassword(key_record, days);
-
-   //
-   //format password
-   sprintf( password_string, "%8X", password);
 
    //
    //Update database
@@ -1224,12 +1227,12 @@ void TFCustomerKeys::createExtensionPassword(unsigned char days)
 //==============================================================================
 void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
 {
-   char password_string[14];
+   char password_string[128];
 
    // Catch just in case the permanent flag is not caught
    if(key_record->non_perm_ktf == true)
    {
-        Application->MessageBox("Unable to generate password for this key type.", "Key Message", MB_OK|MB_ICONERROR );
+      Application->MessageBox("Unable to generate password for this key type.", "Key Message", MB_OK|MB_ICONERROR );
    	return;
    }
 
@@ -1238,8 +1241,8 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
         return;
 
    // generate password
-   unsigned long password = keyMaster->getPermanentPassword(key_record->pkey);
-   if(!password)
+   keyMaster->getPermanentPassword(key_record->pkey, password_string);
+   if(!password_string)
    {
         Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
    	return;
@@ -1247,9 +1250,6 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
 
    // apply password to key
    keyMaster->applyPermanentPassword(key_record);
-
-   // format password
-   sprintf( password_string, "%8X", password);
 
    // Update database
    try
@@ -1348,7 +1348,8 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
                //setOutputUnitsDisplay( ((SpdProtectionKey*)(key_record->pkey))->outputUnits);
             }
-            else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT) {
+            else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
+                     key_record->pkey->productId == SDX_DESIGNER_PRODUCT) {
                KeyFormModuleFrame->load(key_record);
             }
             break;
@@ -1483,6 +1484,198 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
          Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
       }
    }
+}
+
+//==============================================================================
+// Function:    ArchiveBtnClick
+// Purpose:     Creates a password packet file corresponding to the selected passwords
+// Parameters:  ( TObject * ) - Sender
+// Returns:     None
+//==============================================================================
+//const char* PasswordPacketDirectory = "c:\\SolimarLicensing\\";
+const char* PasswordPacketDirectory = "R:\\Solimar Password Bundles\\";
+void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
+{
+   TBookmark tmpMark;
+   AnsiString AnsiPassword;            //stores password read from grid
+   wchar_t wcharPassword[256];    //stores password that is converted from ansi to wchar
+   BSTR bstrPassword;             //stores the BSTR version of the password
+
+   BSTR VerificationCode;
+   int PasswordBufSize = 0;
+   AnsiString CurrentDate;
+   HRESULT hr = 0;
+
+   SYSTEMTIME CurrentTime;
+   VARIANT varTime;
+   varTime.vt = VT_DATE;
+
+   GetLocalTime(&CurrentTime);
+   SystemTimeToVariantTime(&CurrentTime, &varTime.date);
+   varTime.date += 7.0;      //add 7 days to the expiration date.
+
+   int PasswordIDs[1024];
+   memset(PasswordIDs, 0, 1024);
+
+   int PasswordIDIndex = 0;
+
+   //only get the rows selected
+
+   if (PswdGrid->SelectedRows->Count > 0)
+   {
+      try
+      {
+         HRESULT hr = keyMaster->InitPasswordPacket();
+         tmpMark = PasswordQuery->GetBookmark();
+         PasswordQuery->DisableControls();
+
+         PasswordQuery->First();
+
+      	while( !PasswordQuery->Eof )
+         {
+            //if a row is selected append the password to the packet and remember its ID in order to store it in the DB
+       		if( PswdGrid->SelectedRows->CurrentRowSelected )
+            {
+               PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
+               PasswordIDIndex++;
+
+               AnsiPassword = PswdGrid->Columns->Items[3]->Field->AsString;
+               PasswordBufSize = AnsiPassword.WideCharBufSize();
+               AnsiPassword.WideChar(wcharPassword, PasswordBufSize);
+               bstrPassword = SysAllocString(wcharPassword);
+               hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
+               SysFreeString(bstrPassword);
+         	}
+         	PasswordQuery->Next();
+      	}
+         hr = keyMaster->FinalizePasswordPacket();
+
+         varTime.date -= 7.0;    //remove the 7 days that was added before
+
+         //create the filename
+         char TheFileName[128];
+         memset(TheFileName, 0, 128);
+
+         sprintf(TheFileName, " PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
+                 IntToHex(key_record->pkey->customerNumber, 3),
+                 IntToHex(key_record->pkey->keyNumber, 2),
+                 CurrentTime.wMonth, CurrentTime.wDay, CurrentTime.wYear,
+                 CurrentTime.wHour, CurrentTime.wMinute, CurrentTime.wSecond, CurrentTime.wMilliseconds);
+
+         //Create the FilePath
+         char FilePath[1024];
+         memset(FilePath, 0, 1024);
+         sprintf(FilePath, "%s%s", PasswordPacketDirectory, TheFileName);
+
+         // Create the password packet file
+	      HANDLE hFile = CreateFile(FilePath,
+                                    GENERIC_WRITE,
+                                    FILE_SHARE_WRITE,
+                                    0,
+                                    CREATE_NEW, 0, 0);
+
+         hr = HRESULT_FROM_WIN32(::GetLastError());
+         if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
+         {
+            Application->MessageBox( "Error: File Exists","Error", MB_OK);
+            return;
+         }
+
+         // create a variant safearray
+	      VARIANT vtPacket;
+	      VariantInit(&vtPacket);
+         BYTE* pData = 0;
+
+         //Get the password packet and write it to the file
+         hr = keyMaster->GetPasswordPacket(&vtPacket);
+	      if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
+	      {
+		      DWORD bytes_written(0);
+		      if (!WriteFile(hFile,
+                           pData,
+                           vtPacket.parray->rgsabound[0].cElements, //size of array
+                           &bytes_written,
+                           0))
+		      {
+			      hr = HRESULT_FROM_WIN32(::GetLastError());
+		      }
+
+		      SafeArrayUnaccessData(vtPacket.parray);
+		      pData = 0;
+	      }
+
+         //Get the verification code and store it in the DB
+         hr = keyMaster->GetVerificationCode(&VerificationCode);
+
+         //
+         //Update database
+         try
+         {
+            Database1->StartTransaction();
+
+            UtilityQuery->Close();
+            UtilityQuery->SQL->Clear();
+            UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
+            UtilityQuery->ParamByName("path")->AsString = TheFileName;
+            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+            UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
+            UtilityQuery->ExecSQL();
+
+            Database1->Commit();
+            RefreshKeyPage();
+
+            //Get the password packet ID
+            UtilityQuery->Close();
+            UtilityQuery->SQL->Clear();
+            UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
+            UtilityQuery->ParamByName("path")->AsString = TheFileName;
+            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+            UtilityQuery->Prepare();
+            UtilityQuery->Open();
+
+            //If the ID was found
+            if( UtilityQuery->RecordCount )
+            {
+               //Store each password in the packet with its corresponding packet ID
+               int PasswordPacketID;
+               PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
+
+               for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
+               {
+                  UtilityQuery->Close();
+                  UtilityQuery->SQL->Clear();
+                  UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
+                  UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
+                  UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
+                  UtilityQuery->ExecSQL();
+               }
+            }
+            else
+            {
+            	Application->MessageBox("Program Failed", "Key Message", MB_OK );
+            }
+         }
+         catch(EDBEngineError &e)
+         {
+            Database1->Rollback(); //error occurred rollback db changes
+            Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+         }
+
+         VariantClear(&vtPacket);
+         PasswordQuery->GotoBookmark( tmpMark );
+     	   PasswordQuery->FreeBookmark( tmpMark );
+      	PasswordQuery->EnableControls();
+      }
+      catch(EDBEngineError &e)
+      {
+         PasswordQuery->GotoBookmark( tmpMark );
+         PasswordQuery->FreeBookmark( tmpMark );
+         PasswordQuery->EnableControls();
+
+         Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+      }
+   }
+   VariantClear(&varTime);
 }
 
 //==============================================================================
@@ -1701,10 +1894,11 @@ void __fastcall TFCustomerKeys::mmProgramClick(TObject *Sender)
          // key_record should contain all information needed to program key
          // if programming is successful update record information in the database
          // create temp. key to represent customer key
+ //         if( keyMaster->found() )
          if( !keyMaster->programmed() && keyMaster->found() )
-         {
+          {
             // key is attached and unprogrammed, program key and save action in database
-            if( keyMaster->program(key_record->pkey) == 0 )
+            if( keyMaster->program(key_record) == 0 )
             {
                // key programmed successfully save action in database
                if( dbSaveKey(key_record, wizard) == true )
@@ -1766,7 +1960,7 @@ void __fastcall TFCustomerKeys::mmSPDOutputClick(TObject *Sender)
 //==============================================================================
 void TFCustomerKeys::createOutputPassword(int output_units)
 {
-   char password_string[14];
+   char password_string[128];
 
    //check attached key status - need to have a programmed key attached
    SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));//pkey should always be SpdProtectionKey
@@ -1776,17 +1970,14 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       return;
 
    //generate password
-   unsigned long password = keyMaster->getOutputPassword(spd_key, output_units);
-   if(!password)
+   keyMaster->getOutputPassword(spd_key, output_units, password_string);
+   if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
       return;
    }
    //apply password to key
    keyMaster->applyOutputPassword(key_record, output_units);
-
-   //format password
-   sprintf( password_string, "%8X-%1d", password, output_units );
 
    //Update database
    try
@@ -2028,7 +2219,7 @@ void __fastcall TFCustomerKeys::mmReprogramClick(TObject *Sender)
          if( keyMaster->programmed() && keyMaster->found() )
          {
             //key is attached and unprogrammed, program key and save action in database
-            if( keyMaster->program(key_record->pkey) == 0 )
+            if( keyMaster->program(key_record) == 0 )
             {
                //key programmed successfully save action in database
                if( dbSaveKey(key_record, wizard) == true )
@@ -2079,15 +2270,23 @@ void __fastcall TFCustomerKeys::mmRemoveClick(TObject *Sender)
    {
       try
       {
-      	 Database1->StartTransaction();
+      	Database1->StartTransaction();
+
+
+         //delete the corresponding entry in the sPasswordPacketRelationship table
+         UtilityQuery->Close();
+         UtilityQuery->SQL->Clear();
+         UtilityQuery->SQL->Add("DELETE FROM spasswordpacketrelationship WHERE password_id IN (SELECT TDid FROM stransactiondetail WHERE SKRid = :skid)");
+         UtilityQuery->ParamByName("skid")->AsInteger = key_record->skr_id;
+   	   UtilityQuery->ExecSQL();
 
          //
          // remove all password related the current key
          UtilityQuery->Close();
-   	 UtilityQuery->SQL->Clear();
+   	   UtilityQuery->SQL->Clear();
          UtilityQuery->SQL->Add("DELETE FROM sTransactionDetail WHERE SKRid = :id");
          UtilityQuery->ParamByName("id")->AsInteger = key_record->skr_id;
-   	 UtilityQuery->ExecSQL();
+   	   UtilityQuery->ExecSQL();
 
          //
          // remove all modules related the current key
