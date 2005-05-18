@@ -23,6 +23,7 @@ const short INDEX_SERVERS_CELL = 0x00;
 const short REPORT_SERVERS_CELL = 0x01;
 const short CONCURRENT_USERS_25_CELL = 0x02;
 const short APPLICATIONS_CELL = 0x03;
+const short DOCUMENT_ASSEMBLER_CELL = 0x04;
 
 // Every unit licensed in the concurrentUsers25 cell represents 25 concurrent
 // users. For example, if the concurrentUsers25 cell contains a value of 2,
@@ -36,6 +37,7 @@ const ushort MAX_CONCURRENT_USERS_25 = 0x7FF;
 const ushort MAX_CONCURRENT_USERS =
    MAX_CONCURRENT_USERS_25 * _25_UNITS_LICENSED_PER_CONCURRENT_USERS_25;
 const ushort MAX_APPLICATIONS = 0xFF;
+const ushort MAX_DOCUMENT_ASSEMBLER = 0x01;
 
 
 
@@ -58,16 +60,19 @@ public:
    ushort getReportServers() const;
    ushort getConcurrentUsers() const;
    ushort getApplications() const;
+   ushort getDocumentAssembler() const;
    void setIndexServers(ushort units_licensed);
    void setReportServers(ushort units_licensed);
    void setConcurrentUsers(ushort units_licensed);
    void setApplications(ushort units_licensed);
+   void setDocumentAssembler(ushort units_licensed);
 
    // Key I/O functions.
    AnsiString getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
    AnsiString getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
    AnsiString getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
    AnsiString getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   AnsiString getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
 
 protected:
    // Protection key data (references into keyDataBlock).
@@ -75,6 +80,7 @@ protected:
    ushort& reportServers;
    ushort& concurrentUsers25;
    ushort& applications;
+   ushort& documentAssembler;
 };
 
 
