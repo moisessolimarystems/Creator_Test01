@@ -16,8 +16,6 @@
 
 #include <windows.h>
 #include <classes.hpp>
-
-
 #include "keyprod.h"
 #include "pkey.h"
 #include "SSKey.h"
@@ -38,7 +36,8 @@ SSProtectionKey::SSProtectionKey() :
    indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
    reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
    concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
-   applications(keyDataBlock.data[APPLICATIONS_CELL])
+   applications(keyDataBlock.data[APPLICATIONS_CELL]),
+   documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
 
@@ -51,7 +50,8 @@ SSProtectionKey::SSProtectionKey(const SSProtectionKey& pkey) :
    indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
    reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
    concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
-   applications(keyDataBlock.data[APPLICATIONS_CELL])
+   applications(keyDataBlock.data[APPLICATIONS_CELL]),
+   documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
 
@@ -95,8 +95,13 @@ ushort SSProtectionKey::getApplications() const
    return applications;
 }
 
-
-
+/* getDocumentAssembler()
+ *    Return the number of applications licensed on the key.
+------------------------------------------------------------------------------*/
+ushort SSProtectionKey::getDocumentAssembler() const
+{
+   return documentAssembler;
+}
 /* setIndexServers()
  *    Set the number of index servers licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -137,6 +142,14 @@ void SSProtectionKey::setConcurrentUsers(ushort units_licensed)
 void SSProtectionKey::setApplications(ushort units_licensed)
 {
    applications = units_licensed;
+}
+
+/* setDocumentAssembler()
+ *    Set the number of applications licensed on the key.
+------------------------------------------------------------------------------*/
+void SSProtectionKey::setDocumentAssembler(ushort units_licensed)
+{
+   documentAssembler = units_licensed;
 }
 
 
@@ -256,8 +269,6 @@ AnsiString SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, IS
    return *pwd;
 }
 
-
-
 /* getApplicationsPassword()
  *    Calculate and return the password for the number of applications
  *    specified by units_licensed (0 through 255) by querying the secondary
@@ -280,6 +291,40 @@ AnsiString SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISoli
                                                   keyNumber,
                                                   productId,
                                                   APPLICATION_DATABASES_MODULE_ID,
+                                                  units_licensed,
+                                                  &password
+                                                 )))
+      {
+         //convert the password from BSTR to and int
+         pwd = new AnsiString(password);
+         SysFreeString(password);
+      }
+   }
+   return *pwd;
+}
+
+/* getApplicationsPassword()
+ *    Calculate and return the password for the number of applications
+ *    specified by units_licensed (0 through 255) by querying the secondary
+ *    algorithm of the protection key. If successful, returns the password,
+ *    otherwise returns 0.
+ *
+ *    This query will therefore produce a password that is unique for this
+ *    customer, with this key, and with this many applications licensed.
+------------------------------------------------------------------------------*/
+const uchar DOCUMENT_ASSEMBLER_MODULE_ID = 4;
+AnsiString SSProtectionKey::getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+{
+   AnsiString* pwd = 0;
+
+   if(pServer)
+   {
+      BSTR password;
+
+      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+                                                  keyNumber,
+                                                  productId,
+                                                  DOCUMENT_ASSEMBLER_MODULE_ID,
                                                   units_licensed,
                                                   &password
                                                  )))

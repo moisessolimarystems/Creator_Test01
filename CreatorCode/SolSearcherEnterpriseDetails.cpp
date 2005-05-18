@@ -77,6 +77,11 @@ void TSolSearcherDetails::SetValue(TListItem *pItem)//int type)
          max = MAX_APPLICATIONS;
          SetUnits = m_pKey->setApplications;
       break;
+      case  DOCUMENT_ASSEMBLER_CELL:
+         min =  m_pKey->getDocumentAssembler();
+         max = MAX_DOCUMENT_ASSEMBLER;
+         SetUnits = m_pKey->setDocumentAssembler;
+      break;
    }
 
    if (min>=max && m_mode!=3)
@@ -146,7 +151,7 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
          CreatePassword = keyMaster->getConcurrentUsersPassword;
          ApplyPassword =  keyMaster->applyConcurrentUsersPassword;
       break;
-      case  APPLICATIONS_CELL:
+       case  APPLICATIONS_CELL:
          if (!m_pKey->isOnTrial())
             min =  m_pKey->getApplications();
          max = MAX_APPLICATIONS;
@@ -154,6 +159,15 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
          fieldName = "SKRapplications";
          CreatePassword = keyMaster->getApplicationServerPassword;
          ApplyPassword =  keyMaster->applyApplicationPassword;
+      break;
+      case  DOCUMENT_ASSEMBLER_CELL:
+         if (!m_pKey->isOnTrial())
+            min =  m_pKey->getDocumentAssembler();
+         max = MAX_DOCUMENT_ASSEMBLER;
+         descriptionId = 604;
+         fieldName = "SKRdocumentAssembler";
+         CreatePassword = keyMaster->getDocumentAssemblerPassword;
+         ApplyPassword =  keyMaster->applyDocumentAssemblerPassword;
       break;
    }
 
@@ -268,6 +282,12 @@ void TSolSearcherDetails::Load(SKeyRecord* pKeyRecord)
    pItem->Caption = "Application Databases";
    pItem->Data = (void*)APPLICATIONS_CELL;
    pItem->SubItems->Add(m_pKey->getApplications());
+
+   //DOCUMENT_ASSEMBLER_CELL = 0x04;
+   pItem = SolSearcherPropertyList->Items->Add();
+   pItem->Caption = "Document Assembler";
+   pItem->Data = (void*)DOCUMENT_ASSEMBLER_CELL;
+   pItem->SubItems->Add(m_pKey->getDocumentAssembler());
 
 }
 /* Initialize
