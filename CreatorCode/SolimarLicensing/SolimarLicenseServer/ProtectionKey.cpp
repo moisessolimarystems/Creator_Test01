@@ -2359,15 +2359,21 @@ DWORD ProtectionKey::GetSolsearcherModulePassword(unsigned short customer_number
 				((DWORD)(units_licensed)&0xFF);
 			break;
 		case 2: // concurrent users
-			QueryModule_5 = 0x7;
+			QueryModule_5 = 0xA;
 			query |=					//[solsearcher][concurrent users]
 				((DWORD)(m_keyspec->products[8][2].fn_write(units_licensed))&0x7FF);
 			break;
 		case 3: // application databases
-			QueryModule_5 = 0xA;
+			QueryModule_5 = 0xB;
 			query |= 
 				(((DWORD)(QueryModule_5)&0xF) << 8) |
 				((DWORD)(units_licensed)&0xFF);
+			break;
+		case 4: // document assembler
+			QueryModule_5 = 0xC;
+			query |= 
+				(((DWORD)(QueryModule_5)&0xF) << 8) |
+				((DWORD)(units_licensed)&0x01);
 			break;
 		default:
 			throw _com_error(E_INVALIDARG);
