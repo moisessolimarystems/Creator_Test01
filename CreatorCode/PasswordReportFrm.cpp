@@ -23,16 +23,7 @@ __fastcall TPasswordReport::TPasswordReport(TComponent* Owner, AnsiString where_
                            ReportQuery->FieldByName("SKRversion")->AsInteger/0x1000,
                            ReportQuery->FieldByName("SKRversion")->AsInteger&0xFFF))));
       StaticKeyLabel->Caption = key_label;
-      if((key_label.Pos("SOLscript") > 0) || (key_label.Pos("SPDE") > 0) || (key_label.Pos("PDF Utility") > 0))
-      {
-            QRDBText2->Enabled = true;
-            QRExpr1->Enabled = false;
-      }
-      else
-      {
-            QRDBText2->Enabled = false;
-            QRExpr1->Enabled = true;
-      }
+      StaticKeyPassword->Caption = (ReportQuery->FieldByName("TDpassword")->AsString).SubString(PASSWORD_START, PASSWORD_LENGTH);
    }
    catch(EDBEngineError &e)
    {
@@ -44,4 +35,3 @@ __fastcall TPasswordReport::TPasswordReport(TComponent* Owner, AnsiString where_
    }
 }
 //----------------------------------------------------------------------------
-
