@@ -13,6 +13,9 @@
 #include <ExtCtrls.hpp>
 #include <Qrctrls.hpp>
 #include <DB.hpp>
+
+#define PASSWORD_START 0
+#define PASSWORD_LENGTH 12
 //----------------------------------------------------------------------------
 class TPasswordReport : public TQuickRep
 {
@@ -30,6 +33,7 @@ __published:
    TQRRichText *QRRichText1;
    TQRLabel *StaticReportLabel;
    TQRLabel *StaticKeyLabel;
+        TQRLabel *StaticKeyPassword;
 private:
 public:
    __fastcall TPasswordReport::TPasswordReport(TComponent* Owner, AnsiString);

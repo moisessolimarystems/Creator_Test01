@@ -23,6 +23,7 @@ __fastcall TPasswordReport::TPasswordReport(TComponent* Owner, AnsiString where_
                            ReportQuery->FieldByName("SKRversion")->AsInteger/0x1000,
                            ReportQuery->FieldByName("SKRversion")->AsInteger&0xFFF))));
       StaticKeyLabel->Caption = key_label;
+      StaticKeyPassword->Caption = (ReportQuery->FieldByName("TDpassword")->AsString).SubString(PASSWORD_START, PASSWORD_LENGTH);
    }
    catch(EDBEngineError &e)
    {
