@@ -145,8 +145,10 @@ __published:	// IDE-managed Components
         TMenuItem *mmSPDOutput;
         TMenuItem *N2;
         TMenuItem *mmVersion;
+        TMenuItem *mmSPDModule;
         TMenuItem *mmTools;
         TMenuItem *mmToolUpdateModules;
+        TMenuItem *mmCurrentVersion;
         TMenuItem *mmUpdateVersion;
         TStoredProc *sp_GenerateSystemId;
         TQuery *QueryKey;
@@ -191,17 +193,12 @@ __published:	// IDE-managed Components
         TMenuItem *mmExpirationDate;
         TMenuItem *mmActivationDate;
         TMenuItem *mmDeactivationDate;
+        TMenuItem *N6;
+        TMenuItem *N7;
         TMenuItem *UpdateeBONumber;
         TMenuItem *UpdateDescription;
    TTabSheet *SolSearcherEnterpriseProperties;
    TSolSearcherDetails *SolSearcherDetails;
-        TGroupBox *SessionGroupBox;
-        TEdit *operator_sessions;
-        TEdit *user_sessions;
-        TLabel *OperatorSessionLabel;
-        TLabel *UserSessionLabel;
-        TMenuItem *mmSPDEOperatorSessions;
-        TMenuItem *mmSPDEUserSessions;
 	void __fastcall OnKeyRowChange(TObject *Sender);
         void __fastcall mmExtensionClick(TObject* Sender);
 	void __fastcall mmProgramClick(TObject *Sender);
@@ -222,6 +219,7 @@ __published:	// IDE-managed Components
         void __fastcall mmReprogramClick(TObject *Sender);
         void __fastcall mmRemoveClick(TObject *Sender);
         void __fastcall mmReserveClick(TObject *Sender);
+        void __fastcall mmCurrentVersionClick(TObject *Sender);
         void __fastcall mmUpdateVersionClick(TObject *Sender);
         void __fastcall ToBaseClick(TObject *Sender);
         void __fastcall PswdGridKeyDown(TObject *Sender, WORD &Key,
@@ -253,8 +251,6 @@ __published:	// IDE-managed Components
         void __fastcall PKNumberEditBoxChange(TObject *Sender);
         void __fastcall eBONumberEditBoxChange(TObject *Sender);
         void __fastcall DescriptionMemoChange(TObject *Sender);
-        void __fastcall mmSPDEOperatorSessionsClick(TObject *Sender);
-        void __fastcall mmSPDEUserSessionsClick(TObject *Sender);
 
 private:
         // User declarations
@@ -282,7 +278,6 @@ private:
         void __fastcall showLicenseInfo(bool bTurnOn);
         void __fastcall showModuleInfo(bool bTurnOn);
         void __fastcall showPagesPerMinuteInfo(bool bTurnOn);
-        void __fastcall showSessionsInfo(bool bTurnOn) ;
         ///void __fastcall showSSKeyInfo(bool bTurnOn);
         //
         // GUI functions
@@ -291,8 +286,7 @@ private:
         void __fastcall resetKey(ProductId);
         void __fastcall SetModFilter();
         void TabDataOnChange(bool);
-        void setOperatorSessionUnitsDisplay(unsigned short units);
-        void setUserSessionUnitsDisplay(unsigned short units);
+
 
         //
         // Search functions
@@ -325,8 +319,6 @@ public:
         void createExtensionPassword(unsigned short days);
         void createMaxLUValuePassword(int iMaxLUValue);
         void createOutputPassword(int output_units);
-        void createOperatorSessionPassword(int operator_sessions);
-        void createUserSessionPassword(int user_sessions);
         void createVersionPassword(unsigned short version);
         void modulePasswordCreated();
         void createBusTagInPassword(int output_units);

@@ -143,7 +143,6 @@ const ushort DEVELOPER_ID = 0xFEA8;
 #define SECONDS_PER_HOUR         3600
 #define SECONDS_PER_DAY          86400L
 #define TWO_HRS                  7200L
-#define PASSWORD_INDEX           25
 
 //IDs that are used for the license server
 const long ProductID = 10021;
@@ -261,7 +260,7 @@ const unsigned short KDPasswordDays[] =
 {        // Extension Unit Value
    30,  	// 1 Elements #1-#12 are used to deliver prorated Test Licenses (30 days/85 hour increments)
    60,  	// 2
-   90, 	        // 3
+   90, 	// 3
    120, 	// 4
    150, 	// 5
    180, 	// 6
@@ -692,9 +691,7 @@ const char* ProtectionKey::getProductText(ProductId id, ProductLength length)
 //==============================================================================
 const char* ProtectionKey::getKDPasswordText(unsigned short index) const
 {
-    AnsiString text;
-    (index > PASSWORD_INDEX) ? text = "????" : text = KDPasswordText[index];
-    return text.c_str();
+    return KDPasswordText[index];
 }
 
 //==============================================================================
@@ -705,9 +702,7 @@ const char* ProtectionKey::getKDPasswordText(unsigned short index) const
 //==============================================================================
 const unsigned short ProtectionKey::getKDPasswordDays(unsigned short index) const
 {
-    unsigned short days;
-   (index > PASSWORD_INDEX) ?  days = 0 : days = KDPasswordDays[index];
-    return days;
+    return KDPasswordDays[index];
 }
 
 //==============================================================================
@@ -718,9 +713,7 @@ const unsigned short ProtectionKey::getKDPasswordDays(unsigned short index) cons
 //==============================================================================
 const unsigned short ProtectionKey::getKDPasswordHours(unsigned short index) const
 {
-    unsigned short hours;
-    (index > PASSWORD_INDEX) ? hours = 0 : hours = KDPasswordHours[index];
-    return hours;
+    return KDPasswordHours[index];
 }
 
 

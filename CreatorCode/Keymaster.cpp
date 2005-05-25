@@ -225,8 +225,6 @@ void  KeyMaster::getModulePassword(SpdeProtectionKey* key,
                             );
 }
 
-
-
 //==============================================================================
 // Function:    getOutputPassword()
 // Purpose:
@@ -257,38 +255,6 @@ void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
 {
    if(pTheServer)
      key->getOutputPassword(output_units, pTheServer, Password_String);
-}
-
-//==============================================================================
-// Function:    getOutputPassword()
-// Purpose:
-// Parameters:  ProtectionKey* - key
-//              ushort - output_units
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getOperatorSessionPassword(SpdeProtectionKey* key,
-                                   ushort operator_sessions,
-                                   char* Password_String )
-{
-   if(pTheServer)
-     key->getOperatorSessionPassword(operator_sessions, pTheServer, Password_String);
-}
-
-//==============================================================================
-// Function:    getOutputPassword()
-// Purpose:
-// Parameters:  ProtectionKey* - key
-//              ushort - output_units
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getUserSessionPassword(SpdeProtectionKey* key,
-                                   ushort user_sessions,
-                                   char* Password_String )
-{
-   if(pTheServer)
-     key->getUserSessionPassword(user_sessions, pTheServer, Password_String);
 }
 
 //==============================================================================
@@ -725,7 +691,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             NumModules++;
          }
       }
-      NumModules = NumModules+3; //add output, operator, user sessions
+      hasOutputPool = true;
+      NumModules++;
 
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
@@ -751,12 +718,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             //set the type of the variant
             pVarArray->vt = VT_UI4;
                                              //need to do this for other ppms and also hardware
-            if((i == NumModules -3))
+            if((i == NumModules -1) && hasOutputPool)
                pVarArray->ulVal = 240;     //module id from keyspec.xml
-            else if((i == NumModules - 2))
-               pVarArray->ulVal = 400;
-            else if((i == NumModules - 1))
-               pVarArray->ulVal = 401;
             else
                pVarArray->ulVal = ModuleIds[i];//module_detail[ModuleIds[i]]->id;
 
@@ -778,12 +741,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
          {
             //set the type of the variant
             pVarArray->vt = VT_UI4;
-            if((i == NumModules -3))
+            if((i == NumModules -1) && hasOutputPool)
                pVarArray->ulVal = spde_key->getOutputUnits();
-            else if((i == NumModules - 2) )
-               pVarArray->ulVal = spde_key->getOperatorSessionUnits();
-            else if((i == NumModules - 1) )
-               pVarArray->ulVal = spde_key->getUserSessionUnits();
             else
                pVarArray->ulVal = spde_key->getLicense(ModuleIds[i]);
 
@@ -1065,8 +1024,6 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
          }
       }
         spde_key->outputUnits = 4095;
-        spde_key->operatorSessionUnits = 255;
-        spde_key->userSessionUnits = 255;
 /*        spde_key->setBusTagIn(MAX_BUSTAGIN);
         spde_key->setBusTagOut(MAX_BUSTAGOUT);
         spde_key->setParallelIn(MAX_PARALLELIN);
@@ -1217,8 +1174,7 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
       spde_key->setPSInterp(MAX_PSINTERP);
   */
       spde_key->outputUnits = 1;
-      spde_key->operatorSessionUnits = 1;
-      spde_key->userSessionUnits = 1;
+
       keyrec->xch_ipds_ppm = 0;
       keyrec->xch_ps_ppm = 0;
       keyrec->xch_ps_dbcs_ppm = 0;
@@ -1402,7 +1358,6 @@ void KeyMaster::applyExtensionPassword(SKeyRecord* keyrec, unsigned short days )
 {
    // set new status, set counter
    keyrec->pkey->status = keyrec->getNextExtension();
-//setCounterDaysByHours
    keyrec->pkey->setCounterDays(days);
 }
 
@@ -1489,40 +1444,6 @@ void KeyMaster::applyOutputPassword(SKeyRecord* key_record, int output_units)
 }
 
 //==============================================================================
-// Function:    applyOperatorSessionPassword
-// Purpose:
-// Parameters:  (SKeyRecord* key_record, int operator_sessions)
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyOperatorSessionPassword(SKeyRecord* key_record, int operator_sessions)
-{
-      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-      if( spde_key->isOnTrial() )
-      {
-           applyPermanentPassword(key_record);
-      }
-      // set total output units
-      spde_key->operatorSessionUnits = operator_sessions;
-}
-
-//==============================================================================
-// Function:    applyUserSessionPassword
-// Purpose:
-// Parameters:  (SKeyRecord* key_record, int output_units)
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyUserSessionPassword(SKeyRecord* key_record, int user_sessions)
-{
-      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-      if( spde_key->isOnTrial() )
-      {
-          applyPermanentPassword(key_record);
-      }
-      // set total output units
-      spde_key->userSessionUnits =user_sessions;
-}
-
-//==============================================================================
 // Function:    applyModZeroPassword()
 // Purpose:     Apply a module password.
 // Parameters:
@@ -1534,14 +1455,14 @@ void KeyMaster::applyModPassword(SKeyRecord* keyrec, unsigned char module_id, un
     {
            SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
            // increment module
-           spde_key->setLicense(module_id, units);
+           spde_key->setLicense(module_id, units+1);
     }
     else
     {
            SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
            // increment module
            //spd_key->setLicense(module_id, spd_key->getLicense(module_id)+1);
-           spd_key->setLicense(module_id, units);
+           spd_key->setLicense(module_id, units+1);
     }
 }
 
@@ -1827,8 +1748,6 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
       //
       // set outputUnits = 1 /*new_licensing*/
       spde_key->outputUnits = 1;
-      spde_key->operatorSessionUnits = 1;
-      spde_key->userSessionUnits = 1;
       key_record->xch_ipds_ppm = 0;
       key_record->xch_ps_ppm = 0;
       key_record->xch_ps_dbcs_ppm = 0;
@@ -1883,7 +1802,7 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
       ss_key->setIndexServers(0);
       ss_key->setReportServers(0);
       ss_key->setConcurrentUsers(0);
-      ss_key->setApplications(0);  //wanted unlimited status for application servers
+      ss_key->setApplications(MAX_APPLICATIONS);  //wanted unlimited status for application servers
       ss_key->setDocumentAssembler(0);
    }
 
