@@ -83,7 +83,7 @@ Class CProductBuild
                     Case "-PL"
 				      mPrevLabel = wscript.Arguments(iParam + 1)
                     Case "-NNV"
-					  mBuild.NewDevPath = wscript.Arguments(iParam + 1)
+					  mNewNextVersion = wscript.Arguments(iParam + 1)
                     Case "-NDP"
 					  mNewDevPath = wscript.Arguments(iParam + 1)
                     Case "-CBT"
@@ -1027,13 +1027,13 @@ Class CProductBuild
 		newDevPath = GetBuildVersion(ProductName & "NextVersion")
 	           
 		GetEmailBody = "Hello," & vbNewLine _
-					& "    " & "Just wanted to remind everyone that since we just released " & oldDevPath & "." & vbNewLine _
-					& "Everyone should make their current development sandboxes for " & oldDevPath & "." & vbNewLine _
-				  	& "The new Next version is " & newDevPath & " which is now the main trunk. " & vbNewLine _
-					& "	   " & "I have an additional comment regarding the " & oldDevPath& " release. When we made " & vbNewLine _
-					& "the " * oldDevPath & " development path we branched off the " & PrevLabel & "label. This means" & vbNewLine _
-					& "that if you checked any files into " & oldDevPath & " after build " & PrevLabel & " your changes " & vbNewLine _
-					& "did not actually make it into the " & oldDevPath & " branch and need to be merged into " & newDevPath & "." & vbNewLine _
+					& "    " & "Just wanted to remind everyone that since we just released " & oldDevPath & ". Everyone "    & vbNewLine _
+					& "should make their current development sandboxes for " & oldDevPath & ". The new Next Version is "     & vbNewLine _
+				  	& newDevPath & " which is now the main trunk. " & vbNewLine _
+					& "	   " & "I have an additional comment regarding the " & oldDevPath & " release. When we made "    & vbNewLine _
+					& "the " & oldDevPath & " development path we branched off the " & PrevLabel & "label. This means that " & vbNewLine _
+					& "if you checked any files into " & oldDevPath & " after build " & PrevLabel & " your changes did not " & vbNewLine _
+					& "actually make it into the " & oldDevPath & " branch and need to be merged into " & newDevPath & "."   & vbNewLine _
 					& "Please double check your changes for any files may need to be merged." _
 	End Function
 

@@ -3,15 +3,19 @@ Class CMKS
     Public mBuild
     Public Property Set Build(ByRef aBuild)
         Set mBuild = aBuild
-        mBuild.RunCmd "si connect --hostname=mksapp --port=7001 --user=mksuser --password=W3lc0m3 --quiet"
+        'mBuild.RunCmd "si connect --hostname=mksapp --port=7001 --user=mksuser --password=W3lc0m3 --quiet"
     End Property
     
     Function CkPtAndLabel(aLabel)
-        mBuild.WriteToDlgAndFile "Checkpointing and labeling project with " & aLabel
+       Dim output 
+       mBuild.WriteToDlgAndFile "Checkpointing and labeling project with " & aLabel
         If Not g_DEBUG Then
             'mBuild.NewBuild.CheckPointedMain = True
-            mBuild.RunCmd "si checkpoint --label=" & aLabel & " --labelMembers --recurse --quiet --sandbox=" & _
-                          Chr(34) & mBuild.MainPJFile & Chr(34) & " --description=build_" & aLabel
+            output = mBuild.RunCmd("si checkpoint --label=" & aLabel & " --labelMembers --recurse --quiet --sandbox=" & _
+                          Chr(34) & mBuild.MainPJFile & Chr(34) & " --description=build_" & aLabel)
+	    If (InStr(output, "Failed") <> 0) Then
+		mBuild.BuildError "CheckPoint failed! Check in project RCS folders for any locked files( filenames starting with VC_ or _)" & output
+	    End If		  
             mBuild.NewBuild.LabeledMain = True
         End If
     End Function
@@ -326,7 +330,7 @@ Class CMKS
     End Function
 
 	Sub Disconnect()
-		mBuild.RunCmd "si disconnect --hostname=mksapp --port=7001 --user=mksuser --password=W3lc0m3 --quiet --yes"
+		'mBuild.RunCmd "si disconnect --hostname=mksapp --port=7001 --user=mksuser --password=W3lc0m3 --quiet --yes"
 	End Sub
 	
 End Class

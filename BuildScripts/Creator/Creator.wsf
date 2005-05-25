@@ -141,8 +141,8 @@ Sub CreateBranch()
     Set MKS.Build = g_Build
     MKS.CreateNewDevPath g_Build.MainProjPath, g_Build.MainPJFile
     g_Build.UpdateRegVersionVals "CreatorNextVersion", "CreatorCurrentVersion"
-    g_Build.SendEmail
-    UpdateVersionInFiles (MKS) 'taken out since we dont have the trunk sandbox available
+    'g_Build.SendEmail
+    'UpdateVersionInFiles MKS 'taken out since we dont have the trunk sandbox available
     Set MKS = Nothing
 End Sub
    
@@ -392,6 +392,7 @@ Sub SetAllCreatorObjects()
         End If
     Loop
 End Sub
+
 
 '==================================================================================
 ' Function    : ConfigureSubProjectForLicensing
