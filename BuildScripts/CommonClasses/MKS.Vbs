@@ -115,16 +115,10 @@ Class CMKS
     End Sub
 
     Private Sub CleanFolder(aPath)
-            Err.Clear
-	    On Error Resume Next
-	    If mBuild.FSO.FolderExists(aPath) Then
+        If mBuild.FSO.FolderExists(aPath) Then
                 mBuild.FSO.DeleteFile aPath, 1
-                mBuild.FSO.DeleteFolder aPath, 1
+                    mBuild.FSO.DeleteFolder aPath, 1
             End If
-	    If Err Then
-	        mBuild.BuildError "Error attempting to clean : " + aPath
-	        mBuild.WriteToDlgAndfile Err.Description
-	    End If
             mBuild.FSO.CreateFolder aPath
     End Sub
 
@@ -281,12 +275,12 @@ Class CMKS
         
     End Sub
 
-    Function ModsProject(aProjPJ)
+    Function ModsProject(aProjPJ, aLabel)
         Dim output
-        mBuild.WriteToDlgAndFile "Checking if " + aProjPJ + " has been modified since "
+        mBuild.WriteToDlgAndFile "Checking if " + aProjPJ + " has been modified since " + aLabel
         If Not g_DEBUG Then
                 'RunCmd returns output from stdout
-               ModsProject = mBuild.RunCmd("si mods -R --project=" & Chr(34) & aProjPJ & Chr(34))
+               ModsProject = mBuild.RunCmd("si mods --projectRevision=" & aLabel & " --project=" & Chr(34) & aProjPJ & Chr(34))
                       
         End If
     End Function

@@ -1,7 +1,7 @@
 
 Class CProductBuild
     Private mShell, mFSO, mStartTime, mProductName, mBuildLogFile, mNewDevPath, mNewNextVersion, mIgnoreMsgBox, mDebug, mLastBuild
-    Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo, mVersionNum
+    Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo
     Private mLockedPJFile, mLockedFile  'had to put these here instead of in MKS class b/c there should be only 1 instance of these
     Private mLogFileName, mInputFile
     Public mNewBuild, mErrCount, mBuildPath
@@ -25,14 +25,14 @@ Class CProductBuild
         End If
         mLeftOverTime = 0
 
-	mBuildPath = mFSO.GetFolder(mShell.CurrentDirectory & "\\")
+		mBuildPath = mFSO.GetFolder(mShell.CurrentDirectory & "\\")
         mInputFile = "BuildRegistry.txt"
         
         If mFSO.FileExists("..\logFolder\StandardOutput.txt") Then
-              mFSO.DeleteFile "..\logFolder\StandardOutput.txt", 1
+                    mFSO.DeleteFile "..\logFolder\StandardOutput.txt", 1
         End If
         If mFSO.FileExists("..\logFolder\StandardError.txt") Then
-              mFSO.DeleteFile "..\logFolder\StandardError.txt", 1
+                    mFSO.DeleteFile "..\logFolder\StandardError.txt", 1
         End If
 
         mFSO.CreateTextFile (mBuildPath & "\logFolder\StandardOutput.txt")
@@ -70,8 +70,8 @@ Class CProductBuild
     '***************************************************************************************************
     Public Sub GetParams()
 
-        Dim iParam, CodeBuildType, ExistingDevPath, licenseVersion
-         WriteToDlgAndFile "Params passed into the script: "
+        Dim iParam, CodeBuildType, ExistingDevPath, versionNum, licenseVersion
+        WriteToDlgAndFile "Params passed into the script: "
             For iParam = 0 To wscript.Arguments.Count - 1 Step 2
             WriteToDlgAndFile "    " + wscript.Arguments(iParam) + " " + wscript.Arguments(iParam + 1)
 
@@ -91,7 +91,7 @@ Class CProductBuild
                     Case "-EDP"
 					   ExistingDevPath = wscript.Arguments(iParam + 1)
                     Case "-VN"
-					   mVersionNum = wscript.Arguments(iParam + 1)
+					   versionNum = wscript.Arguments(iParam + 1)
                     Case "-SE"
 					  mIgnoreMsgBox = wscript.Arguments(iParam + 1)
                     Case "-DB"
@@ -108,7 +108,7 @@ Class CProductBuild
             Set mNewBuild.Build = Me
             mNewBuild.mCodeBuildType = CodeBuildType
             mNewBuild.mExistingDevPath = ExistingDevPath   'This may not have been set
-            mNewBuild.mVersionNum = mVersionNum
+            mNewBuild.mVersionNum = versionNum
             mNewBuild.mLicenseVersion = StripPrefix(licenseVersion, "SolimarLicensing")
             
         ElseIf mBuildType = "R" Then  'doing a release
@@ -730,9 +730,9 @@ Class CProductBuild
            Dim fldr
            Set f = mFSO.GetFolder(aFldr)
            Set sf = f.SubFolders
-           nResult = CleanFiles(aFldr, ExclusionList)
-	   For Each f1 In sf
-		nResult = CleanFolders(f1.Path, ExclusionList)  'need to pass in paths
+           nResult = CleanFiles(aFldr, ExclusionList())
+		   For Each f1 In sf
+				nResult = CleanFolders(f1.Path, ExclusionList())  'need to pass in paths
            Next	
 	End Function
 	
@@ -746,17 +746,17 @@ Class CProductBuild
          Dim f, f1,fc
          Dim Path, nResult
          Set f = mFSO.GetFolder(aFolder)
-         Set fc = f.Files 'file list	
+         Set fc = f.Files 'file list
+		 nResult = false	
          For Each f1 In fc
-              nResult = false	
               For Each ext In ExclusionList
-			If InStr(f1.Name, ext) Then
-				nResult = true
-			End If		
-	      Next
+					If InStr(f1.Name, ext) Then
+						nResult = true
+					End If		
+			  Next
               If nResult <> true Then
-		      mFSO.DeleteFile f1, true	
-	      End If
+				 mFSO.DeleteFile f1, true
+			  End If
          Next	 
    End Function
 
@@ -845,13 +845,10 @@ Class CProductBuild
    '==================================================================
    Function ValidateInstallSource(aMKS, aMoveFiles)
 	
-		Dim ExclusionList 
-		ExclusionList = Array(".pj")
 		aMoveFiles.CopyFileOrFolder "Folder", InstallSrcPath, MainProjPath & "\BuildInstallSource", True
 		RunCmd ("attrib -r " & InstallSrcPath & "\*.* /S")
-		'aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True	
-		CleanFolders InstallSrcPath, ExclusionList
-		aMKS.Refresh MainPJFile, InstallSrcPJFile
+		aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True	
+		aMKS.Revert MainPJFile, InstallSrcPJFile
 		aMoveFiles.CopyFileOrFolder "Folder", InstallSrcPath, MainProjPath & "\ArchivedInstallSource", True
 		RunCmd ("attrib -r " & InstallSrcPath & "\*.* /S")
 		aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True
@@ -961,8 +958,7 @@ Class CProductBuild
         Dim current, output
         current = GetBuildVersion(aNextVersion)
         WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + Right(mNewNextVersion, 4)
-        RunCmd "attrib -r " + mInputFile
-	If Not g_DEBUG Then
+        If Not g_DEBUG Then
             UpdateFileVersion mInputFile, aCurrentVersion, " " + current
             UpdateFileVersion mInputFile, aNextVersion, " " + Right(mNewNextVersion, 4)
         End If
@@ -1149,23 +1145,6 @@ Class CProductBuild
         endTime = Time
         WriteToDlgAndFile "Time Ended: " & endTime
         WriteToDlgAndFile "Time for Script to Run: " & getHrMinSec(mStartTime, endTime)
-	Dim MoveFiles
-	Set MoveFiles = New CMoveFiles
-	Set MoveFiles.Build = Me
-	DestPath = mBuildPath & "\\logFolder\\" & mProductName
-	If mFSO.FolderExists(DestPath) <> True Then
-		MoveFiles.CreateFileOrFolder "Folder", DestPath, True
-	End If
-	Dim logFileName
-	Select Case mBuildType 
-               Case "NB"	'New Build 	
-			logFileName = "\\BuildLog - " & mVersionNum& ".txt"
-	       Case "R"		'Release
-			logFileName = "\\ReleaseLog - " & mPrevLabel & ".txt"
-	       Case "CB"	'Branch
-			logFileName = "\\BranchLog - " & mPrevLabel & ".txt"
-	End Select	
-	MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & logfileName, True 
         mBuildDialog.ScriptDone False
         wscript.DisconnectObject mBuildDialog
         Set mBuildDialog = Nothing
