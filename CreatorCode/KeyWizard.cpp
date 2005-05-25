@@ -29,8 +29,8 @@ TKeyWizardFrm *KeyWizardFrm;
 // Defines
 //------------------------------------------------------------------------------
 //static member initialized
-const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*PDF Utility*/};
-const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, PDF_UTILITY};
+const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*PDF Utility*/, 0, 14/*SPDE*/};
+const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, PDF_UTILITY, SPDE_PRODUCT};
 
 
 //==============================================================================
@@ -117,7 +117,7 @@ void TKeyWizardFrm::setKeyClassComboBox()
    keyClassComboBox->ItemIndex = USB_KEY;
    keyClassComboBoxChange(this);
 }
-
+                                                                   
 //==============================================================================
 // Function:    ProductComboBoxChange
 // Purpose:     Each time the product is changed update ....
@@ -148,7 +148,8 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    if      (m_selectedProduct == SPD_PRODUCT       ||
             m_selectedProduct == CONNECT_PRODUCT   ||
             m_selectedProduct == QUANTUM_PRODUCT   ||
-            m_selectedProduct == ICONVERT_PRODUCT) {
+            m_selectedProduct == ICONVERT_PRODUCT  ||
+            m_selectedProduct == SPDE_PRODUCT      ) {
 
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
@@ -181,7 +182,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       }
    }
    else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
-            m_selectedProduct == SDX_DESIGNER_PRODUCT ||
+            /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
             m_selectedProduct == PDF_UTILITY) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
@@ -559,8 +560,8 @@ void TKeyWizardFrm::setStartPanelMembers()
 
    //
    // ProtecitonKey Members -
-   // key->customerNumber should be set on keyWizard initialization
-   // key->keyNumber should be set on keyWizard initialization
+   // key->customerNumbeizr should be set on keyWizard initialization
+   // key->keyNumber should be set on keyWizard initialation
    ProtectionKey *pKey(key_record->pkey);
    pKey->keyType = key_record->getKeyTypeEnumValue(keyType);
    pKey->productId = getSelectedProduct();
@@ -605,7 +606,10 @@ void TKeyWizardFrm::setModulePanelMembers()
 {
    //moduleCells are update to key as module grid changes
    //update all other GUI components to key
-   ((SpdProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+        ((SpdeProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
+   else
+        ((SpdProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
 }
 
 //==============================================================================
@@ -644,7 +648,8 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
          if      (m_selectedProduct == SPD_PRODUCT       ||
                   m_selectedProduct == CONNECT_PRODUCT   ||
                   m_selectedProduct == QUANTUM_PRODUCT   ||
-                  m_selectedProduct == ICONVERT_PRODUCT) {
+                  m_selectedProduct == ICONVERT_PRODUCT  ||
+                  m_selectedProduct == SPDE_PRODUCT       ) {
             //Select Modules
             state.push( wsModuleSelection );
             active_panel = ModuleProgramPanel;
@@ -652,7 +657,10 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             ///if(MODULE_STATE_CHANGE) {
                WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
                WizardModuleFrame->load(key_record, true);
-               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+               if(key_record->pkey->productId == SPDE_PRODUCT)
+                       OutputUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->outputUnits;
+               else
+                       OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
             ///}
 
             //enable NextBtn - user is not required to make any chages
@@ -660,7 +668,7 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             active_panel->BringToFront();
             active_panel->Visible = true;
          }
-         else if (m_selectedProduct == SDX_DESIGNER_PRODUCT )
+/*         else if (m_selectedProduct == SDX_DESIGNER_PRODUCT )
          {
             //Select Modules
             state.push( wsModuleSelection );
@@ -677,6 +685,7 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             active_panel->BringToFront();
             active_panel->Visible = true;
          }
+*/
          else if (m_selectedProduct == SOLSCRIPT_PRODUCT || m_selectedProduct == PDF_UTILITY) {
             //Select Modules
             state.push( wsModuleSelection );
@@ -953,13 +962,11 @@ void __fastcall TKeyWizardFrm::OutputEditChange(TObject *Sender)
 //==============================================================================
 void __fastcall TKeyWizardFrm::SelectModulesClick(TObject *Sender)
 {
-
-   
    ///WizardModuleFrame->modifyUnits(SelectModules->Checked);
    if (m_selectedProduct == SOLSEARCHER_ENTERPRISE_PRODUCT) {
       SpdProtectionKey* pSpdKey = static_cast<SpdProtectionKey*>(key_record->pkey);
       pSpdKey->setLicensesToZero();
-      
+
       if (SelectModules->Checked) {
          //initializeMinModules uses productId and productVersion
          key_record->pkey->productId = getSelectedProduct();
@@ -971,6 +978,23 @@ void __fastcall TKeyWizardFrm::SelectModulesClick(TObject *Sender)
          key_record->pkey->productId = getSelectedProduct();
          key_record->pkey->productVersion = getSelectedVersion();
          keyMaster->initializeMaxValues(key_record);
+      }
+   }
+   else if(m_selectedProduct == SPDE_PRODUCT) {    //done for SPDE product
+      SpdeProtectionKey* pSpdeKey = static_cast<SpdeProtectionKey*>(key_record->pkey);
+      pSpdeKey->setLicensesToZero();
+
+      if (SelectModules->Checked) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);  //stuff SPDE conditions into SPD
+      }
+      else {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxModules(key_record);
       }
    }
    else {
@@ -1234,7 +1258,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == QUANTUM_PRODUCT   ||
             m_selectedProduct == ICONVERT_PRODUCT  ||
             m_selectedProduct == SOLSCRIPT_PRODUCT ||
-            m_selectedProduct == SDX_DESIGNER_PRODUCT ||
+            /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
             m_selectedProduct == PDF_UTILITY) {
       if (moduleState == msMax) {
          //initialize uses productId and productVersion
@@ -1254,9 +1278,26 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
          spd_key->setLicensesToZero();
       }
    }
-   else {
-
+   else if(m_selectedProduct == SPDE_PRODUCT) {       //case for SPDE product
+     if (moduleState == msMax) {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxModules(key_record);
+      }
+      else if (moduleState == msMin) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);
+      }
+      else if (moduleState == msClear) {
+         SpdeProtectionKey* spde_key = static_cast<SpdeProtectionKey*>(key_record->pkey);
+         spde_key->outputUnits=0;
+         spde_key->setLicensesToZero();
+      }
    }
+   else {}
 
    updateDays();
 }

@@ -251,6 +251,7 @@ __published:	// IDE-managed Components
         void __fastcall PKNumberEditBoxChange(TObject *Sender);
         void __fastcall eBONumberEditBoxChange(TObject *Sender);
         void __fastcall DescriptionMemoChange(TObject *Sender);
+
 private:
         // User declarations
         AnsiString QueryKeySQL;         // base SQL string for the key form
@@ -263,7 +264,7 @@ private:
         unsigned int dirty_tab;
         unsigned int PHYSICAL_FLAG;
         unsigned short tmp_modules[TOTAL_MODULE_CELLS];
-
+        unsigned short tmp_spde_modules[TOTAL_MODULE_CELLS+2];  //16 + 2 needed for spde
         //
         // GUI Options
         bool isAttachedKeyReady();
@@ -315,17 +316,23 @@ public:
 
         //
         // Password Functions
-        void createExtensionPassword(unsigned char days);
+        void createExtensionPassword(unsigned short days);
         void createMaxLUValuePassword(int iMaxLUValue);
         void createOutputPassword(int output_units);
         void createVersionPassword(unsigned short version);
         void modulePasswordCreated();
+        void createBusTagInPassword(int output_units);
+        void createBusTagOutPassword(int output_units);
+        void createParallelInPassword(int output_units);
+        void createParallelOutPassword(int output_units);
+        void createSCSIOutPassword(int output_units);
+        void createPSInterpPassword(int output_units);
 
         void createConcurrentUsersPassword(unsigned short units_licensed);
         void createIndexServersPassword(unsigned short units_licensed);
         void createReportServersPassword(unsigned short units_licensed);
         void createApplicationPassword(unsigned short units_licensed);
-
+        void createDocumentAssemblerPassword(unsigned short units_licensed);
         //
         // Utility functions
         AnsiString getKeyTypeText(int key_type);

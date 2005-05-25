@@ -198,7 +198,7 @@ public:
    void getBasePassword(ISolimarLicenseSvr* pServer, char* Password_String);
    enum {MAX_EXTENSION_NUM = 4};
 
-   void getExtensionPassword(uchar extension_days,
+   void getExtensionPassword(ushort extension_days,
                               ushort extension_num,
                               ISolimarLicenseSvr* pServer,
                               char* password);

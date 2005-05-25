@@ -29,7 +29,6 @@ CLookup::CLookup()
    cDatabase = Session->FindDatabase("CustDB");
    cQuery = new TQuery(NULL);
 
-
    // initialize all module lists
    for( int mod_id=0; mod_id<64; mod_id++)
    {
@@ -55,9 +54,16 @@ CLookup::CLookup()
       //Create new structures,and assign new module id's to each one.
       m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
+
+  //     m_SpdeModuleDetail[mod_id] = new ModuleDetail();
+  //    m_SpdeModuleDetail[mod_id]->id = mod_id;
    }
-
-
+  //should initialize up to 128
+  for( int mod_id = 0; mod_id < 64; mod_id++)       //64 modules with varying module ids
+   {
+      m_SpdeModuleDetail[mod_id] = new ModuleDetail();
+      m_SpdeModuleDetail[mod_id]->id = mod_id;
+   }
 
    if(cDatabase)
    {
@@ -129,8 +135,15 @@ CLookup::~CLookup()
 
       delete m_solScriptModuleDetail[mod_id];
       delete m_PDFUtilityModuleDetail[mod_id];
+
       delete m_SDXDesignerModuleDetail[mod_id];
+     // delete m_SpdeModuleDetail[mod_id];
    }
+   for( int mod_id=0; mod_id < 64; mod_id++)
+   {
+       delete m_SpdeModuleDetail[mod_id];
+   }
+
 }
 
 //==============================================================================
@@ -222,8 +235,11 @@ ModuleDetail** CLookup::getModuleList(int productID)
       return m_solScriptModuleDetail;
    else if (productID == PDF_UTILITY)
       return m_PDFUtilityModuleDetail;
-   else if (productID == SDX_DESIGNER_PRODUCT)
+   else if (productID == SPDE_PRODUCT)
+      return m_SpdeModuleDetail;
+/*   else if (productID == SDX_DESIGNER_PRODUCT)
       return m_SDXDesignerModuleDetail;
+*/
    else
        return module_detail;
 }
@@ -241,6 +257,8 @@ bool CLookup::resetModuleList()
    bool result(false);
    int mod_id; //module id is index into module_detail list
    int product_id; //product id specifies whether or not to use SPD or ICONVERT
+   int spdeCount(0);
+   int currentCount(-1);
    //int max_solscript;
    ModuleDetail** pModuleList(NULL);
 
@@ -264,14 +282,21 @@ bool CLookup::resetModuleList()
 
       *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
-   }
 
+    //  *m_SpdeModuleDetail[mod_id] = unassigned_module;
+    //  m_SpdeModuleDetail[mod_id]->id = mod_id;
+   }
+   for( mod_id=0; mod_id < 64; mod_id++)
+   {
+     *m_SpdeModuleDetail[mod_id] = unassigned_module; //copies an empty module detail object into module_detail list
+      m_SpdeModuleDetail[mod_id]->id = mod_id;
+   }
    //query module information
    try
    {
       cQuery->Close();
       cQuery->SQL->Clear();
-      cQuery->SQL->Add("SELECT * FROM sModuleDetail");
+      cQuery->SQL->Add("SELECT * FROM sModuleDetail ORDER BY pID, mdId");
       cQuery->Prepare();
       cQuery->Open();
 
@@ -286,59 +311,72 @@ bool CLookup::resetModuleList()
          //
          // Set the module list for iConvert
          //
-         if (product_id==ICONVERT_PRODUCT) {
+         if (product_id==ICONVERT_PRODUCT ) {
             pModuleList = iConvert_module_detail;
+            currentCount = mod_id;
          }
-         else if (product_id==PDF_UTILITY) {
+         else if (product_id==PDF_UTILITY ) {
             pModuleList = m_PDFUtilityModuleDetail;
+            currentCount = mod_id;
          }
-         else if (product_id==SOLSCRIPT_PRODUCT) {
+         else if (product_id==SOLSCRIPT_PRODUCT ) {
             pModuleList = m_solScriptModuleDetail;
+            currentCount =mod_id;
          }
-         else if (product_id==SDX_DESIGNER_PRODUCT)
+         else if (product_id==SPDE_PRODUCT ) {
+            pModuleList = m_SpdeModuleDetail;
+            currentCount = spdeCount++;
+         }
+/*         else if (product_id==SDX_DESIGNER_PRODUCT )
+        {
             pModuleList = m_SDXDesignerModuleDetail;
+            currentCount = mod_id;
+        }
+*/
          else
-            pModuleList = module_detail;
-
-         if (mod_id >= 0 && mod_id < 64)
          {
-
+            pModuleList = module_detail;
+            currentCount = mod_id;
+         }
+        if (mod_id >= 0 && currentCount < 64)
+        {
             // Subtract 1000 because there are 64 values in the array, so each
             // module will correspond to each of these values.  There are labeled
             // 10XX or some other value in the sModuleDetail table.
-            pModuleList[mod_id]->id = mod_id;
-            pModuleList[mod_id]->pid = cQuery->FieldByName("pId")->AsInteger;
-            pModuleList[mod_id]->name = cQuery->FieldByName("MDdescription")->AsString;
-            pModuleList[mod_id]->version_added = cQuery->FieldByName("MDversionAdded")->AsInteger;
-            pModuleList[mod_id]->version_removed = cQuery->FieldByName("MDversionRemoved")->AsInteger;
-            pModuleList[mod_id]->max = cQuery->FieldByName("MDmax")->AsInteger;
-            pModuleList[mod_id]->function = cQuery->FieldByName("MDaction")->AsInteger;
-            pModuleList[mod_id]->spd_default = cQuery->FieldByName("MDspdDefault")->AsBoolean;
-            pModuleList[mod_id]->con_default = cQuery->FieldByName("MDconnectivityDefault")->AsBoolean;
-            pModuleList[mod_id]->con_module = cQuery->FieldByName("MDconnectivityModule")->AsBoolean;
-            pModuleList[mod_id]->iConvert_default = cQuery->FieldByName("MDiConvertDefault")->AsBoolean;
-            pModuleList[mod_id]->iConvert_module = cQuery->FieldByName("MDiConvertModule")->AsBoolean;
-            pModuleList[mod_id]->engineer = cQuery->FieldByName("MDengineer")->AsString;
-            pModuleList[mod_id]->description = cQuery->FieldByName("MDdescription")->AsString;
-            pModuleList[mod_id]->partnumber = cQuery->FieldByName("MDpartnumber")->AsString;
-            pModuleList[mod_id]->pages_per_minute = cQuery->FieldByName("MDpagesPerMinute")->AsBoolean;
-            pModuleList[mod_id]->m_bQuantumDefault = cQuery->FieldByName("MDquantumDefault")->AsBoolean;
-            pModuleList[mod_id]->m_bQuantumModule = cQuery->FieldByName("MDquantumModule")->AsBoolean;
+            pModuleList[currentCount]->id = mod_id;
+            pModuleList[currentCount]->pid = cQuery->FieldByName("pId")->AsInteger;
+            pModuleList[currentCount]->name = cQuery->FieldByName("MDdescription")->AsString;
+            pModuleList[currentCount]->version_added = cQuery->FieldByName("MDversionAdded")->AsInteger;
+            pModuleList[currentCount]->version_removed = cQuery->FieldByName("MDversionRemoved")->AsInteger;
+            pModuleList[currentCount]->max = cQuery->FieldByName("MDmax")->AsInteger;
+            pModuleList[currentCount]->function = cQuery->FieldByName("MDaction")->AsInteger;
+            pModuleList[currentCount]->spd_default = cQuery->FieldByName("MDspdDefault")->AsBoolean;
+            pModuleList[currentCount]->spde_default = cQuery->FieldByName("MDspdeDefault")->AsBoolean;
+            pModuleList[currentCount]->con_default = cQuery->FieldByName("MDconnectivityDefault")->AsBoolean;
+            pModuleList[currentCount]->con_module = cQuery->FieldByName("MDconnectivityModule")->AsBoolean;
+            pModuleList[currentCount]->iConvert_default = cQuery->FieldByName("MDiConvertDefault")->AsBoolean;
+            pModuleList[currentCount]->iConvert_module = cQuery->FieldByName("MDiConvertModule")->AsBoolean;
+            pModuleList[currentCount]->engineer = cQuery->FieldByName("MDengineer")->AsString;
+            pModuleList[currentCount]->description = cQuery->FieldByName("MDdescription")->AsString;
+            pModuleList[currentCount]->partnumber = cQuery->FieldByName("MDpartnumber")->AsString;
+            pModuleList[currentCount]->pages_per_minute = cQuery->FieldByName("MDpagesPerMinute")->AsBoolean;
+            pModuleList[currentCount]->m_bQuantumDefault = cQuery->FieldByName("MDquantumDefault")->AsBoolean;
+            pModuleList[currentCount]->m_bQuantumModule = cQuery->FieldByName("MDquantumModule")->AsBoolean;
             //pModuleList[mod_id]->max_solscript = cQuery->FieldByName("MDmaxsolscript")->AsInteger;
             //
             // Keep track of the modules to see if they are existing members or not.
-            if (pModuleList[mod_id]->name == "{ Not Used }") {
-                pModuleList[mod_id]->bExistingMember = false;
+            if (pModuleList[currentCount]->name == "{ Not Used }") {
+                pModuleList[currentCount]->bExistingMember = false;
             }
             else
-                pModuleList[mod_id]->bExistingMember = true;
-         }
-
+                pModuleList[currentCount]->bExistingMember = true;
+//         }
          //----
+         }
          cQuery->Next();
 
       }
-      cQuery->Close();
+      cQuery->Close();      //pModuleList now has all module info from moduledetail table
       result = true;
    }
    catch(...)
@@ -678,7 +716,34 @@ void CLookup::updateMDSpdDefault(unsigned short module_id, bool bspd_default)
      //refresh module list
      resetModuleList();
 }
+//==============================================================================
+// Function:    updateMDSpdeDefault
+// Purpose:     will update the mdSpdeDefault field associated with each module.
+//              Updates sModuleDetail table in the database.
+// Parameters:  unsigned short module_id - module id
+//              bool bspde_default - true if spde_default
+// Returns:     None
+//==============================================================================
+void CLookup::updateMDSpdeDefault(unsigned short module_id, bool bspde_default)
+{
+     //update module information
+     try
+     {
+        cQuery->Close();
+        cQuery->SQL->Clear();
+        cQuery->SQL->Add("update sModuleDetail SET mdSpdeDefault = :spdedef WHERE mdId = :id");
+        cQuery->ParamByName("spdedef")->AsBoolean = bspde_default;
+        cQuery->ParamByName("id")->AsInteger = module_id;
+        cQuery->ExecSQL();
+     }
+     catch(EDBEngineError &e)
+     {
+        Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+     }
 
+     //refresh module list
+     resetModuleList();
+}
 //==============================================================================
 // Function:    updateMDConnectivityDefault
 // Purpose:     will update the mdConnectivityDefault field associated with each
@@ -819,7 +884,7 @@ void CLookup::addItemToSModuleDetail(int product_id,
                                 AnsiString module_engineer, AnsiString module_partnumber,
                                 unsigned short module_version_added,
                                 unsigned short module_version_removed, AnsiString module_type,
-                                unsigned short module_max, bool module_spd_def,
+                                unsigned short module_max, bool module_spd_def, bool module_spde_def,
                                 bool module_connect_def, bool module_connect_mod,
                                 bool module_iConvert_def, bool module_iConvert_mod )
 {
@@ -962,6 +1027,7 @@ ModuleDetail::ModuleDetail(): name("{ Not Used }"),
                               con_module(false),
                               con_default(false),
                               spd_default(false),
+                              spde_default(false),
                               iConvert_default(false),
                               iConvert_module(false),
                               engineer("N/A"),
@@ -1064,8 +1130,12 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
       case SOLSCRIPT_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
-      case SDX_DESIGNER_PRODUCT:
+/*      case SDX_DESIGNER_PRODUCT:
          result = static_cast<bool>(max>0);
+         break;
+*/
+      case SPDE_PRODUCT:
+         result = true;
          break;
       default:
          result = false;
@@ -1092,6 +1162,8 @@ bool ModuleDetail::isDefaultForProduct(unsigned short product)
       return m_bQuantumDefault;
    else if(product == ICONVERT_PRODUCT)
       return iConvert_default;
+   else if(product == SPDE_PRODUCT)
+      return spde_default;
    else
       return false;
 }

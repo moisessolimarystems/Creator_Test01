@@ -129,6 +129,7 @@
 #include "ssckey.hpp"
 #include "sdxkey.h"
 #include "pdfkey.hpp"
+#include "Spdekey.h"
 
 // protection key passwords and developer ID
 const ushort WRITE_PASSWORD = 0x4AFC;
@@ -169,6 +170,8 @@ const char* ProductText[] =
    "SDX Designer",                                              // SDX_DESIGNER_PRODUCT = 10
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
    "PDF Utility",                                               // PDF Utility = 12
+   "???",                                                       // Not Used
+   "SP/D-E",                                                    // SPDE_PRODUCT = 14
 // "123456789" <-- Maximum product name length is 9
 };
 
@@ -192,6 +195,8 @@ const char* longProductText[] =
    "SDX Designer ",                                             // SDX_DESIGNER_PRODUCT = 10
 	"Solimar Print/Director, Quantum Server Edition ",           // QUANTUM_PRODUCT = 11
    "PDF Utility ",                                              // PDF Utility = 12
+   "???",                                                       // Not Used
+   "Solimar Print/Director, Enterprise Edition",                // SPDE_PRODUCT = 14
 };
 
 /* productText[]
@@ -213,6 +218,8 @@ const char* mediumProductText[] =
    "SDX Designer ",                          // SDX_DESIGNER_PRODUCT = 10
    "SP/D, Quantum Server",							// QUANTUM_PRODUCT = 11
    "PDF Utility",                            // PDF Utility = 12
+   "???",                                    // Not Used
+   "SP/D, Enterprise Edition",               // SPDE_PRODUCT = 14
 };
 
 /* KDPasswordText[]
@@ -245,7 +252,6 @@ const char* KDPasswordText[] =
    "1095 days/3000 hrs - MYTL",  // 23
    "1460 days/4000 hrs - MYTL",  // 24
    "1825 days/5000 hrs - MYTL",  // 25
-
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -600,7 +606,7 @@ short ProtectionKey::getExpirationDays() const
  *    otherwise returns 0.
  *
 ---------------------------------------------------------------------------*/
-void ProtectionKey::getExtensionPassword(uchar extension_days,
+void ProtectionKey::getExtensionPassword(ushort extension_days,
                                           ushort extension_num,
                                           ISolimarLicenseSvr* pServer,
                                           char* password
@@ -804,7 +810,7 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
    {
       case SPD_PRODUCT:
       case CONNECT_PRODUCT:
-		case ICONVERT_PRODUCT:
+      case ICONVERT_PRODUCT:
       case QUANTUM_PRODUCT:
          new_key = new SpdProtectionKey();
          break;
@@ -813,8 +819,9 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey();
+/*         new_key = new SDXDesignerProtectionKey();
          break;
+*/
       default:
          new_key = new ProtectionKey();
          break;
@@ -823,6 +830,9 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
          break;
       case PDF_UTILITY:
          new_key = new PDFUtilityProtectionKey();
+         break;
+      case SPDE_PRODUCT:
+         new_key = new SpdeProtectionKey();
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
@@ -862,7 +872,7 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
 	{
       case SPD_PRODUCT:
       case CONNECT_PRODUCT:
-		case ICONVERT_PRODUCT:
+      case ICONVERT_PRODUCT:
       case QUANTUM_PRODUCT:
          new_key = new SpdProtectionKey();
          break;
@@ -871,8 +881,9 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey();
+ /*        new_key = new SDXDesignerProtectionKey();
          break;
+ */
       default:
          new_key = new ProtectionKey();
          break;
@@ -881,6 +892,9 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
          break;
       case PDF_UTILITY:
          new_key = new PDFUtilityProtectionKey();
+         break;
+      case SPDE_PRODUCT:
+         new_key = new SpdeProtectionKey();
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
@@ -914,8 +928,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
+/*         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
          break;
+*/
       default:
          new_key = new ProtectionKey(*pkey);
          break;
@@ -924,6 +939,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
          break;
       case PDF_UTILITY:
          new_key = new PDFUtilityProtectionKey(*(PDFUtilityProtectionKey*)pkey);
+         break;
+      case SPDE_PRODUCT:
+         new_key = new SpdeProtectionKey(*(SpdeProtectionKey*)pkey);
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
