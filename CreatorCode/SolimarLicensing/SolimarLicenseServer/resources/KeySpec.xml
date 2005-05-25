@@ -528,26 +528,24 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="0"	offset="0x080" bits="16" name="Index Servers"/>
 				<Module id="1"	offset="0x090" bits="16" name="Report Servers"/>
 				<Module id="2"	offset="0x0A0" bits="16" name="Concurrent Users" licenseRead="(value * 25)" licenseWrite="(value / 25)"/>
-				<Module id="3"	offset="0x0B0" bits="16" name="Application Databases"/>
+				<Module id="3"	offset="0x0B0" bits="16" name="Application Databases" unlimited="255"/>
+				<Module id="4"	offset="0x0C0" bits="16" name="Document Assembler" unlimited="1"/>
 			</ModuleList>
 			<ProductList>
 				<Product id="8" name="SolSearcher Enterprise">
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
-					<ModuleInclude id="3" default="0"/>
+					<ModuleInclude id="3" default="255"/>
+					<ModuleInclude id="4" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
 		<KeyLayout name="SDX Designer">
 			<ModuleList>
-				<Module id="0"	offset="0x08c" bits="4" name="SDX Designer"/>
-				<Module id="1"	offset="0x088" bits="4" name="Sol Indexer"/>
 			</ModuleList>
 			<ProductList>
 				<Product id="10" name="SDX Designer">
-					<ModuleInclude id="0" default="0"/>
-					<ModuleInclude id="1" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
@@ -616,9 +614,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="38"	offset="0x0A5" bits="1" name="XCHANGE::PS" unlimited="1"/>
 				<Module id="39"	offset="0x0A4" bits="1" name="XCHANGE::PS (DBCS)" unlimited="1"/>
 				
-				<Module id="40"	offset="0x0A8" bits="1" name="XRocks Printer Controller" unlimited="1"/>
-				<Module id="41"	offset="0x0A9" bits="1" name="IPDS Print Controller" unlimited="1"/>
-				<Module id="42"	offset="0x0AA" bits="1" name="RJE::3211" unlimited="1"/>
+				<Module id="40"	offset="0x0AB" bits="1" name="XRocks Printer Controller" unlimited="1"/>
+				<Module id="41"	offset="0x0AA" bits="1" name="IPDS Print Controller" unlimited="1"/>
+				<Module id="42"	offset="0x0A9" bits="1" name="RJE::3211" unlimited="1"/>
 				
 				
 				<!-- Module IDs identifying hardware -->
@@ -688,6 +686,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="38" default="0"/>
 					<ModuleInclude id="39" default="0"/>
 					<ModuleInclude id="40" default="1"/>
+					<ModuleInclude id="41" default="0"/>
+					<ModuleInclude id="42" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
