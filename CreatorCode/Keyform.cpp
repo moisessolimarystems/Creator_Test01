@@ -260,13 +260,13 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      //if ((PHYSICAL_FLAG & pf_MODULE) && (PERMISSION_FLAG & permanent_pwd || PHYSICAL_FLAG & pf_NONPERMANENT)) {
      //if( ( (PERMISSION_FLAG & permanent_pwd) && (PHYSICAL_FLAG & pf_MODULE) ) || (PHYSICAL_FLAG & pf_NONPERMANENT) )
      //{
-         mmSPDOutput->Visible = ((key_record->getProductId() != ICONVERT_PRODUCT)     &&
+         //mmSPDModule->Enabled = true;         What is this used for???
+         mmSPDOutput->Enabled = ((key_record->getProductId() != ICONVERT_PRODUCT)     &&
                                  (key_record->getProductId() != PDF_UTILITY)          &&
+                                 /*(key_record->getProductId() != SDX_DESIGNER_PRODUCT) &&*/
                                  (key_record->getProductId() != SOLSCRIPT_PRODUCT))
                                 ? true : false;
-         mmSPDEOperatorSessions->Visible = (key_record->getProductId() == SPDE_PRODUCT) ? true : false;
-         mmSPDEUserSessions->Visible = (key_record->getProductId() == SPDE_PRODUCT) ? true : false;
-         mmMaxLU->Visible = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
+         mmMaxLU->Enabled = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
          KeyFormModuleFrame->mmPagesPerMinute->Enabled = true;
          KeyFormModuleFrame->mmIncrementModule->Enabled = true;
      }
@@ -290,10 +290,9 @@ void __fastcall TFCustomerKeys::setGUIOptions()
          if (key_record->non_perm_ktf == false)
          {
              //then we should disable any functionality that could make the key go permanent.
-             mmSPDOutput->Visible = false;
-             mmSPDEOperatorSessions->Visible = false;
-             mmSPDEUserSessions->Visible = false;
-             mmMaxLU->Visible = false;
+             mmSPDModule->Enabled = false;
+             mmSPDOutput->Enabled = false;
+             mmMaxLU->Enabled = false;
              KeyFormModuleFrame->mmIncrementModule->Enabled = false;
              mmPermanent->Enabled = false;
              // NOTE: the user can still make the key a BASE key, and the key
@@ -313,10 +312,9 @@ void __fastcall TFCustomerKeys::setGUIOptions()
 
         //
         // Disallow Master keys to generate these passwords
-        mmMaxLU->Visible = false;
-        mmSPDOutput->Visible = false;
-        mmSPDEOperatorSessions->Visible = false;
-        mmSPDEUserSessions->Visible = false;
+        mmMaxLU->Enabled = false;
+        mmSPDOutput->Enabled = false;
+        mmSPDModule->Enabled = false;
 
         //
         // Enable ability to mark the key LOST or RETURNED
@@ -385,21 +383,6 @@ void __fastcall TFCustomerKeys::showLicenseInfo(bool bTurnOn)
     //
     // Edit Boxes
     output_devices->Visible = bTurnOn;
-}
-
-//==============================================================================
-// Function:    showSessionsInfo()
-// Purpose:     Allows the user to view or not view the information
-// Parameters:  BOOL - true - allows the user to see values
-//                     false - hides the information from the user.
-// Returns:     None
-//==============================================================================
-void __fastcall TFCustomerKeys::showSessionsInfo(bool bTurnOn)
-{
-    //
-    // Group Box
-    SessionGroupBox->Visible = bTurnOn;
-
 }
 
 //==============================================================================
@@ -544,8 +527,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                        ((SpdeProtectionKey*)(key_record->pkey))->setLicenses((unsigned short*)buffer, false);   //need to process 32 bytes of binary modules
 
                         ((SpdeProtectionKey*)(key_record->pkey))->outputUnits = QueryKey->FieldByName("SKRoutput")->AsInteger;
-                        ((SpdeProtectionKey*)(key_record->pkey))->operatorSessionUnits = QueryKey->FieldByName("SKRoperatorSession")->AsInteger;
-                        ((SpdeProtectionKey*)(key_record->pkey))->userSessionUnits = QueryKey->FieldByName("SKRuserSession")->AsInteger;
+
                         // initialize module tab and make it visible
                         KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);
                         PageControl1->Pages[1]->TabVisible = true;
@@ -670,7 +652,6 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         showPagesPerMinuteInfo(true);
         showLicenseInfo(true);
         showModuleInfo(true);
-        showSessionsInfo(false);
 
         //
         // LICENSING - refresh licensing.
@@ -682,20 +663,16 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         showPagesPerMinuteInfo(true);
         showLicenseInfo(true);
         showModuleInfo(true);
-        showSessionsInfo(true);
 
         //
         // LICENSING - refresh licensing.
         setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
-        setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
-        setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
     }
     else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
              /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
              key_record->pkey->productId == PDF_UTILITY) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
-        showSessionsInfo(false);
         showModuleInfo(true);
         //setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
         //PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
@@ -708,7 +685,6 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
         showModuleInfo(false);
-        showSessionsInfo(false);
     }
 
     //
@@ -862,12 +838,13 @@ void __fastcall TFCustomerKeys::clearPermissions()
    mmPermanent->Enabled = false;
    mmExtension->Enabled = false;
    mmVersion->Enabled = false;
-   mmSPDOutput->Visible = false;
-   mmSPDEOperatorSessions->Visible = false;
-   mmSPDEUserSessions->Visible = false;
+   mmSPDModule->Enabled = false;
+   mmSPDOutput->Enabled = false;
    mmLost->Enabled = false;
    mmReturned->Enabled = false;
-   mmMaxLU->Visible = false;
+   mmMaxLU->Enabled = false;
+   mmCurrentVersion->Enabled = false;
+
 
    //
    // Module Features
@@ -1054,6 +1031,19 @@ void __fastcall TFCustomerKeys::KeyGridDrawColumnCell(TObject *Sender,
 }
 
 //==============================================================================
+// Function:    mmCurrentVersionClick
+// Purpose:     Event handler for main menu option.  Calls createVersionPassword
+//              which will generate a password for the key and update the
+//              database.
+// Parameters:  TObject* Sender
+// Returns:     None
+//==============================================================================
+void __fastcall TFCustomerKeys::mmCurrentVersionClick(TObject *Sender)
+{
+   createVersionPassword(lookup->getCurrentVersion(key_record->pkey->productId, false));
+}
+
+//==============================================================================
 // Function:    mmVersionClick
 // Purpose:     Update version information in the database and generates a
 //              password to give to the customer.
@@ -1183,9 +1173,10 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
        }
 
        if( dlg->ShowModal() == IDYES )
-       {   //the index should be the value passed into createExtensionPassword. LicenseServer expects index into KDPasswordHour array
-           index = dlg->passwordComboBox->ItemIndex + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
-           createExtensionPassword(index);
+       {
+           index = dlg->passwordComboBox->ItemIndex; //+ 1;  why does this have + 1?? array is 0 based.
+           unsigned short days  = key_record->pkey->getKDPasswordDays(index);
+           createExtensionPassword(days);
        }
 
        delete dlg;
@@ -1214,7 +1205,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 void TFCustomerKeys::createExtensionPassword(unsigned short days)
 {
    char password_string[128];
-   unsigned short expire_date = days;
+
    //
    //check if key is attached
    if(!isAttachedKeyReady())
@@ -1239,10 +1230,6 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
    //apply password to key
    keyMaster->applyExtensionPassword(key_record, days);
 
-   //Test/Dev keys store index into units field. So need to translate index to actual number of days.
-   if(key_record->pkey->keyType == KEYDevelopment)
-        expire_date = key_record->pkey->getKDPasswordDays(days);
-
    //
    //Update database
    try
@@ -1254,7 +1241,7 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
       UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = :status, SKRexpirationDate = (getdate() + :exp_date) WHERE SKRid = :skr_id ");
       UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
       UtilityQuery->ParamByName("status")->AsInteger = key_record->getStatus();
-      UtilityQuery->ParamByName("exp_date")->AsInteger = expire_date;
+      UtilityQuery->ParamByName("exp_date")->AsInteger = days;
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:skr_id, :password, 255, :days, 0)");
@@ -1317,7 +1304,7 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->Close();
       UtilityQuery->SQL->Clear();
       UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, "
-                             "SKRoutput = 1, SKRoperatorSession = 1, SKRuserSession = 1, SKRppmextensions = 0, "
+                             "SKRoutput = 1, SKRppmextensions = 0, "
                              "modules = :module_list, SKRppmxchipds = :ipds, "
                              "SKRppmxchpcl = :pcl, SKRppmxchps = :ps, "
                              "SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds, "
@@ -1337,7 +1324,7 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->ParamByName("indexServers")->AsInteger = 0;
       UtilityQuery->ParamByName("reportServers")->AsInteger = 0;
       UtilityQuery->ParamByName("concurrentUsers")->AsInteger = 0;
-      UtilityQuery->ParamByName("applications")->AsInteger = 0;
+      UtilityQuery->ParamByName("applications")->AsInteger = MAX_APPLICATIONS;
       UtilityQuery->ParamByName("documentAssembler")->AsInteger = 0;
       UtilityQuery->ExecSQL();
 
@@ -1422,10 +1409,8 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
             }
             else if ( key_record->pkey->productId == SPDE_PRODUCT)
             {
-               KeyFormModuleFrame->load(key_record);  //stupid code since the set functions already call the key_record for units
+               KeyFormModuleFrame->load(key_record);
                setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
-               setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
-               setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
             }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
                      /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
@@ -1482,18 +1467,6 @@ void __fastcall TFCustomerKeys::setOutputUnitsDisplay(unsigned short outputs)
         OutputDescription->Caption = "Licensed for LU's";
 
    }
-}
-
-void TFCustomerKeys::setOperatorSessionUnitsDisplay(unsigned short units)
-{
-   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
-   operator_sessions->Text = units;
-}
-
-void TFCustomerKeys::setUserSessionUnitsDisplay(unsigned short units)
-{
-   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
-   user_sessions->Text = units;
 }
 
 //==============================================================================
@@ -1823,8 +1796,6 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
          programmed->system_id = sp_GenerateSystemId->ParamByName("RETURN_VALUE")->AsInteger;
       }
       int output(0);
-      int operatorSessions(0);
-      int userSessions(0);
       int ppmExtensions(0);
       int ppmXchIpds(0);
       int ppmXchPsDbcs(0);
@@ -1852,8 +1823,6 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
       }
       else if(selectedProduct == SPDE_PRODUCT) {
          output = reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->outputUnits;
-         operatorSessions =   reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->operatorSessionUnits;
-         userSessions =    reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->userSessionUnits;
       }
       else {
 
@@ -1890,9 +1859,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRconcurrentUsers = :concurrent_users, "
                                  "SKRapplications = :applications, "
                                  "SKRdocumentAssembler = :document_assembler, "
-                                 "SKRoutput = :output, "
-                                 "SKRoperatorSession = :operator_sessions, "
-                                 "SKRuserSession = :user_sessions WHERE SKRid = :skrid ");
+                                 "SKRoutput = :output WHERE SKRid = :skrid ");
 
 //-----------------------------------------------------------
          time_t test(programmed->pkey->expirationDate);
@@ -1926,9 +1893,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRconcurrentUsers = :concurrent_users, "
                                  "SKRapplications = :applications, "
                                  "SKRdocumentAssembler = :document_assembler, "
-                                 "SKRoutput = :output, "
-                                 "SKRoperatorSession = :operator_sessions, "
-                                 "SKRuserSession = :user_sessions WHERE SKRid = :skrid ");
+                                 "SKRoutput = :output WHERE SKRid = :skrid ");
       }
 
       UtilityQuery->ParamByName("product")->AsInteger = programmed->pkey->productId;//product;
@@ -1956,8 +1921,6 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
       UtilityQuery->ParamByName("concurrent_users")->AsInteger = concurrentUsers;
       UtilityQuery->ParamByName("applications")->AsInteger = applications;
       UtilityQuery->ParamByName("document_assembler")->AsInteger = documentAssembler;
-      UtilityQuery->ParamByName("operator_sessions")->AsInteger = operatorSessions;
-      UtilityQuery->ParamByName("user_sessions")->AsInteger = userSessions;
       UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
@@ -2070,50 +2033,6 @@ void __fastcall TFCustomerKeys::mmSPDOutputClick(TObject *Sender)
    dlg = NULL;
 }
 
-//---------------------------------------------------------------------------
-
-void __fastcall TFCustomerKeys::mmSPDEOperatorSessionsClick(TObject *Sender)
-{
-   int operator_sessions(0);
-
-   //get new total of outputs
-   TUnitsDlg *dlg = new TUnitsDlg(this, 0xFF);
-   dlg->Edit1->Text = 1;
-
-   if( dlg->ShowModal() == IDYES )
-   {
-      operator_sessions = dlg->Edit1->Text.ToInt();
-      //
-      //check if invalid values returned
-      createOperatorSessionPassword(operator_sessions);
-   }
-   //do not need dialog anymore
-   delete(dlg);
-   dlg = NULL;
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TFCustomerKeys::mmSPDEUserSessionsClick(TObject *Sender)
-{
-   int user_sessions(0);
-
-   //get new total of outputs
-   TUnitsDlg *dlg = new TUnitsDlg(this, 0xFF);
-   dlg->Edit1->Text = 1;
-
-   if( dlg->ShowModal() == IDYES )
-   {
-      user_sessions = dlg->Edit1->Text.ToInt();
-      //
-      //check if invalid values returned
-      createUserSessionPassword(user_sessions);
-   }
-   //do not need dialog anymore
-   delete(dlg);
-   dlg = NULL;
-}
-//---------------------------------------------------------------------------
-
 
 //==============================================================================
 // Function:    createOutputPassword()
@@ -2175,10 +2094,7 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       UtilityQuery->ParamByName("password")->AsString = password_string;
       UtilityQuery->ParamByName("units")->AsInteger = output_units;
       // 300 = Output Pool, 301 = LU Devices
-      if(key_record->pkey->productId == SPDE_PRODUCT)
-              UtilityQuery->ParamByName("descriptionid")->AsInteger = 5240;
-      else
-               UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
+      UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
       UtilityQuery->ExecSQL();
 
       Database1->Commit();
@@ -2191,139 +2107,6 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       Database1->Rollback();
    }
 }
-
-//==============================================================================
-// Function:    createOperatorSessionPassword()
-// Purpose:     creates an operator password, and updates the information in the
-//              SKeyRecord and STransactionDetail tables based on the key record
-//              id number.
-// Parameters:  ( int ) - output_units
-// Returns:     None
-//==============================================================================
-void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
-{
-   char password_string[128];
-
-   //create both for now, need to fix copy constructor....
-   //check attached key status - need to have a programmed key attached
-   SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-   //check if key is attached
-   if(!isAttachedKeyReady())
-      return;
-
-   //generate password
-   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, password_string);
-
-   if(!password_string)
-   {
-      Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-   //apply password to key
-   keyMaster->applyOperatorSessionPassword(key_record, operator_sessions);
-
-   //Update database
-   try
-   {
-      Database1->StartTransaction();
-
-      UtilityQuery->Close();
-      UtilityQuery->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRoperatorSession = :operator_units WHERE SKRid = :keyId ");
-      else
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoperatorSession = :operator_units WHERE SKRid = :keyId ");
-
-      UtilityQuery->ParamByName("operator_units")->AsInteger = spde_key->operatorSessionUnits;
-      UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      UtilityQuery->ExecSQL();
-
-      UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      UtilityQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
-      UtilityQuery->ParamByName("password")->AsString = password_string;
-      UtilityQuery->ParamByName("units")->AsInteger = operator_sessions;
-      // 400 = Operator Sessions
-      UtilityQuery->ParamByName("descriptionid")->AsInteger = 5400;
-      UtilityQuery->ExecSQL();
-
-      Database1->Commit();
-      RefreshKeyPage(0);
-      RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      Database1->Rollback();
-   }
-}
-
-//==============================================================================
-// Function:    createUserSessionsPassword()
-// Purpose:     creates an user session password, and updates the information in the
-//              SKeyRecord and STransactionDetail tables based on the key record
-//              id number.
-// Parameters:  ( int ) - output_units
-// Returns:     None
-//==============================================================================
-void TFCustomerKeys::createUserSessionPassword(int user_sessions)
-{
-   char password_string[128];
-
-   //create both for now, need to fix copy constructor....
-   //check attached key status - need to have a programmed key attached
-      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-   //check if key is attached
-   if(!isAttachedKeyReady())
-      return;
-
-   //generate password
-   keyMaster->getUserSessionPassword(spde_key, user_sessions, password_string);
-
-   if(!password_string)
-   {
-      Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-   //apply password to key
-   keyMaster->applyUserSessionPassword(key_record, user_sessions);
-
-   //Update database
-   try
-   {
-      Database1->StartTransaction();
-
-      UtilityQuery->Close();
-      UtilityQuery->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRuserSession = :user_units WHERE SKRid = :keyId ");
-      else
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRuserSession = :user_units WHERE SKRid = :keyId ");
-
-      UtilityQuery->ParamByName("user_units")->AsInteger = spde_key->userSessionUnits;
-      UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      UtilityQuery->ExecSQL();
-
-      UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      UtilityQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
-      UtilityQuery->ParamByName("password")->AsString = password_string;
-      UtilityQuery->ParamByName("units")->AsInteger = user_sessions;
-      // 401 = user sessions
-      UtilityQuery->ParamByName("descriptionid")->AsInteger = 5401;
-      UtilityQuery->ExecSQL();
-
-      Database1->Commit();
-      RefreshKeyPage(0);
-      RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      Database1->Rollback();
-   }
-}
-
 
 //==============================================================================
 // Function:    createLUPassword
@@ -2930,7 +2713,7 @@ void __fastcall TFCustomerKeys::KeyFormModuleFramemmIncrementModuleClick(
 void __fastcall TFCustomerKeys::TabSheetModulesEnter(TObject *Sender)
 {
    PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
-   mmMaxLU->Visible = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
+   mmMaxLU->Enabled = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
 }
 
 //==============================================================================
@@ -2970,7 +2753,7 @@ void __fastcall TFCustomerKeys::mmMaxLUClick(TObject *Sender)
 //==============================================================================
 void __fastcall TFCustomerKeys::TabSheetModulesExit(TObject *Sender)
 {
-    mmMaxLU->Visible = false;
+    mmMaxLU->Enabled = false;
 }
 
 
@@ -3104,9 +2887,9 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
             // password really is), add the index value
             if( Column->Field->DisplayText == "Extend Trial Period" )
             {
-               int index = PswdGrid->Columns->Items[2]->Field->AsInteger - 1; //Subtact 1 to get proper value in the KDPasswordText array.
+               int days = PswdGrid->Columns->Items[2]->Field->AsInteger; // Take value, subtact 1 to get proper value in the list.
                PswdGrid->Canvas->FillRect( Rect );
-               sprintf( scratch, "Extend Trial Period - %s", key_record->pkey->getKDPasswordText(index)); //display unsigned integer as text in the description.
+               sprintf( scratch, "Extend Trial Period - %u days", days); //display unsigned integer as text in the description.
                PswdGrid->Canvas->TextOut( Rect.Left+2, Rect.Top+2, scratch);
             }
         }
@@ -3973,4 +3756,11 @@ void TFCustomerKeys::TabDataOnChange(bool bKeyTabNeedsRefreshing)
 }
 
 
+
+
+
+
+
+
+//---------------------------------------------------------------------------
 
