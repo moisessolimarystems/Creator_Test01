@@ -65,13 +65,9 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2"
-			ManagedExtensions="TRUE"
-			WholeProgramOptimization="FALSE">
+			ManagedExtensions="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				FavorSizeOrSpeed="0"
-				OptimizeForWindowsApplication="TRUE"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				MinimalRebuild="FALSE"
 				RuntimeLibrary="0"
@@ -85,7 +81,7 @@
 				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
 				SubSystem="2"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -129,7 +125,7 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\AboutBox_Form.cpp">
+				RelativePath=".\AboutBoxForm.cpp">
 			</File>
 			<File
 				RelativePath=".\AssemblyInfo.cpp">
@@ -142,6 +138,9 @@
 			</File>
 			<File
 				RelativePath=".\CommunicationLink.cpp">
+			</File>
+			<File
+				RelativePath=".\ContactInfo.cpp">
 			</File>
 			<File
 				RelativePath=".\ControlSizing.cpp">
@@ -194,23 +193,7 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\AboutBox_Form.h"
-				FileType="3">
-				<File
-					RelativePath=".\AboutBox_Form.resX">
-					<FileConfiguration
-						Name="Debug|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox_Form.resources"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox_Form.resources"/>
-					</FileConfiguration>
-				</File>
+				RelativePath=".\AboutBoxForm.h">
 			</File>
 			<File
 				RelativePath="..\common\ChallengeResponse.h">
@@ -220,6 +203,9 @@
 			</File>
 			<File
 				RelativePath=".\CommunicationLink.h">
+			</File>
+			<File
+				RelativePath=".\ContactInfo.h">
 			</File>
 			<File
 				RelativePath=".\ControlSizing.h">
@@ -272,9 +258,6 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h">
-			</File>
-			<File
-				RelativePath=".\VersionInfo.h">
 			</File>
 		</Filter>
 		<Filter

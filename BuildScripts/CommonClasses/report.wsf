@@ -2,7 +2,6 @@
 <job id="vbs">
 <script language="VBScript" src="..\CommonClasses\ProductReport.vbs" />
 <script language="VBScript" src="..\CommonClasses\ReportAccess.vbs" />
-<script language="VBScript" src="..\CommonClasses\MoveFiles.vbs" />
 <script language="VBScript" src="..\CommonClasses\MKS.vbs" />
 <script language="VBScript">
 
@@ -108,21 +107,13 @@
                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SolimarLicensingInstallSource", _
                                       "\SolimarLicensing\Configuration\SolimarLicensingRelease.txt", "SolimarLicensing", "SolimarLicensing"
         End If
-	If g_Report.Productchoice = "PdfEngine" Then
-             g_Report.SetProjPathsVar "PdfEngine", "PdfEngine", "F:\code\MKSCODE\PdfEngine", _
-									  "S:\MKSCODE\PdfEngine\PdfEngineInstallSource\PdfEngineInstallSource.pj", _
-                                      "S:\MKSCODE\PdfEngine\rcs\PdfEngine.pj", _
-                                      "PdfEngine", "", "PdfEngineInstallSource", _
-                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\PdfEngineInstallSource", _
-                                      "\PdfEngine\Configuration\PdfEngineRelease.txt", "PdfEngine", "PdfEngine"
-	End If
-        If g_Report.Productchoice = "SPDE" Then
-             g_Report.SetProjPathsVar "SPDE", "Spd52xx", "F:\code\MKSCODE\Spd52xx", _
+        If g_Report.Productchoice = "SPD" Then
+             g_Report.SetProjPathsVar "SPD", "Spd52xx", "F:\code\MKSCODE\Spd52xx", _
 									  "S:\MKSCODE\Spd52xx\Spd52xxInstallSource\Spd52xxInstallSource.pj", _
                                       "S:\MKSCODE\Spd52xx\rcs\Spd52xx.pj", _
                                       "Spd52xx", "", "Spd52xxInstallSource", _
                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\Spd52xxInstallSource", _
-                                      "\SPDE\Configuration\SPDERelease.txt", "Spd52xx", "SPDE"
+                                      "\Spd52xx\Configuration\Spd52xxRelease.txt", "Spd52xx", "SPD"
         End If
 End Sub
      

@@ -32,7 +32,7 @@ class TCreatorAboutBox : public TForm
 __published:
     TLabel *Version;
     TLabel *Label;
-        TLabel *CopyRightLabel;
+    TLabel *Label1;
     TBitBtn *BitBtn1;
 	TImage *Image1;
 	

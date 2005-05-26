@@ -134,12 +134,12 @@ Class CReportAccess
                         If words(0) <> "" Then
                                 If tableName = "txs" Then
                                         words(1) = mBuild.InsertZeros(words(1))  'Insert 0's into the revision number
-                              		If(CheckLabelBounds(words(2)) Or mBuild.VersionPrefix = "SolimarLicensing") Then
-										    archIDStr = CStr(CInt(words(0)) + archIDOffset)
+                              		If(CheckLabelBounds(words(2))) Then
+				                archIDStr = CStr(CInt(words(0)) + archIDOffset)
         	                                mCmdTemp.CommandText = "INSERT INTO " + tableName + " (ArchId, RevNum, Symbol) VALUES ('"
                 	                        mCmdTemp.CommandText = mCmdTemp.CommandText + archIDStr + "','" + words(1) + "','" + words(2) + "')"
-											mCmdTemp.Execute
-									End If
+						mCmdTemp.Execute
+					End If
                                 Else
                                         If tableName = "txm" Then
                                                 words(3) = mBuild.InsertZeros(words(3))  'Insert 0's into the revision number
@@ -189,59 +189,7 @@ Class CReportAccess
                 Loop
                 'connection.Close
     End Function
-    
-          '       Creates a Report Grouping Labels associated with paramLabel.
-    Function CreateTextFileLicenseLabels(paramLabel, fileName)   'paramLabel = version of licensing 
-																 'fileName = text file to write to.
-                Dim RevNum, CurRevNum, archID, ArchiveName, LogMsg, tempLog, lastLog, Symbol
-                If mBuild.FSO.FileExists(fileName) = True Then
-                        mBuild.FSO.DeleteFile fileName, 1
-                End If
-                LabelReportName = fileName
-                
-				'select from txs where archid = txm_archid, revnum = txm_revnum
-                mCmdTemp.CommandText = "Select * From txm"
-                Set recordSetTXM = mCmdTemp.Execute
-		'Reference file used to determine what license version was associated w/a product
-		'3 choices - LicenseViewer.msi, SolimarLicenseManager.msi, SolimarLicenseServer.msi
-		'All products that use solimar licensing have one of the 3.
-                Do While Not recordSetTXM.EOF  
-					ArchiveName = recordSetTXM.Fields("ArchiveName")     
-					If InStr(ArchiveName, "SolimarLicenseServer.msi") > 0 Then
-						archId = recordSetTXM.Fields("ArchId")
-						Exit Do
-					End If
-					recordSetTXM.MoveNext
-				Loop		'table with 1 entry which has the solimarlicensing.sln 
-		
-                mCmdTemp.CommandText = "Select * From txs Where ArchId = '" + archId + "'" 
-				'create table with entries where they all have archId that are the same as the 
-				'solimarlicensing.sln									   	
-                Set recordSetTXS = mCmdTemp.Execute                
-				Do While Not recordSetTXS.EOF
-					Symbol = recordSetTXS.Fields("Symbol")
-					If (InStr(Symbol,paramLabel) > 0) Then
-						RevNum = recordSetTXS.Fields("RevNum")
-						Exit Do
-					End If
-					recordSetTXS.MoveNext
-				Loop		
-  			    mCmdTemp.CommandText = "Select * From txs Where ArchId = '" + archId  + "'" + _		
-							           " AND RevNum = '" + RevNum + "'" + _
-							           " ORDER BY Symbol DESC"
-               
-				Set outputReport = mCmdTemp.Execute
-				Set writeFile = mBuild.FSO.CreateTextFile(mBuild.mReportPath & "\Reports\" & fileName)
-                
-                Do While Not outputReport.EOF		'write to file each label on one line
-                        Symbol = outputReport.Fields("Symbol")
-                        If InStr(Symbol, "SolimarLicensing") = 0 Then
-							writeFile.writeLine Symbol
-						End If
-                        outputReport.MoveNext
-                Loop
-                writeFile.Close
-    End Function
+      
   
       '       Creates a Report Grouping files by different Label that have changed since paramLabel
     Function CreateTextFileLabel(paramLabel, fileName)

@@ -35,16 +35,4 @@ __interface ISolimarLicenseMgr : IDispatch
 	
 };
 
-// ISolimarLicenseMgr2
-[
-	object,
-	uuid("EA2ADA7A-67BB-45f6-AF57-40C4E2CE8595"),
-	dual,	helpstring("ISolimarLicenseMgr2 Interface"),
-	pointer_default(unique)
-]
-__interface ISolimarLicenseMgr2 : ISolimarLicenseMgr
-{
-	[id(10),helpstring("method ModuleLicenseSerialNumbers")] HRESULT ModuleLicenseSerialNumbers([in] long module_id, [out,retval] VARIANT *pvtSerialNumberList);
-};
-
 #endif

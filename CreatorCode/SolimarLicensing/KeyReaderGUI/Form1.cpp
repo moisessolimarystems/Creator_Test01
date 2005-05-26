@@ -8,7 +8,7 @@
 
 #define KEY_NUMBER_COL_WIDTH			   72
 #define PRODUCT_ID_COL_WIDTH			   120
-#define PRODUCT_VERSION_COL_WIDTH		   87
+#define PRODUCT_VERSION_COL_WIDTH		87
 #define LICENSES_COL_WIDTH				   49
 #define ACTIVE_COL_WIDTH				   42
 #define HOURS_LEFT_COL_WIDTH			   71
@@ -52,12 +52,10 @@ Form1::Form1()
 	InitializeModListView();
 	InitializeMainMenu();
 	InitializeForm();
-    InitializeModPanel();
+   InitializeModPanel();
 	InitializeGUITimer();
 
-	TheAboutBox = new AboutBox_Form();
-
-	//new up a key view manager to manage the key list view
+   //new up a key view manager to manage the key list view
 	this->TheKeyViewManager = new KeyInfoListViewManager(this->KeyInfoListView);
 
     //fill in the key list view with the appropriate values
@@ -78,7 +76,7 @@ Form1::Form1()
 	mlvwColumnSorter = new ModListViewComparer();
 	this->ModLicenseListView->ListViewItemSorter = mlvwColumnSorter;
 
-    UpdateKeyListView();
+   UpdateKeyListView();
 }
 
 void Form1::Dispose(Boolean disposing)
@@ -336,37 +334,32 @@ void Form1::InitializeModListView()
 																	   &Form1::ModList_RowChange
 																	  );
 }
-System::Void Form1::ExitMenuItem_Click(System::Object *  sender, System::EventArgs *  e)
-{
-	Form1_Closing(sender, e);
-	Application::Exit();
-}
 
 void Form1::InitializeMainMenu()
 {
+   this->openMenuItem->Click += new System::EventHandler(this, Form1::openMenuItem_Click);
    this->refreshMenuItem->Click += new System::EventHandler(this, Form1::refreshMenuItem_Click);
    this->EnterPasswordMenuItem->Click += new System::EventHandler(this, Form1::EnterPasswordMenuItem_Click);
    this->AboutSolimar->Click += new System::EventHandler(this, Form1::AboutSolimar_Click);
+   this->ContactInfoMenuItem->Click += new System::EventHandler(this, Form1::ContactInfo_Click);
 }
 
 void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e)
 {
+	TheAboutBox = new AboutBoxForm();
 	TheAboutBox->ShowDialog();
+
+	//these lines don't get executed until the about box is closed by the user
+	delete TheAboutBox;
+	TheAboutBox = NULL;
 }
 
-
-System::Void Form1::PasswordMenuItem_Select(System::Object *  sender, System::EventArgs *  e)
+void Form1::ContactInfo_Click(Object* sender, System::EventArgs* e)
 {
-	if(this->KeyInfoListView->Items->Count > 0)
-	{
-		EnterPasswordMenuItem->Enabled = true;
-		AddPasswordPacketMenuItem->Enabled = true;
-	}
-	else
-	{
-		EnterPasswordMenuItem->Enabled = false;
-		AddPasswordPacketMenuItem->Enabled = false;
-	}
+	TheContactInfoPage = new ContactInfo();
+	TheContactInfoPage->ShowDialog();
+	delete TheContactInfoPage;
+	TheContactInfoPage = NULL;
 }
 
 void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e) 
@@ -380,9 +373,9 @@ void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e)
 }
 
 // Bring up a dialog to open a file.
-System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, System::EventArgs *  e)
+void Form1::openMenuItem_Click(Object* sender, System::EventArgs* e) 
 {
-		// Show the FolderBrowserDialog.
+	// Show the FolderBrowserDialog.
     System::Windows::Forms::DialogResult result = openFileDialog1->ShowDialog();
 
 	
@@ -403,8 +396,6 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
     }
 }
-
-
 
 // Refresh the window
 void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e) 

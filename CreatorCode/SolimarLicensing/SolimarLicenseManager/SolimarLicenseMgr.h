@@ -20,17 +20,15 @@
 #include <vector>
 #include <map>
 
-#include "..\common\InProcPtr.h"
+#include "../common/InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
-#include "..\common\LicensingMessage.h"
-
 
 // CSolimarLicenseMgr
 
 [
 	coclass,
 	threading("free"),
-	support_error_info("ISolimarLicenseMgr2"),
+	support_error_info("ISolimarLicenseMgr"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -38,7 +36,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr2,
+	public ISolimarLicenseMgr,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -75,45 +73,20 @@ public:
 	STDMETHOD(ModuleLicenseInUse)(long module_id, long *count);
 	STDMETHOD(ModuleLicenseObtain)(long module_id, long count);
 	STDMETHOD(ModuleLicenseRelease)(long module_id, long count);
-
-	// ISolimarLicenseMgr2
-	STDMETHOD(ModuleLicenseSerialNumbers)(long module_id, VARIANT *pvtSerialNumberList);
 	
 	// ILicensingMessage
-	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
-	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
+	STDMETHOD(GetLicenseMessageList)(VARIANT *pvtMessageList);
 	
 private:
+	
+	//typedef void (*LicenseMessageCallbackPtr)(void* pContext, BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);	
+	//_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr,__uuidof(ISolimarLicenseSvr));
 	
 	static BYTE challenge_key_manager_thisauthuser_public[];
 	static BYTE challenge_key_manager_userauththis_private[];
 	static BYTE challenge_key_server_thisauthuser_private[];
 	static BYTE challenge_key_server_userauththis_public[];
 	
-	typedef std::map<long, long> ModuleLicenseMap;
-
-	class KeyInfo
-	{
-	public:
-		KeyInfo();
-		KeyInfo(const KeyInfo &k);
-
-		ModuleLicenseMap licenses_total;
-		ModuleLicenseMap licenses_allocated;
-		
-		bool KeyPresent;
-		bool KeyActive;
-		bool KeyValid;
-		bool KeyLocked;
-		bool KeyObtained;
-		
-		// keep track of trial key information
-		bool KeyTrialInfoInitialized;
-		bool KeyIsTrial;
-		long KeyTrialHoursLeft;
-		long KeyExpiresDaysLeft;
-	};
-
 	class ServerInfo
 	{
 	public:
@@ -123,7 +96,7 @@ private:
 		~ServerInfo();
 
 		_bstr_t name;
-		typedef std::map<_bstr_t, KeyInfo> KeyList;
+		typedef std::vector<_bstr_t> KeyList;
 		KeyList keys;
 		
 		ISolimarLicenseSvrPtr LicenseServer;
@@ -141,27 +114,6 @@ private:
 	DWORD m_ui_level;
 	
 	HANDLE ServerListLock;
-	HANDLE MessageListLock;
-	
-	// refresh the list of the keys on the currently connected servers
-	HRESULT RefreshKeyList();
-	// checks that all licenses checked out are accounted for by some key
-	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
-	// re-allocates any unallocated or invalidated licenses (if possible)
-	HRESULT ReallocateLicenses();
-	// checks if licenses are valid, if not, an attempt to reallocate licenses is made
-	HRESULT RefreshLicenses();
-	// removes any keys from the cache that are not present and have no obtained licenses
-	HRESULT RemoveObsoleteKeysFromCache();
-	// attempts to allocate licenses on the known-good keys in the cache
-	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
-	HRESULT ObtainLicensesInternal(long module_id, long license_count);
-	// attempts to deallocate licenses on keys that have 
-	HRESULT ReleaseLicensesInternal(long module_id, long license_count);
-	// adds a message to the list of unretrieved messages
-	HRESULT AddLicensingMessage(LicensingMessage &message);
-	
-	LicensingMessageList licensing_message_cache;
 	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
 	bool ManagesKey(_bstr_t key_ident);
@@ -174,10 +126,11 @@ private:
 	ServerList m_servers;
 	bool m_single_key, m_lock_keys, m_initialized;	
 	_bstr_t m_specific_single_key_ident;
-	_bstr_t m_current_single_key;
-	long m_product, m_prod_ver_major, m_prod_ver_minor;
-	ModuleLicenseMap m_allocated_licenses;
-		
+	
+	// user defined callback used by ILicensingMessage
+	//void* m_license_message_callback_context;
+	//LicenseMessageCallbackPtr m_license_message_callback;
+	
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
 	static bool isAutoUiStyleDialog(DWORD ui_level);

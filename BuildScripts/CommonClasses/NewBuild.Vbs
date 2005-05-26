@@ -3,7 +3,7 @@ Class CNewBuild
     Public mBuild, mInputFile
 
     Public Sub Class_Initialize() 'set default values
-	  mExistingDevPath = Null       
+       
     End Sub
 
     Public Property Set Build(ByRef aBuild)

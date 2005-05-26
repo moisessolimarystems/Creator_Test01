@@ -290,14 +290,8 @@ STDMETHODIMP CSolimarLicenseSvr::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	return keyserver.KeyReadRaw(key_ident, pvtKeyData);
 }
 
-STDMETHODIMP CSolimarLicenseSvr::GetLicenseMessageList(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList)
+STDMETHODIMP CSolimarLicenseSvr::GetLicenseMessageList(VARIANT *pvtMessageList)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	if (clear_messages!=VARIANT_TRUE) return E_INVALIDARG;
 	return keyserver.GetLicenseMessageList(m_licenseId, pvtMessageList);
-}
-
-STDMETHODIMP CSolimarLicenseSvr::DispatchLicenseMessageList(VARIANT_BOOL clear_messages)
-{
-	return E_NOTIMPL;
 }

@@ -83,18 +83,16 @@ public:
 	HRESULT GetLicenseMessageList(BSTR license_id, VARIANT *pvtMessageList);
 
 	// for reporting messages to clients and the event log
-	void GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...);
-	void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
+	void GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const wchar_t *format, ...);
+	void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const wchar_t *message);
 	
 private:
 	
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	static const unsigned int UpdateKeysThreadPeriod = 30*1000;			//(ms)
-	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
-	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
+	static const unsigned int HeartbeatCheckThreadPeriod = 5*1000;		//(ms)
+	static const unsigned int HeartbeatKillClientPeriod = 10;			// seconds before a non-responding client's licenses are revolked
 	
-	_bstr_t server_host_name;
-
 	typedef std::map<_bstr_t, LicensingMessageList> MessageClientList;
 	
 	// support for generating Password Packet files

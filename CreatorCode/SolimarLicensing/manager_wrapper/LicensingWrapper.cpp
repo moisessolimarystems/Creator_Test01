@@ -296,7 +296,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 	LicensingMessageList message_list;
 	VARIANT vtMessageList;
 	VariantInit(&vtMessageList);
-	hr = pLicenseManagerMessages->GetLicenseMessageList(VARIANT_TRUE, &vtMessageList);
+	hr = pLicenseManagerMessages->GetLicenseMessageList(&vtMessageList);
 	if (vtMessageList.vt & VT_ARRAY)
 		message_list = vtMessageList;
 	VariantClear(&vtMessageList);
