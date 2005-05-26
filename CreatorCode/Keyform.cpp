@@ -13,6 +13,7 @@
 
 #include <time.h>
 #include <stdio.h>
+#include <dir.h>
 #include <clipbrd.hpp>
 #include "KeyForm.h"
 #include "VersionDlg.h"
@@ -94,7 +95,7 @@ __fastcall TFCustomerKeys::TFCustomerKeys(TComponent* Owner, AnsiString name, in
     //
     // Call resetKey function with SPD_PRODUCT
     resetKey(SPD_PRODUCT);
-
+    resetKey(SPDE_PRODUCT);
     //
     // Set the customer Number
     key_record->pkey->customerNumber = static_cast<unsigned short>(number);
@@ -259,8 +260,12 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      //if ((PHYSICAL_FLAG & pf_MODULE) && (PERMISSION_FLAG & permanent_pwd || PHYSICAL_FLAG & pf_NONPERMANENT)) {
      //if( ( (PERMISSION_FLAG & permanent_pwd) && (PHYSICAL_FLAG & pf_MODULE) ) || (PHYSICAL_FLAG & pf_NONPERMANENT) )
      //{
-         mmSPDModule->Enabled = true;
-         mmSPDOutput->Enabled = (key_record->getProductId() != ICONVERT_PRODUCT) ? true : false;
+         //mmSPDModule->Enabled = true;         What is this used for???
+         mmSPDOutput->Enabled = ((key_record->getProductId() != ICONVERT_PRODUCT)     &&
+                                 (key_record->getProductId() != PDF_UTILITY)          &&
+                                 /*(key_record->getProductId() != SDX_DESIGNER_PRODUCT) &&*/
+                                 (key_record->getProductId() != SOLSCRIPT_PRODUCT))
+                                ? true : false;
          mmMaxLU->Enabled = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
          KeyFormModuleFrame->mmPagesPerMinute->Enabled = true;
          KeyFormModuleFrame->mmIncrementModule->Enabled = true;
@@ -319,7 +324,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
 
      if ((PERMISSION_FLAG & permanent_pwd) &&
          (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-         key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+         /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
          key_record->pkey->productId == PDF_UTILITY)
          )
      {
@@ -402,7 +407,7 @@ void __fastcall TFCustomerKeys::showModuleInfo(bool bTurnOn)
 //==============================================================================
 void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
 {
-    //
+    void* buffer;
     //set new key value
     try
     {
@@ -455,7 +460,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         temp_key = NULL;             // Clean up
                         delete temp_key;
 
-                        memset(tmp_modules, 0, sizeof(tmp_modules));
+                        memset(tmp_modules, 0, sizeof(tmp_modules));   //why???
                         QueryKey->Fields->FieldByName("modules")->GetData(tmp_modules, true);
                         ((SpdProtectionKey*)(key_record->pkey))->setLicenses(tmp_modules);
                         ((SpdProtectionKey*)(key_record->pkey))->outputUnits = QueryKey->FieldByName("SKRoutput")->AsInteger;
@@ -466,7 +471,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         PageControl1->Pages[2]->TabVisible = false;
                 }
                 else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT ||
-                         key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+                         /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
                          key_record->pkey->productId == PDF_UTILITY) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
@@ -475,7 +480,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         temp_key = NULL;             // Clean up
                         delete temp_key;
 
-                        memset(tmp_modules, 0, sizeof(tmp_modules));
+                        memset(tmp_modules, 0, sizeof(tmp_modules));       //
                         QueryKey->Fields->FieldByName("modules")->GetData(tmp_modules, true);
                         ((SpdProtectionKey*)(key_record->pkey))->setLicenses(tmp_modules);
 
@@ -500,14 +505,35 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         ((SSProtectionKey*)(key_record->pkey))->setReportServers(QueryKey->FieldByName("SKRreportServers")->AsInteger);
                         ((SSProtectionKey*)(key_record->pkey))->setConcurrentUsers(QueryKey->FieldByName("SKRconcurrentUsers")->AsInteger);
                         ((SSProtectionKey*)(key_record->pkey))->setApplications(QueryKey->FieldByName("SKRapplications")->AsInteger);
-
+                        ((SSProtectionKey*)(key_record->pkey))->setDocumentAssembler(QueryKey->FieldByName("SKRdocumentAssembler")->AsInteger);
                         // initialize module tab and make it visible
                         SolSearcherDetails->Initialize(2, TabDataOnChange);//keyform mode
                         SolSearcherDetails->Load(key_record);
                         PageControl1->Pages[1]->TabVisible = false;
                         PageControl1->Pages[2]->TabVisible = true;
                 }
+                else if( key_record->pkey->productId==SPDE_PRODUCT)
+                {
+                        //
+                        // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
+                        ProtectionKey* temp_key = ProtectionKey::newKey(key_record->pkey);
+                        key_record->pkey = temp_key; // Update the key_record with the new pkey
+                        temp_key = NULL;             // Clean up
+                        delete temp_key;
+                        buffer = malloc(QueryKey->Fields->FieldByName("modules")->DataSize);
+                                     //spde needs
+                        //memset(tmp_spde_modules, 0, sizeof(tmp_spde_modules));  //array of 16 shorts = 32 bytes
+                        QueryKey->Fields->FieldByName("modules")->GetData(buffer, true);  // gives me 32 bytes of binary modules
+                       ((SpdeProtectionKey*)(key_record->pkey))->setLicenses((unsigned short*)buffer, false);   //need to process 32 bytes of binary modules
 
+                        ((SpdeProtectionKey*)(key_record->pkey))->outputUnits = QueryKey->FieldByName("SKRoutput")->AsInteger;
+
+                        // initialize module tab and make it visible
+                        KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);
+                        PageControl1->Pages[1]->TabVisible = true;
+                        PageControl1->Pages[2]->TabVisible = false;
+                        free(buffer);
+                }
                 else
                 {
                   //
@@ -632,8 +658,18 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
         setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
         PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
     }
+    else if (key_record->pkey->productId == SPDE_PRODUCT)
+    {
+        showPagesPerMinuteInfo(true);
+        showLicenseInfo(true);
+        showModuleInfo(true);
+
+        //
+        // LICENSING - refresh licensing.
+        setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+    }
     else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-             key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+             /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
              key_record->pkey->productId == PDF_UTILITY) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
@@ -1097,7 +1133,10 @@ void TFCustomerKeys::createVersionPassword(unsigned short version)
 // Function:    mmExtensionClick
 // Purpose:     create an extension password for the key currently selected in
 //              the database by calling createExtensionPassword.  This is the
-//              event handler.
+//              event handler. The drop down consists of password text combos but
+//              only the days are relevant since the number of hours do not change.
+//              Only the days are recorded and updated in the key and database, the
+//              number of hours remain the same as when the key was initially programmed.
 // Parameters:  ( TObject* ) - Sender
 // Returns:     None
 //==============================================================================
@@ -1135,8 +1174,8 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 
        if( dlg->ShowModal() == IDYES )
        {
-           index = dlg->passwordComboBox->ItemIndex + 1;
-           unsigned short days = key_record->pkey->getKDPasswordDays(index);
+           index = dlg->passwordComboBox->ItemIndex; //+ 1;  why does this have + 1?? array is 0 based.
+           unsigned short days  = key_record->pkey->getKDPasswordDays(index);
            createExtensionPassword(days);
        }
 
@@ -1147,7 +1186,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
    {
        TDlgExtension *dlg = new TDlgExtension( this, key_record );
        if( dlg->ShowModal() == IDYES )
-           createExtensionPassword(static_cast<unsigned char>(dlg->Days->Text.ToInt()));
+           createExtensionPassword(static_cast<unsigned short>(dlg->Days->Text.ToInt()));
 
        delete dlg;
        dlg = NULL;
@@ -1163,7 +1202,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 // Returns:     None
 // Note:        Should not be called if key can not be extended
 //==============================================================================
-void TFCustomerKeys::createExtensionPassword(unsigned char days)
+void TFCustomerKeys::createExtensionPassword(unsigned short days)
 {
    char password_string[128];
 
@@ -1260,11 +1299,21 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
    try
    {
       Database1->StartTransaction();
-      AnsiString updated_module_list(reinterpret_cast<char*>(key_record->pkey->keyDataBlock.data),static_cast<unsigned char>(32));
+      AnsiString updated_module_list(reinterpret_cast<char*>(key_record->pkey->keyDataBlock.data),static_cast<unsigned char>(36));
 
       UtilityQuery->Close();
       UtilityQuery->SQL->Clear();
-      UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoutput = 1, SKRppmextensions = 0, modules = :module_list, SKRppmxchipds = :ipds, SKRppmxchpcl = :pcl, SKRppmxchps = :ps, SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds WHERE SKRid = :keyId ");
+      UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, "
+                             "SKRoutput = 1, SKRppmextensions = 0, "
+                             "modules = :module_list, SKRppmxchipds = :ipds, "
+                             "SKRppmxchpcl = :pcl, SKRppmxchps = :ps, "
+                             "SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds, "
+                             "SKRindexServers =:indexServers, "
+                             "SKRreportServers =:reportServers, "
+                             "SKRconcurrentUsers =:concurrentUsers, "
+                             "SKRapplications =:applications, "
+                             "SKRdocumentAssembler =:documentAssembler WHERE SKRid = :keyId "
+                             );
       UtilityQuery->ParamByName("module_list")->AsBlob = updated_module_list;
       UtilityQuery->ParamByName("ipds")->AsInteger = 0;
       UtilityQuery->ParamByName("pcl")->AsInteger = 0;
@@ -1272,6 +1321,11 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->ParamByName("dbcs")->AsInteger = 0;
       UtilityQuery->ParamByName("afpds")->AsInteger = 0;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
+      UtilityQuery->ParamByName("indexServers")->AsInteger = 0;
+      UtilityQuery->ParamByName("reportServers")->AsInteger = 0;
+      UtilityQuery->ParamByName("concurrentUsers")->AsInteger = 0;
+      UtilityQuery->ParamByName("applications")->AsInteger = MAX_APPLICATIONS;
+      UtilityQuery->ParamByName("documentAssembler")->AsInteger = 0;
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, 253, 0, 0)");
@@ -1353,8 +1407,13 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
                //setOutputUnitsDisplay( ((SpdProtectionKey*)(key_record->pkey))->outputUnits);
             }
+            else if ( key_record->pkey->productId == SPDE_PRODUCT)
+            {
+               KeyFormModuleFrame->load(key_record);
+               setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+            }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-                     key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+                     /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
                      key_record->pkey->productId == PDF_UTILITY) {
                KeyFormModuleFrame->load(key_record);
             }
@@ -1386,7 +1445,12 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
 //==============================================================================
 void __fastcall TFCustomerKeys::setOutputUnitsDisplay(unsigned short outputs)
 {
-   unsigned short units(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
+   unsigned short units;
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+         units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+   else
+         units = (static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
+
    output_devices->Text = units;
    if (key_record->pkey->productId != ICONVERT_PRODUCT)
    {
@@ -1498,15 +1562,15 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
 // Parameters:  ( TObject * ) - Sender
 // Returns:     None
 //==============================================================================
-//const char* PasswordPacketDirectory = "c:\\SolimarLicensing\\";
-const char* PasswordPacketDirectory = "R:\\Solimar Password Bundles\\";
+const char* PasswordPacketDirectory = "L:\\Password Packets\\";
+//const char* PasswordPacketDirectory = "R:\\Solimar Password Bundles\\";
 void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 {
    TBookmark tmpMark;
    AnsiString AnsiPassword;            //stores password read from grid
+   //AnsiString PasswordPacketDirectory;
    wchar_t wcharPassword[256];    //stores password that is converted from ansi to wchar
    BSTR bstrPassword;             //stores the BSTR version of the password
-
    BSTR VerificationCode;
    int PasswordBufSize = 0;
    AnsiString CurrentDate;
@@ -1525,6 +1589,10 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 
    int PasswordIDIndex = 0;
 
+   /*char* buffer = NULL;
+   PasswordPacketDirectory = getcwd(buffer, MAXPATH);
+   PasswordPacketDirectory =  PasswordPacketDirectory + "\\Password Packets\\";
+   */
    //only get the rows selected
 
    if (PswdGrid->SelectedRows->Count > 0)
@@ -1540,7 +1608,7 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
       	while( !PasswordQuery->Eof )
          {
             //if a row is selected append the password to the packet and remember its ID in order to store it in the DB
-       		if( PswdGrid->SelectedRows->CurrentRowSelected )
+       	    if( PswdGrid->SelectedRows->CurrentRowSelected )
             {
                PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
                PasswordIDIndex++;
@@ -1551,8 +1619,8 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
                SysFreeString(bstrPassword);
-         	}
-         	PasswordQuery->Next();
+             }
+             PasswordQuery->Next();
       	}
          hr = keyMaster->FinalizePasswordPacket();
 
@@ -1571,7 +1639,7 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
          //Create the FilePath
          char FilePath[1024];
          memset(FilePath, 0, 1024);
-         sprintf(FilePath, "%s%s", PasswordPacketDirectory, TheFileName);
+         sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
 
          // Create the password packet file
 	      HANDLE hFile = CreateFile(FilePath,
@@ -1588,8 +1656,8 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
          }
 
          // create a variant safearray
-	      VARIANT vtPacket;
-	      VariantInit(&vtPacket);
+	 VARIANT vtPacket;
+	 VariantInit(&vtPacket);
          BYTE* pData = 0;
 
          //Get the password packet and write it to the file
@@ -1666,11 +1734,13 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
             Database1->Rollback(); //error occurred rollback db changes
             Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
          }
-
-         VariantClear(&vtPacket);
-         PasswordQuery->GotoBookmark( tmpMark );
-     	   PasswordQuery->FreeBookmark( tmpMark );
+        //free(buffer); //clear the buffer holding the current working directory
+        CloseHandle(hFile); //Release handle to the packet file.
+        VariantClear(&vtPacket);
+        PasswordQuery->GotoBookmark( tmpMark );
+     	PasswordQuery->FreeBookmark( tmpMark );
       	PasswordQuery->EnableControls();
+
       }
       catch(EDBEngineError &e)
       {
@@ -1734,6 +1804,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
       int reportServers(0);
       int concurrentUsers(0);
       int applications(0);
+      int documentAssembler(0);
 
       int selectedProduct(programmed->pkey->productId);
       if      (selectedProduct == SPD_PRODUCT       ||
@@ -1744,10 +1815,14 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
          output = reinterpret_cast<SpdProtectionKey*>(programmed->pkey)->outputUnits;
       }
       else if (selectedProduct == SOLSEARCHER_ENTERPRISE_PRODUCT) {
-         indexServers    = ((SSProtectionKey*)(programmed->pkey))->getIndexServers();
-         reportServers   = ((SSProtectionKey*)(programmed->pkey))->getReportServers();
-         concurrentUsers = ((SSProtectionKey*)(programmed->pkey))->getConcurrentUsers();
-         applications    = ((SSProtectionKey*)(programmed->pkey))->getApplications();
+         indexServers      = ((SSProtectionKey*)(programmed->pkey))->getIndexServers();
+         reportServers     = ((SSProtectionKey*)(programmed->pkey))->getReportServers();
+         concurrentUsers   = ((SSProtectionKey*)(programmed->pkey))->getConcurrentUsers();
+         applications      = ((SSProtectionKey*)(programmed->pkey))->getApplications();
+         documentAssembler = ((SSProtectionKey*)(programmed->pkey))->getDocumentAssembler();
+      }
+      else if(selectedProduct == SPDE_PRODUCT) {
+         output = reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->outputUnits;
       }
       else {
 
@@ -1764,8 +1839,8 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRproduct = :product, "
                                  "SKRversion = :version, "
                                  "SKRstatus = :status, "
-                                 "modules_initial = CONVERT(binary(64), :module_list), "
-                                 "modules = CONVERT(binary(64), :module_list), "
+                                 "modules_initial = CONVERT(binary(72), :module_list), "
+                                 "modules = CONVERT(binary(72), :module_list), "
                                  "SKRpo = :po, "
                                  "SKReBOnumber = :eBOnumber, "
                                  "SKRkeyClass = :keyClass, "
@@ -1783,6 +1858,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRreportServers = :report_servers, "
                                  "SKRconcurrentUsers = :concurrent_users, "
                                  "SKRapplications = :applications, "
+                                 "SKRdocumentAssembler = :document_assembler, "
                                  "SKRoutput = :output WHERE SKRid = :skrid ");
 
 //-----------------------------------------------------------
@@ -1802,8 +1878,8 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRproduct = :product, "
                                  "SKRversion = :version, "
                                  "SKRstatus = :status, "
-                                 "modules_initial = CONVERT(binary(64), :module_list), "
-                                 "modules = CONVERT(binary(64), :module_list), "
+                                 "modules_initial = CONVERT(binary(72), :module_list), "
+                                 "modules = CONVERT(binary(72), :module_list), "
                                  "SKRpo = :po, "
                                  "SKReBOnumber = :eBOnumber, "
                                  "SKRkeyClass = :keyClass, "
@@ -1816,6 +1892,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
                                  "SKRreportServers = :report_servers, "
                                  "SKRconcurrentUsers = :concurrent_users, "
                                  "SKRapplications = :applications, "
+                                 "SKRdocumentAssembler = :document_assembler, "
                                  "SKRoutput = :output WHERE SKRid = :skrid ");
       }
 
@@ -1826,7 +1903,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
       UtilityQuery->ParamByName("po")->AsInteger = programmed->po;//dlg->EditPO->Text.ToInt();
       UtilityQuery->ParamByName("eBOnumber")->AsString = programmed->eBOnumber;
       UtilityQuery->ParamByName("output")->AsInteger = output;
-      AnsiString mytest(reinterpret_cast<char*>(programmed->pkey->keyDataBlock.data),static_cast<unsigned char>(32));
+      AnsiString mytest(reinterpret_cast<char*>(programmed->pkey->keyDataBlock.data),static_cast<unsigned char>(36));
       UtilityQuery->ParamByName("module_list")->AsBlob = mytest;
       UtilityQuery->ParamByName("skrid")->AsInteger =  programmed->skr_id;
       UtilityQuery->ParamByName("SDid")->AsInteger = programmed->system_id;
@@ -1843,6 +1920,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
       UtilityQuery->ParamByName("report_servers")->AsInteger = reportServers;
       UtilityQuery->ParamByName("concurrent_users")->AsInteger = concurrentUsers;
       UtilityQuery->ParamByName("applications")->AsInteger = applications;
+      UtilityQuery->ParamByName("document_assembler")->AsInteger = documentAssembler;
       UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
@@ -1968,15 +2046,19 @@ void TFCustomerKeys::createOutputPassword(int output_units)
 {
    char password_string[128];
 
+   //create both for now, need to fix copy constructor....
    //check attached key status - need to have a programmed key attached
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));//pkey should always be SpdProtectionKey
-
+      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
    //check if key is attached
    if(!isAttachedKeyReady())
       return;
 
    //generate password
-   keyMaster->getOutputPassword(spd_key, output_units, password_string);
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+        keyMaster->getOutputPassword(spde_key, output_units, password_string);
+   else
+        keyMaster->getOutputPassword(spd_key, output_units, password_string);
    if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
@@ -1989,7 +2071,7 @@ void TFCustomerKeys::createOutputPassword(int output_units)
    try
    {
       Database1->StartTransaction();
-      AnsiString updated_module_list(reinterpret_cast<char*>(key_record->pkey->keyDataBlock.data),static_cast<unsigned char>(32));
+      AnsiString updated_module_list(reinterpret_cast<char*>(key_record->pkey->keyDataBlock.data),static_cast<unsigned char>(36));
 
       UtilityQuery->Close();
       UtilityQuery->SQL->Clear();
@@ -2000,7 +2082,10 @@ void TFCustomerKeys::createOutputPassword(int output_units)
          UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoutput = :output_units, modules = :module_list WHERE SKRid = :keyId ");
 
       UtilityQuery->ParamByName("module_list")->AsBlob = updated_module_list;
-      UtilityQuery->ParamByName("output_units")->AsInteger = spd_key->outputUnits;
+      if(key_record->pkey->productId == SPDE_PRODUCT)
+              UtilityQuery->ParamByName("output_units")->AsInteger = spde_key->outputUnits;
+      else
+              UtilityQuery->ParamByName("output_units")->AsInteger = spd_key->outputUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
       UtilityQuery->ExecSQL();
 
@@ -2349,6 +2434,7 @@ void __fastcall TFCustomerKeys::mmReserveClick(TObject *Sender)
    }
 
    // refresh key grid to reflect changes...
+
    RefreshKeyPage(0);
 }
 
@@ -2791,8 +2877,9 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
 {
     //
     // Check if the key is a Test/Dev Key
+    int idx;
     if (key_record->pkey->keyType == KEYDevelopment)
-    {                                    \
+    {
         if (Column->FieldName == "SDRname")
         {
             //
@@ -2800,9 +2887,9 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
             // password really is), add the index value
             if( Column->Field->DisplayText == "Extend Trial Period" )
             {
-               int index = PswdGrid->Columns->Items[2]->Field->AsInteger-1; // Take value, subtact 1 to get proper value in the list.
+               int days = PswdGrid->Columns->Items[2]->Field->AsInteger; // Take value, subtact 1 to get proper value in the list.
                PswdGrid->Canvas->FillRect( Rect );
-               sprintf( scratch, "Extend Trial Period - %s", key_record->pkey->getKDPasswordText(index) );
+               sprintf( scratch, "Extend Trial Period - %u days", days); //display unsigned integer as text in the description.
                PswdGrid->Canvas->TextOut( Rect.Left+2, Rect.Top+2, scratch);
             }
         }
@@ -3672,4 +3759,8 @@ void TFCustomerKeys::TabDataOnChange(bool bKeyTabNeedsRefreshing)
 
 
 
+
+
+
+//---------------------------------------------------------------------------
 
