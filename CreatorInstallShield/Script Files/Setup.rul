@@ -718,26 +718,26 @@ begin
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
 	szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\LicenseViewer","CurrentVersion", nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ;  
+		 szOpts = " /x " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif;                  
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ; 
+    szOpts = " /i " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ; 
     LaunchAppAndWait(szPath, szOpts, WAIT);     
     
 	szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseManager","CurrentVersion",nvType, svValue, nvSize) == 0) then 
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\""+ " /qn" ;  
+		 szOpts = " /x " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\""+ " /qn" ;  
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\"" + " /qn"  ;
+    szOpts = " /i " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\"" + " /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease","CurrentVersion",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ; 
+		 szOpts = " /x " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ; 
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ;
+    szOpts = " /i " + "\"" + SRCDIR ^ "Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     InstallSentinelDriver();
