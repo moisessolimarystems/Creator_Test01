@@ -29,7 +29,6 @@ CLookup::CLookup()
    cDatabase = Session->FindDatabase("CustDB");
    cQuery = new TQuery(NULL);
 
-
    // initialize all module lists
    for( int mod_id=0; mod_id<64; mod_id++)
    {
@@ -50,13 +49,7 @@ CLookup::CLookup()
 
       m_PDFUtilityModuleDetail[mod_id] = new ModuleDetail();
       m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
-
-      ////initialize modules for SDX Designer module list
-      //Create new structures,and assign new module id's to each one.
-      m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
-
 
 
    if(cDatabase)
@@ -129,8 +122,11 @@ CLookup::~CLookup()
 
       delete m_solScriptModuleDetail[mod_id];
       delete m_PDFUtilityModuleDetail[mod_id];
-      delete m_SDXDesignerModuleDetail[mod_id];
+
+
    }
+
+
 }
 
 //==============================================================================
@@ -222,8 +218,6 @@ ModuleDetail** CLookup::getModuleList(int productID)
       return m_solScriptModuleDetail;
    else if (productID == PDF_UTILITY)
       return m_PDFUtilityModuleDetail;
-   else if (productID == SDX_DESIGNER_PRODUCT)
-      return m_SDXDesignerModuleDetail;
    else
        return module_detail;
 }
@@ -241,6 +235,7 @@ bool CLookup::resetModuleList()
    bool result(false);
    int mod_id; //module id is index into module_detail list
    int product_id; //product id specifies whether or not to use SPD or ICONVERT
+ 
    //int max_solscript;
    ModuleDetail** pModuleList(NULL);
 
@@ -261,11 +256,7 @@ bool CLookup::resetModuleList()
 
       *m_PDFUtilityModuleDetail[mod_id] = unassigned_module;
       m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
-
-      *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
-
    //query module information
    try
    {
@@ -282,27 +273,27 @@ bool CLookup::resetModuleList()
          //----
          mod_id = cQuery->FieldByName("MDid")->AsInteger;
          product_id = cQuery->FieldByName("pId")->AsInteger;
-         ///max_solscript = cQuery->FieldByName("MDmaxsolscript")->AsInteger;
-         //
          // Set the module list for iConvert
          //
-         if (product_id==ICONVERT_PRODUCT) {
+         if (product_id==ICONVERT_PRODUCT ) {
             pModuleList = iConvert_module_detail;
+
          }
-         else if (product_id==PDF_UTILITY) {
+         else if (product_id==PDF_UTILITY ) {
             pModuleList = m_PDFUtilityModuleDetail;
+
          }
-         else if (product_id==SOLSCRIPT_PRODUCT) {
+         else if (product_id==SOLSCRIPT_PRODUCT ) {
             pModuleList = m_solScriptModuleDetail;
+
          }
-         else if (product_id==SDX_DESIGNER_PRODUCT)
-            pModuleList = m_SDXDesignerModuleDetail;
          else
+         {
             pModuleList = module_detail;
 
-         if (mod_id >= 0 && mod_id < 64)
-         {
-
+         }
+        if (mod_id >= 0 && mod_id < 64)
+        {
             // Subtract 1000 because there are 64 values in the array, so each
             // module will correspond to each of these values.  There are labeled
             // 10XX or some other value in the sModuleDetail table.
@@ -332,13 +323,13 @@ bool CLookup::resetModuleList()
             }
             else
                 pModuleList[mod_id]->bExistingMember = true;
-         }
-
+//         }
          //----
+         }
          cQuery->Next();
 
       }
-      cQuery->Close();
+      cQuery->Close();      //pModuleList now has all module info from moduledetail table
       result = true;
    }
    catch(...)
@@ -1062,9 +1053,6 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
          result = static_cast<bool>(max>0);
          break;
       case SOLSCRIPT_PRODUCT:
-         result = static_cast<bool>(max>0);
-         break;
-      case SDX_DESIGNER_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
       default:

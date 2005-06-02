@@ -170,6 +170,7 @@ void TModuleFrame::SetupColumns()
         new_column->MinWidth = 50;
         new_column->Width = new_column->MaxWidth;
         name_width -= new_column->Width;
+
    }
    //set with of Name column base on remaining space
    name_column->Width = name_width;
@@ -233,13 +234,13 @@ void TModuleFrame::load(SKeyRecord* skeyrecord, bool all_modules)
 {
    TListItem* new_item;
    key_record = skeyrecord;
-
+   int total_modules = 64;
    //lookup->getModuleList(m_productId);
 
    ModuleList->Items->BeginUpdate();
    ModuleList->Items->Clear();
 
-   for( int idx(0); idx<64; idx++ )
+   for( int idx(0); idx<total_modules; idx++ )
    {
       //
       // MODULE EDITOR - Used for the Module Editor so that we can see all
@@ -277,20 +278,18 @@ void TModuleFrame::load(SKeyRecord* skeyrecord, bool all_modules)
       } // end if statement
       else
       {
-          //
           // Otherwise check the key for the licensing.
-          SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
-
-          if ( m_moduleDetail[idx]->isAvailableForProduct(spd_key->productId) &&
-               m_moduleDetail[idx]->isAvailableForVersion(spd_key->productVersion) &&
-               (all_modules  || lookup->isAssignedModule(idx)) )
-          {
-             new_item = ModuleList->Items->Add();
-             new_item->Caption = m_moduleDetail[idx]->getActionText();
-             new_item->SubItems->Add(m_moduleDetail[idx]->name);
-             new_item->SubItems->Add(m_moduleDetail[idx]->getTextForUnits(spd_key->productId, spd_key->getLicense(idx)));
-             new_item->Data = static_cast<void*>(m_moduleDetail[idx]);
-          } // end if
+              SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+               if ( m_moduleDetail[idx]->isAvailableForProduct(spd_key->productId) &&
+                     m_moduleDetail[idx]->isAvailableForVersion(spd_key->productVersion) &&
+                    (all_modules  || lookup->isAssignedModule(idx)) )
+               {
+                     new_item = ModuleList->Items->Add();
+                     new_item->Caption = m_moduleDetail[idx]->getActionText();
+                     new_item->SubItems->Add(m_moduleDetail[idx]->name);
+                     new_item->SubItems->Add(m_moduleDetail[idx]->getTextForUnits(spd_key->productId, spd_key->getLicense(idx)));
+                     new_item->Data = static_cast<void*>(m_moduleDetail[idx]);
+               } // end if
       }  // end else
    }  // end for loop
 
@@ -351,10 +350,16 @@ void __fastcall TModuleFrame::ModuleListCompare(TObject *Sender,
    else if(ModuleList->Column[m_sortIdx]->Caption == AnsiString("Units"))
    {
       try
-      {
-         int item_1_unit(my_item_1->SubItems->Strings[m_sortIdx-1].ToInt());
-         int item_2_unit(my_item_2->SubItems->Strings[m_sortIdx-1].ToInt());
-         Compare = item_1_unit - item_2_unit;
+      {  // to integer compare if not '*' or 'X'
+         if((my_item_1->SubItems->Strings[m_sortIdx-1] != '*' && my_item_1->SubItems->Strings[m_sortIdx-1] != 'X')
+             && (my_item_2->SubItems->Strings[m_sortIdx-1] != '*' && my_item_2->SubItems->Strings[m_sortIdx-1] != 'X'))
+         {
+           int item_1_unit(my_item_1->SubItems->Strings[m_sortIdx-1].ToInt());
+           int item_2_unit(my_item_2->SubItems->Strings[m_sortIdx-1].ToInt());
+           Compare = item_1_unit - item_2_unit;
+         }
+         else
+           Compare = CompareText(my_item_1->SubItems->Strings[m_sortIdx-1], my_item_2->SubItems->Strings[m_sortIdx-1]);
          if(Compare==0)//if match secondary sort on name... no two names should be the same
             Compare = CompareText(Item1->SubItems->Strings[0], Item2->SubItems->Strings[0]);
       }
@@ -427,49 +432,39 @@ void __fastcall TModuleFrame::ModuleListKeyPress(TObject *Sender,
       char &Key)
 {
    //get selected LineItem, if there is no item select return
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
-   TListItem* selected(ModuleList->Selected);
-   if(selected==NULL)
-      return;
-
-   ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
-
-   if( m_bChangeUnits )
-   {
-      if(Key == '+')
-      {
-         //check if module can be increased by one
-         unsigned short license(spd_key->getLicense(detail->id));
-         if( license < detail->max )
-         {
+     SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+     TListItem* selected(ModuleList->Selected);
+     if(selected==NULL)
+        return;
+     ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
+     if( m_bChangeUnits )
+     {
+        if(Key == '+')
+        {
+           //check if module can be increased by one
+           unsigned short license(spd_key->getLicense(detail->id));
+           if( license < detail->max )
+           {
             //change value for key and listview
-            spd_key->setLicense(detail->id, license+1);
-            selected->SubItems->Strings[1] = license+1;
-            selected->Update();
-         }
-      }
-      else if(Key == '-')
-      {
-         //check if module can be decreased by one
-         unsigned short license(spd_key->getLicense(detail->id));
-         if( license > 0 )
-         {
-            //change value for key and listview
-            spd_key->setLicense(detail->id, license-1);
-            selected->SubItems->Strings[1] = license-1;
-            selected->Update();
-         }
-      }
-   }
+              spd_key->setLicense(detail->id, license+1);
+              selected->SubItems->Strings[1] = license+1;
+              selected->Update();
+           }
+        }
+        else if(Key == '-')
+        {
+           //check if module can be decreased by one
+           unsigned short license(spd_key->getLicense(detail->id));
+           if( license > 0 )
+           {
+              //change value for key and listview
+              spd_key->setLicense(detail->id, license-1);
+              selected->SubItems->Strings[1] = license-1;
+              selected->Update();
+           }
+        }
+     }
 }
-
-//==============================================================================
-// MODE 1 - member functions
-//==============================================================================
-
-//==============================================================================
-// MODE 2 - member functions
-//==============================================================================
 
 //==============================================================================
 // Function:    createModulePassword(int module_id, int row_id );
@@ -486,14 +481,14 @@ void __fastcall TModuleFrame::ModuleListKeyPress(TObject *Sender,
 bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
 {
    char password_string[128];
-
    //get selected list item, from list item get pointer to ModuleDetail structure
    TListItem* selected(ModuleList->Selected);
    if(selected==NULL)
       return false;
 
    //check attached key status - need to have a programmed key attached
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));//pkey should always be SpdProtectionKey
+
+       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
 
    bool keyOnTrial = key_record->pkey->isOnTrial();
 
@@ -506,7 +501,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       return false;
    }
    //check if attached key is programmed
-   if( keyMaster->programmed() == false )
+   if(keyMaster->programmed() == false )
    {
       //add message, attached key must be programmed to generate a password
       Application->MessageBox("Attached key must be programmed.", "Information Message", MB_OK);
@@ -514,7 +509,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    }
 
    //ModuleDetail* detail = m_moduleDetail[modId];
-   ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
+   ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);  //listselected item
 
    //check if module is default
    if( key_record->pkey->isOnTrial() && key_record->non_perm_ktf == false )
@@ -544,32 +539,29 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          // SolScript module passwords are not incremental
          if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
             units = 0;
-
-         keyMaster->getModulePassword(spd_key,
-                                      detail->id,
-                                      static_cast<ProductId>(spd_key->productId),
-                                      spd_key->productVersion,
-                                      units,
-                                      password_string
-                                     );
-
+                 keyMaster->getModulePassword(spd_key,
+                                              detail->id,
+                                              static_cast<ProductId>(key_record->pkey->productId),
+                                              key_record->pkey->productVersion,
+                                              units,
+                                              password_string
+                                             );
          //applies module password to key
          keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
       }
-
    }
-   else if( spd_key->status == 2 ||  key_record->non_perm_ktf == true)//key is already permanent
+   else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true) ) //key is already permanent
    {
       if (units == -1)
-         units = ((SpdProtectionKey*)(key_record->pkey))->getLicense(detail->id);
+         units = spd_key->getLicense(detail->id);
       //check if license has ability to be incremented
       int available(detail->max - units);
       if( available > 0 )
       {
          keyMaster->getModulePassword(spd_key,
                                       (uchar)detail->id,
-                                      static_cast<ProductId>(spd_key->productId),
-                                      spd_key->productVersion,
+                                      static_cast<ProductId>(key_record->pkey->productId),
+                                      key_record->pkey->productVersion,
                                       units,
                                       password_string
                                      );
@@ -580,16 +572,16 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          Application->MessageBox("Module already set to its maximum value.", "Module Information", MB_OK);
          return false;
       }
-   }
+  }
    else //- key_status not valid, do not generate a module password
       return false;
 
    //execute stored procedure to update database
    try
    {
-      m_pDatabase->StartTransaction();
-      AnsiString updated_module_list(reinterpret_cast<char*>(spd_key->keyDataBlock.data),static_cast<unsigned char>(32));
 
+      m_pDatabase->StartTransaction();
+      AnsiString updated_module_list(reinterpret_cast<char*>((key_record->pkey)->keyDataBlock.data),static_cast<unsigned char>(36));
       ModuleDetailQuery->Close();
       ModuleDetailQuery->SQL->Clear();
       if (key_record->non_perm_ktf == true)
@@ -599,7 +591,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       else
       {
          ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRstatus = 2, SKRoutput = :output, modules = :module_list where SKRid= :skr_id");
-         ModuleDetailQuery->ParamByName("output")->AsInteger = (spd_key->isOnTrial() == true) ? 1 : spd_key->outputUnits;
+                ModuleDetailQuery->ParamByName("output")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spd_key->outputUnits;
       }
 
       ModuleDetailQuery->ParamByName("module_list")->AsBlob = updated_module_list;
@@ -626,19 +618,20 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       ModuleDetailQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :mod_id, :units, 0)");
       ModuleDetailQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
       ModuleDetailQuery->ParamByName("password")->AsString = password_string;
-      ModuleDetailQuery->ParamByName("units")->AsInteger = spd_key->getLicense(detail->id);
+
+              ModuleDetailQuery->ParamByName("units")->AsInteger = spd_key->getLicense(detail->id);
       // ICONVERT products have an SDRid of 10XX, and therefore have to check
       // to see if the product is ICONVERT or other.
 
       if(key_record->pkey->productId == ICONVERT_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 1000;
-      else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+      /*else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 3000;
+      */
       else if(key_record->pkey->productId == PDF_UTILITY)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 4000;
       else
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
-
 
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
@@ -671,7 +664,6 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
 bool TModuleFrame::createPagesPerMinutePassword()
 {
    char password_string[128];
-
    //generate password by selecting a module...
    int pages(0);
    int ext(0);
@@ -680,12 +672,12 @@ bool TModuleFrame::createPagesPerMinutePassword()
    TListItem* selected(ModuleList->Selected);
    if(selected==NULL)
       return false;
-
+   //create both but only use correct one for now....
    //check attached key status - need to have a programmed key attached
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));//pkey should always be SpdProtectionKey
+   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
 
    bool keyOnTrial = key_record->pkey->isOnTrial();
-   
+
    //check if key is attached
    if( keyMaster->found() == false )
    {
@@ -724,7 +716,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
         Application->MessageBox("Maximum Pages Per Minute Passwords have been issued for this key.", "Warning", MB_OK|MB_ICONWARNING );
         return false;
    }
-   
+
    // If all goes well...Launch a dialog to get the pages per minute
    TDlgPPM *dlg = new TDlgPPM( this );
    if( dlg->ShowModal() == mrCancel )
@@ -745,31 +737,31 @@ bool TModuleFrame::createPagesPerMinutePassword()
 
    //detail->pages_per_minute = pages;
    //also translate the mod id to the Pages per minute mod id as specified in the xml file
-   switch(detail->id)
-   {
-        case XCH_IPDS_ID:
-                key_record->xch_ipds_ppm = pages;
-                ppmModID = 68; //56;
-                break;
-        case XCH_PCL_ID:
-                key_record->xch_pcl_ppm = pages;
-                ppmModID = 70; //58;
-                break;
-        case XCH_PS_ID:
-                key_record->xch_ps_ppm = pages;
-                ppmModID = 160; //60;
-                break;
-        case XCH_PS_DBCS_ID:
+       switch(detail->id)
+     {
+          case XCH_IPDS_ID:
+                  key_record->xch_ipds_ppm = pages;
+                  ppmModID = 68; //56;
+                  break;
+          case XCH_PCL_ID:
+                  key_record->xch_pcl_ppm = pages;
+                  ppmModID = 70; //58;
+                  break;
+          case XCH_PS_ID:
+                  key_record->xch_ps_ppm = pages;
+                  ppmModID = 160; //60;
+                  break;
+          case XCH_PS_DBCS_ID:
                 key_record->xch_ps_dbcs_ppm = pages;
                 ppmModID = 64; //64;
                 break;
-        case AFPDS_PS_ID:
+          case AFPDS_PS_ID:
                 key_record->afpds_ps_ppm = pages;
                 ppmModID = 66; //66;
                 break;
-        default:
+          default:
                 break;
-   }
+     }
 
    //check if module is default
    if( key_record->pkey->isOnTrial() )
@@ -785,7 +777,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       }
       else // ...otherwise create a password
       {
-         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
 
          //applies module password to key
          keyMaster->applyPagesPerMinutePassword(key_record);
@@ -795,7 +787,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
    else if( spd_key->status == 2 )//key is already permanent
    {
       //check if license has ability to be incremented
-      int available(ext < MAX_PPM_EXTENSIONS);  
+      int available(ext < MAX_PPM_EXTENSIONS);
       if( available > 0 )
       {
          keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
@@ -822,7 +814,8 @@ bool TModuleFrame::createPagesPerMinutePassword()
    try
    {
       m_pDatabase->StartTransaction();
-      AnsiString updated_module_list(reinterpret_cast<char*>(spd_key->keyDataBlock.data),static_cast<unsigned char>(32));
+      AnsiString updated_module_list(reinterpret_cast<char*>((key_record->pkey)->keyDataBlock.data),static_cast<unsigned char>(36));
+
 
       ModuleDetailQuery->Close();
       ModuleDetailQuery->SQL->Clear();
@@ -869,33 +862,35 @@ bool TModuleFrame::createPagesPerMinutePassword()
 
       ModuleDetailQuery->Close();
       ModuleDetailQuery->SQL->Clear();
-      switch(detail->id)
-      {
-        case XCH_IPDS_ID:
-              ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchipds = :value where SKRid= :skr_id");
-              break;
-        case XCH_PCL_ID:
-              ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchpcl = :value where SKRid= :skr_id");
-              break;
-        case XCH_PS_ID:
-              ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchps = :value where SKRid= :skr_id");
-              break;
-        case XCH_PS_DBCS_ID:
-              ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchpsdbcs = :value where SKRid= :skr_id");
-              break;
-        case AFPDS_PS_ID:
-              ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmafpdsps = :value where SKRid= :skr_id");
-              break;
-        default:
+
+        switch(detail->id)
+        {
+          case XCH_IPDS_ID:
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchipds = :value where SKRid= :skr_id");
+                break;
+          case XCH_PCL_ID:
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchpcl = :value where SKRid= :skr_id");
+                break;
+          case XCH_PS_ID:
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchps = :value where SKRid= :skr_id");
+                break;
+          case XCH_PS_DBCS_ID:
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchpsdbcs = :value where SKRid= :skr_id");
+                break;
+          case AFPDS_PS_ID:
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmafpdsps = :value where SKRid= :skr_id");
+                break;
+          default:
               // should never happen because we check for the module id's before
               // this point.
-              break;
-      }
+                break;
+        }
+
       ModuleDetailQuery->ParamByName("value")->AsInteger = pages;
       ModuleDetailQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
-      
+
 
       ModuleDetailQuery->Close();
       ModuleDetailQuery->SQL->Clear();
@@ -1011,5 +1006,4 @@ void __fastcall TModuleFrame::ModuleListMouseDown(TObject *Sender,
          ModulePopup->Popup(pt.x, pt.y);
    }
 }
-
 

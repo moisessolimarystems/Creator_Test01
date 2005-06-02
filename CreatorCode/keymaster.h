@@ -31,14 +31,10 @@
 
 #define MAXCOMMAND               256
 
-
 class SKeyRecord;
 class ProtectionKey;
 class SpdProtectionKey;
 class SSProtectionKey;
-
-
-
 /*--------------------------------------------------------------------*
  *                                                                    *
  *   KeyMaster Class:                                                 *
@@ -56,13 +52,12 @@ public:
    void getPermanentPassword(ProtectionKey*, char*);
    void getProductVersionPassword(ProtectionKey*, ushort, char*);
    void getExtensionPassword(ProtectionKey*,
-                             uchar,
+                             ushort,
                              ProductId,
                              ushort,
                              ushort,
                              char*
                             );
-
    void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, ushort, char*);
    void getOutputPassword(SpdProtectionKey*, ushort, char*);
    void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, long);
@@ -71,6 +66,7 @@ public:
    AnsiString getReportServersPassword(SSProtectionKey*, ushort);
    AnsiString getConcurrentUsersPassword(SSProtectionKey*, ushort);
    AnsiString getApplicationServerPassword(SSProtectionKey*, ushort);
+   AnsiString getDocumentAssemblerPassword(SSProtectionKey*, ushort);
 
    //simulate applying password to ProtectionKey passed in
    void applyModZeroPassword(SKeyRecord* key_record, unsigned short mod_id, unsigned short units);
@@ -78,13 +74,21 @@ public:
    void applyOutputPassword(SKeyRecord* keyrec, int output_units);
    void applyPermanentPassword(SKeyRecord* key_record);
    void applyVersionPassword(SKeyRecord* keyrec, unsigned short version);
-   void applyExtensionPassword(SKeyRecord* keyrec, unsigned char days);
+   void applyExtensionPassword(SKeyRecord* keyrec, unsigned short days);
    void applyPagesPerMinutePassword(SKeyRecord* keyrec);
 
    void applyIndexServersPassword(SKeyRecord* keyrec, unsigned short units_licensed);
    void applyReportServersPassword(SKeyRecord* keyrec, unsigned short units_licensed);
    void applyConcurrentUsersPassword(SKeyRecord* keyrec, unsigned short units_licensed);
    void applyApplicationPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applyDocumentAssemblerPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+
+   void applyBusTagInPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applyBusTagOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applyParallelInPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applyParallelOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applySCSIOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
+   void applyPSInterpPassword(SKeyRecord* keyrec, unsigned short units_licensed);
 
    //operate on scratchKey
    short clear();
@@ -102,6 +106,8 @@ public:
    void initializeMinModules(SKeyRecord*);
    void initializeMaxValues(SKeyRecord*);
    void initializeMinValues(SKeyRecord*);
+   void initializeMinMod(SKeyRecord*);
+   void initializeMaxMod(SKeyRecord*);
    short read(SKeyRecord*);
    short read(SKeyRecord*, ProductId);
 

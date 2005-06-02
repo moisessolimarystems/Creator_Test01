@@ -15,8 +15,8 @@
 //------------------------------------------------------------------------------
 // Defines
 //------------------------------------------------------------------------------
-const int MAX_SOLIMAR_PRODUCTS = 13;    // 9 Products Total now
-
+const int MAX_SOLIMAR_PRODUCTS = 13;    // 9 Products Total, should be largest product ID + 1
+                                        // current largest product ID = 14
 struct SolimarProduct
 {
    SolimarProduct(){ version = 0x0000;}
@@ -78,7 +78,6 @@ class CLookup
    ModuleDetail* module_detail[64];
    ModuleDetail* iConvert_module_detail[64];
    ModuleDetail* m_solScriptModuleDetail[64];
-   ModuleDetail* m_SDXDesignerModuleDetail[64];
    ModuleDetail* m_PDFUtilityModuleDetail[64];
 
   public:
@@ -112,7 +111,7 @@ class CLookup
                         AnsiString module_engineer,
                         AnsiString module_partnumber, unsigned short module_version_added,
                         unsigned short module_version_removed, AnsiString module_type,
-                        unsigned short module_max, bool module_spd_def,
+                        unsigned short module_max, bool module_spd_def, 
                         bool module_connect_def, bool module_connect_mod,
                         bool module_iConvert_def, bool module_iConvert_mod);
 

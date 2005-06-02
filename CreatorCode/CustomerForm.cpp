@@ -7,7 +7,7 @@
 #include <vcl\vcl.h>
 #pragma hdrstop
 
-const int CREATOR_VERSION = 0x223;
+const int CREATOR_VERSION = 0x224;
 
 #include "CLookups.h"
 #include "CustomerForm.h"
@@ -47,6 +47,7 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
    KeyGridPtr = NULL;
    QueryDialog = NULL;
 
+   resetScroll = true;
    keyMaster = new KeyMaster();
    keyMaster->initDriver();
 
@@ -726,7 +727,7 @@ bool __fastcall TCustForm::LoadKeyInfo()
       if (attached_key->pkey->productId==SPD_PRODUCT ||
           attached_key->pkey->productId==CONNECT_PRODUCT ||
           attached_key->pkey->productId==QUANTUM_PRODUCT ||
-          attached_key->pkey->productId==ICONVERT_PRODUCT)
+          attached_key->pkey->productId==ICONVERT_PRODUCT )
       {
          AttachedKeyModuleFrame->Visible = true;
          AttachedKeyModuleFrame->initialize(MODE_1, attached_key->pkey->productId);
@@ -759,8 +760,8 @@ bool __fastcall TCustForm::LoadKeyInfo()
             KeyCellGrid->Cells[col][row] = cell_text;
          }
       }
+     KeyCellGridClick(this);
    }
-   KeyCellGridClick(this);
    return( LOADED );
 }
 
@@ -773,7 +774,9 @@ bool __fastcall TCustForm::LoadKeyInfo()
 //CellZoom -
 void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
 {
-   //
+   AnsiString listString, module_name, licenseVal;
+   int module_id(0);
+
    // Passing in the attatched key so that we know which module list to choose from.
    // depending on the productId
    ModuleDetail** module_detail_list = lookup->getModuleList(attached_key->pkey->productId);
@@ -795,7 +798,6 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    SpdProtectionKey* spd_key;
    SSProtectionKey* ss_key;
 
-
    //Initialize ZoomCells
    ZoomDetailTextDescription0->Visible = false;
    ZoomDetailValue0->Visible = false;
@@ -805,15 +807,19 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    ZoomDetailValue2->Visible = false;
    ZoomDetailTextDescription3->Visible = false;
    ZoomDetailValue3->Visible = false;
+   ZoomDetailListBox->Visible = false;
+   CellViewScrollBar->Visible = false;
+   if(resetScroll)
+        CellViewScrollBar->Position = 0;
 
    //
    // cell starts at zero
    // Pertains to all keys, including SOLsearcher keys
-   if( cell < TOTAL_MODULE_CELLS ) //16
+   if( cell < TOTAL_MODULE_CELLS) //16    //clicking on a cell on the cell detail tab
    {
       //
-      // For all keys that are not SOLSEARCHER_ENTERPRISE_PRODUCT keys
-      if (attached_key->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
+      // For all keys that are not SOLSEARCHER_ENTERPRISE_PRODUCT keys 
+      if (attached_key->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT )
       {
          spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
          unsigned short base_cell = cell*4;
@@ -839,7 +845,7 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
          ZoomDetailValue3->Text = spd_key->getLicense(base_cell+3);
          ZoomDetailValue3->Visible = true;
       }
-      else
+      else if(attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
       {
          //
          // SOLsearcher Key Information
@@ -885,6 +891,21 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
 
                         ZoomDetailValue0->Visible = true;
                         itoa(ss_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );
+                        ZoomDetailValue0->Text = cell_text;
+                }
+         }
+         else if( cell == DOCUMENT_ASSEMBLER_CELL )
+         {
+                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
+                {
+                        SSProtectionKey* ss_key;
+                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+
+                        ZoomDetailTextDescription0->Visible = true;
+                        ZoomDetailTextDescription0->Caption = "Document Assembler";
+
+                        ZoomDetailValue0->Visible = true;
+                        itoa(ss_key->keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
                 }
          }
@@ -1029,39 +1050,7 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
       itoa(attached_key->pkey->keyDataBlock.data[KEY_NUMBER_CELL], cell_text, 16 );
       ZoomDetailValue0->Text = cell_text;
    }
-   /*else if( cell == MASTER_NOT_FOUND_COUNTER_CELL )
-   {
-      if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-      {
-         SSProtectionKey* ss_key;
-         ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-         ZoomDetailTextDescription0->Visible = true;
-         ZoomDetailTextDescription0->Caption = "Master Not Found Cell";
-
-         ZoomDetailValue0->Visible = true;
-         itoa(ss_key->keyDataBlock.data[MASTER_NOT_FOUND_COUNTER_CELL], cell_text, 16);
-         ZoomDetailValue0->Text = cell_text;
-      }
-   }
-   else if( cell == SLAVE_CELL )
-   {
-      if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-      {
-         SSProtectionKey* ss_key;
-         ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-         ZoomDetailTextDescription0->Visible = true;
-         ZoomDetailTextDescription0->Caption = "Master/Slave Cell";
-
-         ZoomDetailValue0->Visible = true;
-         ZoomDetailValue0->Text = (ss_key->isSlave()) ? "Slave" : "Master";
-      }
-   }*/
    else{}
-
-
-
 }
 
 //==============================================================================
@@ -1108,5 +1097,11 @@ void __fastcall TCustForm::ModuleEditorClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
+void __fastcall TCustForm::CellViewScrollBarChange(TObject *Sender)
+{
+        resetScroll = false;
+        KeyCellGridClick(Sender);
+        resetScroll = true;
+}
+//---------------------------------------------------------------------------
 

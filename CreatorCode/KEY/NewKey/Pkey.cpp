@@ -245,7 +245,6 @@ const char* KDPasswordText[] =
    "1095 days/3000 hrs - MYTL",  // 23
    "1460 days/4000 hrs - MYTL",  // 24
    "1825 days/5000 hrs - MYTL",  // 25
-
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -600,7 +599,7 @@ short ProtectionKey::getExpirationDays() const
  *    otherwise returns 0.
  *
 ---------------------------------------------------------------------------*/
-void ProtectionKey::getExtensionPassword(uchar extension_days,
+void ProtectionKey::getExtensionPassword(ushort extension_days,
                                           ushort extension_num,
                                           ISolimarLicenseSvr* pServer,
                                           char* password
@@ -804,7 +803,7 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
    {
       case SPD_PRODUCT:
       case CONNECT_PRODUCT:
-		case ICONVERT_PRODUCT:
+      case ICONVERT_PRODUCT:
       case QUANTUM_PRODUCT:
          new_key = new SpdProtectionKey();
          break;
@@ -813,8 +812,9 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey();
+/*         new_key = new SDXDesignerProtectionKey();
          break;
+*/
       default:
          new_key = new ProtectionKey();
          break;
@@ -862,7 +862,7 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
 	{
       case SPD_PRODUCT:
       case CONNECT_PRODUCT:
-		case ICONVERT_PRODUCT:
+      case ICONVERT_PRODUCT:
       case QUANTUM_PRODUCT:
          new_key = new SpdProtectionKey();
          break;
@@ -871,8 +871,9 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey();
+ /*        new_key = new SDXDesignerProtectionKey();
          break;
+ */
       default:
          new_key = new ProtectionKey();
          break;
@@ -914,8 +915,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
+/*         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
          break;
+*/
       default:
          new_key = new ProtectionKey(*pkey);
          break;
