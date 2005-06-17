@@ -973,7 +973,7 @@ void KeyMaster::initializeMinValues( SKeyRecord* keyrec )
       ss_key->setIndexServers(0);
       ss_key->setReportServers(0);
       ss_key->setConcurrentUsers(0);
-      ss_key->setApplications(MAX_APPLICATIONS);
+      ss_key->setApplications(0);
       ss_key->setDocumentAssembler(0);
    }
 
@@ -1295,7 +1295,7 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
       ss_key->setIndexServers(0);
       ss_key->setReportServers(0);
       ss_key->setConcurrentUsers(0);
-      ss_key->setApplications(MAX_APPLICATIONS);  //wanted unlimited status for application servers
+      ss_key->setApplications(0);  //wanted unlimited status for application servers
       ss_key->setDocumentAssembler(0);
    }
 
