@@ -23,6 +23,8 @@ void PasswordForm::InitializeComponent()
 	components = new System::ComponentModel::Container();
 	AutoScaleBaseSize = System::Drawing::Size(5, 13);
 	ClientSize = System::Drawing::Size(400, 100);
+	this->FormBorderStyle = FormBorderStyle::FixedDialog;
+  
 	Text = S"Password";
 
 	// Create a new TextBox control using this constructor.

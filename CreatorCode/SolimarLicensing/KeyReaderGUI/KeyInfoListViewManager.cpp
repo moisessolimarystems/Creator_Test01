@@ -14,6 +14,8 @@ const int SolSearcherEnterpriseProductID = 8;
 const int SolScriptProductID = 9;
 const int SDXDesignerProductID = 10;
 const int QuantumServerProductID = 11;
+const int PDFEngineProductID = 12;
+const int SPDEProductID = 14;
 
 //Used to map the license as specified in KeySpec.xml
 const int InitialTrialID = 0;
@@ -150,7 +152,7 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 		switch (*pProductID)
 		{
 			case SPDProductID :
-				return retval = "SPD";
+				return retval = "SP/D Platinum";
 
 			case ConnectivityServerProductID :
 				return retval = "Connectivity Server";
@@ -181,6 +183,12 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
+
+			case PDFEngineProductID :
+				return retval = "PDF Engine";
+
+			case SPDEProductID : 
+				return retval = "SP/D Enterprise";
 
 			default :
 				return retval = "Unknown License";
