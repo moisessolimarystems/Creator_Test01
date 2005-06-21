@@ -65,6 +65,8 @@ public:
    void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, long);
    void getModulePassword(SpdeProtectionKey*, uchar, ProductId, ushort, ushort, char*);
    void getOutputPassword(SpdeProtectionKey*, ushort, char*);
+   void getOperatorSessionPassword(SpdeProtectionKey*, ushort, char*);
+   void getUserSessionPassword(SpdeProtectionKey*, ushort, char*);
    void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, long);
 
    void getBusTagInPassword(SpdeProtectionKey*, ushort, char*);
@@ -84,6 +86,8 @@ public:
    void applyModZeroPassword(SKeyRecord* key_record, unsigned short mod_id, unsigned short units);
    void applyModPassword(SKeyRecord* keyrec, unsigned char module_id, unsigned short units);
    void applyOutputPassword(SKeyRecord* keyrec, int output_units);
+   void applyOperatorSessionPassword(SKeyRecord* keyrec, int operator_session);
+   void applyUserSessionPassword(SKeyRecord* keyrec, int user_session);
    void applyPermanentPassword(SKeyRecord* key_record);
    void applyVersionPassword(SKeyRecord* keyrec, unsigned short version);
    void applyExtensionPassword(SKeyRecord* keyrec, unsigned short days);

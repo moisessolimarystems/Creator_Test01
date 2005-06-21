@@ -83,7 +83,7 @@ Sub GenerateNewBuild()
     Dim MKS
     Set MKS = New CMKS
     Set MKS.Build = g_Build    
-    MKS.GenerateSandBox "New"
+    MKS.GenerateSandBox "New"	
     'ConfigureSubProjectForLicensing MKS, g_Build.NewBuild.LicenseVersion
     BuildMainCode 
     MoveAndCheckInBuiltFiles MKS
@@ -97,6 +97,7 @@ Sub GenerateNewBuild()
     Set MoveFiles = New CMoveFiles
     Set MoveFiles.Build = g_Build
     MoveFiles.MoveCDImageToNetwork g_Build.ProductName, Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
+    MKS.RefreshFile g_Build.mBuildPath & "\buildScript.pj", "BuildRegistry.txt"	  'make sure we have the most updated build registry file.
     g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
     g_Build.NewBuild.IncrementBuildNum "CreatorBuildNumber", MKS
     MKS.Disconnect

@@ -237,9 +237,6 @@ ModuleDetail** CLookup::getModuleList(int productID)
       return m_PDFUtilityModuleDetail;
    else if (productID == SPDE_PRODUCT)
       return m_SpdeModuleDetail;
-/*   else if (productID == SDX_DESIGNER_PRODUCT)
-      return m_SDXDesignerModuleDetail;
-*/
    else
        return module_detail;
 }
@@ -282,9 +279,6 @@ bool CLookup::resetModuleList()
 
       *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
-
-    //  *m_SpdeModuleDetail[mod_id] = unassigned_module;
-    //  m_SpdeModuleDetail[mod_id]->id = mod_id;
    }
    for( mod_id=0; mod_id < 64; mod_id++)
    {
@@ -327,12 +321,6 @@ bool CLookup::resetModuleList()
             pModuleList = m_SpdeModuleDetail;
             currentCount = spdeCount++;
          }
-/*         else if (product_id==SDX_DESIGNER_PRODUCT )
-        {
-            pModuleList = m_SDXDesignerModuleDetail;
-            currentCount = mod_id;
-        }
-*/
          else
          {
             pModuleList = module_detail;
@@ -1130,10 +1118,6 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
       case SOLSCRIPT_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
-/*      case SDX_DESIGNER_PRODUCT:
-         result = static_cast<bool>(max>0);
-         break;
-*/
       case SPDE_PRODUCT:
          result = true;
          break;
