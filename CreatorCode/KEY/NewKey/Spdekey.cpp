@@ -95,7 +95,7 @@ public:
 
 /*-------------------------------------------------------------------------*
  *                                                                         *
- *    SpdeProtectionKey Class:                                              *
+ *    SpdeProtectionKey Class:                                             *
  *                                                                         *
  *    Derived from ProtectionKey, this class expands upon ProtectionKey    *
  *    functionality by adding SP/D module licensing support to the         *
@@ -110,6 +110,8 @@ SpdeProtectionKey::SpdeProtectionKey() :
    ProtectionKey(),
    moduleCells((ModuleCell*)&keyDataBlock.data[SPDE_MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[SPDE_OUTPUT_UNIT_CELL]),
+   operatorSessionUnits(keyDataBlock.data[SPDE_OPERATOR_SESSION_CELL]),
+   userSessionUnits(keyDataBlock.data[SPDE_USER_SESSION_CELL]),
    hardwareModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_HARDWARE_MODULE_START_CELL]),
    resourceModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_RESOURCE_MODULE_START_CELL])
 {
@@ -118,7 +120,11 @@ SpdeProtectionKey::SpdeProtectionKey() :
 SpdeProtectionKey::SpdeProtectionKey() :
    ProtectionKey(),
    moduleCells((ModuleCell*)&keyDataBlock.data[SPDE_MODULE_START_CELL])
-   outputUnits(keyDataBlock.data[SPDE_OUTPUT_UNIT_CELL])
+   outputUnits(keyDataBlock.data[SPDE_OUTPUT_UNIT_CELL]),
+   operatorSessionUnits(keyDataBlock.data[SPDE_OPERATOR_SESSION_CELL]),
+   userSessionUnits(keyDataBlock.data[SPDE_USER_SESSION_CELL]),
+   hardwareModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_HARDWARE_MODULE_START_CELL]),
+   resourceModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_RESOURCE_MODULE_START_CELL])
 {
 }
 #endif
@@ -129,6 +135,8 @@ SpdeProtectionKey::SpdeProtectionKey(const SpdeProtectionKey& pkey) :
    ProtectionKey(pkey),
    moduleCells((ModuleCell*)&keyDataBlock.data[SPDE_MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[SPDE_OUTPUT_UNIT_CELL]),
+   operatorSessionUnits(keyDataBlock.data[SPDE_OPERATOR_SESSION_CELL]),
+   userSessionUnits(keyDataBlock.data[SPDE_USER_SESSION_CELL]),
    hardwareModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_HARDWARE_MODULE_START_CELL]),
    resourceModuleCells((LargeModuleCell*)&keyDataBlock.data[SPDE_RESOURCE_MODULE_START_CELL])
 {
@@ -234,7 +242,7 @@ uchar SpdeProtectionKey::getLicense(ushort mod_id) const
  *    for this customer, with this key, and with this many output units
  *    licensed.  AMAZING!
  -----------------------------------------------------------------------------*/
- const uchar OUTPUT_POOL_MODULE_ID = 240;
+ const ushort OUTPUT_POOL_MODULE_ID = 240;
  void SpdeProtectionKey::getOutputPassword(ushort output_units,
                                           ISolimarLicenseSvr* pServer,
                                           char* Password_String)
@@ -247,6 +255,74 @@ uchar SpdeProtectionKey::getLicense(ushort mod_id) const
                                                    productId,
                                                    OUTPUT_POOL_MODULE_ID,
                                                    output_units,
+                                                   &password
+                                                  )))
+      {
+         AnsiString* pwd = new AnsiString(password);
+         strcpy(Password_String, pwd->c_str());
+         delete pwd;
+      }
+      SysFreeString(password);
+   }
+ }
+
+ /* getOutputPassword()
+ *
+ *
+ *
+ *
+ *
+ *    This query will produce a password that is therefore unique
+ *    for this customer, with this key, and with this many output units
+ *    licensed.  AMAZING!
+ -----------------------------------------------------------------------------*/
+ const ushort USER_SESSION_MODULE_ID = 401;
+ void SpdeProtectionKey::getUserSessionPassword(ushort user_session_units,
+                                          ISolimarLicenseSvr* pServer,
+                                          char* Password_String)
+ {
+   if(pServer)
+   {
+      BSTR password;
+      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+                                                   keyNumber,
+                                                   productId,
+                                                   USER_SESSION_MODULE_ID,
+                                                   user_session_units,
+                                                   &password
+                                                  )))
+      {
+         AnsiString* pwd = new AnsiString(password);
+         strcpy(Password_String, pwd->c_str());
+         delete pwd;
+      }
+      SysFreeString(password);
+   }
+ }
+
+ /* getOutputPassword()
+ *
+ *
+ *
+ *
+ *
+ *    This query will produce a password that is therefore unique
+ *    for this customer, with this key, and with this many output units
+ *    licensed.  AMAZING!
+ -----------------------------------------------------------------------------*/
+ const ushort OPERATOR_SESSION_MODULE_ID = 400;
+ void SpdeProtectionKey::getOperatorSessionPassword(ushort operator_session_units,
+                                          ISolimarLicenseSvr* pServer,
+                                          char* Password_String)
+ {
+   if(pServer)
+   {
+      BSTR password;
+      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+                                                   keyNumber,
+                                                   productId,
+                                                   OPERATOR_SESSION_MODULE_ID,
+                                                   operator_session_units,
                                                    &password
                                                   )))
       {
@@ -461,5 +537,17 @@ void SpdeProtectionKey::setLicensesToZero()
 ushort SpdeProtectionKey::getOutputUnits()
 {
 	return outputUnits;
+}
+
+// getOutputUnits - returns the number of outputs licensed for the key
+ushort SpdeProtectionKey::getOperatorSessionUnits()
+{
+	return operatorSessionUnits;
+}
+
+// getOutputUnits - returns the number of outputs licensed for the key
+ushort SpdeProtectionKey::getUserSessionUnits()
+{
+	return userSessionUnits;
 }
 
