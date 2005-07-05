@@ -84,7 +84,7 @@ Sub GenerateNewBuild()
     Set MKS = New CMKS
     Set MKS.Build = g_Build    
     MKS.GenerateSandBox "New"	
-    'ConfigureSubProjectForLicensing MKS, g_Build.NewBuild.LicenseVersion
+    ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
     BuildMainCode 
     MoveAndCheckInBuiltFiles MKS
     g_Build.NewBuild.BuildLabel = g_Build.ProductName + g_Build.NewBuild.versionNum
@@ -408,12 +408,12 @@ Sub ConfigureSubProjectForLicensing(aMKS, aLicenseVersion)
 	
 	g_Build.WriteToDlgAndFile "configuring Licensing Subprojects"
 	aMKS.ConfigureSubProject g_Build.MainCodePJFile  , _
-							 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", aLicenseVersion
+				 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", aLicenseVersion
 	aMKS.Refresh g_Build.MainCodePJFile , g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj"
-	aMKS.ConfigureSubProject g_Build.InstallSrcPath & "\" & g_Build.InstallSrcBuildPJ, _
-							 g_Build.InstallSrcPath & "\SolimarLicensing\SolimarLicensingMSIPackages.pj", aLicenseVersion
-    aMKS.Refresh g_Build.InstallSrcPath & "\" & g_Build.InstallSrcBuildPJ, g_Build.InstallSrcPath & "\SolimarLicensing\SolimarLicensingMSIPackages.pj" 
-    
+	aMKS.ConfigureSubProject g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
+				 g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj", aLicenseVersion
+        aMKS.Refresh g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
+		     g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj" 
 End Sub
 
 Sub CreateVersionTextAndExtractingFile(aType)
