@@ -1141,10 +1141,9 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
        }
 
        if( dlg->ShowModal() == IDYES )
-       {
-           index = dlg->passwordComboBox->ItemIndex; //+ 1;  why does this have + 1?? array is 0 based.
-           unsigned short days  = key_record->pkey->getKDPasswordDays(index);
-           createExtensionPassword(days);
+       {   //the index should be the value passed into createExtensionPassword. LicenseServer expects index into KDPasswordHour array
+           index = dlg->passwordComboBox->ItemIndex + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
+           createExtensionPassword(index);
        }
 
        delete dlg;
@@ -1173,7 +1172,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 void TFCustomerKeys::createExtensionPassword(unsigned short days)
 {
    char password_string[128];
-
+   unsigned short expire_date = days;
    //
    //check if key is attached
    if(!isAttachedKeyReady())
@@ -1198,6 +1197,10 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
    //apply password to key
    keyMaster->applyExtensionPassword(key_record, days);
 
+   //Test/Dev keys store index into units field. So need to translate index to actual number of days.
+   if(key_record->pkey->keyType == KEYDevelopment)
+        expire_date = key_record->pkey->getKDPasswordDays(days);
+
    //
    //Update database
    try
@@ -1209,7 +1212,7 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
       UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = :status, SKRexpirationDate = (getdate() + :exp_date) WHERE SKRid = :skr_id ");
       UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
       UtilityQuery->ParamByName("status")->AsInteger = key_record->getStatus();
-      UtilityQuery->ParamByName("exp_date")->AsInteger = days;
+      UtilityQuery->ParamByName("exp_date")->AsInteger = expire_date;
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:skr_id, :password, 255, :days, 0)");
@@ -1292,7 +1295,7 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->ParamByName("indexServers")->AsInteger = 0;
       UtilityQuery->ParamByName("reportServers")->AsInteger = 0;
       UtilityQuery->ParamByName("concurrentUsers")->AsInteger = 0;
-      UtilityQuery->ParamByName("applications")->AsInteger = MAX_APPLICATIONS;
+      UtilityQuery->ParamByName("applications")->AsInteger = 0;
       UtilityQuery->ParamByName("documentAssembler")->AsInteger = 0;
       UtilityQuery->ExecSQL();
 
@@ -2838,9 +2841,9 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
             // password really is), add the index value
             if( Column->Field->DisplayText == "Extend Trial Period" )
             {
-               int days = PswdGrid->Columns->Items[2]->Field->AsInteger; // Take value, subtact 1 to get proper value in the list.
+               int index = PswdGrid->Columns->Items[2]->Field->AsInteger - 1; //Subtact 1 to get proper value in the KDPasswordText array.
                PswdGrid->Canvas->FillRect( Rect );
-               sprintf( scratch, "Extend Trial Period - %u days", days); //display unsigned integer as text in the description.
+               sprintf( scratch, "Extend Trial Period - %s", key_record->pkey->getKDPasswordText(index)); //display unsigned integer as text in the description.
                PswdGrid->Canvas->TextOut( Rect.Left+2, Rect.Top+2, scratch);
             }
         }
