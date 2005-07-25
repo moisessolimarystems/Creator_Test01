@@ -1692,9 +1692,9 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		case 8:
 		{
 			// The solsearcher specific (legacy) password generation function 
-			// only generates passwords for modules {0,1,2,3}
+			// only generates passwords for modules {0,1,2,3,4}
 			// any future modules should be handled by the default/generic case
-			if (module.id<=3)
+			if (module.id<=4)
 			{
 				password_hash = GetSolsearcherModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
 				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
@@ -2373,7 +2373,7 @@ DWORD ProtectionKey::GetSolsearcherModulePassword(unsigned short customer_number
 			QueryModule_5 = 0xB;
 			query |= 
 				(((DWORD)(QueryModule_5)&0xF) << 8) |
-				((DWORD)(units_licensed)&0x01);
+				((DWORD)(units_licensed)&0xFF);
 			break;
 		default:
 			throw _com_error(E_INVALIDARG);
