@@ -115,10 +115,16 @@ Class CMKS
     End Sub
 
     Private Sub CleanFolder(aPath)
-        If mBuild.FSO.FolderExists(aPath) Then
+            Err.Clear
+	    On Error Resume Next
+	    If mBuild.FSO.FolderExists(aPath) Then
                 mBuild.FSO.DeleteFile aPath, 1
-                    mBuild.FSO.DeleteFolder aPath, 1
+                mBuild.FSO.DeleteFolder aPath, 1
             End If
+	    If Err Then
+	        mBuild.BuildError "Error attempting to clean : " + aPath
+	        mBuild.WriteToDlgAndfile Err.Description
+	    End If
             mBuild.FSO.CreateFolder aPath
     End Sub
 

@@ -201,9 +201,12 @@ Sub BuildProjects()
                 Next
             End If
             If exeInfo(exeItem).m_ProjectFile <> "" Then
-                g_Build.RunCmd Chr(34) & exeInfo(exeItem).m_CompilerType & Chr(34) & " " + g_Build.MainProjPath & exeInfo(exeItem).m_ProjectLocation & exeInfo(exeItem).m_ProjectFile & " " & exeInfo(exeItem).m_CompilerOption
+                g_Build.RunCmd Chr(34) & exeInfo(exeItem).m_CompilerType & Chr(34) & " " + g_Build.MainProjPath & exeInfo(exeItem).m_ProjectLocation & exeInfo(exeItem).m_ProjectFile & " " & exeInfo(exeItem).m_CompilerOption & _
+			       " >> " + Chr(34) + g_Build.Shell.CurrentDirectory + "\logFolder\StandardOutput.txt" + Chr(34)
+
             Else   'No Project
-                g_Build.RunCmd Chr(34) & exeInfo(exeItem).m_CompilerType & Chr(34) & " " & exeInfo(exeItem).m_CompilerOption
+                g_Build.RunCmd Chr(34) & exeInfo(exeItem).m_CompilerType & Chr(34) & " " & exeInfo(exeItem).m_CompilerOption & _
+	   		       " >> " + Chr(34) + g_Build.Shell.CurrentDirectory + "\logFolder\StandardOutput.txt" + Chr(34)
             End If
             If Not IsNull(exeInfo(exeItem).m_FilesArray) Then
                 Dim successfulCompile
@@ -301,6 +304,14 @@ Sub BuildInstallShieldProject(aVersionNum)
             'g_Build.UpdateInstallShieldVersion ISProject, Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34), aVersionNum
             'g_Build.RunCmd Chr(34) & g_Build.InstallShieldProjPath & "\ProjectDir.bat" & Chr(34)
            
+	    g_Build.WriteToDlgAndFile "Compiling InstallShield Project"
+            g_Build.RunCmd Chr(34) & "C:\Program Files\Common Files\InstallShield\IScript\Compile" & Chr(34) & " " & _
+                       Chr(34) & g_Build.InstallShieldProjPath & "\Script~1\setup.rul" & Chr(34) & " " & _
+                       Chr(34) & InstallShieldProgram & "\Script\IFX\Lib\ifx.obl" & Chr(34) & " " & _
+                       Chr(34) & InstallShieldProgram & "\Script\ISRT\Lib\isrt.obl" & Chr(34) & _
+                       " -I" & Chr(34) & InstallShieldProgram & "\Script\IFX\Include;" & _
+                       InstallShieldProgram & "\Script\ISRT\Include;" & g_Build.InstallShieldProjPath & "\Script Files" & Chr(34) & " "
+
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Generate CD Image"
             g_Build.RunCmd Chr(34) & installShieldBuild & Chr(34) & _
                             " -p" & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
