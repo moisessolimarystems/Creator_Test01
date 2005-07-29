@@ -2232,9 +2232,9 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
       UtilityQuery->SQL->Clear();
 
       if (key_record->non_perm_ktf == true)
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRoperatorSession = :operator_units, WHERE SKRid = :keyId ");
+         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRoperatorSession = :operator_units WHERE SKRid = :keyId ");
       else
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoperatorSession = :operator_units, WHERE SKRid = :keyId ");
+         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoperatorSession = :operator_units WHERE SKRid = :keyId ");
 
       UtilityQuery->ParamByName("operator_units")->AsInteger = spde_key->operatorSessionUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
@@ -2298,9 +2298,9 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       UtilityQuery->SQL->Clear();
 
       if (key_record->non_perm_ktf == true)
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRuserSession = :user_units, WHERE SKRid = :keyId ");
+         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRuserSession = :user_units WHERE SKRid = :keyId ");
       else
-         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRuserSession = :user_units, WHERE SKRid = :keyId ");
+         UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRuserSession = :user_units WHERE SKRid = :keyId ");
 
       UtilityQuery->ParamByName("user_units")->AsInteger = spde_key->userSessionUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;

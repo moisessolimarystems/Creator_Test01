@@ -696,15 +696,18 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       }
       else
       {
-         ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRstatus = 2, SKRoutput = :output, SKRoperatorSession = :operatorSession, SKRuserSession = :userSession, modules = :module_list where SKRid= :skr_id");
+         ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRstatus = 2, SKRoutput = :output, modules = :module_list where SKRid= :skr_id");
          if(key_record->pkey->productId == SPDE_PRODUCT)
          {
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRoperatorSession = :operatorSession, SKRuserSession = :userSession where SKRid= :skr_id");
                 ModuleDetailQuery->ParamByName("output")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->outputUnits;
                 ModuleDetailQuery->ParamByName("operatorSession")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->operatorSessionUnits;
                 ModuleDetailQuery->ParamByName("userSession")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->userSessionUnits;
          }
          else
+         {
                 ModuleDetailQuery->ParamByName("output")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spd_key->outputUnits;
+         }
       }
 
       ModuleDetailQuery->ParamByName("module_list")->AsBlob = updated_module_list;
