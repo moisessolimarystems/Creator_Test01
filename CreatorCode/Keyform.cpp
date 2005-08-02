@@ -1183,10 +1183,9 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
        }
 
        if( dlg->ShowModal() == IDYES )
-       {
-           index = dlg->passwordComboBox->ItemIndex;
-           unsigned short days = key_record->pkey->getKDPasswordDays(index);
-           createExtensionPassword(days);
+       {   //the index should be the value passed into createExtensionPassword. LicenseServer expects index into KDPasswordHour array
+           index = dlg->passwordComboBox->ItemIndex + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
+           createExtensionPassword(index);
        }
 
        delete dlg;
