@@ -790,6 +790,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
    //generate password by selecting a module...
    int pages(0);
    int ext(0);
+   int modID(0);
 
    //get selected list item, from list item get pointer to ModuleDetail structure
    TListItem* selected(ModuleList->Selected);
@@ -888,6 +889,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
           default:
                 break;
      }
+     modID = ppmModID + 5000;
    }
    else
    {
@@ -916,6 +918,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
           default:
                 break;
      }
+     modID = detail->id + 500;
    }
    //check if module is default
    if( key_record->pkey->isOnTrial() )
@@ -941,7 +944,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       }
 
    }
-   else if( spd_key->status == 2 || key_record->pkey->productId != SPDE_PRODUCT)//key is already permanent
+   else if( spd_key->status == 2 && key_record->pkey->productId != SPDE_PRODUCT)//key is already permanent
    {
       //check if license has ability to be incremented
       int available(ext < MAX_PPM_EXTENSIONS);
@@ -956,7 +959,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
          return false;
       }
    }
-   else if( spde_key->status == 2 || key_record->pkey->productId == SPDE_PRODUCT)//key is already permanent
+   else if( spde_key->status == 2 && key_record->pkey->productId == SPDE_PRODUCT)//key is already permanent
    {
       //check if license has ability to be incremented
       int available(ext < MAX_PPM_EXTENSIONS);
@@ -1099,7 +1102,9 @@ bool TModuleFrame::createPagesPerMinutePassword()
 
       // ICONVERT products have an SDRid of 10XX, and therefore have to check
       // to see if the product is ICONVERT or other.
-      ModuleDetailQuery->ParamByName("descid")->AsInteger = detail->id + 500;
+      ModuleDetailQuery->ParamByName("descid")->AsInteger = modID; // detail->id + 500;
+
+
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
 
