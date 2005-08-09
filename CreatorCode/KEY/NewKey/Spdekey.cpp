@@ -399,12 +399,12 @@ void SpdeProtectionKey::getPagesPerMinutePassword(ushort ext,
    if(pServer)
    {
       BSTR password;
-      DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
+      //DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
       if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
                                                    keyNumber,
                                                    productId,
                                                    ModID,
-                                                   ppm_struct,
+                                                   pages,
                                                    &password
                                                   )))
       {
