@@ -87,6 +87,23 @@ private:
 	static BYTE challenge_key_server_thisauthuser_private[];
 	static BYTE challenge_key_server_userauththis_public[];
 	
+	typedef std::map<long, long> ModuleLicenseMap;
+
+	class KeyInfo
+	{
+	public:
+		KeyInfo();
+		KeyInfo(const KeyInfo &k);
+
+		ModuleLicenseMap licenses_total;
+		ModuleLicenseMap licenses_allocated;
+		
+		bool KeyPresent;
+		bool KeyValid;
+		bool KeyLocked;
+		bool KeyObtained;
+	};
+
 	class ServerInfo
 	{
 	public:
@@ -96,7 +113,7 @@ private:
 		~ServerInfo();
 
 		_bstr_t name;
-		typedef std::vector<_bstr_t> KeyList;
+		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		KeyList keys;
 		
 		ISolimarLicenseSvrPtr LicenseServer;
@@ -115,6 +132,24 @@ private:
 	
 	HANDLE ServerListLock;
 	
+	// refresh the list of the keys on the currently connected servers
+	HRESULT RefreshKeyList();
+	// checks that all licenses checked out are accounted for by some key
+	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
+	// re-allocates any unallocated or invalidated licenses (if possible)
+	HRESULT ReallocateLicenses();
+	// checks if licenses are valid, if not, an attempt to reallocate licenses is made
+	HRESULT RefreshLicenses();
+	// removes any keys from the cache that are not present and have no obtained licenses
+	HRESULT RemoveObsoleteKeysFromCache();
+	// attempts to allocate licenses on the known-good keys in the cache
+	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
+	HRESULT ObtainLicensesInternal(long module_id, long license_count);
+	// attempts to deallocate licenses on keys that have 
+	//HRESULT ReleaseLicensesInternal(ModuleLicenseMap &licenses);
+	HRESULT ReleaseLicensesInternal(long module_id, long license_count);
+	
+	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
 	bool ManagesKey(_bstr_t key_ident);
 	
@@ -126,6 +161,9 @@ private:
 	ServerList m_servers;
 	bool m_single_key, m_lock_keys, m_initialized;	
 	_bstr_t m_specific_single_key_ident;
+	_bstr_t m_current_single_key;
+	long m_product, m_prod_ver_major, m_prod_ver_minor;
+	ModuleLicenseMap m_allocated_licenses;
 	
 	// user defined callback used by ILicensingMessage
 	//void* m_license_message_callback_context;

@@ -422,6 +422,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="1" offset="0x081" bits="1" name="Sort" unlimited="1"/>
 				<Module id="2"	offset="0x082" bits="1" name="Split" unlimited="1"/>
 				<Module id="3"	offset="0x083" bits="1" name="Finish" unlimited="1"/>
+				<Module id="4"	offset="0x084" bits="1" name="Concat" unlimited="1"/>				
 			</ModuleList>
 			<ProductList>
 				<Product id="12" name="PDF Utility">
@@ -429,6 +430,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
 					<ModuleInclude id="3" default="0"/>
+					<ModuleInclude id="4" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
