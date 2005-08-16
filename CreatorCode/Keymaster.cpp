@@ -288,7 +288,7 @@ void KeyMaster::getUserSessionPassword(SpdeProtectionKey* key,
                                    char* Password_String )
 {
    if(pTheServer)
-     key->getOutputPassword(user_sessions, pTheServer, Password_String);
+     key->getUserSessionPassword(user_sessions, pTheServer, Password_String);
 }
 
 //==============================================================================

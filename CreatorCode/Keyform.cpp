@@ -2278,7 +2278,7 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       return;
 
    //generate password
-   keyMaster->getOperatorSessionPassword(spde_key, user_sessions, password_string);
+   keyMaster->getUserSessionPassword(spde_key, user_sessions, password_string);
 
    if(!password_string)
    {
