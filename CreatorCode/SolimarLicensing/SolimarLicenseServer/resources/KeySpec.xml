@@ -619,6 +619,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="40"	offset="0x0AB" bits="1" name="XRocks Printer Controller" unlimited="1"/>
 				<Module id="41"	offset="0x0AA" bits="1" name="IPDS Print Controller" unlimited="1"/>
 				<Module id="42"	offset="0x0A9" bits="1" name="RJE::3211" unlimited="1"/>
+				<Module id="43"	offset="0x0A8" bits="1" name="AFPDS::IPDS" unlimited="1"/>
 				
 				
 				<!-- Module IDs identifying hardware -->
@@ -695,6 +696,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="40" default="1"/>
 					<ModuleInclude id="41" default="0"/>
 					<ModuleInclude id="42" default="0"/>
+					<ModuleInclude id="43" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>

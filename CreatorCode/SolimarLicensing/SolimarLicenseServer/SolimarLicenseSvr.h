@@ -181,7 +181,8 @@ public:
 	STDMETHOD(KeyReadRaw)(BSTR key_ident, VARIANT *pvtKeyData);
 
 	// ILicensingMessage
-	STDMETHOD(GetLicenseMessageList)(VARIANT *pvtMessageList);
+	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
+	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
 	
 	
 private:

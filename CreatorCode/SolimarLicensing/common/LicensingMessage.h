@@ -11,18 +11,26 @@ class LicensingMessage
 {
 public:
 	LicensingMessage();
-	LicensingMessage(std::wstring &key, DWORD msg_type, HRESULT hr, VARIANT msg_time, std::wstring &msg);
+	LicensingMessage(std::wstring &server, std::wstring &key, VARIANT msg_time, DWORD msg_type, DWORD msg_id, std::wstring &msg, HRESULT hr, DWORD status, VARIANT expire_date, DWORD trial_hours);
 	LicensingMessage(const LicensingMessage &m);
 	LicensingMessage(const VARIANT &vtMessage);
 	
 	operator VARIANT();
 	operator std::wstring();
 	
+	std::wstring key_server;
 	std::wstring key_ident;
-	DWORD message_type;
-	HRESULT error;
 	VARIANT timestamp;
+	
+	DWORD message_type;
+	DWORD message_id;
 	std::wstring message;
+	HRESULT error;
+	
+	// trial info
+	DWORD key_status;
+	VARIANT key_expire_date;
+	DWORD key_trial_hours;
 };
 
 class LicensingMessageList : public std::deque<LicensingMessage>

@@ -20,8 +20,10 @@
 #include <vector>
 #include <map>
 
-#include "../common/InProcPtr.h"
+#include "..\common\InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
+#include "..\common\LicensingMessage.h"
+
 
 // CSolimarLicenseMgr
 
@@ -75,12 +77,10 @@ public:
 	STDMETHOD(ModuleLicenseRelease)(long module_id, long count);
 	
 	// ILicensingMessage
-	STDMETHOD(GetLicenseMessageList)(VARIANT *pvtMessageList);
+	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
+	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
 	
 private:
-	
-	//typedef void (*LicenseMessageCallbackPtr)(void* pContext, BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);	
-	//_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr,__uuidof(ISolimarLicenseSvr));
 	
 	static BYTE challenge_key_manager_thisauthuser_public[];
 	static BYTE challenge_key_manager_userauththis_private[];
@@ -99,9 +99,16 @@ private:
 		ModuleLicenseMap licenses_allocated;
 		
 		bool KeyPresent;
+		bool KeyActive;
 		bool KeyValid;
 		bool KeyLocked;
 		bool KeyObtained;
+		
+		// keep track of trial key information
+		bool KeyTrialInfoInitialized;
+		bool KeyIsTrial;
+		long KeyTrialHoursLeft;
+		long KeyExpiresDaysLeft;
 	};
 
 	class ServerInfo
@@ -131,6 +138,7 @@ private:
 	DWORD m_ui_level;
 	
 	HANDLE ServerListLock;
+	HANDLE MessageListLock;
 	
 	// refresh the list of the keys on the currently connected servers
 	HRESULT RefreshKeyList();
@@ -146,9 +154,11 @@ private:
 	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
 	HRESULT ObtainLicensesInternal(long module_id, long license_count);
 	// attempts to deallocate licenses on keys that have 
-	//HRESULT ReleaseLicensesInternal(ModuleLicenseMap &licenses);
 	HRESULT ReleaseLicensesInternal(long module_id, long license_count);
+	// adds a message to the list of unretrieved messages
+	HRESULT AddLicensingMessage(LicensingMessage &message);
 	
+	LicensingMessageList licensing_message_cache;
 	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
 	bool ManagesKey(_bstr_t key_ident);
@@ -164,11 +174,7 @@ private:
 	_bstr_t m_current_single_key;
 	long m_product, m_prod_ver_major, m_prod_ver_minor;
 	ModuleLicenseMap m_allocated_licenses;
-	
-	// user defined callback used by ILicensingMessage
-	//void* m_license_message_callback_context;
-	//LicenseMessageCallbackPtr m_license_message_callback;
-	
+		
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
 	static bool isAutoUiStyleDialog(DWORD ui_level);
