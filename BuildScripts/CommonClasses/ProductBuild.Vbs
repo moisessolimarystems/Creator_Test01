@@ -730,9 +730,9 @@ Class CProductBuild
            Dim fldr
            Set f = mFSO.GetFolder(aFldr)
            Set sf = f.SubFolders
-           nResult = CleanFiles(aFldr, ExclusionList())
-		   For Each f1 In sf
-				nResult = CleanFolders(f1.Path, ExclusionList())  'need to pass in paths
+           nResult = CleanFiles(aFldr, ExclusionList)
+	   For Each f1 In sf
+		nResult = CleanFolders(f1.Path, ExclusionList)  'need to pass in paths
            Next	
 	End Function
 	
@@ -746,17 +746,17 @@ Class CProductBuild
          Dim f, f1,fc
          Dim Path, nResult
          Set f = mFSO.GetFolder(aFolder)
-         Set fc = f.Files 'file list
-		 nResult = false	
+         Set fc = f.Files 'file list	
          For Each f1 In fc
+              nResult = false	
               For Each ext In ExclusionList
-					If InStr(f1.Name, ext) Then
-						nResult = true
-					End If		
-			  Next
+			If InStr(f1.Name, ext) Then
+				nResult = true
+			End If		
+	      Next
               If nResult <> true Then
-				 mFSO.DeleteFile f1, true
-			  End If
+		      mFSO.DeleteFile f1, true	
+	      End If
          Next	 
    End Function
 
@@ -845,10 +845,13 @@ Class CProductBuild
    '==================================================================
    Function ValidateInstallSource(aMKS, aMoveFiles)
 	
+		Dim ExclusionList 
+		ExclusionList = Array(".pj")
 		aMoveFiles.CopyFileOrFolder "Folder", InstallSrcPath, MainProjPath & "\BuildInstallSource", True
 		RunCmd ("attrib -r " & InstallSrcPath & "\*.* /S")
-		aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True	
-		aMKS.Revert MainPJFile, InstallSrcPJFile
+		'aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True	
+		CleanFolders InstallSrcPath, ExclusionList
+		aMKS.Refresh MainPJFile, InstallSrcPJFile
 		aMoveFiles.CopyFileOrFolder "Folder", InstallSrcPath, MainProjPath & "\ArchivedInstallSource", True
 		RunCmd ("attrib -r " & InstallSrcPath & "\*.* /S")
 		aMoveFiles.DeleteFileOrFolder "Folder", InstallSrcPath, True

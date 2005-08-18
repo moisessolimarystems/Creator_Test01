@@ -1,7 +1,7 @@
 Class CProductReport
     Private mShell, mFSO, mStartTime, mReportLogFile, mDebug, mCmdTemp, mCancelDiag
     Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mReleaseFile, mExecInfo, SolSearcherSpecialFS, OutputBasePath
-    Private mSrcLabel, mLastBuild, mLastRelease, mBegDevPath, mLastLabel, mPopDataBase, mProject, mLastBuildLabel
+    Private mSrcLabel, mLastBuild, mLastRelease, mBegDevPath, mLastLabel, mPopDataBase, mProject, mLastBuildLabel, mLicenseSummary 
     Private mGenTextFile, mRootProjectDir, mGenAllRelease, mProductChoice, mEmailChoice, mOneStepBldChoice, mStartLabel, mEndLabel
     Private mLogFileName, mInputFile, mksProgram, mCurrentDir, mNumPJFiles, mPJFileArray(2), mFilePathArray(2), mFileNameArray(10), fileNameCount
     Private eReportFilesError, eEmailSendError, eCancel, mMKS , mFileNameCount			
@@ -77,6 +77,7 @@ Class CProductReport
         '       -SLB            Starting label
         '       -ELB            Ending label
         '       -DB             Y or N
+	'       -LS		Y or N
       '************************************************************************************************************
     Public Sub GetParams(aMKS)
         Dim iParam, CodeBuildType, ExistingDevPath, VersionNum
@@ -116,6 +117,8 @@ Class CProductReport
                                 mEndLabel = wscript.Arguments(iParam + 1)
                         Case "-DB"              ' debug option
                                 mDebug = wscript.Arguments(iParam + 1)
+			Case "-LS"
+				mLicenseSummary = wscript.Arguments(iParam + 1)
                  End Select
             Next
 	    Set mMKS = aMKS	
@@ -764,7 +767,7 @@ Function GetEmailBody()
                  & "    " & GetOutputPath & "VersionDifferences\" & ProductChoice & vbNewLine _
                  & FileString & vbNewLine & vbNewLine & String1 & vbNewLine & vbNewLine _
                  & "If you have any questions, please contact me" _
-                 & vbNewLine & vbNewLine & "Alan Chou"
+                 & vbNewLine & vbNewLine & "Alan Chou"	
     End If
 
 End Function
@@ -910,7 +913,7 @@ Sub SetStartLabel()
 End Sub
 
 Sub GenerateTextFile(g_Access)
-
+		Dim fileName
                 WriteToDlgAndFile "Generating Reports"
                 mProject = CheckProject(mFilePathArray(0), mPJFileArray(0))  'check to see if is a variant project or not
                 mCancelDiag.UpdateDisplay "     Project=" & Project & "   0 = main trunk, 1 = var devpath"
@@ -918,24 +921,121 @@ Sub GenerateTextFile(g_Access)
 			mEndLabel = FindLabel("LB")
 		End If
 				
-                mCancelDiag.UpdateDisplay "     LastBuildLabel: " & lastBldLabel
+        mCancelDiag.UpdateDisplay "     LastBuildLabel: " & lastBldLabel
 
-                If mLastBuild = "Y" Then      			   'Last Build
+        If mLastBuild = "Y" Then      			   'Last Build
 			CreateDescAndLabelReports mStartLabel, mEndLabel
-                ElseIf mLastRelease = "Y" Then      		   'Last Release
+        ElseIf mLastRelease = "Y" Then      		   'Last Release
 			mEndLabel = FindLabel("LR")
 			CreateDescAndLabelReports mStartLabel, mEndLabel
-                ElseIf mBegDevPath = "Y" Then      			   'Beginning of Dev Path
-                        CreateDescAndLabelReports mStartLabel, mEndLabel
-                ElseIf mLastLabel = "Y" Then        		   'From Label
+        ElseIf mBegDevPath = "Y" Then      			   'Beginning of Dev Path
+            CreateDescAndLabelReports mStartLabel, mEndLabel
+        ElseIf mLastLabel = "Y" And mLicenseSummary <> "Y" Then        		   'From Label
 			CreateDescAndLabelReports mStartLabel, mEndLabel                    
-                ElseIf mLastBuildLabel = "Y" Then   		   'Last Build Label, only used by 1-Step-Build
+        ElseIf mLastBuildLabel = "Y"  Then   		   'Last Build Label, only used by 1-Step-Build
                         CreateDescAndLabelReports mStartLabel, mEndLabel                   
+		ElseIf mLicenseSummary = "Y" Then 'only for solimar licensing report that lists all labels using license version mStartLabel
+			fileName = "LicenseSummary_" + ChangeDotToLine(g_Report.StartLabel) + ".txt"	
+			g_Access.CreateTextFileLicenseLabels mStartLabel,  fileName 
+			FormatLicenseSummary mReportPath  & "\Reports\" & fileName, mStartLabel
 		Else						   'startlabel <> "" case
 			CreateDescAndLabelReports StartLabel, EndLabel 	
-                End If
+        End If
                
     End Sub
+
+Function IsLicenseAvailable(Prefix)
+	Dim Products
+	Dim i
+
+	Products = Array("Creator", "SOLscript", "SPDE", "PdfEngine")
+	IsLicenseAvailable = 0
+	For i = 0 To UBound(Products)
+		If Products(i) = Prefix Then
+			IsLicenseAvailable = 1
+			Exit For
+		End If
+	Next
+End Function
+
+'*****************************************************************
+' Function Name : IsReleaseLabel
+' Parameter     : Label - text with name and version
+' Description   : Extracts version and name from Label and then 
+'                 searches in the release file to see whether or
+'                 not the label has been released.
+'*****************************************************************
+Function IsReleaseLabel(Label)
+	Dim Prefix, Version, FileName
+	Dim Line
+
+ 	Version = StripAllPrefix(Label)
+	Prefix = Left(Label, Len(Label) - Len(Version))	'grab prefix for element name
+	FileName = mReportPath & "\Product_Scripts\" & Prefix & "\Configuration\" & Prefix & "Release.txt"
+	Set readFile = mFSO.OpenTextFile(FileName)
+
+	IsReleaseLabel = 0	
+	Do While Not readFile.AtEndOfStream
+		Line = Trim(readFile.ReadLine)
+		If Line = Label Then
+		    IsReleaseLabel = 1
+		    Exit Do
+		End If		
+	Loop
+	readFile.Close
+End Function
+
+Sub FormatLicenseSummary(FileName, Label)
+	Dim Header, Root
+	Dim Output, Line, Prefix
+	Output = Left(FileName, Len(FileName) - 4) & ".xml"
+	Set readFile = mFSO.OpenTextFile(FileName)
+	Set writeFile = mFSO.CreateTextFile(Output)
+	
+	Prefix =  ""
+	Header =  "<?xml version=""1.0"" encoding=""ISO-8859-1""?>" & vbNewLine & _
+			  "<?xml-stylesheet type=""text/xsl"" href=""LicenseSummary.xsl""?>"
+	Root   =  "<Licensing Version=" & Chr(34) & StripAllPrefix(Label) & Chr(34) & ">"
+	Body   =  ""
+	'initial conditions
+	Line = Trim(Replace(readFile.ReadLine, Chr(34), ""))
+	Do While Not readFile.AtEndOfStream		
+		Version = StripAllPrefix(Line)
+		Prefix = Left(Line, Len(Line) - Len(Version))	'grab prefix for element name
+		If (IsLicenseAvailable(Prefix) = 1) Then
+			Body = Body & "<Product Name=" & Chr(34) &  Prefix & Chr(34) & ">" + vbNewLine 	
+			Do While InStr(Line, Prefix) > 0 And Not readFile.AtEndOfStream			
+				If IsReleaseLabel(Line) = 1 Then
+					Body = Body + "<Label Released='true'>" & Version & "</Label>" & vbNewLine
+				Else
+					Body = Body + "<Label>" & Version & "</Label>" & vbNewLine
+				End If
+				Line = Trim(Replace(readFile.ReadLine, Chr(34), ""))	
+				Version = StripAllPrefix(Line)
+			Loop
+			If readFile.AtEndOfStream Then		
+				If IsReleaseLabel(Line) = 1 Then
+					Body = Body + "<Label Released='true'>" & Version & "</Label>" & vbNewLine
+				Else
+					Body = Body + "<Label>" & Version & "</Label>" & vbNewLine
+				End If
+			End If
+			Body = Body & "</Product>" + vbNewLine	 'close product element		
+		Else
+			Line = Trim(Replace(readFile.ReadLine, Chr(34), ""))
+		End If	
+	Loop	
+	'close body
+	EndRoot = "</Licensing>"
+
+	readFile.Close
+	writeFile.writeLine Header
+	writeFile.writeLine Root
+	writeFile.writeLine Body
+	writeFile.WRiteLine EndRoot
+	writeFile.Close
+	
+End Sub
     
 Sub CreateDescAndLabelReports(StartLabel, EndLabel)
 			mFileNameArray(mFileNameCount) = FileNamePrefix & "ReportDesc" & ChangeDotToLine(g_Report.StartLabel) & "To" & ChangeDotToLine(g_Report.EndLabel) & ".txt"
