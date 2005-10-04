@@ -961,7 +961,8 @@ Class CProductBuild
         Dim current, output
         current = GetBuildVersion(aNextVersion)
         WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + Right(mNewNextVersion, 4)
-        If Not g_DEBUG Then
+        RunCmd "attrib -r " + mInputFile
+	If Not g_DEBUG Then
             UpdateFileVersion mInputFile, aCurrentVersion, " " + current
             UpdateFileVersion mInputFile, aNextVersion, " " + Right(mNewNextVersion, 4)
         End If
