@@ -1534,14 +1534,14 @@ void KeyMaster::applyModPassword(SKeyRecord* keyrec, unsigned char module_id, un
     {
            SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
            // increment module
-           spde_key->setLicense(module_id, units+1);
+           spde_key->setLicense(module_id, units);
     }
     else
     {
            SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
            // increment module
            //spd_key->setLicense(module_id, spd_key->getLicense(module_id)+1);
-           spd_key->setLicense(module_id, units+1);
+           spd_key->setLicense(module_id, units);
     }
 }
 

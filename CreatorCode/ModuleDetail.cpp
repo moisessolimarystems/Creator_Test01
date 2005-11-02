@@ -608,6 +608,12 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          // SolScript module passwords are not incremental
          if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
             units = 0;
+         //applies module password to key
+         keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
+
+         if (key_record->pkey->productId >= PDF_UTILITY)
+                units++;
+
          if(key_record->pkey->productId == SPDE_PRODUCT)
                  keyMaster->getModulePassword(spde_key,
                                               detail->id,
@@ -623,27 +629,32 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                               key_record->pkey->productVersion,
                                               units,
                                               password_string
-                                             );
-         //applies module password to key
-         keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
+                                              );
+
       }
    }
    else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true) && key_record->pkey->productId != SPDE_PRODUCT) //key is already permanent
    {
       if (units == -1)
          units = spd_key->getLicense(detail->id);
+
       //check if license has ability to be incremented
       int available(detail->max - units);
       if( available > 0 )
       {
+         keyMaster->applyModPassword(key_record, detail->id, units+1);
+
+         if (key_record->pkey->productId >= PDF_UTILITY) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
+                units++;                                         //so need to increment units to pass to license server.
+
          keyMaster->getModulePassword(spd_key,
                                       (uchar)detail->id,
                                       static_cast<ProductId>(key_record->pkey->productId),
                                       key_record->pkey->productVersion,
                                       units,
                                       password_string
-                                     );
-         keyMaster->applyModPassword(key_record, detail->id, units);
+                                      );
+
       }
       else
       {
@@ -666,7 +677,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                         units+1,
                                        password_string
                                        );         //need to do units + 1 to get password for module + 1
-           keyMaster->applyModPassword(key_record, detail->id, units); // units is the current amount, units + 1 done inside applymod
+           keyMaster->applyModPassword(key_record, detail->id, units+1);
         }
         else
         {
