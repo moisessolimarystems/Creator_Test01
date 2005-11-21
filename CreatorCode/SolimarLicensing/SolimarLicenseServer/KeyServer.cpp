@@ -1184,14 +1184,14 @@ void KeyServer::HeartbeatCheck()
 	DWORD cur_time = (DWORD)time(0);
 	for (HeartbeatList::iterator heartbeat = heartbeats.begin(); heartbeat != heartbeats.end(); ++heartbeat)
 	{
-		//xxx debug
-		wchar_t debug_buf[1024];
-		_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-		debug_buf[1023] = 0;
-		OutputDebugStringW(debug_buf);
-		
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
+			//xxx debug
+			wchar_t debug_buf[1024];
+			_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			debug_buf[1023] = 0;
+			OutputDebugStringW(debug_buf);
+
 			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
 						
 			hr = LicenseReleaseAll(heartbeat->first);
