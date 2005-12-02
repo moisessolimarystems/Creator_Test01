@@ -631,6 +631,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				
 				<!-- Module IDs identifying resources -->
 				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
+				<Module id="201"	offset="0x174" bits="1" name="TCP IP Output Dynamic Host Selection" unlimited="1"/>
 				
 				<!-- Output Pool module -->
 				<Module id="240"	offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
@@ -705,6 +706,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="105" default="0"/>
 					
 					<ModuleInclude id="200" default="0"/>
+					<ModuleInclude id="201" default="0"/>
 					<ModuleInclude id="240" default="0"/>
 					
 					<ModuleInclude id="300" default="0"/>
