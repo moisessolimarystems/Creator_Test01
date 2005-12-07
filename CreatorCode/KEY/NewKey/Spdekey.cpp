@@ -226,6 +226,8 @@ uchar SpdeProtectionKey::getLicense(ushort mod_id) const
               case 200:
                    units_licensed = resourceModuleCells[0].b ;
                    break;
+              case 201:
+                   units_licensed = resourceModuleCells[0].c;
               default: break;
        }
    }
@@ -499,6 +501,9 @@ void SpdeProtectionKey::setLicense(/*ushort index,*/ ushort mod_id, ushort units
                    break;
               case 200:
                    resourceModuleCells[0].b = units_licensed;
+                   break;
+              case 201:
+                   resourceModuleCells[0].c = units_licensed;
                    break;
               default: break;
        }
