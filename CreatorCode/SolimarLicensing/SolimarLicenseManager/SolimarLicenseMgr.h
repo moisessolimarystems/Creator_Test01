@@ -30,7 +30,7 @@
 [
 	coclass,
 	threading("free"),
-	support_error_info("ISolimarLicenseMgr"),
+	support_error_info("ISolimarLicenseMgr2"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -38,7 +38,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr,
+	public ISolimarLicenseMgr2,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -75,6 +75,9 @@ public:
 	STDMETHOD(ModuleLicenseInUse)(long module_id, long *count);
 	STDMETHOD(ModuleLicenseObtain)(long module_id, long count);
 	STDMETHOD(ModuleLicenseRelease)(long module_id, long count);
+
+	// ISolimarLicenseMgr2
+	STDMETHOD(ModuleLicenseSerialNumbers)(long module_id, VARIANT *pvtSerialNumberList);
 	
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
