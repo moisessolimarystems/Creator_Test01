@@ -17,7 +17,8 @@ Class CProductBuild
         mStartTime = Time
  		mErrcount = 0
         
-		If mFSO.FileExists("..\Done.txt") = True Then
+	Err.Clear
+	If mFSO.FileExists("..\Done.txt") = True Then
             mFSO.DeleteFile "..\Done.txt", 1
         End If
         If mFSO.FileExists("..\Cancelled.txt") = True Then
@@ -37,6 +38,9 @@ Class CProductBuild
 
         mFSO.CreateTextFile (mBuildPath & "\logFolder\StandardOutput.txt")
         mFSO.CreateTextFile (mBuildPath & "\logFolder\StandardError.txt")
+        If Err.Number <> 0 Then
+               	BuildError "Unable to create standard output/error files : " + Err.Description
+        End If 
 
     End Sub
 
@@ -44,7 +48,8 @@ Class CProductBuild
     Public Sub SetMembers(aAveBuildTime, aProductName)
         mProductName = aProductName
         mBuildDialog.DisplayCancelDialog "Time Started: " & Time, CInt(aAveBuildTime), CStr(mProductName)
-        If Not mFSO.FolderExists(mBuildPath + "\logFolder") Then
+        Err.Clear
+	If Not mFSO.FolderExists(mBuildPath + "\logFolder") Then
             mFSO.CreateFolder mBuildPath + "\logFolder"
         End If
         Dim CurDate, CurTime
@@ -53,6 +58,9 @@ Class CProductBuild
         mLogFileName = mBuildPath & "\logFolder\buildLog.txt"
         
         Set mBuildLogFile = mFSO.CreateTextFile(mLogFileName)
+        If Err.Number <> 0 Then
+               	BuildError "Unable to create build log file : " + Err.Description
+        End If 
     End Sub
 
 
@@ -388,6 +396,9 @@ Class CProductBuild
             If aExitCode = 1 And InStr(aCmdLine, "dirsizes.exe") <> 0 Then
                     HasError = False
             End If
+	    If aExitCode = 1 And InStr(aCmdLine, "devenv") <> 0 Then
+		HasError = False
+	    End If
         If HasError Then
             BuildError "Error running command: " + aCmdLine & vbNewLine + "Refer to logFolder\StandardOutput.txt " + _
                        "and logFolder\StandardError.txt to see the output from the command that failed. Exit code: " + CStr(aExitCode)
@@ -439,6 +450,7 @@ Class CProductBuild
 
 
         Function CreateNewFolder(Folder)
+		Err.Clear
 
                 'CheckPath (Folder)  '%%%% are we supposed to do this or not???
                 If Not mFSO.FolderExists(Folder) Then
@@ -450,6 +462,9 @@ Class CProductBuild
                             BuildError "Unable to create the folder: " + Folder + ". " + Err.Description
                         End If
                 End If
+	        If Err.Number <> 0 Then
+               		BuildError "Unable to create new folder : " + Folder + " : " + Err.Description
+        	End If 
 
         End Function
 
@@ -472,6 +487,7 @@ Class CProductBuild
                 WriteToDlgAndFile "Updating File Version: " & fileInput
                 Dim output, readFile, writeFile
                 output = "temp"
+                Err.Clear
                 Set readFile = mFSO.OpenTextFile(fileInput)
                 Set writeFile = mFSO.CreateTextFile(output)
                 UpdateFileVersion = 0
@@ -493,6 +509,9 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile fileInput, 1
                 mFSO.MoveFile output, fileInput
+		If Err.Number <> 0 Then
+                    BuildError "Unable to update file version for: " + fileInput + " : " + Err.Description
+                End If
 
         End Function
 
@@ -502,6 +521,7 @@ Class CProductBuild
                 WriteToDlgAndFile "Updating File: " & inputFile
                 Dim output, bRightSection, readFile, writeFile
                 output = "temp"
+                Err.Clear
                 bRightSection = False
                 Set readFile = mFSO.OpenTextFile(inputFile)
                 Set writeFile = mFSO.CreateTextFile(output)
@@ -529,6 +549,9 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile inputFile, 1
                 mFSO.MoveFile output, inputFile
+		If Err.Number <> 0 Then
+                    BuildError "Unable to update file for: " + fileInput + " with " + inputFile + " : " + Err.Description
+                End If
 
         End Function
 
@@ -538,6 +561,7 @@ Class CProductBuild
                 WriteToDlgAndFile "Updating File: " & inputFile
                 Dim output, readFile, writeFile
                 output = "temp"
+                Err.Clear
                 Set readFile = mFSO.OpenTextFile(inputFile)
                 Set writeFile = mFSO.CreateTextFile(output)
                 Dim Line
@@ -553,6 +577,9 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile inputFile, 1
                 mFSO.MoveFile output, inputFile
+		If Err.Number <> 0 Then
+                    BuildError "Unable to update file for: " + inputFile + " with " + newPattern + " : " + Err.Description
+                End If                
 
         End Function
  
@@ -580,6 +607,7 @@ Class CProductBuild
                 WriteToDlgAndFile "Updating File Version: " & fileInput
                 Dim output, readFile, writeFile, FileText, ReplacedText
                 output = "temp"
+                Err.Clear
                 Set readFile = mFSO.OpenTextFile(aFilePath)
                 Set writeFile = mFSO.CreateTextFile(output)
 				FileText = readFile.ReadAll
@@ -590,6 +618,9 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile aFilePath, 1
                 mFSO.MoveFile output, aFilePath
+		If Err.Number <> 0 Then
+                    BuildError "Unable to update file for: " + aFilePath + " with " + aPattern + " : " + Err.Description
+                End If   
 
         End Function
 
@@ -599,6 +630,7 @@ Class CProductBuild
 
                 Dim output, bRightSection, readFile, writeFile
                 output = "temp"
+                Err.Clear
                 bRightSection = False
                 Set readFile = mFSO.OpenTextFile(inputFile)
                 Set writeFile = mFSO.CreateTextFile(output)
@@ -624,6 +656,9 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile inputFile, 1
                 mFSO.MoveFile output, inputFile
+		If Err.Number <> 0 Then
+                    BuildError "Unable to update file for: " + inputFile + " with " + patternKey + " : " + Err.Description
+                End If   
 
         End Function
 
@@ -728,12 +763,16 @@ Class CProductBuild
 	Function CleanFolders(aFldr, ByRef ExclusionList())
 		   Dim f, f1, sf, nResult
            Dim fldr
+	   Err.Clear
            Set f = mFSO.GetFolder(aFldr)
            Set sf = f.SubFolders
            nResult = CleanFiles(aFldr, ExclusionList)
 	   For Each f1 In sf
 		nResult = CleanFolders(f1.Path, ExclusionList)  'need to pass in paths
            Next	
+	   If Err.Number <> 0 Then
+                BuildError "Unable to clean folder: " + aFldr + " : " + Err.Description
+           End If   
 	End Function
 	
 	'****************************************************************************
@@ -745,6 +784,7 @@ Class CProductBuild
 	Function CleanFiles(aFolder, ByRef ExclusionList())
          Dim f, f1,fc
          Dim Path, nResult
+	 Err.Clear
          Set f = mFSO.GetFolder(aFolder)
          Set fc = f.Files 'file list	
          For Each f1 In fc
@@ -757,7 +797,10 @@ Class CProductBuild
               If nResult <> true Then
 		      mFSO.DeleteFile f1, true	
 	      End If
-         Next	 
+         Next
+	 If Err.Number <> 0 Then
+              BuildError "Unable to clean files in : " + aFolder + " : " + Err.Description
+         End If   	 
    End Function
 
 
@@ -772,12 +815,16 @@ Class CProductBuild
     Function CompareFolders(aFldr, bFldr)
            Dim f, f1, sf, nResult
            Dim fldr
+	   Err.Clear
            Set f = mFSO.GetFolder(aFldr)
            Set sf = f.SubFolders
            nResult = CompareFiles(aFldr, bFldr)
 		   For Each f1 In sf
 				nResult = CompareFolders(f1.Path, bFldr & "\" & f1.Name)  'need to pass in paths
            Next	
+	   If Err.Number <> 0 Then
+              BuildError "Unable to compare folders : " + aFldr + " and " + bFldr + " : " + Err.Description
+           End If  
     End Function
 
     '***************************************************************************************
@@ -792,6 +839,7 @@ Class CProductBuild
          Dim f, f1, f2, fc
          Dim Path, nResult, pos
          Dim date1, date2 ', time1, time2   add time later
+	 Err.Clear
          Set f = mFSO.GetFolder(aFolder)
          Set fc = f.Files 'file list
 		 CompareFiles = True	
@@ -816,6 +864,9 @@ Class CProductBuild
 				End If		
               End If
          Next
+         If Err.Number <> 0 Then
+              BuildError "Unable to compare files in " + aFolder + " and " + bFolder + " : " + Err.Description
+         End If  
 	 
    End Function
    '=================================================================
@@ -868,6 +919,7 @@ Class CProductBuild
             Name = VersionToNewTitle(aVersionNum, aName)
             WriteToDlgAndFile "creating self extracting exe: " + aName + ".exe"
             destinationFile = Path + "\Projects\" + Name + ".pfw"
+	    Err.Clear
             If mFSO.FileExists(destinationFile) Then
                     mFSO.DeleteFile destinationFile, 1
             End If
@@ -880,6 +932,9 @@ Class CProductBuild
             SourceWebPackageExe = Path + "\pftwwiz.exe"
             RunCmd Chr(34) + SourceWebPackageExe + Chr(34) + " " + Chr(34) + destinationFile + Chr(34) + " -a -s"
 			CreateSelfExtractingEXE = Name + ".exe"
+	    If Err.Number <> 0 Then
+                BuildError "Unable to create self extracting exe : " + aSetupName + " : " + Err.Description
+            End If  
     End Function
 
     'ex. Changes 5.01.000001 ==> SPD5_01_000001
@@ -974,6 +1029,7 @@ Class CProductBuild
 	        Set MKS = New CMKS
 	        Set MKS.Build = Me
 			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+		Err.Clear
                 Set readFile = mFSO.OpenTextFile(mInputFile)
                 Dim check, Line, pos
                 check = 0
@@ -989,7 +1045,10 @@ Class CProductBuild
                         End If 
                 Loop
                 readFile.Close
-			Set MKS = Nothing
+		Set MKS = Nothing
+	   	If Err.Number <> 0 Then
+                	BuildError "Unable to get build version for : " + aPattern + " : " + Err.Description
+          	End If 
     End Function
     
     Function GetVersionFromFile(aFile, aPattern, aKey)
@@ -1006,6 +1065,9 @@ Class CProductBuild
                 End If
         Loop
         readFile.Close
+  	If Err.Number <> 0 Then
+               	BuildError "Unable to get version from file : " + aFile + " : " + Err.Description
+       	End If 
     End Function
         
     Function IsFileEmpty(aFile)
@@ -1018,6 +1080,9 @@ Class CProductBuild
                 IsFileEmpty = True
            End If
            readFile.Close
+     	   If Err.Number <> 0 Then
+               	BuildError "Unable to determine if file is empty : " + aFile + " : " + Err.Description
+       	   End If 
     End Function
                  
     Private Function FormatNextVersionNum()
