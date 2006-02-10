@@ -964,8 +964,9 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		switch(key_status)
 		{
 		case INITIAL_TRIAL:
-			if (key_type==KEYDevelopment)
-				WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
+			////Causes key to expire immediately, not sure why in is in here.
+			//if (key_type==KEYDevelopment)
+			//	WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
 			WriteHeader(_bstr_t(L"Initial Counter"), initial_counter ? --initial_counter : 0);
 			break;
 		case EXTENDED_TRIAL:
@@ -973,8 +974,9 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		case EXTENDED_TRIAL3:
 		case EXTENDED_TRIAL4:
 		case EXTENDED_TRIAL5:
-			if (key_type==KEYDevelopment)
-				WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
+			////Causes key to expire immediately, not sure why in is in here.
+			//if (key_type==KEYDevelopment)
+			//	WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
 			WriteHeader(_bstr_t(L"Extended Counter"), extended_counter ? --extended_counter : 0);
 			break;
 		default:
