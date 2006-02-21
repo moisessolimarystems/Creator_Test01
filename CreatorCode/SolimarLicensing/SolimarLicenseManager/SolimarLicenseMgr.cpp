@@ -12,11 +12,11 @@
 #include "..\SolimarLicenseServer\KeyMessages.h"
 #include "resource.h"
 #include <string>
+#include "list"
 #include <time.h>
 #include <comdef.h>
 #include <math.h>
 #include <stdio.h>
-
 #define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EC_MANAGER_NOT_INITIALIZED
 
 BYTE CSolimarLicenseMgr::challenge_key_manager_thisauthuser_public[] = {
@@ -197,6 +197,10 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 {
 	SafeMutex mutex(ServerListLock);
 
+	//Free up all the licenses
+	for (ModuleLicenseMap::iterator m = m_allocated_licenses.begin(); m != m_allocated_licenses.end(); ++m)
+		ModuleLicenseRelease(m->first, m->second);
+
 	while(!m_servers.empty())
 	{
 		m_servers.erase(m_servers.begin());
@@ -351,6 +355,12 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count)
 {
+	//static const MAX_MESSAGE_SIZE = 1024;
+	//wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
+	//_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"ModuleLicenseRelease module_id=%d, count=%d", module_id, count);
+	//EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, MT_INFO);
+
+
 	HRESULT hr = S_OK;
 	
 	ENSURE_INITIALIZED;
@@ -369,7 +379,112 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	
 	return S_OK;
 }
+STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARIANT *pvtSerialNumberList)
+{
+	HRESULT hr = S_OK;
+	ENSURE_INITIALIZED;
+	SafeMutex mutex(ServerListLock);
+	std::list<unsigned long> serialNumberList;// = new std::list<unsigned long>();
+	// for each server
+	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
+	{
+		// get the key list form the server
+		VARIANT vtKeyList;
+		hr = server->second.LicenseServer->KeyEnumerate(&vtKeyList);
+		if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+		{
+			VARIANT *pvtKeyIdent;
+			if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+			{
+				// for each key on the server
+				for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)
+				{
+					_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+					VARIANT vtKeyProductID, vtKeyProductVersion;
+					
+					// check that the key is present and valid
+					VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
+					hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
+					if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+					hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
+					if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+					hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+					if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+					
+					// check that the key has the requisite product version and etc.
+					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+					if (FAILED(hr)) {hr = S_OK; continue;}
+					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+					if (FAILED(hr)) {hr = S_OK; continue;}
+					
+					// if the product id and product version requirements are satisfied
+					if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+					{
+						// if a specific key is requested, but this one is not it, skip this key
+						if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
+						{
+							// refresh the cache of licenses on the key
+							// for each module in the key spec for the product
+							for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+							{
+								if (module_id == static_cast<long>(module->id) && module->isLicense)
+								{
+									VARIANT vtKeyNum, vtCustNum;
+									VariantInit(&vtKeyNum);
+									VariantInit(&vtCustNum);
+									hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Key Number"].id, &vtKeyNum);
+									if (FAILED(hr)) {hr = S_OK; continue;}
+									hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Customer Number"].id, &vtCustNum);
+									if (FAILED(hr)) {hr = S_OK; continue;}
 
+									serialNumberList.push_back((vtCustNum.uiVal << 16) + vtKeyNum.uiVal);
+
+									VariantClear(&vtKeyNum);
+									VariantClear(&vtCustNum);
+									break;
+								}
+							}						
+						}
+					}
+				}
+				SafeArrayUnaccessData(vtKeyList.parray);
+			}
+		}
+	}
+
+	VariantInit(pvtSerialNumberList);
+	pvtSerialNumberList->vt = VT_ARRAY | VT_UI4;
+
+	pvtSerialNumberList->parray = SafeArrayCreateVector(VT_UI4, 0, serialNumberList.size()>0 ? (ULONG)serialNumberList.size() : 1);
+	if(!pvtSerialNumberList->parray)
+		return E_FAIL;
+
+	long* pSerialNumber;
+	hr = SafeArrayAccessData(pvtSerialNumberList->parray, (void**)&pSerialNumber);
+	if(FAILED(hr))
+		return E_FAIL;
+
+	if(serialNumberList.size())
+	{
+		while(!serialNumberList.empty())
+		{
+			*pSerialNumber = (*serialNumberList.begin());
+			pSerialNumber++;
+			serialNumberList.pop_front();
+		}
+	}
+	else
+	{
+		//No keys found, return 0xffffffff
+		*pSerialNumber = 0xffffffff;
+	}
+
+	if (pvtSerialNumberList->parray)
+		SafeArrayUnaccessData(pvtSerialNumberList->parray);
+
+
+	return S_OK;
+}
 bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 {
 	if (key_ident.length()==0) return true;
@@ -908,7 +1023,7 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 	//xxx how to ensure that the single key case is handled??
 	//xxx need an indicator of which key is the current key (if any) and only use that key
 	//xxx need a way to transfer licenses from the single key to a different single key if needed in case the first one fills up
-	
+
 	// for each server
 	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
 	{
