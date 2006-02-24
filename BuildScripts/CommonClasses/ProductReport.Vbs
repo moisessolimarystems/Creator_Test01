@@ -366,6 +366,14 @@ Class CProductReport
         endTime = Time
         WriteToDlgAndFile "Time Ended: " & endTime
         WriteToDlgAndFile "Time for Script to Run: " & getHrMinSec(mStartTime, endTime)
+	Dim MoveFiles
+	Set MoveFiles = New CMoveFiles
+	Set MoveFiles.Build = Me
+	DestPath = mReportPath & "\\logFolder\\" & mProductChoice
+	If mFSO.FolderExists(DestPath) <> True Then
+		MoveFiles.CreateFileOrFolder "Folder", DestPath, True
+	End If 	
+	MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & "\\ReportLog - " & mStartLabel & "_" & mEndLabel & ".txt", True 
         mCancelDiag.ScriptDone False
         wscript.DisconnectObject mCancelDiag
         Set mCancelDiag = Nothing
