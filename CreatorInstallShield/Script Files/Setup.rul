@@ -717,24 +717,6 @@ begin
 
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
 	szPath = WINSYSDIR + "\msiexec.exe";
-    svSrcPath = SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi";
-    LongPathToQuote(svSrcPath, TRUE);
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\LicenseViewer","CurrentVersion", nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + svSrcPath + " /qn" ;  
-		 LaunchAppAndWait(szPath, szOpts, WAIT);
-    endif;                  
-    szOpts = " /i " + svSrcPath + " /qn" ; 
-    LaunchAppAndWait(szPath, szOpts, WAIT);     
-    
-    svSrcPath = SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi";
-    LongPathToQuote(svSrcPath, TRUE);
-	szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseManager","CurrentVersion",nvType, svValue, nvSize) == 0) then 
-		 szOpts = " /x " + svSrcPath + " /qn" ;  
-		 LaunchAppAndWait(szPath, szOpts, WAIT);
-    endif; 
-    szOpts = " /i " + svSrcPath + " /qn"  ;
-    LaunchAppAndWait(szPath, szOpts, WAIT);
      
     svSrcPath = SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi";
     LongPathToQuote(svSrcPath, TRUE); 
