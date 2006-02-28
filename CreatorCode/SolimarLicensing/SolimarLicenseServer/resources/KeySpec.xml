@@ -420,8 +420,11 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<!-- regular modules -->
 				<Module id="0" offset="0x080" bits="1" name="Merge" unlimited="1"/>
 				<Module id="1" offset="0x081" bits="1" name="Sort" unlimited="1"/>
-				<Module id="2"	offset="0x082" bits="1" name="Split" unlimited="1"/>
-				<Module id="3"	offset="0x083" bits="1" name="Finish" unlimited="1"/>
+				<Module id="2" offset="0x082" bits="1" name="Split" unlimited="1"/>
+				<Module id="3" offset="0x083" bits="1" name="Finish" unlimited="1"/>
+				<Module id="4" offset="0x084" bits="1" name="Concat" unlimited="1"/>
+				<Module id="5" offset="0x085" bits="1" name="Imposition" unlimited="1"/>
+				
 			</ModuleList>
 			<ProductList>
 				<Product id="12" name="PDF Utility">
@@ -429,6 +432,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
 					<ModuleInclude id="3" default="0"/>
+					<ModuleInclude id="4" default="0"/>
+					<ModuleInclude id="5" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
@@ -536,7 +541,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
-					<ModuleInclude id="3" default="255"/>
+					<ModuleInclude id="3" default="0"/>
 					<ModuleInclude id="4" default="0"/>
 				</Product>
 			</ProductList>
@@ -617,6 +622,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="40"	offset="0x0AB" bits="1" name="XRocks Printer Controller" unlimited="1"/>
 				<Module id="41"	offset="0x0AA" bits="1" name="IPDS Print Controller" unlimited="1"/>
 				<Module id="42"	offset="0x0A9" bits="1" name="RJE::3211" unlimited="1"/>
+				<Module id="43"	offset="0x0A8" bits="1" name="AFPDS::IPDS" unlimited="1"/>
 				
 				
 				<!-- Module IDs identifying hardware -->
@@ -628,19 +634,25 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				
 				<!-- Module IDs identifying resources -->
 				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
+				<Module id="201"	offset="0x174" bits="1" name="TCP IP Output Dynamic Host Selection" unlimited="1"/>
 				
 				<!-- Output Pool module -->
-				<Module id="240" offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
+				<Module id="240"	offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
 				
 				<!-- pages per minute extensions -->
-				<Module id="300" offset="0x17C" bits="4" name="Pages Per Minute Extensions" isLicense="false"/>
+				<Module id="300"	offset="0x17C" bits="4" name="Pages Per Minute Extensions" isLicense="false"/>
 				
 				<!-- pages per minute modules -->
-				<Module id="301"   offset="0x318" bits="8" name="AFPDS::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
-				<Module id="302"   offset="0x320" bits="8" name="XCHANGE::IPDS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
-				<Module id="303"   offset="0x328" bits="8" name="XCHANGE::PCL PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
-				<Module id="304"  offset="0x330" bits="8" name="XCHANGE::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
-				<Module id="305"   offset="0x338" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="301"	offset="0x318" bits="8" name="AFPDS::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="302"	offset="0x320" bits="8" name="XCHANGE::IPDS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="303"	offset="0x328" bits="8" name="XCHANGE::PCL PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="304"	offset="0x330" bits="8" name="XCHANGE::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="305"	offset="0x338" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				
+				<!-- Client licensing -->
+				<Module id="400"	offset="0x0B0" bits="8" name="Concurrent Operator Sessions" unlimited="255"/>
+				<Module id="401"	offset="0x0B8" bits="8" name="Named User Sessions" unlimited="255"/>
+				<!-- <Module id="402"	offset="0x0C0" bits="8" name="Concurrent Administrator Sessions" unlimited="255"/> -->
 			</ModuleList>
 			
 			<ProductList>
@@ -688,6 +700,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="40" default="1"/>
 					<ModuleInclude id="41" default="0"/>
 					<ModuleInclude id="42" default="0"/>
+					<ModuleInclude id="43" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
@@ -696,6 +709,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="105" default="0"/>
 					
 					<ModuleInclude id="200" default="0"/>
+					<ModuleInclude id="201" default="0"/>
 					<ModuleInclude id="240" default="0"/>
 					
 					<ModuleInclude id="300" default="0"/>
@@ -704,6 +718,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="303" default="0"/>
 					<ModuleInclude id="304" default="0"/>
 					<ModuleInclude id="305" default="0"/>
+					<ModuleInclude id="400" default="0"/>
+					<ModuleInclude id="401" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
