@@ -1,8 +1,8 @@
 object DlgDevelopmentPassword: TDlgDevelopmentPassword
   Left = 630
   Top = 309
-  Width = 289
-  Height = 156
+  Width = 288
+  Height = 154
   Caption = 'DlgDevelopmentPassword'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET

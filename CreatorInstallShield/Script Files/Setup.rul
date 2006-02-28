@@ -108,7 +108,7 @@ begin
     svIconPath = TARGETDIR ^ "tree.ico";
     LongPathToQuote ( svPath , TRUE );
     AddFolderIcon ( FOLDER_DESKTOP, "Creator" , svPath , TARGETDIR , svIconPath , 0 , "" , REPLACE );	
-
+	CreateDir(TARGETDIR ^ "Password Packets");
 end; 
 
 /*
@@ -711,33 +711,21 @@ end;
 //
 //=============================================================================
 function InstallLicensing()
-	STRING szPath, szOpts, svValue;
+	STRING szPath, szOpts, svValue, svSrcPath;
 	INT nvSize, nResult, nvType;
 begin     
 
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
 	szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\LicenseViewer","CurrentVersion", nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ;  
-		 LaunchAppAndWait(szPath, szOpts, WAIT);
-    endif;                  
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\LicenseViewer.msi" + "\"" + " /qn" ; 
-    LaunchAppAndWait(szPath, szOpts, WAIT);     
-    
-	szPath = WINSYSDIR + "\msiexec.exe";
-    if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseManager","CurrentVersion",nvType, svValue, nvSize) == 0) then 
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\""+ " /qn" ;  
-		 LaunchAppAndWait(szPath, szOpts, WAIT);
-    endif; 
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarLicenseManager.msi" + "\"" + " /qn"  ;
-    LaunchAppAndWait(szPath, szOpts, WAIT);
-    
+     
+    svSrcPath = SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi";
+    LongPathToQuote(svSrcPath, TRUE); 
     szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease","CurrentVersion",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ; 
+		 szOpts = " /x " + svSrcPath + " /qn"  ; 
 		 LaunchAppAndWait(szPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + "\"" + SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.msi" + "\"" + " /qn"  ;
+    szOpts = " /i " + svSrcPath + " /qn"  ;
     LaunchAppAndWait(szPath, szOpts, WAIT);
     
     InstallSentinelDriver();
@@ -778,16 +766,18 @@ begin
    	endif;
 
     if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
-    	nvSize = StrFind(svValue, "7.0.0") ;
+    	nvSize = StrFind(svValue, "7.1.0") ;
     	if(nvSize < 0) then //StrFind(svValue, "1.0.5") < 0) then
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
 			sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+   			LongPathToQuote(sentPath, TRUE);
    			sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    			LaunchAppAndWait(sentPath, sentOpts, WAIT);
 		endif;  
 	else
 		MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);	
 		sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+   		LongPathToQuote(sentPath, TRUE);
    		sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    		LaunchAppAndWait(sentPath, sentOpts, WAIT);
 	endif;

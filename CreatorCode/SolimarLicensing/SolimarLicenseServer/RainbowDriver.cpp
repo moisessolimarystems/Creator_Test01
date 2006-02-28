@@ -241,6 +241,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 		// delete old key packets
 		while(!keys.empty())
 		{
+			RNBOsproReleaseLicense(keys.begin()->second, 0, NULL);	//release previous license into key
 			delete keys.begin()->second;
 			keys.erase(keys.begin());
 		}

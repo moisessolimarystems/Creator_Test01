@@ -25,6 +25,7 @@ HRESULT PasswordValidation::ProcessPasswordFile(BSTR TheFileName)
 	
 	// open the password packet file
 	HANDLE hFile = CreateFileW(TheFileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+	hr = HRESULT_FROM_WIN32(::GetLastError());
 	DWORD file_size = GetFileSize(hFile, 0);
 	
 	// create a variant safearray

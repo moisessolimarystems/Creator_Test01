@@ -27,13 +27,14 @@ __published:
    TQRLabel *StaticLabel2;
    TQRSysData *QRSysData1;
    TQRDBText *QRDBText1;
-   TQRDBText *QRDBText2;
    TQuery *ReportQuery;
    TQRLabel *TitleLabel;
    TQRRichText *QRRichText1;
    TQRLabel *StaticReportLabel;
    TQRLabel *StaticKeyLabel;
-        TQRLabel *StaticKeyPassword;
+        TQRExpr *QRExpr1;
+        TQRDBText *QRDBText2;
+
 private:
 public:
    __fastcall TPasswordReport::TPasswordReport(TComponent* Owner, AnsiString);

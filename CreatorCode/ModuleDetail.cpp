@@ -608,6 +608,12 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          // SolScript module passwords are not incremental
          if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
             units = 0;
+         //applies module password to key
+         keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
+
+         if (key_record->pkey->productId >= PDF_UTILITY)
+                units++;
+
          if(key_record->pkey->productId == SPDE_PRODUCT)
                  keyMaster->getModulePassword(spde_key,
                                               detail->id,
@@ -623,27 +629,32 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                               key_record->pkey->productVersion,
                                               units,
                                               password_string
-                                             );
-         //applies module password to key
-         keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
+                                              );
+
       }
    }
    else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true) && key_record->pkey->productId != SPDE_PRODUCT) //key is already permanent
    {
       if (units == -1)
          units = spd_key->getLicense(detail->id);
+
       //check if license has ability to be incremented
       int available(detail->max - units);
       if( available > 0 )
       {
+         keyMaster->applyModPassword(key_record, detail->id, units+1);
+
+         if (key_record->pkey->productId >= PDF_UTILITY) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
+                units++;                                         //so need to increment units to pass to license server.
+
          keyMaster->getModulePassword(spd_key,
                                       (uchar)detail->id,
                                       static_cast<ProductId>(key_record->pkey->productId),
                                       key_record->pkey->productVersion,
                                       units,
                                       password_string
-                                     );
-         keyMaster->applyModPassword(key_record, detail->id, units);
+                                      );
+
       }
       else
       {
@@ -666,7 +677,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                         units+1,
                                        password_string
                                        );         //need to do units + 1 to get password for module + 1
-           keyMaster->applyModPassword(key_record, detail->id, units); // units is the current amount, units + 1 done inside applymod
+           keyMaster->applyModPassword(key_record, detail->id, units+1);
         }
         else
         {
@@ -698,9 +709,16 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       {
          ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRstatus = 2, SKRoutput = :output, modules = :module_list where SKRid= :skr_id");
          if(key_record->pkey->productId == SPDE_PRODUCT)
+         {
+                ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRoperatorSession = :operatorSession, SKRuserSession = :userSession where SKRid= :skr_id");
                 ModuleDetailQuery->ParamByName("output")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->outputUnits;
+                ModuleDetailQuery->ParamByName("operatorSession")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->operatorSessionUnits;
+                ModuleDetailQuery->ParamByName("userSession")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spde_key->userSessionUnits;
+         }
          else
+         {
                 ModuleDetailQuery->ParamByName("output")->AsInteger = ((key_record->pkey)->isOnTrial() == true) ? 1 : spd_key->outputUnits;
+         }
       }
 
       ModuleDetailQuery->ParamByName("module_list")->AsBlob = updated_module_list;
@@ -783,6 +801,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
    //generate password by selecting a module...
    int pages(0);
    int ext(0);
+   int modID(0);
 
    //get selected list item, from list item get pointer to ModuleDetail structure
    TListItem* selected(ModuleList->Selected);
@@ -881,6 +900,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
           default:
                 break;
      }
+     modID = ppmModID + 5000;
    }
    else
    {
@@ -909,6 +929,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
           default:
                 break;
      }
+     modID = detail->id + 500;
    }
    //check if module is default
    if( key_record->pkey->isOnTrial() )
@@ -934,7 +955,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       }
 
    }
-   else if( spd_key->status == 2 || key_record->pkey->productId != SPDE_PRODUCT)//key is already permanent
+   else if( spd_key->status == 2 && key_record->pkey->productId != SPDE_PRODUCT)//key is already permanent
    {
       //check if license has ability to be incremented
       int available(ext < MAX_PPM_EXTENSIONS);
@@ -949,7 +970,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
          return false;
       }
    }
-   else if( spde_key->status == 2 || key_record->pkey->productId == SPDE_PRODUCT)//key is already permanent
+   else if( spde_key->status == 2 && key_record->pkey->productId == SPDE_PRODUCT)//key is already permanent
    {
       //check if license has ability to be incremented
       int available(ext < MAX_PPM_EXTENSIONS);
@@ -1092,7 +1113,9 @@ bool TModuleFrame::createPagesPerMinutePassword()
 
       // ICONVERT products have an SDRid of 10XX, and therefore have to check
       // to see if the product is ICONVERT or other.
-      ModuleDetailQuery->ParamByName("descid")->AsInteger = detail->id + 500;
+      ModuleDetailQuery->ParamByName("descid")->AsInteger = modID; // detail->id + 500;
+
+
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
 

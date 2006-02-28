@@ -126,6 +126,10 @@ __published:	// IDE-managed Components
         TMenuItem *ModuleEditor;
         TListBox *ZoomDetailListBox;
         TScrollBar *CellViewScrollBar;
+        TLabel *Label1;
+        TLabel *operatorUnits;
+        TLabel *Label4;
+        TLabel *userUnits;
 	void __fastcall Number1Click(TObject *Sender);
 	void __fastcall mmAllClick(TObject *Sender);
 	void __fastcall Name1Click(TObject *Sender);

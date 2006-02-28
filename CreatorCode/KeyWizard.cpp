@@ -1294,6 +1294,8 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       else if (moduleState == msClear) {
          SpdeProtectionKey* spde_key = static_cast<SpdeProtectionKey*>(key_record->pkey);
          spde_key->outputUnits=0;
+         spde_key->operatorSessionUnits=0;
+         spde_key->userSessionUnits=0;
          spde_key->setLicensesToZero();
       }
    }

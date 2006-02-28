@@ -1,4 +1,8 @@
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
 #include "KeyServer.h"
 #include "KeyError.h"
 
@@ -7,10 +11,12 @@
 #include <time.h>
 #include <stdarg.h>
 #include <wchar.h>
+#include <windows.h>
 
 typedef _bstr_t String;
 typedef std::vector<String> StringList;
 
+#include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
 
 // only include the password packet signing PRIVATE key on debug and solimar internal builds
@@ -65,6 +71,14 @@ KeyServer::KeyServer() :
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
+	
+	// get the local host name for use in licensing messages
+	wchar_t hostname[1024];
+	DWORD hostname_size = 0;
+	if (GetComputerNameEx(ComputerNameDnsHostname, hostname, &(hostname_size=1024)) || GetComputerNameEx(ComputerNameNetBIOS, hostname, &(hostname_size=1024)))
+	{
+		server_host_name = hostname;
+	}
 	
 	// trigger a key list resynchronize
 	UpdateKeysThread->Invoke();
@@ -1051,21 +1065,21 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	}
 }
 
-void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const wchar_t *format, ...)
+void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...)
 {
 	static const MAX_MESSAGE_SIZE = 1024;
 	wchar_t message[MAX_MESSAGE_SIZE];
 	va_list pArg;
 	
-	va_start(pArg, format);
-	_vsnwprintf(message, 1024, format, pArg);
+	va_start(pArg, LicensingMessageStringTable[MessageLookupID]);
+	_vsnwprintf(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
 	va_end(pArg);
 	message[MAX_MESSAGE_SIZE-1] = 0;
 	
-	GenerateMessageInternal(key_ident, message_type, error, timestamp, message);
+	GenerateMessageInternal(key_ident, message_type, error, timestamp, MessageLookupID, message);
 }
 
-void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const wchar_t *message)
+void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message)
 {
 	static const MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
@@ -1130,7 +1144,8 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 			//xxx might need to make this asynchronous
 			//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
 			//zzz add message to the message lists for all clients
-			LicensingMessage m(std::wstring(key_ident), message_type, error, vtTimestamp, std::wstring(message));
+			//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
+			LicensingMessage m(std::wstring(server_host_name), std::wstring(key_ident), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
 			for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
 			{
 				c->second.push_back(m);
@@ -1171,7 +1186,14 @@ void KeyServer::HeartbeatCheck()
 	{
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
+			//xxx debug
+			wchar_t debug_buf[1024];
+			_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			debug_buf[1023] = 0;
+			OutputDebugStringW(debug_buf);
+
 			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
+						
 			hr = LicenseReleaseAll(heartbeat->first);
 			
 			// Stop notifying the client of messages

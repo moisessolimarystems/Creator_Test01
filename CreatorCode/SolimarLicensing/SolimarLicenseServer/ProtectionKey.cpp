@@ -964,8 +964,9 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		switch(key_status)
 		{
 		case INITIAL_TRIAL:
-			if (key_type==KEYDevelopment)
-				WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
+			////Causes key to expire immediately, not sure why in is in here.
+			//if (key_type==KEYDevelopment)
+			//	WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
 			WriteHeader(_bstr_t(L"Initial Counter"), initial_counter ? --initial_counter : 0);
 			break;
 		case EXTENDED_TRIAL:
@@ -973,8 +974,9 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		case EXTENDED_TRIAL3:
 		case EXTENDED_TRIAL4:
 		case EXTENDED_TRIAL5:
-			if (key_type==KEYDevelopment)
-				WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
+			////Causes key to expire immediately, not sure why in is in here.
+			//if (key_type==KEYDevelopment)
+			//	WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
 			WriteHeader(_bstr_t(L"Extended Counter"), extended_counter ? --extended_counter : 0);
 			break;
 		default:
@@ -1692,9 +1694,9 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		case 8:
 		{
 			// The solsearcher specific (legacy) password generation function 
-			// only generates passwords for modules {0,1,2,3}
+			// only generates passwords for modules {0,1,2,3,4}
 			// any future modules should be handled by the default/generic case
-			if (module.id<=3)
+			if (module.id<=4)
 			{
 				password_hash = GetSolsearcherModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
 				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
@@ -2359,21 +2361,21 @@ DWORD ProtectionKey::GetSolsearcherModulePassword(unsigned short customer_number
 				((DWORD)(units_licensed)&0xFF);
 			break;
 		case 2: // concurrent users
-			QueryModule_5 = 0xA;
+			QueryModule_5 = 0x7;
 			query |=					//[solsearcher][concurrent users]
 				((DWORD)(m_keyspec->products[8][2].fn_write(units_licensed))&0x7FF);
 			break;
 		case 3: // application databases
-			QueryModule_5 = 0xB;
+			QueryModule_5 = 0xA;
 			query |= 
 				(((DWORD)(QueryModule_5)&0xF) << 8) |
 				((DWORD)(units_licensed)&0xFF);
 			break;
 		case 4: // document assembler
-			QueryModule_5 = 0xC;
+			QueryModule_5 = 0xB;
 			query |= 
 				(((DWORD)(QueryModule_5)&0xF) << 8) |
-				((DWORD)(units_licensed)&0x01);
+				((DWORD)(units_licensed)&0xFF);
 			break;
 		default:
 			throw _com_error(E_INVALIDARG);

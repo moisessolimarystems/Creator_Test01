@@ -13,85 +13,85 @@ object KeyWizardFrm: TKeyWizardFrm
   Font.Style = []
   OldCreateOrder = False
   PixelsPerInch = 96
-  TextHeight = 14
+  TextHeight = 13
   object StartPanel: TPanel
-    Left = 173
+    Left = 161
     Top = 0
-    Width = 605
-    Height = 455
+    Width = 617
+    Height = 458
     Align = alClient
     BevelOuter = bvNone
     BorderStyle = bsSingle
     TabOrder = 0
     object Label5: TLabel
-      Left = 9
-      Top = 69
+      Left = 8
+      Top = 64
       Width = 64
-      Height = 14
+      Height = 13
       Caption = 'Product Type'
     end
     object Label6: TLabel
-      Left = 9
-      Top = 112
-      Width = 46
-      Height = 14
+      Left = 8
+      Top = 104
+      Width = 45
+      Height = 13
       Caption = 'Key Type'
     end
     object Label1: TLabel
-      Left = 170
-      Top = 69
-      Width = 38
-      Height = 14
+      Left = 158
+      Top = 64
+      Width = 35
+      Height = 13
       Caption = 'Version'
     end
     object DaysLabel: TLabel
-      Left = 170
-      Top = 112
-      Width = 25
-      Height = 14
+      Left = 158
+      Top = 104
+      Width = 24
+      Height = 13
       Caption = 'Days'
     end
     object SystemEditLabel: TLabel
-      Left = 9
-      Top = 237
-      Width = 47
-      Height = 14
+      Left = 8
+      Top = 220
+      Width = 46
+      Height = 13
       Caption = 'System Id'
     end
     object Label7: TLabel
-      Left = 9
-      Top = 283
-      Width = 45
-      Height = 14
+      Left = 8
+      Top = 263
+      Width = 43
+      Height = 13
       Caption = 'Summary'
     end
     object eBONumberLabel: TLabel
-      Left = 170
-      Top = 233
+      Left = 158
+      Top = 216
       Width = 61
-      Height = 14
+      Height = 13
       Caption = 'eBO Number'
     end
     object keyClassLabel: TLabel
-      Left = 9
-      Top = 17
-      Width = 49
-      Height = 14
+      Left = 8
+      Top = 16
+      Width = 46
+      Height = 13
       Caption = 'Key Class'
     end
     object passwordComboBoxLabel: TLabel
-      Left = 170
-      Top = 112
-      Width = 107
-      Height = 14
+      Left = 158
+      Top = 104
+      Width = 106
+      Height = 13
       Caption = 'Exp Days/Counter Hrs'
     end
     object ProductComboBox: TComboBox
-      Left = 8
-      Top = 84
-      Width = 157
-      Height = 22
-      ItemHeight = 14
+      Left = 7
+      Top = 78
+      Width = 146
+      Height = 21
+      ItemHeight = 13
       TabOrder = 0
       OnChange = ProductComboBoxChange
       Items.Strings = (
@@ -110,19 +110,19 @@ object KeyWizardFrm: TKeyWizardFrm
         'SP/D Enterprise')
     end
     object keyTypeComboBox: TComboBox
-      Left = 8
-      Top = 128
-      Width = 157
-      Height = 22
-      ItemHeight = 14
+      Left = 7
+      Top = 119
+      Width = 146
+      Height = 21
+      ItemHeight = 13
       TabOrder = 1
       OnChange = keyTypeComboBoxChange
     end
     object ui_version: TMaskEdit
-      Left = 179
-      Top = 84
-      Width = 45
-      Height = 22
+      Left = 166
+      Top = 78
+      Width = 42
+      Height = 21
       EditMask = 'A.AAA;0;_'
       MaxLength = 5
       TabOrder = 2
@@ -130,19 +130,19 @@ object KeyWizardFrm: TKeyWizardFrm
       OnChange = ui_versionChange
     end
     object ui_days: TMaskEdit
-      Left = 179
-      Top = 128
-      Width = 46
-      Height = 22
+      Left = 166
+      Top = 119
+      Width = 43
+      Height = 21
       TabOrder = 3
       Text = '30'
       OnChange = ui_daysChange
     end
     object DayUpDown: TUpDown
-      Left = 225
-      Top = 128
-      Width = 17
-      Height = 22
+      Left = 209
+      Top = 119
+      Width = 16
+      Height = 19
       Associate = ui_days
       Min = -10
       Max = 90
@@ -151,47 +151,47 @@ object KeyWizardFrm: TKeyWizardFrm
       Wrap = False
     end
     object SelectModules: TCheckBox
-      Left = 276
-      Top = 67
-      Width = 311
-      Height = 18
+      Left = 256
+      Top = 62
+      Width = 289
+      Height = 17
       Caption = 'Specify modules to be programed.'
       TabOrder = 5
       Visible = False
       OnClick = SelectModulesClick
     end
     object SystemEdit: TEdit
-      Left = 8
-      Top = 252
-      Width = 126
-      Height = 22
+      Left = 7
+      Top = 234
+      Width = 117
+      Height = 21
       TabOrder = 6
       Text = 'SystemEdit'
       OnChange = SystemEditChange
     end
     object KeySummary: TMemo
-      Left = 8
-      Top = 306
-      Width = 480
-      Height = 66
+      Left = 7
+      Top = 284
+      Width = 446
+      Height = 61
       MaxLength = 254
       TabOrder = 7
     end
     object eBONumberEditBox: TEdit
-      Left = 170
-      Top = 250
-      Width = 81
-      Height = 22
+      Left = 158
+      Top = 232
+      Width = 75
+      Height = 21
       TabOrder = 8
       Text = '0'
       OnChange = eBONumberEditBoxChange
     end
     object keyClassComboBox: TComboBox
-      Left = 9
-      Top = 34
-      Width = 156
-      Height = 22
-      ItemHeight = 14
+      Left = 8
+      Top = 32
+      Width = 145
+      Height = 21
+      ItemHeight = 13
       TabOrder = 9
       OnChange = keyClassComboBoxChange
       Items.Strings = (
@@ -199,21 +199,21 @@ object KeyWizardFrm: TKeyWizardFrm
         'USB')
     end
     object passwordComboBox: TComboBox
-      Left = 179
-      Top = 128
-      Width = 182
-      Height = 22
+      Left = 166
+      Top = 119
+      Width = 169
+      Height = 21
       DropDownCount = 25
-      ItemHeight = 14
+      ItemHeight = 13
       TabOrder = 10
       OnChange = passwordComboBoxChange
     end
   end
   object FinalPanel: TPanel
-    Left = 173
+    Left = 161
     Top = 0
-    Width = 605
-    Height = 455
+    Width = 617
+    Height = 458
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -222,21 +222,36 @@ object KeyWizardFrm: TKeyWizardFrm
     Visible = False
   end
   object SolSearcherEnterprisePanel: TPanel
-    Left = 173
+    Left = 161
     Top = 0
-    Width = 605
-    Height = 455
+    Width = 617
+    Height = 458
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 5
     inline TSolSearcherDetails1: TSolSearcherDetails
       Left = 0
-      Top = 26
-      Width = 664
-      Height = 467
+      Top = 24
+      Width = 617
+      Height = 434
       Color = clBackground
       ParentColor = False
       TabOrder = 0
+      inherited SolSearcherPropertyList: TListView
+        Left = 15
+        Top = 22
+        Width = 201
+        Height = 239
+        Columns = <
+          item
+            Caption = 'Property'
+            Width = 139
+          end
+          item
+            Caption = 'Licenses'
+            Width = 56
+          end>
+      end
       inherited DetailSQL: TQuery
         Left = 46
         Top = 235
@@ -248,56 +263,56 @@ object KeyWizardFrm: TKeyWizardFrm
     end
   end
   object ModuleProgramPanel: TPanel
-    Left = 173
+    Left = 161
     Top = 0
-    Width = 605
-    Height = 455
+    Width = 617
+    Height = 458
     Align = alClient
     BorderWidth = 5
     BorderStyle = bsSingle
     TabOrder = 4
     Visible = False
     object OutputLabel: TLabel
-      Left = 307
-      Top = 366
-      Width = 109
-      Height = 14
+      Left = 285
+      Top = 340
+      Width = 101
+      Height = 13
       Alignment = taRightJustify
       AutoSize = False
       Caption = 'Unlimited Pool'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
     end
     inline WizardModuleFrame: TModuleFrame
-      Left = 11
-      Top = 19
-      Width = 475
-      Height = 331
+      Left = 10
+      Top = 18
+      Width = 441
+      Height = 307
       TabOrder = 0
       inherited ModuleList: TListView
-        Width = 475
-        Height = 331
+        Width = 441
+        Height = 307
         Align = alClient
       end
     end
     object OutputEdit: TMaskEdit
-      Left = 431
-      Top = 363
-      Width = 39
-      Height = 22
+      Left = 400
+      Top = 337
+      Width = 36
+      Height = 21
       TabOrder = 1
       Text = '4095'
       OnChange = OutputEditChange
     end
     object OutputUnits: TUpDown
-      Left = 470
-      Top = 363
-      Width = 17
-      Height = 22
+      Left = 436
+      Top = 337
+      Width = 16
+      Height = 20
       Associate = OutputEdit
       Min = 0
       Max = 4095
@@ -309,38 +324,38 @@ object KeyWizardFrm: TKeyWizardFrm
   end
   object ButtonPanel: TPanel
     Left = 0
-    Top = 455
+    Top = 458
     Width = 778
-    Height = 44
+    Height = 40
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
       778
-      44)
+      40)
     object Bevel1: TBevel
       Left = 0
       Top = 0
       Width = 778
-      Height = 10
+      Height = 9
       Align = alTop
       Shape = bsTopLine
     end
     object NextBtn: TButton
-      Left = 512
-      Top = 17
-      Width = 80
-      Height = 27
+      Left = 475
+      Top = 16
+      Width = 75
+      Height = 25
       Anchors = [akRight, akBottom]
       Caption = '&Next >'
       TabOrder = 0
       OnClick = NextBtnClick
     end
     object BackBtn: TButton
-      Left = 431
-      Top = 17
-      Width = 81
-      Height = 27
+      Left = 400
+      Top = 16
+      Width = 75
+      Height = 25
       Anchors = [akRight, akBottom]
       Caption = '< &Back'
       Enabled = False
@@ -348,20 +363,20 @@ object KeyWizardFrm: TKeyWizardFrm
       OnClick = BackBtnClick
     end
     object CancelBtn: TButton
-      Left = 694
-      Top = 17
-      Width = 81
-      Height = 27
+      Left = 644
+      Top = 16
+      Width = 76
+      Height = 25
       Anchors = [akRight, akBottom]
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 2
     end
     object ProgramBtn: TButton
-      Left = 596
-      Top = 17
-      Width = 79
-      Height = 27
+      Left = 553
+      Top = 16
+      Width = 74
+      Height = 25
       Anchors = [akRight, akBottom]
       Caption = '&Program'
       Enabled = False
@@ -372,8 +387,8 @@ object KeyWizardFrm: TKeyWizardFrm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 173
-    Height = 455
+    Width = 161
+    Height = 458
     Align = alLeft
     BevelOuter = bvLowered
     BorderWidth = 5

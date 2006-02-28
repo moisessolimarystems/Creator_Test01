@@ -16,5 +16,6 @@
 __interface ILicensingMessage : IDispatch
 {
 	// Message/Event support
-	[id(3),helpstring("method GetLicenseMessageList")] HRESULT GetLicenseMessageList([out,retval] VARIANT *pvtMessageList);
+	[id(4),helpstring("method GetLicenseMessageList")] HRESULT GetLicenseMessageList([in] VARIANT_BOOL clear_messages, [out,retval] VARIANT *pvtMessageList);
+	[id(5),helpstring("method DispatchLicenseMessageList")] HRESULT DispatchLicenseMessageList([in] VARIANT_BOOL clear_messages);
 };
