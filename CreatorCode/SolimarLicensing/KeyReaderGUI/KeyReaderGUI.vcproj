@@ -119,6 +119,8 @@
 		<AssemblyReference
 			RelativePath="System.Drawing.dll"/>
 		<AssemblyReference
+			RelativePath="{ReferencesPath}\System.ServiceProcess.dll"/>
+		<AssemblyReference
 			RelativePath="System.Windows.Forms.dll"/>
 		<AssemblyReference
 			RelativePath="System.XML.dll"/>

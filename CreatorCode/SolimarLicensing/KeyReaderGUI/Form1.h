@@ -23,6 +23,7 @@ namespace KeyReaderGUI
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::ServiceProcess;
 	using namespace KeyViewManager;
 	using namespace PWDValidation;
 	using namespace PWDForm;
@@ -94,6 +95,10 @@ namespace KeyReaderGUI
 	private: System::Windows::Forms::ColumnHeader*  ExpirationDate;
 	private: System::Windows::Forms::MenuItem *  ExitMenuItem;
 	private: System::Windows::Forms::MenuItem *  AddPasswordPacketMenuItem;
+
+	private: System::Windows::Forms::MenuItem *  menuItem2;
+	private: System::Windows::Forms::MenuItem *  File_ShutdownServer;
+	private: System::Windows::Forms::MenuItem *  File_StartupServer;
 	private:	System::Windows::Forms::Timer    *  myTimer;
 
    //Event Handler methods
@@ -139,6 +144,9 @@ namespace KeyReaderGUI
 			this->openFileDialog1 = new System::Windows::Forms::OpenFileDialog();
 			this->mainMenu1 = new System::Windows::Forms::MainMenu();
 			this->fileMenuItem = new System::Windows::Forms::MenuItem();
+			this->File_StartupServer = new System::Windows::Forms::MenuItem();
+			this->File_ShutdownServer = new System::Windows::Forms::MenuItem();
+			this->menuItem2 = new System::Windows::Forms::MenuItem();
 			this->ExitMenuItem = new System::Windows::Forms::MenuItem();
 			this->viewMenuItem = new System::Windows::Forms::MenuItem();
 			this->refreshMenuItem = new System::Windows::Forms::MenuItem();
@@ -190,14 +198,35 @@ namespace KeyReaderGUI
 			// fileMenuItem
 			// 
 			this->fileMenuItem->Index = 0;
-			System::Windows::Forms::MenuItem* __mcTemp__2[] = new System::Windows::Forms::MenuItem*[1];
-			__mcTemp__2[0] = this->ExitMenuItem;
+			System::Windows::Forms::MenuItem* __mcTemp__2[] = new System::Windows::Forms::MenuItem*[4];
+			__mcTemp__2[0] = this->File_StartupServer;
+			__mcTemp__2[1] = this->File_ShutdownServer;
+			__mcTemp__2[2] = this->menuItem2;
+			__mcTemp__2[3] = this->ExitMenuItem;
 			this->fileMenuItem->MenuItems->AddRange(__mcTemp__2);
 			this->fileMenuItem->Text = S"File";
 			// 
+			// File_StartupServer
+			// 
+			this->File_StartupServer->Index = 0;
+			this->File_StartupServer->Text = S"Startup Server";
+			this->File_StartupServer->Visible = false;
+			this->File_StartupServer->Click += new System::EventHandler(this, File_StartupServer_Click);
+			// 
+			// File_ShutdownServer
+			// 
+			this->File_ShutdownServer->Index = 1;
+			this->File_ShutdownServer->Text = S"Shudown Server";
+			this->File_ShutdownServer->Click += new System::EventHandler(this, File_ShutdownServer_Click);
+			// 
+			// menuItem2
+			// 
+			this->menuItem2->Index = 2;
+			this->menuItem2->Text = S"-";
+			// 
 			// ExitMenuItem
 			// 
-			this->ExitMenuItem->Index = 0;
+			this->ExitMenuItem->Index = 3;
 			this->ExitMenuItem->Text = S"&Exit";
 			this->ExitMenuItem->Click += new System::EventHandler(this, ExitMenuItem_Click);
 			// 
@@ -336,6 +365,32 @@ namespace KeyReaderGUI
         SaveConfigurations* SaveConfig;
 
 		 
+
+#undef MessageBox
+private: System::Void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
+		 {
+			 // Stop the SpdStartupService if it's not already stopped.
+			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 if (licenseServerService->Status != ServiceControllerStatus::StopPending &&
+				 licenseServerService->Status != ServiceControllerStatus::Stopped)
+				 licenseServerService->Stop();
+			 licenseServerService->WaitForStatus(ServiceControllerStatus::Stopped);
+			 UpdateViews();
+			 this->Refresh();
+			 MessageBox::Show(this, "License Server shutdown complete.", "Shutdown License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		 }
+
+private: System::Void File_StartupServer_Click(System::Object *  sender, System::EventArgs *  e)
+		 {
+			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 if (licenseServerService->Status != ServiceControllerStatus::StartPending &&
+				 licenseServerService->Status != ServiceControllerStatus::Running)
+				 licenseServerService->Start();
+			 licenseServerService->WaitForStatus(ServiceControllerStatus::Running);
+			 UpdateViews();
+			 this->Refresh();
+			 MessageBox::Show(this, "License Server startup complete.", "Startup License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		 }
 
 };
 }
