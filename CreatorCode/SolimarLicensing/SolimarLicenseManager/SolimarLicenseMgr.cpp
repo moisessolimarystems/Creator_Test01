@@ -632,7 +632,7 @@ void CSolimarLicenseMgr::KeyMessageShowDialog(BSTR key_ident, unsigned int messa
 
 void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message)
 {
-	static const MAX_MESSAGE_SIZE = 1024;
+	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
 	
 	_variant_t vtStrTimestamp = vtTimestamp;

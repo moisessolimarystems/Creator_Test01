@@ -1067,7 +1067,7 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 
 void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...)
 {
-	static const MAX_MESSAGE_SIZE = 1024;
+	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t message[MAX_MESSAGE_SIZE];
 	va_list pArg;
 	
@@ -1081,7 +1081,7 @@ void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_t
 
 void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message)
 {
-	static const MAX_MESSAGE_SIZE = 1024;
+	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
 	_variant_t vtTimestamp;
 	
