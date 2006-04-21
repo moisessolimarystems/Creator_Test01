@@ -1017,9 +1017,16 @@ Class CProductBuild
         current = GetBuildVersion(aNextVersion)
         WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + Right(mNewNextVersion, 4)
         RunCmd "attrib -r " + mInputFile
+
+	Dim MKS
+	Set MKS = New CMKS
+	Set MKS.Build = Me
 	If Not g_DEBUG Then
+	    MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+  	    MKS.LockFiles mBuildPath & "\buildScript.pj", mInputFile
             UpdateFileVersion mInputFile, aCurrentVersion, " " + current
             UpdateFileVersion mInputFile, aNextVersion, " " + Right(mNewNextVersion, 4)
+            MKS.CheckInFiles mBuildPath & "\buildScript.pj", mInputFile
         End If
     End Sub
 
@@ -1028,7 +1035,7 @@ Class CProductBuild
 	        Dim MKS
 	        Set MKS = New CMKS
 	        Set MKS.Build = Me
-			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+		MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
 		Err.Clear
                 Set readFile = mFSO.OpenTextFile(mInputFile)
                 Dim check, Line, pos
