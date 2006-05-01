@@ -124,6 +124,14 @@
                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\Spd52xxInstallSource", _
                                       "\SPDE\Configuration\SPDERelease.txt", "Spd52xx", "SPDE"
         End If
+        If g_Report.Productchoice = "Rubika" Then
+             g_Report.SetProjPathsVar "Rubika", "Rubika", "F:\code\MKSCODE\Rubika", _
+									  "S:\MKSCODE\Rubika\RubikaInstallSource\RubikaInstallSource.pj", _
+                                      "S:\MKSCODE\Rubika\rcs\Rubika.pj", _
+                                      "Rubika", "", "RubikaInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\RubikaInstallSource", _
+                                      "\Rubika\Configuration\RubikaRelease.txt", "Rubika", "Rubika"
+        End If
 End Sub
      
                         
