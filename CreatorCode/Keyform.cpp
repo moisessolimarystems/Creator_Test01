@@ -261,7 +261,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      //if( ( (PERMISSION_FLAG & permanent_pwd) && (PHYSICAL_FLAG & pf_MODULE) ) || (PHYSICAL_FLAG & pf_NONPERMANENT) )
      //{
          mmSPDOutput->Visible = ((key_record->getProductId() != ICONVERT_PRODUCT)     &&
-                                 (key_record->getProductId() != PDF_UTILITY)          &&
+                                 (key_record->getProductId() != RUBIKA_PRODUCT)          &&
                                  (key_record->getProductId() != SOLSCRIPT_PRODUCT))
                                 ? true : false;
          mmSPDEOperatorSessions->Visible = (key_record->getProductId() == SPDE_PRODUCT) ? true : false;
@@ -327,7 +327,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      if ((PERMISSION_FLAG & permanent_pwd) &&
          (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
          /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
-         key_record->pkey->productId == PDF_UTILITY)
+         key_record->pkey->productId == RUBIKA_PRODUCT)
          )
      {
         KeyFormModuleFrame->mmViewAll->Enabled = false;
@@ -489,7 +489,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 }
                 else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT ||
                          /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
-                         key_record->pkey->productId == PDF_UTILITY) {
+                         key_record->pkey->productId == RUBIKA_PRODUCT) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
                         ProtectionKey* temp_key = ProtectionKey::newKey(key_record->pkey);
@@ -692,7 +692,7 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
     }
     else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
              /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
-             key_record->pkey->productId == PDF_UTILITY) {
+             key_record->pkey->productId == RUBIKA_PRODUCT) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
         showSessionsInfo(false);
@@ -1429,7 +1429,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
             }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
                      /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
-                     key_record->pkey->productId == PDF_UTILITY) {
+                     key_record->pkey->productId == RUBIKA_PRODUCT) {
                KeyFormModuleFrame->load(key_record);
             }
             break;

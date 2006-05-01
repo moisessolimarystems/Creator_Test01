@@ -29,8 +29,8 @@ TKeyWizardFrm *KeyWizardFrm;
 // Defines
 //------------------------------------------------------------------------------
 //static member initialized
-const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*PDF Utility*/, 0, 14/*SPDE*/};
-const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, PDF_UTILITY, SPDE_PRODUCT};
+const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*Rubika*/, 0, 14/*SPDE*/};
+const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, RUBIKA_PRODUCT, SPDE_PRODUCT};
 
 
 //==============================================================================
@@ -183,7 +183,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    }
    else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
             /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
-            m_selectedProduct == PDF_UTILITY) {
+            m_selectedProduct == RUBIKA_PRODUCT) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
       m_bModules    = true;
@@ -686,7 +686,7 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             active_panel->Visible = true;
          }
 */
-         else if (m_selectedProduct == SOLSCRIPT_PRODUCT || m_selectedProduct == PDF_UTILITY) {
+         else if (m_selectedProduct == SOLSCRIPT_PRODUCT || m_selectedProduct == RUBIKA_PRODUCT) {
             //Select Modules
             state.push( wsModuleSelection );
             active_panel = ModuleProgramPanel;
@@ -1259,7 +1259,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == ICONVERT_PRODUCT  ||
             m_selectedProduct == SOLSCRIPT_PRODUCT ||
             /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
-            m_selectedProduct == PDF_UTILITY) {
+            m_selectedProduct == RUBIKA_PRODUCT) {
       if (moduleState == msMax) {
          //initialize uses productId and productVersion
          key_record->pkey->productId = getSelectedProduct();

@@ -611,7 +611,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          //applies module password to key
          keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
 
-         if (key_record->pkey->productId >= PDF_UTILITY)
+         if (key_record->pkey->productId >= RUBIKA_PRODUCT)
                 units++;
 
          if(key_record->pkey->productId == SPDE_PRODUCT)
@@ -644,7 +644,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       {
          keyMaster->applyModPassword(key_record, detail->id, units+1);
 
-         if (key_record->pkey->productId >= PDF_UTILITY) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
+         if (key_record->pkey->productId >= RUBIKA_PRODUCT) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
                 units++;                                         //so need to increment units to pass to license server.
 
          keyMaster->getModulePassword(spd_key,
@@ -760,7 +760,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       /*else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 3000;
       */
-      else if(key_record->pkey->productId == PDF_UTILITY)
+      else if(key_record->pkey->productId == RUBIKA_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 4000;
       else if(key_record->pkey->productId == SPDE_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 5000;

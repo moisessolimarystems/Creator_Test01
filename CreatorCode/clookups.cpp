@@ -233,7 +233,7 @@ ModuleDetail** CLookup::getModuleList(int productID)
        return iConvert_module_detail;
    else if (productID == SOLSCRIPT_PRODUCT)
       return m_solScriptModuleDetail;
-   else if (productID == PDF_UTILITY)
+   else if (productID == RUBIKA_PRODUCT)
       return m_PDFUtilityModuleDetail;
    else if (productID == SPDE_PRODUCT)
       return m_SpdeModuleDetail;
@@ -309,7 +309,7 @@ bool CLookup::resetModuleList()
             pModuleList = iConvert_module_detail;
             currentCount = mod_id;
          }
-         else if (product_id==PDF_UTILITY ) {
+         else if (product_id==RUBIKA_PRODUCT ) {
             pModuleList = m_PDFUtilityModuleDetail;
             currentCount = mod_id;
          }
@@ -1112,7 +1112,7 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
       case ICONVERT_PRODUCT:
          result = iConvert_module;   // supports iConvert modules.
          break;
-      case PDF_UTILITY:
+      case RUBIKA_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
       case SOLSCRIPT_PRODUCT:
