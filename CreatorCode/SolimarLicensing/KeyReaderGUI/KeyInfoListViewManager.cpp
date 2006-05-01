@@ -14,7 +14,7 @@ const int SolSearcherEnterpriseProductID = 8;
 const int SolScriptProductID = 9;
 const int SDXDesignerProductID = 10;
 const int QuantumServerProductID = 11;
-const int PDFEngineProductID = 12;
+const int RubikaProductID = 12;
 const int SPDEProductID = 14;
 
 //Used to map the license as specified in KeySpec.xml
@@ -184,8 +184,8 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
 
-			case PDFEngineProductID :
-				return retval = "PDF Engine";
+			case RubikaProductID :
+				return retval = "Rubika";
 
 			case SPDEProductID : 
 				return retval = "SP/D Enterprise";

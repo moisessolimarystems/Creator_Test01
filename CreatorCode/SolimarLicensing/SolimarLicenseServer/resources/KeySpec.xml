@@ -424,16 +424,34 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="3" offset="0x083" bits="1" name="Finish" unlimited="1"/>
 				<Module id="4" offset="0x084" bits="1" name="Concat" unlimited="1"/>
 				<Module id="5" offset="0x085" bits="1" name="Imposition" unlimited="1"/>
+				<Module id="6" offset="0x086" bits="1" name="Underlay" unlimited="1"/>
+				<Module id="7" offset="0x087" bits="1" name="Insert" unlimited="1"/>
+				<Module id="8" offset="0x088" bits="1" name="Segmentation" unlimited="1"/>
+				<Module id="9" offset="0x089" bits="1" name="ArchiveAssistant" unlimited="1"/>
+				<Module id="10" offset="0x08A" bits="1" name="OMR" unlimited="1"/>
+				<Module id="11" offset="0x08B" bits="1" name="Barcode" unlimited="1"/>
+				<Module id="12" offset="0x08C" bits="1" name="Text Marking" unlimited="1"/>
+				<Module id="13" offset="0x08D" bits="1" name="Delete" unlimited="1"/>
+				<Module id="14" offset="0x08E" bits="1" name="Replace" unlimited="1"/>																																							
 				
 			</ModuleList>
 			<ProductList>
-				<Product id="12" name="PDF Utility">
+				<Product id="12" name="Rubika">
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
 					<ModuleInclude id="3" default="0"/>
 					<ModuleInclude id="4" default="0"/>
 					<ModuleInclude id="5" default="0"/>
+					<ModuleInclude id="6" default="0"/>
+					<ModuleInclude id="7" default="0"/>
+					<ModuleInclude id="8" default="0"/>
+					<ModuleInclude id="9" default="0"/>	
+					<ModuleInclude id="10" default="0"/>
+					<ModuleInclude id="11" default="0"/>
+					<ModuleInclude id="12" default="0"/>
+					<ModuleInclude id="13" default="0"/>
+					<ModuleInclude id="14" default="0"/>																																						
 				</Product>
 			</ProductList>
 		</KeyLayout>

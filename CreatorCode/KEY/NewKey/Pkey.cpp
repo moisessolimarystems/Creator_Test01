@@ -170,7 +170,7 @@ const char* ProductText[] =
    "SOLscript",                                                 // SOLSCRIPT_PRODUCT = 9
    "SDX Designer",                                              // SDX_DESIGNER_PRODUCT = 10
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
-   "PDF Utility",                                               // PDF Utility = 12
+   "Rubika",                                                    // PDF Utility = 12
    "???",                                                       // Not Used
    "SP/D-E",                                                    // SPDE_PRODUCT = 14
 // "123456789" <-- Maximum product name length is 9
@@ -195,7 +195,7 @@ const char* longProductText[] =
    "SOLscript ",                                                // SOLSCRIPT_PRODUCT = 9
    "SDX Designer ",                                             // SDX_DESIGNER_PRODUCT = 10
 	"Solimar Print/Director, Quantum Server Edition ",           // QUANTUM_PRODUCT = 11
-   "PDF Utility ",                                              // PDF Utility = 12
+   "Rubika ",                                                   // PDF Utility = 12
    "???",                                                       // Not Used
    "Solimar Print/Director, Enterprise Edition",                // SPDE_PRODUCT = 14
 };
@@ -218,7 +218,7 @@ const char* mediumProductText[] =
    "SOLscript ",                             // SOLSCRIPT_PRODUCT = 9
    "SDX Designer ",                          // SDX_DESIGNER_PRODUCT = 10
    "SP/D, Quantum Server",							// QUANTUM_PRODUCT = 11
-   "PDF Utility",                            // PDF Utility = 12
+   "Rubika",                                 // PDF Utility = 12
    "???",                                    // Not Used
    "SP/D, Enterprise Edition",               // SPDE_PRODUCT = 14
 };
@@ -835,7 +835,7 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
          break;
-      case PDF_UTILITY:
+      case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
          break;
       case SPDE_PRODUCT:
@@ -897,7 +897,7 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
          break;
-      case PDF_UTILITY:
+      case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
          break;
       case SPDE_PRODUCT:
@@ -944,7 +944,7 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);
          break;
-      case PDF_UTILITY:
+      case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey(*(PDFUtilityProtectionKey*)pkey);
          break;
       case SPDE_PRODUCT:
