@@ -52,9 +52,6 @@ CLookup::CLookup()
 
       ////initialize modules for SDX Designer module list
       //Create new structures,and assign new module id's to each one.
-      m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
-
   //     m_SpdeModuleDetail[mod_id] = new ModuleDetail();
   //    m_SpdeModuleDetail[mod_id]->id = mod_id;
    }
@@ -132,12 +129,8 @@ CLookup::~CLookup()
 
       //free memory associated with iConvert_module_list. (ICONVERT)
       delete iConvert_module_detail[mod_id];
-
       delete m_solScriptModuleDetail[mod_id];
       delete m_PDFUtilityModuleDetail[mod_id];
-
-      delete m_SDXDesignerModuleDetail[mod_id];
-     // delete m_SpdeModuleDetail[mod_id];
    }
    for( int mod_id=0; mod_id < 64; mod_id++)
    {
@@ -229,16 +222,18 @@ bool CLookup::isAssignedModule(int idx)
 //============================================================================== 
 ModuleDetail** CLookup::getModuleList(int productID)
 {
-   if (productID == ICONVERT_PRODUCT)
-       return iConvert_module_detail;
-   else if (productID == SOLSCRIPT_PRODUCT)
-      return m_solScriptModuleDetail;
-   else if (productID == RUBIKA_PRODUCT)
-      return m_PDFUtilityModuleDetail;
-   else if (productID == SPDE_PRODUCT)
-      return m_SpdeModuleDetail;
-   else
-       return module_detail;
+   switch(productID) {
+        case ICONVERT_PRODUCT :
+                return iConvert_module_detail;
+        case SOLSCRIPT_PRODUCT :
+                return m_solScriptModuleDetail;
+        case RUBIKA_PRODUCT :
+                return m_PDFUtilityModuleDetail;
+        case SPDE_PRODUCT :
+                return m_SpdeModuleDetail;
+        default :
+                return module_detail;
+   }
 }
 
 //==============================================================================
@@ -277,8 +272,6 @@ bool CLookup::resetModuleList()
       *m_PDFUtilityModuleDetail[mod_id] = unassigned_module;
       m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
 
-      *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
    }
    for( mod_id=0; mod_id < 64; mod_id++)
    {
