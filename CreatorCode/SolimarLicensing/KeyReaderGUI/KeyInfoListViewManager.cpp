@@ -16,6 +16,7 @@ const int SDXDesignerProductID = 10;
 const int QuantumServerProductID = 11;
 const int RubikaProductID = 12;
 const int SPDEProductID = 14;
+const int SPProductID = 15;
 
 //Used to map the license as specified in KeySpec.xml
 const int InitialTrialID = 0;
@@ -183,6 +184,9 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
+
+			case SPProductID :
+				return retval = "SSE SP";
 
 			case RubikaProductID :
 				return retval = "Rubika";
