@@ -1589,13 +1589,13 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
 // Parameters:  ( TObject * ) - Sender
 // Returns:     None
 //==============================================================================
-const char* PasswordPacketDirectory = "L:\\Password Packets\\";
+//const char* PasswordPacketDirectory = "L:\\Password Packets\\";
 //const char* PasswordPacketDirectory = "R:\\Solimar Password Bundles\\";
 void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 {
    TBookmark tmpMark;
    AnsiString AnsiPassword;            //stores password read from grid
-   //AnsiString PasswordPacketDirectory;
+   AnsiString PasswordPacketDirectory;
    wchar_t wcharPassword[256];    //stores password that is converted from ansi to wchar
    BSTR bstrPassword;             //stores the BSTR version of the password
    BSTR VerificationCode;
@@ -1616,10 +1616,10 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 
    int PasswordIDIndex = 0;
 
-   /*char* buffer = NULL;
+   char* buffer = NULL;
    PasswordPacketDirectory = getcwd(buffer, MAXPATH);
    PasswordPacketDirectory =  PasswordPacketDirectory + "\\Password Packets\\";
-   */
+
    //only get the rows selected
 
    if (PswdGrid->SelectedRows->Count > 0)
@@ -1657,7 +1657,8 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
          char TheFileName[128];
          memset(TheFileName, 0, 128);
 
-         sprintf(TheFileName, " PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
+         sprintf(TheFileName, " %s_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
+                 key_record->pkey->getProductText(),
                  IntToHex(key_record->pkey->customerNumber, 3),
                  IntToHex(key_record->pkey->keyNumber, 2),
                  CurrentTime.wMonth, CurrentTime.wDay, CurrentTime.wYear,
