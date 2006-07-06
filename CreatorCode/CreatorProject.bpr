@@ -16,7 +16,7 @@
       objs\CryptoHelper.obj objs\ChallengeResponseHelper.obj 
       objs\ChallengeResponse.obj objs\MultidimensionalSafeArray.obj 
       objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj 
-      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj"/>
+      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj objs\SPKey.obj"/>
     <RESFILES value="CreatorProject.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) CustomerForm.dfm CreatorAbout.dfm CustQueryDlg.dfm 
@@ -98,8 +98,8 @@
       <FILE FILENAME="KEY\NewKey\Pkey.cpp" FORMNAME="" UNITNAME="Pkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\sdxkey.cpp" FORMNAME="" UNITNAME="sdxkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\pdfkey.cpp" FORMNAME="" UNITNAME="pdfkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="KEY\NewKey\Spdekey.h" FORMNAME="" UNITNAME="Spdekey.h" CONTAINERID="" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\Spdekey.cpp" FORMNAME="" UNITNAME="Spdekey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\NewKey\SPKey.cpp" FORMNAME="" UNITNAME="SPKey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>

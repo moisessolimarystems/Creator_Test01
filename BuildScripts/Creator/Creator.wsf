@@ -301,7 +301,7 @@ Sub BuildInstallShieldProject(aVersionNum)
             g_Build.WriteToDlgAndFile "installKey(" & installItem & "): " & installKey(installItem)
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Updating Version Number"
             g_Build.WriteToDlgAndFile "versionNumber: " & aVersionNum
-            'g_Build.UpdateInstallShieldVersion ISProject, Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34), aVersionNum
+            'g_Build.UpdateInstallShieldVersion ISProject, g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, aVersionNum
             'g_Build.RunCmd Chr(34) & g_Build.InstallShieldProjPath & "\ProjectDir.bat" & Chr(34)
            
 	    g_Build.WriteToDlgAndFile "Compiling InstallShield Project"

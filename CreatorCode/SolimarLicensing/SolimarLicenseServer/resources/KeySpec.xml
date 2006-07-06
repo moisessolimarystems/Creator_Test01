@@ -48,7 +48,11 @@ enum ProductId {
 9	SOLSCRIPT_PRODUCT
 10	SDX_DESIGNER_PRODUCT
 11	QUANTUM_PRODUCT
-12	NUMBER_OF_PRODUCTS
+12  RUBIKA_PRODUCT
+13  NOT_AVAILABLE
+14  SPDE_PRODUCT
+15  SSE_SP_PRODUCT
+16	NUMBER_OF_PRODUCTS
 0xFFFF	UNKNOWN_PRODUCT
 };
 -->
@@ -572,6 +576,14 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
+		<KeyLayout name="SSE SP">
+			<ModuleList>
+			</ModuleList>
+			<ProductList>
+				<Product id="15" name="SSE SP">
+				</Product>
+			</ProductList>
+		</KeyLayout>		
 		<KeyLayout name="SPD">
 			<ModuleList>
 				<!-- Twinax Input -->
@@ -641,6 +653,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="41"	offset="0x0AA" bits="1" name="IPDS Print Controller" unlimited="1"/>
 				<Module id="42"	offset="0x0A9" bits="1" name="RJE::3211" unlimited="1"/>
 				<Module id="43"	offset="0x0A8" bits="1" name="AFPDS::IPDS" unlimited="1"/>
+            
+            <Module id="44"	offset="0x0AF" bits="1" name="PDF::Postscript(PDFL)" unlimited="1"/>
 				
 				
 				<!-- Module IDs identifying hardware -->
@@ -653,6 +667,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<!-- Module IDs identifying resources -->
 				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
 				<Module id="201"	offset="0x174" bits="1" name="TCP IP Output Dynamic Host Selection" unlimited="1"/>
+            <Module id="202"	offset="0x170" bits="4" name="PS(PDFL) Interpreter"/>
 				
 				<!-- Output Pool module -->
 				<Module id="240"	offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
@@ -719,6 +734,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="41" default="0"/>
 					<ModuleInclude id="42" default="0"/>
 					<ModuleInclude id="43" default="0"/>
+					<ModuleInclude id="44" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
@@ -728,6 +744,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					
 					<ModuleInclude id="200" default="0"/>
 					<ModuleInclude id="201" default="0"/>
+					<ModuleInclude id="202" default="0"/>
 					<ModuleInclude id="240" default="0"/>
 					
 					<ModuleInclude id="300" default="0"/>
