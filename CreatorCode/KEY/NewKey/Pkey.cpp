@@ -130,6 +130,7 @@
 #include "sdxkey.h"
 #include "pdfkey.hpp"
 #include "Spdekey.h"
+#include "SPKey.h"
 
 // protection key passwords and developer ID
 const ushort WRITE_PASSWORD = 0x4AFC;
@@ -171,8 +172,9 @@ const char* ProductText[] =
    "SDX Designer",                                              // SDX_DESIGNER_PRODUCT = 10
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
    "Rubika",                                                    // PDF Utility = 12
-   "???",                                                       // Not Used
+   "???",                                                       //
    "SP/D-E",                                                    // SPDE_PRODUCT = 14
+   "SSE SP",                                                    // SSE SP = 15
 // "123456789" <-- Maximum product name length is 9
 };
 
@@ -198,6 +200,7 @@ const char* longProductText[] =
    "Rubika ",                                                   // PDF Utility = 12
    "???",                                                       // Not Used
    "Solimar Print/Director, Enterprise Edition",                // SPDE_PRODUCT = 14
+   "SOLsearcher Enterprise, Single Platform",                   // SSE SP = 15
 };
 
 /* productText[]
@@ -221,6 +224,7 @@ const char* mediumProductText[] =
    "Rubika",                                 // PDF Utility = 12
    "???",                                    // Not Used
    "SP/D, Enterprise Edition",               // SPDE_PRODUCT = 14
+   "SSE, Single Platform",                    // SSE SP = 15
 };
 
 /* KDPasswordText[]
@@ -826,9 +830,6 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-/*         new_key = new SDXDesignerProtectionKey();
-         break;
-*/
       default:
          new_key = new ProtectionKey();
          break;
@@ -888,9 +889,6 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
- /*        new_key = new SDXDesignerProtectionKey();
-         break;
- */
       default:
          new_key = new ProtectionKey();
          break;
@@ -935,9 +933,6 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
-/*         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
-         break;
-*/
       default:
          new_key = new ProtectionKey(*pkey);
          break;
