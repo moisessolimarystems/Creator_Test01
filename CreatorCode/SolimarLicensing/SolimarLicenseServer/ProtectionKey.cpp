@@ -202,7 +202,7 @@ HRESULT ProtectionKey::IsActive(VARIANT_BOOL *key_active)
 	try
 	{
 		// key has a customer number, key number, and is not an expired key
-		*key_active = ((ReadHeaderCache(L"Customer Number").uiVal && ReadHeaderCache(L"Key Number").uiVal && (!isOnTrial() || !TimesUp()))
+		*key_active = ((!isOnTrial() || !TimesUp())
 			? VARIANT_TRUE : VARIANT_FALSE);
 	}
 	catch(_com_error &e)
