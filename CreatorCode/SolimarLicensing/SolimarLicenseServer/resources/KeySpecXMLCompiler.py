@@ -104,7 +104,7 @@ def XMLProcessProduct(node, products, all_modules):
 def XMLProcessModuleInclude(node, prod_modules, all_modules):
 	
 	# read this xml ModuleInclude
-	this_module = {'default':'0', 'unlimited':0, 'pool':'0', 'isPool':'false', 'isLicense':'true', 'isCounter':'false', 'counter':'0', 'isSharable':'false'}
+	this_module = {'default':'0', 'unlimited':0, 'pool':'0', 'isPool':'false', 'isLicense':'true', 'isCounter':'false', 'counter':'0'}
 	for i in range(0,node.attributes.length):
 		this_module[node.attributes.item(i).nodeName]=node.attributes.item(i).nodeValue
 		
@@ -206,7 +206,6 @@ for product in formats['products']:
 		fout.write('\tproducts.data.back().data.back().isLicense = %s;\n' % (module['isLicense'],))
 		fout.write('\tproducts.data.back().data.back().isCounter = %s;\n' % (module['isCounter'],))
 		fout.write('\tproducts.data.back().data.back().counter = %s;\n' % (module['counter'],))
-		fout.write('\tproducts.data.back().data.back().isSharable = %s;\n' % (module['isSharable'],))
 		
 		if (module.has_key('licenseRead') and len(module['licenseRead'])>0):
 			fout.write('\tproducts.data.back().data.back().fn_read = Module::%s;\n' % (function_name_read,))
@@ -253,7 +252,7 @@ fout = open('.\\resources\\KeySpec.html','w')
 
 def ModuleDetailsHtml(module):
 	s = ""
-	for key in ['name','id','offset','bits','isLicense','default','unlimited','isPool','pool','licenseRead','licenseWrite', 'isCounter', 'counter', 'isSharable']:
+	for key in ['name','id','offset','bits','isLicense','default','unlimited','isPool','pool','licenseRead','licenseWrite', 'isCounter', 'counter']:
 		if (module.has_key(key)):
 			s = s + key + ": " + str(module[key]) + "<br/>"
 	return s

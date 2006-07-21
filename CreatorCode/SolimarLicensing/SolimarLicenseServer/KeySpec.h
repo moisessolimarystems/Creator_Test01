@@ -70,7 +70,6 @@ public:
 		bool isPool;
 		bool isLicense;
 		bool isCounter;
-		bool isSharable;
 		ReadWriteFunctionPtr fn_read;
 		ReadWriteFunctionPtr fn_write;
 		
