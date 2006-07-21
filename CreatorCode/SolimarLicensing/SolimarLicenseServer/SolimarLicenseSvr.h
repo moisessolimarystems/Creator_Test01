@@ -30,6 +30,7 @@ __interface ISolimarLicenseSvr : IDispatch
 	[id(7),helpstring("method GenerateExtensionPassword")] HRESULT GenerateExtensionPassword([in] long customer_number, [in] long key_number, [in] long extend_days, [in] long extension_num, [out,retval] BSTR *password);
 	[id(8),helpstring("method GenerateModulePassword")] HRESULT GenerateModulePassword([in] long customer_number, [in] long key_number, [in] long product_ident, [in] long module_ident, [in] long license_count, [out,retval] BSTR *password);
 	[id(9),helpstring("method GetLicenseServerTime")] HRESULT GetLicenseServerTime([out,retval] VARIANT *pvtSystemTime);
+	[id(10),helpstring("method GenerateModulePassword2")] HRESULT GenerateModulePassword2([in] long customer_number, [in] long key_number, [in] long product_ident, [in] long module_ident, [in] long license_count, [in] long password_number, [out,retval] BSTR *password);
 	
 	// Password packet management
 	[id(20),helpstring("method PasswordPacketInitialize")] HRESULT PasswordPacketInitialize();
@@ -62,6 +63,7 @@ __interface ISolimarLicenseSvr : IDispatch
 	[id(54),helpstring("method KeyModuleLicenseInUse")] HRESULT KeyModuleLicenseInUse([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
 	[id(55),helpstring("method KeyModuleLicenseObtain")] HRESULT KeyModuleLicenseObtain([in] BSTR key_ident, [in] long module_ident, [in] long license_count);
 	[id(56),helpstring("method KeyModuleLicenseRelease")] HRESULT KeyModuleLicenseRelease([in] BSTR key_ident, [in] long module_ident, [in] long license_count);
+	[id(57),helpstring("method KeyModuleLicenseCounterDecrement")] HRESULT KeyModuleLicenseCounterDecrement([in] BSTR key_ident, [in] long module_ident, [in] long license_count);
 	
 	// Key Programming/Creator support
 	// Sets all writable cells on a key to zero
@@ -140,6 +142,7 @@ public:
 	STDMETHOD(GenerateExtensionPassword)(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	STDMETHOD(GenerateModulePassword)(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
 	STDMETHOD(GetLicenseServerTime)(VARIANT *pvtSystemTime);
+	STDMETHOD(GenerateModulePassword2)(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password);
 	
 	// Password packet management
 	STDMETHOD(PasswordPacketInitialize)();
@@ -172,6 +175,7 @@ public:
 	STDMETHOD(KeyModuleLicenseInUse)(BSTR key_ident, long module_ident, long* license_count);
 	STDMETHOD(KeyModuleLicenseObtain)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseRelease)(BSTR key_ident, long module_ident, long license_count);
+	STDMETHOD(KeyModuleLicenseCounterDecrement)(BSTR key_ident, long module_ident, long license_count);
 	
 	// Sets all writable cells on a key to zero
 	STDMETHOD(KeyFormat)(BSTR key_ident, BSTR *new_key_ident);

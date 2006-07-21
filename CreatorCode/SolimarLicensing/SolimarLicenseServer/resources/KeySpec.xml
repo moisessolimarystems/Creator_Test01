@@ -22,6 +22,7 @@
 #define PRIMARY_PASSWD_CELL      0x16
 #define EXPIRATION_DATE_CELL     0x18
 #define SECONDARY_ALG_CELL       0x22
+#define PASSWORD_NUMBER			 0x2d
 #define KEY_TYPE_CELL            0x30
 #define PRODUCT_ID_CELL          0x31
 #define PRODUCT_VERSION_CELL     0x32
@@ -143,6 +144,21 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					A pooled module is one that shares a set of licenses with one or more modules. This value
 					indicates the id of a Pool to associate this module with.
 					Special case: 0 indicates that a module is not a pooled license module.
+					
+	isCounter		true | false	(default: false)
+					A counter module is a one who's licenses can be decremented.  When applying a password 
+					to a counter module, the licenses are added instead to the amount on the key instead of
+					replaced like all other modules.
+	
+	counter			integer (default: 0)
+					A counter module is a one who's licenses can be decremented.  The counter field can be used
+					to keep track of sublicenses when licenseRead or licenseWrite is used for a counter module.
+					For example,:
+					licenseRead(int x) {return (x*25);}  and licenseWrite(int x) {return (x/25);}
+					when decrementLicense is called, counter will increase by 1 per call from 0-24, once 25 is hit, then 
+					licenseWrite can be called and counter will be set back to 0.  If you want the first call to decementLicense 
+					to subtract a value from the key, then the default value of counter should equal licenseRead(1)-1 or 24 in the
+					example above.
 -->
 
 
@@ -169,6 +185,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		<HeaderField id="10007"	offset="0x2A0" bits="32" name="Secondary Descriptor" default="0xBF0A1143"/>
 		<!-- We may need to move this field if it's in the way of counter/algorithm cells -->
 		<HeaderField id="10030" offset="0x340" bits="16" name="Key Host"/>
+		<HeaderField id="10040" offset="0x350" bits="16" name="Password Number"/>
+		<HeaderField id="10041" offset="0x360" bits="32" name="Headers Initialized"/>
 		<HeaderField id="10020"	offset="0x380" bits="16" name="Key Type"/>
 		<HeaderField id="10021"	offset="0x390" bits="16" name="Product ID"/>
 		<HeaderField id="10022"	offset="0x3A0" bits="16" name="Product Version"/>
@@ -436,7 +454,10 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="11" offset="0x08B" bits="1" name="Barcode" unlimited="1"/>
 				<Module id="12" offset="0x08C" bits="1" name="Text Marking" unlimited="1"/>
 				<Module id="13" offset="0x08D" bits="1" name="Delete" unlimited="1"/>
-				<Module id="14" offset="0x08E" bits="1" name="Replace" unlimited="1"/>																																							
+				<Module id="14" offset="0x08E" bits="1" name="Replace" unlimited="1"/>
+				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
+				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
+				<Module id="30" offset="0x0f0" bits="4" name="Instances"/>
 				
 			</ModuleList>
 			<ProductList>
@@ -455,7 +476,10 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="11" default="0"/>
 					<ModuleInclude id="12" default="0"/>
 					<ModuleInclude id="13" default="0"/>
-					<ModuleInclude id="14" default="0"/>																																						
+					<ModuleInclude id="14" default="0"/>
+					<ModuleInclude id="20" default="0"/>
+					<ModuleInclude id="21" default="0"/>
+					<ModuleInclude id="30" default="1"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>

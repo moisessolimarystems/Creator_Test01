@@ -554,6 +554,39 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 	return hr;
 }
 
+HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count)
+{
+	HRESULT hr = S_OK;
+	try
+	{
+		SafeMutex mutex(license_use_lock);
+		unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
+		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
+
+		//Only decrement counter if license count is not unlimited and not key status is not initial_trial
+		if(module.isCounter && !LicenseIsUnlimited(module.id) && key_status != INITIAL_TRIAL)
+		{
+			if(module.fn_read(ReadModuleCache(module.id).ulVal) >= module.counter+license_count)
+			{
+				module.counter+=license_count;
+				if(module.counter / module.fn_read(1))	//Actually decrement from the key.
+				{
+					WriteLicenseDecrementCounter(module_ident, module.counter);
+					module.counter = module.counter % module.fn_read(1); 
+				}
+			}
+			else
+			{
+				throw _com_error(LicenseServerError::EHR_LICENSE_INSUFFICIENT);
+			}
+		}
+	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
 HRESULT ProtectionKey::LicenseReleaseAll(BSTR license_id)
 {
 	SafeMutex mutex(license_use_lock);
@@ -651,7 +684,7 @@ OutputFormattedDebugString(L"ProtectionKey::Program(%d, %d, %d, %d, %d, %d, %d, 
 	
 //xxx debug
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Product: %d, Version: %08x, Key Type: %d, Status: INITIAL_TRIAL", product_ident, product_version, key_type);
-	
+
 	// write the header data
 	WriteHeader(L"Product ID",(unsigned int)(unsigned short)product_ident);
 	WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
@@ -685,6 +718,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentK
 	    hr = m_driver->ComputeCurrentKeyIdent(m_keyident, new_key_ident);
 		if (FAILED(hr)) throw _com_error(hr);
 	}
+
+	m_driver->ClearKeyUnprogrammedIdentifier(m_keyident);
+	InitializePasswordNumber();	// Set the module password number to 0
 	
 //xxx debug
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primary descriptor, primary password, secondary descriptor)");
@@ -696,6 +732,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primar
 	WriteHeader(header_primary_password.id, header_primary_password.default_value);
 	WriteHeader(header_secondary_descriptor.id, header_secondary_descriptor.default_value);
 			
+	
+	
+
 //xxx debug
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data");
 	
@@ -1002,15 +1041,16 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 		if (FAILED(hr))
 			return hr;
 		
-		DWORD user_password = password_arguments.password;
-		
+		DWORD user_password = password_arguments.password;	
 		unsigned short key_number = ReadHeaderCache(L"Key Number").uiVal;
 		unsigned short customer_number = ReadHeaderCache(L"Customer Number").uiVal;
 		unsigned short product_id = ReadHeaderCache(L"Product ID").uiVal;
 		unsigned short product_version = ReadHeaderCache(L"Product Version").uiVal;
 		unsigned short key_type = ReadHeaderCache(L"Key Type").uiVal;
 		unsigned short key_status = ReadHeaderCache(L"Status").uiVal;
-		
+		unsigned short password_number = ReadHeaderCache(L"Password Number").uiVal;
+		unsigned int headersInitialized = ReadHeaderCache(L"Headers Initialized").ulVal;
+				
 		bool permanent_allowed_key = (key_type!=KEYDevelopment && key_type!=KEYBackup && key_type!=KEYAddon);
 		bool trial_key = isOnTrial();
 		bool base_key = key_status == BASE;
@@ -1019,6 +1059,7 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 // Extension passwords:		<password,16>				new: <password,16>-0-2-<customer_number,16>-<key_number,16>-<extend_days,10>-<extension_num,10>
 // Version passwords:		<password,16>-<version,16>	new: <password,16>-<version,16>-3-<customer_number,16>-<key_number,16>
 // Module passwords:		<password,16>-<units,10/16>	new: <password,16>-<units,10/16>-4-<customer_number,16>-<key_number,16>-<module.id,10>
+// Module passwords:		<password,16>-<units,10/16>	new: <password,16>-<units,10/16>-4-<customer_number,10>-<key_number,10>-<module.id,10>-<password_number,10>
 		// new style password entry (specifies password type and all the arguments to the password generate function)
 		if (!password_arguments.legacy)
 		{
@@ -1085,9 +1126,54 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 							return S_OK;
 					}
 					
+					//for non-legacy keys, if headersInitialized!=0xdeadbeef (HEADER_INITIALIZED), then the values in the
+					//unused headers is garabage, so set all unused header to 0x00 and set headersInitialized to HEADER_INITIALIZED
+					//there is a slim chance (1:0xffffffff) that the garabage value in headerInitialized could be 0xdeadbeef (HEADER_INITIALIZED)
+					if(headersInitialized != HEADER_INITIALIZED)
+					{
+						password_number = 0;	// set to zero, because it was probably a garbage value before.
+						unsigned short afpdsPS_PPM = 0;
+						unsigned short xchangeIPDS_PPM = 0;
+						unsigned short xchangePCL_PPM = 0;
+						unsigned short xchangePS_PPM = 0;
+						unsigned short xchangePSDBCS_PPM = 0;
+						if (product_id==12)		// SPDE
+						{
+							//Keep track of:
+							//	AFPDS::PS PPM
+							//	XCHANGE::IPDS PPM
+							//	XCHANGE::PCL PPM
+							//	XCHANGE::PS PPM
+							//	XCHANGE::PS(DBCS) PPM
+							//Because it is stored in the cells that will be erased.
+							afpdsPS_PPM = ReadModuleCache(L"AFPDS::PS PPM").uiVal;
+							xchangeIPDS_PPM = ReadModuleCache(L"XCHANGE::IPDS PPM").uiVal;
+							xchangePCL_PPM = ReadModuleCache(L"XCHANGE::PCL PPM").uiVal;
+							xchangePS_PPM = ReadModuleCache(L"XCHANGE::PS PPM").uiVal;
+							xchangePSDBCS_PPM = ReadModuleCache(L"XCHANGE::PS(DBCS) PPM").uiVal;
+						}
+						hr = m_driver->ClearKeyUnprogrammedIdentifier(m_keyident);
+						InitializePasswordNumber();
+
+						if (product_id==12)		// SPDE
+						{
+							WriteModule(L"AFPDS::PS PPM", afpdsPS_PPM);
+							WriteModule(L"XCHANGE::IPDS PPM", xchangeIPDS_PPM);
+							WriteModule(L"XCHANGE::PCL PPM", xchangePCL_PPM);
+							WriteModule(L"XCHANGE::PS PPM", xchangePS_PPM);
+							WriteModule(L"XCHANGE::PS(DBCS) PPM", xchangePSDBCS_PPM);
+						}
+					}
+
 					// Generic module password code
-					if (EnterModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
-						return S_OK;
+					//when password_arguments.password_number==0 && password_number==0 then Pre-incremental Password Numbering
+					if((password_arguments.password_number==0 && password_number==0) ||
+						password_arguments.password_number > password_number)
+					{
+						if (EnterModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed, password_arguments.password_number))
+							return S_OK;
+
+					}
 					break;
 				}
 				default:
@@ -1315,13 +1401,13 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 	return false;
 }
 
-bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed)
+bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number)
 {
 	HRESULT hr = S_OK;
 
 	// Generic module password code
 	// if trial key
-	if (GetModulePassword(customer_number, key_number, module_id, units_licensed) == user_password)
+	if (GetModulePassword(customer_number, key_number, module_id, units_licensed, password_number) == user_password)
 	{
 		if (trial_key && permanent_allowed_key)
 		{
@@ -1346,6 +1432,10 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 			try
 			{
 				WriteLicense(module_id, units_licensed);
+
+				//if password_number > 0 then write it into the PASSWORD_NUMBER cell.
+				if(password_number > 0)
+					WriteHeader(L"Password Number", password_number);
 			}
 			catch (_com_error &e)
 			{
@@ -1726,6 +1816,138 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 	
 	return S_OK;
 }
+HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password)
+{
+	bool password_generated = false;
+	DWORD password_hash;
+	wchar_t password_string[128];
+	KeySpec::Product &product(m_keyspec->products[product_ident]);
+	KeySpec::Module &module(product[module_ident]);
+	
+	password_string[0]=0;
+	
+	//Generate old style passwords if password number is 0, else force the 
+	//use of new style passwords
+	if(password_number == 0)
+	{
+		// different products have different module password functions for reasons of legacy code compatiblity
+		switch(product.id)
+		{
+			// SPD and iConvert
+			case 0:		// SPD
+			case 6:		// Connectivity
+			case 11:	// Quantum
+			case 7:		// iConvert
+			{
+				// we need differentiation here between pages per minute and output passwords (pooled password issue)
+				//	_variant_t GetSPDOutputPassword(unsigned short customer_number, unsigned short key_number, unsigned short output_units);
+				//	_variant_t GetSPDModulePassword(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
+				//	_variant_t GetSPDPagesPerMinutePassword(unsigned short customer_number, unsigned short key_number, unsigned short ext);
+				
+				// if the module is the 'max lu/output pool' module
+				if (module.id==128)
+				{
+					password_hash = GetSPDOutputPassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)license_count);
+					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+					password_generated = true;
+				}
+				// if the module is a pages per minute module (andt he product is an spd or spd derivative)
+				else if
+				(
+					/* Spd Product */
+					(product.id==0 || product.id==6 || product.id==11)
+					&&
+					/* Pages Per Minute Module */
+					(module.id==68 || module.id==70 || module.id==160 || module.id==64 || module.id==66)
+				)
+				{
+					// The license_count parameter for pages per minute must consist of the following:
+					// bottom 4 bits: ppm extension
+					// top 4 bits: pages per minute
+					unsigned short ppm_pages = (unsigned short)((license_count & 0xFFFF0000) >> 16);
+					unsigned short ppm_extension = (unsigned short)(license_count & 0x0000FFFF);
+					
+					// translate the pages per minute module id to the underlying module id (eg XCHANGE::PS PPM module id ->  XCHANGE::PS module id)
+					unsigned int ppm_underlying_module;
+					switch(module.id)
+					{
+					case 68:
+						ppm_underlying_module = 2;		break;
+					case 70:
+						ppm_underlying_module = 35;		break;
+					case 160:
+						ppm_underlying_module = 39;		break;
+					case 64:
+						ppm_underlying_module = 44;		break;
+					case 66:
+						ppm_underlying_module = 47;		break;
+					default:
+						return E_INVALIDARG;
+					}
+					
+					password_hash = GetSPDPagesPerMinutePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)ppm_extension);
+					
+					unsigned int pages_per_minute_struct = ((ppm_underlying_module & 0xFF) << 12) | (ppm_pages & 0x00FFF);
+					
+					swprintf(password_string, L"%x-%x-4-%x-%x-%d", password_hash, pages_per_minute_struct, customer_number, key_number, module.id);
+					
+					password_generated = true;
+				}
+				// otherwise, regular SPD module password
+				else
+				{
+					password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
+					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+					password_generated = true;
+				}
+				break;
+			}
+			// SolSearcher
+			case 8:
+			{
+				// The solsearcher specific (legacy) password generation function 
+				// only generates passwords for modules {0,1,2,3,4}
+				// any future modules should be handled by the default/generic case
+				if (module.id<=4)
+				{
+					password_hash = GetSolsearcherModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
+					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+					password_generated = true;
+				}
+				break;
+			}
+			// SolScript
+			case 9:	
+			{
+				// for spd modules (all modules are currently legacy spd style modules)
+				password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
+				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+				password_generated = true;
+				break;
+			}
+		}
+	}
+		
+	// all other products and modules
+	if (!password_generated)
+	{
+		if(password_number == 0)
+		{
+			password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
+			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+		}
+		else
+		{
+			password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count, (unsigned int)password_number);
+			swprintf(password_string, L"%x-%d-4-%x-%x-%d-%d", password_hash, license_count, customer_number, key_number, module.id, password_number);
+		}
+	}
+	
+	*password = SysAllocString(password_string);
+	
+	return S_OK;
+}
+
 
 unsigned short ProtectionKey::ReadCellPhysical(unsigned short cell)
 {
@@ -1892,13 +2114,59 @@ void ProtectionKey::WriteModule(unsigned int id, unsigned int value)
 void ProtectionKey::WriteLicense(wchar_t* id, unsigned int value)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(value)));
+	if(module.isCounter)
+	{
+		long writeValue = module.fn_read(ReadModuleCache(id).ulVal) + value;
+		WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(writeValue)));
+	}
+	else
+		WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(value)));
 }
+
 
 void ProtectionKey::WriteLicense(unsigned int id, unsigned int value)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(value)));
+	if(module.isCounter)
+	{
+		long writeValue = module.fn_read(ReadModuleCache(id).ulVal) + value;
+		WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(writeValue)));
+	}
+	else
+		WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(value)));
+}
+
+HRESULT ProtectionKey::WriteLicenseDecrementCounter(wchar_t* id, unsigned int value)
+{
+	HRESULT hr(S_OK);
+	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
+	if(module.isCounter && !LicenseIsUnlimited(id))
+	{
+		long writeValue = module.fn_write(module.fn_read(ReadModuleCache(id).ulVal) - value) + ((value % module.fn_read(1)) > 0 ? 1 : 0);
+		if(module.fn_read(ReadModuleCache(id).ulVal) >= value)
+			WriteBitsPhysical(module.offset, module.bits, _variant_t(writeValue));
+		else	//Case where they try to decrement more licenses than are on the key
+			WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(0)));
+	}
+	else
+		hr = E_INVALIDARG;
+	return hr;
+}
+HRESULT ProtectionKey::WriteLicenseDecrementCounter(unsigned int id, unsigned int value)
+{
+	HRESULT hr(S_OK);
+	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
+	if(module.isCounter && !LicenseIsUnlimited(id))
+	{
+		long writeValue = module.fn_write(module.fn_read(ReadModuleCache(id).ulVal) - value) + ((value % module.fn_read(1)) > 0 ? 1 : 0);
+		if(module.fn_read(ReadModuleCache(id).ulVal) >= value)
+			WriteBitsPhysical(module.offset, module.bits, _variant_t(writeValue));
+		else	//Case where they try to decrement more licenses than are on the key
+			WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(0)));
+	}
+	else
+		hr = E_INVALIDARG;
+	return hr;
 }
 
 
@@ -1973,6 +2241,13 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 				return 0;
 			}
 		}
+		else if(module.isCounter)
+		{
+			//if(module.id == 10)
+			//	return module.fn_read(65536) - module.counter;
+			//else
+			return module.fn_read(ReadModuleCache(id).ulVal) - module.counter;
+		}
 		else
 		{
 			return module.fn_read(ReadModuleCache(id).ulVal);
@@ -2005,6 +2280,13 @@ unsigned int ProtectionKey::LicenseEffectiveValue(unsigned int id)
 			{
 				return 0;
 			}
+		}
+		else if(module.isCounter)
+		{
+			//if(module.id == 10)
+			//	return module.fn_read(65536) - module.counter;
+			//else
+			return module.fn_read(ReadModuleCache(id).ulVal) - module.counter;
 		}
 		else
 		{
@@ -2181,6 +2463,46 @@ DWORD ProtectionKey::GetModulePassword(unsigned short customer_number, unsigned 
 	
 	return GetPassword(*((DWORD*)digest.m_digest));
 }
+
+/* GetModulePassword()
+ *    Calculate and return the password for a module license.
+ *    An md5 hash is computed on the struct formed by:
+ *    struct
+ *	  {
+ *		unsigned short customer_number, key_number;
+ *		unsigned int module_id, units_licensed, password_number;
+ *	  };
+ *    The value used for the query is the first 4 bytes of the hash.
+ */
+
+DWORD ProtectionKey::GetModulePassword(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number)
+{
+	HRESULT hr = S_OK;
+	if(password_number == 0)	//Pre-incremental Password Numbering
+		return GetModulePassword(customer_number, key_number, module_id, units_licensed);
+	class QueryFiveElements
+	{
+	public:
+		QueryFiveElements(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number) : 
+			m_customer_number(customer_number), m_key_number(key_number), m_module_id(module_id), m_units_licensed(units_licensed), m_password_number(password_number)
+		{
+			;
+		}
+	private:
+		unsigned short m_customer_number, m_key_number;
+		unsigned int m_module_id, m_units_licensed, m_password_number;
+	};
+	
+	CryptoHelper crypto;
+	CryptoHelper::Digest digest;
+	QueryFiveElements query(customer_number, key_number, module_id, units_licensed, password_number);
+	
+	hr = crypto.HashData((BYTE*)&query, sizeof(QueryFiveElements), digest);
+	if (FAILED(hr)) throw _com_error(hr);
+	
+	return GetPassword(*((DWORD*)digest.m_digest));
+}
+
 
 /* GetExtensionPassword()
  *    Calculate and return the password for the specified number of
@@ -2441,6 +2763,12 @@ void ProtectionKey::TrialToPermanent()
 	{
 		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
 	}
+}
+
+void ProtectionKey::InitializePasswordNumber()
+{
+	WriteHeader(L"Password Number", _variant_t(0));
+	WriteHeader(L"Headers Initialized", _variant_t(HEADER_INITIALIZED));
 }
 
 

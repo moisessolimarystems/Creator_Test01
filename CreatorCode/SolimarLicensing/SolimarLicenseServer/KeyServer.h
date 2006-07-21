@@ -37,6 +37,7 @@ public:
 	HRESULT GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password);
 	HRESULT GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
+	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password, long password_number);
 	HRESULT GetLicenseServerTime(VARIANT *pvtSystemTime);
 	
 	// Password packet management
@@ -70,6 +71,7 @@ public:
 	HRESULT KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long module_ident, long* license_count);
 	HRESULT KeyModuleLicenseObtain(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
+	HRESULT KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT LicenseReleaseAll(BSTR license_id);
 	
 	// Sets all writable cells on a key to zero

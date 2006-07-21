@@ -29,7 +29,7 @@ private:
 	bool EnterBasePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number);
 	bool EnterProductVersionPassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned short product_version);
 	bool EnterExtensionPassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned short key_status, unsigned short extend_days, unsigned short extension_num);
-	bool EnterModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
+	bool EnterModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number);
 	
     // SPD/iConvert specific	
 	bool EnterSPDModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
@@ -45,6 +45,7 @@ public:
 	HRESULT GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password);
 	HRESULT GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
+	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password);
 	
 	HRESULT Lock(BSTR license_id);
 	HRESULT Unlock(BSTR license_id);
@@ -58,6 +59,8 @@ public:
 	HRESULT ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count);
 	HRESULT ModuleLicenseObtain(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count);
+	HRESULT ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count);
+
 	HRESULT LicenseReleaseAll(BSTR license_id);
 	
 	// Sets all writable cells on a key to zero
@@ -125,6 +128,7 @@ private:
 	static const short INITIAL_TRIAL_DAYS = 30;
 	static const short EXTRA_DAY_BUFFER = 10;
 	static const short MAX_EXTENSION_DAYS = 255;  //before 3/17/98 MAX_EXTENSION_DAYS = 90;
+	static const unsigned int HEADER_INITIALIZED = 0xDEADBEEF;
 	
 public:
 	static const unsigned int DAYS_PER_YEAR = 365;
@@ -177,12 +181,16 @@ private:
 	void WriteModule(unsigned int id, unsigned int value);
 	void WriteLicense(wchar_t* id, unsigned int value);
 	void WriteLicense(unsigned int id, unsigned int value);
+	HRESULT WriteLicenseDecrementCounter(wchar_t* id, unsigned int value);
+	HRESULT WriteLicenseDecrementCounter(unsigned int id, unsigned int value);
 	
 	// License information helpers
 	bool LicenseIsUnlimited(wchar_t* id);
 	bool LicenseIsUnlimited(unsigned int id);
 	bool LicenseIsPooled(wchar_t* id);
 	bool LicenseIsPooled(unsigned int id);
+	bool LicenseIsCounter(wchar_t* id);
+	bool LicenseIsCounter(unsigned int id);
 	unsigned int LicenseEffectiveValue(wchar_t* id);
 	unsigned int LicenseEffectiveValue(unsigned int id);
 	
@@ -198,6 +206,8 @@ private:
 	
 	// generic, non product-specific module password generation
 	DWORD GetModulePassword(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
+	DWORD GetModulePassword(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number);
+	
 	
 	// SPD/iConvert specific
 	DWORD GetSPDOutputPassword(unsigned short customer_number, unsigned short key_number, unsigned short output_units);
@@ -208,6 +218,8 @@ private:
 	DWORD GetSolsearcherModulePassword(unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
 	
 	void TrialToPermanent();
+	//void ClearUnusedHeaderCells();
+	void InitializePasswordNumber();
 	HRESULT WriteStatus(unsigned short new_key_status);
 	HRESULT WriteCounterDays(unsigned short extend_days);
 	HRESULT WriteExpirationDays(unsigned short extend_days);

@@ -109,7 +109,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 	// errors, we create a packet and call FindFirst/FindNext the appropriate
 	// number of times to get to that key. While ugly, this is the method
 	// recommended by Rainbow.
-	
+
 	HRESULT hr = S_OK;
 	KeyList newkeys;
 	
@@ -126,16 +126,30 @@ HRESULT RainbowDriver::RefreshKeyList()
 	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
+		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
 	
+wchar_t tmpBuf[256];
+//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - RNBOsproSetContactServer() - hr = %x", hr);
+//OutputDebugStringW(tmpBuf);
+
 	bool key_found = (bool)SUCCEEDED(hr);
 	int key_count = 0;
 	
 	// count the keys
-	for (key_found = !RNBOsproFindFirstUnit(packet, DEVELOPER_ID); 
-			key_found; 
-			key_found = !RNBOsproFindNextUnit(packet))
+	unsigned short retVal = RNBOsproFindFirstUnit(packet, DEVELOPER_ID);
+	if(retVal != 0)
+	{
+		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
+		wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st Looking for first key - %d", retVal);
+		OutputDebugStringW(tmpBuf);
+	}
+
+	while(retVal == 0)
 	{
 		++key_count;
+		retVal = RNBOsproFindNextUnit(packet);
+		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindNextUnit() - retVal = %d", retVal);
+		//OutputDebugStringW(tmpBuf);
 	}
 	
 	if (packet)
@@ -157,14 +171,25 @@ HRESULT RainbowDriver::RefreshKeyList()
 			hr = TranslateRainbowError(RNBOsproInitialize(keypacket));
 		
 		if (SUCCEEDED(hr))
-			TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
+			TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_STANDALONE"));
+			//TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_SPN_LOCAL"));
+			
 		
 		// iterate to the ith key
-		int j;
-		for (j = 0, key_found = !RNBOsproFindFirstUnit(keypacket, DEVELOPER_ID);
-			j < i && SUCCEEDED(hr);
-			j++, key_found = !RNBOsproFindNextUnit(keypacket));
-		
+		unsigned short retVal = RNBOsproFindFirstUnit(keypacket, DEVELOPER_ID);
+		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 2nd RNBOsproFindFirstUnit() - retVal = %d", retVal);
+		//OutputDebugStringW(tmpBuf);
+
+		int j = 0;
+		while(retVal == 0 && j<i)
+		{
+			retVal = RNBOsproFindNextUnit(keypacket);
+			//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 2nd RNBOsproFindNextUnit() - retVal = %d", retVal);
+			//OutputDebugStringW(tmpBuf);
+			key_found = retVal == 0;
+			j++;
+		}
+
 		// if the key packet was obtained
 		if (SUCCEEDED(hr) && key_found)
 		{
@@ -213,6 +238,8 @@ HRESULT RainbowDriver::RefreshKeyList()
 				else
 				{
 					_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
+					//wsprintf(tmpBuf, L"Key Found: %s", key_id);
+					//OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
 					valid_key_id = true;
 				}
@@ -258,7 +285,6 @@ HRESULT RainbowDriver::RefreshKeyList()
 			newkeys.erase(newkeys.begin());
 		}
 	}
-	
 	return hr;
 }
 
@@ -360,6 +386,25 @@ HRESULT RainbowDriver::WriteKeyUnprogrammedIdentifier(_bstr_t key)
 	
 	return hr;
 }
+HRESULT RainbowDriver::ClearKeyUnprogrammedIdentifier(_bstr_t key)
+{
+	HRESULT hr = S_OK;
+
+	SafeMutex mutex(keys_lock);
+	
+	KeyList::iterator k = keys.find(key);
+	if (k!=keys.end())
+	{
+		// the guid lives in cells CELL_KEY_GUID to CELL_KEY_GUID+7 inclusive
+		hr = ClearKeyTempGUID(k->second);
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+	
+	return hr;
+}
 
 
 // Password specifications:
@@ -367,6 +412,7 @@ HRESULT RainbowDriver::WriteKeyUnprogrammedIdentifier(_bstr_t key)
 // Extension passwords:		<password,16>				new: <password,16>-0-2-<customer_number,10>-<key_number,10>-<extend_days,10>-<extension_num,10>
 // Version passwords:		<password,16>-<version,16>	new: <password,16>-<version,16>-3-<customer_number,10>-<key_number,10>
 // Module passwords:		<password,16>-<units,10/16>	new: <password,16>-<units,10/16>-4-<customer_number,10>-<key_number,10>-<module.id,10>
+// Module passwords:		<password,16>-<units,10/16>	new: <password,16>-<units,10/16>-4-<customer_number,10>-<key_number,10>-<module.id,10>-<password_number,10>
 
 //HRESULT RainbowDriver::ParsePassword(_bstr_t password, unsigned int *pPassword, unsigned short *pArg1_decimal, unsigned short *pArg1_hex)
 HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
@@ -374,6 +420,7 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 	// initialization
 	memset(&arguments, 0, sizeof(arguments));
 	arguments.legacy = true;
+	arguments.password_number = 0;
 	
 	// copy the password in to an editable buffer for use with strtok
 	unsigned int tokbuflen = min(password.length()+1,100);
@@ -437,6 +484,10 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 			case 2:
 				arguments.extend_num=(unsigned short)_wtoi(arg_txt);
 				break;
+			// module case
+			case 4:
+				arguments.password_number=(unsigned int)_wtoi(arg_txt);
+				break;
 			}
 			break;
 		default:
@@ -478,6 +529,20 @@ HRESULT RainbowDriver::ReadKeyTempGUID(RBP_SPRO_APIPACKET packet, GUID &id)
 	}
 	return S_OK;
 }
+HRESULT RainbowDriver::ClearKeyTempGUID(RBP_SPRO_APIPACKET packet)
+{
+	// erase the guid on the key
+	// this guid lives in cells CELL_KEY_GUID to CELL_KEY_GUID+7 inclusive
+	for (unsigned int i = 0; i<sizeof(GUID)/sizeof(unsigned short); ++i)
+	{
+		unsigned short cell = CELL_KEY_GUID+i;
+		HRESULT hr = TranslateRainbowError(RNBOsproWrite(packet, WRITE_PASSWORD, cell, 0, accessCode[cell]));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+
+
 
 HRESULT RainbowDriver::TranslateRainbowError(unsigned short rnboError)
 {

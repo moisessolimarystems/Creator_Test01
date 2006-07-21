@@ -66,8 +66,10 @@ public:
 		unsigned int default_license;
 		unsigned int unlimited;
 		unsigned int pool;
+		unsigned int counter;
 		bool isPool;
 		bool isLicense;
+		bool isCounter;
 		ReadWriteFunctionPtr fn_read;
 		ReadWriteFunctionPtr fn_write;
 		

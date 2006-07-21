@@ -485,6 +485,99 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 
 	return S_OK;
 }
+STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, long license_count)
+{
+	HRESULT hr = S_OK;
+	ENSURE_INITIALIZED;
+
+	SafeMutex mutex(ServerListLock);
+	
+	// perform the license allocation
+	VARIANT_BOOL licensing_valid = VARIANT_FALSE;
+	hr = ValidateLicense(&licensing_valid);
+	if (SUCCEEDED(hr) && licensing_valid==VARIANT_FALSE) 
+		hr = E_FAIL;
+
+	long licenseToDecrement = license_count;
+	if(SUCCEEDED(hr))
+	{
+
+		// for each server
+		for (ServerList::iterator server = m_servers.begin(); server != m_servers.end() && licenseToDecrement>0; ++server)
+		{
+			// get the key list form the server
+			VARIANT vtKeyList;
+			hr = server->second.LicenseServer->KeyEnumerate(&vtKeyList);
+			if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+			{
+				VARIANT *pvtKeyIdent;
+				if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+				{
+					// for each key on the server
+					for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements && licenseToDecrement>0; ++i)
+					{
+						_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+						VARIANT vtKeyProductID, vtKeyProductVersion;
+
+						// check that the key has the requisite product version and etc.
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+					
+						// if the product id and product version requirements are satisfied
+						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+						{
+							// if a specific key is requested, but this one is not it, skip this key
+							if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
+							{
+								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end() && licenseToDecrement>0; ++module)
+								{
+									if (module->isLicense && module_id == static_cast<long>(module->id))
+									{
+										long licenses_total(0);
+
+										// get the total number of licenses
+										hr = server->second.LicenseServer->KeyModuleLicenseTotal(key_ident, module_id, &licenses_total);
+										if(licenses_total >= licenseToDecrement)
+										{
+											//This key has enough licenses to handle license decrement
+											hr = server->second.LicenseServer->KeyModuleLicenseCounterDecrement(key_ident, module_id, license_count);
+											licenseToDecrement = 0;
+										}
+										else //if(licenses_total < licenseToDecrement)
+										{
+											//This key doesn't have enough licenses to handle full license decrement, 
+											//decrement what can be done
+											hr = server->second.LicenseServer->KeyModuleLicenseCounterDecrement(key_ident, module_id, licenses_total);
+											licenseToDecrement = licenseToDecrement - licenses_total;
+										}
+
+										break;	//found the module on this key...
+									}
+								}
+							}
+						}
+					}
+					SafeArrayUnaccessData(vtKeyList.parray);
+				}
+			}
+		}
+	}
+
+	// perform the license de-allocation
+	if(SUCCEEDED(hr))
+	{
+		//Need to do if I force obtain to be called before.
+		// record that the licenses were released
+		//ModuleLicenseRelease(module_id, count);
+
+		//Need to do if I assume obtain was not called before.
+		hr = RefreshLicenses();
+	}
+
+	return hr;
+}
 bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 {
 	if (key_ident.length()==0) return true;

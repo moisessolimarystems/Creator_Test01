@@ -22,6 +22,7 @@ public:
 	HRESULT Query(_bstr_t key, unsigned short cell, void* query, void* response, unsigned short length);
 	HRESULT Activate(_bstr_t key, unsigned short cell);
 	HRESULT WriteKeyUnprogrammedIdentifier(_bstr_t key);
+	HRESULT ClearKeyUnprogrammedIdentifier(_bstr_t key);
 	
 	typedef std::map<_bstr_t,RBP_SPRO_APIPACKET> KeyList;
 	HANDLE keys_lock;
@@ -32,6 +33,7 @@ public:
 		DWORD password;
 		unsigned int units_licensed;
 		unsigned int pages_per_minute_struct;
+		unsigned int password_number;
 		unsigned short version;
 		unsigned int type;
 		unsigned int module;
@@ -65,9 +67,14 @@ private:
 	static const unsigned short CELL_SERIAL_NUMBER = (unsigned short)0x01;
 	static const unsigned short CELL_KEY_NUMBER = (unsigned short)0x3F;
 	static const unsigned short CELL_CUSTOMER_NUMBER = (unsigned short)0x3E;
+	static const unsigned short CELL_PASSWORD_NUMBER = (unsigned short)0x35;
 	static const unsigned short CELL_KEY_GUID = (unsigned short)0x30;
+	//Unprogrammed keys have a GUID written from CELL_KEY_GUID to CELL_KEY_GUID+7
+	//There was a bug that the cells CELL_KEY_GUID to CELL_KEY_GUID+7 were not being
+	//cleared out when a key got programmed.
 	
 	// Unique key id management for unprogrammed keys
 	HRESULT WriteKeyTempGUID(RBP_SPRO_APIPACKET packet, GUID &id);
 	HRESULT ReadKeyTempGUID(RBP_SPRO_APIPACKET packet, GUID &id);
+	HRESULT ClearKeyTempGUID(RBP_SPRO_APIPACKET packet);
 };

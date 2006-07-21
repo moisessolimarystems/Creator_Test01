@@ -47,4 +47,16 @@ __interface ISolimarLicenseMgr2 : ISolimarLicenseMgr
 	[id(10),helpstring("method ModuleLicenseSerialNumbers")] HRESULT ModuleLicenseSerialNumbers([in] long module_id, [out,retval] VARIANT *pvtSerialNumberList);
 };
 
+// ISolimarLicenseMgr3
+[
+	object,
+	uuid("CF8B391B-286E-4d72-9087-C8720C32D25C"),
+	dual,	helpstring("ISolimarLicenseMgr3 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr3 : ISolimarLicenseMgr2
+{
+	[id(11),helpstring("method ModuleLicenseCounterDecrement")] HRESULT ModuleLicenseCounterDecrement([in] long module_id, [in] long license_count);
+};
+
 #endif

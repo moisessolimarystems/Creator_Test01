@@ -120,6 +120,12 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateModulePassword(long customer_number, lo
 	CHECK_CLIENT_AUTHENTICATION;
 	return keyserver.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password);
 }
+STDMETHODIMP CSolimarLicenseSvr::GenerateModulePassword2(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password, password_number);
+}
 
 STDMETHODIMP CSolimarLicenseSvr::GetLicenseServerTime(VARIANT *pvtSystemTime)
 {
@@ -264,6 +270,12 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseRelease(BSTR key_ident, long mo
 {
 	CHECK_CLIENT_AUTHENTICATION;
 	return keyserver.KeyModuleLicenseRelease(m_licenseId, key_ident, module_ident, license_count);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseCounterDecrement(BSTR key_ident, long module_ident, long license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseCounterDecrement(m_licenseId, key_ident, module_ident, license_count);
 }
 
 // Sets all writable cells on a key to zero

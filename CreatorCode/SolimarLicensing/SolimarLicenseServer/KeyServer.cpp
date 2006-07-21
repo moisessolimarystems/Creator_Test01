@@ -551,6 +551,38 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	
 	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
 }
+HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password, long password_number)
+{
+	HRESULT hr = S_OK;
+
+	SafeMutex mutex(KeyListLock);
+
+	// find a programmed key, and use it to generate the password
+	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
+	{
+		VARIANT_BOOL vtValid;
+		hr = key->second.IsProgrammed(&vtValid);
+		if (vtValid==VARIANT_TRUE)
+		{
+			BSTR temp_password=0;
+			hr = key->second.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password_number, &temp_password);
+			if (SUCCEEDED(hr))
+			{
+				*password = temp_password;
+				return S_OK;
+			}
+			else
+			{
+				if (temp_password)
+					SysFreeString(temp_password);
+			}
+		}
+	}
+	
+	*password = SysAllocString(L"");
+	
+	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
+}
 
 HRESULT KeyServer::GetLicenseServerTime(VARIANT *pvtSystemTime)
 {
@@ -985,6 +1017,22 @@ HRESULT KeyServer::KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long
 	if (key!=keys.end())
 	{
 		return key->second.ModuleLicenseRelease(license_id, module_ident, license_count);
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+}
+
+HRESULT KeyServer::KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count)
+{
+	SafeMutex mutex(KeyListLock);
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	
+	if (key!=keys.end())
+	{
+		return key->second.ModuleLicenseDecrementCounter(license_id, module_ident, license_count);
 	}
 	else
 	{
