@@ -159,7 +159,7 @@ const long LicenseStatusID = 10025;
  *-------------------------------------------------------------------------*/
 const char* ProductText[] =
 {
-   "SP/D",                                                      // SPD_PRODUCT = 0
+   "SPD",                                                      // SPD_PRODUCT = 0
    "XImage",                                                    // XIMAGE_PRODUCT = 1
    "XImage NT",                                                 // XIMAGENT_PRODUCT = 2
    "SolPcl",                                                    // SOLPCLNT_PRODUCT = 3
@@ -173,7 +173,7 @@ const char* ProductText[] =
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
    "Rubika",                                                    // PDF Utility = 12
    "???",                                                       //
-   "SP/D-E",                                                    // SPDE_PRODUCT = 14
+   "SPDE",                                                    // SPDE_PRODUCT = 14
    "SSE SP",                                                    // SSE SP = 15
 // "123456789" <-- Maximum product name length is 9
 };
