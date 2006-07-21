@@ -16,7 +16,6 @@ public:
 	// used during key programming, the key identifier changes during the programming process from a guid to a string based on customer and key numbers
 	HRESULT ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_ident);
 	HRESULT RefreshKeyList();
-	bool AtLeastOneParallelKey();
 	HRESULT ReadCell(_bstr_t key, unsigned short cell, unsigned short *value);
 	HRESULT WriteCell(_bstr_t key, unsigned short cell, unsigned short value);
 	HRESULT FormatCell(_bstr_t key, unsigned short cell);
@@ -28,7 +27,7 @@ public:
 	typedef std::map<_bstr_t,RBP_SPRO_APIPACKET> KeyList;
 	HANDLE keys_lock;
 	KeyList keys;
-	bool bAtLeastOneParallelKey;
+	
 	typedef struct
 	{
 		DWORD password;

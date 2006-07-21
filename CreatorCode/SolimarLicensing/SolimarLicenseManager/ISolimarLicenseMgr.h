@@ -3,25 +3,8 @@
 #pragma once
 #include "resource.h"       // main symbols
 
-//#ifndef UI_IGNORE
-enum
-{
-	UI_IGNORE =				0x00,
-	UI_LEVEL_ALL =			0x01,
-	UI_LEVEL_RESPONSE =		0x02,
-	UI_LEVEL_CRITICAL =		0x04,
-	UI_STYLE_DIALOG =		0x10,
-	UI_STYLE_EVENT_LOG =	0x20,
-};
-
-//#endif
-
-
 #ifndef __ISolimarLicenseMgr_INTERFACE_DEFINED__
 #define __ISolimarLicenseMgr_INTERFACE_DEFINED__
-
-
-
 
 
 // ISolimarLicenseMgr
@@ -31,7 +14,6 @@ enum
 	dual,	helpstring("ISolimarLicenseMgr Interface"),
 	pointer_default(unique)
 ]
-
 __interface ISolimarLicenseMgr : IDispatch
 {
 	// Connects to a key monitor server.
@@ -75,20 +57,6 @@ __interface ISolimarLicenseMgr2 : ISolimarLicenseMgr
 __interface ISolimarLicenseMgr3 : ISolimarLicenseMgr2
 {
 	[id(11),helpstring("method ModuleLicenseCounterDecrement")] HRESULT ModuleLicenseCounterDecrement([in] long module_id, [in] long license_count);
-};
-
-
-// ISolimarLicenseMgr4
-[
-	object,
-	uuid("3DD3F19F-B523-4c1b-9AC3-0840C90B78E3"),
-	dual,	helpstring("ISolimarLicenseMgr4 Interface"),
-	pointer_default(unique)
-]
-__interface ISolimarLicenseMgr4 : ISolimarLicenseMgr3
-{
-	// Sets the product and product version required. Call this function after calling Connect()
-	[id(12),helpstring("method Initialize2")] HRESULT Initialize2([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] VARIANT_BOOL single_key, [in] BSTR specific_single_key_ident, [in] VARIANT_BOOL lock_keys, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
 };
 
 #endif

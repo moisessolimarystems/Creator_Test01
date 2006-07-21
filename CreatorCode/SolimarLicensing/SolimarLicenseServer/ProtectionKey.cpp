@@ -1,5 +1,5 @@
 #include "ProtectionKey.h"
-#include "..\common\LicenseError.h"
+#include "KeyError.h"
 #include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
 #include "..\common\SafeMutex.h"
@@ -118,18 +118,6 @@ const BYTE ProtectionKey::predefined_queries[8][5] =
 };
 
 
-void OutputFormattedDebugString(const wchar_t *fmt, ...)
-{
-	va_list list;
-	va_start(list, fmt);
-	wchar_t buf[1024];
-	memset(buf, 0, sizeof(buf));
-	_vsnwprintf(buf, 1024, fmt, list);
-	OutputDebugStringW(buf);
-}
-
-
-
 ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0)
 {
 	;
@@ -137,7 +125,6 @@ ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0)
 
 ProtectionKey::ProtectionKey(const ProtectionKey &k) : 
 	key_owned(false),
-	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
 	m_keyident(k.m_keyident), 
 	m_keyspec(k.m_keyspec), 
@@ -149,14 +136,12 @@ ProtectionKey::ProtectionKey(const ProtectionKey &k) :
 	}
 	catch (_com_error &e)
 	{
-		OutputDebugStringW(L"ProtectionKey::ProtectionKey() - catch (_com_error &e)");
 		e.Error();
 	}
 }
 
 ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *driver) : 
 	key_owned(false),
-	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
 	m_keyident(keyident),
 	m_keyspec(keyspec),
@@ -168,7 +153,6 @@ ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *
 	}
 	catch (_com_error &e)
 	{
-		OutputDebugStringW(L"ProtectionKey::ProtectionKey() - catch (_com_error &e)");
 		e.Error();
 	}
 }
@@ -488,29 +472,7 @@ HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, lo
 	return hr;
 }
 
-
-//Counts the ModuleInUse based on the license_id
 HRESULT ProtectionKey::ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count)
-{
-	// lock a license
-	HRESULT hr = S_OK;
-	try
-	{
-		_variant_t module_value = ReadModuleCache(module_ident);
-		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
-		SafeMutex mutex(license_use_lock);
-		ModuleLicenseUseList &module_license_use = license_use[license_id];
-		*license_count = module_license_use[module.id];
-	}
-	catch (_com_error &e)
-	{
-		hr = e.Error();
-	}
-	return hr;
-}
-
-//Counts up all the ModuleInUse on the key.
-HRESULT ProtectionKey::ModuleInUse(long module_ident, long* license_count)
 {
 	// lock a license
 	HRESULT hr = S_OK;
@@ -565,6 +527,7 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 	{
 		hr = e.Error();
 	}
+	
 	return hr;
 }
 
@@ -590,10 +553,10 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 	
 	return hr;
 }
-//returns E_FAIL if there is TrialKey
+
 HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count)
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr = S_OK;
 	try
 	{
 		SafeMutex mutex(license_use_lock);
@@ -603,14 +566,12 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 		//Only decrement counter if license count is not unlimited and not key status is not initial_trial
 		if(module.isCounter && !LicenseIsUnlimited(module.id) && key_status != INITIAL_TRIAL)
 		{
-			hr = S_OK;
 			if(module.fn_read(ReadModuleCache(module.id).ulVal) >= module.counter+license_count)
 			{
 				module.counter+=license_count;
-				hr = S_OK;
 				if(module.counter / module.fn_read(1))	//Actually decrement from the key.
 				{
-					hr = WriteLicenseDecrementCounter(module_ident, module.counter);
+					WriteLicenseDecrementCounter(module_ident, module.counter);
 					module.counter = module.counter % module.fn_read(1); 
 				}
 			}
@@ -679,6 +640,17 @@ HRESULT ProtectionKey::Format(BSTR *new_key_ident)
 	return S_OK;
 }
 
+
+
+void OutputFormattedDebugString(const wchar_t *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+	wchar_t buf[1024];
+	memset(buf, 0, sizeof(buf));
+	_vsnwprintf(buf, 1024, fmt, list);
+	OutputDebugStringW(buf);
+}
 
 
 // Programs a key
@@ -838,7 +810,7 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provide
 		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
 		return E_INVALIDARG;
 	}
-OutputFormattedDebugString(L"ProtectionKey::Program() -- Leave");	
+	
 	return S_OK;
 }
 
@@ -880,6 +852,7 @@ HRESULT ProtectionKey::ReadRaw(VARIANT *pvtKeyData)
 unsigned short ProtectionKey::ReadCellCache(unsigned short cell)
 {
 	SafeMutex mutex(cells_lock);
+
 	if (cell>=KeyCellCount)
 		throw _com_error(E_INVALIDARG);
 	
@@ -1142,9 +1115,7 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 					// SolSearcher legacy code
 					if (product_id==8)
 					{
-						// The solsearcher specific (legacy) password for modules {0,1,2,3,4}
-						// any future modules should be handled by the default/generic case
-						if (password_arguments.module <= 4 && EnterSolSearcherModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
+						if (EnterSolSearcherModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
 							return S_OK;
 					}
 					// SolScript legacy code (based on SPD keys for older modules)
@@ -1480,7 +1451,7 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 	return false;
 }
 
-// SPD/iConvert/SOLscript specific	
+// SPD/iConvert specific	
 bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed)
 {
 	HRESULT hr = S_OK;
@@ -1496,7 +1467,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 	unsigned int mod_units_licensed = (units_licensed==0 ? 0 : units_licensed-1);	
 	if (GetSPDModulePassword(customer_number, key_number, module_id, mod_units_licensed) == user_password)
 	{
-		if (trial_key && permanent_allowed_key)
+		if (trial_key)
 		{
 			// the password is for a trial key -> activate the algorithm,
 			// initialize licensing, and set status to BASE
@@ -2275,10 +2246,6 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 			//if(module.id == 10)
 			//	return module.fn_read(65536) - module.counter;
 			//else
-
-			// module.counter is not tied to a key on purpose, the only side effect
-			// is that if you have multiple keys attached to a system, then -module.counter
-			// is applied to all keys.
 			return module.fn_read(ReadModuleCache(id).ulVal) - module.counter;
 		}
 		else

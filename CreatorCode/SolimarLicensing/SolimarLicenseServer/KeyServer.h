@@ -73,7 +73,6 @@ public:
 	HRESULT KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT LicenseReleaseAll(BSTR license_id);
-	HRESULT KeyModuleInUse(BSTR key_ident, long module_ident, long* license_count);
 	
 	// Sets all writable cells on a key to zero
 	HRESULT KeyFormat(BSTR key_ident, BSTR *new_key_ident);
@@ -92,12 +91,7 @@ public:
 private:
 	
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
-	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
-	static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
-	static const unsigned int UpdateKeysThreadLowPeriodSeconds = 300;	//(sec) - 5 Minutes
-	
-	
-
+	static const unsigned int UpdateKeysThreadPeriod = 30*1000;			//(ms)
 	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
 	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
 	

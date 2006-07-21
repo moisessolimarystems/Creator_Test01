@@ -75,18 +75,6 @@ __interface ISolimarLicenseSvr : IDispatch
 
 };
 
-// ISolimarLicenseSvr2
-[
-	object,
-	uuid("4852B206-97BA-4934-AFD8-35E85F7FC855"),
-	dual,	helpstring("ISolimarLicenseSvr2 Interface"),
-	pointer_default(unique)
-]
-__interface ISolimarLicenseSvr2 : ISolimarLicenseSvr
-{
-	[id(70),helpstring("method KeyModuleLicenseInUse2")] HRESULT KeyModuleLicenseInUse2([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
-	[id(71),helpstring("method KeyModuleInUse")] HRESULT KeyModuleInUse([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
-};
 
 
 // CSolimarLicenseSvr
@@ -94,7 +82,7 @@ __interface ISolimarLicenseSvr2 : ISolimarLicenseSvr
 [
 	coclass,
 	threading("free"),
-	support_error_info("ISolimarLicenseSvr2"),
+	support_error_info("ISolimarLicenseSvr"),
 	vi_progid("SolimarLicenseServer.SolimarLicenseSvr"),
 	progid("SolimarLicenseServer.SolimarLicenseSv.1"),
 	version(1.0),
@@ -102,7 +90,7 @@ __interface ISolimarLicenseSvr2 : ISolimarLicenseSvr
 	helpstring("SolimarLicenseSvr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
-	public ISolimarLicenseSvr2, 
+	public ISolimarLicenseSvr, 
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -125,11 +113,9 @@ public:
 		buffer[0]=0;
 		StringFromGUID2(guid, buffer, 128);
 		m_licenseId = buffer;
-
+		
 		keyserver.LicenseSessionInitialize(m_licenseId);
-
-		//No longer start heart beat requirement until a key or license is obtained.
-		//keyserver.Heartbeat(m_licenseId);
+		keyserver.Heartbeat(m_licenseId);
 		
 		return S_OK;
 	}
@@ -138,6 +124,7 @@ public:
 	{
 		keyserver.LicenseSessionUninitialize(m_licenseId);
 	}
+
 public:
 	// IObjectAuthentication
 	STDMETHOD(Challenge)(VARIANT vtChallenge, VARIANT *pvtResponse);
@@ -146,7 +133,7 @@ public:
 	
 	// ISolimarLicenseMgr
 	// Top level functions
-	STDMETHOD(Heartbeat)();	//Any function that obtains or checks out licensing function needs to maintain a heart beat
+	STDMETHOD(Heartbeat)();
 	STDMETHOD(KeyEnumerate)(VARIANT *keylist);
 	STDMETHOD(EnterPassword)(BSTR password);
 	STDMETHOD(EnterPasswordPacket)(VARIANT vtPasswordPacket, BSTR *verification_code);
@@ -189,8 +176,6 @@ public:
 	STDMETHOD(KeyModuleLicenseObtain)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseRelease)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseCounterDecrement)(BSTR key_ident, long module_ident, long license_count);
-	STDMETHOD(KeyModuleLicenseInUse2)(BSTR key_ident, long module_ident, long* license_count);
-	STDMETHOD(KeyModuleInUse)(BSTR key_ident, long module_ident, long* license_count);
 	
 	// Sets all writable cells on a key to zero
 	STDMETHOD(KeyFormat)(BSTR key_ident, BSTR *new_key_ident);

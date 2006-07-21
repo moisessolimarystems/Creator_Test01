@@ -221,10 +221,6 @@ STDMETHODIMP CSolimarLicenseSvr::KeyUnlock(BSTR key_ident)
 STDMETHODIMP CSolimarLicenseSvr::KeyObtain(BSTR key_ident)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-
-	//This starts the heart beat. The calling program must maintain the heart beat
-	//to keep the resource obtained.
-	keyserver.Heartbeat(m_licenseId);
 	return keyserver.KeyObtain(m_licenseId, key_ident);
 }
 
@@ -261,16 +257,12 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseTotal(BSTR key_ident, long modu
 STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse(BSTR key_ident, long module_ident, long* license_count)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return keyserver.KeyModuleInUse(key_ident, module_ident, license_count);	//For Backward Compatibility
+	return keyserver.KeyModuleLicenseInUse(m_licenseId, key_ident, module_ident, license_count);
 }
 
 STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseObtain(BSTR key_ident, long module_ident, long license_count)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-
-	//This starts the heart beat. The calling program must maintain the heart beat
-	//to keep the resource obtained.
-	keyserver.Heartbeat(m_licenseId);
 	return keyserver.KeyModuleLicenseObtain(m_licenseId, key_ident, module_ident, license_count);
 }
 
@@ -283,25 +275,8 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseRelease(BSTR key_ident, long mo
 STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseCounterDecrement(BSTR key_ident, long module_ident, long license_count)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-
-	//This starts the heart beat. The calling program must maintain the heart beat
-	//to keep the resource obtained.
-	keyserver.Heartbeat(m_licenseId);
 	return keyserver.KeyModuleLicenseCounterDecrement(m_licenseId, key_ident, module_ident, license_count);
 }
-
-STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse2(BSTR key_ident, long module_ident, long* license_count)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return keyserver.KeyModuleLicenseInUse(m_licenseId, key_ident, module_ident, license_count);
-}
-
-STDMETHODIMP CSolimarLicenseSvr::KeyModuleInUse(BSTR key_ident, long module_ident, long* license_count)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return keyserver.KeyModuleInUse(key_ident, module_ident, license_count);
-}
-
 
 // Sets all writable cells on a key to zero
 STDMETHODIMP CSolimarLicenseSvr::KeyFormat(BSTR key_ident, BSTR *new_key_ident)
