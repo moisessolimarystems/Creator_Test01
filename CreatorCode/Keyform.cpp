@@ -2133,9 +2133,9 @@ void TFCustomerKeys::createOutputPassword(int output_units)
 
    //generate password
    if(key_record->pkey->productId == SPDE_PRODUCT)
-        keyMaster->getOutputPassword(spde_key, output_units, key_record->incrementPasswordNumber(), password_string);
+        keyMaster->getOutputPassword(spde_key, output_units, key_record->passwordNumber, password_string);
    else
-        keyMaster->getOutputPassword(spd_key, output_units, key_record->incrementPasswordNumber(),password_string);
+        keyMaster->getOutputPassword(spd_key, output_units, key_record->passwordNumber,password_string);
    if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
@@ -2208,7 +2208,7 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
       return;
 
    //generate password
-   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, key_record->incrementPasswordNumber(), password_string);
+   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
@@ -2274,7 +2274,7 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       return;
 
    //generate password
-   keyMaster->getUserSessionPassword(spde_key, user_sessions, key_record->incrementPasswordNumber(), password_string);
+   keyMaster->getUserSessionPassword(spde_key, user_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
