@@ -170,6 +170,7 @@ void KeyMaster::getExtensionPassword(ProtectionKey* key,
       key->getExtensionPassword(extension_days, extension_num, pTheServer, Password_String);
 }
 
+
 //==============================================================================
 // Function:    getModulePassword()
 // Purpose:     Get password for module mod_id.  Returns password for success, 0
@@ -181,7 +182,7 @@ void KeyMaster::getExtensionPassword(ProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-void  KeyMaster::getModulePassword(ProtectionKey* key,
+void  KeyMaster::getModulePassword(SpdProtectionKey* key,
                                    uchar mod_id,
                                    ProductId product_id,
                                    ushort product_version,
@@ -189,56 +190,46 @@ void  KeyMaster::getModulePassword(ProtectionKey* key,
                                    ushort password_number,
                                    char* Password_String)
 {
-
-    if(pTheServer)
-    ((SpdProtectionKey*)key)->getModulePassword(mod_id, units,
-                                               product_id,
-                                               product_version,
-                                               pTheServer,
-                                               password_number,
-                                               Password_String
-                                              );
-/*
-   switch(product_id) {
-       case SOLSEARCHER_ENTERPRISE_PRODUCT :
-           {
-           if(pTheServer)
-                    ((SSProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                               product_id,
-                                                               product_version,
-                                                               pTheServer,
-                                                               password_number,
-                                                               Password_String
-                                                              );
-           }
-           break;
-       case SPDE_PRODUCT:
-           {
-              if(pTheServer)
-                    ((SpdeProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                                 product_id,
-                                                                 product_version,
-                                                                 pTheServer,
-                                                                 password_number,
-                                                                 Password_String
-                                                                 );
-           }
-           break;
-       default :
-           {
-               if(pTheServer)
-                    ((SpdProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                                product_id,
-                                                                product_version,
-                                                                pTheServer,
-                                                                password_number,
-                                                                Password_String
-                                                                );
-           }
-           break;
-   }
-*/
+   if(pTheServer)
+      key->getModulePassword(mod_id, units,
+                             product_id,
+                             product_version,
+                             pTheServer,
+                             password_number,
+                             Password_String
+                            );
 }
+
+//==============================================================================
+// Function:    getModulePassword()
+// Purpose:     Get password for module mod_id.  Returns password for success, 0
+//              otherwise.
+// Parameters:  ProtectionKey* - key
+//              uchar - mod_id
+//              ProductId - product_id
+//              ushort - product_version
+// Returns:     ulong
+// Note:
+//==============================================================================
+void  KeyMaster::getModulePassword(SpdeProtectionKey* key,
+                                   uchar mod_id,
+                                   ProductId product_id,
+                                   ushort product_version,
+                                   unsigned int units,
+                                   ushort password_number,
+                                   char* Password_String)
+{
+   if(pTheServer)
+      key->getModulePassword(mod_id, units,
+                             product_id,
+                             product_version,
+                             pTheServer,
+                             password_number,
+                             Password_String
+                            );
+}
+
+
 
 //==============================================================================
 // Function:    getOutputPassword()
@@ -265,7 +256,7 @@ void KeyMaster::getOutputPassword(SpdProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-/*void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
+void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
                                    ushort output_units,
                                    ushort Password_Number,
                                    char* Password_String )
@@ -273,7 +264,7 @@ void KeyMaster::getOutputPassword(SpdProtectionKey* key,
    if(pTheServer)
      key->getOutputPassword(output_units, pTheServer, Password_Number, Password_String);
 }
-*/
+
 //==============================================================================
 // Function:    getOutputPassword()
 // Purpose:
@@ -529,7 +520,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
 
    ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
    if(key_record->pkey->productId == XIMAGENT_PRODUCT ||
-      key_record->pkey->productId == XIMAGE_PRODUCT)
+      key_record->pkey->productId == XIMAGE_PRODUCT ||
+      key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
    {
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
@@ -549,10 +541,12 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
       {
          if ((module_detail[mod_id]->bExistingMember))
          {
-            ModuleIds[NumModules] = mod_id;//module_detail[mod_id]->id;
+
+            ModuleIds[NumModules] = mod_id;
             NumModules++;
          }
       }
+
       //SPD and iConvert Keys have an extra one for Output Pool
       if((key_record->pkey->productId == SPD_PRODUCT) || (key_record->pkey->productId == ICONVERT_PRODUCT)|| (key_record->pkey->productId == SPDE_PRODUCT))
       {
@@ -609,8 +603,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             pVarArray->vt = VT_UI4;     //set field [mod id][1]
             if((i == NumModules -1) && hasOutputPool)
                pVarArray->ulVal = spd_key->getOutputUnits();
-            else                   //moduleid[i] may have empty module because
-               pVarArray->ulVal = spd_key->getLicense(module_detail[ModuleIds[i]]->offset, module_detail[ModuleIds[i]]->bits);
+            else
+               pVarArray->ulVal = spd_key->getLicense(ModuleIds[i]);
             hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
             ltoa(hr, Buff, 10);
            	OutputDebugString("**HR from second unaccess ");
@@ -633,7 +627,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
       {
          if ((module_detail[mod_id]->bExistingMember))
          {
-            ModuleIds[NumModules] = mod_id; //module_detail[mod_id]->id;
+            ModuleIds[NumModules] = module_detail[mod_id]->id;
             NumModules++;
          }
       }
@@ -670,7 +664,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             else if((i == NumModules - 1))
                pVarArray->ulVal = 401;
             else
-               pVarArray->ulVal = module_detail[ModuleIds[i]]->id; //ModuleIds[i];
+               pVarArray->ulVal = ModuleIds[i];//module_detail[ModuleIds[i]]->id;
+
 
             hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
             ltoa(hr, Buff, 10);
@@ -696,7 +691,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             else if((i == NumModules - 1) )
                pVarArray->ulVal = spde_key->getUserSessionUnits();
             else
-               pVarArray->ulVal = spde_key->getLicense(module_detail[ModuleIds[i]]->offset, module_detail[ModuleIds[i]]->bits);
+               pVarArray->ulVal = spde_key->getLicense(ModuleIds[i]);
 
             hr = MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
             ltoa(hr, Buff, 10);
@@ -711,33 +706,15 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
    //its an SSE key
    else
    {
-      int NumModules = 0;
-      int TotalModules = SSE_TOTAL_KEY_MODULES + SSE_TOTAL_RESOURCES;
-      int* ModuleIds = new int(TotalModules);
-
-      for(int mod_id =0; mod_id<SSE_TOTAL_KEY_MODULES;mod_id++)
-      {
-         if ((module_detail[mod_id]->bExistingMember)) //&&
-//              module_detail[mod_id]->name != "{ Not Used }")
-         {
-            ModuleIds[NumModules] = mod_id; //module_detail[mod_id]->id;
-            NumModules++;
-         }
-      }
-      for(int mod_id=0; mod_id<SSE_TOTAL_RESOURCES; mod_id++)
-      {
-          ModuleIds[NumModules] = mod_id;
-          NumModules++;
-      }
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
-      dims.push_back(NumModules);
+      dims.push_back(5);
       dims.push_back(2);
 
       //create the multi dim safe array to look like Module_Array [NumModules][2]
       MultidimensionalSafeArray::CreateMultidimensionalSafearray(&ModuleArray, dims);
 
-      for( int mod_id=0; mod_id<NumModules; mod_id++ )
+      for( int mod_id=0; mod_id<5; mod_id++ )
       {
          SSProtectionKey* ss_key = ((SSProtectionKey*)(key_record->pkey));
          index.push_back(mod_id);
@@ -750,20 +727,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
          {
             //set the type of the variant
             pVarArray->vt = VT_UI4;
-            //need to assign for module ids and resource ids : resource ids hard coded.
-            if(mod_id == NumModules - (SSE_TOTAL_RESOURCES))//(ModuleIds[mod_id] == 0)
-               pVarArray->ulVal = 0;
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-1))
-               pVarArray->ulVal = 1;
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-2))
-               pVarArray->ulVal = 2;
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-3))
-               pVarArray->ulVal = 3;
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-4))
-               pVarArray->ulVal = 4;
-            else
-               pVarArray->ulVal = module_detail[ModuleIds[mod_id]]->id;
-
+            pVarArray->ulVal = mod_id;
             MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
          }
 
@@ -777,25 +741,22 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             //set the type of the variant
             pVarArray->vt = VT_UI4;
 
-            if(mod_id == NumModules - (SSE_TOTAL_RESOURCES))
+            if(mod_id == 0)
               pVarArray->ulVal = ss_key->getIndexServers();
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-1))
+            else if(mod_id == 1)
                pVarArray->ulVal = ss_key->getReportServers();
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-2))
+            else if(mod_id == 2)
                pVarArray->ulVal = ss_key->getConcurrentUsers();
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-3))
+            else if(mod_id == 3)
                pVarArray->ulVal = ss_key->getApplications();
-            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-4))
-               pVarArray->ulVal = ss_key->getDocumentAssembler();
             else
-               pVarArray->ulVal = ss_key->getLicense(module_detail[ModuleIds[mod_id]]->offset, module_detail[ModuleIds[mod_id]]->bits);
+               pVarArray->ulVal = ss_key->getDocumentAssembler();
 
             MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
          }
          index.pop_back();
          index.pop_back();         //wipe out index array to process for next module
       }
-      delete ModuleIds;
    }
    if(pTheServer)
       ret = key->ProgramKey(pTheServer, CurrentKeyID, key_record->num_days, &ModuleArray);
@@ -939,102 +900,149 @@ HRESULT KeyMaster::setHandle()
 //==============================================================================
 void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
 {
-    ModuleDetail**ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
-    SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
+   //
+   // SP/D or CONNECTIVITY
+   if( keyrec->pkey->productId == SPD_PRODUCT ||
+       keyrec->pkey->productId == CONNECT_PRODUCT ||
+       keyrec->pkey->productId == QUANTUM_PRODUCT)
+   {
+      ModuleDetail** module_detail = lookup->getModuleList(SPD_PRODUCT);
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
 
-    for (int mod_id=0; mod_id<64; mod_id++) {
-       if(ppModuleDetail[mod_id]->name != "{ Not Used }") {
-          if (ppModuleDetail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
-              ppModuleDetail[mod_id]->isAvailableForProduct(spd_key->productId) &&
-              ppModuleDetail[mod_id]->counterUnit == 0)
-              spd_key->setLicense(ppModuleDetail[mod_id]->offset, ppModuleDetail[mod_id]->bits, ppModuleDetail[mod_id]->max);
-          else
-              spd_key->setLicense(ppModuleDetail[mod_id]->offset, ppModuleDetail[mod_id]->bits, 0);
-        }
-    }
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
+                module_detail[mod_id]->isAvailableForProduct(spd_key->productId) )
+         {
+            spd_key->setLicense(mod_id, module_detail[mod_id]->max);
+            spd_key->getLicense(mod_id);
+         }
+         else
+         {
+            spd_key->setLicense(mod_id, 0);
+         }
+      }
 
-   switch(keyrec->pkey->productId) {
-       case SPD_PRODUCT :
-       case CONNECT_PRODUCT :
-       case QUANTUM_PRODUCT :
-            {
-                if(keyrec->pkey->productVersion > 0x4000)
-                    spd_key->setOutputUnits(4095);
-                else
-                    spd_key->setOutputUnits(0);
+      if(keyrec->pkey->productVersion > 0x4000)
+         spd_key->outputUnits = 4095;
+      else
+         spd_key->outputUnits = 0;
 
-                if(keyrec->pkey->productVersion > 0x5110)
-                {
-                    keyrec->xch_ipds_ppm = MAX_PAGES_PER_MINUTE;
-                    keyrec->xch_ps_ppm = MAX_PAGES_PER_MINUTE;
-                    keyrec->xch_ps_dbcs_ppm = MAX_PAGES_PER_MINUTE;
-                    keyrec->xch_pcl_ppm = MAX_PAGES_PER_MINUTE;
-                    keyrec->afpds_ps_ppm = MAX_PAGES_PER_MINUTE;
-                }
-                else
-                {
-                    keyrec->xch_ipds_ppm = 0;
-                    keyrec->xch_ps_ppm = 0;
-                    keyrec->xch_ps_dbcs_ppm = 0;
-                    keyrec->xch_pcl_ppm = 0;
-                    keyrec->afpds_ps_ppm = 0;
-                }
-            }
-            break;
-       case SPDE_PRODUCT :
-            {
-                SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
-
-                spde_key->setOutputUnits(4095);
-                spde_key->setOperatorSessionUnits(255);
-                spde_key->setUserSessionUnits(255);
-                keyrec->xch_ipds_ppm = SPDE_MAX_PAGES_PER_MINUTE;
-                keyrec->xch_ps_ppm = SPDE_MAX_PAGES_PER_MINUTE;
-                keyrec->xch_ps_dbcs_ppm = SPDE_MAX_PAGES_PER_MINUTE;
-                keyrec->xch_pcl_ppm = SPDE_MAX_PAGES_PER_MINUTE;
-                keyrec->afpds_ps_ppm = SPDE_MAX_PAGES_PER_MINUTE;
-            }
-            break;
-       case ICONVERT_PRODUCT :
-            {
-                if(keyrec->pkey->productVersion > 0x0000)
-                    spd_key->setOutputUnits(4095);
-                else
-                    spd_key->setOutputUnits(0);
-
-                keyrec->xch_ipds_ppm = 0;
-                keyrec->xch_ps_ppm = 0;
-                keyrec->xch_ps_dbcs_ppm = 0;
-                keyrec->xch_pcl_ppm = 0;
-                keyrec->afpds_ps_ppm = 0;
-            }
-            break;
-       case SOLSEARCHER_ENTERPRISE_PRODUCT :
-            {
-                 SSProtectionKey* ss_key((SSProtectionKey*)(keyrec->pkey));
-                 ss_key->setIndexServers(MAX_INDEX_SERVERS);
-                 ss_key->setReportServers(MAX_REPORT_SERVERS);
-                 ss_key->setConcurrentUsers(MAX_CONCURRENT_USERS);
-                 ss_key->setApplications(MAX_APPLICATIONS);
-                 ss_key->setDocumentAssembler(MAX_DOCUMENT_ASSEMBLER);
-             }
-             break;
-       case SOLSCRIPT_PRODUCT :
-       case SDX_DESIGNER_PRODUCT :
-       case RUBIKA_PRODUCT :
-            {
-                spd_key->setOutputUnits(0);
-
-                keyrec->xch_ipds_ppm = 0;
-                keyrec->xch_ps_ppm = 0;
-                keyrec->xch_ps_dbcs_ppm = 0;
-                keyrec->xch_pcl_ppm = 0;
-                keyrec->afpds_ps_ppm = 0;
-            }
-            break;
-       default :
-             break;
+      if(keyrec->pkey->productVersion > 0x5110)
+      {
+        keyrec->xch_ipds_ppm = MAX_PAGES_PER_MINUTE;
+        keyrec->xch_ps_ppm = MAX_PAGES_PER_MINUTE;
+        keyrec->xch_ps_dbcs_ppm = MAX_PAGES_PER_MINUTE;
+        keyrec->xch_pcl_ppm = MAX_PAGES_PER_MINUTE;
+        keyrec->afpds_ps_ppm = MAX_PAGES_PER_MINUTE;
+      }
+      else
+      {
+        keyrec->xch_ipds_ppm = 0;
+        keyrec->xch_ps_ppm = 0;
+        keyrec->xch_ps_dbcs_ppm = 0;
+        keyrec->xch_pcl_ppm = 0;
+        keyrec->afpds_ps_ppm = 0;
+      }
    }
+   //SP/D - Enterprise
+   if( keyrec->pkey->productId == SPDE_PRODUCT)
+   {
+      ModuleDetail** module_detail = lookup->getModuleList(SPDE_PRODUCT);
+      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
+
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( module_detail[mod_id]->isAvailableForVersion(spde_key->productVersion) &&
+                module_detail[mod_id]->isAvailableForProduct(spde_key->productId) )
+         {                       //mod_id in this case is just a counter
+                                //need to use the module_detail[mod_id] to get real id
+            if(module_detail[mod_id]->name != "{ Not Used }")
+            {
+                    spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, module_detail[mod_id]->max);
+                    spde_key->getLicense(module_detail[mod_id]->id);
+            }
+            else
+                spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, 0);
+         }
+         else
+         {
+            spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, 0);
+         }
+      }
+        spde_key->outputUnits = 4095;
+        spde_key->operatorSessionUnits = 255;
+        spde_key->userSessionUnits = 255;
+        keyrec->xch_ipds_ppm = SPDE_MAX_PAGES_PER_MINUTE;
+        keyrec->xch_ps_ppm = SPDE_MAX_PAGES_PER_MINUTE;
+        keyrec->xch_ps_dbcs_ppm = SPDE_MAX_PAGES_PER_MINUTE;
+        keyrec->xch_pcl_ppm = SPDE_MAX_PAGES_PER_MINUTE;
+        keyrec->afpds_ps_ppm = SPDE_MAX_PAGES_PER_MINUTE;
+   }
+   //
+   // ICONVERT -
+   if( keyrec->pkey->productId == ICONVERT_PRODUCT )
+   {
+      ModuleDetail** iConvert_module_detail = lookup->getModuleList(ICONVERT_PRODUCT);
+      SpdProtectionKey* iConvert_key((SpdProtectionKey*)(keyrec->pkey));
+
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( iConvert_module_detail[mod_id]->isAvailableForVersion(iConvert_key->productVersion) &&
+                iConvert_module_detail[mod_id]->isAvailableForProduct(iConvert_key->productId) )
+         {
+            iConvert_key->setLicense(mod_id, iConvert_module_detail[mod_id]->max);
+         }
+         else
+         {
+            iConvert_key->setLicense(mod_id, 0);
+         }
+      }
+
+      if(keyrec->pkey->productVersion > 0x0000)
+         iConvert_key->outputUnits = 4095;
+      else
+         iConvert_key->outputUnits = 0;
+
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
+   }
+
+   //
+   // SOLSCRIPT_PRODUCT -
+   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       /*keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
+       keyrec->pkey->productId == RUBIKA_PRODUCT)
+   {
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
+      SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
+
+      for (int mod_id=0; mod_id<64; mod_id++) {
+         if (ppModuleDetail[mod_id]->isAvailableForVersion(spdKey->productVersion) &&
+                ppModuleDetail[mod_id]->isAvailableForProduct(spdKey->productId) ) {
+            spdKey->setLicense(mod_id, ppModuleDetail[mod_id]->max);
+         }
+         else {
+            spdKey->setLicense(mod_id, 0);
+         }
+      }
+
+      ///if(spdKey->productVersion > 0x0000)
+      ///   spdKey->outputUnits = 4095;
+      ///else
+         spdKey->outputUnits = 0;
+
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
+
+   }  // end of SOLSCRIPT_PRODUCT code added
+
 }
 
 //==============================================================================
@@ -1045,99 +1053,184 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
 //==============================================================================
 void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
 {
+   //
+   // SP/D or CONNECTIVITY -
+   if( keyrec->pkey->productId == SPD_PRODUCT ||
+       keyrec->pkey->productId == CONNECT_PRODUCT ||
+       keyrec->pkey->productId == QUANTUM_PRODUCT)
+   {
+      ModuleDetail** module_detail = lookup->getModuleList(SPD_PRODUCT);
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
 
-    ModuleDetail** module_detail = lookup->getModuleList(keyrec->pkey->productId);
-    SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
+                module_detail[mod_id]->isDefaultForProduct(spd_key->productId) )
+         {
+            spd_key->setLicense(mod_id, module_detail[mod_id]->max);
+         }
+         else
+         {
+            spd_key->setLicense(mod_id, 0);
+         }
+      }
+      if(keyrec->pkey->productVersion > 0x4000)
+         spd_key->outputUnits = 1;
+      else
+         spd_key->outputUnits = 0;
 
-    for( int mod_id=0; mod_id<64; mod_id++ )
-    {
-         if(module_detail[mod_id]->name != "{ Not Used }") {
-             if( module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
-                 module_detail[mod_id]->isDefaultForProduct(spd_key->productId) &&
-                 module_detail[mod_id]->counterUnit == 0)
-                 spd_key->setLicense(module_detail[mod_id]->offset, module_detail[mod_id]->bits, module_detail[mod_id]->max);
-             else
-                 spd_key->setLicense(module_detail[mod_id]->offset, module_detail[mod_id]->bits, 0);
-       }
-    }
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
+   }
+   // SP/D Enterprise
+   if( keyrec->pkey->productId == SPDE_PRODUCT)
+   {
+      ModuleDetail** module_detail = lookup->getModuleList(SPDE_PRODUCT);
+      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
 
-    switch(keyrec->pkey->productId) {
-        case SPD_PRODUCT :
-        case CONNECT_PRODUCT :
-        case QUANTUM_PRODUCT :
-             {
-                 if(keyrec->pkey->productVersion > 0x4000)
-                     spd_key->setOutputUnits(1);
-                 else
-                     spd_key->setOutputUnits(0);
-
-                 keyrec->xch_ipds_ppm = 0;
-                 keyrec->xch_ps_ppm = 0;
-                 keyrec->xch_ps_dbcs_ppm = 0;
-                 keyrec->xch_pcl_ppm = 0;
-                 keyrec->afpds_ps_ppm = 0;
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( module_detail[mod_id]->isAvailableForVersion(spde_key->productVersion) &&
+                module_detail[mod_id]->isDefaultForProduct(spde_key->productId) )
+         {
+            if(module_detail[mod_id]->name != "{ Not Used }")
+            {
+                    spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, module_detail[mod_id]->max);
             }
-            break;
-        case SPDE_PRODUCT :
-             {
-                 SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
+            else
+                    spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, 0);
+         }
+         else
+         {
+            spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, 0);
+         }
+      }
+      spde_key->outputUnits = 1;
+      spde_key->operatorSessionUnits = 1;
+      spde_key->userSessionUnits = 1;
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
+   }
+   //
+   // ICONVERT -
+   if( keyrec->pkey->productId == ICONVERT_PRODUCT )
+   {
+      ModuleDetail** iConvert_module_detail = lookup->getModuleList(ICONVERT_PRODUCT);
+      SpdProtectionKey* iConvert_key((SpdProtectionKey*)(keyrec->pkey));
 
-                 spde_key->setOutputUnits(1);
-                 spde_key->setOperatorSessionUnits(0);
-                 spde_key->setUserSessionUnits(0);
-                 keyrec->xch_ipds_ppm = 0;
-                 keyrec->xch_ps_ppm = 0;
-                 keyrec->xch_ps_dbcs_ppm = 0;
-                 keyrec->xch_pcl_ppm = 0;
-                 keyrec->afpds_ps_ppm = 0;
-             }
-             break;
-        case SOLSEARCHER_ENTERPRISE_PRODUCT :
-             {
-                 SSProtectionKey* ss_key((SSProtectionKey*)(keyrec->pkey));
-                 ss_key->setIndexServers(0);
-                 ss_key->setReportServers(0);
-                 ss_key->setConcurrentUsers(0);
-                 ss_key->setApplications(MAX_APPLICATIONS);
-                 ss_key->setDocumentAssembler(0);
-             }
-             break;
-        case ICONVERT_PRODUCT :
-             {
-                 if(keyrec->pkey->productVersion > 0x0000)
-                     spd_key->setOutputUnits(1);
-                 else
-                     spd_key->setOutputUnits(0);
+      for( int mod_id=0; mod_id<64; mod_id++ )
+      {
+         if( iConvert_module_detail[mod_id]->isAvailableForVersion(iConvert_key->productVersion) &&
+                iConvert_module_detail[mod_id]->isDefaultForProduct(iConvert_key->productId) )
+         {
+            iConvert_key->setLicense(mod_id, iConvert_module_detail[mod_id]->max);
+         }
+         else
+         {
+            iConvert_key->setLicense(mod_id, 0);
+         }
+      }
 
-                 keyrec->xch_ipds_ppm = 0;
-                 keyrec->xch_ps_ppm = 0;
-                 keyrec->xch_ps_dbcs_ppm = 0;
-                 keyrec->xch_pcl_ppm = 0;
-                 keyrec->afpds_ps_ppm = 0;
-            }
-            break;
-        case SOLSCRIPT_PRODUCT :
-        case RUBIKA_PRODUCT :
-        case SDX_DESIGNER_PRODUCT :
-             {
+      if(keyrec->pkey->productVersion > 0x0000)
+         iConvert_key->outputUnits = 1;
+      else
+         iConvert_key->outputUnits = 0;
 
-                 if(spd_key->productVersion > 0x0000)
-                     spd_key->setOutputUnits(1);
-                 else
-                     spd_key->setOutputUnits(0);
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
 
-                 keyrec->xch_ipds_ppm = 0;
-                 keyrec->xch_ps_ppm = 0;
-                 keyrec->xch_ps_dbcs_ppm = 0;
-                 keyrec->xch_pcl_ppm = 0;
-                 keyrec->afpds_ps_ppm = 0;
-            }
-            break;
-        default :
-            break;
-    }
+   }  // end of iConvert code added
+
+   //
+   // SOLSCRIPT_PRODUCT -
+   if( keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       /*keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
+       keyrec->pkey->productId == RUBIKA_PRODUCT)
+   {
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
+      SpdProtectionKey* spdKey((SpdProtectionKey*)(keyrec->pkey));
+
+      for (int mod_id=0; mod_id<64; mod_id++) {
+         if (ppModuleDetail[mod_id]->isAvailableForVersion(spdKey->productVersion) &&
+                ppModuleDetail[mod_id]->isDefaultForProduct(spdKey->productId) ) {
+            spdKey->setLicense(mod_id, ppModuleDetail[mod_id]->max);
+         }
+         else {
+            spdKey->setLicense(mod_id, 0);
+         }
+      }
+
+      if(spdKey->productVersion > 0x0000)
+         spdKey->outputUnits = 1;
+      else
+         spdKey->outputUnits = 0;
+
+      keyrec->xch_ipds_ppm = 0;
+      keyrec->xch_ps_ppm = 0;
+      keyrec->xch_ps_dbcs_ppm = 0;
+      keyrec->xch_pcl_ppm = 0;
+      keyrec->afpds_ps_ppm = 0;
+
+   }  // end of SOLSCRIPT_PRODUCT code added
 }
 
+//==============================================================================
+// Function:    initializeMaxValues
+// Purpose:     Initializes the index servers, reports servers & consurrent users
+//              to their max values.
+// Parameters:  SKeyRecord* - keyrec
+// Returns:     None
+//==============================================================================
+void KeyMaster::initializeMaxValues( SKeyRecord* keyrec )
+{
+   //
+   // SOLsearcher Enterprise Product
+   if( keyrec->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT )
+   {
+      // reinterpret cast to SSProtectionKey to access functions of that class
+      SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
+
+      ss_key->setIndexServers(MAX_INDEX_SERVERS);
+      ss_key->setReportServers(MAX_REPORT_SERVERS);
+      ss_key->setConcurrentUsers(MAX_CONCURRENT_USERS);
+      ss_key->setApplications(MAX_APPLICATIONS);
+      ss_key->setDocumentAssembler(MAX_DOCUMENT_ASSEMBLER);
+   }
+}
+
+//==============================================================================
+// Function:    initializeMinValues
+// Purpose:     Initializes the index servers, reports servers & consurrent users
+//              to their minimum values.
+// Parameters:  SKeyRecord* - keyrec
+// Returns:     None
+//==============================================================================
+void KeyMaster::initializeMinValues( SKeyRecord* keyrec )
+{
+   //
+   // SOLsearcher Enterprise Product
+   if( keyrec->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT )
+   {
+      // cast to SSProtectionKey to access functions of that class
+      SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
+
+      ss_key->setIndexServers(0);
+      ss_key->setReportServers(0);
+      ss_key->setConcurrentUsers(0);
+      ss_key->setApplications(MAX_APPLICATIONS);
+      ss_key->setDocumentAssembler(0);
+   }
+
+}
 //==============================================================================
 // Function:    applyVersionPassword()
 // Purpose:
@@ -1151,15 +1244,41 @@ void KeyMaster::applyVersionPassword(SKeyRecord* keyrec, unsigned short version)
    // Set version
    keyrec->pkey->productVersion = version;
 
-   ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
-   SpdProtectionKey* pSpdKey((SpdProtectionKey*)(keyrec->pkey));
+   //
+   // Check if key product type supports module licensing
+   if( keyrec->pkey->productId == SPD_PRODUCT ||
+       keyrec->pkey->productId == CONNECT_PRODUCT ||
+       keyrec->pkey->productId == QUANTUM_PRODUCT ||
+       keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
+       keyrec->pkey->productId == RUBIKA_PRODUCT)
+   {
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
+      SpdProtectionKey* pSpdKey((SpdProtectionKey*)(keyrec->pkey));
 
-            // Zero out all modules except those that are default
-   for (int mod_idx(0);mod_idx<64; mod_idx++) {
-            //if available default set to max value
-       if( ppModuleDetail[mod_idx]->isAvailableForVersion(pSpdKey->productVersion) &&
-           ppModuleDetail[mod_idx]->isDefaultForProduct(pSpdKey->productId) )
-           pSpdKey->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->max);
+      // Zero out all modules except those that are default
+      for (int mod_idx(0);mod_idx<64; mod_idx++) {
+         //if available default set to max value
+         if( ppModuleDetail[mod_idx]->isAvailableForVersion(pSpdKey->productVersion) &&
+             ppModuleDetail[mod_idx]->isDefaultForProduct(pSpdKey->productId) )
+         {
+            pSpdKey->setLicense(mod_idx, ppModuleDetail[mod_idx]->max);
+         }
+      }
+   }
+   if( keyrec->pkey->productId == SPDE_PRODUCT)    // added for SPD-E
+   {
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
+      SpdeProtectionKey* pSpdeKey((SpdeProtectionKey*)(keyrec->pkey));
+
+      // Zero out all modules except those that are default
+      for (int mod_idx(0);mod_idx<64; mod_idx++) {
+         //if available default set to max value
+         if( ppModuleDetail[mod_idx]->isAvailableForVersion(pSpdeKey->productVersion) &&
+             ppModuleDetail[mod_idx]->isDefaultForProduct(pSpdeKey->productId) )
+         {      //need to use ppModuleDetail[]->id not just mod_idx b/c it is just a counter not actual id
+            pSpdeKey->setLicense(/*mod_idx,*/ppModuleDetail[mod_idx]->id, ppModuleDetail[mod_idx]->max);
+         }
+      }
    }
 }
 //==============================================================================
@@ -1185,13 +1304,22 @@ void KeyMaster::applyExtensionPassword(SKeyRecord* keyrec, unsigned short days )
 //              unsigned short module_id
 // Returns:     None
 //==============================================================================
-void KeyMaster::applyModZeroPassword(SKeyRecord* keyrec, ModuleDetail* detail, unsigned short unit)
+void KeyMaster::applyModZeroPassword(SKeyRecord* keyrec, unsigned short module_id, unsigned short unit)
 {
    //make key permanent
    applyPermanentPassword(keyrec);
+   if(keyrec->pkey->productId == SPDE_PRODUCT)
+   {               //increment module to 1
+           SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
+           spde_key->setLicense(/*spde_key->getModID_Index(module_id),*/module_id, ushort(unit));
+   }
+   else
+   {
+           //increment module to 1
+           SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
+           spd_key->setLicense(module_id, ushort(unit));
+   }
 
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
-   spd_key->setLicense(detail->offset, detail->bits, ushort(unit));
 }
 
 //==============================================================================
@@ -1202,9 +1330,23 @@ void KeyMaster::applyModZeroPassword(SKeyRecord* keyrec, ModuleDetail* detail, u
 //==============================================================================
 void KeyMaster::applyPagesPerMinutePassword(SKeyRecord* keyrec)
 {
-    SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
-    if( spd_key->isOnTrial() )
-        applyPermanentPassword(keyrec);
+   // make key permanent
+   if(keyrec->pkey->productId == SPDE_PRODUCT)
+   {
+        SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
+        if( spde_key->isOnTrial() )
+        {
+           applyPermanentPassword(keyrec);
+        }
+   }
+   else
+   {
+        SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
+        if( spd_key->isOnTrial() )
+        {
+              applyPermanentPassword(keyrec);
+        }
+   }
 }
 
 //==============================================================================
@@ -1215,13 +1357,26 @@ void KeyMaster::applyPagesPerMinutePassword(SKeyRecord* keyrec)
 //==============================================================================
 void KeyMaster::applyOutputPassword(SKeyRecord* key_record, int output_units)
 {
-
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
-   if( spd_key->isOnTrial() )
-       applyPermanentPassword(key_record);
-       // set total output units
-   spd_key->setOutputUnits(output_units);
-
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+   {
+          SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+          if( spde_key->isOnTrial() )
+           {
+              applyPermanentPassword(key_record);
+           }
+          // set total output units
+          spde_key->outputUnits = output_units;
+   }
+   else
+   {       // int mod_id_idx;
+           SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+           if( spd_key->isOnTrial() )
+           {
+              applyPermanentPassword(key_record);
+           }
+          // set total output units
+          spd_key->outputUnits = output_units;
+   }
 }
 
 //==============================================================================
@@ -1234,9 +1389,11 @@ void KeyMaster::applyOperatorSessionPassword(SKeyRecord* key_record, int operato
 {
       SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
       if( spde_key->isOnTrial() )
+      {
            applyPermanentPassword(key_record);
+      }
       // set total output units
-      spde_key->setOperatorSessionUnits(operator_sessions);
+      spde_key->operatorSessionUnits = operator_sessions;
 }
 
 //==============================================================================
@@ -1249,9 +1406,11 @@ void KeyMaster::applyUserSessionPassword(SKeyRecord* key_record, int user_sessio
 {
       SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
       if( spde_key->isOnTrial() )
+      {
           applyPermanentPassword(key_record);
+      }
       // set total output units
-      spde_key->setUserSessionUnits(user_sessions);
+      spde_key->userSessionUnits =user_sessions;
 }
 
 //==============================================================================
@@ -1260,11 +1419,21 @@ void KeyMaster::applyUserSessionPassword(SKeyRecord* key_record, int user_sessio
 // Parameters:
 // Returns:
 //==============================================================================
-void KeyMaster::applyModPassword(SKeyRecord* keyrec, ModuleDetail* detail, unsigned short units)
+void KeyMaster::applyModPassword(SKeyRecord* keyrec, unsigned char module_id, unsigned short units)
 {
-
-    SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
-    spd_key->setLicense(detail->offset, detail->bits, units);
+    if(keyrec->pkey->productId == SPDE_PRODUCT)
+    {
+           SpdeProtectionKey* spde_key((SpdeProtectionKey*)(keyrec->pkey));
+           // increment module
+           spde_key->setLicense(module_id, units);
+    }
+    else
+    {
+           SpdProtectionKey* spd_key((SpdProtectionKey*)(keyrec->pkey));
+           // increment module
+           //spd_key->setLicense(module_id, spd_key->getLicense(module_id)+1);
+           spd_key->setLicense(module_id, units);
+    }
 }
 
 //==============================================================================
@@ -1280,7 +1449,9 @@ void KeyMaster::applyIndexServersPassword(SKeyRecord* keyrec,
    SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
 
    if( ss_key->isOnTrial() )
+   {
       applyPermanentPassword(keyrec);
+   }
 
    ss_key->setIndexServers(units_licensed);
 }
@@ -1297,7 +1468,9 @@ void KeyMaster::applyReportServersPassword(SKeyRecord* keyrec,
    // make key permanent
    SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
    if( ss_key->isOnTrial() )
+   {
       applyPermanentPassword(keyrec);
+   }
 
    ss_key->setReportServers(units_licensed);
 }
@@ -1315,7 +1488,9 @@ void KeyMaster::applyConcurrentUsersPassword(SKeyRecord* keyrec,
    // cast ss_key
    SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
    if( ss_key->isOnTrial() )
+   {
       applyPermanentPassword(keyrec);
+   }
 
    ss_key->setConcurrentUsers(units_licensed);
 }
@@ -1334,7 +1509,9 @@ void KeyMaster::applyApplicationPassword(SKeyRecord* keyrec,
    // cast ss_key
    SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
    if( ss_key->isOnTrial() )
+   {
       applyPermanentPassword(keyrec);
+   }
 
    ss_key->setApplications(units_licensed);
 }
@@ -1352,7 +1529,9 @@ void KeyMaster::applyDocumentAssemblerPassword(SKeyRecord* keyrec,
    // cast ss_key
    SSProtectionKey* ss_key = ((SSProtectionKey*)(keyrec->pkey));
    if( ss_key->isOnTrial() )
+   {
       applyPermanentPassword(keyrec);
+   }
 
    ss_key->setDocumentAssembler(units_licensed);
 }
@@ -1373,89 +1552,112 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
    if (key_record->non_perm_ktf == true)
         return;
 
+   //
+   // check if key product type supports module licensing
+   if (key_record->pkey->productId == SPD_PRODUCT ||
+       key_record->pkey->productId == CONNECT_PRODUCT ||
+       key_record->pkey->productId == QUANTUM_PRODUCT ||
+       key_record->pkey->productId == ICONVERT_PRODUCT) {
 
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+
+      //
+      // set outputUnits = 1 /*new_licensing*/
+      spd_key->outputUnits = 1;
+      key_record->xch_ipds_ppm = 0;
+      key_record->xch_ps_ppm = 0;
+      key_record->xch_ps_dbcs_ppm = 0;
+      key_record->xch_pcl_ppm = 0;
+      key_record->afpds_ps_ppm = 0;
+
+      if (key_record->pkey->productId != ICONVERT_PRODUCT) {
+         //
+         // CREATES the pages per minute values in the registry.
+         spd_key->setPagesPerMinute(XCH_PS_ID, 0);
+         spd_key->setPagesPerMinute(XCH_PCL_ID, 0);
+         spd_key->setPagesPerMinute(XCH_PS_DBCS_ID, 0);
+         spd_key->setPagesPerMinute(XCH_IPDS_ID, 0);
+         spd_key->setPagesPerMinute(AFPDS_PS_ID, 0);
+      }
+
+      //
       // zero out all modules except those that are default
-   if(key_record->pkey->productId != XIMAGENT_PRODUCT &&
-      key_record->pkey->productId != XIMAGE_PRODUCT) {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(key_record->pkey->productId);
-
       for (int mod_idx(0);mod_idx<64; mod_idx++) {
-          if(ppModuleDetail[mod_idx]->name != "{ Not Used }") {
-              if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
-                  ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) )
-                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->max);
-              else
-                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, 0);
-          }
+         if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
+             ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) ) {
+            spd_key->setLicense(mod_idx, ppModuleDetail[mod_idx]->max);
+         }
+         else
+            spd_key->setLicense(mod_idx, 0);
+      }
+   }          // SPD ENTERPRISE
+   else if (key_record->pkey->productId == SPDE_PRODUCT) {
+
+      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+
+      //
+      // set outputUnits = 1 /*new_licensing*/
+      spde_key->outputUnits = 1;
+      spde_key->operatorSessionUnits = 1;
+      spde_key->userSessionUnits = 1;
+      key_record->xch_ipds_ppm = 0;
+      key_record->xch_ps_ppm = 0;
+      key_record->xch_ps_dbcs_ppm = 0;
+      key_record->xch_pcl_ppm = 0;
+      key_record->afpds_ps_ppm = 0;
+   //
+      // zero out all modules except those that are default
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(key_record->pkey->productId);
+      for (int mod_idx(0);mod_idx<64; mod_idx++) {
+         if( ppModuleDetail[mod_idx]->isAvailableForVersion(spde_key->productVersion) &&
+             ppModuleDetail[mod_idx]->isDefaultForProduct(spde_key->productId) ) {
+            spde_key->setLicense(/*mod_idx,*/ ppModuleDetail[mod_idx]->id, ppModuleDetail[mod_idx]->max);
+         }              //need to use ppModuleDetail since mod_idx is only a counter not actual id
+         else
+            spde_key->setLicense(/*mod_idx,*/ppModuleDetail[mod_idx]->id, 0);
+      }
+   }
+   else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
+            key_record->pkey->productId == RUBIKA_PRODUCT) {
+
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+
+      spd_key->outputUnits = 0; //does not belong to SOLSCRIPT
+      key_record->xch_ipds_ppm = 0;
+      key_record->xch_ps_ppm = 0;
+      key_record->xch_ps_dbcs_ppm = 0;
+      key_record->xch_pcl_ppm = 0;
+      key_record->afpds_ps_ppm = 0;
+
+      //
+      // zero out all modules except those that are default
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(key_record->pkey->productId);
+      for (int mod_idx(0);mod_idx<64; mod_idx++) {
+         if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
+             ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) ) {
+            spd_key->setLicense(mod_idx, ppModuleDetail[mod_idx]->max);
+         }
+         else
+            spd_key->setLicense(mod_idx, 0);
       }
    }
 
+   //
+   // SOLSEARCHER ENTERPRISE
+   //
+   if( key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT )
+   {
+      SSProtectionKey* ss_key;
+      ss_key = ((SSProtectionKey*)(key_record->pkey));
 
-   switch(key_record->pkey->productId) {
-       case SPD_PRODUCT:
-       case CONNECT_PRODUCT :
-       case QUANTUM_PRODUCT :
-       case ICONVERT_PRODUCT :
-            {
-                spd_key->setOutputUnits(1);
-                key_record->xch_ipds_ppm = 0;
-                key_record->xch_ps_ppm = 0;
-                key_record->xch_ps_dbcs_ppm = 0;
-                key_record->xch_pcl_ppm = 0;
-                key_record->afpds_ps_ppm = 0;
-
-                if (key_record->pkey->productId != ICONVERT_PRODUCT) {
-                   // CREATES the pages per minute values in the registry.
-                   spd_key->setPagesPerMinute(XCH_PS_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_PCL_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_PS_DBCS_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_IPDS_ID, 0);
-                   spd_key->setPagesPerMinute(AFPDS_PS_ID, 0);
-                }
-            }
-            break;
-       case SPDE_PRODUCT:
-            {
-                 SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-
-                 spde_key->setOutputUnits(1);
-                 spde_key->setOperatorSessionUnits(0);
-                 spde_key->setUserSessionUnits(0);
-                 key_record->xch_ipds_ppm = 0;
-                 key_record->xch_ps_ppm = 0;
-                 key_record->xch_ps_dbcs_ppm = 0;
-                 key_record->xch_pcl_ppm = 0;
-                 key_record->afpds_ps_ppm = 0;
-            }
-            break;
-       case SOLSCRIPT_PRODUCT :
-       case RUBIKA_PRODUCT :
-       case SDX_DESIGNER_PRODUCT :
-            {
-                 spd_key->setOutputUnits(0); //does not belong to SOLSCRIPT
-                 key_record->xch_ipds_ppm = 0;
-                 key_record->xch_ps_ppm = 0;
-                 key_record->xch_ps_dbcs_ppm = 0;
-                 key_record->xch_pcl_ppm = 0;
-                 key_record->afpds_ps_ppm = 0;
-            }
-            break;
-       case SOLSEARCHER_ENTERPRISE_PRODUCT :
-            {
-                 SSProtectionKey* ss_key;
-                 ss_key = ((SSProtectionKey*)(key_record->pkey));
-
-                 ss_key->setIndexServers(0);
-                 ss_key->setReportServers(0);
-                 ss_key->setConcurrentUsers(0);
-                 ss_key->setApplications(0);  //wanted unlimited status for application servers
-                 ss_key->setDocumentAssembler(0);
-            }
-            break;
-       default :
-            break;
+      ss_key->setIndexServers(0);
+      ss_key->setReportServers(0);
+      ss_key->setConcurrentUsers(0);
+      ss_key->setApplications(0);  //wanted unlimited status for application servers
+      ss_key->setDocumentAssembler(0);
    }
+
    //set status to permanent
    key_record->pkey->status = 2;
 }
@@ -1483,5 +1685,4 @@ HRESULT KeyMaster::GetVerificationCode(BSTR* VerificationCode)
 {
    return pTheServer->PasswordPacketGetVerificationCode(VerificationCode);
 }
-
 

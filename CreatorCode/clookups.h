@@ -54,15 +54,13 @@ public:
    bool pages_per_minute;               //pages per minute module
    bool m_bQuantumModule;
    bool m_bQuantumDefault;
-   unsigned short bits;                 //number of bits module occupies
-   unsigned short offset;               //offset into key cell position
 
    ModuleDetail();
    char* getActionText();
    bool isAvailableForVersion(unsigned short version);
    bool isAvailableForProduct(unsigned short product);
    bool isDefaultForProduct(unsigned short product);
-   AnsiString getTextForUnits(unsigned short product, unsigned short units);
+   AnsiString getTextForUnits(unsigned short product, unsigned char units);
 };
 //------------------------------------------------------------------------------
 //      class CLookup
@@ -83,9 +81,7 @@ class CLookup
    ModuleDetail* iConvert_module_detail[64];
    ModuleDetail* m_solScriptModuleDetail[64];
    ModuleDetail* m_PDFUtilityModuleDetail[64];
-   ModuleDetail* m_SDXDesignerModuleDetail[64];
    ModuleDetail* m_SpdeModuleDetail[64];
-   ModuleDetail* m_SSEModuleDetail[64];
 
   public:
    CLookup();

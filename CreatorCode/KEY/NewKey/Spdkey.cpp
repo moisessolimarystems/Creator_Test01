@@ -77,6 +77,33 @@
 #endif
 #endif
 
+
+/*-------------------------------------------------------------------------*
+ *                                                                         *
+ *    ModuleCell Class:                                                    *
+ *                                                                         *
+ *    This class corresponds to one cell of the protection key.  Using     *
+ *    ModuleCell, you can access a ushort by nibble (4 bits).  ModuleCells *
+ *    are used primarily to store the module licensing information from    *
+ *    the protection key.                                                  *
+ *                                                                         *
+ *-------------------------------------------------------------------------*/
+enum Nibbles {NIBBLE_A, NIBBLE_B, NIBBLE_C, NIBBLE_D};
+class ModuleCell
+{
+public:
+   ModuleCell() : a(0), b(0), c(0), d(0) {};
+   operator ushort() const {return *((ushort*)this);}
+
+   enum {NIBBLE=4};
+   ushort d:NIBBLE;
+   ushort c:NIBBLE;
+   ushort b:NIBBLE;
+   ushort a:NIBBLE;
+};
+
+
+
 /*-------------------------------------------------------------------------*
  *                                                                         *
  *    SpdProtectionKey Class:                                              *
@@ -92,16 +119,14 @@
 #ifdef __WIN32__ // the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
-   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
+   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
 #else // not the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL])
-   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
+   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL])
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
@@ -111,39 +136,33 @@ SpdProtectionKey::SpdProtectionKey() :
 ---------------------------------------------------------------------------*/
 SpdProtectionKey::SpdProtectionKey(const SpdProtectionKey& pkey) :
    ProtectionKey(pkey),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
-   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
+   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
 
-ushort SpdProtectionKey::getLicense(ushort mod_offset, ushort mod_bits) const
+/* getLicense()
+ *    Get and return the license of module mod_id in the moduleCells[] array.
+---------------------------------------------------------------------------*/
+uchar SpdProtectionKey::getLicense(ushort mod_id) const
 {
-    ushort unitsLicensed = 0;
-    //16 bits in a cell, offset by 0x80
-    ushort mCell = (mod_offset / 16) - 8;   //Cell in ModuleArray, remove offset
-    ushort mOffset = mod_offset%16; //Position in Cell
-
-    unitsLicensed = moduleCells[mCell] >> mOffset;
-    //unitsLicensed >> mOffset; //shift right
-    switch(mod_bits) {
-        case 1  :
-             unitsLicensed &= 0x0001;  //return value in bit 1
-             break;
-        case 2  :
-             unitsLicensed &= 0x0003;  //return value in bits 1,2
-             break;
-        case 4  :
-             unitsLicensed &= 0x000F;  //return value in bits 1-4
-             break;
-        case 8  :
-             unitsLicensed &= 0x00FF;  //return value in bits 1-8
-             break;
-        default :
-             break;
-    }
-
-    return unitsLicensed;
+   ushort units_licensed = 0;
+   ushort mcell = ushort(mod_id>>2); // >>2 same as /4
+   Nibbles offset = (Nibbles)(mod_id&3); // same as %4
+   switch(offset) {
+      case NIBBLE_A:
+         units_licensed = moduleCells[mcell].a;
+         break;
+      case NIBBLE_B:
+         units_licensed = moduleCells[mcell].b;
+         break;
+      case NIBBLE_C:
+         units_licensed = moduleCells[mcell].c;
+         break;
+      case NIBBLE_D:
+         units_licensed = moduleCells[mcell].d;
+   }
+   return (uchar)units_licensed;
 }
 /* getOutputPassword()
  *
@@ -477,46 +496,36 @@ void SpdProtectionKey::licenseDevices()
 #endif
 }
 
-void SpdProtectionKey::setLicense(ushort mod_offset, ushort mod_bits, ushort units_licensed)
-{
-    ushort mCellVal;
-    ushort mVal;
-    //16 bit per cell, offset by 0x80
-    ushort mCell = (mod_offset/16)-8;    //Cell in ModuleArray, remove offset
-    ushort mOffset = mod_offset%16;      //Position within Cell
-    ushort mask = 0x0000;                //used to clear out entire cell
-    mCellVal = moduleCells[mCell];
-    mVal = (units_licensed << (mOffset));
-    switch(mod_bits) {
-        case 1 :
-            //clear moduleCells[mCell] position where bit should be set
-            mask = ~(0x0001 << mOffset) ;
-            break;
-        case 2 :
-            mask = ~(0x0003 << mOffset);
-            break;
-        case 4 :
-            mask = ~(0x000F << mOffset);
-            break;
-        case 8 :
-            mask = ~(0x00FF << mOffset);
-            break;
-        default :
-            break;
-    }
-    mCellVal &= mask;         //Clear bits in position to set
-    mCellVal |=  (units_licensed << (mOffset));
-    moduleCells[mCell] = mCellVal;
-    mVal = getLicense(mod_offset, mod_bits);
-}
 
+/* setLicense()
+ *    Set the license of module mod_id in the moduleCells[] array to
+ *    units_licensed.
+---------------------------------------------------------------------------*/
+void SpdProtectionKey::setLicense(ushort mod_id, ushort units_licensed)
+{
+   ushort mcell = ushort(mod_id>>2); // >>2 same as /4
+   Nibbles offset = (Nibbles)(mod_id&3); // same as %4
+   switch(offset) {
+      case NIBBLE_A:
+         moduleCells[mcell].a = units_licensed;
+         break;
+      case NIBBLE_B:
+         moduleCells[mcell].b = units_licensed;
+         break;
+      case NIBBLE_C:
+         moduleCells[mcell].c = units_licensed;
+         break;
+      case NIBBLE_D:
+         moduleCells[mcell].d = units_licensed;
+   }
+}
 
 /* setLicenses(ushort* buffer)
  *    Should only be used by creator.
 ---------------------------------------------------------------------------*/
 void SpdProtectionKey::setLicenses(ushort* buffer)
 {
-   memcpy( moduleCells, buffer, 36 );
+   memcpy( moduleCells, buffer, 32 );
 }
 
 
@@ -531,12 +540,10 @@ void SpdProtectionKey::setLicensesToZero()
    outputUnits = 0x0000;
 
    //zero out modules
-   //ushort total_modules = TOTAL_MODULE_CELLS*MODS_PER_CELL;
-   for (ushort i = 0; i < TOTAL_MODULE_CELLS; i++)
-      moduleCells[i] = 0;
+   ushort total_modules = TOTAL_MODULE_CELLS*MODS_PER_CELL;
+   for (ushort i = 0; i < total_modules; i++)
+      setLicense(i, 0);
 }
-
-
 
 // getOutputUnits - returns the number of outputs licensed for the key
 ushort SpdProtectionKey::getOutputUnits()
@@ -544,9 +551,6 @@ ushort SpdProtectionKey::getOutputUnits()
 	return outputUnits;
 }
 
-void SpdProtectionKey::setOutputUnits(ushort units)
-{
-        outputUnits = units;
-}
+
 
 

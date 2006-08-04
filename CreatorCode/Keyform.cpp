@@ -25,8 +25,6 @@
 #include "keySearchDlg.h"
 #include "keyDateSearchDlg.h"
 
-
-
 #pragma link "ModuleDetail"
 #pragma link "SolSearcherEnterpriseDetails"
 #pragma resource "*.dfm"
@@ -89,8 +87,6 @@ __fastcall TFCustomerKeys::TFCustomerKeys(TComponent* Owner, AnsiString name, in
     //create instance of SKeyRecord, represents selected key
     key_record = new SKeyRecord();
 
-    //Create a string list to hold packet names
-    PktList = new TStringList();
     //
     // set visual properties
     PageControl1->ActivePage = TabSheetKeys;
@@ -100,7 +96,6 @@ __fastcall TFCustomerKeys::TFCustomerKeys(TComponent* Owner, AnsiString name, in
     // Call resetKey function with SPD_PRODUCT
     resetKey(SPD_PRODUCT);
     resetKey(SPDE_PRODUCT);
-    resetKey(SOLSEARCHER_ENTERPRISE_PRODUCT);
     //
     // Set the customer Number
     key_record->pkey->customerNumber = static_cast<unsigned short>(number);
@@ -265,9 +260,8 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      //if ((PHYSICAL_FLAG & pf_MODULE) && (PERMISSION_FLAG & permanent_pwd || PHYSICAL_FLAG & pf_NONPERMANENT)) {
      //if( ( (PERMISSION_FLAG & permanent_pwd) && (PHYSICAL_FLAG & pf_MODULE) ) || (PHYSICAL_FLAG & pf_NONPERMANENT) )
      //{
-         mmSPDOutput->Visible = ((key_record->getProductId() != ICONVERT_PRODUCT)        &&
+         mmSPDOutput->Visible = ((key_record->getProductId() != ICONVERT_PRODUCT)     &&
                                  (key_record->getProductId() != RUBIKA_PRODUCT)          &&
-                                 (key_record->getProductId() != SDX_DESIGNER_PRODUCT)    &&
                                  (key_record->getProductId() != SOLSCRIPT_PRODUCT))
                                 ? true : false;
          mmSPDEOperatorSessions->Visible = (key_record->getProductId() == SPDE_PRODUCT) ? true : false;
@@ -315,6 +309,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
         // Allow Master keys to generate these passwords
 
         mmPermanent->Enabled = true;
+
         //
         // Disallow Master keys to generate these passwords
         mmMaxLU->Visible = false;
@@ -330,8 +325,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
 
      if ((PERMISSION_FLAG & permanent_pwd) &&
          (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-          key_record->pkey->productId == RUBIKA_PRODUCT     ||
-          key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+         key_record->pkey->productId == RUBIKA_PRODUCT)
          )
      {
         KeyFormModuleFrame->mmViewAll->Enabled = false;
@@ -492,9 +486,9 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         PageControl1->Pages[1]->TabVisible = true;
                         PageControl1->Pages[2]->TabVisible = false;
                 }
-                else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-                         key_record->pkey->productId == RUBIKA_PRODUCT    ||
-                         key_record->pkey->productId == SDX_DESIGNER_PRODUCT ) {
+                else if (key_record->pkey->productId==SOLSCRIPT_PRODUCT ||
+                         /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
+                         key_record->pkey->productId == RUBIKA_PRODUCT) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
                         ProtectionKey* temp_key = ProtectionKey::newKey(key_record->pkey);
@@ -521,12 +515,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         key_record->pkey = temp_key; // Update the key_record with the new pkey
                         temp_key = NULL;             // Clean up
                         delete temp_key;
-
-                        buffer = malloc(QueryKey->Fields->FieldByName("modules")->DataSize);
-
-                        //memset(tmp_spde_modules, 0, sizeof(tmp_spde_modules));  //array of 16 shorts = 32 bytes
-                        QueryKey->Fields->FieldByName("modules")->GetData(buffer, true);  // gives me 32 bytes of binary modules
-                       ((SSProtectionKey*)(key_record->pkey))->setLicenses((unsigned short*)buffer);   //need to process 32 bytes of binary modules                                        //
+                                        //
                         // Now we can safely access the SSKey Members
                         ((SSProtectionKey*)(key_record->pkey))->setIndexServers(QueryKey->FieldByName("SKRindexServers")->AsInteger);
                         ((SSProtectionKey*)(key_record->pkey))->setReportServers(QueryKey->FieldByName("SKRreportServers")->AsInteger);
@@ -536,8 +525,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         // initialize module tab and make it visible
                         SolSearcherDetails->Initialize(2, TabDataOnChange);//keyform mode
                         SolSearcherDetails->Load(key_record);
-                        KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);                        
-                        PageControl1->Pages[1]->TabVisible = true;
+                        PageControl1->Pages[1]->TabVisible = false;
                         PageControl1->Pages[2]->TabVisible = true;
                 }
                 else if( key_record->pkey->productId==SPDE_PRODUCT)
@@ -552,11 +540,11 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                                      //spde needs
                         //memset(tmp_spde_modules, 0, sizeof(tmp_spde_modules));  //array of 16 shorts = 32 bytes
                         QueryKey->Fields->FieldByName("modules")->GetData(buffer, true);  // gives me 32 bytes of binary modules
-                       ((SpdeProtectionKey*)(key_record->pkey))->setLicenses((unsigned short*)buffer);   //need to process 32 bytes of binary modules
+                       ((SpdeProtectionKey*)(key_record->pkey))->setLicenses((unsigned short*)buffer, false);   //need to process 32 bytes of binary modules
 
-                        ((SpdeProtectionKey*)(key_record->pkey))->setOutputUnits(QueryKey->FieldByName("SKRoutput")->AsInteger);
-                        ((SpdeProtectionKey*)(key_record->pkey))->setOperatorSessionUnits(QueryKey->FieldByName("SKRoperatorSession")->AsInteger);
-                        ((SpdeProtectionKey*)(key_record->pkey))->setUserSessionUnits(QueryKey->FieldByName("SKRuserSession")->AsInteger);
+                        ((SpdeProtectionKey*)(key_record->pkey))->outputUnits = QueryKey->FieldByName("SKRoutput")->AsInteger;
+                        ((SpdeProtectionKey*)(key_record->pkey))->operatorSessionUnits = QueryKey->FieldByName("SKRoperatorSession")->AsInteger;
+                        ((SpdeProtectionKey*)(key_record->pkey))->userSessionUnits = QueryKey->FieldByName("SKRuserSession")->AsInteger;
                         // initialize module tab and make it visible
                         KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);
                         PageControl1->Pages[1]->TabVisible = true;
@@ -697,18 +685,19 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
 
         //
         // LICENSING - refresh licensing.
-        setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getOutputUnits());
-        setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getOperatorSessionUnits());
-        setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getUserSessionUnits());
+        setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+        setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
+        setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
     }
     else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-             key_record->pkey->productId == RUBIKA_PRODUCT ||
-             key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
-             key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) {
+             /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
+             key_record->pkey->productId == RUBIKA_PRODUCT) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
         showSessionsInfo(false);
         showModuleInfo(true);
+        //setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
+        //PoolLabel->Caption = (key_record->getProductId() == ICONVERT_PRODUCT) ? "Max LU's Licensed:" : "Pool:";
     }
     else
     {
@@ -803,18 +792,6 @@ void __fastcall TFCustomerKeys::resetPhysicalFlag()
             PHYSICAL_FLAG |= pf_PROGRAM;
          else
          {
-/*            SKeyRecord *attached_key = new SKeyRecord();  // key connected to the pc
-            //try to read info from key
-            if(!keyMaster->read(attached_key)) //success returns 0
-            {
-                 //verify attached key is selected in creator
-                 if( key_record->pkey->customerNumber == attached_key->pkey->customerNumber &&
-                     key_record->pkey->keyNumber == attached_key->pkey->keyNumber )
-                     PHYSICAL_FLAG |= pf_REPROGRAM;
-            }
-            if(attached_key)
-               delete(attached_key);
-*/
             //set base on key status and type
             int key_status(key_record->pkey->status);
 
@@ -1339,7 +1316,7 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->Close();
       UtilityQuery->SQL->Clear();
       UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, "
-                             "SKRoutput = 1, SKRoperatorSession = 0, SKRuserSession = 0, SKRppmextensions = 0, "
+                             "SKRoutput = 1, SKRoperatorSession = 1, SKRuserSession = 1, SKRppmextensions = 0, "
                              "modules = :module_list, SKRppmxchipds = :ipds, "
                              "SKRppmxchpcl = :pcl, SKRppmxchps = :ps, "
                              "SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds, "
@@ -1403,7 +1380,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
    if(_index == -1 )
    	_index = activeTab->PageIndex;
    //else user has specified a tab to update
-
+      
    switch( _index )
    {
    	case 0 : //key page refresh
@@ -1439,19 +1416,18 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                  (key_record->pkey->productId == ICONVERT_PRODUCT)  )
             {
                KeyFormModuleFrame->load(key_record);
-               setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->getOutputUnits());
+               setOutputUnitsDisplay(static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
+               //setOutputUnitsDisplay( ((SpdProtectionKey*)(key_record->pkey))->outputUnits);
             }
             else if ( key_record->pkey->productId == SPDE_PRODUCT)
             {
                KeyFormModuleFrame->load(key_record);  //stupid code since the set functions already call the key_record for units
-               setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getOutputUnits());
-               setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getOperatorSessionUnits());
-               setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->getUserSessionUnits());
+               setOutputUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+               setOperatorSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
+               setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
             }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-                     key_record->pkey->productId == RUBIKA_PRODUCT ||
-                     key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
-                     key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) {
+                     key_record->pkey->productId == RUBIKA_PRODUCT) {
                KeyFormModuleFrame->load(key_record);
             }
             break;
@@ -1466,27 +1442,6 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
          PasswordQuery->Open();
          PasswordQuery->First();
          PasswordQuery->EnableControls();
-         //Restrict Password Packets for Legacy Passwords
-         //Spdnt, iCvt(below 9.06), SDX/SSE(below 3.00), Ximage
-         switch(key_record->pkey->productId)
-         {
-              case SPDE_PRODUCT :
-              case RUBIKA_PRODUCT :
-              case SOLSCRIPT_PRODUCT :
-                   ArchiveBtn->Enabled = true;
-              case SDX_DESIGNER_PRODUCT :
-              case SOLSEARCHER_ENTERPRISE_PRODUCT :
-                   if(key_record->pkey->productVersion > 0x2190)
-                        ArchiveBtn->Enabled = true;
-                   break;
-              case ICONVERT_PRODUCT :
-                   if(key_record->pkey->productVersion > 0x9050)
-                        ArchiveBtn->Enabled = true;
-                   break;
-              default :
-                   ArchiveBtn->Enabled = false;
-                   break;
-         }
          break;
    }
 
@@ -1504,7 +1459,10 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
 void __fastcall TFCustomerKeys::setOutputUnitsDisplay(unsigned short outputs)
 {
    unsigned short units;
-   units = (static_cast<SpdProtectionKey*>(key_record->pkey)->getOutputUnits());
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+         units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->outputUnits);
+   else
+         units = (static_cast<SpdProtectionKey*>(key_record->pkey)->outputUnits);
 
    output_devices->Text = units;
    if (key_record->pkey->productId != ICONVERT_PRODUCT)
@@ -1520,18 +1478,19 @@ void __fastcall TFCustomerKeys::setOutputUnitsDisplay(unsigned short outputs)
         OutputDescription->Caption = "NOT Licensed for LU's";
       else
         OutputDescription->Caption = "Licensed for LU's";
+
    }
 }
 
 void TFCustomerKeys::setOperatorSessionUnitsDisplay(unsigned short units)
 {
-   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->getOperatorSessionUnits());
+   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->operatorSessionUnits);
    operator_sessions->Text = units;
 }
 
 void TFCustomerKeys::setUserSessionUnitsDisplay(unsigned short units)
 {
-   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->getUserSessionUnits());
+   units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
    user_sessions->Text = units;
 }
 
@@ -1622,14 +1581,19 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
    }
 }
 
-void TFCustomerKeys::createExtensionPackets(unsigned short days)
+//==============================================================================
+// Function:    ArchiveBtnClick
+// Purpose:     Creates a password packet file corresponding to the selected passwords
+// Parameters:  ( TObject * ) - Sender
+// Returns:     None
+//==============================================================================
+void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 {
    TBookmark tmpMark;
    AnsiString AnsiPassword;            //stores password read from grid
-   AnsiString AnsiDescription;         //stores description read from grid
    AnsiString PasswordPacketDirectory;
-   wchar_t wcharPassword[256];         //stores password that is converted from ansi to wchar
-   BSTR bstrPassword;                  //stores the BSTR version of the password
+   wchar_t wcharPassword[256];    //stores password that is converted from ansi to wchar
+   BSTR bstrPassword;             //stores the BSTR version of the password
    BSTR VerificationCode;
    int PasswordBufSize = 0;
    AnsiString CurrentDate;
@@ -1638,196 +1602,10 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
    SYSTEMTIME CurrentTime;
    VARIANT varTime;
    varTime.vt = VT_DATE;
-               GetLocalTime(&CurrentTime);
-               SystemTimeToVariantTime(&CurrentTime, &varTime.date);
-               varTime.date += days;
-
-   int PasswordID;
-
-   char* buffer = NULL;
-   PasswordPacketDirectory = getcwd(buffer, MAXPATH);
-   PasswordPacketDirectory =  PasswordPacketDirectory + "\\Password Packets\\";
-
-      try
-      {
-         PasswordQuery->DisableControls();
-         PasswordQuery->First();
-
-         //create the filename
-         char TheFileName[128];
-         //Create the FilePath
-         char FilePath[1024];
-         int Extension(1);
-         while( !PasswordQuery->Eof )
-         {
-           tmpMark = PasswordQuery->GetBookmark();
-           AnsiDescription = PswdGrid->Columns->Items[1]->Field->AsString;
-           if(AnsiDescription.AnsiPos("Extend") > 0)   // Found Extension Password to create packet
-           {
-               GetLocalTime(&CurrentTime);
-               SystemTimeToVariantTime(&CurrentTime, &varTime.date);
-               varTime.date += days;
-
-               hr = keyMaster->InitPasswordPacket();
-               PasswordID = PasswordQuery->FieldByName("TDid")->AsInteger;
-
-               AnsiPassword = PswdGrid->Columns->Items[3]->Field->AsString;
-               PasswordBufSize = AnsiPassword.WideCharBufSize();
-               AnsiPassword.WideChar(wcharPassword, PasswordBufSize);
-               bstrPassword = SysAllocString(wcharPassword);
-               hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
-               SysFreeString(bstrPassword);
-               hr = keyMaster->FinalizePasswordPacket();
-
-
-               varTime.date -= days;
-               memset(TheFileName, 0, 128);
-               sprintf(TheFileName, " %s_Extension_%d_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
-                                    key_record->pkey->getProductText(),
-                                    Extension++,
-                                    IntToHex(key_record->pkey->customerNumber, 3),
-                                    IntToHex(key_record->pkey->keyNumber, 2),
-                                    CurrentTime.wMonth, CurrentTime.wDay, CurrentTime.wYear,
-                                    CurrentTime.wHour, CurrentTime.wMinute, CurrentTime.wSecond, CurrentTime.wMilliseconds
-                                    );
-               PktList->Add(AnsiString(TheFileName));
-               memset(FilePath, 0, 1024);
-               sprintf(FilePath, "%s%s", PasswordPacketDirectory , TheFileName);
-               // Create the password packet file
-               HANDLE hFile = CreateFile(FilePath,
-                                    GENERIC_WRITE,
-                                    FILE_SHARE_WRITE,
-                                    0,
-                                    CREATE_NEW, 0, 0);
-
-               hr = HRESULT_FROM_WIN32(::GetLastError());
-               if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
-               {
-                    Application->MessageBox( "Error: File Exists","Error", MB_OK);
-                    break;
-                    //return;
-               }
-               // create a variant safearray
-               VARIANT vtPacket;
-               VariantInit(&vtPacket);
-               BYTE* pData = 0;
-               //Get the password packet and write it to the file
-               hr = keyMaster->GetPasswordPacket(&vtPacket);
-               if(!SUCCEEDED(hr))
-                  Application->MessageBox("Failed to get password packet.", "Packet Error", MB_OK|MB_ICONERROR);
-
-               if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
-               {
-                  DWORD bytes_written(0);
-                  if (!WriteFile(hFile,
-                           pData,
-                           vtPacket.parray->rgsabound[0].cElements, //size of array
-                           &bytes_written,
-                           0))
-                  {
-                           hr = HRESULT_FROM_WIN32(::GetLastError());
-                           Application->MessageBox("Failed to write packet", "Write Error", MB_OK|MB_ICONERROR);
-
-                  }
-                  SafeArrayUnaccessData(vtPacket.parray);
-                  pData = 0;
-               }
-               else
-                  Application->MessageBox("Failed to access packet data", "Write Error", MB_OK|MB_ICONERROR);
-
-               //Get the verification code and store it in the DB
-               hr = keyMaster->GetVerificationCode(&VerificationCode);
-               //
-               //Update database
-               try
-               {
-                   Database1->StartTransaction();
-
-                   UtilityQuery->Close();
-                   UtilityQuery->SQL->Clear();
-                   UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
-                   UtilityQuery->ParamByName("path")->AsString = TheFileName;
-                   UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-                   UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
-                   UtilityQuery->ExecSQL();
-
-                   Database1->Commit();
-                   RefreshKeyPage();
-
-                   //Get the password packet ID
-                   UtilityQuery->Close();
-                   UtilityQuery->SQL->Clear();
-                   UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
-                   UtilityQuery->ParamByName("path")->AsString = TheFileName;
-                   UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-                   UtilityQuery->Prepare();
-                   UtilityQuery->Open();
-
-                   //If the ID was found
-                   if( UtilityQuery->RecordCount )
-                   {
-                       //Store each password in the packet with its corresponding packet ID
-                       int PasswordPacketID;
-                       PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
-
-                       UtilityQuery->Close();
-                       UtilityQuery->SQL->Clear();
-                       UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
-                       UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
-                       UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordID;
-                       UtilityQuery->ExecSQL();
-                   }
-                   else
-                   {
-                       Application->MessageBox("Program Failed", "Key Message", MB_OK );
-                   }
-               }
-               catch(EDBEngineError &e)
-               {
-                   Database1->Rollback(); //error occurred rollback db changes
-                   Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
-               }
-               CloseHandle(hFile); //Release handle to the packet file.
-               VariantClear(&vtPacket);
-               PasswordQuery->GotoBookmark( tmpMark );
-               PasswordQuery->FreeBookmark( tmpMark );
-               PasswordQuery->EnableControls();
-           }
-           PasswordQuery->Next();
-         }
-      }
-      catch(EDBEngineError &e)
-      {
-         PasswordQuery->GotoBookmark( tmpMark );
-         PasswordQuery->FreeBookmark( tmpMark );
-         PasswordQuery->EnableControls();
-
-         Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
-      }
-   free(buffer); //clear the buffer holding the current working directory
-   VariantClear(&varTime);
-}
-
-void TFCustomerKeys::createPasswordPackets(unsigned short days)
-{
-   TBookmark tmpMark;
-   AnsiString AnsiPassword;            //stores password read from grid
-   AnsiString AnsiDescription;         //stores description read from grid
-   AnsiString PasswordPacketDirectory;
-   wchar_t wcharPassword[256];    //stores password that is converted from ansi to wchar
-   BSTR bstrPassword;             //stores the BSTR version of the password
-   BSTR VerificationCode;
-   int PasswordBufSize = 0;
-   AnsiString CurrentDate, ErrorMsg;
-   HRESULT hr = 0;
-
-   SYSTEMTIME CurrentTime;
-   VARIANT varTime;
-   varTime.vt = VT_DATE;
 
    GetLocalTime(&CurrentTime);
    SystemTimeToVariantTime(&CurrentTime, &varTime.date);
-   varTime.date += days;      //add 2 years to the expiration date.
+   varTime.date += 7.0;      //add 7 days to the expiration date.
 
    int PasswordIDs[1024];
    memset(PasswordIDs, 0, 1024);
@@ -1840,22 +1618,23 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
    //only get the rows selected
 
+   if (PswdGrid->SelectedRows->Count > 0)
+   {
       try
       {
-
+         HRESULT hr = keyMaster->InitPasswordPacket();
          tmpMark = PasswordQuery->GetBookmark();
          PasswordQuery->DisableControls();
+
          PasswordQuery->First();
-         hr = keyMaster->InitPasswordPacket();
+
          while( !PasswordQuery->Eof )
          {
-           AnsiDescription = PswdGrid->Columns->Items[1]->Field->AsString;
-           //Append passwords that are not extensions
-           if(AnsiDescription.AnsiPos("Extend") == 0)
-            {
+            //if a row is selected append the password to the packet and remember its ID in order to store it in the DB
+//           if( PswdGrid->SelectedRows->CurrentRowSelected )
+//            {
                PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
                PasswordIDIndex++;
-
 
                AnsiPassword = PswdGrid->Columns->Items[3]->Field->AsString;
                PasswordBufSize = AnsiPassword.WideCharBufSize();
@@ -1863,138 +1642,129 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
                SysFreeString(bstrPassword);
-             }
+//             }
              PasswordQuery->Next();
          }
          hr = keyMaster->FinalizePasswordPacket();
-         if(PasswordIDIndex > 0)
-         {
 
-             varTime.date -= days;    //remove the 2 years that was added before
+         varTime.date -= 7.0;    //remove the 7 days that was added before
 
-             //create the filename
-             char TheFileName[128];
-             memset(TheFileName, 0, 128);
+         //create the filename
+         char TheFileName[128];
+         memset(TheFileName, 0, 128);
 
-             sprintf(TheFileName, " %s_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
-                               key_record->pkey->getProductText(),
-                               IntToHex(key_record->pkey->customerNumber, 3),
-                               IntToHex(key_record->pkey->keyNumber, 2),
-                               CurrentTime.wMonth, CurrentTime.wDay, CurrentTime.wYear,
-                               CurrentTime.wHour, CurrentTime.wMinute, CurrentTime.wSecond, CurrentTime.wMilliseconds
-                             );
+         sprintf(TheFileName, " %s_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
+                 key_record->pkey->getProductText(),
+                 IntToHex(key_record->pkey->customerNumber, 3),
+                 IntToHex(key_record->pkey->keyNumber, 2),
+                 CurrentTime.wMonth, CurrentTime.wDay, CurrentTime.wYear,
+                 CurrentTime.wHour, CurrentTime.wMinute, CurrentTime.wSecond, CurrentTime.wMilliseconds);
 
-             PktList->Add(AnsiString(TheFileName));
-             //Create the FilePath
-             char FilePath[1024];
-             memset(FilePath, 0, 1024);
-             sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
+         //Create the FilePath
+         char FilePath[1024];
+         memset(FilePath, 0, 1024);
+         sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
 
-             // Create the password packet file
-             HANDLE hFile = CreateFile(FilePath,
+         // Create the password packet file
+	      HANDLE hFile = CreateFile(FilePath,
                                     GENERIC_WRITE,
                                     FILE_SHARE_WRITE,
                                     0,
                                     CREATE_NEW, 0, 0);
 
-             hr = HRESULT_FROM_WIN32(::GetLastError());
-             if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
-             {
-                 Application->MessageBox( "Error: File Exists","Error", MB_OK);
-                 return;
-             }
+         hr = HRESULT_FROM_WIN32(::GetLastError());
+         if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
+         {
+            Application->MessageBox( "Error: File Exists","Error", MB_OK);
+            return;
+         }
 
-             // create a variant safearray
-             VARIANT vtPacket;
-             VariantInit(&vtPacket);
-             BYTE* pData = 0;
+         // create a variant safearray
+	 VARIANT vtPacket;
+	 VariantInit(&vtPacket);
+         BYTE* pData = 0;
 
-             //Get the password packet and write it to the file
-             hr = keyMaster->GetPasswordPacket(&vtPacket);
-             if(!SUCCEEDED(hr))
-                 Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
+         //Get the password packet and write it to the file
+         hr = keyMaster->GetPasswordPacket(&vtPacket);
+	      if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
+	      {
+		      DWORD bytes_written(0);
+		      if (!WriteFile(hFile,
+                           pData,
+                           vtPacket.parray->rgsabound[0].cElements, //size of array
+                           &bytes_written,
+                           0))
+		      {
+			      hr = HRESULT_FROM_WIN32(::GetLastError());
+		      }
 
-             if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
-             {
-               DWORD bytes_written(0);
-               if (!WriteFile(hFile,
-                    pData,
-                    vtPacket.parray->rgsabound[0].cElements, //size of array
-                    &bytes_written,
-                    0))
-               {
-                    hr = HRESULT_FROM_WIN32(::GetLastError());
-                    Application->MessageBox(ErrorMsg.sprintf("Failed to write packet data to file\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
-               }
-
-               SafeArrayUnaccessData(vtPacket.parray);
-               pData = 0;
-             }
+		      SafeArrayUnaccessData(vtPacket.parray);
+		      pData = 0;
+	      }
 
          //Get the verification code and store it in the DB
-             hr = keyMaster->GetVerificationCode(&VerificationCode);
-/*         if(!SUCCEEDED(hr))
-            Application->MessageBox(ErrorMsg.sprintf("Failed to get verification code\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
-*/
+         hr = keyMaster->GetVerificationCode(&VerificationCode);
+
          //
          //Update database
-             try
-             {
-                 Database1->StartTransaction();
+         try
+         {
+            Database1->StartTransaction();
 
-                 UtilityQuery->Close();
-                 UtilityQuery->SQL->Clear();
-                 UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
-                 UtilityQuery->ParamByName("path")->AsString = TheFileName;
-                 UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-                 UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
-                 UtilityQuery->ExecSQL();
+            UtilityQuery->Close();
+            UtilityQuery->SQL->Clear();
+            UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
+            UtilityQuery->ParamByName("path")->AsString = TheFileName;
+            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+            UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
+            UtilityQuery->ExecSQL();
 
-                 Database1->Commit();
-                 RefreshKeyPage();
+            Database1->Commit();
+            RefreshKeyPage();
 
             //Get the password packet ID
+            UtilityQuery->Close();
+            UtilityQuery->SQL->Clear();
+            UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
+            UtilityQuery->ParamByName("path")->AsString = TheFileName;
+            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+            UtilityQuery->Prepare();
+            UtilityQuery->Open();
+
+            //If the ID was found
+            if( UtilityQuery->RecordCount )
+            {
+               //Store each password in the packet with its corresponding packet ID
+               int PasswordPacketID;
+               PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
+
+               for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
+               {
                   UtilityQuery->Close();
                   UtilityQuery->SQL->Clear();
-                  UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
-                  UtilityQuery->ParamByName("path")->AsString = TheFileName;
-                  UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-                  UtilityQuery->Prepare();
-                  UtilityQuery->Open();
-
-                  //If the ID was found
-                  if( UtilityQuery->RecordCount )
-                  {
-                      //Store each password in the packet with its corresponding packet ID
-                      int PasswordPacketID;
-                      PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
-
-                      for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
-                      {
-                          UtilityQuery->Close();
-                          UtilityQuery->SQL->Clear();
-                          UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
-                          UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
-                          UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
-                          UtilityQuery->ExecSQL();
-                      }
-                  }
-                  else
-                  {
-            	      Application->MessageBox("Program Failed", "Key Message", MB_OK );
-                  }
+                  UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
+                  UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
+                  UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
+                  UtilityQuery->ExecSQL();
+               }
             }
-            catch(EDBEngineError &e)
+            else
             {
-                Database1->Rollback(); //error occurred rollback db changes
-                Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+            	Application->MessageBox("Program Failed", "Key Message", MB_OK );
             }
-            CloseHandle(hFile); //Release handle to the packet file.
-            VariantClear(&vtPacket);
-            PasswordQuery->GotoBookmark( tmpMark );
-     	    PasswordQuery->FreeBookmark( tmpMark );
-      	    PasswordQuery->EnableControls();
          }
+         catch(EDBEngineError &e)
+         {
+            Database1->Rollback(); //error occurred rollback db changes
+            Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+         }
+        //free(buffer); //clear the buffer holding the current working directory
+        CloseHandle(hFile); //Release handle to the packet file.
+        VariantClear(&vtPacket);
+        PasswordQuery->GotoBookmark( tmpMark );
+     	PasswordQuery->FreeBookmark( tmpMark );
+      	PasswordQuery->EnableControls();
+
       }
       catch(EDBEngineError &e)
       {
@@ -2004,48 +1774,8 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
          Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
       }
-      free(buffer); //clear the buffer holding the current working directory
-      VariantClear(&varTime);
-}
-
-
-//==============================================================================
-// Function:    ArchiveBtnClick
-// Purpose:     Creates a password packet file corresponding to the selected passwords
-// Parameters:  ( TObject * ) - Sender
-// Returns:     None
-//==============================================================================
-void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
-{
-   AnsiString packetList;
-   int daysExpire;
-   //get number of days till packet expires
-   TUnitsDlg *dlg = new TUnitsDlg(this, 0xFFF);
-   dlg->Caption = "Packet Expiration";
-   dlg->Label1->Caption = "Days";
-   dlg->Edit1->Text = 7; //default 7 days
-
-   if( dlg->ShowModal() == IDYES )
-      daysExpire = dlg->Edit1->Text.ToInt();
-   else
-      return;
-
-   //do not need dialog anymore
-   delete(dlg);
-   dlg = NULL;
-
-   createExtensionPackets(daysExpire);
-   createPasswordPackets(daysExpire);
-
-   for(int i=0; i < PktList->Count;i++)
-   {
-       packetList = packetList +
-                    AnsiString("\n") +
-                    PktList->Strings[i];
    }
-
-   Application->MessageBox(packetList.c_str(),"Password Packet(s) Created : ",MB_OK);
-   PktList->Clear();
+   VariantClear(&varTime);
 }
 
 //==============================================================================
@@ -2118,9 +1848,9 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
          documentAssembler = ((SSProtectionKey*)(programmed->pkey))->getDocumentAssembler();
       }
       else if(selectedProduct == SPDE_PRODUCT) {
-         output = reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->getOutputUnits();
-         operatorSessions =   reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->getOperatorSessionUnits();
-         userSessions =    reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->getUserSessionUnits();
+         output = reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->outputUnits;
+         operatorSessions =   reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->operatorSessionUnits;
+         userSessions =    reinterpret_cast<SpdeProtectionKey*>(programmed->pkey)->userSessionUnits;
       }
       else {
 
@@ -2282,6 +2012,7 @@ void __fastcall TFCustomerKeys::mmProgramClick(TObject *Sender)
          // key_record should contain all information needed to program key
          // if programming is successful update record information in the database
          // create temp. key to represent customer key
+//          if( keyMaster->found() )
          if( !keyMaster->programmed() && keyMaster->found() )
          {
             // key is attached and unprogrammed, program key and save action in database
@@ -2302,6 +2033,7 @@ void __fastcall TFCustomerKeys::mmProgramClick(TObject *Sender)
       // user canceled action, break out of while
       else
          break;
+
    }
 
    delete wizard;
@@ -2379,7 +2111,6 @@ void __fastcall TFCustomerKeys::mmSPDEUserSessionsClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
 //==============================================================================
 // Function:    createOutputPassword()
 // Purpose:     creates an output password, and updates the information in the
@@ -2394,12 +2125,17 @@ void TFCustomerKeys::createOutputPassword(int output_units)
 
    //create both for now, need to fix copy constructor....
    //check attached key status - need to have a programmed key attached
-   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
    //check if key is attached
    if(!isAttachedKeyReady())
       return;
 
-   keyMaster->getOutputPassword(spd_key, output_units, key_record->incrementPasswordNumber(),password_string);
+   //generate password
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+        keyMaster->getOutputPassword(spde_key, output_units, key_record->passwordNumber, password_string);
+   else
+        keyMaster->getOutputPassword(spd_key, output_units, key_record->passwordNumber,password_string);
    if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
@@ -2423,16 +2159,11 @@ void TFCustomerKeys::createOutputPassword(int output_units)
          UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoutput = :output_units, modules = :module_list WHERE SKRid = :keyId ");
 
       UtilityQuery->ParamByName("module_list")->AsBlob = updated_module_list;
-      UtilityQuery->ParamByName("output_units")->AsInteger = spd_key->getOutputUnits();
+      if(key_record->pkey->productId == SPDE_PRODUCT)
+              UtilityQuery->ParamByName("output_units")->AsInteger = spde_key->outputUnits;
+      else
+              UtilityQuery->ParamByName("output_units")->AsInteger = spd_key->outputUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      UtilityQuery->ExecSQL();
-
-      UtilityQuery->Close();
-      UtilityQuery->SQL->Clear();
-      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
-      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
-      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
-      UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
@@ -2443,7 +2174,7 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       if(key_record->pkey->productId == SPDE_PRODUCT)
               UtilityQuery->ParamByName("descriptionid")->AsInteger = 5240;
       else
-              UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
+               UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
       UtilityQuery->ExecSQL();
 
       Database1->Commit();
@@ -2477,7 +2208,7 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
       return;
 
    //generate password
-   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, key_record->incrementPasswordNumber(), password_string);
+   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
@@ -2500,16 +2231,8 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
       else
          UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRoperatorSession = :operator_units WHERE SKRid = :keyId ");
 
-      UtilityQuery->ParamByName("operator_units")->AsInteger = spde_key->getOperatorSessionUnits();
+      UtilityQuery->ParamByName("operator_units")->AsInteger = spde_key->operatorSessionUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      UtilityQuery->ExecSQL();
-
-      UtilityQuery->Close();
-      UtilityQuery->SQL->Clear();
-      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
-      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
-      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
-      UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
@@ -2551,7 +2274,7 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       return;
 
    //generate password
-   keyMaster->getUserSessionPassword(spde_key, user_sessions, key_record->incrementPasswordNumber(), password_string);
+   keyMaster->getUserSessionPassword(spde_key, user_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
@@ -2574,16 +2297,8 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       else
          UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRuserSession = :user_units WHERE SKRid = :keyId ");
 
-      UtilityQuery->ParamByName("user_units")->AsInteger = spde_key->getUserSessionUnits();
+      UtilityQuery->ParamByName("user_units")->AsInteger = spde_key->userSessionUnits;
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      UtilityQuery->ExecSQL();
-
-      UtilityQuery->Close();
-      UtilityQuery->SQL->Clear();
-      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
-      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
-      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
-      UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
@@ -2604,7 +2319,6 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       Database1->Rollback();
    }
 }
-
 
 //==============================================================================
 // Function:    createLUPassword
@@ -2771,7 +2485,7 @@ void __fastcall TFCustomerKeys::mmReprogramClick(TObject *Sender)
    //try to read info from key
    if( keyMaster->read(attached_key))
    {
-//      //Application->MessageBox("Could not deactivate the key.", "Key Message", MB_OK|MB_ICONERROR);
+      //Application->MessageBox("Could not deactivate the key.", "Key Message", MB_OK|MB_ICONERROR);
       if(attached_key)
    	 delete(attached_key);
       return;
@@ -2785,9 +2499,6 @@ void __fastcall TFCustomerKeys::mmReprogramClick(TObject *Sender)
    	 delete(attached_key);
       return;
    }
-
-   //Clear out key
-//   keyMaster->deactivate();
 
    //
 //Create a wizard
@@ -2833,7 +2544,7 @@ void __fastcall TFCustomerKeys::mmReprogramClick(TObject *Sender)
    }
 
    delete wizard;
-   RefreshKeyPage(0);
+   RefreshKeyPage();
 
    //reset how many days the key is programmed for
    //check that same key is attached
@@ -4257,12 +3968,4 @@ void TFCustomerKeys::TabDataOnChange(bool bKeyTabNeedsRefreshing)
 }
 
 
-
-void __fastcall TFCustomerKeys::KeyFormModuleFramemmSetModuleClick(
-      TObject *Sender)
-{
-  KeyFormModuleFrame->mmSetModuleClick(Sender);
-
-}
-//---------------------------------------------------------------------------
 

@@ -50,13 +50,10 @@ CLookup::CLookup()
       m_PDFUtilityModuleDetail[mod_id] = new ModuleDetail();
       m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
 
-      m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
-
-      m_SSEModuleDetail[mod_id] = new ModuleDetail();
-      m_SSEModuleDetail[mod_id]->id = mod_id;
-
+      ////initialize modules for SDX Designer module list
       //Create new structures,and assign new module id's to each one.
+  //     m_SpdeModuleDetail[mod_id] = new ModuleDetail();
+  //    m_SpdeModuleDetail[mod_id]->id = mod_id;
    }
   //should initialize up to 128
   for( int mod_id = 0; mod_id < 64; mod_id++)       //64 modules with varying module ids
@@ -134,8 +131,6 @@ CLookup::~CLookup()
       delete iConvert_module_detail[mod_id];
       delete m_solScriptModuleDetail[mod_id];
       delete m_PDFUtilityModuleDetail[mod_id];
-      delete m_SDXDesignerModuleDetail[mod_id];
-      delete m_SSEModuleDetail[mod_id];
    }
    for( int mod_id=0; mod_id < 64; mod_id++)
    {
@@ -234,10 +229,6 @@ ModuleDetail** CLookup::getModuleList(int productID)
                 return m_solScriptModuleDetail;
         case RUBIKA_PRODUCT :
                 return m_PDFUtilityModuleDetail;
-        case SOLSEARCHER_ENTERPRISE_PRODUCT :
-                return m_SSEModuleDetail;
-        case SDX_DESIGNER_PRODUCT :
-                return m_SDXDesignerModuleDetail;
         case SPDE_PRODUCT :
                 return m_SpdeModuleDetail;
         default :
@@ -259,8 +250,7 @@ bool CLookup::resetModuleList()
    int mod_id; //module id is index into module_detail list
    int product_id; //product id specifies whether or not to use SPD or ICONVERT
    int spdeCount(0);
-   int currentCount;
-   char query[64];
+   int currentCount(-1);
    //int max_solscript;
    ModuleDetail** pModuleList(NULL);
 
@@ -282,11 +272,6 @@ bool CLookup::resetModuleList()
       *m_PDFUtilityModuleDetail[mod_id] = unassigned_module;
       m_PDFUtilityModuleDetail[mod_id]->id = mod_id;
 
-      *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
-      m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
-
-     *m_SSEModuleDetail[mod_id] = unassigned_module;
-      m_SSEModuleDetail[mod_id]->id = mod_id;
    }
    for( mod_id=0; mod_id < 64; mod_id++)
    {
@@ -294,53 +279,49 @@ bool CLookup::resetModuleList()
       m_SpdeModuleDetail[mod_id]->id = mod_id;
    }
    //query module information
-   for(int i = 0; i < MAX_SOLIMAR_PRODUCTS; i++)
-   {
-      currentCount = -1;
    try
    {
-      sprintf(query, "SELECT * FROM sModuleDetail WHERE pID=%d ORDER BY mdId", i);
       cQuery->Close();
       cQuery->SQL->Clear();
-      cQuery->SQL->Add(query);
+      cQuery->SQL->Add("SELECT * FROM sModuleDetail ORDER BY pID, mdId");
       cQuery->Prepare();
       cQuery->Open();
 
       cQuery->First();
-      int recordCount = cQuery->RecordCount;
-      if(recordCount > 0)
+
+      while(!cQuery->Eof)
       {
-          while(!cQuery->Eof )
-          {
          //----
          mod_id = cQuery->FieldByName("MDid")->AsInteger;
          product_id = cQuery->FieldByName("pId")->AsInteger;
-         switch(product_id) {
-              case ICONVERT_PRODUCT :
-                   pModuleList = iConvert_module_detail;
-                   break;
-              case RUBIKA_PRODUCT :
-                   pModuleList = m_PDFUtilityModuleDetail;
-                   break;
-              case SDX_DESIGNER_PRODUCT :
-                   pModuleList = m_SDXDesignerModuleDetail;
-                   break;
-              case SOLSEARCHER_ENTERPRISE_PRODUCT :
-                   pModuleList = m_SSEModuleDetail;
-                   break;
-              case SOLSCRIPT_PRODUCT:
-                   pModuleList = m_solScriptModuleDetail;
-                   break;
-              case SPDE_PRODUCT :
-                   pModuleList = m_SpdeModuleDetail;
-                   break;
-              default :
-                   pModuleList = module_detail;
-                   break;
-}
-			currentCount++;
-			if (mod_id >= 0 && currentCount < recordCount)
-        	{
+         ///max_solscript = cQuery->FieldByName("MDmaxsolscript")->AsInteger;
+         //
+         // Set the module list for iConvert
+         //
+         if (product_id==ICONVERT_PRODUCT ) {
+            pModuleList = iConvert_module_detail;
+            currentCount = mod_id;
+         }
+         else if (product_id==RUBIKA_PRODUCT ) {
+            pModuleList = m_PDFUtilityModuleDetail;
+            currentCount = mod_id;
+         }
+         else if (product_id==SOLSCRIPT_PRODUCT ) {
+            pModuleList = m_solScriptModuleDetail;
+            currentCount =mod_id;
+         }
+         else if (product_id==SPDE_PRODUCT ) {
+            pModuleList = m_SpdeModuleDetail;
+            currentCount = spdeCount++;
+         }
+         else
+         {
+            pModuleList = module_detail;
+            currentCount = mod_id;
+         }
+        if (mod_id >= 0 && currentCount < 64)
+        {
+            // Subtract 1000 because there are 64 values in the array, so each
             // module will correspond to each of these values.  There are labeled
             // 10XX or some other value in the sModuleDetail table.
             pModuleList[currentCount]->id = mod_id;
@@ -363,17 +344,19 @@ bool CLookup::resetModuleList()
             pModuleList[currentCount]->pages_per_minute = cQuery->FieldByName("MDpagesPerMinute")->AsBoolean;
             pModuleList[currentCount]->m_bQuantumDefault = cQuery->FieldByName("MDquantumDefault")->AsBoolean;
             pModuleList[currentCount]->m_bQuantumModule = cQuery->FieldByName("MDquantumModule")->AsBoolean;
-            pModuleList[currentCount]->bits = cQuery->FieldByName("MDbits")->AsInteger;
-            pModuleList[currentCount]->offset = cQuery->FieldByName("MDoffset")->AsInteger;
+            //pModuleList[mod_id]->max_solscript = cQuery->FieldByName("MDmaxsolscript")->AsInteger;
             //
             // Keep track of the modules to see if they are existing members or not.
-            if (pModuleList[currentCount]->name == "{ Not Used }")
+            if (pModuleList[currentCount]->name == "{ Not Used }") {
                 pModuleList[currentCount]->bExistingMember = false;
+            }
             else
                 pModuleList[currentCount]->bExistingMember = true;
+//         }
+         //----
          }
          cQuery->Next();
-         }
+
       }
       cQuery->Close();      //pModuleList now has all module info from moduledetail table
       result = true;
@@ -381,7 +364,6 @@ bool CLookup::resetModuleList()
    catch(...)
    {
       cQuery->Close();
-   }
    }
 
    return result;
@@ -1038,9 +1020,7 @@ ModuleDetail::ModuleDetail(): name("{ Not Used }"),
                               pages_per_minute(false),
                               bExistingMember(false),
                               m_bQuantumModule(false),
-                              m_bQuantumDefault(false),
-                              offset(0),
-                              bits(0)
+                              m_bQuantumDefault(false)
                               {}
 
 //==============================================================================
@@ -1079,7 +1059,7 @@ char* ModuleDetail::getActionText()
 //              unsigned char
 // Returns:     AnsiString
 //==============================================================================
-AnsiString ModuleDetail::getTextForUnits(unsigned short product_id, unsigned short units)
+AnsiString ModuleDetail::getTextForUnits(unsigned short product_id, unsigned char units)
 {
    AnsiString result_string(units);
 
@@ -1134,12 +1114,6 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
          result = iConvert_module;   // supports iConvert modules.
          break;
       case RUBIKA_PRODUCT:
-         result = static_cast<bool>(max>0);
-         break;
-      case SDX_DESIGNER_PRODUCT:
-         result = static_cast<bool>(max>0);
-         break;
-      case SOLSEARCHER_ENTERPRISE_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
       case SOLSCRIPT_PRODUCT:

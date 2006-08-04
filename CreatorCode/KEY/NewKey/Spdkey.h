@@ -30,7 +30,7 @@
 
 // key cell specifications
 #define OUTPUT_UNIT_CELL         0x20
-#define TOTAL_MODULE_CELLS       17
+#define TOTAL_MODULE_CELLS       16
 #define MODS_PER_CELL            4
 #define TOTAL_KEY_MODULES        TOTAL_MODULE_CELLS*MODS_PER_CELL
 #define MAX_MOD_UNITS_LICENSED   0xF
@@ -55,26 +55,22 @@ class SpdProtectionKey : public ProtectionKey
 {
 public:
    SpdProtectionKey();
-   virtual ~SpdProtectionKey() {}
    SpdProtectionKey(const SpdProtectionKey&);
 
    // protection key data (references into keyDataBlock)
    ushort& outputUnits;
 
    // functions that do not perform key I/O
-   //uchar getLicense(ushort mod_id) const;
-   ushort getLicense(ushort mod_offset, ushort mod_bits) const;
+   uchar getLicense(ushort mod_id) const;
    void licenseMods();
    void licenseDevices();
-   //void setLicense(ushort mod_id, ushort units_licensed);
-   void setLicense(ushort mod_offset, ushort mod_bits, ushort units_licensed);
+   void setLicense(ushort mod_id, ushort units_licensed);
    void setLicensesToZero(); //setSpdKeyCellsToZero
    void setLicenses(ushort* buffer);
    ushort getOutputUnits();
-   void   setOutputUnits(ushort units);
 
    // simple key I/O functions
-   virtual void getModulePassword(uchar mod_id,
+   void getModulePassword(uchar mod_id,
                            unsigned int units_licensed,
                            ProductId product_id,
                            ushort product_version,
@@ -84,7 +80,7 @@ public:
                            );
 
    //---Output Unit Functions
-   virtual void getOutputPassword(ushort, ISolimarLicenseSvr*, ushort password_number, char*);
+   void getOutputPassword(ushort, ISolimarLicenseSvr*, ushort password_number, char*);
 
    //--- Pages Per Minute Functions
    void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, ushort password_number, long);
@@ -97,7 +93,7 @@ public:
 
 protected:
    // protection key data (references into ProtectionKey::keyDataBlock)
-   ushort* moduleCells;
+   ModuleCell* moduleCells;
    // above is equivalent to ModuleCell moduleCells[TOTAL_MODULE_CELLS]
 };
 

@@ -60,10 +60,11 @@ public:
                              ushort,
                              char*
                             );
-   void getModulePassword(ProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
+   void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
    void getOutputPassword(SpdProtectionKey*, ushort, ushort, char*);
    void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, ushort, long);
-   //void getOutputPassword(SpdeProtectionKey*, ushort, ushort, char*);
+   void getModulePassword(SpdeProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
+   void getOutputPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getOperatorSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getUserSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, ushort, long);
@@ -75,8 +76,8 @@ public:
    AnsiString getDocumentAssemblerPassword(SSProtectionKey*, ushort);
 
    //simulate applying password to ProtectionKey passed in
-   void applyModZeroPassword(SKeyRecord* key_record, ModuleDetail* detail, unsigned short units);
-   void applyModPassword(SKeyRecord* keyrec, /*unsigned char module_id,*/ ModuleDetail* detail, unsigned short units);
+   void applyModZeroPassword(SKeyRecord* key_record, unsigned short mod_id, unsigned short units);
+   void applyModPassword(SKeyRecord* keyrec, unsigned char module_id, unsigned short units);
    void applyOutputPassword(SKeyRecord* keyrec, int output_units);
    void applyOperatorSessionPassword(SKeyRecord* keyrec, int operator_session);
    void applyUserSessionPassword(SKeyRecord* keyrec, int user_session);
@@ -105,6 +106,10 @@ public:
    //operate on specificed SKeyRecord
    void initializeMaxModules(SKeyRecord*);
    void initializeMinModules(SKeyRecord*);
+   void initializeMaxValues(SKeyRecord*);
+   void initializeMinValues(SKeyRecord*);
+   void initializeMinMod(SKeyRecord*);
+   void initializeMaxMod(SKeyRecord*);
    short read(SKeyRecord*);
    short read(SKeyRecord*, ProductId);
 
