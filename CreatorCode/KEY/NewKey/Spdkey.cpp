@@ -177,16 +177,18 @@ uchar SpdProtectionKey::getLicense(ushort mod_id) const
  const uchar OUTPUT_POOL_MODULE_ID = 128;
  void SpdProtectionKey::getOutputPassword(ushort output_units,
                                           ISolimarLicenseSvr* pServer,
+                                          ushort password_number,
                                           char* Password_String)
  {
    if(pServer)
    {
       BSTR password;
-      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+      if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    productId,
                                                    OUTPUT_POOL_MODULE_ID,
                                                    output_units,
+                                                   password_number,
                                                    &password
                                                   )))
       {
@@ -197,8 +199,6 @@ uchar SpdProtectionKey::getLicense(ushort mod_id) const
       SysFreeString(password);
    }
  }
-
-
 
 /* getModulePassword()
  *    Calculate and return the password for module mod_id by querying the
@@ -220,21 +220,24 @@ uchar SpdProtectionKey::getLicense(ushort mod_id) const
  *    this many units licensed.
 ---------------------------------------------------------------------------*/
 void SpdProtectionKey::getModulePassword(uchar mod_id,
-                                          uchar units_licensed,
+                                          unsigned int units_licensed,
                                           ProductId product_id,
                                           ushort product_version,
                                           ISolimarLicenseSvr* pServer,
+                                          ushort password_number,
                                           char* Password_String
                                           )
 {
    if(pServer)
    {
       BSTR password;
-      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+
+      if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    product_id,
                                                    mod_id,
                                                    units_licensed,
+                                                   password_number,
                                                    &password
                                                   )))
       {
@@ -262,17 +265,19 @@ void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
                                                  ushort pages,
                                                  ISolimarLicenseSvr* pServer,
                                                  char* Password_String,
+                                                 ushort password_number,
                                                  long ModID)
 {
    if(pServer)
    {
       BSTR password;
       DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
-      if(SUCCEEDED(pServer->GenerateModulePassword(customerNumber,
+      if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    productId,
                                                    ModID,
                                                    ppm_struct,
+                                                   password_number,
                                                    &password
                                                   )))
       {

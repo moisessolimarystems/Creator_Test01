@@ -71,18 +71,19 @@ public:
 
    // simple key I/O functions
    void getModulePassword(uchar mod_id,
-                           uchar units_licensed,
+                           unsigned int units_licensed,
                            ProductId product_id,
                            ushort product_version,
                            ISolimarLicenseSvr* pServer,
+                           ushort password_number,
                            char* Password_String
                            );
 
    //---Output Unit Functions
-   void getOutputPassword(ushort, ISolimarLicenseSvr*, char*);
+   void getOutputPassword(ushort, ISolimarLicenseSvr*, ushort password_number, char*);
 
    //--- Pages Per Minute Functions
-   void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, long);
+   void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, ushort password_number, long);
 
    ushort getPagesPerMinuteExtensions();
    ushort getPagesPerMinute(ushort/*mod_id*/);

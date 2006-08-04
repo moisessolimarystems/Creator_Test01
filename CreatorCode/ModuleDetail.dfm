@@ -40,6 +40,10 @@ object ModuleFrame: TModuleFrame
       Caption = 'Set Module'
       OnClick = mmSetModuleClick
     end
+    object mmIncrementCounter: TMenuItem
+      Caption = 'Increment Counter'
+      OnClick = mmIncrementCounterClick
+    end
     object N1: TMenuItem
       Caption = '-'
     end

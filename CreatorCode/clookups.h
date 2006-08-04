@@ -40,7 +40,8 @@ public:
    unsigned short version_removed;      //0000-FFFF
    int max;                             //0-15
    //int max_solscript;                   //0-15 max solscript value
-   int function;                        //input, emulation, output
+   int function;                        //input, emulation, output, counter
+   int counterUnit;                     //unit size for counter
    int pid;                             //product id
    unsigned short id;                   //module id
    bool spd_default;                    //spd default
@@ -91,6 +92,7 @@ class CLookup
    unsigned short getCurrentVersion(unsigned short productId, bool spd_dos);
    AnsiString getProductText(unsigned short productId, unsigned short version);
    void updateVersion(unsigned short product_id, unsigned short version);
+
 
    //Added these functions for ModuleEditor....updates sModuleDetail
    int  getAction(AnsiString action_type);

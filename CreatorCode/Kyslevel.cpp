@@ -173,8 +173,6 @@ ushort SKeyRecord::getKeyTypeEnumValue(int iIntegerValue)
            return KEYBackup;
         case ktfEmergency:
            return KEYEmergency;
-        //case ktfSolimar:
-        //   return KEYSolimar;
         case ktfCustom:
            return KEYCustom;
         case ktfLoan:
@@ -286,7 +284,6 @@ ushort SKeyRecord::getProductId()
 {
     return(pkey->productId);
 }
-
 
 //==============================================================================
 // Function:    setStatus
@@ -473,6 +470,25 @@ const char* SKeyRecord::getStatusText(unsigned short status)
    	return status_text[status];
    else
       return "Unknown";
+}
+
+unsigned short SKeyRecord::incrementPasswordNumber()
+{
+      ushort value(0);
+      switch(getProductId())
+      {
+          case SPDE_PRODUCT :
+          case RUBIKA_PRODUCT :
+               value = ++passwordNumber;
+               break;
+          case ICONVERT_PRODUCT :
+               if(pkey->productVersion > 0x9050)
+                  value = ++passwordNumber;
+               break;
+          default :
+               break;
+      }
+      return value;
 }
 
 

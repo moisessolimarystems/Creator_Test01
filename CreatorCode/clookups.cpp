@@ -331,6 +331,7 @@ bool CLookup::resetModuleList()
             pModuleList[currentCount]->version_removed = cQuery->FieldByName("MDversionRemoved")->AsInteger;
             pModuleList[currentCount]->max = cQuery->FieldByName("MDmax")->AsInteger;
             pModuleList[currentCount]->function = cQuery->FieldByName("MDaction")->AsInteger;
+            pModuleList[currentCount]->counterUnit = cQuery->FieldByName("MDcounterUnit")->AsInteger;
             pModuleList[currentCount]->spd_default = cQuery->FieldByName("MDspdDefault")->AsBoolean;
             pModuleList[currentCount]->spde_default = cQuery->FieldByName("MDspdeDefault")->AsBoolean;
             pModuleList[currentCount]->con_default = cQuery->FieldByName("MDconnectivityDefault")->AsBoolean;
@@ -572,6 +573,8 @@ int  CLookup::getAction(AnsiString action_type)
         iAction = 5;
      else if (action_type == "Emailer")
         iAction = 6;
+     else if (action_type == "Counter")
+          iAction = 9;
      else
         iAction = NULL; //Undefined
 
@@ -580,7 +583,8 @@ int  CLookup::getAction(AnsiString action_type)
 //==============================================================================
 // Function:    updateMDAction
 // Purpose:     will update the field in the database that contains the type of
-//              module that it is..input = 1, emulation = 2, output = 3, undefined.
+//              module that it is..input = 1, emulation = 2, output = 3,
+//              counter = 4, undefined.
 //              Updates sModuleDetail table in the database.
 // Parameters:  unsigned short module_id - module id
 //              AnsiString  a_function - type of module..described in the purpose.
@@ -1021,8 +1025,8 @@ ModuleDetail::ModuleDetail(): name("{ Not Used }"),
 
 //==============================================================================
 // Function:    getActionText()
-// Purpose:     Returns the type or name of a particular module.  There are three
-//              valid choices...Input, Emulation, or Output.  Unused modules will
+// Purpose:     Returns the type or name of a particular module.  There are four
+//              valid choices...Input, Emulation, Counter, or Output.  Unused modules will
 //              have Undefined returned.
 // Parameters:  None
 // Returns:     char *
@@ -1041,6 +1045,8 @@ char* ModuleDetail::getActionText()
       return "Job Event";
    else if ( function == mtEmailer )
       return "Emailer";
+   else if( function == mtCounter )
+      return "Counter";
    else
       return "Undefined";
 }
@@ -1065,6 +1071,8 @@ AnsiString ModuleDetail::getTextForUnits(unsigned short product_id, unsigned cha
          result_string = "X";
       //else # of units
    }
+   if(function == mtCounter)
+         result_string = "#";
    return result_string;
 }
 

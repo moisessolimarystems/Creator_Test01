@@ -31,6 +31,7 @@ enum ModType
    mtEmailer=6,
    mtPathOk=7,
    mtIlleagal=8,
+   mtCounter=9,
 };
 enum KeyType
 {
@@ -85,6 +86,7 @@ public:
    const char* getStatusText(){return getStatusText(pkey->status);}
    bool loadKeyRow(char*);
    bool hasAssociatedKey(){return parent_skr_id;}
+   unsigned short incrementPasswordNumber();
 
    ProtectionKey* pkey;
    static char *text;
@@ -106,6 +108,7 @@ public:
    // Database Tracking Numbers
    int po;                  // PK Number for DacEasy
    AnsiString eBOnumber;    // epicore BackOffice order number
+   ushort passwordNumber;   // Password Count
 
    //
    // Key Information

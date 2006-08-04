@@ -12,7 +12,7 @@
 #endif
 TUnitsDlg *UnitsDlg;
 //---------------------------------------------------------------------
-__fastcall TUnitsDlg::TUnitsDlg(TComponent* AOwner, unsigned short max)
+__fastcall TUnitsDlg::TUnitsDlg(TComponent* AOwner, unsigned int max)
 	: TForm(AOwner), m_MaxUnits(max)
 {
    char maxString[32];
@@ -44,12 +44,19 @@ void __fastcall TUnitsDlg::OkBtnClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TUnitsDlg::FormShow(TObject *Sender)
 {
-	Edit1->SetFocus();
+     Edit1->SetFocus();
 }
 //---------------------------------------------------------------------------
 void __fastcall TUnitsDlg::CancelBtnClick(TObject *Sender)
 {
-   ModalResult = mrCancel;
+     ModalResult = mrCancel;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TUnitsDlg::UpDownBtnClick(TObject *Sender,
+      TUDBtnType Button)
+{
+      Edit1->Text = m_CounterUnits * (UpDownBtn->Position + 1);
 }
 //---------------------------------------------------------------------------
 

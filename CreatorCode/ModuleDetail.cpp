@@ -211,22 +211,11 @@ void TModuleFrame::initialize(int mode, int productID, void(__closure *onModuleC
 
    // disable the module popup for the key view
    m_bPopup = false;
-   ModulePopup->Items->Items[0]->Visible = false;
-   ModulePopup->Items->Items[1]->Visible = false;
-   
-   if (m_mode==2)     // - KeyForm, general uses - //
-   {
-      m_bPopup = true;
 
-      if (m_productId==SOLSCRIPT_PRODUCT)
-         ModulePopup->Items->Items[1]->Visible = true;
-      else
-         ModulePopup->Items->Items[0]->Visible = true;
-   }
+   if (m_mode==2)     // - KeyForm, general uses - //
+      m_bPopup = true;
    else if (m_mode == 3)  //  - KeyWizard - //
-   {
       m_bChangeUnits = true;
-   }
 }
 
 
@@ -273,6 +262,7 @@ void TModuleFrame::load(SKeyRecord* skeyrecord, bool all_modules)
           new_item->SubItems->Add(m_moduleDetail[idx]->id);
           new_item->SubItems->Add(m_moduleDetail[idx]->engineer);
           new_item->SubItems->Add(m_moduleDetail[idx]->partnumber);
+          new_item->SubItems->Add(m_moduleDetail[idx]->counterUnit);
           new_item->SubItems->Add(ver_added);
           new_item->SubItems->Add(ver_removed);
           new_item->SubItems->Add(m_moduleDetail[idx]->max);
@@ -552,13 +542,9 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       return false;
 
    //check attached key status - need to have a programmed key attached
-   /*if(key_record->pkey->productId == SPDE_PRODUCT)*/
-       SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
-   //else
-       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
-   /**/
+   SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
    bool keyOnTrial = key_record->pkey->isOnTrial();
-
 
    //check if key is attached
    if( keyMaster->found() == false )
@@ -620,14 +606,16 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                               static_cast<ProductId>(key_record->pkey->productId),
                                               key_record->pkey->productVersion,
                                               units,
+                                              key_record->incrementPasswordNumber(),
                                               password_string
-                                             );
+                                              );
          else
                  keyMaster->getModulePassword(spd_key,
                                               detail->id,
                                               static_cast<ProductId>(key_record->pkey->productId),
                                               key_record->pkey->productVersion,
                                               units,
+                                              key_record->incrementPasswordNumber(),
                                               password_string
                                               );
 
@@ -652,6 +640,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                       static_cast<ProductId>(key_record->pkey->productId),
                                       key_record->pkey->productVersion,
                                       units,
+                                      key_record->incrementPasswordNumber(),
                                       password_string
                                       );
 
@@ -674,7 +663,8 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                         (uchar)detail->id,
                                         static_cast<ProductId>(key_record->pkey->productId),
                                         key_record->pkey->productVersion,
-                                        units+1,
+                                        ++units,
+                                        key_record->incrementPasswordNumber(),
                                        password_string
                                        );         //need to do units + 1 to get password for module + 1
            keyMaster->applyModPassword(key_record, detail->id, units+1);
@@ -693,11 +683,6 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    {
 
       m_pDatabase->StartTransaction();
-      /*if(key_record->pkey->productId == SPDE_PRODUCT)
-              updated_module_list = (reinterpret_cast<char*>((SpdeProtectionKey*)(key_record->pkey)->keyDataBlock.data),static_cast<unsigned char>(36));
-      else
-              updated_module_list = (reinterpret_cast<char*>((SpdProtectionKey*)(key_record->pkey)->keyDataBlock.data),static_cast<unsigned char>(36));
-      */
       AnsiString updated_module_list(reinterpret_cast<char*>((key_record->pkey)->keyDataBlock.data),static_cast<unsigned char>(36));
       ModuleDetailQuery->Close();
       ModuleDetailQuery->SQL->Clear();
@@ -770,6 +755,14 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
 
+      ModuleDetailQuery->Close();
+      ModuleDetailQuery->SQL->Clear();
+      ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      ModuleDetailQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      ModuleDetailQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      ModuleDetailQuery->Prepare();
+      ModuleDetailQuery->ExecSQL();
+
       m_pDatabase->Commit();
 
    }
@@ -777,12 +770,206 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    {
       Application->MessageBox( e.Message.c_str(), "Database Failure", MB_OK );
       m_pDatabase->Rollback();
+      key_record->passwordNumber--;
       return false;
    }
 
    return true;
 }
 
+//==============================================================================
+// Function:    createModulePassword(int module_id, int row_id );
+// Purpose:     Creates a module password for a selected module.  This password
+//              will be entered into sTransaction detail in the database, and is
+//              dependent upon SDRid which is a value in the sDescriptionRecord
+//              table.  The password is dependent upon the customer number which
+//              will make it unique. Also the key automatically becomes a
+//              permanent key when a password is created.
+// Parameters:  module_id - identifies module type of password
+//              row_id - NULL if legacy password, else a db key for ord_list table
+// Returns:     bool
+//==============================================================================
+bool TModuleFrame::createCounterPassword(unsigned int units, const bool bPasswordExt)
+{
+   char password_string[128];
+   //get selected list item, from list item get pointer to ModuleDetail structure
+   TListItem* selected(ModuleList->Selected);
+   if(selected==NULL)
+      return false;
+
+   //check attached key status - need to have a programmed key attached
+   SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+   SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
+   bool keyOnTrial = key_record->pkey->isOnTrial();
+
+   //check if key is attached
+   if( keyMaster->found() == false )
+   {
+      //add message, no key attached
+      Application->MessageBox("No key attached.", "Information Message", MB_OK);
+      return false;
+   }
+   //check if attached key is programmed
+   if(keyMaster->programmed() == false )
+   {
+      //add message, attached key must be programmed to generate a password
+      Application->MessageBox("Attached key must be programmed.", "Information Message", MB_OK);
+      return false;
+   }
+
+   //ModuleDetail* detail = m_moduleDetail[modId];
+   ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);  //listselected item
+
+   //check if module is default
+   if( key_record->pkey->isOnTrial() && key_record->non_perm_ktf == false )
+   {
+      //if the module is a default module, then let the user know that you can't
+      //create a password for a default module.
+      bool not_available(detail->spd_default||detail->spde_default||detail->con_default||detail->iConvert_default);
+
+      // Only display the message if the default module applies to the product.
+      // Before, any default module would pertain to all products.
+      if ( key_record->pkey->productId == SPD_PRODUCT)
+          not_available = detail->spd_default;
+      else if ( key_record->pkey->productId == SPDE_PRODUCT)
+          not_available = detail->spde_default;
+      else if (key_record->pkey->productId == CONNECT_PRODUCT)
+          not_available = detail->con_default;
+      else if (key_record->pkey->productId == QUANTUM_PRODUCT)
+          not_available = detail->m_bQuantumDefault;
+      else if (key_record->pkey->productId == ICONVERT_PRODUCT)
+          not_available = detail->iConvert_default;
+
+      if( not_available )
+      {
+         Application->MessageBox("The word of Bert says you can't create a password for default modules.", "User Error", MB_ICONINFORMATION);
+         return false;
+      }
+      else // ...otherwise create a password
+      {
+         if(key_record->pkey->productId == SPDE_PRODUCT)
+                 keyMaster->getModulePassword(spde_key,
+                                              detail->id,
+                                              static_cast<ProductId>(key_record->pkey->productId),
+                                              key_record->pkey->productVersion,
+                                              units,
+                                              key_record->incrementPasswordNumber(),
+                                              password_string
+                                             );
+         else
+                 keyMaster->getModulePassword(spd_key,
+                                              detail->id,
+                                              static_cast<ProductId>(key_record->pkey->productId),
+                                              key_record->pkey->productVersion,
+                                              units,
+                                              key_record->incrementPasswordNumber(),
+                                              password_string
+                                              );
+
+      }
+   }
+   else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true) && key_record->pkey->productId != SPDE_PRODUCT) //key is already permanent
+   {
+      if (units == -1)
+         units = spd_key->getLicense(detail->id);
+
+      //check if license has ability to be incremented
+      int available(detail->max - units);
+      if( available > 0 )
+      {
+         keyMaster->getModulePassword(spd_key,
+                                      (uchar)detail->id,
+                                      static_cast<ProductId>(key_record->pkey->productId),
+                                      key_record->pkey->productVersion,
+                                      units,
+                                      key_record->incrementPasswordNumber(),
+                                      password_string
+                                      );
+      }
+      else
+      {
+         Application->MessageBox("Module already set to its maximum value.", "Module Information", MB_OK);
+         return false;
+      }
+  }
+  else if((key_record->pkey->status == 2 ||  key_record->non_perm_ktf == true) && key_record->pkey->productId == SPDE_PRODUCT) //key is already permanent
+  {
+         if (units == -1)
+            units = spde_key->getLicense(detail->id);
+      //check if license has ability to be incremented
+        int available(detail->max - units);
+        if( available > 0 )
+        {
+           keyMaster->getModulePassword(spde_key,
+                                        (uchar)detail->id,
+                                        static_cast<ProductId>(key_record->pkey->productId),
+                                        key_record->pkey->productVersion,
+                                        units,
+                                        key_record->incrementPasswordNumber(),
+                                        password_string
+                                       );
+        }
+        else
+        {
+         Application->MessageBox("Module already set to its maximum value.", "Module Information", MB_OK);
+         return false;
+        }
+   }
+   else //- key_status not valid, do not generate a module password
+      return false;
+
+   //execute stored procedure to update database
+   try
+   {
+
+      m_pDatabase->StartTransaction();
+
+      ModuleDetailQuery->Close();
+      ModuleDetailQuery->SQL->Clear();
+      ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      ModuleDetailQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      ModuleDetailQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      ModuleDetailQuery->Prepare();
+      ModuleDetailQuery->ExecSQL();
+
+      ModuleDetailQuery->Close();
+      ModuleDetailQuery->SQL->Clear();
+      ModuleDetailQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :mod_id, :units, 0)");
+      ModuleDetailQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
+      ModuleDetailQuery->ParamByName("password")->AsString = password_string;
+
+      ModuleDetailQuery->ParamByName("units")->AsInteger = units;
+
+      // ICONVERT products have an SDRid of 10XX, and therefore have to check
+      // to see if the product is ICONVERT or other.
+
+      if(key_record->pkey->productId == ICONVERT_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 1000;
+      else if(key_record->pkey->productId == SDX_DESIGNER_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 3000;
+      else if(key_record->pkey->productId == RUBIKA_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 4000;
+      else if(key_record->pkey->productId == SPDE_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 5000;
+      else
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
+
+      ModuleDetailQuery->Prepare();
+      ModuleDetailQuery->ExecSQL();
+
+      m_pDatabase->Commit();
+
+   }
+   catch(EDBEngineError &e)
+   {
+      Application->MessageBox( e.Message.c_str(), "Database Failure", MB_OK );
+      m_pDatabase->Rollback();
+      key_record->passwordNumber--;
+      return false;
+   }
+
+   return true;
+}
 //==============================================================================
 // Function:    createPagesPerMinutePassword();
 // Purpose:     Creates a pages per minute password for a selected module.  This password
@@ -860,7 +1047,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
         delete(dlg);
         return false;
    }
-   
+
    pages = dlg->PagesEditBox->Text.ToInt();
    delete(dlg);
 
@@ -946,9 +1133,9 @@ bool TModuleFrame::createPagesPerMinutePassword()
       else // ...otherwise create a password
       {
          if(key_record->pkey->productId == SPDE_PRODUCT)
-                keyMaster->getPagesPerMinutePassword(spde_key, ext, pages, password_string, ppmModID);
+                keyMaster->getPagesPerMinutePassword(spde_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
          else
-                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
 
          //applies module password to key
          keyMaster->applyPagesPerMinutePassword(key_record);
@@ -961,7 +1148,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       int available(ext < MAX_PPM_EXTENSIONS);
       if( available > 0 )
       {
-         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ppmModID);
+         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
          keyMaster->applyPagesPerMinutePassword(key_record);
       }
       else
@@ -976,7 +1163,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
       int available(ext < MAX_PPM_EXTENSIONS);
       if( available > 0 )
       {
-         keyMaster->getPagesPerMinutePassword(spde_key, ext, pages, password_string, ppmModID);
+         keyMaster->getPagesPerMinutePassword(spde_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
          keyMaster->applyPagesPerMinutePassword(key_record);
       }
       else
@@ -1119,6 +1306,13 @@ bool TModuleFrame::createPagesPerMinutePassword()
       ModuleDetailQuery->Prepare();
       ModuleDetailQuery->ExecSQL();
 
+      ModuleDetailQuery->Close();
+      ModuleDetailQuery->SQL->Clear();
+      ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      ModuleDetailQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      ModuleDetailQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      ModuleDetailQuery->Prepare();
+      ModuleDetailQuery->ExecSQL();
 
       m_pDatabase->Commit();
 
@@ -1127,6 +1321,7 @@ bool TModuleFrame::createPagesPerMinutePassword()
    {
       Application->MessageBox( e.Message.c_str(), "Database Failure", MB_OK );
       m_pDatabase->Rollback();
+      key_record->passwordNumber--;
       return false;
    }
 
@@ -1216,8 +1411,45 @@ void __fastcall TModuleFrame::ModuleListMouseDown(TObject *Sender,
    void* pModuleData(ModuleList->Selected->Data);
    if (pModuleData) {
       ModuleDetail* detail = static_cast<ModuleDetail*>(pModuleData);
+
+      ModulePopup->Items->Items[0]->Visible = false;
+      ModulePopup->Items->Items[1]->Visible = false;
+      if(detail->counterUnit > 0)
+         ModulePopup->Items->Items[2]->Visible = true;  //enable counter
+      else
+      {
+         if (m_productId==SOLSCRIPT_PRODUCT)
+              ModulePopup->Items->Items[1]->Visible = true;
+         else
+              ModulePopup->Items->Items[0]->Visible = true;
+         ModulePopup->Items->Items[2]->Visible = false; //disable counter
+      }
+
       if (m_bPopup && Button==mbRight && detail->name != "{ Not Used }")
          ModulePopup->Popup(pt.x, pt.y);
    }
 }
+
+
+void __fastcall TModuleFrame::mmIncrementCounterClick(TObject *Sender)
+{
+   TUnitsDlg *pDlg = new TUnitsDlg(NULL, 0xFFFFFFFF);  //set counter units as max
+   TListItem* selected(ModuleList->Selected);
+   if(selected==NULL)
+        return;
+   ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
+   pDlg->EnableCounter(true);
+   pDlg->SetCounterUnits(detail->counterUnit);
+   if (pDlg->ShowModal()==IDYES)
+      createCounterPassword(pDlg->GetUnits(), true);
+   pDlg->EnableCounter(false);
+   delete pDlg;
+
+   //call update function
+   if(OnModuleChange)
+      OnModuleChange();
+
+}
+//---------------------------------------------------------------------------
+
 

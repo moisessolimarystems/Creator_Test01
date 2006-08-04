@@ -60,21 +60,14 @@ public:
                              ushort,
                              char*
                             );
-   void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, ushort, char*);
-   void getOutputPassword(SpdProtectionKey*, ushort, char*);
-   void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, long);
-   void getModulePassword(SpdeProtectionKey*, uchar, ProductId, ushort, ushort, char*);
-   void getOutputPassword(SpdeProtectionKey*, ushort, char*);
-   void getOperatorSessionPassword(SpdeProtectionKey*, ushort, char*);
-   void getUserSessionPassword(SpdeProtectionKey*, ushort, char*);
-   void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, long);
-
-   void getBusTagInPassword(SpdeProtectionKey*, ushort, char*);
-   void getBusTagOutPassword(SpdeProtectionKey*, ushort, char*);
-   void getParallelInPassword(SpdeProtectionKey*, ushort, char*);
-   void getParallelOutPassword(SpdeProtectionKey*, ushort, char*);
-   void getSCSIOutPassword(SpdeProtectionKey*, ushort, char*);
-   void getPSInterpPassword(SpdeProtectionKey*, ushort, char*);
+   void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
+   void getOutputPassword(SpdProtectionKey*, ushort, ushort, char*);
+   void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, ushort, long);
+   void getModulePassword(SpdeProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
+   void getOutputPassword(SpdeProtectionKey*, ushort, ushort, char*);
+   void getOperatorSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
+   void getUserSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
+   void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, ushort, long);
 
    AnsiString getIndexServersPassword(SSProtectionKey*, ushort);
    AnsiString getReportServersPassword(SSProtectionKey*, ushort);
@@ -98,13 +91,6 @@ public:
    void applyConcurrentUsersPassword(SKeyRecord* keyrec, unsigned short units_licensed);
    void applyApplicationPassword(SKeyRecord* keyrec, unsigned short units_licensed);
    void applyDocumentAssemblerPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-
-   void applyBusTagInPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-   void applyBusTagOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-   void applyParallelInPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-   void applyParallelOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-   void applySCSIOutPassword(SKeyRecord* keyrec, unsigned short units_licensed);
-   void applyPSInterpPassword(SKeyRecord* keyrec, unsigned short units_licensed);
 
    //operate on scratchKey
    short clear();

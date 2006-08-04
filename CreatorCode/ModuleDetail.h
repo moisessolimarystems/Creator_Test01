@@ -46,6 +46,7 @@ __published:	// IDE-managed Components
    TMenuItem *mmViewAll;
    TMenuItem *mmPagesPerMinute;
         TMenuItem *mmSetModule;
+        TMenuItem *mmIncrementCounter;
    void __fastcall ModuleListCompare(TObject *Sender, TListItem *Item1,
           TListItem *Item2, int Data, int &Compare);
    void __fastcall ModuleListColumnClick(TObject *Sender,
@@ -57,6 +58,7 @@ __published:	// IDE-managed Components
         void __fastcall mmSetModuleClick(TObject *Sender);
    void __fastcall ModuleListMouseDown(TObject *Sender,
           TMouseButton Button, TShiftState Shift, int X, int Y);
+        void __fastcall mmIncrementCounterClick(TObject *Sender);
 
 private:	// User declarations
    SKeyRecord*    key_record;
@@ -83,6 +85,7 @@ public:		// User declarations
    void modifyModulePanel(bool can_modify){m_bChangeUnits=can_modify;}
    void initialize(int mode, int productID, void( __closure *onModuleUpdate)(void)=NULL);
    bool createModulePassword(int units = -1, const bool bPasswordExt = false);
+   bool createCounterPassword(unsigned int units = -1, const bool bPasswordExt = false);
    bool createPagesPerMinutePassword();
 
 

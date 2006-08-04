@@ -186,7 +186,8 @@ void  KeyMaster::getModulePassword(SpdProtectionKey* key,
                                    uchar mod_id,
                                    ProductId product_id,
                                    ushort product_version,
-                                   ushort units,
+                                   unsigned int units,
+                                   ushort password_number,
                                    char* Password_String)
 {
    if(pTheServer)
@@ -194,6 +195,7 @@ void  KeyMaster::getModulePassword(SpdProtectionKey* key,
                              product_id,
                              product_version,
                              pTheServer,
+                             password_number,
                              Password_String
                             );
 }
@@ -213,7 +215,8 @@ void  KeyMaster::getModulePassword(SpdeProtectionKey* key,
                                    uchar mod_id,
                                    ProductId product_id,
                                    ushort product_version,
-                                   ushort units,
+                                   unsigned int units,
+                                   ushort password_number,
                                    char* Password_String)
 {
    if(pTheServer)
@@ -221,6 +224,7 @@ void  KeyMaster::getModulePassword(SpdeProtectionKey* key,
                              product_id,
                              product_version,
                              pTheServer,
+                             password_number,
                              Password_String
                             );
 }
@@ -237,10 +241,11 @@ void  KeyMaster::getModulePassword(SpdeProtectionKey* key,
 //==============================================================================
 void KeyMaster::getOutputPassword(SpdProtectionKey* key,
                                    ushort output_units,
+                                   ushort Password_Number,
                                    char* Password_String )
 {
    if(pTheServer)
-     key->getOutputPassword(output_units, pTheServer, Password_String);
+     key->getOutputPassword(output_units, pTheServer, Password_Number, Password_String);
 }
 
 //==============================================================================
@@ -253,10 +258,11 @@ void KeyMaster::getOutputPassword(SpdProtectionKey* key,
 //==============================================================================
 void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
                                    ushort output_units,
+                                   ushort Password_Number,
                                    char* Password_String )
 {
    if(pTheServer)
-     key->getOutputPassword(output_units, pTheServer, Password_String);
+     key->getOutputPassword(output_units, pTheServer, Password_Number, Password_String);
 }
 
 //==============================================================================
@@ -269,10 +275,11 @@ void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
 //==============================================================================
 void KeyMaster::getOperatorSessionPassword(SpdeProtectionKey* key,
                                    ushort operator_sessions,
+                                   ushort Password_Number,
                                    char* Password_String )
 {
    if(pTheServer)
-     key->getOperatorSessionPassword(operator_sessions, pTheServer, Password_String);
+     key->getOperatorSessionPassword(operator_sessions, pTheServer, Password_Number, Password_String);
 }
 
 //==============================================================================
@@ -285,10 +292,11 @@ void KeyMaster::getOperatorSessionPassword(SpdeProtectionKey* key,
 //==============================================================================
 void KeyMaster::getUserSessionPassword(SpdeProtectionKey* key,
                                    ushort user_sessions,
+                                   ushort Password_Number,
                                    char* Password_String )
 {
    if(pTheServer)
-     key->getUserSessionPassword(user_sessions, pTheServer, Password_String);
+     key->getUserSessionPassword(user_sessions, pTheServer, Password_Number, Password_String);
 }
 
 //==============================================================================
@@ -303,10 +311,11 @@ void KeyMaster::getPagesPerMinutePassword(SpdProtectionKey* key,
                                            ushort ext,
                                            ushort pages,
                                            char* Password_String,
+                                           ushort Password_Number,
                                            long ModID )
 {
    if(pTheServer)
-      key->getPagesPerMinutePassword(ext, pages, pTheServer, Password_String, ModID);
+      key->getPagesPerMinutePassword(ext, pages, pTheServer, Password_String, Password_Number, ModID);
 }
 
 //==============================================================================
@@ -321,10 +330,11 @@ void KeyMaster::getPagesPerMinutePassword(SpdeProtectionKey* key,
                                            ushort ext,
                                            ushort pages,
                                            char* Password_String,
+                                           ushort Password_Number,
                                            long ModID )
 {
    if(pTheServer)
-      key->getPagesPerMinutePassword(ext, pages, pTheServer, Password_String, ModID);
+      key->getPagesPerMinutePassword(ext, pages, pTheServer, Password_String, Password_Number, ModID);
 }
 
 //==============================================================================
@@ -345,110 +355,6 @@ void KeyMaster::getProductVersionPassword(ProtectionKey* key,
       key->getProductVersionPassword(product_version,
                                      pTheServer,
                                      Password_String);
-
-}
-
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getBusTagInPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,
-                                         char* Password_String)
-{
-   /*if(pTheServer)
-      return key->getBusTagInPassword(units_licensed, pTheServer,Password_String);
-   */
-
-}
-
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getBusTagOutPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,char* Password_String)
-{
-  // if(pTheServer)
-   //   return key->getBusTagOutPassword(units_licensed, pTheServer,Password_String);
-
-
-}
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getParallelInPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,char* Password_String)
-{
-  // if(pTheServer)
-   //   return key->getParallelInPassword(units_licensed, pTheServer,Password_String);
-
-
-}
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getParallelOutPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,char* Password_String)
-{
- //  if(pTheServer)
- //     return key->getParallelOutPassword(units_licensed, pTheServer,Password_String);
-
-
-}
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getSCSIOutPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,char* Password_String)
-{
-  // if(pTheServer)
-  //    return key->getSCSIOutPassword(units_licensed, pTheServer,Password_String);
-
-
-}
-//==============================================================================
-// Function:    getIndexServerPassword()
-// Purpose:     Gets the index server password used for the SOL searcher enterprise
-//              keys.
-// Parameters:  SSProtectionKey* - key
-//              ushort - units_licensed
-// Returns:     ulong
-// Note:
-//==============================================================================
-void KeyMaster::getPSInterpPassword(SpdeProtectionKey* key,
-                                         ushort units_licensed,char* Password_String)
-{
-   //if(pTheServer)
-   //  return key->getPSInterpPassword(units_licensed, pTheServer,Password_String);
 
 }
 
@@ -1067,13 +973,6 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
         spde_key->outputUnits = 4095;
         spde_key->operatorSessionUnits = 255;
         spde_key->userSessionUnits = 255;
-/*        spde_key->setBusTagIn(MAX_BUSTAGIN);
-        spde_key->setBusTagOut(MAX_BUSTAGOUT);
-        spde_key->setParallelIn(MAX_PARALLELIN);
-        spde_key->setParallelOut(MAX_PARALLELOUT);
-        spde_key->setSCSIOut(MAX_SCSIOUT);
-        spde_key->setPSInterp(MAX_PSINTERP);
-*/
         keyrec->xch_ipds_ppm = SPDE_MAX_PAGES_PER_MINUTE;
         keyrec->xch_ps_ppm = SPDE_MAX_PAGES_PER_MINUTE;
         keyrec->xch_ps_dbcs_ppm = SPDE_MAX_PAGES_PER_MINUTE;
@@ -1209,13 +1108,6 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
             spde_key->setLicense(/*mod_id,*/ module_detail[mod_id]->id, 0);
          }
       }
- /*     spde_key->setBusTagIn(MAX_BUSTAGIN);
-      spde_key->setBusTagOut(MAX_BUSTAGOUT);
-      spde_key->setParallelIn(MAX_PARALLELIN);
-      spde_key->setParallelOut(MAX_PARALLELOUT);
-      spde_key->setSCSIOut(MAX_SCSIOUT);
-      spde_key->setPSInterp(MAX_PSINTERP);
-  */
       spde_key->outputUnits = 1;
       spde_key->operatorSessionUnits = 1;
       spde_key->userSessionUnits = 1;
@@ -1358,7 +1250,6 @@ void KeyMaster::applyVersionPassword(SKeyRecord* keyrec, unsigned short version)
        keyrec->pkey->productId == CONNECT_PRODUCT ||
        keyrec->pkey->productId == QUANTUM_PRODUCT ||
        keyrec->pkey->productId == SOLSCRIPT_PRODUCT ||
-       /*keyrec->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
        keyrec->pkey->productId == RUBIKA_PRODUCT)
    {
       ModuleDetail** ppModuleDetail = lookup->getModuleList(keyrec->pkey->productId);
@@ -1545,125 +1436,6 @@ void KeyMaster::applyModPassword(SKeyRecord* keyrec, unsigned char module_id, un
     }
 }
 
-///==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyBusTagInPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setBusTagIn(units_licensed);
-}
-
-///==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyBusTagOutPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setBusTagOut(units_licensed);
-
-}
-///==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyParallelInPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setParallelIn(units_licensed);
-}
-///==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyParallelOutPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setParallelOut(units_licensed);
-}
-
-///==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applySCSIOutPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setSCSIOut(units_licensed);
-}
-
-//==============================================================================
-// Function:    applyIndexServersPassword()
-// Purpose:
-// Parameters:  SKeyRecord* keyrec,
-// Returns:     None
-//==============================================================================
-void KeyMaster::applyPSInterpPassword(SKeyRecord* keyrec,
-                                          unsigned short units_licensed)
-{
-   // make key permanent
-   SpdeProtectionKey* spde_key = ((SpdeProtectionKey*)(keyrec->pkey));
-
-   if( spde_key->isOnTrial() )
-   {
-      applyPermanentPassword(keyrec);
-   }
-
-   //spde_key->setPSInterp(units_licensed);
-}
-
 //==============================================================================
 // Function:    applyIndexServersPassword()
 // Purpose:
@@ -1847,7 +1619,6 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
       }
    }
    else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-           /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
             key_record->pkey->productId == RUBIKA_PRODUCT) {
 
       SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));

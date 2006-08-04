@@ -309,7 +309,6 @@ void __fastcall TFCustomerKeys::setGUIOptions()
         // Allow Master keys to generate these passwords
 
         mmPermanent->Enabled = true;
-       // mmExtension->Enabled = true;
 
         //
         // Disallow Master keys to generate these passwords
@@ -326,7 +325,6 @@ void __fastcall TFCustomerKeys::setGUIOptions()
 
      if ((PERMISSION_FLAG & permanent_pwd) &&
          (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-         /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
          key_record->pkey->productId == RUBIKA_PRODUCT)
          )
      {
@@ -437,6 +435,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 // Database ONLY members
                 key_record->customerName = QueryKey->FieldByName("SCRname")->AsString;
                 key_record->skr_id = QueryKey->FieldByName("SKRid")->AsInteger;
+                key_record->passwordNumber = QueryKey->FieldByName("SKRpasswordNumber")->AsInteger;
                 key_record->system_id = QueryKey->FieldByName("SDid")->AsInteger;
                 key_record->po = QueryKey->FieldByName("SKRpo")->AsInteger;
                 key_record->eBOnumber = QueryKey->FieldByName("SKReBOnumber")->AsString;
@@ -1428,7 +1427,6 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                setUserSessionUnitsDisplay(static_cast<SpdeProtectionKey*>(key_record->pkey)->userSessionUnits);
             }
             else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
-                     /*key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||*/
                      key_record->pkey->productId == RUBIKA_PRODUCT) {
                KeyFormModuleFrame->load(key_record);
             }
@@ -1589,8 +1587,6 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
 // Parameters:  ( TObject * ) - Sender
 // Returns:     None
 //==============================================================================
-//const char* PasswordPacketDirectory = "L:\\Password Packets\\";
-//const char* PasswordPacketDirectory = "R:\\Solimar Password Bundles\\";
 void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 {
    TBookmark tmpMark;
@@ -1632,11 +1628,11 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
 
          PasswordQuery->First();
 
-      	while( !PasswordQuery->Eof )
+         while( !PasswordQuery->Eof )
          {
             //if a row is selected append the password to the packet and remember its ID in order to store it in the DB
-       	    if( PswdGrid->SelectedRows->CurrentRowSelected )
-            {
+//           if( PswdGrid->SelectedRows->CurrentRowSelected )
+//            {
                PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
                PasswordIDIndex++;
 
@@ -1646,9 +1642,9 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
                SysFreeString(bstrPassword);
-             }
+//             }
              PasswordQuery->Next();
-      	}
+         }
          hr = keyMaster->FinalizePasswordPacket();
 
          varTime.date -= 7.0;    //remove the 7 days that was added before
@@ -2115,7 +2111,6 @@ void __fastcall TFCustomerKeys::mmSPDEUserSessionsClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
 //==============================================================================
 // Function:    createOutputPassword()
 // Purpose:     creates an output password, and updates the information in the
@@ -2138,9 +2133,9 @@ void TFCustomerKeys::createOutputPassword(int output_units)
 
    //generate password
    if(key_record->pkey->productId == SPDE_PRODUCT)
-        keyMaster->getOutputPassword(spde_key, output_units, password_string);
+        keyMaster->getOutputPassword(spde_key, output_units, key_record->passwordNumber, password_string);
    else
-        keyMaster->getOutputPassword(spd_key, output_units, password_string);
+        keyMaster->getOutputPassword(spd_key, output_units, key_record->passwordNumber,password_string);
    if(!password_string)
    {
       Application->MessageBox("Unable to generate password.", "Key Message", MB_OK|MB_ICONERROR );
@@ -2213,7 +2208,7 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
       return;
 
    //generate password
-   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, password_string);
+   keyMaster->getOperatorSessionPassword(spde_key, operator_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
@@ -2273,13 +2268,13 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
 
    //create both for now, need to fix copy constructor....
    //check attached key status - need to have a programmed key attached
-      SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
+   SpdeProtectionKey* spde_key((SpdeProtectionKey*)(key_record->pkey));
    //check if key is attached
    if(!isAttachedKeyReady())
       return;
 
    //generate password
-   keyMaster->getUserSessionPassword(spde_key, user_sessions, password_string);
+   keyMaster->getUserSessionPassword(spde_key, user_sessions, key_record->passwordNumber, password_string);
 
    if(!password_string)
    {
@@ -2324,7 +2319,6 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
       Database1->Rollback();
    }
 }
-
 
 //==============================================================================
 // Function:    createLUPassword
