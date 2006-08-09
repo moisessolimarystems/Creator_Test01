@@ -23,6 +23,9 @@
 // Defines
 //------------------------------------------------------------------------------
 
+const int VERSION_MAJOR  = 2;
+const int VERSION_MINOR = 26;
+const int BUILD_NUMBER = 46;
 
 //------------------------------------------------------------------------------
 // Class TCreatorAboutBox
@@ -30,16 +33,13 @@
 class TCreatorAboutBox : public TForm
 {
 __published:
-    TLabel *Version;
-    TLabel *Label;
-        TLabel *CopyRightLabel;
-    TBitBtn *BitBtn1;
+        TLabel *Version;
+        TBitBtn *BitBtn1;
 	TImage *Image1;
-	
-private:
-   __fastcall TCreatorAboutBox(TComponent* Owner):TForm(Owner){}
+        TLabel *CopyRightLabel;
+
 public:
-	__fastcall TCreatorAboutBox(int, TComponent* AOwner);
+	__fastcall TCreatorAboutBox(/*int,*/ TComponent* AOwner);
 };
 //----------------------------------------------------------------------------
 extern TCreatorAboutBox *CreatorAboutBox;

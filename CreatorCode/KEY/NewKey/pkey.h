@@ -37,7 +37,7 @@
 #define PRIMARY_PASSWD_CELL      0x16
 #define EXPIRATION_DATE_CELL     0x18
 #define SECONDARY_ALG_CELL       0x22
-#define KEY_TYPE_CELL				0x30
+#define KEY_TYPE_CELL		 0x30
 #define PRODUCT_ID_CELL          0x31
 #define PRODUCT_VERSION_CELL     0x32
 #define KEY_VERSION_CELL         0x33

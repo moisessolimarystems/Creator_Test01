@@ -7,7 +7,7 @@
 #include <vcl\vcl.h>
 #pragma hdrstop
 
-const int CREATOR_VERSION = 0x225;
+const int CREATOR_VERSION = 0x226;
 
 #include "CLookups.h"
 #include "CustomerForm.h"
@@ -627,7 +627,7 @@ void __fastcall TCustForm::SetCustomerForm()
 //==============================================================================
 void __fastcall TCustForm::MMAboutClick(TObject *Sender)
 {
-   TCreatorAboutBox* aboutbox = new TCreatorAboutBox(CREATOR_VERSION, this);
+   TCreatorAboutBox* aboutbox = new TCreatorAboutBox(/*CREATOR_VERSION,*/ this);
    aboutbox->ShowModal();
    delete(aboutbox);
 }
