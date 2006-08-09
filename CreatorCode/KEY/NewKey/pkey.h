@@ -29,9 +29,8 @@
 // key cell specifications
 #define TOTAL_CELLS              56
 
-
 // key cell numbers
-#define KEY_START_ADDRESS        0x00
+#define KEY_START_ADDRESS        0x08
 #define INITIAL_COUNTER_CELL     0x12
 #define EXTENDED_COUNTER_CELL    0x13
 #define PRIMARY_ALG_CELL         0x14
