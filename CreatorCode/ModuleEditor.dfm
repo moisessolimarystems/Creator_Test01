@@ -6,9 +6,5 @@ object ModuleEditor: TModuleEditor
   TabOrder = 0
   inline ModuleFrame1: TModuleFrame
     Left = 8
-    Top = 0
-    Width = 391
-    Height = 337
-    TabOrder = 0
   end
 end

@@ -32,14 +32,17 @@ const int Deactivated = 11;
 
 using namespace KeyViewManager;
 
-#undef MessageBox
 KeyInfoListViewManager::KeyInfoListViewManager(ListView* KeyInfoListView)
 			:TheKeyListView(KeyInfoListView)
 {
 	//new up a commlink object
 	OurCommLink = new CommunicationLink();
-	if(!OurCommLink)
-		return;
+
+	//connect to the solimar license server
+	OurCommLink->Connect();
+
+	//initializes the commlink object to be KeyInfo connection 
+	OurCommLink->InitializeKeyInfoConnection();
 }
 
 KeyInfoListViewManager::~KeyInfoListViewManager()
@@ -55,21 +58,6 @@ KeyInfoListViewManager::~KeyInfoListViewManager()
 		TheModViewManager = NULL;
 	}
 
-}
-
-bool KeyInfoListViewManager::Connect()
-{	
-	if(OurCommLink)
-	{
-			//connect to the solimar license server
-		if(SUCCEEDED(OurCommLink->Connect()))
-		{
-			//initializes the commlink object to be KeyInfo connection 
-			if(SUCCEEDED(OurCommLink->InitializeKeyInfoConnection()))
-				return true;
-		}
-	}
-	return false;
 }
 
 bool KeyInfoListViewManager::PopulateView()
@@ -93,13 +81,13 @@ bool KeyInfoListViewManager::PopulateView()
 
 		//extract the first byte
 		//12 = 3 Bytes * sizeof(BYTE) = 3*4
-		int MajorVersion = TheKeyInfoStructure.ProductVersion.lVal >> 12;
+		int MajorVersion = ((int)TheKeyInfoStructure.ProductVersion) >> 12;
 
-		//extract the last three bytes but drop the last unused byte
-		int MinorVersion = (TheKeyInfoStructure.ProductVersion.lVal & 0x0fff) >> 4;
+		//extract the last three bytes
+		int MinorVersion = ((int)TheKeyInfoStructure.ProductVersion) & 0x0fff;
+		//int MinorVersion = (int)((((((int)TheKeyInfoStructure.ProductVersion) & 0x0F00) >> 8) * 10) + (((((int)TheKeyInfoStructure.ProductVersion) & 0x00F0) >> 4) * 1));
 
-		//%x hexadecimal integer format
-		sprintf(ProductVersion, "%x.%02x", MajorVersion, MinorVersion);
+		sprintf(ProductVersion, "%x.%x", MajorVersion, MinorVersion);
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
@@ -204,7 +192,7 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				return retval = "Rubika";
 
 			case SPDEProductID : 
-				return retval = "SPDE";
+				return retval = "SP/D Enterprise";
 
 			default :
 				return retval = "Unknown License";
@@ -214,7 +202,6 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 //Fills a row with the info in the key info structure
 bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
-	bool bRetVal = false;
 	ListViewItem*  listViewItem1 = new ListViewItem();
 	listViewItem1->Text = TheKeyInfoStructure.KeyNumber.bstrVal;
 	
@@ -222,55 +209,33 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductVersion.bstrVal);
 	listViewItem1->SubItems->Add(TheKeyInfoStructure.License.bstrVal);
 
-	if(TheKeyInfoStructure.Active.intVal == 0) 
-		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u2212"));
-		listViewItem1->SubItems->Add(S"-"); 
+	if(TheKeyInfoStructure.Active.intVal == 0)
+		listViewItem1->SubItems->Add(S"0");
+
 	else
-		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u002B")); 
-		listViewItem1->SubItems->Add(S"+"); 
+		listViewItem1->SubItems->Add(S"1");
+
+	char retval[10];
 
    //Convert the hours left into Days Left as requested by Tech Support
-    TheKeyInfoStructure.HoursLeft /= 24;
-	//Permanent Key
-	if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
-		listViewItem1->SubItems->Add(S"Unlimited");
-	else
-	{	
-		char retval[10];
-		sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
-		listViewItem1->SubItems->Add(retval);
-	}
+   TheKeyInfoStructure.HoursLeft /= 24;
+	sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
+	listViewItem1->SubItems->Add(retval);
 
-	//Convert from UTC time to Local time.
-	SYSTEMTIME st;
-	FILETIME ft, dft;
-    LARGE_INTEGER li;  
-	VariantTimeToSystemTime(TheKeyInfoStructure.ExpirationDate,&st);
-	SystemTimeToFileTime(&st, &ft);
-	FileTimeToLocalFileTime(&ft, &dft);
-    li.LowPart = dft.dwLowDateTime;
-    li.HighPart = dft.dwHighDateTime;    
-	System::DateTime utc_t = System::DateTime::FromFileTimeUtc(li.QuadPart);
+	//convert the COM Variant into an Object
+	Object* ConvertedStr = System::Runtime::InteropServices::Marshal
+					::GetObjectForNativeVariant(&TheKeyInfoStructure.ExpirationDate);	
 
 	if(TheKeyInfoStructure.ExpirationDate)
 	{
-		//Permanent Key
-		if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
-			listViewItem1->SubItems->Add(S"Unlimited");
-		else	
-			listViewItem1->SubItems->Add(utc_t.ToString());
-
+		listViewItem1->SubItems->Add(ConvertedStr->ToString());
 		ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     	__mcTemp__2[0] = listViewItem1;
 		this->TheKeyListView->Items->AddRange(__mcTemp__2);
-		bRetVal = true;
+		return true;
 	}
-	return bRetVal;
-}
-
-String* KeyInfoListViewManager::UnicodeStrToString(String* uniStr)
-{
-	UnicodeEncoding* unicode = new UnicodeEncoding();
-	Byte encodedBytes[] = unicode -> GetBytes(uniStr);
-	return unicode->GetString(encodedBytes);
+	else
+	{
+		return false;
+	}
 }

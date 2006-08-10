@@ -9,7 +9,6 @@
 #include "..\SolimarLicenseServer\KeySpec.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\LicensingMessage.h"
-#include "..\Common\GIT.h"
 
 // Usage:
 // 1) Create a LicensingWrapper object.
@@ -22,17 +21,6 @@
 
 namespace SolimarLicenseManagerWrapper
 {
-
-#define LOG_ERROR_HR(header, hr) \
-	{ /* begin scope */ \
-	if(FAILED(hr)) \
-	{ \
-		wchar_t debug_buf[1024]; \
-		_snwprintf(debug_buf, 1024, L"%s - Error = 0x%08X", header, hr); \
-		debug_buf[1023] = 0; \
-		OutputDebugStringW(debug_buf); \
-	} \
-	} /* end scope */ \
 
 class LicensingWrapper : public ChallengeResponseHelper
 {
@@ -55,13 +43,11 @@ public:
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	
 	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE);
+	//bool GetLicenseMessageList(LicensingMessageList &message_list);
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
-	bool ModuleLicenseTotal(long module, long* license_count);
-	bool ModuleLicenseInUse(long module, long* license_count);
 	bool ModuleLicenseObtain(long module, long license_count);
 	bool ModuleLicenseRelease(long module, long license_count);
-	bool ModuleLicenseCounterDecrement(long module, long license_count);
 	bool ValidateLicense();
 	
 	long LookupProductID(std::wstring product);
@@ -80,7 +66,7 @@ private:
 	
 	HANDLE m_MessageDispatchThread;
 	static DWORD WINAPI MessageDispatchThreadProc(LPVOID pWrapper);
-	HRESULT MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages);
+	HRESULT MessageDispatchThreadProc();
 	
 	HANDLE m_LicenseValidityThread;
 	static DWORD WINAPI LicenseValidityThreadProc(LPVOID pWrapper);
@@ -92,8 +78,9 @@ private:
 	
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
-
-	GITPtr<ISolimarLicenseMgr4> m_licenseManagerPtr;
+	
+	ISolimarLicenseMgr *pLicenseManager;
+	ILicensingMessage *pLicenseManagerMessages;	
 
 	std::wstring StringToWstring(const std::string &s);
 };

@@ -18,7 +18,6 @@
 #include <classes.hpp>
 #include "keyprod.h"
 #include "pkey.h"
-#include "spdkey.h"
 #include "SSKey.h"
 
 /*----------------------------------------------------------------------------*
@@ -33,11 +32,11 @@
 /* constructor
 ------------------------------------------------------------------------------*/
 SSProtectionKey::SSProtectionKey() :
-   SpdProtectionKey(),
-   indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),  //0x00
-   reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),//0x01
-   concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]), //0x02
-   applications(keyDataBlock.data[APPLICATIONS_CELL]), //0x03
+   ProtectionKey(),
+   indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
+   reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
+   concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
+   applications(keyDataBlock.data[APPLICATIONS_CELL]),
    documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
@@ -47,7 +46,7 @@ SSProtectionKey::SSProtectionKey() :
 /* copy constructor
 ------------------------------------------------------------------------------*/
 SSProtectionKey::SSProtectionKey(const SSProtectionKey& pkey) :
-   SpdProtectionKey(pkey),
+   ProtectionKey(pkey),
    indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
    reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
    concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
@@ -55,6 +54,8 @@ SSProtectionKey::SSProtectionKey(const SSProtectionKey& pkey) :
    documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
+
+
 
 /* getIndexServers()
  *    Return the number of index servers licensed on the key.
@@ -64,6 +65,8 @@ ushort SSProtectionKey::getIndexServers() const
    return indexServers;
 }
 
+
+
 /* getReportServers()
  *    Return the number of report servers licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -72,6 +75,8 @@ ushort SSProtectionKey::getReportServers() const
    return reportServers;
 }
 
+
+
 /* getConcurrentUsers()
  *    Return the number of concurrent users licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -79,6 +84,8 @@ ushort SSProtectionKey::getConcurrentUsers() const
 {
    return concurrentUsers25 * _25_UNITS_LICENSED_PER_CONCURRENT_USERS_25;
 }
+
+
 
 /* getApplications()
  *    Return the number of applications licensed on the key.
@@ -103,6 +110,8 @@ void SSProtectionKey::setIndexServers(ushort units_licensed)
    indexServers = units_licensed;
 }
 
+
+
 /* setReportServers()
  *    Set the number of report servers licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -110,6 +119,8 @@ void SSProtectionKey::setReportServers(ushort units_licensed)
 {
    reportServers = units_licensed;
 }
+
+
 
 /* setConcurrentUsers()
  *    Set the number of concurrent users licensed on the key. Since the
@@ -122,6 +133,8 @@ void SSProtectionKey::setConcurrentUsers(ushort units_licensed)
    concurrentUsers25 =
       units_licensed / _25_UNITS_LICENSED_PER_CONCURRENT_USERS_25;
 }
+
+
 
 /* setApplications()
  *    Set the number of applications licensed on the key.
@@ -138,6 +151,8 @@ void SSProtectionKey::setDocumentAssembler(ushort units_licensed)
 {
    documentAssembler = units_licensed;
 }
+
+
 
 /* getIndexServersPassword()
  *    Calculate and return the password for the number of index servers
@@ -174,6 +189,8 @@ AnsiString SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISoli
    return *pwd;
 }
 
+
+
 /* getReportServersPassword()
  *    Calculate and return the password for the number of report servers
  *    specified by units_licensed (0 through 255) by querying the secondary
@@ -208,6 +225,8 @@ AnsiString SSProtectionKey::getReportServersPassword(ushort units_licensed, ISol
    }
    return *pwd;
 }
+
+
 
 /* getConcurrentUsersPassword()
  *    Calculate and return the password for the number of concurrent users

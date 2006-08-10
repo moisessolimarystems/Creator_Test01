@@ -142,7 +142,7 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 209
       Top = 119
       Width = 16
-      Height = 21
+      Height = 19
       Associate = ui_days
       Min = -10
       Max = 90
@@ -237,6 +237,21 @@ object KeyWizardFrm: TKeyWizardFrm
       Color = clBackground
       ParentColor = False
       TabOrder = 0
+      inherited SolSearcherPropertyList: TListView
+        Left = 15
+        Top = 22
+        Width = 201
+        Height = 239
+        Columns = <
+          item
+            Caption = 'Property'
+            Width = 139
+          end
+          item
+            Caption = 'Licenses'
+            Width = 56
+          end>
+      end
       inherited DetailSQL: TQuery
         Left = 46
         Top = 235
@@ -272,36 +287,6 @@ object KeyWizardFrm: TKeyWizardFrm
       Font.Style = []
       ParentFont = False
     end
-    object ConcurrentLabel: TLabel
-      Left = 285
-      Top = 364
-      Width = 101
-      Height = 13
-      Alignment = taRightJustify
-      AutoSize = False
-      Caption = 'Concurrent Operators'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
-    object NamedLabel: TLabel
-      Left = 285
-      Top = 388
-      Width = 101
-      Height = 13
-      Alignment = taRightJustify
-      AutoSize = False
-      Caption = 'Named Users'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -12
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-    end
     inline WizardModuleFrame: TModuleFrame
       Left = 10
       Top = 18
@@ -327,54 +312,12 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 436
       Top = 337
       Width = 16
-      Height = 21
+      Height = 20
       Associate = OutputEdit
       Min = 0
       Max = 4095
       Position = 4095
       TabOrder = 2
-      Thousands = False
-      Wrap = False
-    end
-    object ConcurrentEdit: TMaskEdit
-      Left = 400
-      Top = 361
-      Width = 36
-      Height = 21
-      TabOrder = 3
-      Text = '255'
-    end
-    object NamedEdit: TMaskEdit
-      Left = 400
-      Top = 385
-      Width = 36
-      Height = 21
-      TabOrder = 4
-      Text = '255'
-    end
-    object ConcurrentUnits: TUpDown
-      Left = 436
-      Top = 361
-      Width = 15
-      Height = 21
-      Associate = ConcurrentEdit
-      Min = 0
-      Max = 255
-      Position = 255
-      TabOrder = 5
-      Thousands = False
-      Wrap = False
-    end
-    object NamedUnits: TUpDown
-      Left = 436
-      Top = 385
-      Width = 15
-      Height = 21
-      Associate = NamedEdit
-      Min = 0
-      Max = 255
-      Position = 255
-      TabOrder = 6
       Thousands = False
       Wrap = False
     end

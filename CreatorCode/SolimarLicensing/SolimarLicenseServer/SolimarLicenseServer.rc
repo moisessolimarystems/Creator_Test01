@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -12,41 +12,30 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
-/////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
-
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+LANGUAGE 9, 1
 #pragma code_page(1252)
-#endif //_WIN32
-
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE  
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE  
 BEGIN
     "#include ""winres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
-BEGIN
-    "\r\n"
-    "\0"
-END
 
 #endif    // APSTUDIO_INVOKED
 
-
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -69,52 +58,42 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Solimar Systems, Inc."
-            VALUE "FileDescription", "Solimar License Server"
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
             VALUE "FileVersion", "1.0.0.1"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
             VALUE "InternalName", "SolimarLicenseServer.exe"
-            VALUE "LegalCopyright", "Solimar Systems, Inc.  All rights reserved."
             VALUE "OriginalFilename", "SolimarLicenseServer.exe"
-            VALUE "ProductName", "Solimar Licensing"
+            VALUE "ProductName", "TODO: <Product name>"
             VALUE "ProductVersion", "1.0.0.1"
+            VALUE "OLESelfRegister", ""
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1252
+		VALUE "Translation", 0x0409, 1252
     END
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// REGISTRY
-//
-
-IDR_SOLIMARLICENSESERVER REGISTRY                "SolimarLicenseServer.rgs"
+#endif    // !_MAC
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE  
 BEGIN
-    IDS_SERVICENAME         "Solimar License Server"
+	IDS_SERVICENAME					"SolimarLicenseServer"
 END
 
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
+IDR_SOLIMARLICENSESERVER REGISTRY "SolimarLicenseServer.rgs"
+////////////////////////////////////////////////////////////////////////////
 
 
+#endif
 
 #ifndef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// Generated from the TEXTINCLUDE 3 resource.
-//
-
-
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

@@ -83,7 +83,7 @@ private:
 	Object* KeyNumber;
 
 	//ptr to the server object. Used to access the lower layer code.
-	ISolimarLicenseSvr2* pTheServer;
+	ISolimarLicenseSvr* pTheServer;
 
 	bool ModInitialized;
 

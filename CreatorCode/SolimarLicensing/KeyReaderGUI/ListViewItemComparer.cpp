@@ -35,50 +35,22 @@ int ListViewItemComparer::Compare(Object* x, Object* y)
 
 	if(ColumnToSort == EXPIRATION_DATE_COLUMN)
 	{
-		if(listviewX->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-		{
-			if(listviewY->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-				compareResult = 0;
+		System::DateTime firstDate =
+			DateTime::Parse(listviewX->SubItems->Item[ColumnToSort]->Text);
+		System::DateTime secondDate =
+			DateTime::Parse(listviewY->SubItems->Item[ColumnToSort]->Text);
 
-			compareResult = 1;
-		}
-
-		else if(listviewY->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-			compareResult = -1;
-
-		else 
-		{
-			System::DateTime firstDate =
-				DateTime::Parse(listviewX->SubItems->Item[ColumnToSort]->Text);
-			System::DateTime secondDate =
-				DateTime::Parse(listviewY->SubItems->Item[ColumnToSort]->Text);
-		
-			 // Compare the two dates.
-			compareResult = DateTime::Compare(firstDate, secondDate);
-		}
+        // Compare the two dates.
+		compareResult = DateTime::Compare(firstDate, secondDate);
 	}
-
 
 	else if(ColumnToSort == HOURS_LEFT_COLUMN)
 	{
-		if(listviewX->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-		{
-			if(listviewY->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-				compareResult = 0;
-
-			compareResult = 1;
-		}
-
-		else if(listviewY->SubItems->Item[ColumnToSort]->Text->Equals("Unlimited"))
-			compareResult = -1;
-		else
-		{
-			int firstint = System::Convert::ToInt16(listviewX->SubItems->Item[ColumnToSort]->Text);
-			int secondint = System::Convert::ToInt16(listviewY->SubItems->Item[ColumnToSort]->Text);
+		int firstint = System::Convert::ToInt16(listviewX->SubItems->Item[ColumnToSort]->Text);
+		int secondint = System::Convert::ToInt16(listviewY->SubItems->Item[ColumnToSort]->Text);
 		
-			compareResult = (firstint < secondint ? -1 : 
-							(firstint > secondint ? 1 : 0));
-		}
+		compareResult = (firstint < secondint ? -1 : 
+						(firstint > secondint ? 1 : 0));
 	}
 
 	else

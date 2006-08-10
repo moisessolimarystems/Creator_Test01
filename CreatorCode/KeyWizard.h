@@ -28,7 +28,6 @@
 #include <ImgList.hpp>
 #include "SolSearcherEnterpriseDetails.h"
 #include <DB.hpp>
-#include <Menus.hpp>
 #include <stack>
 
 //------------------------------------------------------------------------------
@@ -179,12 +178,6 @@ __published:	// IDE-managed Components
         TDataSource *PasswordDataSource;
    TPanel *SolSearcherEnterprisePanel;
    TSolSearcherDetails *TSolSearcherDetails1;
-        TLabel *ConcurrentLabel;
-        TLabel *NamedLabel;
-        TMaskEdit *ConcurrentEdit;
-        TMaskEdit *NamedEdit;
-        TUpDown *ConcurrentUnits;
-        TUpDown *NamedUnits;
         void __fastcall BackBtnClick(TObject *Sender);
         void __fastcall NextBtnClick(TObject *Sender);
         void __fastcall ProductComboBoxChange(TObject *Sender);
@@ -210,7 +203,7 @@ private:
         void setStartPanelMembers();
         void setModulePanelMembers();
         void SetSSEMembers(){}
-        bool hasModuleLicenses(){if(key_record->pkey->productId==SPD_PRODUCT||key_record->pkey->productId==CONNECT_PRODUCT||key_record->pkey->productId==QUANTUM_PRODUCT||key_record->pkey->productId==ICONVERT_PRODUCT||key_record->pkey->productId==SDX_DESIGNER_PRODUCT||key_record->pkey->productId==SOLSCRIPT_PRODUCT||key_record->pkey->productId==RUBIKA_PRODUCT||key_record->pkey->productId==SPDE_PRODUCT)return true;else return false;}
+        bool hasModuleLicenses(){if(key_record->pkey->productId==SPD_PRODUCT||key_record->pkey->productId==CONNECT_PRODUCT||key_record->pkey->productId==QUANTUM_PRODUCT||key_record->pkey->productId==ICONVERT_PRODUCT||key_record->pkey->productId==SOLSCRIPT_PRODUCT||/*key_record->pkey->productId==SDX_DESIGNER_PRODUCT||*/key_record->pkey->productId==RUBIKA_PRODUCT||key_record->pkey->productId==SPDE_PRODUCT)return true;else return false;}
 
         //
         // START PANEL

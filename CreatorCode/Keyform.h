@@ -255,8 +255,6 @@ __published:	// IDE-managed Components
         void __fastcall DescriptionMemoChange(TObject *Sender);
         void __fastcall mmSPDEOperatorSessionsClick(TObject *Sender);
         void __fastcall mmSPDEUserSessionsClick(TObject *Sender);
-        void __fastcall KeyFormModuleFramemmSetModuleClick(
-          TObject *Sender);
 
 private:
         // User declarations
@@ -267,7 +265,6 @@ private:
         static char* key_sort_type[];   // list of sort types for sql statement
         SKeyRecord* key_record;
         TDatabase* Database1;
-        TStringList* PktList;
         unsigned int dirty_tab;
         unsigned int PHYSICAL_FLAG;
         unsigned short tmp_modules[TOTAL_MODULE_CELLS];
@@ -311,10 +308,7 @@ public:
         //constructor(s) and destructor(s)
         __fastcall TFCustomerKeys(TComponent* Owner):TForm(Owner){}
         __fastcall TFCustomerKeys(TComponent* Owner, AnsiString, int, int searchKey = -1 );
-        virtual __fastcall ~TFCustomerKeys(){
-                                              delete PktList;
-                                              delete key_record;
-                                            }
+        virtual __fastcall ~TFCustomerKeys(){}
 
         //
         // Member variables
@@ -326,8 +320,6 @@ public:
         String productStatus;
         String versionStatus;
 
-
-
         //
         // Password Functions
         void createExtensionPassword(unsigned short days);
@@ -337,10 +329,12 @@ public:
         void createUserSessionPassword(int user_sessions);
         void createVersionPassword(unsigned short version);
         void modulePasswordCreated();
-
-        //Packet Functions
-        void createExtensionPackets(unsigned short days);
-        void createPasswordPackets(unsigned short days);
+        void createBusTagInPassword(int output_units);
+        void createBusTagOutPassword(int output_units);
+        void createParallelInPassword(int output_units);
+        void createParallelOutPassword(int output_units);
+        void createSCSIOutPassword(int output_units);
+        void createPSInterpPassword(int output_units);
 
         void createConcurrentUsersPassword(unsigned short units_licensed);
         void createIndexServersPassword(unsigned short units_licensed);

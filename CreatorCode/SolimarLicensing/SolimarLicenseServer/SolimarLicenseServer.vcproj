@@ -265,6 +265,9 @@
 				RelativePath="..\common\CryptoHelper.cpp">
 			</File>
 			<File
+				RelativePath=".\KeyError.cpp">
+			</File>
+			<File
 				RelativePath=".\KeyServer.cpp">
 			</File>
 			<File
@@ -302,9 +305,6 @@
 						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
 						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\common\LicenseError.cpp">
 			</File>
 			<File
 				RelativePath="..\common\LicensingMessage.cpp">
@@ -354,6 +354,9 @@
 				RelativePath="..\common\IObjectAuthentication.h">
 			</File>
 			<File
+				RelativePath=".\KeyError.h">
+			</File>
+			<File
 				RelativePath=".\KeyMessages.h">
 			</File>
 			<File
@@ -364,9 +367,6 @@
 			</File>
 			<File
 				RelativePath=".\KeySpec.h">
-			</File>
-			<File
-				RelativePath="..\common\LicenseError.h">
 			</File>
 			<File
 				RelativePath="..\common\LicensingMessage.h">

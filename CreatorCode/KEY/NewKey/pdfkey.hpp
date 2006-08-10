@@ -32,7 +32,6 @@ class PDFUtilityProtectionKey : public SpdProtectionKey
 {
 public:
    PDFUtilityProtectionKey() : SpdProtectionKey() {}
-   ~PDFUtilityProtectionKey() {}
    PDFUtilityProtectionKey(const PDFUtilityProtectionKey& pkey) : SpdProtectionKey(pkey) {}
 
 protected:

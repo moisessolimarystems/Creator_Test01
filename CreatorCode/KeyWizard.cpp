@@ -91,9 +91,8 @@ void TKeyWizardFrm::setPasswordComboBox()
 {
     try
     {
-        for (int i = 0; i < KD_PASSWORD_MAX; i++) {
-            passwordComboBox->Items->Add((key_record->pkey->getKDPasswordText(i)));
-        }
+        for (int i = 0; i < KD_PASSWORD_MAX; i++)
+            passwordComboBox->Items->Add(key_record->pkey->getKDPasswordText(i));
 
         passwordComboBox->ItemIndex = 0;
         edited_days_value = key_record->pkey->getKDPasswordDays(passwordComboBox->ItemIndex);
@@ -145,16 +144,6 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    delete key_record->pkey;
    key_record->pkey = pProtectionKey;
 
-   OutputUnits->Visible = false;
-   OutputEdit->Visible = false;
-   OutputLabel->Visible = false;
-   ConcurrentUnits->Visible = false;
-   ConcurrentEdit->Visible = false;
-   ConcurrentLabel->Visible = false;
-   NamedUnits->Visible = false;
-   NamedEdit->Visible = false;
-   NamedLabel->Visible = false;
-
    //based on the product set the avaible keyType
    if      (m_selectedProduct == SPD_PRODUCT       ||
             m_selectedProduct == CONNECT_PRODUCT   ||
@@ -170,16 +159,6 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       OutputEdit->Visible = true;
       OutputLabel->Visible = true;
 
-      if(m_selectedProduct == SPDE_PRODUCT)
-      {
-            ConcurrentUnits->Visible = true;
-            ConcurrentEdit->Visible = true;
-            ConcurrentLabel->Visible = true;
-            NamedUnits->Visible = true;
-            NamedEdit->Visible = true;
-            NamedLabel->Visible = true;
-      }
-
       if (m_selectedProduct == ICONVERT_PRODUCT)
          OutputLabel->Caption = "Max Number of LUs";
       else {
@@ -192,6 +171,8 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       }
 
       if (m_selectedProduct == 5) {
+         OutputUnits->Enabled = false;
+         OutputEdit->Enabled = false;
          SPD_LEGACY = true;
       }
       else {
@@ -201,7 +182,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       }
    }
    else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
-            m_selectedProduct == SDX_DESIGNER_PRODUCT ||
+            /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
             m_selectedProduct == RUBIKA_PRODUCT) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
@@ -217,13 +198,10 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
 
    }
    else if (m_selectedProduct == SOLSEARCHER_ENTERPRISE_PRODUCT) {
-      WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       TSolSearcherDetails1->Initialize(MODE_3);
       key_type_flag = ktfSPD;
       m_bModules    = true;
       SelectModules->Visible = true;
-
-      SPD_LEGACY = false;
    }
    else { //all other products
       key_type_flag = ktfProductWithoutModules;
@@ -487,7 +465,6 @@ void __fastcall TKeyWizardFrm::BackBtnClick(TObject *Sender)
          break;
       case wsSSESelection :
          active_panel = SolSearcherEnterprisePanel;
-         break;
       case wsModuleSelection :
          active_panel = ModuleProgramPanel;
          break;
@@ -629,15 +606,10 @@ void TKeyWizardFrm::setModulePanelMembers()
 {
    //moduleCells are update to key as module grid changes
    //update all other GUI components to key
-   if(key_record->pkey->productId == SPD_PRODUCT ||
-           key_record->pkey->productId == ICONVERT_PRODUCT ||
-           key_record->pkey->productId == SPDE_PRODUCT)
-        ((SpdProtectionKey*)(key_record->pkey))->setOutputUnits(static_cast<unsigned short>(OutputEdit->Text.ToInt()));
    if(key_record->pkey->productId == SPDE_PRODUCT)
-   {
-        ((SpdeProtectionKey*)(key_record->pkey))->setOperatorSessionUnits(static_cast<unsigned short>(ConcurrentEdit->Text.ToInt()));
-        ((SpdeProtectionKey*)(key_record->pkey))->setUserSessionUnits(static_cast<unsigned short>(NamedEdit->Text.ToInt()));
-   }
+        ((SpdeProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
+   else
+        ((SpdProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
 }
 
 //==============================================================================
@@ -685,12 +657,10 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             ///if(MODULE_STATE_CHANGE) {
                WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
                WizardModuleFrame->load(key_record, true);
-               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->getOutputUnits();
-               if(m_selectedProduct == SPDE_PRODUCT)
-               {
-                   ConcurrentUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->getOperatorSessionUnits();
-                   NamedUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->getUserSessionUnits();
-               }
+               if(key_record->pkey->productId == SPDE_PRODUCT)
+                       OutputUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->outputUnits;
+               else
+                       OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
             ///}
 
             //enable NextBtn - user is not required to make any chages
@@ -698,9 +668,8 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             active_panel->BringToFront();
             active_panel->Visible = true;
          }
-         else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
-                  m_selectedProduct == RUBIKA_PRODUCT  ||
-                  m_selectedProduct == SDX_DESIGNER_PRODUCT) {
+/*         else if (m_selectedProduct == SDX_DESIGNER_PRODUCT )
+         {
             //Select Modules
             state.push( wsModuleSelection );
             active_panel = ModuleProgramPanel;
@@ -708,7 +677,24 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             ///if(MODULE_STATE_CHANGE) {
                WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
                WizardModuleFrame->load(key_record, true);
-               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->getOutputUnits();
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+            ///}
+
+            //enable NextBtn - user is not required to make any chages
+            NextBtn->Enabled = true;
+            active_panel->BringToFront();
+            active_panel->Visible = true;
+         }
+*/
+         else if (m_selectedProduct == SOLSCRIPT_PRODUCT || m_selectedProduct == RUBIKA_PRODUCT) {
+            //Select Modules
+            state.push( wsModuleSelection );
+            active_panel = ModuleProgramPanel;
+
+            ///if(MODULE_STATE_CHANGE) {
+               WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
+               WizardModuleFrame->load(key_record, true);
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
             ///}
 
             //enable NextBtn - user is not required to make any chages
@@ -721,16 +707,15 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             state.push( wsSSESelection );
             active_panel = SolSearcherEnterprisePanel;
 
-            WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
-            WizardModuleFrame->load(key_record, true);
-            TSolSearcherDetails1->Initialize(MODE_3);
-            TSolSearcherDetails1->Load(key_record);
+            ///if(MODULE_STATE_CHANGE) {
+               TSolSearcherDetails1->Initialize(MODE_3);
+               TSolSearcherDetails1->Load(key_record);
+            ///}
 
             //enable NextBtn - user is not required to make any chages
             NextBtn->Enabled = true;
             active_panel->BringToFront();
             active_panel->Visible = true;
-
          }
          else { //all other products
             state.push( wsFinal );
@@ -740,6 +725,76 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
             active_panel->BringToFront();
             active_panel->Visible = true;
          }
+         ////////////////////////////////////
+         /*if( (keyTypeSelected == ktfInventory) || (hasModuleLicenses() == false))
+         {
+            state.push( wsFinal );
+            NextBtn->Enabled = false;
+            ProgramBtn->Enabled = true;
+            active_panel = FinalPanel;
+            active_panel->Visible = true;
+            //if key has modules they should be set to trial values
+         }
+         else if((keyTypeSelected == ktfRelicense ||
+                  keyTypeSelected == ktfReplacement ||
+                  keyTypeSelected == ktfAddon ))
+         {
+            //User selects modules
+            state.push( wsModuleSelection );
+
+            active_panel = ModuleProgramPanel;
+
+            //Initialize modules and load
+            ///if(MODULE_STATE_CHANGE)
+            ///{
+               WizardModuleFrame->initialize(MODE_3, key_record->pkey->productId);
+               WizardModuleFrame->load(key_record, true);
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+            //}
+
+            //enable NextBtn - user is not required to make any chages
+            NextBtn->Enabled = true;
+            active_panel->Visible = true;
+         }
+         else if(keyTypeSelected == ktfBackup )
+         {
+            //User selects modules
+            state.push( wsModuleSelection );
+            active_panel = ModuleProgramPanel;
+
+            //Initialize modules and load
+            ///if(MODULE_STATE_CHANGE)
+            ///{
+               WizardModuleFrame->initialize(MODE_3, key_record->pkey->productId);
+               WizardModuleFrame->load(key_record, true);
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+            ///}
+
+            //enable NextBtn - user is not required to make any chages
+            NextBtn->Enabled = true;
+            active_panel->Visible = true;
+         }
+         else
+         {
+            //User selects modules
+            state.push( wsModuleSelection );
+            active_panel = ModuleProgramPanel;
+
+            //Initialize modules and load
+            ///if(MODULE_STATE_CHANGE)
+            ///{
+               WizardModuleFrame->initialize(MODE_3, key_record->pkey->productId);
+               WizardModuleFrame->load(key_record, true);
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+            ///}
+
+            //enable NextBtn - user is not required to make any chages
+            NextBtn->Enabled = true;
+            ProgramBtn->Enabled = true;
+            active_panel->Visible = true;
+         }
+
+ */
          break;
       //OnClick Next - ModulePanel
       case wsModuleSelection:
@@ -763,17 +818,17 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
          //set key to reflect changes made on Module Selection Panel
          SetSSEMembers();
 
-         state.push( wsModuleSelection );
-         NextBtn->Enabled = true;
-         ProgramBtn->Enabled = false;
-         active_panel = ModuleProgramPanel;
+         state.push( wsFinal );
+         NextBtn->Enabled = false;
+         ProgramBtn->Enabled = true;
+         active_panel = FinalPanel;
          active_panel->BringToFront();
          active_panel->Visible = true;
 
          break;
       //OnClick Next - FinalPanel
       case wsFinal:
-      default:             
+      default:
          break;
    }
 }
@@ -808,6 +863,8 @@ KeyType TKeyWizardFrm::getKeyType()
       selected = static_cast<KeyType>(ktfBackup);
    else if( selected_string == "Emergency")
       selected = static_cast<KeyType>(ktfEmergency);
+   //else if( selected_string == "Solimar")
+   //   selected = ktfSolimar;
    else if( selected_string == "Custom")
       selected = static_cast<KeyType>(ktfCustom);
    else if( selected_string == "Loan")
@@ -905,20 +962,55 @@ void __fastcall TKeyWizardFrm::OutputEditChange(TObject *Sender)
 //==============================================================================
 void __fastcall TKeyWizardFrm::SelectModulesClick(TObject *Sender)
 {
-    SpdProtectionKey* pSpdKey = static_cast<SpdProtectionKey*>(key_record->pkey);
-    pSpdKey->setLicensesToZero();
-    if (SelectModules->Checked) {
+   ///WizardModuleFrame->modifyUnits(SelectModules->Checked);
+   if (m_selectedProduct == SOLSEARCHER_ENTERPRISE_PRODUCT) {
+      SpdProtectionKey* pSpdKey = static_cast<SpdProtectionKey*>(key_record->pkey);
+      pSpdKey->setLicensesToZero();
+
+      if (SelectModules->Checked) {
          //initializeMinModules uses productId and productVersion
          key_record->pkey->productId = getSelectedProduct();
          key_record->pkey->productVersion = getSelectedVersion();
-         keyMaster->initializeMinModules(key_record);
-    }
-    else {
+         keyMaster->initializeMinValues(key_record);
+      }
+      else {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxValues(key_record);
+      }
+   }
+   else if(m_selectedProduct == SPDE_PRODUCT) {    //done for SPDE product
+      SpdeProtectionKey* pSpdeKey = static_cast<SpdeProtectionKey*>(key_record->pkey);
+      pSpdeKey->setLicensesToZero();
+
+      if (SelectModules->Checked) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);  //stuff SPDE conditions into SPD
+      }
+      else {
          //initialize uses productId and productVersion
          key_record->pkey->productId = getSelectedProduct();
          key_record->pkey->productVersion = getSelectedVersion();
          keyMaster->initializeMaxModules(key_record);
-    }
+      }
+   }
+   else {
+      if (SelectModules->Checked) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);
+      }
+      else {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxModules(key_record);
+      }
+   }
 }
 
 //==============================================================================
@@ -970,7 +1062,6 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       if (m_bModules) {
          moduleState = msMin;
          SelectModules->Checked = true;
-         SelectModules->Enabled = true;
       }
    }
    else if (keyType == ktfBackup) {
@@ -999,12 +1090,11 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       SystemEdit->Visible = true;
       SystemEdit->Enabled = false;
       SystemEdit->Text = "GENERATED";
-      m_bNonPermanentKey = true;
+      m_bNonPermanentKey = false;
       showPasswordComboBox(false);
 
       if (m_bModules) {
          SelectModules->Checked = true;
-         SelectModules->Enabled = true;
          moduleState = msMin;
       }
       else { // XImange, SolSearcher, etc.
@@ -1083,13 +1173,12 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       SystemEdit->Visible = true;
       SystemEdit->Enabled = false;
       SystemEdit->Text = "GENERATED";
-      m_bNonPermanentKey = true;
+      m_bNonPermanentKey = false;
 
       showPasswordComboBox(false);
       if (m_bModules) {
          moduleState = msMin;
          SelectModules->Checked = true;
-         SelectModules->Enabled = true;
       }
       else {// XImage, SolSearcher, etc.
             moduleState = msClear;
@@ -1118,9 +1207,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
 
       showPasswordComboBox(false);
       if (m_bModules) {
-//         moduleState = msMax;
-         SelectModules->Enabled = true;
-         SelectModulesClick(this);
+         moduleState = msMax;
       }
       else {// XImange, SolSearcher, etc.
          moduleState = msClear;
@@ -1149,23 +1236,21 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
    // update the key type flag pertaining to: Addon, Test/Dev, & Backup keys
    //key_record->non_perm_ktf = (keyTypeCheckBox->Checked == true) ? true : false;
 
-   if (moduleState == msMax) {
-         //initialize uses productId and productVersion
-       key_record->pkey->productId = getSelectedProduct();
-       key_record->pkey->productVersion = getSelectedVersion();
-       keyMaster->initializeMaxModules(key_record);
-   }
-   else if (moduleState == msMin) {
-         //initializeMinModules uses productId and productVersion
-       key_record->pkey->productId = getSelectedProduct();
-       key_record->pkey->productVersion = getSelectedVersion();
-       keyMaster->initializeMinModules(key_record);
-   }
-
    if (m_selectedProduct == SOLSEARCHER_ENTERPRISE_PRODUCT) {
-      if (moduleState == msClear) {
-         SSProtectionKey* pSSKey = static_cast<SSProtectionKey*>(key_record->pkey);
-         pSSKey->setLicensesToZero();
+      SpdProtectionKey* pSpdKey = static_cast<SpdProtectionKey*>(key_record->pkey);
+         //spd_key->outputUnits=0;
+         pSpdKey->setLicensesToZero();
+      if (moduleState == msMax) {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxValues(key_record);
+      }
+      else if (moduleState == msMin) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinValues(key_record);
       }
    }
    else if (m_selectedProduct == SPD_PRODUCT       ||
@@ -1173,20 +1258,44 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == QUANTUM_PRODUCT   ||
             m_selectedProduct == ICONVERT_PRODUCT  ||
             m_selectedProduct == SOLSCRIPT_PRODUCT ||
-            m_selectedProduct == SDX_DESIGNER_PRODUCT ||            
+            /*m_selectedProduct == SDX_DESIGNER_PRODUCT ||*/
             m_selectedProduct == RUBIKA_PRODUCT) {
-      if (moduleState == msClear) {
+      if (moduleState == msMax) {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxModules(key_record);
+      }
+      else if (moduleState == msMin) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);
+      }
+      else if (moduleState == msClear) {
          SpdProtectionKey* spd_key = static_cast<SpdProtectionKey*>(key_record->pkey);
-         spd_key->setOutputUnits(0);
+         spd_key->outputUnits=0;
          spd_key->setLicensesToZero();
       }
    }
    else if(m_selectedProduct == SPDE_PRODUCT) {       //case for SPDE product
-      if (moduleState == msClear) {
+     if (moduleState == msMax) {
+         //initialize uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMaxModules(key_record);
+      }
+      else if (moduleState == msMin) {
+         //initializeMinModules uses productId and productVersion
+         key_record->pkey->productId = getSelectedProduct();
+         key_record->pkey->productVersion = getSelectedVersion();
+         keyMaster->initializeMinModules(key_record);
+      }
+      else if (moduleState == msClear) {
          SpdeProtectionKey* spde_key = static_cast<SpdeProtectionKey*>(key_record->pkey);
-         spde_key->setOutputUnits(0);
-         spde_key->setOperatorSessionUnits(0);
-         spde_key->setUserSessionUnits(0);
+         spde_key->outputUnits=0;
+         spde_key->operatorSessionUnits=0;
+         spde_key->userSessionUnits=0;
          spde_key->setLicensesToZero();
       }
    }
@@ -1294,8 +1403,7 @@ void __fastcall TKeyWizardFrm::ui_versionChange(TObject *Sender)
 {
    if (ui_version->Text.Length()==4){
       key_record->pkey->productVersion = getSelectedVersion();
-      if(m_bModules)
-         SelectModulesClick(NULL);
+      SelectModulesClick(NULL);
    }
 }
 

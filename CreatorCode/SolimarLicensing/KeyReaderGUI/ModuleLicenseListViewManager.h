@@ -21,7 +21,6 @@ namespace ModuleViewManager
 			void PopulateView();
 			void SetKeyID(Object* NewKeyNumber);
 			bool IsInitialized();
-			bool Connect();
 
 	private: 
 		CommunicationLink* OurCommLink;

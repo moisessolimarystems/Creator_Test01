@@ -113,7 +113,7 @@ void APCTimer::RevUp()
 	} // end mutex scope.
 
 	SetTimer();
-	//Invoke();  //Do not call invoke when RevUp is called
+	Invoke();
 }
 
 //
@@ -125,16 +125,14 @@ void APCTimer::RevDown()
 	{ // begin mutex scope.
 
 	SafeMutex revBlock(m_hRevMutex);
-	if (m_msAPCRevInterval < m_msRevLowInterval) 
-	{
+
+	if (m_msAPCRevInterval < m_msRevLowInterval) {
 		m_msAPCRevInterval = m_msAPCRevInterval + (long)(float(m_revDownRatePercent) / float(100) * float(m_msAPCRevInterval));
 		if (m_msAPCRevInterval > m_msRevLowInterval)
 			m_msAPCRevInterval = m_msRevLowInterval;
 	}
 
 	} // end mutex scope.
-
-
 
 	SetTimer();
 }
@@ -227,7 +225,7 @@ BOOL APCTimer::SetTimer()
 	// signal the timer m_APCInterval nano-seconds from now.
 	//
 
-	qwDueTime = (__int64)-m_msAPCRevInterval * (__int64)10000; // 100 nano second intervals.
+	qwDueTime = -m_msAPCRevInterval * 10000; // 100 nano second intervals.
 
 	//
 	// Copy the relative time into a LARGE_INTEGER.

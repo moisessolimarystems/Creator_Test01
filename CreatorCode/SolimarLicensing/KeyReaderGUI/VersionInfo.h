@@ -14,7 +14,7 @@
 
 // Version of the program
 #define MAJOR_REVISION_NUMBER 1
-#define MINOR_REVISION_NUMBER 02
+#define MINOR_REVISION_NUMBER 00
 
 //Build Number of the program
 #define BUILD_NUMBER 999999

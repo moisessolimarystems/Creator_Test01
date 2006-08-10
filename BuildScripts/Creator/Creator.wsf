@@ -84,7 +84,6 @@ Sub GenerateNewBuild()
     Set MKS = New CMKS
     Set MKS.Build = g_Build    
     MKS.GenerateSandBox "New"	
-    UpdateFileVersions
     ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
     BuildMainCode 
     MoveAndCheckInBuiltFiles MKS
@@ -147,15 +146,6 @@ Sub CreateBranch()
     'UpdateVersionInFiles MKS 'taken out since we dont have the trunk sandbox available
     Set MKS = Nothing
 End Sub
-
-Sub UpdateFileVersions()
-    g_Build.WriteToDlgAndFile "Updating File Version Using: " & CStr(g_Build.NewBuild.versionNum)
-    g_Build.RunCmd "attrib -r " + g_Build.MainProjPath & "\CreatorCode\*.* /S"
-    g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"
-    g_Build.UpdateFileVersion g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h", "const int BUILD_NUMBER = ",  Right(g_Build.NewBuild.versionNum, 3) & ";"
-    g_Build.RunCmd "attrib +r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"              
-End Sub
-
    
 Sub BuildMainCode()
     g_Build.WriteToDlgAndFile "Building Main Code"

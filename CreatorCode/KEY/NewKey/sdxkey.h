@@ -31,8 +31,7 @@
 class SDXDesignerProtectionKey : public SpdProtectionKey
 {
 public:
-   SDXDesignerProtectionKey() :  SpdProtectionKey() {}
-   ~SDXDesignerProtectionKey() {}   
+   SDXDesignerProtectionKey() : SpdProtectionKey() {}
    SDXDesignerProtectionKey(const SDXDesignerProtectionKey& pkey) : SpdProtectionKey(pkey) {}
 
 protected:
