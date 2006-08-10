@@ -46,10 +46,8 @@ public:
 	//bool GetLicenseMessageList(LicensingMessageList &message_list);
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
-	bool ModuleLicenseTotal(long module, long* license_count);
 	bool ModuleLicenseObtain(long module, long license_count);
 	bool ModuleLicenseRelease(long module, long license_count);
-	bool ModuleLicenseCounterDecrement(long module, long license_count);
 	bool ValidateLicense();
 	
 	long LookupProductID(std::wstring product);
@@ -81,7 +79,7 @@ private:
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
 	
-	ISolimarLicenseMgr3 *pLicenseManager;
+	ISolimarLicenseMgr *pLicenseManager;
 	ILicensingMessage *pLicenseManagerMessages;	
 
 	std::wstring StringToWstring(const std::string &s);
