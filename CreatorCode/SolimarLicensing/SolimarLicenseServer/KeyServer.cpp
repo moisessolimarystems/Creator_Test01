@@ -365,7 +365,6 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// finished with parse and validation, check for expired passwords
 		bool expired_password = false;
-		bool some_passwords_failed = false;
 		
 		// get the current date/time
 		_variant_t current_time(0.0,VT_DATE);
@@ -383,14 +382,14 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		}
 		
 		// if all of the passwords are non-expired, apply them sequentially
-		// quit if any passwords aren't accepted
+		// don't quit if any passwords aren't accepted because password packets 
+		// now contain all passwords for the key.  Already applied passwords 
+		// will fail.  Only return the HRESULT for the last entered password.
 		if (!expired_password)
 		{
 			for (PasswordList::iterator p = packet.passwords.begin(); p != packet.passwords.end(); ++p)
 			{
 				hr = EnterPassword(p->second);
-				if (FAILED(hr)) throw hr;
-				if (hr == S_FALSE) some_passwords_failed = true;
 			}
 		}
 		else
@@ -401,8 +400,6 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// password entry succeeded, provide the verification code to the user
 		*verification_code = verification.Detach();
-		
-		if (some_passwords_failed) hr = S_FALSE;
 	}
 	catch (HRESULT &ehr)
 	{
