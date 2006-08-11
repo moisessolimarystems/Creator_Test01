@@ -4,7 +4,7 @@ Class CProductBuild
     Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo, mVersionNum
     Private mLockedPJFile, mLockedFile  'had to put these here instead of in MKS class b/c there should be only 1 instance of these
     Private mLogFileName, mInputFile
-    Public mNewBuild, mErrCount, mBuildPath
+    Public mNewBuild, mErrCount, mBuildPath, mEngBuild
 
     Public Sub Class_Initialize() 'set default values
         Set mShell = wscript.CreateObject("Wscript.Shell")
@@ -12,10 +12,11 @@ Class CProductBuild
         Set mBuildDialog = wscript.CreateObject("BuildDialog.BuildDialogB6", "BuildDiag_")
         Set mProjPaths = New CProjectPaths
         mDebug = "N"
+        mEngBuild = "N"
         mNewBuild = Null
         mRelease = Null
         mStartTime = Time
- 		mErrcount = 0
+ 	mErrcount = 0
         
 	Err.Clear
 	If mFSO.FileExists("..\Done.txt") = True Then
@@ -75,6 +76,9 @@ Class CProductBuild
     '* -EDP   mExistingDevPath    Existing Development Path to use
     '* -SE    mIgnoreMsgBox       Y or N for suppressing all messageboxes
     '* -DB    mDebug              Y or N switch for debug in product scripts
+    '* -LB    mLastBuild          
+    '* -LIC   licenseVersion      version of solimar licensing to use 
+    '* -EB    mEngBuild           Y or N Engineering Build
     '***************************************************************************************************
     Public Sub GetParams()
 
@@ -85,29 +89,31 @@ Class CProductBuild
 
                Select Case wscript.Arguments(iParam)
                     Case "-BT"
-					  mBuildType = wscript.Arguments(iParam + 1)
+				        mBuildType = wscript.Arguments(iParam + 1)
                     Case "-MPP"
-				      mProjPaths.SetMainProjPath wscript.Arguments(iParam + 1)
+				        mProjPaths.SetMainProjPath wscript.Arguments(iParam + 1)
                     Case "-PL"
-				      mPrevLabel = wscript.Arguments(iParam + 1)
+				        mPrevLabel = wscript.Arguments(iParam + 1)
                     Case "-NNV"
-					  mNewNextVersion = wscript.Arguments(iParam + 1)
+					mNewNextVersion = wscript.Arguments(iParam + 1)
                     Case "-NDP"
-					  mNewDevPath = wscript.Arguments(iParam + 1)
+					mNewDevPath = wscript.Arguments(iParam + 1)
                     Case "-CBT"
-					  CodeBuildType = wscript.Arguments(iParam + 1)
+					CodeBuildType = wscript.Arguments(iParam + 1)
                     Case "-EDP"
-					   ExistingDevPath = wscript.Arguments(iParam + 1)
+				        ExistingDevPath = wscript.Arguments(iParam + 1)
                     Case "-VN"
-					   mVersionNum = wscript.Arguments(iParam + 1)
+					mVersionNum = wscript.Arguments(iParam + 1)
                     Case "-SE"
-					  mIgnoreMsgBox = wscript.Arguments(iParam + 1)
+					mIgnoreMsgBox = wscript.Arguments(iParam + 1)
                     Case "-DB"
-					   mDebug = wscript.Arguments(iParam + 1)
+				        mDebug = wscript.Arguments(iParam + 1)
                     Case "-LB"
-					    mLastBuild = wscript.Arguments(iParam + 1)
-					Case "-LIC"
-						licenseVersion = wscript.Arguments(iParam + 1)
+					mLastBuild = wscript.Arguments(iParam + 1)
+		    Case "-LIC"
+					licenseVersion = wscript.Arguments(iParam + 1)	
+		    Case "-EB"	
+					mEngBuild = wscript.Arguments(iParam + 1)
                End Select
             Next
 
@@ -192,7 +198,7 @@ Class CProductBuild
 
     Public Property Get FSO()
             Set FSO = mFSO
-        End Property
+    End Property
 
     Public Property Get Shell()
             Set Shell = mShell
@@ -212,7 +218,11 @@ Class CProductBuild
 
     Public Property Get BuildType()
             BuildType = mBuildType
-        End Property
+    End Property
+
+    Public Property Get EngOption()
+	EngOption = mEngBuild
+    End Property
 
     Public Property Get PrevLabel()
             PrevLabel = mPrevLabel
@@ -568,7 +578,7 @@ Class CProductBuild
                 Do While Not readFile.AtEndOfStream
                         Line = RTrim(readFile.ReadLine)
                         If InStr(Line, patternKey) <> 0 Then
-                            writeFile.writeLine Left(Line, Len(Line) - Len(newPattern)) & newPattern
+                            writeFile.writeLine Left(Line, (InStr(Line,patternKey) + Len(patternKey))-1) & newPattern
                         Else
                             writeFile.writeLine Line
                         End If
@@ -1128,8 +1138,8 @@ Class CProductBuild
             Err.Clear    
              With oSMTP
              .RemoteHost = "mail.corp.solimarsystems.com"
-             .MailFromAddress = "achou@solimarsystems.com"
-             .FromName = "achou@solimarsystems.com"
+             .MailFromAddress = "alan.chou@solimarsystems.com"
+             .FromName = "alan.chou@solimarsystems.com"
              .AddRecipient "achou@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
              .Charset = 1
              .Subject = GetEmailSubject

@@ -14,6 +14,9 @@ Class CMoveFiles
 
     Public Property Set Build(ByRef aBuild) 
         Set mBuild = aBuild
+	If aBuild.EngOption <> "N" Then
+		mNetworkBasePath = "L:\cd_images\Engineering Builds\"
+	End If
     End Property
 
     Public Property Get NetworkBasePath()
@@ -27,13 +30,10 @@ Class CMoveFiles
     'Move ImageDir into a temporary folder on network	
     'Then move everything to correct folder name if successful
     Sub MoveCDImageToNetwork(aDestFolder, aDestFolderName)
-		Dim DestPath, tempDestPath
-		tempDestPath =  GetOutputPath + aDestFolder + "\Temp"
+	Dim DestPath, tempDestPath
+	tempDestPath =  GetOutputPath + aDestFolder + "\Temp"
         DestPath = GetOutputPath + aDestFolder + "\" + aDestFolderName
 	mBuild.WriteToDlgAndFile "Copying CD image files to the network" 
-        If mBuild.FSO.FolderExists(DestPath) Then 
-			DeleteFileOrFolder "Folder", DestPath, True
-	End If
         mBuild.WriteToDlgAndFile "Creating: " & tempDestPath
         'mBuild.FSO.CreateFolder tempDestPath   
 	CreateFileOrFolder "Folder", tempDestPath, True 
@@ -47,18 +47,21 @@ Class CMoveFiles
             CopyFileOrFolder "File", mBuild.ImageDirPath & "\*", tempDestPath & "\", True
         End If
 	'mBuild.FSO.CreateFolder DestPath
+        If mBuild.FSO.FolderExists(DestPath) Then 
+			DeleteFileOrFolder "Folder", DestPath, True
+	End If
 	CreateFileOrFolder "Folder", DestPath, True
 	Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
-			MoveFileOrFolder "Folder", tempDestPath & "\*", DestPath & "\"
-		End If
-		Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
-		Set Files1 = Folder1.Files
-		If Files1.Count <> 0 Then
-			MoveFileOrFolder "File", tempDestPath & "\*", DestPath & "\"
-		End If
-		DeleteFileOrFolder "Folder", tempDestPath, True
+		MoveFileOrFolder "Folder", tempDestPath & "\*", DestPath & "\"
+	End If
+	Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
+	Set Files1 = Folder1.Files
+	If Files1.Count <> 0 Then
+		MoveFileOrFolder "File", tempDestPath & "\*", DestPath & "\"
+	End If
+	DeleteFileOrFolder "Folder", tempDestPath, True
     End Sub
 
     Sub MoveCDImageToImageDir(aImageSourcePath)
@@ -80,6 +83,21 @@ Class CMoveFiles
         End If
     End Sub
 
+    Sub DeleteFolderContents(aFolderPath)
+        Dim Folder, SubFolders, Files
+	Set Folder = mBuild.FSO.GetFolder(aFolderPath)
+
+        Set SubFolders = Folder.SubFolders
+	For Each f1 in SubFolders	 
+	    DeleteFileOrFolder "Folder", f1, True 
+	Next
+
+        Set Files = Folder.Files
+	For Each f1 in Files	 
+            DeleteFileOrFolder "File", f1, True 
+	Next
+    End Sub
+
     Private Function GetOutputPath()
 		If mBuild.BuildType = "R" Then    'Release
 		    GetOutputPath = mNetworkBasePath & "CurrentVersion\release\"  
@@ -96,17 +114,17 @@ Class CMoveFiles
 
     Public Function DeleteFileOrFolder(aDeleteType, aPath, aOverride)
         mBuild.WriteToDlgAndFile "Deleting: " & aPath
-	    Err.Clear
-	    On Error Resume Next
+	Err.Clear
+	On Error Resume Next
         If aDeleteType = "File" Then
             mBuild.FSO.DeleteFile aPath, aOverride
-		Else 
-	        mBuild.FSO.DeleteFolder aPath, aOverride  'remove contents of the folder
-		End If
-	    If Err Then
-		    mBuild.BuildError "Error attempting to delete " + aDeleteType + ": " + aPath
-		    mBuild.WriteToDlgAndfile Err.Description
-	    End If
+	Else 
+	    mBuild.FSO.DeleteFolder aPath, aOverride  'remove contents of the folder
+	End If
+	If Err Then
+	    mBuild.BuildError "Error attempting to delete " + aDeleteType + ": " + aPath
+	    mBuild.WriteToDlgAndfile Err.Description
+	End If
     End Function
 
     Public Function CreateFileOrFolder(aCreateType, aPath, aOverride)

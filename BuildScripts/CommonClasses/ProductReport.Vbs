@@ -4,8 +4,8 @@ Class CProductReport
     Private mSrcLabel, mLastBuild, mLastRelease, mBegDevPath, mLastLabel, mPopDataBase, mProject, mLastBuildLabel, mLicenseSummary 
     Private mGenTextFile, mRootProjectDir, mGenAllRelease, mProductChoice, mEmailChoice, mOneStepBldChoice, mStartLabel, mEndLabel
     Private mLogFileName, mInputFile, mksProgram, mCurrentDir, mNumPJFiles, mPJFileArray(2), mFilePathArray(2), mFileNameArray(10), fileNameCount
-    Private eReportFilesError, eEmailSendError, eCancel, mMKS , mFileNameCount			
-    Public mReportPath
+    Private eReportFilesError, eEmailSendError, eCancel, mMKS , mFileNameCount, mLicenseVersion			
+    Public mReportPath, mEngReport
           
     Public Sub Class_Initialize() 'set default values
         Set mShell = wscript.CreateObject("Wscript.Shell")
@@ -32,6 +32,8 @@ Class CProductReport
         mStartTime = Time
         mPopDataBase = "N"
 	mFileNameCount = 0
+	mEngReport = "N"
+	mLicenseVersion = ""
 		
  	Dim CurrentDir
         CurrentDir = mShell.CurrentDirectory
@@ -116,9 +118,13 @@ Class CProductReport
                         Case "-ELB"             'end label
                                 mEndLabel = wscript.Arguments(iParam + 1)
                         Case "-DB"              ' debug option
-                                mDebug = wscript.Arguments(iParam + 1)
-			Case "-LS"
+                                mDebug = wscript.Arguments(iParam + 1)                        
+			Case "-LS"				'license summary(not used yet)
 				mLicenseSummary = wscript.Arguments(iParam + 1)
+			Case "-ER"				'Engineering Report
+				mEngReport = wscript.Arguments(iParam + 1)
+			Case "-LV"
+			       mLicenseVersion = wscript.Arguments(iParam + 1)
                  End Select
             Next
 	    Set mMKS = aMKS	
@@ -141,6 +147,10 @@ Class CProductReport
         mFilePathArray(0) = aFilePath
         mFilePathArray(1) = bFilePath
         mFilePathArray(2) = cFilePath
+        
+        If EngOption <> "N" Then
+		OutputBasePath = "L:\\cd_images\\Engineering Builds\\"  	
+        End If
     End Function
     
     'When running a command using Exec, the object returned can give misleading results for executables.
@@ -724,6 +734,7 @@ End Function
 
 Function GetEmailBody()
     Dim location, lastBldLabel
+    Dim LicVerString
     
     lastBldLabel = FindLabel("LB")
     If mOneStepBldChoice = "R" Then
@@ -746,7 +757,12 @@ Function GetEmailBody()
     For Index = 0 To fileNameCount - 1 Step 1
         FileString = FileString & "        " & mFileNameArray(Index) & vbNewLine
     Next
-    
+
+    LicVerString = ""
+    If mLicenseVersion <> "" Then
+	LicVerString = "Solimar License Server Version : " & Mid(mLicenseVersion, InStr(mLicenseVersion, ".") - 1, Len(lastBldLabel))  & " is included with this build. "
+    End If   
+      
     Dim String1
     String1 = "Please review the change notes.  If you see any of your Change Requests in the notes, please verify that the Change Request is fixed." _
               & "  The change will be in the format of CR.FIX.###### where ###### is the Change Request number."
@@ -756,6 +772,7 @@ Function GetEmailBody()
            
     If mOneStepBldChoice = "B" Then 'build
         GetEmailBody = mProductChoice & " " & buildNumber & " is at " & location & "." & vbNewLine & vbNewLine _
+                 & LicVerString & vbNewLine _
                  & "These are the changes since the last " & Left(buildNumber, InStrRev(buildNumber, ".") - 1) & " build." & vbNewLine _
                  & vbNewLine & "Read the attached files to see what has changed." & vbNewLine _
                  & "These notes are also located at:" & vbNewLine _
@@ -764,7 +781,7 @@ Function GetEmailBody()
                  & "If you have any questions, please contact me" _
                  & vbNewLine & vbNewLine & "Alan Chou"
     ElseIf mOneStepBldChoice = "R" Then  'release
-        ftpLocation = GetOutputPath & "ftp\" & ProductName & Replace(buildNumber, ".", "_", 1, -1) & ".exe"
+        ftpLocation = GetOutputPath & "ftp\" & ProductChoice & Replace(buildNumber, ".", "_", 1, -1) & ".exe"
         GetEmailBody = "The version " & mProductChoice & " " & buildNumber & "is released" & vbNewLine _
                  & vbNewLine & "Please burn new cd's and send this version, located at:" & vbNewLine _
                  & location & vbNewLine & vbNewLine & "The self-extracting exe for the ftp site is at:" _
@@ -811,12 +828,18 @@ Function SendEmail(Subject, Body, ReportPath, DescReportName, LabelReportName)
     Error = False
     Err.Clear
     
+    If EngOption <> "N" Then
+		Recipient = "engineering@solimarsystems.com"
+	Else
+		Recipient = "all@solimarsystems.com"
+    End If
+    
     If mFSO.FileExists(ReportPath & DescReportName) And mFSO.FileExists(ReportPath & LabelReportName) Then
         With oSMTP
             .RemoteHost = "mail.corp.solimarsystems.com"
-            .MailFromAddress = "achou@solimarsystems.com"
-            .FromName = "achou@solimarsystems.com"
-            .AddRecipient "all@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
+            .MailFromAddress = "alan.chou@solimarsystems.com"
+            .FromName = "alan.chou@solimarsystems.com"
+            .AddRecipient Recipient  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
             .Charset = 1
             .Subject = Subject
             .BodyText = Body
@@ -1116,7 +1139,7 @@ End Function
 
     Public Property Get Shell()
             Set Shell = mShell
-    End Property
+    End Property  
 
     Public Property Get CancelDialog()
             Set CancelDialog = mCancelDiag
@@ -1125,6 +1148,10 @@ End Function
     Public Property Get ExecInfo()
             Set ExecInfo = mExecInfo
         End Property
+
+    Public Property Get EngOption()
+            EngOption = mEngReport
+    End Property
 
     Public Property Get SrcLabel()
             ProductName = mSrcLabel
