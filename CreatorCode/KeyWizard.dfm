@@ -142,7 +142,7 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 209
       Top = 119
       Width = 16
-      Height = 19
+      Height = 21
       Associate = ui_days
       Min = -10
       Max = 90
@@ -237,21 +237,6 @@ object KeyWizardFrm: TKeyWizardFrm
       Color = clBackground
       ParentColor = False
       TabOrder = 0
-      inherited SolSearcherPropertyList: TListView
-        Left = 15
-        Top = 22
-        Width = 201
-        Height = 239
-        Columns = <
-          item
-            Caption = 'Property'
-            Width = 139
-          end
-          item
-            Caption = 'Licenses'
-            Width = 56
-          end>
-      end
       inherited DetailSQL: TQuery
         Left = 46
         Top = 235
@@ -312,7 +297,7 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 436
       Top = 337
       Width = 16
-      Height = 20
+      Height = 21
       Associate = OutputEdit
       Min = 0
       Max = 4095
