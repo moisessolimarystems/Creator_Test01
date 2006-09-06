@@ -192,7 +192,7 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				return retval = "Rubika";
 
 			case SPDEProductID : 
-				return retval = "SP/D Enterprise";
+				return retval = "SPDE";
 
 			default :
 				return retval = "Unknown License";
