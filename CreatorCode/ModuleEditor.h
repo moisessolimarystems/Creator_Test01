@@ -20,6 +20,7 @@
 
 #include <Buttons.hpp>
 #include <ExtCtrls.hpp>
+#include <Menus.hpp>
 
 //
 // MODE_4 = Module Editor
