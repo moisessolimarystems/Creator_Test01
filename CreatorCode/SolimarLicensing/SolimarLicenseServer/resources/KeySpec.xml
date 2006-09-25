@@ -22,7 +22,7 @@
 #define PRIMARY_PASSWD_CELL      0x16
 #define EXPIRATION_DATE_CELL     0x18
 #define SECONDARY_ALG_CELL       0x22
-#define PASSWORD_NUMBER			 0x2d
+#define PASSWORD_NUMBER		   0x2d
 #define KEY_TYPE_CELL            0x30
 #define PRODUCT_ID_CELL          0x31
 #define PRODUCT_VERSION_CELL     0x32
@@ -306,6 +306,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="29" default="0"/>
 					<ModuleInclude id="30" default="0"/>
 					<ModuleInclude id="31" default="0"/>
+					<ModuleInclude id="32" default="0"/>
 					<ModuleInclude id="33" default="15"/>
 					<ModuleInclude id="34" default="0"/>
 					<ModuleInclude id="35" default="0"/>
@@ -437,7 +438,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
-		<KeyLayout name="PDF Utility">
+		<KeyLayout name="Rubika">
 			<ModuleList>
 				<!-- regular modules -->
 				<Module id="0" offset="0x080" bits="1" name="Merge" unlimited="1"/>
@@ -581,6 +582,16 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="2"	offset="0x0A0" bits="16" name="Concurrent Users" licenseRead="(value * 25)" licenseWrite="(value / 25)"/>
 				<Module id="3"	offset="0x0B0" bits="16" name="Application Databases" unlimited="255"/>
 				<Module id="4"	offset="0x0C0" bits="16" name="Document Assembler" unlimited="1"/>
+				<Module id="5"	offset="0x0D0" bits="16" name="Server" />
+				<Module id="6"	offset="0x0E0" bits="16" name="CPU" />
+				<Module id="7"	offset="0x0F0" bits="16" name="Archive" />
+
+				<Module id="128"  offset="0x103" bits="1" name="SSE Full" unlimited="1"/>
+				<Module id="129"  offset="0x102" bits="1" name="Net Folders" unlimited="1"/>
+				<Module id="130"  offset="0x101" bits="1" name="SSE Notes" unlimited="1"/>	
+				<Module id="131"  offset="0x100" bits="1" name="Ascii " unlimited="1"/>							
+				<Module id="132"  offset="0x107" bits="1" name="PDF" unlimited="1"/>	
+				<Module id="133"  offset="0x106" bits="1" name="Full Text" unlimited="1"/>							
 			</ModuleList>
 			<ProductList>
 				<Product id="8" name="SolSearcher Enterprise">
@@ -589,22 +600,28 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="2" default="0"/>
 					<ModuleInclude id="3" default="0"/>
 					<ModuleInclude id="4" default="0"/>
+					<ModuleInclude id="5" default="0"/>
+					<ModuleInclude id="6" default="0"/>
+					<ModuleInclude id="7" default="0"/>
+					
+					<ModuleInclude id="128" default="0"/>
+					<ModuleInclude id="129" default="0"/>					
+					<ModuleInclude id="130" default="0"/>	
+					<ModuleInclude id="131" default="0"/>
+					<ModuleInclude id="132" default="0"/>					
+					<ModuleInclude id="133" default="0"/>	
 				</Product>
 			</ProductList>
 		</KeyLayout>
 		<KeyLayout name="SDX Designer">
 			<ModuleList>
+				<Module id="0"	offset="0x080" bits="16" name="SDX Designer"/>				
+				<Module id="1"	offset="0x090" bits="16" name="SOLmonitor"/>
 			</ModuleList>
 			<ProductList>
 				<Product id="10" name="SDX Designer">
-				</Product>
-			</ProductList>
-		</KeyLayout>
-		<KeyLayout name="SSE SP">
-			<ModuleList>
-			</ModuleList>
-			<ProductList>
-				<Product id="15" name="SSE SP">
+					<ModuleInclude id="0" default="0"/>
+					<ModuleInclude id="1" default="0"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>		
