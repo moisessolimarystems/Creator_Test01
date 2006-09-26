@@ -4,10 +4,12 @@
 
 #include "stdafx.h"
 #include "resource.h"       // main symbols
+#include <time.h>
 #include "..\SolimarLicenseServer\KeySpec.h"
 #include "..\common\IObjectAuthentication.h"
 #include "..\common\ILicensingMessage.h"
 #include "..\common\ChallengeResponseHelper.h"
+#include "..\common\ss_rpc_failed.h"
 
 #import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
 //#include "..\SolimarLicenseServer\SolimarLicenseSvr.h"
@@ -25,12 +27,64 @@
 #include "..\common\LicensingMessage.h"
 
 
+/*
+ * SS_SLSERVER_FTCALL 
+ *	Fault tolerant call for SolimarLicenseServer
+ */
+#define SS_SLSERVER_FTCALL(srvInfoObj, func, plist) \
+	{ /* begin hr scope */ \
+	HRESULT hr; \
+	SS_SLSERVER_FTCALL_HR(srvInfoObj func, plist, hr) \
+	} /* end hr scope */ \
+
+/*
+ * SS_SLSERVER__HR 
+ *	Fault tolerant call which sets an HRESULT.
+ */
+#define SS_SLSERVER_FTCALL_HR(srvInfoObj, func, plist, hr) \
+	bool __retry; \
+	bool __connected = true; \
+	do { \
+		try \
+		{ \
+			__retry = false; \
+			HRESULT connectHR = LicenseServerError::EHR_CLIENT_TIMEOUT; \
+			if (__connected || SUCCEEDED(connectHR = srvInfoObj.Connect())) \
+			{ \
+				hr = srvInfoObj.LicenseServer->##func##plist; \
+				srvInfoObj.Disconnect(); \
+			} \
+			else \
+				throw _com_error(connectHR); \
+		} \
+		catch (_com_error& e) \
+		{ \
+			__connected = false; \
+			/* TRACE("FUNCTION FAILED");*/ \
+			/* TRACE("	Function name	= " #func);*/ \
+			/* TRACE("	Parameters		= " #plist);*/ \
+			/* TRACE("	HRESULT			= %X", e.Error());*/ \
+ 			srvInfoObj.Disconnect(); \
+			if (SS_RPC_FAILED(e.Error())) \
+			{ \
+				if (SUCCEEDED(srvInfoObj.Connect())) \
+				{ \
+					__retry = true; \
+					__connected = true; \
+				} \
+			} \
+			if (!__retry) \
+				throw e; /* Pass to outer catch block. */ \
+		} \
+	} while (__retry);
+
+
 // CSolimarLicenseMgr
 
 [
 	coclass,
 	threading("free"),
-	support_error_info("ISolimarLicenseMgr3"),
+	support_error_info("ISolimarLicenseMgr4"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -38,7 +92,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr3,
+	public ISolimarLicenseMgr4,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -81,7 +135,10 @@ public:
 
 	// ISolimarLicenseMgr3
 	STDMETHOD(ModuleLicenseCounterDecrement)(long module_id, long license_count);
-	
+
+	// ISolimarLicenseMgr4
+	STDMETHOD(Initialize2)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes);
+
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
@@ -130,7 +187,15 @@ private:
 		KeyList keys;
 		
 		ISolimarLicenseSvrPtr LicenseServer;
+
+		HRESULT Connect();
+
+		HRESULT Disconnect()
+		{
+			return S_OK;
+		}
 	};
+		
 	
 	enum {
 		UI_IGNORE =				0x00,
@@ -145,22 +210,30 @@ private:
 	
 	HANDLE ServerListLock;
 	HANDLE MessageListLock;
+	HANDLE GracePeriodLock;
 	
 	// refresh the list of the keys on the currently connected servers
-	HRESULT RefreshKeyList();
+	HRESULT RefreshKeyList(bool _bLogError = false);
+
 	// checks that all licenses checked out are accounted for by some key
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
+
 	// re-allocates any unallocated or invalidated licenses (if possible)
 	HRESULT ReallocateLicenses();
+
 	// checks if licenses are valid, if not, an attempt to reallocate licenses is made
 	HRESULT RefreshLicenses();
+
 	// removes any keys from the cache that are not present and have no obtained licenses
 	HRESULT RemoveObsoleteKeysFromCache();
+
 	// attempts to allocate licenses on the known-good keys in the cache
 	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
 	HRESULT ObtainLicensesInternal(long module_id, long license_count);
+
 	// attempts to deallocate licenses on keys that have 
 	HRESULT ReleaseLicensesInternal(long module_id, long license_count);
+
 	// adds a message to the list of unretrieved messages
 	HRESULT AddLicensingMessage(LicensingMessage &message);
 	
@@ -180,6 +253,13 @@ private:
 	_bstr_t m_current_single_key;
 	long m_product, m_prod_ver_major, m_prod_ver_minor;
 	ModuleLicenseMap m_allocated_licenses;
+	time_t m_dtGracePeriodStart;
+	unsigned long m_dtGracePeriod;	//in minutes
+
+	bool InViolationPeriod();
+	bool GracePeriodHasStarted();
+	void StartGracePeriod();
+	void StopGracePeriod();
 		
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
