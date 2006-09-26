@@ -17,7 +17,7 @@
 #include <comdef.h>
 #include <math.h>
 #include <stdio.h>
-#define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EC_MANAGER_NOT_INITIALIZED
+#define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY
 
 BYTE CSolimarLicenseMgr::challenge_key_manager_thisauthuser_public[] = {
 #include "..\common\keys\SolimarLicenseManager.ThisAuthUser.public.key.txt"
@@ -89,13 +89,49 @@ CSolimarLicenseMgr::ServerInfo::~ServerInfo()
 {
 	;
 }
+HRESULT CSolimarLicenseMgr::ServerInfo::Connect()
+{
+	// Try to create an ISolimarLicenseServer proxy to the server
+	ISolimarLicenseSvr *pILicenseServer = 0;
+	COSERVERINFO	serverInfo	= {0, this->name, NULL, 0};
+	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr), NULL, NOERROR};
+	
+	HRESULT hr = CoCreateInstanceEx(
+		__uuidof(CSolimarLicenseSvr), 
+		NULL, 
+		CLSCTX_REMOTE_SERVER, 
+		&serverInfo, 
+		1, 
+		&multiQI);
+	if (FAILED(hr))
+		return hr;
+
+	ISolimarLicenseSvrPtr pServer;
+	pServer.Attach((ISolimarLicenseSvr*)multiQI.pItf);
+	
+	ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+	// try to authenticate the license server
+	hr = CR.AuthenticateServer(pServer);
+	if (FAILED(hr)) return hr;
+	
+	// let the license server authenticate this manager
+	hr = CR.AuthenticateToServer(pServer);
+	if (FAILED(hr)) return hr;
+
+	this->LicenseServer = pServer;
+	return S_OK;
+}
+
 
 
 CSolimarLicenseMgr::CSolimarLicenseMgr() : 
 	m_initialized(false), 
 	ServerListLock(CreateMutex(0,0,0)),
+	GracePeriodLock(CreateMutex(0,0,0)),
 	MessageListLock(CreateMutex(0,0,0)),
 	m_ui_level(UI_IGNORE),
+	m_dtGracePeriodStart(0),
+	m_dtGracePeriod(0),
 	ChallengeResponseHelper(challenge_key_manager_userauththis_private, sizeof(challenge_key_manager_userauththis_private), challenge_key_manager_thisauthuser_public, sizeof(challenge_key_manager_thisauthuser_public))
 {
 	HeartbeatThread = new APCTimer(HeartbeatThreadFunction, this, 3*1000 /* 3 seconds */);
@@ -107,6 +143,8 @@ CSolimarLicenseMgr::~CSolimarLicenseMgr()
 		delete HeartbeatThread;
 	if (ServerListLock!=INVALID_HANDLE_VALUE)
 		CloseHandle(ServerListLock);
+	if (GracePeriodLock!=INVALID_HANDLE_VALUE)
+		CloseHandle(GracePeriodLock);
 	if (MessageListLock!=INVALID_HANDLE_VALUE)
 		CloseHandle(MessageListLock);
 }
@@ -203,6 +241,8 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 
 	while(!m_servers.empty())
 	{
+		if((*m_servers.begin()).second.LicenseServer != NULL)
+			(*m_servers.begin()).second.LicenseServer->Release();
 		m_servers.erase(m_servers.begin());
 	}
 	
@@ -212,7 +252,16 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 	return S_OK;
 }
 
+//
+// S_OK if some keys were found
+// S_FALSE if no keys are found
+// Error HRESULT if there was an error
 STDMETHODIMP CSolimarLicenseMgr::Initialize(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level)
+{
+	return Initialize2(product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, auto_ui_level, 0);
+}
+
+STDMETHODIMP CSolimarLicenseMgr::Initialize2(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes)
 {
 	HRESULT hr = S_OK;
 	
@@ -229,25 +278,14 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize(long product, long prod_ver_major, l
 	m_prod_ver_minor = prod_ver_minor;
 	m_current_single_key = _bstr_t(L"");
 	m_initialized = true;
-	
-	size_t found_keys=0;
+	m_dtGracePeriod = grace_period_minutes;
 	
 	SafeMutex mutex(ServerListLock);
 	
 	hr = RefreshLicenses();
 	if (FAILED(hr)) return hr;
 	
-	// count the number of keys available
-	// for each server
-	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
-	{
-		found_keys += server->second.keys.size();
-	}
-	
-	// S_OK if some keys were found
-	// S_FALSE if no keys are found
-	// Error HRESULT if there was an error
-	return (SUCCEEDED(hr) ? (found_keys > 0 ? S_OK : S_FALSE) : hr);
+	return RefreshKeyList(true/*Log Error*/);
 }
 
 STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
@@ -257,26 +295,38 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 	ENSURE_INITIALIZED;
 	
 	SafeMutex mutex(ServerListLock);
-	
-	hr = RefreshLicenses();
-	if (FAILED(hr)) {*license_valid = VARIANT_FALSE; return S_FALSE;}
-	
-	ModuleLicenseMap outstanding_licenses;
-	hr = ValidateLicenseCache(outstanding_licenses);
-	if (FAILED(hr)) {*license_valid = VARIANT_FALSE; return hr;}
-	
-	// determine if any licenses aren't backed up by keys
-	*license_valid = VARIANT_TRUE;
-	for (ModuleLicenseMap::iterator module = outstanding_licenses.begin(); module != outstanding_licenses.end(); ++module)
+	for(;;)
 	{
-		if (module->second>0)
+		hr = RefreshLicenses();
+		if (FAILED(hr)) {*license_valid = VARIANT_FALSE; break;}
+		
+		ModuleLicenseMap outstanding_licenses;
+		hr = ValidateLicenseCache(outstanding_licenses);
+		if (FAILED(hr)) {*license_valid = VARIANT_FALSE; break;}
+		
+		// determine if any licenses aren't backed up by keys
+		*license_valid = VARIANT_TRUE;
+		for (ModuleLicenseMap::iterator module = outstanding_licenses.begin(); module != outstanding_licenses.end(); ++module)
 		{
-			*license_valid = VARIANT_FALSE;
-			break;
+			if (module->second>0)
+			{
+				*license_valid = VARIANT_FALSE;
+				break;
+			}
 		}
+		break;
 	}
-	
-	return S_OK;
+	if(*license_valid == VARIANT_FALSE)
+	{
+		StartGracePeriod();	//Does nothing if grace period has already been started
+		*license_valid = InViolationPeriod() ? VARIANT_FALSE : VARIANT_TRUE;
+		hr = S_OK;
+	}
+	else if(*license_valid == VARIANT_TRUE)
+	{
+		StopGracePeriod();
+	}
+	return hr;
 }
 
 // count the total licenses in all keys
@@ -338,7 +388,10 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 	
 	if (count<0)
 		return E_INVALIDARG;
-	
+
+	if(GracePeriodHasStarted())
+		return E_FAIL;
+
 	SafeMutex mutex(ServerListLock);
 	
 	// record that the licenses were obtained
@@ -369,6 +422,9 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	
 	if (count<0 || count>m_allocated_licenses[module_id])
 		return E_INVALIDARG;
+
+	if(GracePeriodHasStarted())
+		return E_FAIL;
 	
 	// record that the licenses were released
 	m_allocated_licenses[module_id] -= count;
@@ -379,10 +435,16 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	
 	return S_OK;
 }
+
+//passing in -1 for the module ID will return a list of all keys serial numbers for the product.
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARIANT *pvtSerialNumberList)
 {
 	HRESULT hr = S_OK;
 	ENSURE_INITIALIZED;
+
+	if(GracePeriodHasStarted())
+		return E_FAIL;
+
 	SafeMutex mutex(ServerListLock);
 	std::list<unsigned long> serialNumberList;// = new std::list<unsigned long>();
 	// for each server
@@ -390,64 +452,76 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 	{
 		// get the key list form the server
 		VARIANT vtKeyList;
-		hr = server->second.LicenseServer->KeyEnumerate(&vtKeyList);
-		if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+		try 
 		{
-			VARIANT *pvtKeyIdent;
-			if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+			SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+			if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
 			{
-				// for each key on the server
-				for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)
+				VARIANT *pvtKeyIdent;
+				if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
 				{
-					_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
-					VARIANT vtKeyProductID, vtKeyProductVersion;
-					
-					// check that the key is present and valid
-					VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-					hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
-					if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
-					if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-					if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
-					
-					// check that the key has the requisite product version and etc.
-					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					
-					// if the product id and product version requirements are satisfied
-					if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+					// for each key on the server
+					for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)
 					{
-						// if a specific key is requested, but this one is not it, skip this key
-						if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
+						_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+						VARIANT vtKeyProductID, vtKeyProductVersion;
+						
+						// check that the key is present and valid
+						VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
+						hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
+						if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
+						if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+						if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+						
+						// check that the key has the requisite product version and etc.
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						
+						// if the product id and product version requirements are satisfied
+						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
 						{
-							// refresh the cache of licenses on the key
-							// for each module in the key spec for the product
-							for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+							// if a specific key is requested, but this one is not it, skip this key
+							if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 							{
-								if (module_id == static_cast<long>(module->id) && module->isLicense)
+								// refresh the cache of licenses on the key
+								// for each module in the key spec for the product
+								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
 								{
-									VARIANT vtKeyNum, vtCustNum;
-									VariantInit(&vtKeyNum);
-									VariantInit(&vtCustNum);
-									hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Key Number"].id, &vtKeyNum);
-									if (FAILED(hr)) {hr = S_OK; continue;}
-									hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Customer Number"].id, &vtCustNum);
-									if (FAILED(hr)) {hr = S_OK; continue;}
+									//
+									//Accept -1 as ignore moduleID
+									if ((module_id == static_cast<long>(module->id) && module->isLicense) || module_id == -1)
+									{
+										VARIANT vtKeyNum, vtCustNum;
+										VariantInit(&vtKeyNum);
+										VariantInit(&vtCustNum);
+										hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Key Number"].id, &vtKeyNum);
+										if (FAILED(hr)) {hr = S_OK; continue;}
+										hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Customer Number"].id, &vtCustNum);
+										if (FAILED(hr)) {hr = S_OK; continue;}
 
-									serialNumberList.push_back((vtCustNum.uiVal << 16) + vtKeyNum.uiVal);
+										serialNumberList.push_back((vtCustNum.uiVal << 16) + vtKeyNum.uiVal);
 
-									VariantClear(&vtKeyNum);
-									VariantClear(&vtCustNum);
-									break;
-								}
-							}						
+										VariantClear(&vtKeyNum);
+										VariantClear(&vtCustNum);
+										break;
+									}
+								}						
+							}
 						}
 					}
+					SafeArrayUnaccessData(vtKeyList.parray);
 				}
-				SafeArrayUnaccessData(vtKeyList.parray);
+			}
+		}
+		catch (_com_error &e) 
+		{
+			if(SS_RPC_FAILED(e.Error()))
+			{
+				//Log Message about RPC failure to Key
 			}
 		}
 	}
@@ -485,10 +559,14 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 
 	return S_OK;
 }
+
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, long license_count)
 {
 	HRESULT hr = S_OK;
 	ENSURE_INITIALIZED;
+
+	if(GracePeriodHasStarted())
+		return E_FAIL;
 
 	SafeMutex mutex(ServerListLock);
 	
@@ -604,20 +682,30 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 	SafeMutex mutex(ServerListLock);
 	{
 		SafeMutex mutex_messages(MessageListLock);
-		
 		// foreach server append messages from the server to the message cache
 		for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
 		{
 			ILicensingMessage *pServerLicensingMessage = 0;
 			_variant_t vtServerMessageList;
-			if (SUCCEEDED(server->second.LicenseServer->QueryInterface(__uuidof(ILicensingMessage), (void**)&pServerLicensingMessage)))
+			try
 			{
-				pServerLicensingMessage->GetLicenseMessageList(VARIANT_TRUE, &vtServerMessageList);
-				LicensingMessageList server_messages(vtServerMessageList);
-				licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
+				//hr = server->second.LicenseServer->QueryInterface(__uuidof(ILicensingMessage), (void**)&pServerLicensingMessage);
+				SS_SLSERVER_FTCALL_HR(server->second, QueryInterface, (__uuidof(ILicensingMessage), (void**)&pServerLicensingMessage), hr);
+				if (SUCCEEDED(hr))
+				{
+					pServerLicensingMessage->GetLicenseMessageList(VARIANT_TRUE, &vtServerMessageList);
+					LicensingMessageList server_messages(vtServerMessageList);
+					licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
+				}
+			}
+			catch (_com_error &e) 
+			{
+				if(SS_RPC_FAILED(e.Error()))
+				{
+					//Log Message about RPC failure to Key
+				}
 			}
 		}
-		
 		// filter the message list, removing messages that are not relevant to the manager (by key identifier)
 		for (LicensingMessageList::iterator m = licensing_message_cache.begin(); m != licensing_message_cache.end();)
 		{
@@ -664,10 +752,19 @@ void CSolimarLicenseMgr::SendHeartbeat()
 	HRESULT hr = S_OK;
 
 	SafeMutex mutex(ServerListLock);
-
 	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
 	{
-		hr = server->second.LicenseServer->Heartbeat();
+		try 
+		{
+			SS_SLSERVER_FTCALL_HR(server->second, Heartbeat, (), hr);
+		}
+		catch (_com_error &e) 
+		{
+			if(SS_RPC_FAILED(e.Error()))
+			{
+				//Log Message about RPC failure to Key
+			}
+		}
 	}
 }
 
@@ -758,7 +855,7 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
 	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
 	
-	EventLogHelper::WriteEventLog(L"Solimar License Server", message, message_type);
+	EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, message_type);
 }
 
 HRESULT CSolimarLicenseMgr::ShowLicenseDialog(_bstr_t caption, _bstr_t message)
@@ -813,8 +910,13 @@ BOOL CALLBACK CSolimarLicenseMgr::LicenseDlgProc(HWND hDlg, UINT message, WPARAM
 
 
 
+
+//
 // refresh the list of the keys on the currently connected servers
-HRESULT CSolimarLicenseMgr::RefreshKeyList()
+// S_OK if some keys were found
+// S_FALSE if no keys are found
+// Error HRESULT if there was an error
+HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 {
 	HRESULT hr = S_OK;
 	
@@ -823,7 +925,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList()
 	SafeMutex mutex(ServerListLock);
 		
 	bool found_keys = false;
-
+	bool bGracePeriodSeen = false;
 	// for each server
 	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
 	{
@@ -837,159 +939,197 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList()
 		
 		// get the key list form the server
 		VARIANT vtKeyList;
-		hr = server->second.LicenseServer->KeyEnumerate(&vtKeyList);
-		if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+		try
 		{
-			VARIANT *pvtKeyIdent;
-			if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+			SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+			if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
 			{
-				// for each key on the server
-				for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)
+				VARIANT *pvtKeyIdent;
+				if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
 				{
-					_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
-					VARIANT vtKeyProductID, vtKeyProductVersion;
-
-					// check that the key is present and valid
-					VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-					hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
-					if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					
-					// check that the key has the requisite product version and etc.
-					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					
-					// get information about trial keys
-					_variant_t vtKeyStatus, vtExpirationDate, vtServerTime;
-					long lTrialHours(0);
-					hr = server->second.LicenseServer->GetLicenseServerTime(&vtServerTime);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Status"].id, &vtKeyStatus);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyTrialExpires(key_ident, &vtExpirationDate);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					hr = server->second.LicenseServer->KeyTrialHours(key_ident, &lTrialHours);
-					if (FAILED(hr)) {hr = S_OK; continue;}
-					
-					// if the product id and product version requirements are satisfied
-					if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+					// for each key on the server
+					for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)
 					{
-						// if a specific key is requested, but this one is not it, skip this key
-						if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
+						_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+						VARIANT vtKeyProductID, vtKeyProductVersion;
+
+						// check that the key is present and valid
+						VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
+						hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
+						if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						
+						// check that the key has the requisite product version and etc.
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						
+						// get information about trial keys
+						_variant_t vtKeyStatus, vtExpirationDate, vtServerTime;
+						long lTrialHours(0);
+						hr = server->second.LicenseServer->GetLicenseServerTime(&vtServerTime);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Status"].id, &vtKeyStatus);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyTrialExpires(key_ident, &vtExpirationDate);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						hr = server->second.LicenseServer->KeyTrialHours(key_ident, &lTrialHours);
+						if (FAILED(hr)) {hr = S_OK; continue;}
+						
+						// if the product id and product version requirements are satisfied
+						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
 						{
-							server->second.keys[key_ident].KeyPresent = true;
-							server->second.keys[key_ident].KeyValid = (key_license_valid != VARIANT_FALSE && key_active != VARIANT_FALSE);
-							
-							// trial information and messages
-							bool TrialInfoInitialized = server->second.keys[key_ident].KeyTrialInfoInitialized;
-							bool KeyActive = (key_active==VARIANT_TRUE);
-							bool KeyIsTrial = false;
-							long KeyTrialHoursLeft = lTrialHours;
-							long KeyExpiresDaysLeft(0);
-							
-							_variant_t vtExpirationDaysLeft;
-							hr = VarSub(&vtExpirationDate, &vtServerTime, &vtExpirationDaysLeft);
-							if (FAILED(hr) || vtExpirationDaysLeft.dblVal < 0.0) {vtExpirationDaysLeft.vt = VT_DATE; vtExpirationDaysLeft.dblVal = 0.0; hr = S_OK;}
-							KeyExpiresDaysLeft = static_cast<long>(floor(vtExpirationDaysLeft.dblVal));
-							
-							enum KeyStatuses
+							// if a specific key is requested, but this one is not it, skip this key
+							if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 							{
-								UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
-								EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
-								EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11
-							};
-
-							KeyIsTrial = (
-								vtKeyStatus.ulVal == INITIAL_TRIAL ||
-								vtKeyStatus.ulVal == EXTENDED_TRIAL ||
-								vtKeyStatus.ulVal == EXTENDED_TRIAL2 ||
-								vtKeyStatus.ulVal == EXTENDED_TRIAL3 ||
-								vtKeyStatus.ulVal == EXTENDED_TRIAL4 ||
-								vtKeyStatus.ulVal == EXTENDED_TRIAL5 ||
-								vtKeyStatus.ulVal == UNINITIALIZED_TRIAL
-							);
-							
-							wchar_t licensing_message_buffer[256];
-							
-                            // if the key has just become inactive add message
-							if (TrialInfoInitialized && !KeyActive && server->second.keys[key_ident].KeyActive)
-							{
-								swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
-								AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
-							}
-							// if the key has just become active add message
-							if (TrialInfoInitialized && KeyActive && !server->second.keys[key_ident].KeyActive)
-							{
-								swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyActive], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
-								AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyActive, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
-							}
-							// if the key had not been seen before and is inactive
-							if (KeyIsTrial && !KeyActive && !TrialInfoInitialized)
-							{
-								swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
-								AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
-							}
-							if (KeyIsTrial && KeyActive && 
-								(
-									// if the key is seen for the first time or the number of trial hours left has changed
-									(!TrialInfoInitialized || (TrialInfoInitialized && server->second.keys[key_ident].KeyTrialHoursLeft/24!=KeyTrialHoursLeft/24 && KeyTrialHoursLeft/24 < 15))
-									||
-									// if the key is seen for the first time or the number of expiration days left has changed
-									(!TrialInfoInitialized || (TrialInfoInitialized && server->second.keys[key_ident].KeyExpiresDaysLeft!=KeyExpiresDaysLeft && KeyExpiresDaysLeft < 15))
-								)
-							)
-							{
-								swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyStatus], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
-								AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyStatus, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
-							}
-							
-							server->second.keys[key_ident].KeyActive = KeyActive;
-							server->second.keys[key_ident].KeyTrialInfoInitialized = true;
-							server->second.keys[key_ident].KeyIsTrial = KeyIsTrial;
-							server->second.keys[key_ident].KeyTrialHoursLeft = KeyTrialHoursLeft;
-							server->second.keys[key_ident].KeyExpiresDaysLeft = KeyExpiresDaysLeft;
-							
-							// refresh the cache of licenses on the key
-							// for each module in the key spec for the product
-							for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
-							{
-								if (module->isLicense)
+								server->second.keys[key_ident].KeyPresent = true;
+								server->second.keys[key_ident].KeyValid = (key_license_valid != VARIANT_FALSE && key_active != VARIANT_FALSE);
+								
+								// trial information and messages
+								bool TrialInfoInitialized = server->second.keys[key_ident].KeyTrialInfoInitialized;
+								bool KeyActive = (key_active==VARIANT_TRUE);
+								bool KeyIsTrial = false;
+								long KeyTrialHoursLeft = lTrialHours;
+								long KeyExpiresDaysLeft(0);
+								
+								_variant_t vtExpirationDaysLeft;
+								hr = VarSub(&vtExpirationDate, &vtServerTime, &vtExpirationDaysLeft);
+								if (FAILED(hr) || vtExpirationDaysLeft.dblVal < 0.0) {vtExpirationDaysLeft.vt = VT_DATE; vtExpirationDaysLeft.dblVal = 0.0; hr = S_OK;}
+								KeyExpiresDaysLeft = static_cast<long>(floor(vtExpirationDaysLeft.dblVal));
+								
+								enum KeyStatuses
 								{
-									long module_id = static_cast<long>(module->id);
-									long licenses_total(0), licenses_allocated(0);
-									// get the total number of licenses
-									hr = server->second.LicenseServer->KeyModuleLicenseTotal(key_ident, module_id, &licenses_total);
-									if (FAILED(hr)) break;
-									// get the number of licenses in use
-									hr = server->second.LicenseServer->KeyModuleLicenseInUse(key_ident, module_id, &licenses_allocated);
-									if (FAILED(hr)) break;
-									
-									server->second.keys[key_ident].licenses_total[module_id] = licenses_total;
-									server->second.keys[key_ident].licenses_allocated[module_id] = licenses_allocated;
-								}
-							}
-							
-							if (server->second.keys[key_ident].KeyObtained)
-							{
-								// ensure that the licensing on this key is still valid
-								VARIANT_BOOL this_key_license_valid = VARIANT_FALSE;
-								HRESULT hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &this_key_license_valid);
-								server->second.keys[key_ident].KeyValid = (SUCCEEDED(hr) && this_key_license_valid==VARIANT_TRUE);
-							}
+									UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
+									EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
+									EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11
+								};
 
-							found_keys = true;
+								KeyIsTrial = (
+									vtKeyStatus.ulVal == INITIAL_TRIAL ||
+									vtKeyStatus.ulVal == EXTENDED_TRIAL ||
+									vtKeyStatus.ulVal == EXTENDED_TRIAL2 ||
+									vtKeyStatus.ulVal == EXTENDED_TRIAL3 ||
+									vtKeyStatus.ulVal == EXTENDED_TRIAL4 ||
+									vtKeyStatus.ulVal == EXTENDED_TRIAL5 ||
+									vtKeyStatus.ulVal == UNINITIALIZED_TRIAL
+								);
+								
+								wchar_t licensing_message_buffer[256];
+								
+								// if the key has just become inactive add message
+								if (TrialInfoInitialized && !KeyActive && server->second.keys[key_ident].KeyActive)
+								{
+									swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+									AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
+								}
+								// if the key has just become active add message
+								if (TrialInfoInitialized && KeyActive && !server->second.keys[key_ident].KeyActive)
+								{
+									swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyActive], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+									AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyActive, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
+								}
+								// if the key had not been seen before and is inactive
+								if (KeyIsTrial && !KeyActive && !TrialInfoInitialized)
+								{
+									swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+									AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
+								}
+								if (KeyIsTrial && KeyActive && 
+									(
+										// if the key is seen for the first time or the number of trial hours left has changed
+										(!TrialInfoInitialized || (TrialInfoInitialized && server->second.keys[key_ident].KeyTrialHoursLeft/24!=KeyTrialHoursLeft/24 && KeyTrialHoursLeft/24 < 15))
+										||
+										// if the key is seen for the first time or the number of expiration days left has changed
+										(!TrialInfoInitialized || (TrialInfoInitialized && server->second.keys[key_ident].KeyExpiresDaysLeft!=KeyExpiresDaysLeft && KeyExpiresDaysLeft < 15))
+									)
+								)
+								{
+									swprintf(licensing_message_buffer, LicensingMessageStringTable[MessageLMTempKeyStatus], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+									AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)server->first), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyStatus, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
+								}
+								
+								server->second.keys[key_ident].KeyActive = KeyActive;
+								server->second.keys[key_ident].KeyTrialInfoInitialized = true;
+								server->second.keys[key_ident].KeyIsTrial = KeyIsTrial;
+								server->second.keys[key_ident].KeyTrialHoursLeft = KeyTrialHoursLeft;
+								server->second.keys[key_ident].KeyExpiresDaysLeft = KeyExpiresDaysLeft;
+								
+								// refresh the cache of licenses on the key
+								// for each module in the key spec for the product
+								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+								{
+									if (module->isLicense)
+									{
+										long module_id = static_cast<long>(module->id);
+										long licenses_total(0), licenses_allocated(0);
+										// get the total number of licenses
+										hr = server->second.LicenseServer->KeyModuleLicenseTotal(key_ident, module_id, &licenses_total);
+										if (FAILED(hr)) break;
+										// get the number of licenses in use
+										hr = server->second.LicenseServer->KeyModuleLicenseInUse(key_ident, module_id, &licenses_allocated);
+										if (FAILED(hr)) break;
+										
+										server->second.keys[key_ident].licenses_total[module_id] = licenses_total;
+										server->second.keys[key_ident].licenses_allocated[module_id] = licenses_allocated;
+									}
+								}
+								
+								if (server->second.keys[key_ident].KeyObtained)
+								{
+									// ensure that the licensing on this key is still valid
+									VARIANT_BOOL this_key_license_valid = VARIANT_FALSE;
+									HRESULT hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &this_key_license_valid);
+									server->second.keys[key_ident].KeyValid = (SUCCEEDED(hr) && this_key_license_valid==VARIANT_TRUE);
+								}
+
+								found_keys = true;
+							}
+						}
+						else if(_bLogError && Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+						{
+							static const int MAX_MESSAGE_SIZE = 1024;
+							wchar_t message[MAX_MESSAGE_SIZE];
+							_snwprintf(message, MAX_MESSAGE_SIZE, LicensingMessageStringTable[MessageViolationVersion], m_prod_ver_major, m_prod_ver_minor);
+							message[MAX_MESSAGE_SIZE-1] = 0;
+							
+							// convert the time_t in to a variant date
+							time_t timestamp = time(0);
+							_variant_t vtTimestamp;
+							double vtimestamp;
+							SYSTEMTIME systimestamp;
+							memset(&systimestamp, 0, sizeof(systimestamp));
+							tm * tm_struct = gmtime(&timestamp);
+							systimestamp.wSecond = tm_struct->tm_sec;
+							systimestamp.wMinute = tm_struct->tm_min;
+							systimestamp.wHour = tm_struct->tm_hour;
+							systimestamp.wDay = tm_struct->tm_mday;
+							systimestamp.wMonth = tm_struct->tm_mon;
+							systimestamp.wYear = tm_struct->tm_year;
+							systimestamp.wDayOfWeek = tm_struct->tm_wday;
+							if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
+								vtTimestamp = _variant_t(vtimestamp, VT_DATE);
+							else
+								vtTimestamp = _variant_t(0.0, VT_DATE);
+
+							DispatchLicenseMessage(key_ident, MT_INFO, LicenseServerError::EC_SP_VERSION_NOT_SUPPORTED, vtTimestamp, message);
 						}
 					}
+					SafeArrayUnaccessData(vtKeyList.parray);
 				}
-				SafeArrayUnaccessData(vtKeyList.parray);
+			}
+
+		}
+		catch (_com_error &e) 
+		{
+			if(SS_RPC_FAILED(e.Error()))
+			{
+				//Log Message about RPC failure to Key
 			}
 		}
-
 	}
 	
 	// remove any keys that are not present and have no licenses obtained
@@ -1131,25 +1271,36 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 				// if the key has has licenses available and hasn't been obtained yet, obtain it
 				if (!k->second.KeyObtained && key_licenses_to_obtain>0)
 				{
-					hr = server->second.LicenseServer->KeyObtain(k->first);
-					if (FAILED(hr)) continue;
-					
-					k->second.KeyObtained = true;
-					
-					if (m_lock_keys)
+					try
 					{
-						hr = server->second.LicenseServer->KeyLock(k->first);
-						if (FAILED(hr))
+						SS_SLSERVER_FTCALL_HR(server->second, KeyObtain, (k->first), hr);
+						if (FAILED(hr)) continue;
+					
+						k->second.KeyObtained = true;
+						
+						if (m_lock_keys)
 						{
-							hr = server->second.LicenseServer->KeyRelease(k->first);
-							k->second.KeyObtained = false;
-							continue;
-						}
-						else
-						{
-							k->second.KeyLocked = true;
+							hr = server->second.LicenseServer->KeyLock(k->first);
+							if (FAILED(hr))
+							{
+								hr = server->second.LicenseServer->KeyRelease(k->first);
+								k->second.KeyObtained = false;
+								continue;
+							}
+							else
+							{
+								k->second.KeyLocked = true;
+							}
 						}
 					}
+					catch (_com_error &e) 
+					{
+						if(SS_RPC_FAILED(e.Error()))
+						{
+							//Log Message about RPC failure to Key
+						}
+					}
+					
 				}
 				
 				if (key_licenses_to_obtain>0)
@@ -1189,12 +1340,14 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 				// if the key has already been obtained
 				if (!k->second.KeyObtained)
 				{
-					hr = server->second.LicenseServer->KeyObtain(k->first);
-					if (FAILED(hr)) continue;
-					
-					k->second.KeyObtained = true;
-					
-					if (m_lock_keys)
+					try
+					{
+						hr = server->second.LicenseServer->KeyObtain(k->first);
+						if (FAILED(hr)) continue;
+						
+						k->second.KeyObtained = true;
+						
+						if (m_lock_keys)
 					{
 						hr = server->second.LicenseServer->KeyLock(k->first);
 						if (FAILED(hr))
@@ -1206,6 +1359,14 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 						else
 						{
 							k->second.KeyLocked = true;
+						}
+					}
+					}
+					catch (_com_error &e) 
+					{
+						if(SS_RPC_FAILED(e.Error()))
+						{
+							//Log Message about RPC failure to Key
 						}
 					}
 				}
@@ -1221,7 +1382,6 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 			}
 		}
 	}
-	
 	return (licenses_released == licenses_to_release ? S_OK : E_FAIL);
 }
 
@@ -1231,4 +1391,91 @@ HRESULT CSolimarLicenseMgr::AddLicensingMessage(LicensingMessage &message)
 	SafeMutex mutex_messages(MessageListLock);
 	licensing_message_cache.push_back(message);
 	return S_OK;
+}
+bool CSolimarLicenseMgr::InViolationPeriod()
+{
+	SafeMutex mutex(GracePeriodLock);
+	time_t timeNow = time(NULL);
+	double timeDiff1 = difftime(m_dtGracePeriodStart+(m_dtGracePeriod*60), timeNow);
+	double timeDiff2 = difftime(timeNow, m_dtGracePeriodStart+(m_dtGracePeriod*60));
+	bool bViolation = GracePeriodHasStarted() && (m_dtGracePeriodStart+(m_dtGracePeriod*60) < (unsigned)timeNow);
+	return bViolation;
+	//return GracePeriodHasStarted() && (difftime(m_dtGracePeriodStart+m_dtGracePeriod, time(NULL)) > 0);
+}
+bool CSolimarLicenseMgr::GracePeriodHasStarted()
+{
+	SafeMutex mutex(GracePeriodLock);
+	return m_dtGracePeriodStart != 0;
+}
+void CSolimarLicenseMgr::StartGracePeriod()
+{
+	
+	if(GracePeriodHasStarted() == false)	//If not in grace period already, start grace period
+	{
+		{
+		SafeMutex mutex(GracePeriodLock);
+		m_dtGracePeriodStart = time(NULL);
+		}
+
+		static const int MAX_MESSAGE_SIZE = 1024;
+		wchar_t message[MAX_MESSAGE_SIZE];
+		_snwprintf(message, MAX_MESSAGE_SIZE, LicensingMessageStringTable[MessageGracePeriodStarted]);
+		message[MAX_MESSAGE_SIZE-1] = 0;
+
+		// convert the time_t in to a variant date
+		time_t timestamp = time(0);
+		_variant_t vtTimestamp;
+		double vtimestamp;
+		SYSTEMTIME systimestamp;
+		memset(&systimestamp, 0, sizeof(systimestamp));
+		tm * tm_struct = gmtime(&timestamp);
+		systimestamp.wSecond = tm_struct->tm_sec;
+		systimestamp.wMinute = tm_struct->tm_min;
+		systimestamp.wHour = tm_struct->tm_hour;
+		systimestamp.wDay = tm_struct->tm_mday;
+		systimestamp.wMonth = tm_struct->tm_mon;
+		systimestamp.wYear = tm_struct->tm_year;
+		systimestamp.wDayOfWeek = tm_struct->tm_wday;
+		if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
+			vtTimestamp = _variant_t(vtimestamp, VT_DATE);
+		else
+			vtTimestamp = _variant_t(0.0, VT_DATE);
+
+		DispatchLicenseMessage(L"", MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, vtTimestamp, message);
+	}
+}
+void CSolimarLicenseMgr::StopGracePeriod()
+{
+	if(GracePeriodHasStarted() == true)
+	{
+		{
+		SafeMutex mutex(GracePeriodLock);
+		m_dtGracePeriodStart = 0;
+		}
+		static const int MAX_MESSAGE_SIZE = 1024;
+		wchar_t message[MAX_MESSAGE_SIZE];
+		_snwprintf(message, MAX_MESSAGE_SIZE, LicensingMessageStringTable[MessageGracePeriodEnded]);
+		message[MAX_MESSAGE_SIZE-1] = 0;
+
+		// convert the time_t in to a variant date
+		time_t timestamp = time(0);
+		_variant_t vtTimestamp;
+		double vtimestamp;
+		SYSTEMTIME systimestamp;
+		memset(&systimestamp, 0, sizeof(systimestamp));
+		tm * tm_struct = gmtime(&timestamp);
+		systimestamp.wSecond = tm_struct->tm_sec;
+		systimestamp.wMinute = tm_struct->tm_min;
+		systimestamp.wHour = tm_struct->tm_hour;
+		systimestamp.wDay = tm_struct->tm_mday;
+		systimestamp.wMonth = tm_struct->tm_mon;
+		systimestamp.wYear = tm_struct->tm_year;
+		systimestamp.wDayOfWeek = tm_struct->tm_wday;
+		if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
+			vtTimestamp = _variant_t(vtimestamp, VT_DATE);
+		else
+			vtTimestamp = _variant_t(0.0, VT_DATE);
+
+		DispatchLicenseMessage(L"", MT_INFO, 0, vtTimestamp, message);
+	}
 }

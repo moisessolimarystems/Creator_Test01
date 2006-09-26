@@ -163,11 +163,19 @@ HRESULT KeyServer::LicenseSessionInitialize(BSTR license_id)
 HRESULT KeyServer::LicenseSessionUninitialize(BSTR license_id)
 {
 	_bstr_t lid(license_id,true);
-	
+	{
 	SafeMutex mutex(MessageClientListLock);
 	if (message_clients.find(lid)!=message_clients.end())
 		message_clients.erase(lid);
-	
+	}
+
+	//Needed to remove the license_id from the heartbeats list so the timeout
+	//message is not added to the event log.
+	{
+	SafeMutex mutex2(HeartbeatListLock);
+	if(heartbeats[_bstr_t(license_id,true)] != NULL)
+		heartbeats.erase(license_id);
+	}
 	return S_OK;
 }
 
@@ -175,7 +183,7 @@ HRESULT KeyServer::Heartbeat(BSTR license_id)
 {
 	SafeMutex mutex(HeartbeatListLock);
 	
-	DWORD cur_time = (DWORD)time(0);
+	DWORD cur_time = (DWORD)time(0);	
 	heartbeats[_bstr_t(license_id,true)]=cur_time;
 
 	return S_OK;
@@ -365,7 +373,6 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// finished with parse and validation, check for expired passwords
 		bool expired_password = false;
-		bool some_passwords_failed = false;
 		
 		// get the current date/time
 		_variant_t current_time(0.0,VT_DATE);
@@ -383,14 +390,14 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		}
 		
 		// if all of the passwords are non-expired, apply them sequentially
-		// quit if any passwords aren't accepted
+		// don't quit if any passwords aren't accepted because password packets 
+		// now contain all passwords for the key.  Already applied passwords 
+		// will fail.  Only return the HRESULT for the last entered password.
 		if (!expired_password)
 		{
 			for (PasswordList::iterator p = packet.passwords.begin(); p != packet.passwords.end(); ++p)
 			{
 				hr = EnterPassword(p->second);
-				if (FAILED(hr)) throw hr;
-				if (hr == S_FALSE) some_passwords_failed = true;
 			}
 		}
 		else
@@ -401,8 +408,6 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// password entry succeeded, provide the verification code to the user
 		*verification_code = verification.Detach();
-		
-		if (some_passwords_failed) hr = S_FALSE;
 	}
 	catch (HRESULT &ehr)
 	{

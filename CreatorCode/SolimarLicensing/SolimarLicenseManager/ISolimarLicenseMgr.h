@@ -59,4 +59,18 @@ __interface ISolimarLicenseMgr3 : ISolimarLicenseMgr2
 	[id(11),helpstring("method ModuleLicenseCounterDecrement")] HRESULT ModuleLicenseCounterDecrement([in] long module_id, [in] long license_count);
 };
 
+
+// ISolimarLicenseMgr4
+[
+	object,
+	uuid("3DD3F19F-B523-4c1b-9AC3-0840C90B78E3"),
+	dual,	helpstring("ISolimarLicenseMgr4 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr4 : ISolimarLicenseMgr3
+{
+	// Sets the product and product version required. Call this function after calling Connect()
+	[id(12),helpstring("method Initialize2")] HRESULT Initialize2([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] VARIANT_BOOL single_key, [in] BSTR specific_single_key_ident, [in] VARIANT_BOOL lock_keys, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
+};
+
 #endif

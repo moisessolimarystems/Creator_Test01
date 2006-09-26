@@ -55,6 +55,10 @@ static const unsigned int MessageLMTempKeyExpired = 22;
 static const unsigned int MessageLMTempKeyActive = 23;
 static const unsigned int MessageLMTempKeyStatus = 24;
 
+// grace period
+static const unsigned int MessageGracePeriodStarted = 25;
+static const unsigned int MessageGracePeriodEnded = 26;
+
 
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
@@ -102,6 +106,10 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageTempKeyExpired*/ L"Trial key has expired and is no longer active. Hours Left: %d, Expires: %s.",
 	/*MessageTempActive*/ L"Trial key is now active. Hours Left: %d, Expires: %s.",
 	/*MessageTempStatus*/ L"Trial key status update. Hours Left: %d, Expires: %s.",
+
+// grace period
+	/*MessageGracePeriodStarted*/ L"Licensing has entered its grace period. The most common reasons for this are one of your keys has expired or communication to one of your key servers has been lost.",
+	/*MessageGracePeriodEnded*/ L"Licensing has been restored, the grace period has ended.",
 };
 
 
