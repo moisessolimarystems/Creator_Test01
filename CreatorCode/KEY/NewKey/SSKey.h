@@ -18,12 +18,17 @@
 #include <windows.h>
 #include <classes.hpp>
 
+#define SSE_TOTAL_RESOURCES                    5
+#define SSE_MODULE_OFFSET                      128
+#define SSE_TOTAL_KEY_MODULES                  64
+
 // Key cell numbers
 const short INDEX_SERVERS_CELL = 0x00;
 const short REPORT_SERVERS_CELL = 0x01;
 const short CONCURRENT_USERS_25_CELL = 0x02;
 const short APPLICATIONS_CELL = 0x03;
 const short DOCUMENT_ASSEMBLER_CELL = 0x04;
+//moduleCells need start index to be at 0x00 for set/getLicense to increment/decrement correctly
 
 // Every unit licensed in the concurrentUsers25 cell represents 25 concurrent
 // users. For example, if the concurrentUsers25 cell contains a value of 2,
@@ -39,20 +44,11 @@ const ushort MAX_CONCURRENT_USERS =
 const ushort MAX_APPLICATIONS = 0xFF;
 const ushort MAX_DOCUMENT_ASSEMBLER = 0x01;
 
-
-
-/*----------------------------------------------------------------------------*
- *                                                                            *
- *    SSProtectionKey Class:                                                  *
- *                                                                            *
- *    Derived from ProtectionKey, this class provides the interface for       *
- *    accessing a SOLsearcher protection key.                                 *
- *                                                                            *
- *----------------------------------------------------------------------------*/
-class SSProtectionKey : public ProtectionKey
+class SSProtectionKey : public SpdProtectionKey
 {
 public:
    SSProtectionKey();
+   ~SSProtectionKey() {}
    SSProtectionKey(const SSProtectionKey& pkey);
 
    // Functions that do not perform key I/O.
@@ -61,6 +57,7 @@ public:
    ushort getConcurrentUsers() const;
    ushort getApplications() const;
    ushort getDocumentAssembler() const;
+
    void setIndexServers(ushort units_licensed);
    void setReportServers(ushort units_licensed);
    void setConcurrentUsers(ushort units_licensed);

@@ -244,19 +244,22 @@ const char* KDPasswordText[] =
    "300 days/850 hrs - TL",      // 10
    "330 days/935 hrs - TL",      // 11
    "365 days/1000 hrs - TL",     // 12
-   "365 days/9000 hrs - DL",     // 13 Element #13 is the Development License
-   "365 days/250 hrs - PDSL",    // 14 Elements #14-#17 are Partner Demo and Support Licenses
-   "365 days/375 hrs - PDSL",    // 15
-   "365 days/500 hrs - PDSL",    // 16
-   "365 days/750 hrs - PDSL",    // 17
-   "730 days/18000 hrs - MYDL",  // 18 Elements #18-#21 are multi-year prepaid Development Licenses
-   "1095 days/27000 hrs - MYDL", // 19
-   "1460 days/36000 hrs - MYDL", // 20
-   "1825 days/45000 hrs - MYDL", // 21
-   "730 days/2000 hrs - MYTL",   // 22 Elements #22-#25 are multi-year prepaid Test License
-   "1095 days/3000 hrs - MYTL",  // 23
-   "1460 days/4000 hrs - MYTL",  // 24
-   "1825 days/5000 hrs - MYTL",  // 25
+   "30 days/750 hrs - DL",       // 13  Element #13-16 is the Development License
+   "90 days/2250 hrs - DL",      // 14
+   "180 days/4500 hrs - DL",     // 15
+   "365 days/9000 hrs - DL",     // 16
+   "365 days/250 hrs - PDSL",    // 17 Elements #17-#20 are Partner Demo and Support Licenses
+   "365 days/375 hrs - PDSL",    // 18
+   "365 days/500 hrs - PDSL",    // 19
+   "365 days/750 hrs - PDSL",    // 20
+   "730 days/18000 hrs - MYDL",  // 21 Elements #21-#24 are multi-year prepaid Development Licenses
+   "1095 days/27000 hrs - MYDL", // 22
+   "1460 days/36000 hrs - MYDL", // 23
+   "1825 days/45000 hrs - MYDL", // 24
+   "730 days/2000 hrs - MYTL",   // 25 Elements #25-#28 are multi-year prepaid Test License
+   "1095 days/3000 hrs - MYTL",  // 26
+   "1460 days/4000 hrs - MYTL",  // 27
+   "1825 days/5000 hrs - MYTL",  // 28
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -275,19 +278,22 @@ const unsigned short KDPasswordDays[] =
    300, 	// 10
    330, 	// 11
    365, 	// 12
-   365, 	// 13 Element #13 is the Development License
-   365, 	// 14 Elements #14-#17 are Partner Demo and Support Licenses
-   365, 	// 15
+   30,          // 13 Element #13-#16 is the Development License
+   90,          // 14
+   180,         // 15
    365, 	// 16
-   365, 	// 17
-   730, 	// 18 Elements #18-#21 are multi-year prepaid Development Licenses
-   1095, // 19
-   1460, // 20
-   1825, // 21
-   730,  // 22 Elements #22-#25 are multi-year prepaid Test License
-   1095, // 23
-   1460, // 24
-   1825, // 25
+   365, 	// 17 Elements #16-#20 are Partner Demo and Support Licenses
+   365, 	// 18
+   365, 	// 19
+   365, 	// 20
+   730, 	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
+   1095,        // 22
+   1460,        // 23
+   1825,        // 24
+   730,         // 25 Elements #25-#28 are multi-year prepaid Test License
+   1095,        // 26
+   1460,        // 27
+   1825,        // 28
 };
 
 /* KDPasswordHours[]
@@ -307,19 +313,22 @@ const unsigned short KDPasswordHours[] =
    850,     // 10
    935,     // 11
    1000,    // 12
-   9000,    // 13 Element #13 is the Development License
-   250,    	// 14 Elements #14-#17 are Partner Demo and Support Licenses
-   375,    	// 15
-   500,    	// 16
-   750,    	// 17
-   18000,  	// 18 Elements #18-#21 are multi-year prepaid Development Licenses
-   27000, 	// 19
-   36000, 	// 20
-   45000, 	// 21
-   2000,  	// 22 Elements #22-#25 are multi-year prepaid Test License
-   3000,  	// 23
-   4000,   	// 24
-   5000, 	// 25
+   750,     // 13     Element #13-#16 is the Development License
+   2250,    // 14
+   4500,    // 15
+   9000,    // 16
+   250,    	// 17 Elements #17-#20 are Partner Demo and Support Licenses
+   375,    	// 18
+   500,    	// 19
+   750,    	// 20
+   18000,  	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
+   27000, 	// 22
+   36000, 	// 23
+   45000, 	// 24
+   2000,  	// 25 Elements #25-#28 are multi-year prepaid Test License
+   3000,  	// 26
+   4000,   	// 27
+   5000, 	// 28
 };
 
 
@@ -829,9 +838,11 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
       default:
          new_key = new ProtectionKey();
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
@@ -888,12 +899,15 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
+
       default:
          new_key = new ProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
          break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
@@ -932,12 +946,15 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
+
       default:
          new_key = new ProtectionKey(*pkey);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
          break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey(*(PDFUtilityProtectionKey*)pkey);
