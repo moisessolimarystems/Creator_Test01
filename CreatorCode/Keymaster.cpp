@@ -751,18 +751,18 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             //set the type of the variant
             pVarArray->vt = VT_UI4;
             //need to assign for module ids and resource ids : resource ids hard coded.
-            if(ModuleIds[mod_id] == 0)
+            if(mod_id == NumModules - (SSE_TOTAL_RESOURCES))//(ModuleIds[mod_id] == 0)
                pVarArray->ulVal = 0;
-            else if(ModuleIds[mod_id] == 1)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-1))
                pVarArray->ulVal = 1;
-            else if(ModuleIds[mod_id] == 2)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-2))
                pVarArray->ulVal = 2;
-            else if(ModuleIds[mod_id] == 3)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-3))
                pVarArray->ulVal = 3;
-            else if(ModuleIds[mod_id] == 4)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-4))
                pVarArray->ulVal = 4;
             else
-               pVarArray->ulVal = module_detail[ModuleIds[mod_id]]->id; //ModuleIds[mod_id];
+               pVarArray->ulVal = module_detail[ModuleIds[mod_id]]->id;
 
             MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&ModuleArray, index);
          }
@@ -777,15 +777,15 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
             //set the type of the variant
             pVarArray->vt = VT_UI4;
 
-            if(ModuleIds[mod_id] == 0)
+            if(mod_id == NumModules - (SSE_TOTAL_RESOURCES))
               pVarArray->ulVal = ss_key->getIndexServers();
-            else if(ModuleIds[mod_id] == 1)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-1))
                pVarArray->ulVal = ss_key->getReportServers();
-            else if(ModuleIds[mod_id]  == 2)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-2))
                pVarArray->ulVal = ss_key->getConcurrentUsers();
-            else if(ModuleIds[mod_id]  == 3)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-3))
                pVarArray->ulVal = ss_key->getApplications();
-            else if(ModuleIds[mod_id]  == 4)
+            else if(mod_id == NumModules - (SSE_TOTAL_RESOURCES-4))
                pVarArray->ulVal = ss_key->getDocumentAssembler();
             else
                pVarArray->ulVal = ss_key->getLicense(module_detail[ModuleIds[mod_id]]->offset, module_detail[ModuleIds[mod_id]]->bits);

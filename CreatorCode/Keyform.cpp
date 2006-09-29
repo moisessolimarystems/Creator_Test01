@@ -1337,7 +1337,7 @@ void __fastcall TFCustomerKeys::mmPermanentClick(TObject *Sender)
       UtilityQuery->Close();
       UtilityQuery->SQL->Clear();
       UtilityQuery->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, "
-                             "SKRoutput = 1, SKRoperatorSession = 1, SKRuserSession = 1, SKRppmextensions = 0, "
+                             "SKRoutput = 1, SKRoperatorSession = 0, SKRuserSession = 0, SKRppmextensions = 0, "
                              "modules = :module_list, SKRppmxchipds = :ipds, "
                              "SKRppmxchpcl = :pcl, SKRppmxchps = :ps, "
                              "SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds, "
@@ -1990,7 +1990,7 @@ void __fastcall TFCustomerKeys::ArchiveBtnClick(TObject *Sender)
    TUnitsDlg *dlg = new TUnitsDlg(this, 0xFFF);
    dlg->Caption = "Packet Expiration";
    dlg->Label1->Caption = "Days";
-   dlg->Edit1->Text = 7;
+   dlg->Edit1->Text = 7; //default 7 days
 
    if( dlg->ShowModal() == IDYES )
       daysExpire = dlg->Edit1->Text.ToInt();
