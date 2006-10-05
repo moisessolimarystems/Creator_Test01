@@ -218,17 +218,24 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 	char retval[10];
 
    //Convert the hours left into Days Left as requested by Tech Support
-   TheKeyInfoStructure.HoursLeft /= 24;
+    TheKeyInfoStructure.HoursLeft /= 24;
 	sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
 	listViewItem1->SubItems->Add(retval);
 
-	//convert the COM Variant into an Object
-	Object* ConvertedStr = System::Runtime::InteropServices::Marshal
-					::GetObjectForNativeVariant(&TheKeyInfoStructure.ExpirationDate);	
+	//Convert from UTC time to Local time.
+	SYSTEMTIME st;
+	FILETIME ft, dft;
+    LARGE_INTEGER li;  
+	VariantTimeToSystemTime(TheKeyInfoStructure.ExpirationDate,&st);
+	SystemTimeToFileTime(&st, &ft);
+	FileTimeToLocalFileTime(&ft, &dft);
+    li.LowPart = dft.dwLowDateTime;
+    li.HighPart = dft.dwHighDateTime;    
+	System::DateTime utc_t = System::DateTime::FromFileTimeUtc(li.QuadPart);
 
 	if(TheKeyInfoStructure.ExpirationDate)
 	{
-		listViewItem1->SubItems->Add(ConvertedStr->ToString());
+		listViewItem1->SubItems->Add(utc_t.ToString());
 		ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     	__mcTemp__2[0] = listViewItem1;
 		this->TheKeyListView->Items->AddRange(__mcTemp__2);
