@@ -55,11 +55,15 @@ public:
 	HRESULT ValidateLicense(BSTR license_id, VARIANT_BOOL *license_valid);
 	HRESULT ModuleEnumerate(VARIANT *pvtModuleList);
 	HRESULT ModuleQuery(long module_ident, VARIANT *vtValue);
+	//Results based on the license_id.
 	HRESULT ModuleLicenseTotal(BSTR license_id, long module_ident, long* license_count);
 	HRESULT ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count);
 	HRESULT ModuleLicenseObtain(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count);
+
+	//Results based on the entire key.
+	HRESULT ModuleInUse(long module_ident, long* license_count);
 
 	HRESULT LicenseReleaseAll(BSTR license_id);
 	

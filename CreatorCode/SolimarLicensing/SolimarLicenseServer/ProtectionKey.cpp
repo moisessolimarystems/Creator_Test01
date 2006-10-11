@@ -472,7 +472,29 @@ HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, lo
 	return hr;
 }
 
+
+//Counts the ModuleInUse based on the license_id
 HRESULT ProtectionKey::ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count)
+{
+	// lock a license
+	HRESULT hr = S_OK;
+	try
+	{
+		_variant_t module_value = ReadModuleCache(module_ident);
+		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
+		SafeMutex mutex(license_use_lock);
+		ModuleLicenseUseList &module_license_use = license_use[license_id];
+		*license_count = module_license_use[module.id];
+	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
+//Counts up all the ModuleInUse on the key.
+HRESULT ProtectionKey::ModuleInUse(long module_ident, long* license_count)
 {
 	// lock a license
 	HRESULT hr = S_OK;

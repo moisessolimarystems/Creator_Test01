@@ -42,16 +42,17 @@ HRESULT CommunicationLink::Connect()
 	void* temp = 0;
 
 	//connects to the solimar license server
-	hr = CoCreateInstance(CLSID_CSolimarLicenseSvr, 
+	hr = CoCreateInstance(
+						  __uuidof(CSolimarLicenseSvr),
 						  NULL, 
 						  CLSCTX_LOCAL_SERVER, 
-						  IID_ISolimarLicenseSvr, 
+						  __uuidof(ISolimarLicenseSvr2),
 						  &temp
 						 );
 	if(SUCCEEDED(hr))
 	{
 		//if cocreateinstance succeeds save the pointer to the server
-		pTheServer = reinterpret_cast<ISolimarLicenseSvr*>(temp);
+		pTheServer = reinterpret_cast<ISolimarLicenseSvr2*>(temp);
 	}
 
 	ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
@@ -293,7 +294,7 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 											  &(TheModStruct.TotalLicenses)
 											 );
 
-			pTheServer->KeyModuleLicenseInUse(retval.bstrVal,
+			pTheServer->KeyModuleInUse(retval.bstrVal,
 											  (TheModStruct.ModuleID).lVal,
 											  &(TheModStruct.LicensesInUse)
 											  );

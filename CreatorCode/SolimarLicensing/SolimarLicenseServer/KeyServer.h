@@ -73,6 +73,7 @@ public:
 	HRESULT KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT LicenseReleaseAll(BSTR license_id);
+	HRESULT KeyModuleInUse(BSTR key_ident, long module_ident, long* license_count);
 	
 	// Sets all writable cells on a key to zero
 	HRESULT KeyFormat(BSTR key_ident, BSTR *new_key_ident);
