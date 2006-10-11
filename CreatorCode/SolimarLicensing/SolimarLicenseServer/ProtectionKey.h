@@ -5,7 +5,6 @@
 #include "KeySpec.h"
 #include "RainbowDriver.h"
 #include <map>
-#include <list>
 
 class ProtectionKey
 {
@@ -13,8 +12,7 @@ public:
 	
 	ProtectionKey();
 	ProtectionKey(const ProtectionKey &k);
-	ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, KeySpec *keyspec, RainbowDriver *driver, bool bUseSharedLicensing);
-	~ProtectionKey();
+	ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *driver);
 	
 	HRESULT TrialExpires(VARIANT *expire_date);
 	HRESULT TrialHours(long *trial_hours);
@@ -24,13 +22,6 @@ public:
 	HRESULT IsPresent(VARIANT_BOOL *key_present);
 	HRESULT EnterPassword(BSTR password);
 
-	typedef enum
-	{
-		//LCT_NONE = 0,
-		LCT_LOCK_APPLICATION_INSTANCE = 1,		// Lock so only the given application instance can grab licenses, look to map for given app instances
-		LCT_ASSOCIATE_APPLICATION_INSTANCE = 2,	// Use so any application instance can grab licenses, look to map to see what app instances are associate with the key
-	} LicenseConnectionType ;
-
 private:
 	// Password Entry
 
@@ -39,7 +30,6 @@ private:
 	bool EnterProductVersionPassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned short product_version);
 	bool EnterExtensionPassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned short key_status, unsigned short extend_days, unsigned short extension_num);
 	bool EnterModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed, unsigned int password_number);
-	bool EnterApplicationInstancePassword(DWORD user_password, unsigned short customer_number, unsigned short key_number, unsigned int units_licensed, unsigned int password_number);
 	
     // SPD/iConvert specific	
 	bool EnterSPDModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
@@ -49,19 +39,9 @@ private:
 	// SolSearcher specific
 	bool EnterSolSearcherModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed);
 
-	HRESULT AddLicenseApplicationInstance(BSTR license_id, long module_ident);
-	void RemoveLicenseApplicationInstance(BSTR license_id, long module_ident);
-
 public:
-	HRESULT Initialize(BSTR license_id, BSTR application_id);
-
-	HRESULT AddApplicationInstance(BSTR license_id, BSTR application_id, VARIANT_BOOL b_app_instance_lock_key);
-	HRESULT RemoveApplicationInstance(BSTR license_id, BSTR application_id);
-	HRESULT GetApplicationInstanceList(VARIANT *pvtAppInstanceList);
-
 
 	HRESULT GenerateBasePassword(long customer_number, long key_number, BSTR *password);
-	HRESULT GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password);
 	HRESULT GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password);
 	HRESULT GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
@@ -81,7 +61,6 @@ public:
 	HRESULT ModuleLicenseObtain(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count);
-	HRESULT ModuleLicenseUnlimited(BSTR license_id, long module_ident, VARIANT_BOOL b_module_is_unlimited);
 
 	//Results based on the entire key.
 	HRESULT ModuleInUse(long module_ident, long* license_count);
@@ -91,7 +70,7 @@ public:
 	// Sets all writable cells on a key to zero
 	HRESULT Format(BSTR *new_key_ident=0);
 	// Programs a key
-	HRESULT Program(long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident);
+	HRESULT Program(long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident);
 	// Reads raw data off of the key
 	HRESULT ReadRaw(VARIANT *pvtKeyData);
 
@@ -106,12 +85,9 @@ public:
 	// returns true if the key is currently obtained by at least one application
 	bool KeyInUse();
 
-	HRESULT ApplicationInstanceCount(long* application_instance_count);
-
 private:
 	
-	_bstr_t m_physicalKeyIdent;
-	_bstr_t m_virtualKeyIdent;
+	_bstr_t m_keyident;
 	KeySpec *m_keyspec;
 	RainbowDriver *m_driver;
 	
@@ -121,10 +97,10 @@ private:
 	
 	typedef enum
 	{
-		STATE_UNKNOWN     =	0,
-		STATE_CONNECTED   =	1,
-		STATE_DISCONNECTED=	2,
-		STATE_ERROR       =	3
+		STATE_UNKNOWN =			0,
+		STATE_CONNECTED =		1,
+		STATE_DISCONNECTED =	2,
+		STATE_ERROR =			3
 	} KeyState;
 	
 	typedef enum
@@ -136,7 +112,7 @@ private:
 	
 	typedef enum {
 		KEYNone			=0x00000000,  //reserved state
-		KEYAddon		   =1,
+		KEYAddon		=1,
 		KEYBase			=2,
 		KEYReplacement	=3,
 		KEYRelicense	=4,
@@ -172,31 +148,12 @@ private:
 
 	HANDLE license_use_lock;
 	typedef std::map<unsigned int,long> ModuleLicenseUseList;
-	typedef std::map<_bstr_t, ModuleLicenseUseList> LicenseUseList;	// maps license identifier guid to a module use list
-	typedef std::map<_bstr_t, long> KeyUseList;							   // maps license identifier guid to the number of times the key has been obtained by that ident
-
-	typedef std::map<unsigned int,bool> ModuleLicenseUnlimitedList;
-	typedef std::map<_bstr_t, ModuleLicenseUnlimitedList> LicenseUnlimitedList;		// maps license identifier guid to a module unlimited list
-	typedef std::list<_bstr_t> ApplicationList;										// list of application names
-	typedef std::map<_bstr_t, LicenseConnectionType> AppInstanceConnectionTypeList;	// maps license application instance to the connection type.
-	typedef std::map<_bstr_t, _bstr_t> LicenseToApplicationInstanceList;			// maps license identifier guid to application instance names
-	typedef std::map<unsigned int, ApplicationList> ModuleApplicationUseList;		// map of modules and which application instances are associated
-	
+	typedef std::map<_bstr_t, ModuleLicenseUseList> LicenseUseList;		// maps license identifier guid to a module use list
+	typedef std::map<_bstr_t, long> KeyUseList;							// maps license identifier guid to the number of times the key has been obtained by that ident
 	bool key_owned;
 	_bstr_t key_owner;
 	KeyUseList key_use;
 	LicenseUseList license_use;
-	LicenseUnlimitedList license_unlimited_list;
-	bool b_use_shared_licensing;
-
-	_bstr_t m_application_instance;
-	LicenseConnectionType m_license_connection_type;
-
-	AppInstanceConnectionTypeList appInstance_to_connectionType_list;
-	
-	ModuleApplicationUseList module_app_use;
-	LicenseToApplicationInstanceList license_to_app;
-
 	
 	// predefined queries
 	typedef enum {PRIMARY_1=0, PRIMARY_2=1, SECONDARY_1=2, SECONDARY_2=3} PredefinedQuery;
@@ -228,18 +185,18 @@ private:
 	void WriteModule(unsigned int id, unsigned int value);
 	void WriteLicense(wchar_t* id, unsigned int value);
 	void WriteLicense(unsigned int id, unsigned int value);
-	HRESULT WriteLicenseDecrementCounter(BSTR license_id, wchar_t* id, unsigned int value);
-	HRESULT WriteLicenseDecrementCounter(BSTR license_id, unsigned int id, unsigned int value);
+	HRESULT WriteLicenseDecrementCounter(wchar_t* id, unsigned int value);
+	HRESULT WriteLicenseDecrementCounter(unsigned int id, unsigned int value);
 	
 	// License information helpers
-	bool LicenseIsUnlimited(BSTR license_id, wchar_t* id);
-	bool LicenseIsUnlimited(BSTR license_id, unsigned int id);
+	bool LicenseIsUnlimited(wchar_t* id);
+	bool LicenseIsUnlimited(unsigned int id);
 	bool LicenseIsPooled(wchar_t* id);
 	bool LicenseIsPooled(unsigned int id);
 	bool LicenseIsCounter(wchar_t* id);
 	bool LicenseIsCounter(unsigned int id);
-	unsigned int LicenseEffectiveValue(BSTR license_id, wchar_t* id);
-	unsigned int LicenseEffectiveValue(BSTR license_id, unsigned int id);
+	unsigned int LicenseEffectiveValue(wchar_t* id);
+	unsigned int LicenseEffectiveValue(unsigned int id);
 	
 	// Utility functions
 	
