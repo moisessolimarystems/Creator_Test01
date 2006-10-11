@@ -696,6 +696,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="43"	offset="0x0A8" bits="1" name="AFPDS::IPDS" unlimited="1"/>
             
             <Module id="44"	offset="0x0AF" bits="1" name="PDF::Postscript(PDFL)" unlimited="1"/>
+				<Module id="45"	offset="0x0AE" bits="1" name="PDF::IPDS(PDFL)" unlimited="1"/>
+				<Module id="46"	offset="0x0AD" bits="1" name="PDF::TIFF(PDFL)" unlimited="1"/>
 				
 				
 				<!-- Module IDs identifying hardware -->
@@ -776,6 +778,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="42" default="0"/>
 					<ModuleInclude id="43" default="0"/>
 					<ModuleInclude id="44" default="0"/>
+					<ModuleInclude id="45" default="0"/>
+					<ModuleInclude id="46" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
