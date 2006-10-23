@@ -9,6 +9,7 @@
 #include "..\SolimarLicenseServer\KeySpec.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\LicensingMessage.h"
+#include "..\Common\GITComPtr.h"
 
 // Usage:
 // 1) Create a LicensingWrapper object.
@@ -21,6 +22,8 @@
 
 namespace SolimarLicenseManagerWrapper
 {
+_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseMgr4, __uuidof(ISolimarLicenseMgr4));
+_GIT_COM_SMARTPTR_TYPEDEF(ILicensingMessage, __uuidof(ILicensingMessage));
 
 class LicensingWrapper : public ChallengeResponseHelper
 {
@@ -81,7 +84,6 @@ private:
 	
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
-	
 	ISolimarLicenseMgr4 *pLicenseManager;
 	ILicensingMessage *pLicenseManagerMessages;	
 

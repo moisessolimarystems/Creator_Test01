@@ -110,6 +110,9 @@ static const wchar_t* LicensingMessageStringTable[256] =
 // grace period
 	/*MessageGracePeriodStarted*/ L"Licensing has entered its grace period. The most common reasons for this are one of your keys has expired or communication to one of your key servers has been lost.",
 	/*MessageGracePeriodEnded*/ L"Licensing has been restored, the grace period has ended.",
+
+// general errors
+	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
 };
 
 

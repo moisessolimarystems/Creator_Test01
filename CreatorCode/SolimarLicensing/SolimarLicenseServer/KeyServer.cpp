@@ -71,7 +71,13 @@ KeyServer::KeyServer() :
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
-	
+
+	{
+	SafeMutex mutex(HeartbeatListLock);
+	heartbeats.clear();
+	}
+
+
 	// get the local host name for use in licensing messages
 	wchar_t hostname[1024];
 	DWORD hostname_size = 0;
@@ -173,8 +179,13 @@ HRESULT KeyServer::LicenseSessionUninitialize(BSTR license_id)
 	//message is not added to the event log.
 	{
 	SafeMutex mutex2(HeartbeatListLock);
-	if(heartbeats[_bstr_t(license_id,true)] != NULL)
+
+	HeartbeatList::iterator heartbeatIt = heartbeats.find(_bstr_t(license_id,true));
+	if(heartbeatIt != heartbeats.end())
+	{
 		heartbeats.erase(license_id);
+	}
+
 	}
 	return S_OK;
 }
@@ -184,6 +195,7 @@ HRESULT KeyServer::Heartbeat(BSTR license_id)
 	SafeMutex mutex(HeartbeatListLock);
 	
 	DWORD cur_time = (DWORD)time(0);	
+
 	heartbeats[_bstr_t(license_id,true)]=cur_time;
 
 	return S_OK;
@@ -984,6 +996,7 @@ HRESULT KeyServer::KeyModuleLicenseTotal(BSTR license_id, BSTR key_ident, long m
 HRESULT KeyServer::KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long module_ident, long* license_count)
 {
 	SafeMutex mutex(KeyListLock);
+
 	// find the key in the key list
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
 	
@@ -1038,6 +1051,23 @@ HRESULT KeyServer::KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_id
 	if (key!=keys.end())
 	{
 		return key->second.ModuleLicenseDecrementCounter(license_id, module_ident, license_count);
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+}
+
+HRESULT KeyServer::KeyModuleInUse(BSTR key_ident, long module_ident, long* license_count)
+{
+	SafeMutex mutex(KeyListLock);
+
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	
+	if (key!=keys.end())
+	{
+		return key->second.ModuleInUse(module_ident, license_count);
 	}
 	else
 	{
@@ -1235,12 +1265,14 @@ void KeyServer::HeartbeatCheck()
 	HeartbeatList keepers;
 
 	DWORD cur_time = (DWORD)time(0);
+
 	for (HeartbeatList::iterator heartbeat = heartbeats.begin(); heartbeat != heartbeats.end(); ++heartbeat)
 	{
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
 			//xxx debug
 			wchar_t debug_buf[1024];
+			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
 			_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
 			debug_buf[1023] = 0;
 			OutputDebugStringW(debug_buf);

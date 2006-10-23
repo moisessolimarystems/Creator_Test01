@@ -25,6 +25,10 @@
 #include "..\common\InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
 #include "..\common\LicensingMessage.h"
+#include "..\common\GITComPtr.h"
+
+
+_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2Ptr, __uuidof(ISolimarLicenseSvr2Ptr));
 
 
 /*
@@ -77,6 +81,33 @@
 				throw e; /* Pass to outer catch block. */ \
 		} \
 	} while (__retry);
+
+#define SS_GENERATE_AND_DISPATCH_MESSAGE(MessageValue, MessageType, MessageErrorCode) \
+{ /* begin scope */ \
+	static const int MAX_MESSAGE_SIZE = 1024; \
+	wchar_t message[MAX_MESSAGE_SIZE]; \
+	_snwprintf(message, MAX_MESSAGE_SIZE, MessageValue); \
+	message[MAX_MESSAGE_SIZE-1] = 0; \
+	/* convert the time_t in to a variant date */ \
+	time_t timestamp = time(0); \
+	_variant_t vtTimestamp; \
+	double vtimestamp; \
+	SYSTEMTIME systimestamp; \
+	memset(&systimestamp, 0, sizeof(systimestamp)); \
+	tm * tm_struct = gmtime(&timestamp); \
+	systimestamp.wSecond = tm_struct->tm_sec; \
+	systimestamp.wMinute = tm_struct->tm_min; \
+	systimestamp.wHour = tm_struct->tm_hour; \
+	systimestamp.wDay = tm_struct->tm_mday; \
+	systimestamp.wMonth = tm_struct->tm_mon; \
+	systimestamp.wYear = tm_struct->tm_year; \
+	systimestamp.wDayOfWeek = tm_struct->tm_wday; \
+	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp)) \
+		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
+	else \
+		vtTimestamp = _variant_t(0.0, VT_DATE); \
+	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, message); \
+} /* end hr scope */ \
 
 
 // CSolimarLicenseMgr
@@ -142,8 +173,20 @@ public:
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
-	
+
+	static bool InitTimerThreadCB(EInitReason reason, void *pArg) {return static_cast<CSolimarLicenseMgr*>(pArg)->InitTimerThread(reason);}
 private:
+
+	/* InitPoolCleanerThread()
+	Initialize the pool cleaner thread for COM. */
+	bool InitTimerThread(EInitReason reason)
+	{
+		if (reason == irStartup)
+			CoInitializeEx(NULL, COINIT_MULTITHREADED); 
+		else if (reason == irShutdown) 
+			CoUninitialize();
+		return true;
+	}
 	
 	static BYTE challenge_key_manager_thisauthuser_public[];
 	static BYTE challenge_key_manager_userauththis_private[];
@@ -179,14 +222,14 @@ private:
 	public:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
-		ServerInfo(_bstr_t servername, ISolimarLicenseSvrPtr pILicenseServer);
+		ServerInfo(_bstr_t servername, ISolimarLicenseSvr2Ptr pILicenseServer);
 		~ServerInfo();
 
 		_bstr_t name;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		KeyList keys;
 		
-		ISolimarLicenseSvrPtr LicenseServer;
+		ISolimarLicenseSvr2Ptr LicenseServer;
 
 		HRESULT Connect();
 
@@ -217,6 +260,9 @@ private:
 
 	// checks that all licenses checked out are accounted for by some key
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
+
+	// checks if there is valid licensing, 2nd Param tellls whether to enter Grace Period if FAILS
+	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool enter_grace_period_on_error);
 
 	// re-allocates any unallocated or invalidated licenses (if possible)
 	HRESULT ReallocateLicenses();
@@ -260,6 +306,8 @@ private:
 	bool GracePeriodHasStarted();
 	void StartGracePeriod();
 	void StopGracePeriod();
+
+	
 		
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
