@@ -459,6 +459,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="30" offset="0x0f0" bits="4" name="Instances"/>
+        <Module id="31" offset="0x0f4" bits="4" name="Process Builders"/>
 				
 			</ModuleList>
 			<ProductList>
@@ -481,6 +482,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="20" default="0"/>
 					<ModuleInclude id="21" default="0"/>
 					<ModuleInclude id="30" default="1"/>
+          <ModuleInclude id="31" default="1"/>
 				</Product>
 			</ProductList>
 		</KeyLayout>
