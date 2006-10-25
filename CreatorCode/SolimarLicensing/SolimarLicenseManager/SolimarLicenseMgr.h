@@ -106,7 +106,7 @@ _GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2Ptr, __uuidof(ISolimarLicenseSvr2Pt
 		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
 	else \
 		vtTimestamp = _variant_t(0.0, VT_DATE); \
-	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, message); \
+	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
 } /* end hr scope */ \
 
 

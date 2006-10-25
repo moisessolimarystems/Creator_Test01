@@ -306,7 +306,6 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize2(long product, long prod_ver_major, 
 
 STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 {
-	
 	//return ValidateLicenseInternal(license_valid, true);
 	HRESULT hr = S_OK;
 	try
@@ -315,10 +314,12 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 	}
 	catch(_com_error &e2)
 	{
+OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception");	
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	catch(...)
 	{
+OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception");	
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	return hr;
@@ -326,7 +327,6 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool enter_grace_period_on_error)
 {
 	HRESULT hr = S_OK;
-
 	ENSURE_INITIALIZED;
 	SafeMutex mutex(ServerListLock);
 	for(;;)
@@ -336,10 +336,13 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 		{
 			*license_valid = VARIANT_FALSE; break;
 		}
-		
 		ModuleLicenseMap outstanding_licenses;
 		hr = ValidateLicenseCache(outstanding_licenses);
-		if (FAILED(hr)) {*license_valid = VARIANT_FALSE; break;}
+		if (FAILED(hr)) 
+		{
+			*license_valid = VARIANT_FALSE; 
+			break;
+		}
 		
 		// determine if any licenses aren't backed up by keys
 		*license_valid = VARIANT_TRUE;
@@ -698,7 +701,10 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 }
 bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 {
-	if (key_ident.length()==0) return true;
+	if (key_ident.length()==0) 
+	{
+		return true;
+	}
 
 	// foreach server
 	for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
@@ -709,7 +715,6 @@ bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 			return true;
 		}
 	}
-	
 	return false;
 }
 
@@ -753,24 +758,29 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 			// filter the message list, removing messages that are not relevant to the manager (by key identifier)
 			for (LicensingMessageList::iterator m = licensing_message_cache.begin(); m != licensing_message_cache.end();)
 			{
+				
 				if (!ManagesKey(m->key_ident.c_str()))
-					licensing_message_cache.erase(m);
+				{
+					m = licensing_message_cache.erase(m);
+				}
 				else
+				{
 					++m;
+				}
 			}
-					
 			*pvtMessageList = licensing_message_cache;
-			
 			if (clear_messages==VARIANT_TRUE)
 				licensing_message_cache.clear();
 		}
 	}
 	catch(_com_error &e2)
 	{
+OutputDebugString(L"CSolimarLicenseMgr::GetLicenseMessageList() - Outer COM Exception");
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	catch(...)
 	{
+OutputDebugString(L"CSolimarLicenseMgr::GetLicenseMessageList() - Outer Unknown Exception");
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	return S_OK;
@@ -878,16 +888,12 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 {
 	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
-	
 	_variant_t vtStrTimestamp = vtTimestamp;
 	vtStrTimestamp.ChangeType(VT_BSTR);
-	
 	_bstr_t str_timestamp = vtStrTimestamp.bstrVal;
 	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
-	
 	//xxx implement GetErrorMessage such that it returns the right error message?
 	str_error_message = GetErrorMessage(error).c_str();
-	
 	switch (message_type)
 	{
 	case MT_INFO:
@@ -908,7 +914,6 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 	
 	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
 	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
-	
 	EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, message_type);
 }
 
@@ -1169,7 +1174,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 							else
 								vtTimestamp = _variant_t(0.0, VT_DATE);
 
-							DispatchLicenseMessage(key_ident, MT_INFO, LicenseServerError::EC_SP_VERSION_NOT_SUPPORTED, vtTimestamp, message);
+							DispatchLicenseMessage(key_ident, MT_INFO, LicenseServerError::EC_SP_VERSION_NOT_SUPPORTED, vtTimestamp, _bstr_t(message));
 						}
 					}
 					SafeArrayUnaccessData(vtKeyList.parray);
@@ -1477,14 +1482,12 @@ bool CSolimarLicenseMgr::GracePeriodHasStarted()
 }
 void CSolimarLicenseMgr::StartGracePeriod()
 {
-	
 	if(GracePeriodHasStarted() == false)	//If not in grace period already, start grace period
 	{
 		{
 		SafeMutex mutex(GracePeriodLock);
 		m_dtGracePeriodStart = time(NULL);
 		}
-
 		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE);
 	}
 }
