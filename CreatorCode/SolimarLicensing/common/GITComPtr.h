@@ -89,7 +89,8 @@ public:
 
     // Copy the pointer and AddRef().
     //
-    template<> GITComPtr(const GITComPtr& cp) throw()
+    //template<> GITComPtr(const GITComPtr& cp) throw()	//C2299 changes made to build in visual studios 2005
+	GITComPtr(const GITComPtr& cp) throw()
         : m_dwCookie(0)
     {
 		InsertInterfacePointer(cp.ExtractInterfacePointer());
@@ -202,7 +203,8 @@ public:
 	
     // Copies and AddRef()'s the interface.
     //
-    template<> GITComPtr& operator=(const GITComPtr& cp) throw()
+    //template<> GITComPtr& operator=(const GITComPtr& cp) throw()//C2299 changes made to build in visual studios 2005
+	GITComPtr& operator=(const GITComPtr& cp) throw()
     { 
         return operator=(cp.ExtractInterfacePointer());
     }
