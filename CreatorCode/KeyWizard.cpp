@@ -1269,7 +1269,8 @@ void __fastcall TKeyWizardFrm::ui_versionChange(TObject *Sender)
 {
    if (ui_version->Text.Length()==4){
       key_record->pkey->productVersion = getSelectedVersion();
-      SelectModulesClick(NULL);
+      if(m_bModules)
+         SelectModulesClick(NULL);
    }
 }
 
