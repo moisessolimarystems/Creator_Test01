@@ -107,7 +107,7 @@ _GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2Ptr, __uuidof(ISolimarLicenseSvr2Pt
 	else \
 		vtTimestamp = _variant_t(0.0, VT_DATE); \
 	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
-} /* end hr scope */ \
+} /* end scope */ \
 
 
 // CSolimarLicenseMgr
@@ -301,6 +301,8 @@ private:
 	ModuleLicenseMap m_allocated_licenses;
 	time_t m_dtGracePeriodStart;
 	unsigned long m_dtGracePeriod;	//in minutes
+
+	time_t m_dtRefreshKeyList;
 
 	bool InViolationPeriod();
 	bool GracePeriodHasStarted();
