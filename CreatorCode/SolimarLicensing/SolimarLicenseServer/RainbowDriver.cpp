@@ -31,7 +31,8 @@ const RainbowDriver::AccessCode RainbowDriver::accessCode[] =
 
 
 RainbowDriver::RainbowDriver() : 
-	keys_lock(CreateMutex(0, 0, 0))
+	keys_lock(CreateMutex(0, 0, 0)),
+	bAtLeastOneParallelKey(true)
 {
 	;
 }
@@ -112,9 +113,8 @@ HRESULT RainbowDriver::RefreshKeyList()
 
 	HRESULT hr = S_OK;
 	KeyList newkeys;
-	
 	RBP_SPRO_APIPACKET packet = new RB_SPRO_APIPACKET;
-
+	bool bLocalAtLeastOneParallelKey = false;
 	if (!packet)
 		hr = E_FAIL;
 	
@@ -123,11 +123,10 @@ HRESULT RainbowDriver::RefreshKeyList()
 	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproInitialize(packet));
-	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
 		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
-	
+
 wchar_t tmpBuf[256];
 //wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - RNBOsproSetContactServer() - hr = %x", hr);
 //OutputDebugStringW(tmpBuf);
@@ -140,8 +139,7 @@ wchar_t tmpBuf[256];
 	if(retVal != 0)
 	{
 		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
-		wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st Looking for first key - %d", retVal);
-		OutputDebugStringW(tmpBuf);
+		//OutputDebugStringW(tmpBuf);
 	}
 
 	while(retVal == 0)
@@ -156,7 +154,6 @@ wchar_t tmpBuf[256];
 	{
 		delete packet;
 	}
-
 	// run through the list of keys backwards (see note above) storing each key's packet
 	for (int i = key_count - 1; i >= 0; i--)
 	{
@@ -166,20 +163,16 @@ wchar_t tmpBuf[256];
 		
 		if (SUCCEEDED(hr))
 			hr = TranslateRainbowError(RNBOsproFormatPacket(keypacket, sizeof(RB_SPRO_APIPACKET)));
-		
 		if (SUCCEEDED(hr))
 			hr = TranslateRainbowError(RNBOsproInitialize(keypacket));
-		
 		if (SUCCEEDED(hr))
 			TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_STANDALONE"));
 			//TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_SPN_LOCAL"));
 			
-		
 		// iterate to the ith key
 		unsigned short retVal = RNBOsproFindFirstUnit(keypacket, DEVELOPER_ID);
 		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 2nd RNBOsproFindFirstUnit() - retVal = %d", retVal);
 		//OutputDebugStringW(tmpBuf);
-
 		int j = 0;
 		while(retVal == 0 && j<i)
 		{
@@ -244,6 +237,31 @@ wchar_t tmpBuf[256];
 					valid_key_id = true;
 				}
 				
+				
+				if(!bLocalAtLeastOneParallelKey)
+				{
+					// determine if key is usb or parallel
+					unsigned short keyFamily;
+					unsigned short keyFormFactor;
+					unsigned short keyMemorySize;
+					hr = TranslateRainbowError(RNBOsproGetKeyType(
+									keypacket,
+									&keyFamily,
+									&keyFormFactor,
+									&keyMemorySize));
+					if(SUCCEEDED(hr))
+					{
+						/*
+						* Key Family - The key family parameter will return 0 or 1, where 0 denotes the
+						*		SuperPro keys (the SSP keys) and 1 denotes the UltraPro keys (the SUP keys).
+						* Form Factor - The form factor parameter will return 0 or 1, where 0 denotes the
+ 						*		parallel keys and 1 denotes the USB keys.
+						* Memory Size - The number of cells (inclusive of the reserved cells).
+						*/
+						bLocalAtLeastOneParallelKey = keyFormFactor == 0;
+					}
+				}
+
 				if (valid_key_id)
 				{
 					newkeys[key_id] = keypacket;
@@ -251,7 +269,6 @@ wchar_t tmpBuf[256];
 				}
 			}
 		}
-		
 		// cleanup
 		if (keypacket)
 		{
@@ -264,7 +281,7 @@ wchar_t tmpBuf[256];
 	if (SUCCEEDED(hr))
 	{
 		SafeMutex mutex(keys_lock);
-		
+		bAtLeastOneParallelKey = bLocalAtLeastOneParallelKey;
 		// delete old key packets
 		while(!keys.empty())
 		{
@@ -272,7 +289,6 @@ wchar_t tmpBuf[256];
 			delete keys.begin()->second;
 			keys.erase(keys.begin());
 		}
-		
 		keys.insert(newkeys.begin(), newkeys.end());
 		newkeys.clear();
 	}
@@ -288,6 +304,11 @@ wchar_t tmpBuf[256];
 	return hr;
 }
 
+bool RainbowDriver::AtLeastOneParallelKey()
+{
+	SafeMutex mutex(keys_lock);
+	return bAtLeastOneParallelKey;
+}
 HRESULT RainbowDriver::ReadCell(_bstr_t key, unsigned short cell, unsigned short *value)
 {
 	SafeMutex mutex(keys_lock);

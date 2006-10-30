@@ -35,7 +35,13 @@ USBNotification::USBNotification(LPVOID pContext) :
     
 	// register the window for usb notifications
 	DEV_BROADCAST_DEVICEINTERFACE NotificationFilter;
-	static const GUID usb_class_guid = {0x36fc9e60, 0xc465, 0x11cf, {0x80, 0x56, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}};
+
+	// for USB Raw Device
+	static const GUID usb_class_guid = {0xa5dcbf10, 0x6530, 0x11d2, {0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed}};	
+
+	// for USB hubs, not needed.  Disconnecting / Connecting the hub will notify each individual device
+	//static const GUID usb_class_guid = {0x36fc9e60, 0xc465, 0x11cf, {0x80, 0x56, 0x44, 0x45, 0x53, 0x54, 0x00, 0x00}};
+
 	ZeroMemory( &NotificationFilter, sizeof(NotificationFilter) );
 	NotificationFilter.dbcc_size		= sizeof(DEV_BROADCAST_DEVICEINTERFACE);
 	NotificationFilter.dbcc_devicetype	= DBT_DEVTYP_DEVICEINTERFACE;
