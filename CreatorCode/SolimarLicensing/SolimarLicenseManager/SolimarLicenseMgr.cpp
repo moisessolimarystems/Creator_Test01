@@ -133,6 +133,7 @@ CSolimarLicenseMgr::CSolimarLicenseMgr() :
 	m_ui_level(UI_IGNORE),
 	m_dtGracePeriodStart(0),
 	m_dtGracePeriod(0),
+	m_dtRefreshKeyList(0),
 	ChallengeResponseHelper(challenge_key_manager_userauththis_private, sizeof(challenge_key_manager_userauththis_private), challenge_key_manager_thisauthuser_public, sizeof(challenge_key_manager_thisauthuser_public))
 {
 	HeartbeatThread = new APCTimer(HeartbeatThreadFunction, this, 3*1000 /* 3 seconds */, InitTimerThreadCB, this);
@@ -450,7 +451,6 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 		m_allocated_licenses[module_id] -= count;
 
 	if (FAILED(hr)) return hr;
-	
 	return (licensing_valid == VARIANT_TRUE ? S_OK : E_FAIL);
 }
 
@@ -1192,7 +1192,6 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 			}
 		}
 	}
-	
 	// remove any keys that are not present and have no licenses obtained
 	hr = RemoveObsoleteKeysFromCache();
 	if (FAILED(hr)) return hr;
@@ -1242,7 +1241,17 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 	SafeMutex mutex(ServerListLock);
 	
 	// refresh the cache
-	hr = RefreshKeyList();
+	time_t timeNow = time(NULL);
+	double timeDiffSeconds = difftime(m_dtRefreshKeyList, timeNow);
+
+	// don't call RefreshKeyList if just made the same call within the last second
+	if(abs(timeDiffSeconds) > 1.0)	
+	{
+		hr = RefreshKeyList();
+		if(SUCCEEDED(hr))
+			m_dtRefreshKeyList = time(NULL);
+	}
+
 	if (FAILED(hr)) return hr;
 	
 	// check to see if there is a difference between 
@@ -1377,7 +1386,6 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 			}
 		}
 	}
-	
 	return (licenses_obtained == licenses_to_obtain ? S_OK : E_FAIL);
 }
 
