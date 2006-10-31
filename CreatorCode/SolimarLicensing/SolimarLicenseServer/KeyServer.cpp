@@ -41,23 +41,29 @@ BYTE KeyServer::crypto_key_password_packet_password[] = {
 
 void KeyServer::UpdateKeysThreadFunction(void* pvThis)
 {
+//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Enter");
 	HRESULT hr = S_OK;
 	KeyServer *pThis = (KeyServer*)pvThis;
 	hr = pThis->ResynchronizeKeys();
+//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Leave");
 }
 
 void KeyServer::HeartbeatCheckThreadFunction(void* pvThis)
 {
+//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Enter");
 	HRESULT hr = S_OK;
 	KeyServer *pThis = (KeyServer*)pvThis;
 	pThis->HeartbeatCheck();
+//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Leave");
 }
 
 void KeyServer::TimesUpThreadFunction(void* pvThis)
 {
+//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Enter");
 	HRESULT hr = S_OK;
 	KeyServer *pThis = (KeyServer*)pvThis;
 	hr = pThis->TimesUp();
+//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Leave");
 }
 
 KeyServer::KeyServer() : 
@@ -68,6 +74,7 @@ KeyServer::KeyServer() :
 	USBNotification(this)
 {
 	_tzset();
+
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
@@ -87,6 +94,7 @@ KeyServer::KeyServer() :
 	}
 	
 	// trigger a key list resynchronize
+	UpdateKeysThread->RevEnable(UpdateKeysThreadHighPeriodSeconds, UpdateKeysThreadLowPeriodSeconds, 20);
 	UpdateKeysThread->Invoke();
 }
 
@@ -109,16 +117,14 @@ KeyServer::~KeyServer()
 
 HRESULT KeyServer::ResynchronizeKeys()
 {
+	OutputDebugStringW(L"KeyServer::ResynchronizeKeys() -- Enter");	
 	HRESULT hr = S_OK;
-	
 	{// obtain a lock on the driver's key list
+		SafeMutex mutex2(KeyListLock);		
 		SafeMutex mutex1(driver.keys_lock);
 		driver.RefreshKeyList();
-	}// release the lock on the driver's key list
-
-	{// obtain a lock on the driver's key list
-		SafeMutex mutex2(KeyListLock);
-		SafeMutex mutex1(driver.keys_lock);
+		if(driver.AtLeastOneParallelKey())
+			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 		
 		// first pass, add newly found keys
 		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
@@ -150,8 +156,8 @@ HRESULT KeyServer::ResynchronizeKeys()
 				break;
 			}
 		}
-	}
-	
+	} // release the lock on the driver's key list
+	OutputDebugStringW(L"KeyServer::ResynchronizeKeys() -- Leave");	
 	return hr;
 }
 
@@ -182,10 +188,7 @@ HRESULT KeyServer::LicenseSessionUninitialize(BSTR license_id)
 
 	HeartbeatList::iterator heartbeatIt = heartbeats.find(_bstr_t(license_id,true));
 	if(heartbeatIt != heartbeats.end())
-	{
 		heartbeats.erase(license_id);
-	}
-
 	}
 	return S_OK;
 }
@@ -195,6 +198,11 @@ HRESULT KeyServer::Heartbeat(BSTR license_id)
 	SafeMutex mutex(HeartbeatListLock);
 	
 	DWORD cur_time = (DWORD)time(0);	
+
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
+//debug_buf[1023] = 0;
+//OutputDebugStringW(debug_buf);
 
 	heartbeats[_bstr_t(license_id,true)]=cur_time;
 
@@ -1265,9 +1273,17 @@ void KeyServer::HeartbeatCheck()
 	HeartbeatList keepers;
 
 	DWORD cur_time = (DWORD)time(0);
+wchar_t debug_buf1[1024];
+//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Enter - NumberOfHeartBeats = %d", heartbeats.size());
+//debug_buf1[1023] = 0;
+//OutputDebugStringW(debug_buf1);
 
 	for (HeartbeatList::iterator heartbeat = heartbeats.begin(); heartbeat != heartbeats.end(); ++heartbeat)
 	{
+//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+//debug_buf1[1023] = 0;
+//OutputDebugStringW(debug_buf1);
+
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
 			//xxx debug
@@ -1293,6 +1309,10 @@ void KeyServer::HeartbeatCheck()
 	}
 	
 	heartbeats = keepers;
+//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Leave - NumberOfHeartBeats = %d", heartbeats.size());
+//debug_buf1[1023] = 0;
+//OutputDebugStringW(debug_buf1);
+
 }
 
 /*
@@ -1394,7 +1414,9 @@ HRESULT KeyServer::TimesUp()
 // supports usb device insert/remove notification
 void KeyServer::USBEventCallback(LPVOID pContext)
 {
+//OutputDebugStringW(L"KeyServer::USBEventCallback() - Enter");
 	ResynchronizeKeys();
+//OutputDebugStringW(L"KeyServer::USBEventCallback() - Leave");
 }
 
 _bstr_t KeyServer::BinaryToString(BYTE *pData, DWORD length)
