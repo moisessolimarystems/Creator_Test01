@@ -125,6 +125,7 @@ ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0)
 
 ProtectionKey::ProtectionKey(const ProtectionKey &k) : 
 	key_owned(false),
+	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
 	m_keyident(k.m_keyident), 
 	m_keyspec(k.m_keyspec), 
@@ -136,12 +137,14 @@ ProtectionKey::ProtectionKey(const ProtectionKey &k) :
 	}
 	catch (_com_error &e)
 	{
+		OutputDebugStringW(L"ProtectionKey::ProtectionKey() - catch (_com_error &e)");
 		e.Error();
 	}
 }
 
 ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *driver) : 
 	key_owned(false),
+	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
 	m_keyident(keyident),
 	m_keyspec(keyspec),
@@ -153,6 +156,7 @@ ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *
 	}
 	catch (_com_error &e)
 	{
+		OutputDebugStringW(L"ProtectionKey::ProtectionKey() - catch (_com_error &e)");
 		e.Error();
 	}
 }
@@ -549,7 +553,6 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 	{
 		hr = e.Error();
 	}
-	
 	return hr;
 }
 
@@ -832,7 +835,7 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provide
 		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
 		return E_INVALIDARG;
 	}
-	
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Leave");	
 	return S_OK;
 }
 
@@ -874,7 +877,6 @@ HRESULT ProtectionKey::ReadRaw(VARIANT *pvtKeyData)
 unsigned short ProtectionKey::ReadCellCache(unsigned short cell)
 {
 	SafeMutex mutex(cells_lock);
-
 	if (cell>=KeyCellCount)
 		throw _com_error(E_INVALIDARG);
 	
