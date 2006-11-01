@@ -55,7 +55,7 @@ Form1::Form1()
     InitializeModPanel();
 	InitializeGUITimer();
 
-	TheAboutBox = new AboutBox_Form();
+	TheAboutBox = new AboutBox();
 
 	//new up a key view manager to manage the key list view
 	this->TheKeyViewManager = new KeyInfoListViewManager(this->KeyInfoListView);

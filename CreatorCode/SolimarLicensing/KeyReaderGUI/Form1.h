@@ -4,7 +4,7 @@
 #include "KeyInfoListViewManager.h"
 #include "PasswordValidation.h"
 #include "PasswordForm.h"
-#include "AboutBox_Form.h"
+#include "AboutBox.h"
 #include "ListViewItemComparer.h"
 #include "ModListViewItemComparer.h"
 #include "ControlSizing.h"
@@ -295,6 +295,7 @@ namespace KeyReaderGUI
 			this->ModLicenseListView->Size = System::Drawing::Size(200, 373);
 			this->ModLicenseListView->TabIndex = 0;
 			this->ModLicenseListView->View = System::Windows::Forms::View::Details;
+			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, ModLicenseListView_KeyUp);
 			// 
 			// splitter1
 			// 
@@ -332,6 +333,7 @@ namespace KeyReaderGUI
 			this->KeyInfoListView->Size = System::Drawing::Size(509, 373);
 			this->KeyInfoListView->TabIndex = 0;
 			this->KeyInfoListView->View = System::Windows::Forms::View::Details;
+			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, KeyInfoListView_KeyUp);
 			// 
 			// Form1
 			// 
@@ -358,7 +360,7 @@ namespace KeyReaderGUI
 		Object* CurrentKeySelected;
 		PasswordValidation* PasswordValidater;
 		PasswordForm* ThePasswordForm;
-		AboutBox_Form* TheAboutBox;
+		AboutBox* TheAboutBox;
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
 		ControlSizing* TheSizingManager;
@@ -390,6 +392,24 @@ private: System::Void File_StartupServer_Click(System::Object *  sender, System:
 			 UpdateViews();
 			 this->Refresh();
 			 MessageBox::Show(this, "License Server startup complete.", "Startup License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
+		 }
+
+private: System::Void KeyInfoListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+		 {
+			if(e->KeyCode == Keys::F5)
+			{
+				UpdateViews();
+				this->Refresh();
+			}
+		 }
+
+private: System::Void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+		 {
+			if(e->KeyCode == Keys::F5)
+			{
+				UpdateViews();
+				this->Refresh();
+			}
 		 }
 
 };

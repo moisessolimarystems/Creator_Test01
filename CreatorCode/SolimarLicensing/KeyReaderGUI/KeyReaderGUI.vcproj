@@ -131,6 +131,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\AboutBox.cpp">
+			</File>
+			<File
 				RelativePath=".\AboutBox_Form.cpp">
 			</File>
 			<File
@@ -196,21 +199,21 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\AboutBox_Form.h"
+				RelativePath=".\AboutBox.h"
 				FileType="3">
 				<File
-					RelativePath=".\AboutBox_Form.resX">
+					RelativePath=".\AboutBox.resX">
 					<FileConfiguration
 						Name="Debug|Win32">
 						<Tool
 							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox_Form.resources"/>
+							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Win32">
 						<Tool
 							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox_Form.resources"/>
+							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
 					</FileConfiguration>
 				</File>
 			</File>
@@ -295,5 +298,8 @@
 		</Filter>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="app.rc"/>
 	</Globals>
 </VisualStudioProject>
