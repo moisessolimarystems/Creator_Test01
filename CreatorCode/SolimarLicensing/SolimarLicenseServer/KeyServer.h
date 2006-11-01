@@ -95,6 +95,8 @@ private:
 	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
 	static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
 	static const unsigned int UpdateKeysThreadLowPeriodSeconds = 300;	//(sec) - 5 Minutes
+	
+	
 
 	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
 	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
