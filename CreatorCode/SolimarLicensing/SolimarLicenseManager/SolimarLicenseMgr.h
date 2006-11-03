@@ -11,7 +11,8 @@
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\ss_rpc_failed.h"
 
-#import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
+#import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_smart_pointers attribute no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
+
 //#include "..\SolimarLicenseServer\SolimarLicenseSvr.h"
 //#include "..\SolimarLicenseServer\_SolimarLicenseServer.h"
 
@@ -28,7 +29,7 @@
 #include "..\common\GITComPtr.h"
 
 
-_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2Ptr, __uuidof(ISolimarLicenseSvr2Ptr));
+_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2, __uuidof(ISolimarLicenseSvr2));
 
 
 /*
