@@ -31,18 +31,24 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 {
 	HRESULT hr = S_OK;
 
-	hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr4), (void**)&pLicenseManager);
+	ISolimarLicenseMgr4* pLocalLicenseMgr;
+	hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr4), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
-		hr = pLicenseManager->QueryInterface(__uuidof(ILicensingMessage), (void**)&pLicenseManagerMessages);
+		pLicenseManager = pLocalLicenseMgr;
+		pLocalLicenseMgr->Release();
+		ILicensingMessage* pLocalLicenseMsg;
+		hr = pLicenseManager->QueryInterface(__uuidof(ILicensingMessage), (void**)&pLocalLicenseMsg);
 		if (SUCCEEDED(hr))
 		{
+			pLicenseManagerMessages = pLocalLicenseMsg;
+			pLocalLicenseMsg->Release();
+
 			m_MessageDispatchThread = CreateThread(0, 0, MessageDispatchThreadProc, this, 0, 0);
 			m_LicenseValidityThread = CreateThread(0, 0, LicenseValidityThreadProc, this, 0, 0);
 		}
 		else
 		{
-			pLicenseManager->Release();
 			pLicenseManager = 0;
 			pLicenseManagerMessages = 0;
 		}
@@ -51,6 +57,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	{
 		pLicenseManager = 0;
 	}
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper()", hr);
 }
 
 SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const LicensingWrapper &o) : 
@@ -73,11 +80,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const Licensing
 		m_license_message_callback = o.m_license_message_callback;
 	}
 	
-	if (pLicenseManager)
-		pLicenseManager->AddRef();
-	if (pLicenseManagerMessages)
-		pLicenseManagerMessages->AddRef();
-	if (pLicenseManager && pLicenseManagerMessages)
+	if (pLicenseManager!=0 && pLicenseManagerMessages!=0)
 	{
 		m_MessageDispatchThread = CreateThread(0, 0, MessageDispatchThreadProc, this, 0, 0);
 		m_LicenseValidityThread = CreateThread(0, 0, LicenseValidityThreadProc, this, 0, 0);
@@ -93,26 +96,18 @@ SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::Li
 	
 	if (pLicenseManager)
 	{
-		pLicenseManager->Release();
 		pLicenseManager = 0;
 	}
 	
 	this->pLicenseManager = o.pLicenseManager;
 
-	if (pLicenseManager)
-		pLicenseManager->AddRef();
-
 	if (pLicenseManagerMessages )
 	{
-		pLicenseManagerMessages ->Release();
 		pLicenseManagerMessages  = 0;
 	}
 	
 	pLicenseManagerMessages  = o.pLicenseManagerMessages ;
 
-	if (pLicenseManagerMessages )
-		pLicenseManagerMessages ->AddRef();
-	
 	return *this;
 }
 
@@ -136,14 +131,12 @@ SolimarLicenseManagerWrapper::LicensingWrapper::~LicensingWrapper()
 	
 	if (pLicenseManagerMessages)
 	{
-		pLicenseManagerMessages->Release();
 		pLicenseManagerMessages = 0;
 	}
 	
 	if (pLicenseManager)
 	{
 		pLicenseManager->Disconnect();
-		pLicenseManager->Release();
 		pLicenseManager = 0;
 	}
 }
@@ -154,7 +147,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Connect(std::wstring server
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	// try to authenticate the license manager
@@ -170,6 +163,8 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Connect(std::wstring server
 	hr = pLicenseManager->Connect(bstrServer);
 	SysFreeString(bstrServer);
 	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::Connect()", hr);
+
 	return SUCCEEDED(hr);
 }
 
@@ -179,13 +174,14 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(long product, lo
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	BSTR bstrSpecificSingleKey = SysAllocString(specific_single_key_ident.c_str());
 	hr = pLicenseManager->Initialize(product, prod_ver_major, prod_ver_minor, (single_key ? VARIANT_TRUE : VARIANT_FALSE), bstrSpecificSingleKey, (lock_keys ? VARIANT_TRUE : VARIANT_FALSE), ui_level);
 	SysFreeString(bstrSpecificSingleKey);
 	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::Initialize()", hr);
 	return SUCCEEDED(hr);
 }
 
@@ -233,11 +229,11 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseTotal(long mod
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	hr = pLicenseManager->ModuleLicenseTotal(module, license_count);
-	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseTotal()", hr);
 	return SUCCEEDED(hr);
 }
 bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse(long module, long* license_count)
@@ -246,11 +242,11 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse(long mod
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	hr = pLicenseManager->ModuleLicenseInUse(module, license_count);
-	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse()", hr);
 	return SUCCEEDED(hr);
 }
 
@@ -260,10 +256,12 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtain(long mo
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
-	
+
 	hr = pLicenseManager->ModuleLicenseObtain(module, license_count);
+
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtain()", hr);
 	
 	return SUCCEEDED(hr);
 }
@@ -274,11 +272,11 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseCounterDecreme
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	hr = pLicenseManager->ModuleLicenseCounterDecrement(module, license_count);
-	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseCounterDecrement()", hr);
 	return SUCCEEDED(hr);
 }
 
@@ -288,11 +286,11 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseRelease(long m
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	hr = pLicenseManager->ModuleLicenseRelease(module, license_count);
-	
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseRelease()", hr);
 	return SUCCEEDED(hr);
 }
 
@@ -302,11 +300,12 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::ValidateLicense()
 	
 	SafeMutex mutex(m_MemberLock);
 	
-	if (!pLicenseManager)
+	if (pLicenseManager==0)
 		return false;
 	
 	VARIANT_BOOL license_valid;
 	hr = pLicenseManager->ValidateLicense(&license_valid);
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ValidateLicense()", hr);
 	return SUCCEEDED(hr) && (license_valid==VARIANT_TRUE);
 }
 
@@ -343,7 +342,6 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 		message_list = vtMessageList;
 	VariantClear(&vtMessageList);
 	if (FAILED(hr)) return hr;
-	
 	if (m_license_message_callback)
 	{
 		for (LicensingMessageList::iterator m = message_list.begin(); m != message_list.end(); ++m)
@@ -351,7 +349,6 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 			m_license_message_callback(m_license_message_callback_context, m->key_ident.c_str(), m->message_type, m->error, &m->timestamp, m->message.c_str());
 		}
 	}
-	
 	return S_OK;
 }
 

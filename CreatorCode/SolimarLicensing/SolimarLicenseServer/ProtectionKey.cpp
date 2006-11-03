@@ -578,10 +578,10 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 	
 	return hr;
 }
-
+//returns E_FAIL if there is TrialKey
 HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count)
 {
-	HRESULT hr = S_OK;
+	HRESULT hr = E_FAIL;
 	try
 	{
 		SafeMutex mutex(license_use_lock);
@@ -594,9 +594,10 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 			if(module.fn_read(ReadModuleCache(module.id).ulVal) >= module.counter+license_count)
 			{
 				module.counter+=license_count;
+				hr = S_OK;
 				if(module.counter / module.fn_read(1))	//Actually decrement from the key.
 				{
-					WriteLicenseDecrementCounter(module_ident, module.counter);
+					hr = WriteLicenseDecrementCounter(module_ident, module.counter);
 					module.counter = module.counter % module.fn_read(1); 
 				}
 			}
@@ -2270,6 +2271,10 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 			//if(module.id == 10)
 			//	return module.fn_read(65536) - module.counter;
 			//else
+
+			// module.counter is not tied to a key on purpose, the only side effect
+			// is that if you have multiple keys attached to a system, then -module.counter
+			// is applied to all keys.
 			return module.fn_read(ReadModuleCache(id).ulVal) - module.counter;
 		}
 		else

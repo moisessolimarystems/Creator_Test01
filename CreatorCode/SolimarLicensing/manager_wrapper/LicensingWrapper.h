@@ -25,6 +25,17 @@ namespace SolimarLicenseManagerWrapper
 _GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseMgr4, __uuidof(ISolimarLicenseMgr4));
 _GIT_COM_SMARTPTR_TYPEDEF(ILicensingMessage, __uuidof(ILicensingMessage));
 
+#define LOG_ERROR_HR(header, hr) \
+	{ /* begin scope */ \
+	if(FAILED(hr)) \
+	{ \
+		wchar_t debug_buf[1024]; \
+		_snwprintf(debug_buf, 1024, L"%s - Error = 0x%08X", header, hr); \
+		debug_buf[1023] = 0; \
+		OutputDebugStringW(debug_buf); \
+	} \
+	} /* end scope */ \
+
 class LicensingWrapper : public ChallengeResponseHelper
 {
 public:
@@ -84,8 +95,9 @@ private:
 	
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
-	ISolimarLicenseMgr4 *pLicenseManager;
-	ILicensingMessage *pLicenseManagerMessages;	
+
+	ISolimarLicenseMgr4Ptr pLicenseManager;
+	ILicensingMessagePtr pLicenseManagerMessages;	
 
 	std::wstring StringToWstring(const std::string &s);
 };

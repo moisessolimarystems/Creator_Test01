@@ -307,7 +307,6 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize2(long product, long prod_ver_major, 
 
 STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 {
-	//return ValidateLicenseInternal(license_valid, true);
 	HRESULT hr = S_OK;
 	try
 	{
@@ -429,6 +428,10 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseInUse(long module_id, long *count)
 
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 {
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseObtain module_id=%d, count=%d)", module_id, count);
+//debug_buf[1023] = 0;
+//OutputDebugStringW(debug_buf);
 	HRESULT hr = S_OK;
 	
 	ENSURE_INITIALIZED;
@@ -460,8 +463,6 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	//wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
 	//_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"ModuleLicenseRelease module_id=%d, count=%d", module_id, count);
 	//EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, MT_INFO);
-
-
 	HRESULT hr = S_OK;
 	
 	ENSURE_INITIALIZED;
@@ -476,7 +477,6 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	
 	// perform the license de-allocation
 	RefreshLicenses();	//don't return the state of the manager
-	
 	return S_OK;
 }
 
@@ -609,7 +609,9 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 	ENSURE_INITIALIZED;
 
 	if(GracePeriodHasStarted())
+	{
 		return E_FAIL;
+	}
 
 	SafeMutex mutex(ServerListLock);
 	
@@ -664,14 +666,16 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 										{
 											//This key has enough licenses to handle license decrement
 											hr = server->second.LicenseServer->KeyModuleLicenseCounterDecrement(key_ident, module_id, license_count);
-											licenseToDecrement = 0;
+											if(SUCCEEDED(hr))	//hr == E_FAIL if key is a trial key or can't decrement from key
+												licenseToDecrement = 0;
 										}
 										else //if(licenses_total < licenseToDecrement)
 										{
 											//This key doesn't have enough licenses to handle full license decrement, 
 											//decrement what can be done
 											hr = server->second.LicenseServer->KeyModuleLicenseCounterDecrement(key_ident, module_id, licenses_total);
-											licenseToDecrement = licenseToDecrement - licenses_total;
+											if(SUCCEEDED(hr))	//hr == E_FAIL if key is a trial key or can't decrement from key
+												licenseToDecrement = licenseToDecrement - licenses_total;
 										}
 
 										break;	//found the module on this key...
@@ -696,7 +700,6 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 		//Need to do if I assume obtain was not called before.
 		hr = RefreshLicenses();
 	}
-
 	return hr;
 }
 bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
