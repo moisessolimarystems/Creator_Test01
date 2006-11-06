@@ -945,7 +945,8 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
     for (int mod_id=0; mod_id<64; mod_id++) {
        if(ppModuleDetail[mod_id]->name != "{ Not Used }") {
           if (ppModuleDetail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
-              ppModuleDetail[mod_id]->isAvailableForProduct(spd_key->productId) )
+              ppModuleDetail[mod_id]->isAvailableForProduct(spd_key->productId) &&
+              ppModuleDetail[mod_id]->counterUnit == 0)
               spd_key->setLicense(ppModuleDetail[mod_id]->offset, ppModuleDetail[mod_id]->bits, ppModuleDetail[mod_id]->max);
           else
               spd_key->setLicense(ppModuleDetail[mod_id]->offset, ppModuleDetail[mod_id]->bits, 0);
@@ -1052,7 +1053,8 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
     {
          if(module_detail[mod_id]->name != "{ Not Used }") {
              if( module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion) &&
-                 module_detail[mod_id]->isDefaultForProduct(spd_key->productId) )
+                 module_detail[mod_id]->isDefaultForProduct(spd_key->productId) &&
+                 module_detail[mod_id]->counterUnit == 0)
                  spd_key->setLicense(module_detail[mod_id]->offset, module_detail[mod_id]->bits, module_detail[mod_id]->max);
              else
                  spd_key->setLicense(module_detail[mod_id]->offset, module_detail[mod_id]->bits, 0);
