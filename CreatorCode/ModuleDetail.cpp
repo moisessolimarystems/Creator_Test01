@@ -1553,9 +1553,7 @@ void __fastcall TModuleFrame::ModuleListMouseDown(TObject *Sender,
                 ModulePopup->Items->Items[2]->Visible = true;  //enable counter
            else
            {
-                //if (m_productId==SOLSCRIPT_PRODUCT ||
-                //    m_productId==SDX_DESIGNER_PRODUCT)
-                if(detail->max > 15)                    
+                if(detail->max >= 15)
                    ModulePopup->Items->Items[1]->Visible = true;
                 else
                    ModulePopup->Items->Items[0]->Visible = true;
