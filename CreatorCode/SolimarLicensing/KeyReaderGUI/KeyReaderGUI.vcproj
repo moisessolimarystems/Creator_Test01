@@ -134,9 +134,6 @@
 				RelativePath=".\AboutBox.cpp">
 			</File>
 			<File
-				RelativePath=".\AboutBox_Form.cpp">
-			</File>
-			<File
 				RelativePath=".\AssemblyInfo.cpp">
 			</File>
 			<File
