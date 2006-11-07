@@ -167,10 +167,10 @@
 				RelativePath=".\ModuleLicenseListViewManager.cpp">
 			</File>
 			<File
-				RelativePath=".\PasswordForm.cpp">
+				RelativePath=".\PasswordValidation.cpp">
 			</File>
 			<File
-				RelativePath=".\PasswordValidation.cpp">
+				RelativePath=".\PswdForm.cpp">
 			</File>
 			<File
 				RelativePath=".\SaveConfigurations.cpp">
@@ -190,94 +190,110 @@
 						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath=".\AboutBox.h"
-				FileType="3">
+			<Filter
+				Name="Header Files"
+				Filter="h;hpp;hxx;hm;inl;inc;xsd"
+				UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 				<File
-					RelativePath=".\AboutBox.resX">
-					<FileConfiguration
-						Name="Debug|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
-					</FileConfiguration>
+					RelativePath=".\AboutBox.h"
+					FileType="3">
+					<File
+						RelativePath=".\AboutBox.resX">
+						<FileConfiguration
+							Name="Debug|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.AboutBox.resources"/>
+						</FileConfiguration>
+					</File>
 				</File>
-			</File>
-			<File
-				RelativePath="..\common\ChallengeResponse.h">
-			</File>
-			<File
-				RelativePath="..\common\ChallengeResponseHelper.h">
-			</File>
-			<File
-				RelativePath=".\CommunicationLink.h">
-			</File>
-			<File
-				RelativePath=".\ControlSizing.h">
-			</File>
-			<File
-				RelativePath="..\common\CryptoHelper.h">
-			</File>
-			<File
-				RelativePath=".\Form1.h"
-				FileType="3">
 				<File
-					RelativePath=".\Form1.resX">
-					<FileConfiguration
-						Name="Debug|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.Form1.resources"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32">
-						<Tool
-							Name="VCManagedResourceCompilerTool"
-							ResourceFileName="$(IntDir)/KeyReaderGUI.Form1.resources"/>
-					</FileConfiguration>
+					RelativePath="..\common\ChallengeResponse.h">
 				</File>
-			</File>
-			<File
-				RelativePath=".\KeyInfoListViewManager.h">
-			</File>
-			<File
-				RelativePath=".\ListViewItemComparer.h">
-			</File>
-			<File
-				RelativePath=".\ModListViewItemComparer.h">
-			</File>
-			<File
-				RelativePath=".\ModuleLicenseListViewManager.h">
-			</File>
-			<File
-				RelativePath=".\PasswordForm.h">
-			</File>
-			<File
-				RelativePath=".\PasswordValidation.h">
-			</File>
-			<File
-				RelativePath=".\resource.h">
-			</File>
-			<File
-				RelativePath=".\SaveConfigurations.h">
-			</File>
-			<File
-				RelativePath=".\stdafx.h">
-			</File>
-			<File
-				RelativePath=".\VersionInfo.h">
-			</File>
+				<File
+					RelativePath="..\common\ChallengeResponseHelper.h">
+				</File>
+				<File
+					RelativePath=".\CommunicationLink.h">
+				</File>
+				<File
+					RelativePath=".\ControlSizing.h">
+				</File>
+				<File
+					RelativePath="..\common\CryptoHelper.h">
+				</File>
+				<File
+					RelativePath=".\Form1.h"
+					FileType="3">
+					<File
+						RelativePath=".\Form1.resX">
+						<FileConfiguration
+							Name="Debug|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.Form1.resources"/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.Form1.resources"/>
+						</FileConfiguration>
+					</File>
+				</File>
+				<File
+					RelativePath=".\KeyInfoListViewManager.h">
+				</File>
+				<File
+					RelativePath=".\ListViewItemComparer.h">
+				</File>
+				<File
+					RelativePath=".\ModListViewItemComparer.h">
+				</File>
+				<File
+					RelativePath=".\ModuleLicenseListViewManager.h">
+				</File>
+				<File
+					RelativePath=".\PasswordValidation.h">
+				</File>
+				<File
+					RelativePath=".\PswdForm.h"
+					FileType="3">
+					<File
+						RelativePath=".\PswdForm.resX">
+						<FileConfiguration
+							Name="Debug|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.PswdForm.resources"/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32">
+							<Tool
+								Name="VCManagedResourceCompilerTool"
+								ResourceFileName="$(IntDir)/KeyReaderGUI.PswdForm.resources"/>
+						</FileConfiguration>
+					</File>
+				</File>
+				<File
+					RelativePath=".\resource.h">
+				</File>
+				<File
+					RelativePath=".\SaveConfigurations.h">
+				</File>
+				<File
+					RelativePath=".\stdafx.h">
+				</File>
+				<File
+					RelativePath=".\VersionInfo.h">
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

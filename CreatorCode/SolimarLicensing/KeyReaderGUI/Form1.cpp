@@ -371,10 +371,9 @@ System::Void Form1::PasswordMenuItem_Select(System::Object *  sender, System::Ev
 
 void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e) 
 {
-	ThePasswordForm = new PasswordForm(PasswordValidater);
+	ThePasswordForm = new PswdForm(PasswordValidater);
 	ThePasswordForm->ShowDialog();
 	UpdateViews();
-	ThePasswordForm->Dispose(true);
 	delete ThePasswordForm;
 	ThePasswordForm = NULL;
 }
@@ -384,7 +383,6 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 {
 		// Show the FolderBrowserDialog.
     System::Windows::Forms::DialogResult result = openFileDialog1->ShowDialog();
-
 	
 	//if OK button was pressed
 	if (result == DialogResult::OK) 
