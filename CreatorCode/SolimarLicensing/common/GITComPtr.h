@@ -250,9 +250,7 @@ public:
     //
     void Attach(Interface* pInterface) throw()
     {
-		//xxx this affects refcount strategy
-		if (pInterface) pInterface->Release();
-		InsertInterfacePointer(pInterface);
+		Attach(pInterface, false);
     }
 
     // Saves/sets the interface only AddRef()ing if fAddRef is TRUE.
@@ -261,17 +259,13 @@ public:
     void Attach(Interface* pInterface, bool fAddRef) throw()
     {
 		//xxx this affects refcount strategy
-		if (pInterface) pInterface->Release();
+		//xxx InsertInterfacePointer does take ownership of interface - probably calls AddRef
 		InsertInterfacePointer(pInterface);
-		
-        if (fAddRef) {
-            if (pInterface == NULL) {
-                _com_issue_error(E_POINTER);
-            } 
-            else {
-                pInterface->AddRef();
-            }
-        }
+
+		if (pInterface == NULL)
+			_com_issue_error(E_POINTER);
+		if (!fAddRef)
+			pInterface->Release();
     }
 
     // Simply NULL the interface pointer so that it isn't Released()'ed.
@@ -708,7 +702,8 @@ protected:
 			HRESULT hr = git->RegisterInterfaceInGlobal(pInterface, GetIID(), &m_dwCookie);
 			if (FAILED(hr)) _com_issue_error(hr);
 
-			//xxx call addref() ??
+			//xxx git takes ownership of interface* in RegisterInterfaceInGlobal() 
+			//    must be calling addref() 
 		}
 	}
 	
@@ -740,7 +735,9 @@ protected:
 		{
 			IGlobalInterfaceTablePtr git(CLSID_StdGlobalInterfaceTable);
 			git->RevokeInterfaceFromGlobal(m_dwCookie);
-			//xxx call release() ?
+
+			//xxx git releases ownership of interface* in RevokeInterfaceFromGlobal() 
+			//    must be calling release() 
 		}
 		m_dwCookie = 0;
 	}
