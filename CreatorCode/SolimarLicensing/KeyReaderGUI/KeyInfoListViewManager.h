@@ -6,12 +6,16 @@
 
 namespace KeyViewManager
 {
+
 	using namespace System;
 	using namespace System::IO;
 	using namespace System::Data;
+	using namespace System::Text;
 	using namespace System::Windows::Forms;
 	using namespace ModuleViewManager;
 	using namespace System::ComponentModel;
+
+
 
 	__gc class KeyInfoListViewManager
 	{
@@ -30,6 +34,8 @@ namespace KeyViewManager
 		//maps the status id returned from the lower layer app
 		//to the corresponding license as described in status.txt
 		char* MapLicenseID(int* pLicenseID);
+
+		String* UnicodeStrToString(String* unicode);
 
 		//This is our communication Link
 		CommunicationLink* OurCommLink;

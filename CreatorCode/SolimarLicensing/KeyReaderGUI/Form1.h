@@ -3,7 +3,7 @@
 
 #include "KeyInfoListViewManager.h"
 #include "PasswordValidation.h"
-#include "PasswordForm.h"
+#include "PswdForm.h"
 #include "AboutBox.h"
 #include "ListViewItemComparer.h"
 #include "ModListViewItemComparer.h"
@@ -26,7 +26,6 @@ namespace KeyReaderGUI
 	using namespace System::ServiceProcess;
 	using namespace KeyViewManager;
 	using namespace PWDValidation;
-	using namespace PWDForm;
 	using namespace ListViewComparer;
 	using namespace ModListViewItemComparer;
 	using namespace SizeControl;
@@ -216,7 +215,7 @@ namespace KeyReaderGUI
 			// File_ShutdownServer
 			// 
 			this->File_ShutdownServer->Index = 1;
-			this->File_ShutdownServer->Text = S"Shudown Server";
+			this->File_ShutdownServer->Text = S"Shutdown Server";
 			this->File_ShutdownServer->Click += new System::EventHandler(this, File_ShutdownServer_Click);
 			// 
 			// menuItem2
@@ -290,6 +289,7 @@ namespace KeyReaderGUI
 			// 
 			this->ModLicenseListView->BackColor = System::Drawing::SystemColors::InactiveBorder;
 			this->ModLicenseListView->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->ModLicenseListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->ModLicenseListView->Location = System::Drawing::Point(0, 0);
 			this->ModLicenseListView->Name = S"ModLicenseListView";
 			this->ModLicenseListView->Size = System::Drawing::Size(200, 373);
@@ -328,6 +328,7 @@ namespace KeyReaderGUI
 			__mcTemp__6[6] = this->ExpirationDate;
 			this->KeyInfoListView->Columns->AddRange(__mcTemp__6);
 			this->KeyInfoListView->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->KeyInfoListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->KeyInfoListView->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoListView->Name = S"KeyInfoListView";
 			this->KeyInfoListView->Size = System::Drawing::Size(509, 373);
@@ -359,7 +360,7 @@ namespace KeyReaderGUI
 		bool exitFlag;
 		Object* CurrentKeySelected;
 		PasswordValidation* PasswordValidater;
-		PasswordForm* ThePasswordForm;
+		PswdForm* ThePasswordForm;
 		AboutBox* TheAboutBox;
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
