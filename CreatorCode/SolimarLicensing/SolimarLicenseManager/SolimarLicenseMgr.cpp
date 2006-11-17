@@ -79,7 +79,7 @@ CSolimarLicenseMgr::ServerInfo::ServerInfo(const ServerInfo &s) :
 	;
 }
 
-CSolimarLicenseMgr::ServerInfo::ServerInfo(_bstr_t servername, ISolimarLicenseSvr2Ptr pILicenseServer) : 
+CSolimarLicenseMgr::ServerInfo::ServerInfo(_bstr_t servername, GITPtr<ISolimarLicenseSvr2> pILicenseServer) : 
 	name(servername), 
 	LicenseServer(pILicenseServer)
 {
@@ -93,7 +93,6 @@ CSolimarLicenseMgr::ServerInfo::~ServerInfo()
 HRESULT CSolimarLicenseMgr::ServerInfo::Connect()
 {
 	// Try to create an ISolimarLicenseServer proxy to the server
-	ISolimarLicenseSvr2 *pILicenseServer = 0;
 	COSERVERINFO	serverInfo	= {0, this->name, NULL, 0};
 	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
 	
@@ -104,23 +103,26 @@ HRESULT CSolimarLicenseMgr::ServerInfo::Connect()
 		&serverInfo, 
 		1, 
 		&multiQI);
-	if (FAILED(hr))
-		return hr;
-
-	ISolimarLicenseSvr2Ptr pServer;
-	pServer.Attach((ISolimarLicenseSvr2*)multiQI.pItf);
-	
-	ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
-	// try to authenticate the license server
-	hr = CR.AuthenticateServer(pServer);
-	if (FAILED(hr)) return hr;
-	
-	// let the license server authenticate this manager
-	hr = CR.AuthenticateToServer(pServer);
-	if (FAILED(hr)) return hr;
-
-	this->LicenseServer = pServer;
-	return S_OK;
+	if (SUCCEEDED(hr))
+	{
+		ISolimarLicenseSvr2 *pILicenseServer = (ISolimarLicenseSvr2*)multiQI.pItf;
+		ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+		// try to authenticate the license server
+		hr = CR.AuthenticateServer(pILicenseServer);
+		if (SUCCEEDED(hr))
+		{
+			// let the license server authenticate this manager
+			hr = CR.AuthenticateToServer(pILicenseServer);
+			if (SUCCEEDED(hr))
+			{
+				hr = this->LicenseServer.Attach(pILicenseServer);
+			}
+		}
+		if (FAILED(hr))
+			pILicenseServer->Release();
+	}
+		
+	return hr;
 }
 
 
@@ -205,8 +207,6 @@ STDMETHODIMP CSolimarLicenseMgr::Connect(BSTR server)
 	}
 	
 	// Try to create an ISolimarLicenseServer proxy to the server
-	//ISolimarLicenseServer *pILicenseServer;
-	ISolimarLicenseSvr2 *pILicenseServer = 0;
 	COSERVERINFO	serverInfo	= {0, server, NULL, 0};
 	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
 	
@@ -217,30 +217,29 @@ STDMETHODIMP CSolimarLicenseMgr::Connect(BSTR server)
 		&serverInfo, 
 		1, 
 		&multiQI);
-	if (FAILED(hr))
-		return hr;
-
-	ISolimarLicenseSvr2Ptr pServer;
-	pServer.Attach((ISolimarLicenseSvr2*)multiQI.pItf);
-	
-	ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
-	// try to authenticate the license server
-	hr = CR.AuthenticateServer(pServer);
-	if (FAILED(hr)) return hr;
-	
-	// let the license server authenticate this manager
-	hr = CR.AuthenticateToServer(pServer);
-	if (FAILED(hr)) return hr;
-	
-	{
-		SafeMutex mutex(ServerListLock);
-		m_servers[server]=ServerInfo(server, pServer);
+	if (SUCCEEDED(hr))
+	{	
+		ISolimarLicenseSvr2 *pILicenseServer = (ISolimarLicenseSvr2*)multiQI.pItf;
+		ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+		// try to authenticate the license server
+		hr = CR.AuthenticateServer(pILicenseServer);
+		if (SUCCEEDED(hr))
+		{
+			// let the license server authenticate this manager
+			hr = CR.AuthenticateToServer(pILicenseServer);
+			if (SUCCEEDED(hr))
+			{
+				SafeMutex mutex(ServerListLock);
+				m_servers[server] = ServerInfo(server, pILicenseServer);
+			}
+		}
+		if (FAILED(hr))
+			pILicenseServer->Release();
 	}
-	
 
 	m_initialized = false;
 	
-	return S_OK;
+	return hr;
 }
 
 STDMETHODIMP CSolimarLicenseMgr::Disconnect()
@@ -312,14 +311,12 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 	{
 		hr = ValidateLicenseInternal(license_valid, true);
 	}
-	catch(_com_error &e2)
+	catch(_com_error&)
 	{
-OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception");	
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	catch(...)
 	{
-OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception");	
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	return hr;
@@ -776,14 +773,12 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 				licensing_message_cache.clear();
 		}
 	}
-	catch(_com_error &e2)
+	catch(_com_error&)
 	{
-OutputDebugString(L"CSolimarLicenseMgr::GetLicenseMessageList() - Outer COM Exception");
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	catch(...)
 	{
-OutputDebugString(L"CSolimarLicenseMgr::GetLicenseMessageList() - Outer Unknown Exception");
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
 	return S_OK;

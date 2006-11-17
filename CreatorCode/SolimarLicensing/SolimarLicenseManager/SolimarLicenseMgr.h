@@ -11,11 +11,7 @@
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\ss_rpc_failed.h"
 
-#import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_smart_pointers attribute no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
-
-//#include "..\SolimarLicenseServer\SolimarLicenseSvr.h"
-//#include "..\SolimarLicenseServer\_SolimarLicenseServer.h"
-
+#import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_smart_pointers no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
 
 #include "..\common\apctimer.h"
 
@@ -26,11 +22,7 @@
 #include "..\common\InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
 #include "..\common\LicensingMessage.h"
-#include "..\common\GITComPtr.h"
-
-
-_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseSvr2, __uuidof(ISolimarLicenseSvr2));
-
+#include "..\common\GIT.h"
 
 /*
  * SS_SLSERVER_FTCALL 
@@ -223,14 +215,14 @@ private:
 	public:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
-		ServerInfo(_bstr_t servername, ISolimarLicenseSvr2Ptr pILicenseServer);
+		ServerInfo(_bstr_t servername, GITPtr<ISolimarLicenseSvr2> pILicenseServer);
 		~ServerInfo();
 
 		_bstr_t name;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		KeyList keys;
-		
-		ISolimarLicenseSvr2Ptr LicenseServer;
+
+		GITPtr<ISolimarLicenseSvr2> LicenseServer;
 
 		HRESULT Connect();
 

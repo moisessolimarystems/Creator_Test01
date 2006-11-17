@@ -9,7 +9,7 @@
 #include "..\SolimarLicenseServer\KeySpec.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\LicensingMessage.h"
-#include "..\Common\GITComPtr.h"
+#include "..\Common\GIT.h"
 
 // Usage:
 // 1) Create a LicensingWrapper object.
@@ -22,8 +22,6 @@
 
 namespace SolimarLicenseManagerWrapper
 {
-_GIT_COM_SMARTPTR_TYPEDEF(ISolimarLicenseMgr4, __uuidof(ISolimarLicenseMgr4));
-_GIT_COM_SMARTPTR_TYPEDEF(ILicensingMessage, __uuidof(ILicensingMessage));
 
 #define LOG_ERROR_HR(header, hr) \
 	{ /* begin scope */ \
@@ -57,7 +55,6 @@ public:
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	
 	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE);
-	//bool GetLicenseMessageList(LicensingMessageList &message_list);
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
 	bool ModuleLicenseTotal(long module, long* license_count);
@@ -83,7 +80,7 @@ private:
 	
 	HANDLE m_MessageDispatchThread;
 	static DWORD WINAPI MessageDispatchThreadProc(LPVOID pWrapper);
-	HRESULT MessageDispatchThreadProc();
+	HRESULT MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages);
 	
 	HANDLE m_LicenseValidityThread;
 	static DWORD WINAPI LicenseValidityThreadProc(LPVOID pWrapper);
@@ -96,8 +93,7 @@ private:
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
 
-	ISolimarLicenseMgr4Ptr pLicenseManager;
-	ILicensingMessagePtr pLicenseManagerMessages;	
+	GITPtr<ISolimarLicenseMgr4> m_licenseManagerPtr;
 
 	std::wstring StringToWstring(const std::string &s);
 };
