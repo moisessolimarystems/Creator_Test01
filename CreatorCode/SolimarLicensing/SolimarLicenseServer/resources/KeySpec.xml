@@ -523,7 +523,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="0"	offset="0x08c" bits="4" name="APPC" pool="128"/>
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
 				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
-				<Module id="8"	offset="0x0ac" bits="4" name="Docserver Job Event"/>
+				<Module id="8"	offset="0x0ac" bits="4" name="IConvert Job Event"/>
 				<Module id="9"	offset="0x0a8" bits="4" name="IPDS::2dBarCodes"/>
 				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
 				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
@@ -680,10 +680,10 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="28"	offset="0x09F" bits="1" name="SMART" unlimited="1"/>
 				<Module id="29"	offset="0x09E" bits="1" name="Tape Input" unlimited="1"/>
 				<Module id="30"	offset="0x09D" bits="1" name="TCP/IP lpr Input" unlimited="1"/> 
-				<Module id="31"	offset="0x09C" bits="1" name="TCP/IP lpd Output" pool="240" unlimited="1"/> 
+				<Module id="31"	offset="0x09C" bits="1" name="TCP/IP lpd Output" unlimited="1"/> 
 				
 				<Module id="32"	offset="0x0A3" bits="1" name="Trash Can" unlimited="1"/>
-				<Module id="33"	offset="0x0A2" bits="1" name="Windows Printer Spooler" pool="240" unlimited="1"/>
+				<Module id="33"	offset="0x0A2" bits="1" name="Windows Printer Spooler" unlimited="1"/>
 				<Module id="34"	offset="0x0A1" bits="1" name="XCHANGE::IPDS" unlimited="1"/> 
 				<Module id="35"	offset="0x0A0" bits="1" name="XCHANGE::Metacode" unlimited="1"/> 
 				
