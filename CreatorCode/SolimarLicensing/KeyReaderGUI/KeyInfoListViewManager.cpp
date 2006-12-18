@@ -81,13 +81,13 @@ bool KeyInfoListViewManager::PopulateView()
 
 		//extract the first byte
 		//12 = 3 Bytes * sizeof(BYTE) = 3*4
-		int MajorVersion = ((int)TheKeyInfoStructure.ProductVersion) >> 12;
+		int MajorVersion = TheKeyInfoStructure.ProductVersion.lVal >> 12;
 
-		//extract the last three bytes
-		int MinorVersion = ((int)TheKeyInfoStructure.ProductVersion) & 0x0fff;
-		//int MinorVersion = (int)((((((int)TheKeyInfoStructure.ProductVersion) & 0x0F00) >> 8) * 10) + (((((int)TheKeyInfoStructure.ProductVersion) & 0x00F0) >> 4) * 1));
+		//extract the last three bytes but drop the last unused byte
+		int MinorVersion = (TheKeyInfoStructure.ProductVersion.lVal & 0x0fff) >> 4;
 
-		sprintf(ProductVersion, "%x.%x", MajorVersion, MinorVersion);
+		//%x hexadecimal integer format
+		sprintf(ProductVersion, "%x.%02x", MajorVersion, MinorVersion);
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
@@ -202,6 +202,7 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 //Fills a row with the info in the key info structure
 bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
+	bool bRetVal = false;
 	ListViewItem*  listViewItem1 = new ListViewItem();
 	listViewItem1->Text = TheKeyInfoStructure.KeyNumber.bstrVal;
 	
@@ -209,18 +210,24 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductVersion.bstrVal);
 	listViewItem1->SubItems->Add(TheKeyInfoStructure.License.bstrVal);
 
-	if(TheKeyInfoStructure.Active.intVal == 0)
-		listViewItem1->SubItems->Add(S"0");
-
+	if(TheKeyInfoStructure.Active.intVal == 0) 
+		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u2212"));
+		listViewItem1->SubItems->Add(S"-"); 
 	else
-		listViewItem1->SubItems->Add(S"1");
-
-	char retval[10];
+		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u002B")); 
+		listViewItem1->SubItems->Add(S"+"); 
 
    //Convert the hours left into Days Left as requested by Tech Support
     TheKeyInfoStructure.HoursLeft /= 24;
-	sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
-	listViewItem1->SubItems->Add(retval);
+	//Permanent Key
+	if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
+		listViewItem1->SubItems->Add(S"Unlimited");
+	else
+	{	
+		char retval[10];
+		sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
+		listViewItem1->SubItems->Add(retval);
+	}
 
 	//Convert from UTC time to Local time.
 	SYSTEMTIME st;
@@ -235,14 +242,23 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 
 	if(TheKeyInfoStructure.ExpirationDate)
 	{
-		listViewItem1->SubItems->Add(utc_t.ToString());
+		//Permanent Key
+		if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
+			listViewItem1->SubItems->Add(S"Unlimited");
+		else	
+			listViewItem1->SubItems->Add(utc_t.ToString());
+
 		ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     	__mcTemp__2[0] = listViewItem1;
 		this->TheKeyListView->Items->AddRange(__mcTemp__2);
-		return true;
+		bRetVal = true;
 	}
-	else
-	{
-		return false;
-	}
+	return bRetVal;
+}
+
+String* KeyInfoListViewManager::UnicodeStrToString(String* uniStr)
+{
+	UnicodeEncoding* unicode = new UnicodeEncoding();
+	Byte encodedBytes[] = unicode -> GetBytes(uniStr);
+	return unicode->GetString(encodedBytes);
 }
