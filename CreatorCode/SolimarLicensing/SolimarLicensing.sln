@@ -1,5 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManager", "SolimarLicenseManager\SolimarLicenseManager.vcproj", "{59F6B038-5173-4A62-A866-BC1B5826CFFF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
@@ -11,81 +10,90 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManagerPS", "
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServer", "SolimarLicenseServer\SolimarLicenseServer.vcproj", "{DD791949-C013-44C7-9044-0BD21F9AAB50}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServerPS", "SolimarLicenseServer\SolimarLicenseServerPS.vcproj", "{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MessageFile", "MessageFile\MessageFile.vcproj", "{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicenseTestClient", "LicenseTestClient\LicenseTestClient.vcproj", "{0FBD940B-1D34-4B74-BDCF-58453FFA522E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F111B110-0EAD-4C55-8F25-39253546B137}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PasswordEntry", "PasswordEntry\PasswordEntry.vcproj", "{1A69B8D3-AC33-408F-838F-BAEE741C9688}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicenseViewer", "LicenseViewer\LicenseViewer.vcproj", "{5F5BE48E-3B16-4370-89E6-16B4A7EBEF78}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyReaderGUI", "KeyReaderGUI\KeyReaderGUI.vcproj", "{96F6EB14-80CB-4235-B86C-81A4FE4EF255}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MessageFile", "MessageFile\MessageFile.vcproj", "{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Debug|x64 = Debug|x64
-		Release|Win32 = Release|Win32
-		Release|x64 = Release|x64
-		SolimarInternalRelease|Win32 = SolimarInternalRelease|Win32
-		SolimarInternalRelease|x64 = SolimarInternalRelease|x64
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug|Win32.Build.0 = Debug|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug|x64.ActiveCfg = Debug|x64
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug|x64.Build.0 = Debug|x64
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release|Win32.ActiveCfg = Release|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release|Win32.Build.0 = Release|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release|x64.ActiveCfg = Release|x64
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release|x64.Build.0 = Release|x64
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.SolimarInternalRelease|Win32.Build.0 = Release|Win32
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-		{71098209-3D45-442A-820A-787C94065CFA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{71098209-3D45-442A-820A-787C94065CFA}.Debug|x64.ActiveCfg = Debug|x64
-		{71098209-3D45-442A-820A-787C94065CFA}.Release|Win32.ActiveCfg = Release|Win32
-		{71098209-3D45-442A-820A-787C94065CFA}.Release|x64.ActiveCfg = Release|x64
-		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Debug|Win32.ActiveCfg = Debug|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Debug|Win32.Build.0 = Debug|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Debug|x64.ActiveCfg = Debug|x64
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Release|Win32.ActiveCfg = Release|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Release|Win32.Build.0 = Release|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Release|x64.ActiveCfg = Release|x64
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|Win32.ActiveCfg = SolimarInternalRelease|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|Win32.Build.0 = SolimarInternalRelease|Win32
-		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|x64.ActiveCfg = SolimarInternalRelease|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|x64.ActiveCfg = Debug|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Win32.ActiveCfg = Release|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|x64.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Debug|x64.ActiveCfg = Debug|x64
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Release|Win32.ActiveCfg = Release|Win32
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Release|x64.ActiveCfg = Release|x64
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.SolimarInternalRelease|Win32.Build.0 = Release|Win32
-		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|Win32.ActiveCfg = Debug|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|Win32.Build.0 = Debug|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|x64.ActiveCfg = Debug|x64
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Release|Win32.ActiveCfg = Release|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Release|Win32.Build.0 = Release|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Release|x64.ActiveCfg = Release|x64
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.SolimarInternalRelease|Win32.Build.0 = Release|Win32
-		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}
+	EndGlobalSection
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+		SolimarInternalRelease = SolimarInternalRelease
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug.ActiveCfg = Debug|Win32
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Debug.Build.0 = Debug|Win32
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release.ActiveCfg = Release|Win32
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.Release.Build.0 = Release|Win32
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{59F6B038-5173-4A62-A866-BC1B5826CFFF}.SolimarInternalRelease.Build.0 = Release|Win32
+		{71098209-3D45-442A-820A-787C94065CFA}.Debug.ActiveCfg = Debug|Win32
+		{71098209-3D45-442A-820A-787C94065CFA}.Release.ActiveCfg = Release|Win32
+		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Debug.ActiveCfg = Debug|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Debug.Build.0 = Debug|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Release.ActiveCfg = Release|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.Release.Build.0 = Release|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease.ActiveCfg = SolimarInternalRelease|Win32
+		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease.Build.0 = SolimarInternalRelease|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug.ActiveCfg = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{0FBD940B-1D34-4B74-BDCF-58453FFA522E}.Debug.ActiveCfg = Debug|Win32
+		{0FBD940B-1D34-4B74-BDCF-58453FFA522E}.Release.ActiveCfg = Release|Win32
+		{0FBD940B-1D34-4B74-BDCF-58453FFA522E}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{0FBD940B-1D34-4B74-BDCF-58453FFA522E}.SolimarInternalRelease.Build.0 = Release|Win32
+		{1A69B8D3-AC33-408F-838F-BAEE741C9688}.Debug.ActiveCfg = Debug|Win32
+		{1A69B8D3-AC33-408F-838F-BAEE741C9688}.Release.ActiveCfg = Release|Win32
+		{1A69B8D3-AC33-408F-838F-BAEE741C9688}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{1A69B8D3-AC33-408F-838F-BAEE741C9688}.SolimarInternalRelease.Build.0 = Release|Win32
+		{5F5BE48E-3B16-4370-89E6-16B4A7EBEF78}.Debug.ActiveCfg = Debug|Win32
+		{5F5BE48E-3B16-4370-89E6-16B4A7EBEF78}.Release.ActiveCfg = Release|Win32
+		{5F5BE48E-3B16-4370-89E6-16B4A7EBEF78}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{5F5BE48E-3B16-4370-89E6-16B4A7EBEF78}.SolimarInternalRelease.Build.0 = Release|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug.ActiveCfg = Debug|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug.Build.0 = Debug|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Release.ActiveCfg = Release|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Release.Build.0 = Release|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.SolimarInternalRelease.Build.0 = Release|Win32
+		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Debug.ActiveCfg = Debug|Win32
+		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.Release.ActiveCfg = Release|Win32
+		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.SolimarInternalRelease.ActiveCfg = Release|Win32
+		{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}.SolimarInternalRelease.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionItems) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
 	EndGlobalSection
 EndGlobal
