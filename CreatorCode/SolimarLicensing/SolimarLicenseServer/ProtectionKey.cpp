@@ -118,6 +118,18 @@ const BYTE ProtectionKey::predefined_queries[8][5] =
 };
 
 
+void OutputFormattedDebugString(const wchar_t *fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+	wchar_t buf[1024];
+	memset(buf, 0, sizeof(buf));
+	_vsnwprintf(buf, 1024, fmt, list);
+	OutputDebugStringW(buf);
+}
+
+
+
 ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0)
 {
 	;
@@ -591,6 +603,7 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 		//Only decrement counter if license count is not unlimited and not key status is not initial_trial
 		if(module.isCounter && !LicenseIsUnlimited(module.id) && key_status != INITIAL_TRIAL)
 		{
+			hr = S_OK;
 			if(module.fn_read(ReadModuleCache(module.id).ulVal) >= module.counter+license_count)
 			{
 				module.counter+=license_count;
@@ -666,17 +679,6 @@ HRESULT ProtectionKey::Format(BSTR *new_key_ident)
 	return S_OK;
 }
 
-
-
-void OutputFormattedDebugString(const wchar_t *fmt, ...)
-{
-	va_list list;
-	va_start(list, fmt);
-	wchar_t buf[1024];
-	memset(buf, 0, sizeof(buf));
-	_vsnwprintf(buf, 1024, fmt, list);
-	OutputDebugStringW(buf);
-}
 
 
 // Programs a key
@@ -1140,7 +1142,9 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 					// SolSearcher legacy code
 					if (product_id==8)
 					{
-						if (EnterSolSearcherModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
+						// The solsearcher specific (legacy) password for modules {0,1,2,3,4}
+						// any future modules should be handled by the default/generic case
+						if (password_arguments.module <= 4 && EnterSolSearcherModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
 							return S_OK;
 					}
 					// SolScript legacy code (based on SPD keys for older modules)
