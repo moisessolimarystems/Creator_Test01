@@ -699,7 +699,10 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          //keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
 
          keyMaster->applyModZeroPassword(key_record, detail, units+1);
-         if (key_record->pkey->productId >= RUBIKA_PRODUCT)
+
+         //All products using the new licensing scheme will need their units incremented by 1
+         if (key_record->pkey->productId >= RUBIKA_PRODUCT ||
+            (key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT))
                 units++;
 
          keyMaster->getModulePassword((key_record->pkey),
@@ -707,7 +710,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                        static_cast<ProductId>(key_record->pkey->productId),
                                        key_record->pkey->productVersion,
                                        units,
-                                       key_record->incrementPasswordNumber(),                                       
+                                       key_record->incrementPasswordNumber(),
                                        password_string
                                       );
       }
@@ -723,8 +726,9 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       {
          keyMaster->applyModPassword(key_record, detail, units+1);
 
-
-         if (key_record->pkey->productId >= RUBIKA_PRODUCT) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
+         //All products using the new licensing scheme will need their units incremented by 1
+         if (key_record->pkey->productId >= RUBIKA_PRODUCT ||
+             key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
                 units++;                                         //so need to increment units to pass to license server.
 
          //keyMaster->getModulePassword((SpdProtectionKey*)(key_record->pkey),

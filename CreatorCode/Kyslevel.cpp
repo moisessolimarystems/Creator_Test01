@@ -480,6 +480,7 @@ unsigned short SKeyRecord::incrementPasswordNumber()
           case SPDE_PRODUCT :
           case RUBIKA_PRODUCT :
           case SDX_DESIGNER_PRODUCT :
+          case SOLSEARCHER_ENTERPRISE_PRODUCT :
                value = ++passwordNumber;
                break;
           case ICONVERT_PRODUCT :
