@@ -1373,18 +1373,24 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
    if (key_record->non_perm_ktf == true)
         return;
 
+
    SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
       // zero out all modules except those that are default
-   ModuleDetail** ppModuleDetail = lookup->getModuleList(key_record->pkey->productId);
-   for (int mod_idx(0);mod_idx<64; mod_idx++) {
-         if(ppModuleDetail[mod_idx]->name != "{ Not Used }") {
-             if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
-                 ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) )
-                spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->max);
-             else
-                spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, 0);
-         }
+   if(key_record->pkey->productId != XIMAGENT_PRODUCT &&
+      key_record->pkey->productId != XIMAGE_PRODUCT) {
+      ModuleDetail** ppModuleDetail = lookup->getModuleList(key_record->pkey->productId);
+
+      for (int mod_idx(0);mod_idx<64; mod_idx++) {
+          if(ppModuleDetail[mod_idx]->name != "{ Not Used }") {
+              if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
+                  ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) )
+                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->max);
+              else
+                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, 0);
+          }
+      }
    }
+
 
    switch(key_record->pkey->productId) {
        case SPD_PRODUCT:
