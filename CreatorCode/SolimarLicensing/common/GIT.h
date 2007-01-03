@@ -147,6 +147,59 @@ public:
 		return *this;
 	}
 
+	/*
+	 * operator==
+	 * Compare NULL
+	 */
+    bool operator==(int null) 
+    {
+        if (null != 0) 
+		{
+            _com_issue_error(E_POINTER);
+        }
+		SafeMutex lock(m_hXLockMut);
+        return m_cookie == 0;
+    }
+
+	/* 
+	 * CreateInstance()
+     * Creates locally typed interface for the provided CLSID.
+	 */
+    HRESULT CreateInstance(const CLSID& rclsid, IUnknown* pOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
+    {
+		Interface* pInterface = 0;		
+		HRESULT hr = CoCreateInstance(
+			rclsid, 
+			pOuter, 
+			dwClsContext, 
+			__uuidof(Interface), 
+			reinterpret_cast<void**>(&pInterface));
+		if (SUCCEEDED(hr)) 
+			Attach(pInterface);		
+		return hr;
+    }
+
+    /*
+	 * QueryInterface()
+	 * Allows for GITPtr output param.
+	 */
+	template<typename _OtherIIID> HRESULT QueryInterface(const IID& iid, GITPtr<_OtherIIID>& p)
+	{
+		Interface* pItf;
+		HRESULT hr = CopyTo(&pItf);
+		if (SUCCEEDED(hr))
+		{
+			_OtherIIID* pOtherItf = NULL;
+			hr = pItf->QueryInterface(iid, reinterpret_cast<void**>(&pOtherItf));
+			pItf->Release();
+			if (SUCCEEDED(hr))
+			{
+				hr = p.Attach(pOtherItf);
+			}
+		}
+		return hr;	
+	}
+
 private:
 
 	HANDLE m_hXLockMut;
