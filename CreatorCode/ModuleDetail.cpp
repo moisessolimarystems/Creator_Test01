@@ -701,9 +701,21 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          keyMaster->applyModZeroPassword(key_record, detail, units+1);
 
          //All products using the new licensing scheme will need their units incremented by 1
-         if (key_record->pkey->productId >= RUBIKA_PRODUCT ||
-            (key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT))
-                units++;
+         switch(key_record->pkey->productId)
+         {
+             case SPDE_PRODUCT :
+             case RUBIKA_PRODUCT :
+             case SDX_DESIGNER_PRODUCT :
+             case SOLSEARCHER_ENTERPRISE_PRODUCT :
+                 units++;
+                 break;
+             case ICONVERT_PRODUCT :
+                 if(key_record->pkey->productVersion > 0x9050)
+                     units++;
+                 break;
+             default :
+                 break;
+         }
 
          keyMaster->getModulePassword((key_record->pkey),
                                        detail->id,
@@ -727,9 +739,21 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          keyMaster->applyModPassword(key_record, detail, units+1);
 
          //All products using the new licensing scheme will need their units incremented by 1
-         if (key_record->pkey->productId >= RUBIKA_PRODUCT ||
-             key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) //all products from RUBIKA on, dont follow the input 0 units receive 1 unit password
-                units++;                                         //so need to increment units to pass to license server.
+         switch(key_record->pkey->productId)
+         {
+             case SPDE_PRODUCT :
+             case RUBIKA_PRODUCT :
+             case SDX_DESIGNER_PRODUCT :
+             case SOLSEARCHER_ENTERPRISE_PRODUCT :
+                 units++;
+                 break;
+             case ICONVERT_PRODUCT :
+                 if(key_record->pkey->productVersion > 0x9050)
+                     units++;
+                 break;
+             default :
+                 break;
+         }                                        //so need to increment units to pass to license server.
 
          //keyMaster->getModulePassword((SpdProtectionKey*)(key_record->pkey),
          keyMaster->getModulePassword((key_record->pkey),
