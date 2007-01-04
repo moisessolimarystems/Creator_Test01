@@ -1453,7 +1453,7 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 				if (SUCCEEDED(hr)) 
 				{
 					licenses_released+=key_licenses_to_release; 
-					k->second.licenses_allocated[module_id]+=key_licenses_to_release;
+					k->second.licenses_allocated[module_id]-=key_licenses_to_release;
 				}
 				
 				// if the key no longer has any licenses obtained on it, try to release it and unlock it where necessary
