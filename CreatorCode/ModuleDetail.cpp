@@ -1602,7 +1602,7 @@ void __fastcall TModuleFrame::mmIncrementCounterClick(TObject *Sender)
         return;
    ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
    pDlg->EnableCounter(true);
-   pDlg->SetCounterUnits(detail->counterUnit);
+   pDlg->SetCounterUnits(detail->counterUnit, detail->max);
    if (pDlg->ShowModal()==IDYES)
       createCounterPassword(pDlg->GetUnits(), true);
    pDlg->EnableCounter(false);
