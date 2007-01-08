@@ -1480,7 +1480,7 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 	return false;
 }
 
-// SPD/iConvert specific	
+// SPD/iConvert/SOLscript specific	
 bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, bool base_key, bool permanent_allowed_key, unsigned short customer_number, unsigned short key_number, unsigned int module_id, unsigned int units_licensed)
 {
 	HRESULT hr = S_OK;
@@ -1496,7 +1496,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 	unsigned int mod_units_licensed = (units_licensed==0 ? 0 : units_licensed-1);	
 	if (GetSPDModulePassword(customer_number, key_number, module_id, mod_units_licensed) == user_password)
 	{
-		if (trial_key)
+		if (trial_key && permanent_allowed_key)
 		{
 			// the password is for a trial key -> activate the algorithm,
 			// initialize licensing, and set status to BASE
