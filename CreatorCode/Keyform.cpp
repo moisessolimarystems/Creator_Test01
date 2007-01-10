@@ -1464,6 +1464,27 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
          PasswordQuery->Open();
          PasswordQuery->First();
          PasswordQuery->EnableControls();
+         //Restrict Password Packets for Legacy Passwords
+         //Spdnt, iCvt(below 9.06), SDX/SSE(below 3.00), Ximage
+         switch(key_record->pkey->productId)
+         {
+              case SPDE_PRODUCT :
+              case RUBIKA_PRODUCT :
+              case SOLSCRIPT_PRODUCT :
+                   ArchiveBtn->Enabled = true;
+              case SDX_DESIGNER_PRODUCT :
+              case SOLSEARCHER_ENTERPRISE_PRODUCT :
+                   if(key_record->pkey->productVersion > 0x2190)
+                        ArchiveBtn->Enabled = true;
+                   break;
+              case ICONVERT_PRODUCT :
+                   if(key_record->pkey->productVersion > 0x9050)
+                        ArchiveBtn->Enabled = true;
+                   break;
+              default :
+                   ArchiveBtn->Enabled = false;
+                   break;
+         }
          break;
    }
 
@@ -1481,11 +1502,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
 void __fastcall TFCustomerKeys::setOutputUnitsDisplay(unsigned short outputs)
 {
    unsigned short units;
-/*   if(key_record->pkey->productId == SPDE_PRODUCT)
-         units = (static_cast<SpdeProtectionKey*>(key_record->pkey)->getOutputUnits());
-   else
-*/
-         units = (static_cast<SpdProtectionKey*>(key_record->pkey)->getOutputUnits());
+   units = (static_cast<SpdProtectionKey*>(key_record->pkey)->getOutputUnits());
 
    output_devices->Text = units;
    if (key_record->pkey->productId != ICONVERT_PRODUCT)
@@ -2395,6 +2412,14 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
       UtilityQuery->ExecSQL();
 
+      UtilityQuery->Close();
+      UtilityQuery->SQL->Clear();
+      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      UtilityQuery->Prepare();
+      UtilityQuery->ExecSQL();
+
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
       UtilityQuery->ParamByName("key_id")->AsInteger = key_record->skr_id;
       UtilityQuery->ParamByName("password")->AsString = password_string;
@@ -2403,7 +2428,7 @@ void TFCustomerKeys::createOutputPassword(int output_units)
       if(key_record->pkey->productId == SPDE_PRODUCT)
               UtilityQuery->ParamByName("descriptionid")->AsInteger = 5240;
       else
-               UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
+              UtilityQuery->ParamByName("descriptionid")->AsInteger = (key_record->pkey->productId == ICONVERT_PRODUCT) ? 301 : 300;
       UtilityQuery->ExecSQL();
 
       Database1->Commit();
@@ -2462,6 +2487,14 @@ void TFCustomerKeys::createOperatorSessionPassword(int operator_sessions)
 
       UtilityQuery->ParamByName("operator_units")->AsInteger = spde_key->getOperatorSessionUnits();
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
+      UtilityQuery->ExecSQL();
+
+      UtilityQuery->Close();
+      UtilityQuery->SQL->Clear();
+      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
@@ -2528,6 +2561,14 @@ void TFCustomerKeys::createUserSessionPassword(int user_sessions)
 
       UtilityQuery->ParamByName("user_units")->AsInteger = spde_key->getUserSessionUnits();
       UtilityQuery->ParamByName("keyId")->AsInteger = key_record->skr_id;
+      UtilityQuery->ExecSQL();
+
+      UtilityQuery->Close();
+      UtilityQuery->SQL->Clear();
+      UtilityQuery->SQL->Add("Update SKeyRecord set SKRpasswordNumber = :value where SKRid= :skr_id");
+      UtilityQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
+      UtilityQuery->ParamByName("value")->AsInteger = key_record->passwordNumber;
+      UtilityQuery->Prepare();
       UtilityQuery->ExecSQL();
 
       UtilityQuery->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
