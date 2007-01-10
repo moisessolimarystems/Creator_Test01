@@ -11,6 +11,7 @@ const int CREATOR_VERSION = 0x226;
 
 #include "CLookups.h"
 #include "CustomerForm.h"
+#include <Registry.hpp>
 
 //Globals
 KeyMaster *keyMaster;
@@ -36,7 +37,6 @@ char* TCustForm::sort_type[] =
    NULL,
 };
 
-
 //==============================================================================
 // Fuction:     TCustForm
 // Purpose:     Constructor
@@ -46,8 +46,21 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
 {
    KeyGridPtr = NULL;
    QueryDialog = NULL;
-
+   TRegistry *Registry;
    resetScroll = true;
+
+   try
+   {
+       Registry = new TRegistry(KEY_READ);
+       Registry->RootKey = HKEY_LOCAL_MACHINE;
+       if(!Registry->OpenKey("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease", false))
+       {
+          Application->MessageBox("The Solimar Internal Server Is Not Installed", "Key Message", MB_OK|MB_ICONERROR );
+          Application->Terminate();
+       }
+   }
+   __finally { delete Registry; }
+
    keyMaster = new KeyMaster();
    keyMaster->initDriver();
 
@@ -64,15 +77,12 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
    try
    {
       CFdatabase->Connected = true;
-
       //CLookup uses Database1 connection
       lookup = new CLookup();
-
 
       //set permissions for currrent user
       SetPermissions();
       SetCustomerForm();
-      ///initializeVersionLookup();
 
       //check version of creator
       UtilityQuery1->Close();
@@ -97,12 +107,11 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
 
    //if login was not successful terminate application
    if(LOGIN == false )
-   	Application->Terminate();
+      Application->Terminate();
 
    //set pagecontrol size and then initialize
    AttachedKeyModuleFrame->Height = 229;
    AttachedKeyModuleFrame->Width = 392;
-   //AttachedKeyModuleFrame->initialize(MODE_1, SPD_PRODUCT); // Default
 }
 
 
