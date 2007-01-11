@@ -8,7 +8,7 @@
 #include "..\common\TimeHelper.h"
 #include "..\common\EventLogHelper.h"
 #include "..\common\LicensingMessage.h"
-#include "..\SolimarLicenseServer\KeyError.h"
+#include "..\common\LicenseError.h"
 #include "..\SolimarLicenseServer\KeyMessages.h"
 #include "resource.h"
 #include <string>
@@ -437,7 +437,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 		return E_INVALIDARG;
 
 	if(GracePeriodHasStarted())
-		return E_FAIL;
+		return LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 
 	SafeMutex mutex(ServerListLock);
 	
@@ -450,8 +450,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 	if (FAILED(hr) || licensing_valid==VARIANT_FALSE) 
 		m_allocated_licenses[module_id] -= count;
 
-	if (FAILED(hr)) return hr;
-	return (licensing_valid == VARIANT_TRUE ? S_OK : E_FAIL);
+	return (licensing_valid == VARIANT_TRUE ? S_OK : hr);
 }
 
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count)
@@ -576,7 +575,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 	long* pSerialNumber;
 	hr = SafeArrayAccessData(pvtSerialNumberList->parray, (void**)&pSerialNumber);
 	if(FAILED(hr))
-		return E_FAIL;
+		return hr;
 
 	if(serialNumberList.size())
 	{
@@ -607,7 +606,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 
 	if(GracePeriodHasStarted())
 	{
-		return E_FAIL;
+		return LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 	}
 
 	SafeMutex mutex(ServerListLock);
@@ -615,7 +614,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 	// perform the license allocation
 	VARIANT_BOOL licensing_valid = VARIANT_FALSE;
 	hr = ValidateLicenseInternal(&licensing_valid, false);
-	if (FAILED(hr) || licensing_valid==VARIANT_FALSE) 
+	if (SUCCEEDED(hr) && licensing_valid==VARIANT_FALSE) 
 		hr = E_FAIL;
 
 	long licenseToDecrement = license_count;
@@ -891,7 +890,7 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 	_bstr_t str_timestamp = vtStrTimestamp.bstrVal;
 	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
 	//xxx implement GetErrorMessage such that it returns the right error message?
-	str_error_message = GetErrorMessage(error).c_str();
+	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
 	switch (message_type)
 	{
 	case MT_INFO:
@@ -1262,7 +1261,7 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 	for (ModuleLicenseMap::iterator module = outstanding_licenses.begin(); module != outstanding_licenses.end(); ++module)
 	{
 		if (module->second>0)
-		{
+		{	
 			hr = ObtainLicensesInternal(module->first, module->second);
 			if (FAILED(hr)) 
 			{
@@ -1384,7 +1383,7 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 			}
 		}
 	}
-	return (licenses_obtained == licenses_to_obtain ? S_OK : E_FAIL);
+	return (licenses_obtained == licenses_to_obtain ? S_OK : LicenseServerError::EHR_LICENSE_INSUFFICIENT);
 }
 
 // attempts to deallocate licenses on keys that have 

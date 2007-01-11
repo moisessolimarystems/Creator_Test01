@@ -1,5 +1,5 @@
 #include "ProtectionKey.h"
-#include "KeyError.h"
+#include "..\common\LicenseError.h"
 #include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
 #include "..\common\SafeMutex.h"

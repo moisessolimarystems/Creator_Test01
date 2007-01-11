@@ -4,7 +4,7 @@
 #endif
 
 #include "KeyServer.h"
-#include "KeyError.h"
+#include "..\common\LicenseError.h"
 
 #include <string>
 #include <vector>
@@ -117,20 +117,23 @@ KeyServer::~KeyServer()
 
 HRESULT KeyServer::ResynchronizeKeys()
 {
-	OutputDebugStringW(L"KeyServer::ResynchronizeKeys() -- Enter");	
+//OutputDebugStringW(L"KeyServer::ResynchronizeKeys() - Enter");
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
-		SafeMutex mutex2(KeyListLock);		
+		SafeMutex mutex2(KeyListLock);
 		SafeMutex mutex1(driver.keys_lock);
 		driver.RefreshKeyList();
 		if(driver.AtLeastOneParallelKey())
 			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 		
+		
 		// first pass, add newly found keys
 		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
 		{
 			if (keys.find(dkey->first)==keys.end())
+			{
 				keys.insert(KeyList::value_type(dkey->first,ProtectionKey(dkey->first,&keyspec,&driver)));
+			}
 		}
 		
 		// second pass, remove keys that are no longer reported by the driver
@@ -157,7 +160,7 @@ HRESULT KeyServer::ResynchronizeKeys()
 			}
 		}
 	} // release the lock on the driver's key list
-	OutputDebugStringW(L"KeyServer::ResynchronizeKeys() -- Leave");	
+//OutputDebugStringW(L"KeyServer::ResynchronizeKeys() - Leave");
 	return hr;
 }
 
@@ -215,7 +218,11 @@ HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 	VariantInit(keylist);
 	
 	SafeMutex mutex(KeyListLock);
-	
+
+wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
+//debug_buf[1023] = 0;
+//OutputDebugStringW(debug_buf);
 	SAFEARRAY *pSA = SafeArrayCreateVector(VT_VARIANT, 0, (unsigned int)keys.size());
 	VARIANT *pElement = 0;
 	hr = SafeArrayAccessData(pSA, (void**)&pElement);
@@ -227,6 +234,10 @@ HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 			VariantInit(pElement);
 			pElement->vt = VT_BSTR;
 			pElement->bstrVal = i->first.copy();
+//_snwprintf(debug_buf, 1024, L"KeyServer::KeyEnumerate keyName = %s", pElement->bstrVal);
+//debug_buf[1023] = 0;
+//OutputDebugStringW(debug_buf);
+
 		}
 		SafeArrayUnaccessData(pSA);
 		
@@ -236,6 +247,7 @@ HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 	
 	if (FAILED(hr))
 	{
+//OutputDebugStringW(L"KeyServer::KeyEnumerate - Failed");
 		SafeArrayDestroy(pSA);
 	}
 	
@@ -833,6 +845,10 @@ HRESULT KeyServer::KeyIsProgrammed(BSTR key_ident, VARIANT_BOOL *key_programmed)
 
 HRESULT KeyServer::KeyHeaderQuery(BSTR key_ident, long header_ident, VARIANT *value)
 {
+wchar_t debug_buf1[1024];
+//_snwprintf(debug_buf1, 1024, L"KeyServer::KeyHeaderQuery Enter - key_ident = %s, header_ident = %d", key_ident, header_ident);
+//debug_buf1[1023] = 0;
+//OutputDebugStringW(debug_buf1);
 	SafeMutex mutex(KeyListLock);
 	// find the key in the key list
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
@@ -1196,7 +1212,7 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	_bstr_t str_timestamp;
 	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
 	
-	str_error_message = GetErrorMessage(error).c_str();
+	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
 	
 	// convert the date in to a string
 	char cstr_timestamp[256];
@@ -1223,7 +1239,7 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	
 	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
 	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
-	WriteEventLog(event_log_msg, event_type);
+	LicenseServerError::WriteEventLog(event_log_msg, event_type);
 	
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
