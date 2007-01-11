@@ -1,639 +1,248 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="7.10"
 	Name="SolimarLicenseServer"
 	ProjectGUID="{DD791949-C013-44C7-9044-0BD21F9AAB50}"
 	RootNamespace="SolimarLicenseServer"
-	Keyword="AtlProj"
-	>
+	Keyword="AtlProj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
-		<Platform
-			Name="x64"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/Fx"
+				Optimization="0"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				MinimalRebuild="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="4"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				AdditionalOptions="/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:libcmt.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:msvcrtd.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
+				LinkIncremental="2"
+				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
+				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
-				GenerateStublessProxies="true"
+				GenerateStublessProxies="TRUE"
 				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
 				HeaderFileName="SolimarLicenseServer.h"
 				DLLDataFileName=""
 				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
+				ProxyFileName="SolimarLicenseServer_p.c"/>
 			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/Fx"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
-			/>
+				Name="VCPostBuildEventTool"
+				Description="Performing registration"
+				CommandLine="&quot;$(TargetPath)&quot; /RegServer"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
-				LinkIncremental="2"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="1"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCWebDeploymentTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-				ExcludedFromBuild="false"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
-				HeaderFileName="SolimarLicenseServer.h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/Fx"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
-				LinkIncremental="2"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-				ExcludedFromBuild="true"
-			/>
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)\Image"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="0"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				AdditionalOptions="/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
+				LinkIncremental="1"
+				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
+				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
-				GenerateStublessProxies="true"
+				GenerateStublessProxies="TRUE"
 				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
 				HeaderFileName="SolimarLicenseServer.h"
 				DLLDataFileName=""
 				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
+				ProxyFileName="SolimarLicenseServer_p.c"/>
 			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
+				Name="VCPostBuildEventTool"
+				Description="Performing registration"
+				CommandLine="&quot;$(TargetPath)&quot; /RegServer"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
-				LinkIncremental="1"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="1"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCWebDeploymentTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer&#x0D;&#x0A;cp $(InputDir)_$(InputName).tlb $(OutDir)"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
-				HeaderFileName="SolimarLicenseServer.h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
-				LinkIncremental="1"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-				ExcludedFromBuild="false"
-			/>
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="SolimarInternalRelease|Win32"
 			OutputDirectory="$(SolutionDir)\Image\SolimarInternalRelease"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCCLCompilerTool"
+				Optimization="4"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="0"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCLinkerTool"
+				IgnoreImportLibrary="TRUE"
+				AdditionalOptions="/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
+				LinkIncremental="1"
+				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
+				MkTypLibCompatible="FALSE"
 				TargetEnvironment="1"
-				GenerateStublessProxies="true"
+				GenerateStublessProxies="TRUE"
 				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
 				HeaderFileName="SolimarLicenseServer.h"
 				DLLDataFileName=""
 				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
+				ProxyFileName="SolimarLicenseServer_p.c"/>
 			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
+				Name="VCPostBuildEventTool"
+				Description="Performing registration"
+				CommandLine="&quot;$(TargetPath)&quot; /RegServer"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
-				LinkIncremental="1"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="1"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCWebDeploymentTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-			/>
-		</Configuration>
-		<Configuration
-			Name="SolimarInternalRelease|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfATL="1"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
-				TargetEnvironment="3"
-				GenerateStublessProxies="true"
-				TypeLibraryName="$(IntDir)/SolimarLicenseServer.tlb"
-				HeaderFileName="SolimarLicenseServer.h"
-				DLLDataFileName=""
-				InterfaceIdentifierFileName="SolimarLicenseServer_i.c"
-				ProxyFileName="SolimarLicenseServer_p.c"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="4"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
-				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
-				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
-				LinkIncremental="1"
-				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-			/>
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -642,256 +251,177 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\common\apctimer.cpp"
-				>
+				RelativePath="..\common\apctimer.cpp">
 			</File>
 			<File
-				RelativePath="..\common\ChallengeResponse.cpp"
-				>
+				RelativePath="..\common\ChallengeResponse.cpp">
 			</File>
 			<File
-				RelativePath="..\common\ChallengeResponseHelper.cpp"
-				>
+				RelativePath="..\common\ChallengeResponseHelper.cpp">
 			</File>
 			<File
-				RelativePath="..\common\CryptoHelper.cpp"
-				>
+				RelativePath="..\common\CryptoHelper.cpp">
 			</File>
 			<File
-				RelativePath=".\KeyServer.cpp"
-				>
+				RelativePath=".\KeyServer.cpp">
 			</File>
 			<File
-				RelativePath=".\KeyServerInstance.cpp"
-				>
+				RelativePath=".\KeyServerInstance.cpp">
 			</File>
 			<File
-				RelativePath=".\KeySpec.cpp"
-				>
+				RelativePath=".\KeySpec.cpp">
 			</File>
 			<File
-				RelativePath=".\resources\KeySpec.xml"
-				>
+				RelativePath=".\resources\KeySpec.xml">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
+						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py
+"
 						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
+						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|x64"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
+						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py
+"
 						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
+						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="SolimarInternalRelease|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
+						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py
+"
 						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
-						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="SolimarInternalRelease|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
-						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="SolimarInternalRelease|x64"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="python.exe .\resources\KeySpecXMLCompiler.py&#x0D;&#x0A;"
-						AdditionalDependencies=".\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py"
-						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"
-					/>
+						Outputs=".\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\common\LicenseError.cpp"
-				>
+				RelativePath="..\common\LicenseError.cpp">
 			</File>
 			<File
-				RelativePath="..\common\LicensingMessage.cpp"
-				>
+				RelativePath="..\common\LicensingMessage.cpp">
 			</File>
 			<File
-				RelativePath="..\common\MultidimensionalSafeArray.cpp"
-				>
+				RelativePath="..\common\MultidimensionalSafeArray.cpp">
 			</File>
 			<File
-				RelativePath=".\ProtectionKey.cpp"
-				>
+				RelativePath=".\ProtectionKey.cpp">
 			</File>
 			<File
-				RelativePath=".\RainbowDriver.cpp"
-				>
+				RelativePath=".\RainbowDriver.cpp">
 			</File>
 			<File
-				RelativePath="..\common\SafeMutex.cpp"
-				>
+				RelativePath="..\common\SafeMutex.cpp">
 			</File>
 			<File
-				RelativePath=".\SolimarLicenseServer.cpp"
-				>
+				RelativePath=".\SolimarLicenseServer.cpp">
 			</File>
 			<File
-				RelativePath=".\SolimarLicenseSvr.cpp"
-				>
+				RelativePath=".\SolimarLicenseSvr.cpp">
 			</File>
 			<File
-				RelativePath=".\USBNotification.cpp"
-				>
+				RelativePath=".\USBNotification.cpp">
 			</File>
 			<File
-				RelativePath="..\common\Version.cpp"
-				>
+				RelativePath="..\common\Version.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="..\common\apctimer.h"
-				>
+				RelativePath="..\common\apctimer.h">
 			</File>
 			<File
-				RelativePath="..\common\ChallengeResponse.h"
-				>
+				RelativePath="..\common\ChallengeResponse.h">
 			</File>
 			<File
-				RelativePath="..\common\ChallengeResponseHelper.h"
-				>
+				RelativePath="..\common\ChallengeResponseHelper.h">
 			</File>
 			<File
-				RelativePath="..\common\CryptoHelper.h"
-				>
+				RelativePath="..\common\CryptoHelper.h">
 			</File>
 			<File
-				RelativePath="..\common\IObjectAuthentication.h"
-				>
+				RelativePath="..\common\IObjectAuthentication.h">
 			</File>
 			<File
-				RelativePath=".\KeyMessages.h"
-				>
+				RelativePath=".\KeyMessages.h">
 			</File>
 			<File
-				RelativePath=".\KeyServer.h"
-				>
+				RelativePath=".\KeyServer.h">
 			</File>
 			<File
-				RelativePath=".\KeyServerInstance.h"
-				>
+				RelativePath=".\KeyServerInstance.h">
 			</File>
 			<File
-				RelativePath=".\KeySpec.h"
-				>
+				RelativePath=".\KeySpec.h">
 			</File>
 			<File
-				RelativePath="..\common\LicenseError.h"
-				>
+				RelativePath="..\common\LicenseError.h">
 			</File>
 			<File
-				RelativePath="..\common\LicensingMessage.h"
-				>
+				RelativePath="..\common\LicensingMessage.h">
 			</File>
 			<File
-				RelativePath="..\common\MultidimensionalSafeArray.h"
-				>
+				RelativePath="..\common\MultidimensionalSafeArray.h">
 			</File>
 			<File
-				RelativePath=".\ProtectionKey.h"
-				>
+				RelativePath=".\ProtectionKey.h">
 			</File>
 			<File
-				RelativePath=".\RainbowDriver.h"
-				>
+				RelativePath=".\RainbowDriver.h">
 			</File>
 			<File
-				RelativePath=".\Resource.h"
-				>
+				RelativePath=".\Resource.h">
 			</File>
 			<File
-				RelativePath="..\common\SafeMutex.h"
-				>
+				RelativePath="..\common\SafeMutex.h">
 			</File>
 			<File
-				RelativePath=".\SolimarLicenseSvr.h"
-				>
+				RelativePath=".\SolimarLicenseSvr.h">
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
-				>
+				RelativePath=".\stdafx.h">
 			</File>
 			<File
-				RelativePath="..\common\TimeHelper.h"
-				>
+				RelativePath="..\common\TimeHelper.h">
 			</File>
 			<File
-				RelativePath=".\USBNotification.h"
-				>
+				RelativePath=".\USBNotification.h">
 			</File>
 			<File
-				RelativePath="..\common\Version.h"
-				>
+				RelativePath="..\common\Version.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath=".\SolimarLicenseServer.rc"
-				>
+				RelativePath=".\SolimarLicenseServer.rc">
 			</File>
 			<File
-				RelativePath=".\SolimarLicenseServer.rgs"
-				>
+				RelativePath=".\SolimarLicenseServer.rgs">
 			</File>
 		</Filter>
 		<Filter
 			Name="Python Pre Compile"
-			>
+			Filter="">
 			<File
-				RelativePath=".\resources\KeySpecXMLCompiler.py"
-				>
+				RelativePath=".\resources\KeySpecXMLCompiler.py">
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
-			>
+			RelativePath=".\ReadMe.txt">
 		</File>
 	</Files>
 	<Globals>
