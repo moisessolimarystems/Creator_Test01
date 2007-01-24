@@ -12,12 +12,25 @@ template<class Interface>
 class AutoReleasePtr
 {
 public:
-	AutoReleasePtr(Interface* pItf) : m_pItf(pItf) {}
-	~AutoReleasePtr() { m_pItf->Release(); }
-	Interface* operator->() { return m_pItf; }
+	AutoReleasePtr(Interface* pItf) : 
+      m_pItf(pItf) 
+   {
+      ;
+   }
+	~AutoReleasePtr() 
+   { 
+      m_pItf->Release(); 
+   }
+	Interface* operator->() 
+   { 
+      return m_pItf; 
+   }
 private:
 	Interface* m_pItf;
-	AutoReleasePtr() {} // avoid misuse
+	AutoReleasePtr() 
+   {
+      ;
+   } // avoid misuse
 };
 
 /*
@@ -30,20 +43,20 @@ template<class Interface>
 class GITPtr 
 {
 public:
-	GITPtr(Interface* pItf) : m_cookie(0) 
+	GITPtr(Interface* pItf) : m_cookie(0), m_hXLockMut(INVALID_HANDLE_VALUE) 
 	{ 
 		m_hXLockMut = CreateMutex(NULL, FALSE, NULL);
 		Attach(pItf); 
 	}
-	GITPtr(int null) : m_cookie(0) 
+	GITPtr(int null) : m_cookie(0), m_hXLockMut(INVALID_HANDLE_VALUE)  
 	{
 		m_hXLockMut = CreateMutex(NULL, FALSE, NULL);
 	}
-	GITPtr() : m_cookie(0) 
+	GITPtr() : m_cookie(0), m_hXLockMut(INVALID_HANDLE_VALUE)  
 	{ 
 		m_hXLockMut = CreateMutex(NULL, FALSE, NULL); 
 	}
-	GITPtr(const GITPtr& r) : m_cookie(0)
+	GITPtr(const GITPtr& r) : m_cookie(0), m_hXLockMut(INVALID_HANDLE_VALUE) 
 	{
 		m_hXLockMut = CreateMutex(NULL, FALSE, NULL); 
 		*this = r;
@@ -51,8 +64,9 @@ public:
 
 	~GITPtr()
 	{
-		Revoke();
+		Revoke(); 
 		CloseHandle(m_hXLockMut);
+      m_hXLockMut = INVALID_HANDLE_VALUE ;
 	}
 
 	/*
@@ -66,27 +80,37 @@ public:
 	 */
 	HRESULT Attach(Interface* pItf)
 	{
+      SafeMutex lock(m_hXLockMut);
 		HRESULT hr;
 		hr = Revoke();
 		if (FAILED(hr))
-			return hr;
-
-		IGlobalInterfaceTable* pIGIT = NULL;
-		hr = CreateGIT(&pIGIT);
-		if (SUCCEEDED(hr))
-		{
-			{
+      {
+         OutputDebugStringW(L"\nGITPtr::Attach() - Revoke() failed.") ;
+      }
+      else
+      {
+		   IGlobalInterfaceTable* pIGIT = NULL;
+		   hr = CreateGIT(&pIGIT);
+         if (FAILED(hr))
+         {
+            OutputDebugStringW(L"\nGITPtr::Attach() - CreateGIT() failed.") ;
+         }
+		   else //if (SUCCEEDED(hr))
+		   {
+			   {
 				SafeMutex lock(m_hXLockMut);
 				hr = pIGIT->RegisterInterfaceInGlobal(
 					static_cast<IUnknown*>(pItf),
 					__uuidof(Interface),
 					&m_cookie);
-			}
-			pIGIT->Release();
-			if (SUCCEEDED(hr))
-				pItf->Release();
-		}
-
+			   }
+			   pIGIT->Release();
+			   if (FAILED(hr))
+            {
+               OutputDebugStringW(L"\nGITPtr::Attach() - pIGIT->RegisterInterfaceInGlobal() failed.") ;
+            }
+		   }
+      }
 		return hr;
 	}
 
@@ -98,29 +122,76 @@ public:
 	 */
 	HRESULT CopyTo(Interface** ppItf) const
 	{
+      SafeMutex lock(m_hXLockMut);
+      HRESULT hr(S_OK) ;
 		*ppItf = NULL;
 
 		IGlobalInterfaceTable* pIGIT = NULL;
-		HRESULT hr = CreateGIT(&pIGIT);
-		if (SUCCEEDED(hr))
-		{
-			{
-				SafeMutex lock(m_hXLockMut);
-				if (m_cookie)
-				{
-					hr = pIGIT->GetInterfaceFromGlobal(
-						m_cookie,
+      if (!m_cookie)
+      {  //
+         // Not a problem: copying an empty GITPtr object.
+         // Nothing needs to be done because *ppItf has already been set to NULL.
+         //
+         hr = S_FALSE ;
+      }
+      else
+      {
+		   hr = CreateGIT(&pIGIT);
+         if (FAILED(hr))
+         {
+            OutputDebugStringW(L"\nGITPtr::CopyTo() - CreateGIT() failed.") ;
+         }
+         else //if (SUCCEEDED(hr))
+		   {
+            try
+			   {
+				   SafeMutex lock(m_hXLockMut);
+
+               try
+               {
+               hr = pIGIT->GetInterfaceFromGlobal(
+						m_cookie, 
 						__uuidof(Interface),
 						(void**)ppItf);
-				}
-				else
-				{
-					hr = E_NOINTERFACE;
-				}
-			}
-			pIGIT->Release();
-		}
-
+               }
+               catch (...)
+               {
+                  wchar_t wcsMsg[128] ;
+                  _snwprintf(
+                     wcsMsg, sizeof(wcsMsg),
+                     L"\nGITPtr::CopyTo() - general exception while calling pIGIT->GetInterfaceFromGlobal() cookie(%08X)",
+                     m_cookie
+                     ) ;
+                  OutputDebugStringW(wcsMsg) ;
+                  hr = E_FAIL ;
+               }
+               if (FAILED(hr))
+               {
+                  wchar_t wcsMsg[128] ;
+                  _snwprintf(
+                     wcsMsg, sizeof(wcsMsg),
+                     L"\nGITPtr::CopyTo() - pIGIT->GetInterfaceFromGlobal() failed. hr(%08X), cookie(%08X)",
+                     hr,
+                     m_cookie
+                     ) ;
+                  OutputDebugStringW(wcsMsg) ;
+                }
+			   }
+            catch (...)
+            {
+               wchar_t wcsMsg[128] ;
+               _snwprintf(
+                  wcsMsg, sizeof(wcsMsg),
+                  L"\nGITPtr::CopyTo() - General exception caught hr(%08X) cookie(%08X)",
+                  hr,
+                  m_cookie
+                  ) ;
+               OutputDebugStringW(wcsMsg) ;
+               hr = E_FAIL ;
+            }
+			   pIGIT->Release();
+		   }
+      }
 		return hr;
 	}
 
@@ -129,8 +200,16 @@ public:
 	 */
 	AutoReleasePtr<Interface> operator->()
 	{
+      HRESULT hr(S_OK) ;
 		Interface* pItf = NULL;
-		CopyTo(&pItf);
+		hr = CopyTo(&pItf);
+      if (FAILED(hr))
+      {
+         OutputDebugStringW(L"\nGITPtr::operator->() - CopyTo() failed. Exception will be thrown.") ;
+         _com_error e(hr) ;
+         throw(e) ;
+      }
+      
 		return AutoReleasePtr<Interface>(pItf);
 	}
 
@@ -139,34 +218,49 @@ public:
 	 */
 	GITPtr& operator=(const GITPtr& r) 
 	{
+      SafeMutex lock(m_hXLockMut);
+      HRESULT hr(S_OK) ;
 		Interface* pItf = NULL;
-		if (SUCCEEDED(r.CopyTo(&pItf)))
+
+      hr = r.CopyTo(&pItf) ;
+      if (FAILED(hr))
+      {
+         OutputDebugStringW(L"\nGITPtr::operator=() - CopyTo() failed. Exception will be thrown.") ;
+      }
+      else if (pItf) //if (SUCCEEDED(hr))
 		{
-			Attach(pItf);
+			hr = Attach(pItf);
+         if (FAILED(hr))
+         {
+            OutputDebugStringW(L"\nGITPtr::operator=() - Attach() failed. Exception will be thrown.") ;
+         }
 		}
+
+      if (FAILED(hr))
+      {
+         _com_error e(hr) ;
+         throw(hr) ;
+      }
 		return *this;
 	}
 
 	/*
-	 * operator==
+	 * operator!=
 	 * Compare NULL
 	 */
-    bool operator==(int null) 
+    operator bool() const
     {
-        if (null != 0) 
-		{
-            _com_issue_error(E_POINTER);
-        }
-		SafeMutex lock(m_hXLockMut);
-        return m_cookie == 0;
+      return m_cookie!=0 ;
     }
+
 
 	/* 
 	 * CreateInstance()
-     * Creates locally typed interface for the provided CLSID.
+    * Creates locally typed interface for the provided CLSID.
 	 */
     HRESULT CreateInstance(const CLSID& rclsid, IUnknown* pOuter = NULL, DWORD dwClsContext = CLSCTX_ALL)
     {
+      SafeMutex lock(m_hXLockMut);
 		Interface* pInterface = 0;		
 		HRESULT hr = CoCreateInstance(
 			rclsid, 
@@ -174,8 +268,14 @@ public:
 			dwClsContext, 
 			__uuidof(Interface), 
 			reinterpret_cast<void**>(&pInterface));
-		if (SUCCEEDED(hr)) 
+		if (FAILED(hr))
+      {  
+         OutputDebugStringW(L"\nGITPtr::CreateInstance=() - CoCreateInstance() failed.") ;
+      }
+      else //if (SUCCEEDED(hr)) 
+      {
 			Attach(pInterface);		
+      }
 		return hr;
     }
 
@@ -185,16 +285,39 @@ public:
 	 */
 	template<typename _OtherIIID> HRESULT QueryInterface(const IID& iid, GITPtr<_OtherIIID>& p)
 	{
+      SafeMutex lock(m_hXLockMut);
 		Interface* pItf;
+      DWORD dwItfRefCount(0) ;
 		HRESULT hr = CopyTo(&pItf);
-		if (SUCCEEDED(hr))
+		if (FAILED(hr))
+      {  
+         OutputDebugStringW(L"\nGITPtr::CreateInstance() - CopyTo() failed.") ;
+      }
+		else if (!pItf)
+      {
+         hr = E_NOINTERFACE ;
+         OutputDebugStringW(L"\nGITPtr::CreateInstance() - CopyTo() failed.") ;
+      }
+      else //if (SUCCEEDED(hr))
 		{
 			_OtherIIID* pOtherItf = NULL;
 			hr = pItf->QueryInterface(iid, reinterpret_cast<void**>(&pOtherItf));
-			pItf->Release();
-			if (SUCCEEDED(hr))
+			dwItfRefCount = pItf->Release();
+         if (!dwItfRefCount)
+         {
+            OutputDebugStringW(L"\nDebug -> Refcount == 0") ;
+         }
+         if (FAILED(hr))
+         {
+            OutputDebugStringW(L"\nGITPtr::CreateInstance() - QueryInterface() failed.") ;
+         }
+         else // if (SUCCEEDED(hr))
 			{
 				hr = p.Attach(pOtherItf);
+            if (FAILED(hr))
+            {
+               OutputDebugStringW(L"\nGITPtr::CreateInstance() - Attach() failed.") ;
+            }
 			}
 		}
 		return hr;	
@@ -204,7 +327,6 @@ private:
 
 	HANDLE m_hXLockMut;
 	DWORD m_cookie;
-
 	/*
 	 * CreateGIT()
 	 *	Creates a GIT object.
@@ -227,20 +349,38 @@ private:
 	HRESULT Revoke()
 	{
 		HRESULT hr = S_OK;
-		IGlobalInterfaceTable* pIGIT;
-		hr = CreateGIT(&pIGIT);
-		if (SUCCEEDED(hr))
-		{
-			{
-				SafeMutex lock(m_hXLockMut);
-				if (m_cookie)
-				{
-					hr = pIGIT->RevokeInterfaceFromGlobal(m_cookie);
-				}
-				m_cookie = 0;
-			}
-			pIGIT->Release();
-		}
+
+      if (!m_cookie)
+      {  //
+         // Not a problem.
+         // No interface registered to revoke.
+         //
+      }
+      else
+      {
+		   IGlobalInterfaceTable* pIGIT(NULL) ;
+
+		   hr = CreateGIT(&pIGIT);
+         if (FAILED(hr))
+         {
+            OutputDebugStringW(L"\nGITPtr::Revoke() - CreateGIT() failed.") ;
+            SafeMutex lock(m_hXLockMut);
+            m_cookie = 0 ;
+         }
+         else //if (SUCCEEDED(hr))
+		   {
+			   {
+				   SafeMutex lock(m_hXLockMut);
+               hr = pIGIT->RevokeInterfaceFromGlobal(m_cookie);
+               if (FAILED(hr))
+               {
+                  OutputDebugStringW(L"\nGITPtr::Revoke() - RevokeInterfaceFromGlobal() failed.") ;
+               }
+				   m_cookie = 0;
+			   }
+			   pIGIT->Release();
+		   }
+      }
 		return hr;
 	}
 };
