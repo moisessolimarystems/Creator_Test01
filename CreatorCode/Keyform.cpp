@@ -25,6 +25,8 @@
 #include "keySearchDlg.h"
 #include "keyDateSearchDlg.h"
 
+
+
 #pragma link "ModuleDetail"
 #pragma link "SolSearcherEnterpriseDetails"
 #pragma resource "*.dfm"
@@ -1711,6 +1713,9 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
                BYTE* pData = 0;
                //Get the password packet and write it to the file
                hr = keyMaster->GetPasswordPacket(&vtPacket);
+               if(!SUCCEEDED(hr))
+                  Application->MessageBox("Failed to get password packet.", "Packet Error", MB_OK|MB_ICONERROR);
+
                if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
                {
                   DWORD bytes_written(0);
@@ -1719,11 +1724,17 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
                            vtPacket.parray->rgsabound[0].cElements, //size of array
                            &bytes_written,
                            0))
-                  hr = HRESULT_FROM_WIN32(::GetLastError());
+                  {
+                           hr = HRESULT_FROM_WIN32(::GetLastError());
+                           Application->MessageBox("Failed to write packet", "Write Error", MB_OK|MB_ICONERROR);
 
+                  }
                   SafeArrayUnaccessData(vtPacket.parray);
                   pData = 0;
                }
+               else
+                  Application->MessageBox("Failed to access packet data", "Write Error", MB_OK|MB_ICONERROR);
+
                //Get the verification code and store it in the DB
                hr = keyMaster->GetVerificationCode(&VerificationCode);
                //
@@ -1810,7 +1821,7 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
    BSTR bstrPassword;             //stores the BSTR version of the password
    BSTR VerificationCode;
    int PasswordBufSize = 0;
-   AnsiString CurrentDate;
+   AnsiString CurrentDate, ErrorMsg;
    HRESULT hr = 0;
 
    SYSTEMTIME CurrentTime;
@@ -1835,6 +1846,11 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
       try
       {
          hr = keyMaster->InitPasswordPacket();
+/*         if(SUCCEEDED(hr))
+         {
+             Application->MessageBox(ErrorMsg.sprintf("Failed to initialize password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
+         }
+*/
          tmpMark = PasswordQuery->GetBookmark();
          PasswordQuery->DisableControls();
 
@@ -1854,12 +1870,17 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                AnsiPassword.WideChar(wcharPassword, PasswordBufSize);
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
+           /*    if(!SUCCEEDED(hr))
+                   Application->MessageBox(ErrorMsg.sprintf("Failed to append password : %s to packet\nHResult = 0x%i",AnsiDescription.c_str(),hr).c_str(),"Error", MB_OK);
+           */
                SysFreeString(bstrPassword);
              }
              PasswordQuery->Next();
          }
          hr = keyMaster->FinalizePasswordPacket();
-
+         /*if(!SUCCEEDED(hr))
+             Application->MessageBox(ErrorMsg.sprintf("Failed to finalize password packet\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
+         */
          varTime.date -= days;    //remove the 2 years that was added before
 
          //create the filename
@@ -1881,7 +1902,7 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
          sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
 
          // Create the password packet file
-	      HANDLE hFile = CreateFile(FilePath,
+         HANDLE hFile = CreateFile(FilePath,
                                     GENERIC_WRITE,
                                     FILE_SHARE_WRITE,
                                     0,
@@ -1895,31 +1916,37 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
          }
 
          // create a variant safearray
-	 VARIANT vtPacket;
-	 VariantInit(&vtPacket);
+         VARIANT vtPacket;
+         VariantInit(&vtPacket);
          BYTE* pData = 0;
 
          //Get the password packet and write it to the file
          hr = keyMaster->GetPasswordPacket(&vtPacket);
-	      if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
-	      {
-		      DWORD bytes_written(0);
-		      if (!WriteFile(hFile,
-                           pData,
-                           vtPacket.parray->rgsabound[0].cElements, //size of array
-                           &bytes_written,
-                           0))
-		      {
-			      hr = HRESULT_FROM_WIN32(::GetLastError());
-		      }
+         if(!SUCCEEDED(hr))
+            Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
 
-		      SafeArrayUnaccessData(vtPacket.parray);
-		      pData = 0;
-	      }
+         if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
+         {
+               DWORD bytes_written(0);
+               if (!WriteFile(hFile,
+                    pData,
+                    vtPacket.parray->rgsabound[0].cElements, //size of array
+                    &bytes_written,
+                    0))
+               {
+                    hr = HRESULT_FROM_WIN32(::GetLastError());
+                    Application->MessageBox(ErrorMsg.sprintf("Failed to write packet data to file\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
+               }
+
+               SafeArrayUnaccessData(vtPacket.parray);
+               pData = 0;
+         }
 
          //Get the verification code and store it in the DB
          hr = keyMaster->GetVerificationCode(&VerificationCode);
-
+/*         if(!SUCCEEDED(hr))
+            Application->MessageBox(ErrorMsg.sprintf("Failed to get verification code\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
+*/
          //
          //Update database
          try
@@ -2266,7 +2293,6 @@ void __fastcall TFCustomerKeys::mmProgramClick(TObject *Sender)
          // key_record should contain all information needed to program key
          // if programming is successful update record information in the database
          // create temp. key to represent customer key
-//          if( keyMaster->found() )
          if( !keyMaster->programmed() && keyMaster->found() )
          {
             // key is attached and unprogrammed, program key and save action in database
