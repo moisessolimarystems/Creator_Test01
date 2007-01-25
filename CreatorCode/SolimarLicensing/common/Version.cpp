@@ -2,26 +2,24 @@
 #include <string>
 #include <stdio.h>
 #include <tchar.h>
+
 Version::ModuleVersion::ModuleVersion(std::wstring versionstr)
 {
 	long output[4]={0,0,0,0};
 	wchar_t *pToken;
-	wchar_t *pNextToken;
-	size_t sizeofVersionBuffer = versionstr.length()+1;
-	wchar_t *pVersionBuffer=new wchar_t[sizeofVersionBuffer];
-	
+	wchar_t *pVersionBuffer=new wchar_t[versionstr.length()+1];
 	
 	// copy the string so we can modify the copy using strtok
-	wcscpy_s(pVersionBuffer, sizeofVersionBuffer, versionstr.c_str());
+	wcscpy(pVersionBuffer,versionstr.c_str());
 	
 	// parse the string
 	unsigned int uiVersionCount=0;
-	pToken=wcstok_s(pVersionBuffer, L",. \t\n", &pNextToken);
+	pToken=wcstok(pVersionBuffer, L",. \t\n");
 	while (pToken!=NULL && uiVersionCount<4)
 	{
 		output[uiVersionCount]= _wtol(pToken);
 		++uiVersionCount;
-		pToken=wcstok_s(NULL,L",. \t\n", &pNextToken);
+		pToken=wcstok(NULL,L",. \t\n");
 	}
 	
 	major = output[0];
@@ -42,7 +40,7 @@ Version::ModuleVersion::ModuleVersion(const TinyVersion &t)
 std::wstring Version::ModuleVersion::ToString()
 {
 	wchar_t *versionstring=new wchar_t[64];
-	_snwprintf_s(versionstring, sizeof(versionstring)/sizeof(wchar_t), _TRUNCATE, L"%d.%d.%d.%d", major, minor, submajor, subminor);
+	_snwprintf(versionstring, 64, L"%d.%d.%d.%d", major, minor, submajor, subminor);
 	versionstring[63]=0;	// prevent string buffer overflows
 	return versionstring;
 }

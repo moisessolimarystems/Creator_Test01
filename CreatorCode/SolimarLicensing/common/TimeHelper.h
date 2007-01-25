@@ -32,15 +32,14 @@ public:
 		vtTimestamp.dblVal = 0.0;
 		SYSTEMTIME systimestamp;
 		memset(&systimestamp, 0, sizeof(systimestamp));
-		tm tm_struct;
-		gmtime_s(&tm_struct, &timestamp);
-		systimestamp.wSecond = tm_struct.tm_sec;
-		systimestamp.wMinute = tm_struct.tm_min;
-		systimestamp.wHour = tm_struct.tm_hour;
-		systimestamp.wDay = tm_struct.tm_mday;
-		systimestamp.wMonth = tm_struct.tm_mon + 1;
-		systimestamp.wYear = tm_struct.tm_year + 1900;
-		systimestamp.wDayOfWeek = tm_struct.tm_wday;
+		tm * tm_struct = gmtime(&timestamp);
+		systimestamp.wSecond = tm_struct->tm_sec;
+		systimestamp.wMinute = tm_struct->tm_min;
+		systimestamp.wHour = tm_struct->tm_hour;
+		systimestamp.wDay = tm_struct->tm_mday;
+		systimestamp.wMonth = tm_struct->tm_mon + 1;
+		systimestamp.wYear = tm_struct->tm_year + 1900;
+		systimestamp.wDayOfWeek = tm_struct->tm_wday;
 		SystemTimeToVariantTime(&systimestamp, &vtTimestamp.dblVal);
 		return vtTimestamp;
 	}
