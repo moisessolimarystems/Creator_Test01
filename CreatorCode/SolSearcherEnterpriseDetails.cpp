@@ -5,6 +5,8 @@
 
 #include "SetUnitsDlg.h"
 #include "SolSearcherEnterpriseDetails.h"
+#include "SSKey.h"
+
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -177,6 +179,9 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
    //
    // get new total of units licensed.
    TUnitsDlg *dlg = new TUnitsDlg(this, max);
+   //Concurrent User module needs to be in units of 25
+   if(type == CONCURRENT_USERS_25_CELL)
+       dlg->SetMinUnits(_25_UNITS_LICENSED_PER_CONCURRENT_USERS_25);
    dlg->Edit1->Text = min;
 
    if( dlg->ShowModal() == IDYES ) {
