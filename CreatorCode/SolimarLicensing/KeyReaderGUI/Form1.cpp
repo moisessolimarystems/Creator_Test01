@@ -400,6 +400,8 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 			PasswordValidater->ProcessPasswordFile(bstr_FileName);
 			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
     }
+	UpdateViews();
+	this->Refresh();
 }
 
 
