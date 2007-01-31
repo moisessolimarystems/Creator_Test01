@@ -182,6 +182,9 @@
 				RelativePath="..\SolimarLicenseServer\KeySpec.cpp">
 			</File>
 			<File
+				RelativePath="..\common\LicenseError.cpp">
+			</File>
+			<File
 				RelativePath="..\common\LicensingMessage.cpp">
 			</File>
 			<File
