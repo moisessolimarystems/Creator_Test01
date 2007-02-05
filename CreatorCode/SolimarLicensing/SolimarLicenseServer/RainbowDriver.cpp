@@ -60,7 +60,7 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 			// if the key is programmed
 			if (keynumber!=0 || customer!=0)
 			{
-				_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
+				_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
 				key_id[127]=0;
 				*physical_key_ident = _bstr_t(key_id).Detach();
 			}
@@ -89,7 +89,6 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 	return S_OK;
 }
 
-
 HRESULT RainbowDriver::RefreshKeyList()
 {
 //OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Enter");
@@ -112,6 +111,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 	// errors, we create a packet and call FindFirst/FindNext the appropriate
 	// number of times to get to that key. While ugly, this is the method
 	// recommended by Rainbow.
+
 	HRESULT hr = S_OK;
 	KeyList newkeys;
 	RBP_SPRO_APIPACKET packet = new RB_SPRO_APIPACKET;
@@ -121,6 +121,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproFormatPacket(packet, sizeof(RB_SPRO_APIPACKET)));
+	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproInitialize(packet));
 	if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
@@ -129,7 +130,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
 		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
 
-//wchar_t tmpBuf[256];
+wchar_t tmpBuf[256];
 //wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - RNBOsproSetContactServer() - hr = %x", hr);
 //OutputDebugStringW(tmpBuf);
 
@@ -236,7 +237,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 				// if key is programmed, use the key number and customer number as the key id
 				else
 				{
-					_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
+					_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
 //wsprintf(tmpBuf, L"Key Found: %s", key_id);
 //OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
@@ -453,28 +454,27 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 	// copy the password in to an editable buffer for use with strtok
 	unsigned int tokbuflen = min(password.length()+1,100);
 	wchar_t *tokbuf = new wchar_t[tokbuflen];
-	wcscpy_s(tokbuf, tokbuflen, (wchar_t*)password);
+	wcsncpy(tokbuf,(wchar_t*)password,tokbuflen-1);
 	tokbuf[tokbuflen-1]=0;
 	
-	wchar_t *pNextToken;
-	wchar_t* pass_txt = wcstok_s(tokbuf,L"- ", &pNextToken);
-	wchar_t* arg_txt = (pass_txt ? wcstok_s(NULL,L"- ",&pNextToken) : 0);
+	wchar_t* pass_txt = wcstok(tokbuf,L"- ");
+	wchar_t* arg_txt = (pass_txt ? wcstok(NULL,L"- ") : 0);
 	
 	if (pass_txt)
 	{
-		swscanf_s(pass_txt, L"%x", &arguments.password);
+		swscanf(pass_txt, L"%x", &arguments.password);
 	}
 	if (arg_txt)
 	{
 		unsigned int arg1_decimal, arg1_hex;
-		swscanf_s(arg_txt, L"%d", &arg1_decimal);
-		swscanf_s(arg_txt, L"%x", &arg1_hex);
+		swscanf(arg_txt, L"%d", &arg1_decimal);
+		swscanf(arg_txt, L"%x", &arg1_hex);
 		arguments.units_licensed = arg1_decimal;
 		arguments.pages_per_minute_struct = arg1_hex;
 		arguments.version = (unsigned short)arg1_hex;
 	}
 	
-	for (unsigned int extended_arg = 0; arg_txt = (arg_txt ? wcstok_s(NULL,L"- ",&pNextToken) : 0); ++extended_arg)
+	for (unsigned int extended_arg = 0; arg_txt = (arg_txt ? wcstok(NULL,L"- ") : 0); ++extended_arg)
 	{
 		arguments.legacy = false;
 		
@@ -486,11 +486,11 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 			break;
 		// customer number
 		case 1:
-			swscanf_s(arg_txt, L"%hx", &arguments.customer);
+			swscanf(arg_txt, L"%hx", &arguments.customer);
 			//arguments.customer=(unsigned short)_wtoi(arg_txt);
 			break;
 		case 2:
-			swscanf_s(arg_txt, L"%hx", &arguments.key);
+			swscanf(arg_txt, L"%hx", &arguments.key);
 			//arguments.key=(unsigned short)_wtoi(arg_txt);
 			break;
 		case 3:
@@ -513,15 +513,11 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 			case 2:
 				arguments.extend_num=(unsigned short)_wtoi(arg_txt);
 				break;
-			
-			case 4:	// module case
-			case 5:	// application instances case
+			// module case
+			case 4:
 				arguments.password_number=(unsigned int)_wtoi(arg_txt);
 				break;
 			}
-			break;
-		
-			
 			break;
 		default:
 			break;
