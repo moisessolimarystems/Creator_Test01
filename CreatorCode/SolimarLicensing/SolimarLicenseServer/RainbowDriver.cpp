@@ -1,5 +1,5 @@
 #include "RainbowDriver.h"
-#include "KeyError.h"
+#include "..\common\LicenseError.h"
 #include "..\common\SafeMutex.h"
 #include <objbase.h>
 
@@ -91,6 +91,7 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 
 HRESULT RainbowDriver::RefreshKeyList()
 {
+//OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Enter");
 	// DCM 12.nov.02 - In version 6.3 of the SuperPro libraries, Rainbow
 	// changed the way that the FindFirst/FindNext functions work. My opinion
 	// is that the new behavior is flawed, but Rainbow insists that this
@@ -123,6 +124,8 @@ HRESULT RainbowDriver::RefreshKeyList()
 	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproInitialize(packet));
+	if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
+		hr = TranslateRainbowError(RNBOsproCheckTerminalservice(packet, SP_TERM_SERV_CHECK_OFF));
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
 		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
@@ -138,16 +141,16 @@ wchar_t tmpBuf[256];
 	unsigned short retVal = RNBOsproFindFirstUnit(packet, DEVELOPER_ID);
 	if(retVal != 0)
 	{
-		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
-		//OutputDebugStringW(tmpBuf);
+//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
+//OutputDebugStringW(tmpBuf);
 	}
 
 	while(retVal == 0)
 	{
 		++key_count;
 		retVal = RNBOsproFindNextUnit(packet);
-		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindNextUnit() - retVal = %d", retVal);
-		//OutputDebugStringW(tmpBuf);
+//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindNextUnit() - retVal = %d", retVal);
+//OutputDebugStringW(tmpBuf);
 	}
 	
 	if (packet)
@@ -165,6 +168,10 @@ wchar_t tmpBuf[256];
 			hr = TranslateRainbowError(RNBOsproFormatPacket(keypacket, sizeof(RB_SPRO_APIPACKET)));
 		if (SUCCEEDED(hr))
 			hr = TranslateRainbowError(RNBOsproInitialize(keypacket));
+
+		if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
+			hr = TranslateRainbowError(RNBOsproCheckTerminalservice(keypacket, SP_TERM_SERV_CHECK_OFF));
+		
 		if (SUCCEEDED(hr))
 			TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_STANDALONE"));
 			//TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_SPN_LOCAL"));
@@ -231,8 +238,8 @@ wchar_t tmpBuf[256];
 				else
 				{
 					_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
-					//wsprintf(tmpBuf, L"Key Found: %s", key_id);
-					//OutputDebugStringW(tmpBuf);
+//wsprintf(tmpBuf, L"Key Found: %s", key_id);
+//OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
 					valid_key_id = true;
 				}
@@ -301,6 +308,7 @@ wchar_t tmpBuf[256];
 			newkeys.erase(newkeys.begin());
 		}
 	}
+//OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Leave");
 	return hr;
 }
 

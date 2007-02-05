@@ -516,6 +516,11 @@ typedef RB_WORD PROTOCOL_FLAG;
 #define MAX_NAME_LEN  64     // Maximum host name length
 #define MAX_ADDR_LEN  32     // Maximum host address length
 
+/*kapil Terminal Service flags*/
+
+#define SP_TERM_SERV_CHECK_OFF          0
+#define SP_TERM_SERV_CHECK_ON	        1
+
 /* Key Monitoring Information */
 
 typedef struct tag_nsproKeyMonitorInfo {
@@ -550,6 +555,10 @@ typedef struct {
 /***************************************************************************
 *                       Function Prototypes
 ****************************************************************************/
+
+SP_EXPORT SP_STATUS SP_API
+RNBOsproCheckTerminalservice(SP_OUT RBP_SPRO_APIPACKET thepacket ,
+							   SP_IN RB_WORD	 termserv);
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproFormatPacket( SP_OUT RBP_SPRO_APIPACKET thePacket,
