@@ -15,7 +15,7 @@
 
 // Include header files
     
-#include "ifx.h"           
+#include "ifx.h"
     
 ////////////////////// string defines //////////////////////////// 
 
@@ -38,15 +38,9 @@
 #endif
 #ifndef RES_DIALOG_SUBTITLE_MSG
 #define RES_DIALOG_SUBTITLE_MSG					711 // ID of Sub-Header Message
-#endif   
-#ifndef RES_DIALOG_CHBOX_README
-#define RES_DIALOG_CHBOX_README					501 // CheckBox for readme
-#endif
-#ifndef RES_DIALOG_CHBOX_LAUNCH
-#define RES_DIALOG_CHBOX_LAUNCH					502 // CheckBox for launch me
 #endif
 
-#define RES_SDFINISHCUSTOMDLG_DIALOG_ID			12032  // SdWelcomeMaintCustomDlg  
+#define RES_SDFINISHCUSTOMDLG_DIALOG_ID			30000  // SdWelcomeMaintCustomDlg  
 
 
 
@@ -54,7 +48,7 @@
 //////////////////// installation declarations ///////////////////
 
 // ----- DLL function prototypes -----
-//prototype cdecl LONG solstart.ProcessID(); 
+prototype cdecl LONG solstart.ProcessID(); 
 
 
 // ---- script function prototypes -----
@@ -79,8 +73,8 @@ end;
 //===== UNINSTALL Type Structure =====
 typedef UNINSTALLTYPE
 begin
-    BOOL AddRemove; 
-    BOOL RemoveAll;    
+    BOOL AddRemove;
+    BOOL Program;
 end;  
 
     // your script function prototypes
@@ -89,19 +83,16 @@ end;
     prototype CheckRequirements(); 
     prototype InstallLicensing(); 
     prototype InstallSentinelDriver();
-    //prototype InstallDotNet();
+    prototype InstallDotNet();
     
     // your global variables   
     BOOL        	bIsShellExplorer;
     STRING			szCmdLine;
     VARIANT			vDllString;   
     OSTYPE			gstructOSTYPE;
-    UNINSTALLTYPE 	gstructUNINSTALLTYPE;   
-    STRING      	gsvSetupType, gsvDir;  
-	BOOL			gboolAddRemove, gboolResume;         
+    UNINSTALLTYPE 	gstructUNINSTALLTYPE;
 
-       
-	STRING SETUPEXEDIR[MAX_PATH + 1];       
+
 //////////////////////////////////////////////////////////////////////////////
 //                                                                           
 //  FUNCTION:   SetupFolders                                            
@@ -296,7 +287,7 @@ begin
 	
     	if (nType = REMOVEALL) then  
     		bRemove = TRUE; 
-    		gstructUNINSTALLTYPE.RemoveAll = TRUE;
+    		gstructUNINSTALLTYPE.Program = TRUE;
 			svResult = SdLoadString(IFX_MAINTUI_MSG);
 			szCaption = SdLoadString(IFX_ONMAINTUI_CAPTION);
 			nResult = SprintfBox(MB_OKCANCEL,szCaption,"%s",svResult);
@@ -349,18 +340,36 @@ function OnBegin()
      STRING szAttributes, szDriverName, szMsg;
      NUMBER nvResult;
      NUMBER nProcessID;  
-     NUMBER nBuffer;
 begin        
-           
-    nBuffer = MAX_PATH + 1; // initialize size buffer before calling MsiGetProperty
-	MsiGetProperty(ISMSI_HANDLE, "SETUPEXEDIR", SETUPEXEDIR, nBuffer);
-	           
+       
     CheckRequirements(); 
-    gstructUNINSTALLTYPE.RemoveAll = FALSE;
-    gstructUNINSTALLTYPE.AddRemove = FALSE; 
-    gboolAddRemove = FALSE;   
-    gboolResume = FALSE;    
-    UNINSTALL_STRING = UNINSTALL_STRING + "UNINSTALL";                                                                                                                                                      
+    gstructUNINSTALLTYPE.Program = FALSE;
+    gstructUNINSTALLTYPE.AddRemove = FALSE;
+    UNINSTALL_STRING = UNINSTALL_STRING + "UNINSTALL";                                                                       
+                                                                            
+    // Get the processID for the setup, so the user doesn't have to restart.
+	UseDLL( SUPPORTDIR ^ "solstart.dll" );
+    vDllString = ProcessID(); 
+    UnUseDLL( SUPPORTDIR ^ "solstart.dll" ); 
+       
+       
+    // Get a reference to an BDE 5.1 object named "New BDE 5.1 Object 1".
+    set oObj = GetObject("New BDE 5.11 1");  
+    set oObj2 = GetObject("New ODBC 3.51 1");
+     
+    while( oObj.IsBDERunning() ) 
+         szMsg = "Borland Database Engine is running, please shutdown BDE.";
+         nvResult = SprintfBox( MB_RETRYCANCEL, "BDE in use", szMsg );
+         if( nvResult = 2 ) then
+             abort;
+         endif;
+    endwhile;  
+    
+    if(!MAINTENANCE) then 
+    	InstallDotNet();                                 
+    endif;
+	//Create the ODBC_SQLCreator bde key...                                     
+    //CreateODBC_SQLCreatorKey();         
 end;
  
  ///////////////////////////////////////////////////////////////////////////////
@@ -436,6 +445,11 @@ begin
 		
 	endif;         
     
+    // Now find out if we are on a Workstation and a Server
+    //if (gstructOSTYPE.IsWindows2000) then
+    //	CheckFor2000Workstation_Server();
+    //endif;      
+          
     // Ensure that we are only working on a Windows NT, 2000, or XP machine.
     if ( (gstructOSTYPE.IsWindowsNT351 || gstructOSTYPE.IsWindows95 || gstructOSTYPE.IsWindows98 || gstructOSTYPE.IsWindowsME) = TRUE ) then	
     	MessageBox(@PRODUCT_NAME + " can only be installed on a machine with a Windows NT 4.0 or a Windows 2000 platform.", SEVERE);		
@@ -476,7 +490,7 @@ function OnFirstUIAfter()
 begin
     Disable(STATUSEX);
 
-    //ShowObjWizardPages(NEXT);
+    ShowObjWizardPages(NEXT);
 
     SdShowMsg("Installing Solimar Licensing.....Please wait.", TRUE);
     InstallLicensing();   
@@ -484,14 +498,13 @@ begin
       
 	bOpt1  = FALSE;
     bOpt2  = TRUE;
-    szMsg2 = "Setup has finished installing Creator on your system.\n\nSetup can launch Creator if you wish.";                           
-    szOption2 = "Launch Creator";
+    szMsg2 = "Setup has finished installing Creator on your system.\n\nSetup can launch the Read Me file if you wish.";                           
+    szOption2 = "View Readme file";
     szMsg1 = SdLoadString(IFX_SDFINISH_MSG1);
     nResult = SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);   
-    if (bOpt2) then 
-        LaunchApp (TARGETDIR ^ "CreatorProject.exe",""); 
-    endif; 
-  	
+    if (bOpt2) then
+    	LaunchApp("notepad.exe", SUPPORTDIR ^ "readme.txt");
+  	endif;  
 end;
  
 ///////////////////////////////////////////////////////////////////////////////
@@ -511,21 +524,30 @@ function OnMaintUIAfter()
 begin
 	Disable(STATUSEX);
 
+    ShowObjWizardPages(NEXT);
  	bOpt1   = FALSE;
    	bOpt2   = FALSE;
    
-    if (gstructUNINSTALLTYPE.AddRemove) then
+ 	   
+    if ( gstructUNINSTALLTYPE.AddRemove ) then
     	szMsg1  = "Setup has finished removing " + @PRODUCT_NAME + " from your system.";
     	szTitle = "Uninstallation Complete.";
-    	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);	
-    elseif (!ADDREMOVE && gstructUNINSTALLTYPE.RemoveAll) then
+    	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
+    elseif ( gstructUNINSTALLTYPE.Program ) then
+        //szMsg1 =  "Setup has finished removing " + @PRODUCT_NAME + " from your system.\n\n" + 
+        //		  "You must restart Setup to upgrade your application.";
+		//szTitle = "Uninstallation Complete."; 
 		szMsg1 = "UNINSTALLATION COMPLETE\n\n\nPart I of the 'Remove and Upgrade' process has finished. The application has been removed.\n\nClick 'Upgrade' to restart setup and continue with the upgrade process.";
-		SdFinishCustomDlg(szMsg1);  		
+		SdFinishCustomDlg(szMsg1);  
 	else
 		szMsg1  = SdLoadString(IFX_SDFINISH_MAINT_MSG1);
     	szTitle = SdLoadString(IFX_SDFINISH_MAINT_TITLE);                       
     	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
-	endif; 
+	endif;
+	 
+	
+   	
+  
 end;
  
 ///////////////////////////////////////////////////////////////////////////////
@@ -543,7 +565,54 @@ function OnEnd()
 	OBJECT oObj, oObj2; 
 	STRING svArgument, szSourceDir, szOperatingSystem; 
 begin      
-
+	
+   	set oObj = GetObject("New BDE 5.11 1");
+   	if !IsEmpty(oObj) then
+        if oObj.Status.Number != OBJ_STATUS_SUCCESS then
+            MessageBox("BDE Object Error: " + oObj.Status.Description, SEVERE);
+            abort; 
+        endif;
+   	endif;    
+   
+   	set oObj2 = GetObject("New ODBC 3.51 1");
+   	if !IsEmpty(oObj2) then
+        if oObj2.Status.Number != OBJ_STATUS_SUCCESS then
+            MessageBox("ODBC Object Error: " + oObj2.Status.Description, SEVERE);
+            abort; 
+        endif;
+   	endif;       
+    
+    // Since there is a problem with the OpenProcess function in Windows98,
+	// I have put in a delay before the startup...a solution that is rarely used
+	// If 2000 or NT then we will wait for the process to finish
+	// otherwise we set a delay (rarely used).
+	/*
+	if (gstructOSTYPE.IsWindowsNT4 || gstructOSTYPE.IsWindows2000 || gstructOSTYPE.IsWindowsXP) then
+		szOperatingSystem = "WindowsNT2000";
+	else
+		szOperatingSystem = "NOTWindowsNT2000";
+	endif;
+	
+   
+   	szSourceDir = SRCDIR + "setup.exe";
+   	svArgument = vDllString + "," + szOperatingSystem + "," + szSourceDir;  
+    // Argument passed into setuputil.exe which will contain the
+	// PID, operating system type, and the source directory for setup.exe      
+    if ( (MAINTENANCE) && (gstructUNINSTALLTYPE.Program) && (!BATCH_INSTALL) ) then
+    	if (AskYesNo("Would you like to restart the setup?",YES) = YES) then     	
+    		if ((!gstructUNINSTALLTYPE.AddRemove) && (gstructUNINSTALLTYPE.Program)) then
+    			SdShowMsg("Setup will now restart...", TRUE);                              
+    			Delay(4);
+    		endif;
+        
+			if ((MAINTENANCE) && (gstructUNINSTALLTYPE.Program)) then  
+				SRCDIR = SRCDIR + "setuputil.exe";
+				LaunchApp(SRCDIR, svArgument);
+			endif; 			
+		endif; 
+	endif;
+	*/  
+ 
 end;
 
 //=============================================================================  
@@ -560,26 +629,15 @@ end;
 //=============================================================================
 function SdFinishCustomDlg (szMsg1)
     NUMBER  nvType, nvSize;   
-    STRING  szDialogName, szSourceDir, svArgument, szTitle, szButton;
+    STRING  szDialogName, szSourceDir, svArgument, szTitle;
     NUMBER  nDialog, nCmdValue; 
-    HWND    hwndDlg, hwndItem;
     BOOL    bDone;
 begin 
 	//
    	// Initialize variables to be used with this function...
    	szDialogName = "SdFinishCustomDlg";       
    	// Initialize the indicator used to control the while loop. 
-   	bDone = FALSE;  
-   	 	
-	if(gboolResume != TRUE) then
-   		szTitle = "UNINSTALLATION COMPLETE";
-   		szMsg1 = "Part I of the 'Remove and Upgrade' process has finished. The application has been removed.\n\nClick 'Upgrade' to restart setup and continue with the upgrade process.";    
-   		szButton = "Upgrade";
-   	else
-   		szTitle = "Resume Complete";
-   		szMsg1 = "Required tasks for the setup process have finished.\n\nClick 'Restart' to continue.";
-   		szButton = "Restart";
-   	endif;   	    
+   	bDone = FALSE;   	
    	    
    	//
    	// Define the dialog.  Pass a null string in the second parameter 
@@ -605,24 +663,9 @@ begin
        		case DLG_ERR: 
            		MessageBox ("Unable to display dialog. Setup canceled.", SEVERE);  
 	           	abort; 
-       		case DLG_INIT:    
-                hwndDlg = CmdGetHwndDlg( szDialogName );       		
+       		case DLG_INIT:
        			// Do some initialization                                             
-       			CtrlSetText  (szDialogName, RES_DIALOG_TITLE, szTitle);
-       			CtrlSetText  (szDialogName, RES_DIALOG_SUBTITLE_MSG, szMsg1); 
-       			CtrlSetText  (szDialogName, RES_PBUT_NEXT, szButton);     
-				//Disable Back Button
-				hwndItem = GetDlgItem( hwndDlg, RES_PBUT_BACK );
-				EnableWindow(hwndItem, FALSE);	
-                //Enable Cancel Button
-				hwndItem = GetDlgItem( hwndDlg, RES_PBUT_CANCEL);
-				EnableWindow(hwndItem, TRUE);	
-				//hide readme checkbox				
-			    hwndItem = GetDlgItem(hwndDlg, RES_DIALOG_CHBOX_README);
-				ShowWindow(hwndItem, SW_HIDE);  
-				//hide launch checkbox				
-			    hwndItem = GetDlgItem(hwndDlg, RES_DIALOG_CHBOX_LAUNCH);
-				ShowWindow(hwndItem, SW_HIDE);													       			  					
+       			CtrlSetText  (szDialogName, RES_DIALOG_TITLE, szMsg1);
        			bDone = FALSE;
     		case RES_PBUT_CANCEL:   // Click EXIT                                                  
            		// The user clicked the Cancel button.
@@ -630,33 +673,33 @@ begin
        		case RES_PBUT_NEXT:  	// Click FINISH       	
 				// Do something
 				bDone = TRUE;	
-					 		
-				if (BATCH_INSTALL) then   
-					szTitle = "Uninstallation Complete";
-					szMsg1 = "This installation requires you to reboot your machine.";
-					SdFinishReboot(szTitle, szMsg1, SYS_BOOTMACHINE, "", 0); 
-				endif;   				  
+				szSourceDir = SRCDIR; 
+				//szSourceDir = "\"" + szSourceDir + "setup.exe";
+				szSourceDir = szSourceDir + "setup.exe";	
+    			svArgument =vDllString + "," + szSourceDir; 
+    
+    			if ( (MAINTENANCE) && (gstructUNINSTALLTYPE.Program) && (!gstructUNINSTALLTYPE.AddRemove)&& (!BATCH_INSTALL) ) then
+    				SdShowMsg("Setup will now restart...", TRUE);                              
+    				Delay(4);
+  					SRCDIR = SRCDIR + "setuputil.exe";
+					LaunchApp(SRCDIR, svArgument);		
+				endif; 
+				
+				//if (BATCH_INSTALL) then   
+				//	szTitle = "Uninstallation Complete";
+				//	szMsg1 = "This installation requires you to reboot your machine.";
+				//  SdFinishReboot(szTitle, szMsg1, SYS_BOOTMACHINE, "", 0); 
+				//endif;     
    		endswitch;  	
    until bDone;
    //
    // Close the dialog box. 
    EndDialog (szDialogName);          
+     
    //
    // Free the dialog box from memory.
-   ReleaseDialog (szDialogName);
-   if(nCmdValue = RES_PBUT_NEXT) then
-    	if (((gstructUNINSTALLTYPE.RemoveAll) && (!gstructUNINSTALLTYPE.AddRemove)&& (!BATCH_INSTALL)) || (gboolResume)) then
-    			SdShowMsg("Setup will now restart...", TRUE);   
-				Delay(1); 
-				Disable(BACKGROUND);
-				Delay(1); 		
-				SdShowMsg("Setup will now restart...", FALSE); 		                    
-				if(LaunchApp(SETUPEXEDIR ^ "setup.exe", "") < 0) then					  				   					
-					MessageBox("Unable to restart setup. Please retry from source.", SEVERE);
-				endif;
-    	endif; 
-   endif;       
-      	
+   ReleaseDialog (szDialogName);   
+  	
 end;
 
 //=============================================================================
@@ -739,9 +782,39 @@ begin
    		LaunchAppAndWait(sentPath, sentOpts, WAIT);
 	endif;
 end;    
- 
 
-// --- include script file section ---       
+//=============================================================================  
+//
+// Function: 	InstallDotNet()
+// Purpose:   	This function will call the executable that will install the 
+//				latest sentinel drivers for the rainbow protection keys.
+// Parameters:	None
+// Returns:		None
+//
+//=============================================================================      
+function InstallDotNet()	
+	STRING szSubKey, svPath;
+	INT nvType, nvSize; 
+begin                   
+    
+    /*if (RegDBKeyExist (szSubKey) < 0) then
+		AskYesNo("Do you want to install the Microsoft .NET Framework? Components to be installed are dependent on the framework " +  
+	 	         "to function. Please install the .NET Framework found in the installation setup directory " + 
+	           	 "or from Microsoft.com", YES); 	
+    endif;
+    */
+    //check if .net framework is needed
+    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);                                                                       
+    szSubKey = "SOFTWARE\\Microsoft\\.NETFramework\\policy\\v1.1";
+    // If the path in the registry does not exist
+    if (RegDBKeyExist (szSubKey) < 0) then
+	//check if .net framework is installed
+		svPath = SRCDIR ^ "Common\\SolimarLicensing" ^ "dotnetfx.exe";
+		LaunchAppAndWait(svPath, "/t:" + SUPPORTDIR + "\\tmpnet /c", WAIT);
+		LaunchAppAndWait(WINSYSDIR ^ "msiexec", "/i " + SUPPORTDIR + "\\tmpnet\\netfx.msi",WAIT);
+	endif;
+end;    
 
+// --- include script file section ---
 
 
