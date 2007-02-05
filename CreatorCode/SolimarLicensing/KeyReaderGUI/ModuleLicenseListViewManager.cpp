@@ -87,12 +87,12 @@ void ModuleLicenseListViewManager::FillRow(ModuleLicensingStructure TheModuleLic
 	}
 	else
 	{
-		sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.TotalLicenses);
+		sprintf(retval, "%d", TheModuleLicStructure.TotalLicenses);
 		listViewItem1->SubItems->Add(retval);
 	}
 
 	//convert the licenses in use to a string and insert it as a subitem
-	sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.LicensesInUse);
+	sprintf(retval, "%d", TheModuleLicStructure.LicensesInUse);
 	listViewItem1->SubItems->Add(retval);
 
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
