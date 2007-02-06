@@ -516,7 +516,7 @@ void SpdProtectionKey::setLicense(ushort mod_offset, ushort mod_bits, ushort uni
 ---------------------------------------------------------------------------*/
 void SpdProtectionKey::setLicenses(ushort* buffer)
 {
-   memcpy( moduleCells, buffer, 32 );
+   memcpy( moduleCells, buffer, 36 );
 }
 
 
