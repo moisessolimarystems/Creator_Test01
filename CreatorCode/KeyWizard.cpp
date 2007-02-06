@@ -145,6 +145,16 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    delete key_record->pkey;
    key_record->pkey = pProtectionKey;
 
+   OutputUnits->Visible = false;
+   OutputEdit->Visible = false;
+   OutputLabel->Visible = false;
+   ConcurrentUnits->Visible = false;
+   ConcurrentEdit->Visible = false;
+   ConcurrentLabel->Visible = false;
+   NamedUnits->Visible = false;
+   NamedEdit->Visible = false;
+   NamedLabel->Visible = false;
+
    //based on the product set the avaible keyType
    if      (m_selectedProduct == SPD_PRODUCT       ||
             m_selectedProduct == CONNECT_PRODUCT   ||
@@ -160,6 +170,16 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       OutputEdit->Visible = true;
       OutputLabel->Visible = true;
 
+      if(m_selectedProduct == SPDE_PRODUCT)
+      {
+            ConcurrentUnits->Visible = true;
+            ConcurrentEdit->Visible = true;
+            ConcurrentLabel->Visible = true;
+            NamedUnits->Visible = true;
+            NamedEdit->Visible = true;
+            NamedLabel->Visible = true;
+      }
+
       if (m_selectedProduct == ICONVERT_PRODUCT)
          OutputLabel->Caption = "Max Number of LUs";
       else {
@@ -172,8 +192,6 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       }
 
       if (m_selectedProduct == 5) {
-         OutputUnits->Enabled = false;
-         OutputEdit->Enabled = false;
          SPD_LEGACY = true;
       }
       else {
@@ -205,9 +223,6 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
       m_bModules    = true;
       SelectModules->Visible = true;
 
-      OutputUnits->Visible = false;
-      OutputEdit->Visible = false;
-      OutputLabel->Visible = false;
       SPD_LEGACY = false;
    }
    else { //all other products
@@ -617,7 +632,12 @@ void TKeyWizardFrm::setModulePanelMembers()
    if(key_record->pkey->productId == SPD_PRODUCT ||
            key_record->pkey->productId == ICONVERT_PRODUCT ||
            key_record->pkey->productId == SPDE_PRODUCT)
-        ((SpdProtectionKey*)(key_record->pkey))->outputUnits = static_cast<unsigned short>(OutputEdit->Text.ToInt());
+        ((SpdProtectionKey*)(key_record->pkey))->setOutputUnits(static_cast<unsigned short>(OutputEdit->Text.ToInt()));
+   if(key_record->pkey->productId == SPDE_PRODUCT)
+   {
+        ((SpdeProtectionKey*)(key_record->pkey))->setOperatorSessionUnits(static_cast<unsigned short>(ConcurrentEdit->Text.ToInt()));
+        ((SpdeProtectionKey*)(key_record->pkey))->setUserSessionUnits(static_cast<unsigned short>(NamedEdit->Text.ToInt()));
+   }
 }
 
 //==============================================================================

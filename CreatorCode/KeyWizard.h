@@ -28,6 +28,7 @@
 #include <ImgList.hpp>
 #include "SolSearcherEnterpriseDetails.h"
 #include <DB.hpp>
+#include <Menus.hpp>
 #include <stack>
 
 //------------------------------------------------------------------------------
@@ -178,6 +179,12 @@ __published:	// IDE-managed Components
         TDataSource *PasswordDataSource;
    TPanel *SolSearcherEnterprisePanel;
    TSolSearcherDetails *TSolSearcherDetails1;
+        TLabel *ConcurrentLabel;
+        TLabel *NamedLabel;
+        TMaskEdit *ConcurrentEdit;
+        TMaskEdit *NamedEdit;
+        TUpDown *ConcurrentUnits;
+        TUpDown *NamedUnits;
         void __fastcall BackBtnClick(TObject *Sender);
         void __fastcall NextBtnClick(TObject *Sender);
         void __fastcall ProductComboBoxChange(TObject *Sender);
