@@ -686,6 +686,11 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
                WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
                WizardModuleFrame->load(key_record, true);
                OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->getOutputUnits();
+               if(m_selectedProduct == SPDE_PRODUCT)
+               {
+                   ConcurrentUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->getOperatorSessionUnits();
+                   NamedUnits->Position = ((SpdeProtectionKey*)(key_record->pkey))->getUserSessionUnits();
+               }
             ///}
 
             //enable NextBtn - user is not required to make any chages
