@@ -219,7 +219,7 @@ HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 	
 	SafeMutex mutex(KeyListLock);
 
-wchar_t debug_buf[1024];
+//wchar_t debug_buf[1024];
 //_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
 //debug_buf[1023] = 0;
 //OutputDebugStringW(debug_buf);
@@ -1190,6 +1190,7 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 {
 	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
+	
 	_variant_t vtTimestamp;
 	
 	// convert the time_t in to a variant date
@@ -1209,6 +1210,7 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	else
 		vtTimestamp = _variant_t(0.0, VT_DATE);
 	
+	/*
 	_bstr_t str_timestamp;
 	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
 	
@@ -1223,13 +1225,37 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	{
 	case MT_INFO:
 		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n%s\r\nKey: %s\r\n\r\n%s",
-			str_timestamp,
+			str_timestamp.GetBSTR(),
 			key_ident,
 			message);
 		break;
 	case MT_ERROR:
 		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n%s\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			str_timestamp,
+			str_timestamp.GetBSTR(),
+			key_ident,
+			error,
+			str_error_message,
+			message);
+		break;
+	}
+	*/
+
+
+	//Ignore Timedate stamp for writing to event log, unnecessary because event log
+	//keeps track of Timedate anyways.
+	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
+	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
+	
+	// convert the date in to a string
+	switch (message_type)
+	{
+	case MT_INFO:
+		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
+			key_ident,
+			message);
+		break;
+	case MT_ERROR:
+		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
 			key_ident,
 			error,
 			str_error_message,

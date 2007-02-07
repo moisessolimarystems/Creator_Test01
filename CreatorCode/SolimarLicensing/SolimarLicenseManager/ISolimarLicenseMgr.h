@@ -3,8 +3,25 @@
 #pragma once
 #include "resource.h"       // main symbols
 
+//#ifndef UI_IGNORE
+enum
+{
+	UI_IGNORE =				0x00,
+	UI_LEVEL_ALL =			0x01,
+	UI_LEVEL_RESPONSE =		0x02,
+	UI_LEVEL_CRITICAL =		0x04,
+	UI_STYLE_DIALOG =		0x10,
+	UI_STYLE_EVENT_LOG =	0x20,
+};
+
+//#endif
+
+
 #ifndef __ISolimarLicenseMgr_INTERFACE_DEFINED__
 #define __ISolimarLicenseMgr_INTERFACE_DEFINED__
+
+
+
 
 
 // ISolimarLicenseMgr
@@ -14,6 +31,7 @@
 	dual,	helpstring("ISolimarLicenseMgr Interface"),
 	pointer_default(unique)
 ]
+
 __interface ISolimarLicenseMgr : IDispatch
 {
 	// Connects to a key monitor server.
