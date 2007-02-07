@@ -18,6 +18,7 @@
 #include <comutil.h>
 #include <vector>
 #include <map>
+#include <list>
 
 #include "..\common\InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
@@ -196,6 +197,7 @@ private:
 
 		ModuleLicenseMap licenses_total;
 		ModuleLicenseMap licenses_allocated;
+		ModuleLicenseMap licenses_inuse;
 		
 		bool KeyPresent;
 		bool KeyActive;
@@ -279,7 +281,10 @@ private:
 	LicensingMessageList licensing_message_cache;
 	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
+	typedef std::map<_bstr_t,bool> KeyIdentList;	
+
 	bool ManagesKey(_bstr_t key_ident);
+	bool ProductKey(_bstr_t key_ident);
 	
 	APCTimer *HeartbeatThread;
 	static void HeartbeatThreadFunction(void* pvThis);
@@ -287,6 +292,8 @@ private:
 	
 	KeySpec m_keyspec;
 	ServerList m_servers;
+	KeyIdentList m_productkeys;
+
 	bool m_single_key, m_lock_keys, m_initialized;	
 	_bstr_t m_specific_single_key_ident;
 	_bstr_t m_current_single_key;
