@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "SaveConfigurations.h"
 
-
 const char* RegistryAddress = "SOFTWARE\\Solimar\\Solimar Licensing\\Key License Manager";
-
 using namespace SaveConfig;
 
 //Constructor. 
@@ -208,7 +206,7 @@ void SaveConfigurations::LoadModListConfig(ModuleGUIConfigurationStructPtr TheMo
 		TheModConfigStructPtr->width = -1;
 		return;
 	}
-	
+
 	//convert the string* to a char*
 	System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(retval));
 	RegValue = (static_cast<char *>(static_cast<void *>(ptr)));
@@ -383,17 +381,36 @@ void SaveConfigurations::LoadSplitterConfig(int* width, int* height,
 	*y_coord = atoi(token);
 }
 
+
 void SaveConfigurations::InitRegKeyEditing()
 {
-	pRegKey = Registry::CurrentUser->CreateSubKey(RegistryAddress);
+	try
+	{
+		pRegKey = Registry::CurrentUser->CreateSubKey(RegistryAddress);
+	}
+	catch(Exception* e)
+	{
+		pRegKey = NULL;
+	}
 }
-
+#undef MessageBox
 void SaveConfigurations::WriteRegKey(String* name, Object* value)
 {
-	pRegKey->SetValue(name, value); 
+	try
+	{
+		if(pRegKey)
+			pRegKey->SetValue(name, value); 
+	}
+	catch(Exception* e)
+	{
+		MessageBox::Show(MainForm, "Failed to Write Configuration to Registry", "Registry Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
+	}
 }
 
 Object* SaveConfigurations::ReadRegKey(String* name)
 {
-	return pRegKey->GetValue(name);
+	if(pRegKey)
+		return pRegKey->GetValue(name);
+
+	return NULL;
 }

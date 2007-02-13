@@ -32,17 +32,14 @@ const int Deactivated = 11;
 
 using namespace KeyViewManager;
 
+#undef MessageBox
 KeyInfoListViewManager::KeyInfoListViewManager(ListView* KeyInfoListView)
 			:TheKeyListView(KeyInfoListView)
 {
 	//new up a commlink object
 	OurCommLink = new CommunicationLink();
-
-	//connect to the solimar license server
-	OurCommLink->Connect();
-
-	//initializes the commlink object to be KeyInfo connection 
-	OurCommLink->InitializeKeyInfoConnection();
+	if(!OurCommLink)
+		return;
 }
 
 KeyInfoListViewManager::~KeyInfoListViewManager()
@@ -58,6 +55,21 @@ KeyInfoListViewManager::~KeyInfoListViewManager()
 		TheModViewManager = NULL;
 	}
 
+}
+
+bool KeyInfoListViewManager::Connect()
+{	
+	if(OurCommLink)
+	{
+			//connect to the solimar license server
+		if(SUCCEEDED(OurCommLink->Connect()))
+		{
+			//initializes the commlink object to be KeyInfo connection 
+			if(SUCCEEDED(OurCommLink->InitializeKeyInfoConnection()))
+				return true;
+		}
+	}
+	return false;
 }
 
 bool KeyInfoListViewManager::PopulateView()

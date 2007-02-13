@@ -31,6 +31,7 @@ namespace KeyReaderGUI
 	using namespace SizeControl;
 	using namespace SaveConfig;
 
+
 	/// <summary> 
 	/// Summary for Form1
 	///
@@ -112,7 +113,9 @@ namespace KeyReaderGUI
 	void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e);
   	void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e);
 	void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e);
-	void Form1_Closing(Object* sender, EventArgs* e);
+	void Form1::Form1_Closing(Object* sender, EventArgs* e);
+	
+	System::Void Form1_Load(System::Object *  sender, System::EventArgs *  e);
 
 	//method that runs when the Timer is signaled
 	void TimerEventProcessor(Object* myObject, EventArgs* myEventArgs);
@@ -348,6 +351,7 @@ namespace KeyReaderGUI
 			this->Menu = this->mainMenu1;
 			this->Name = S"Form1";
 			this->Text = S"Solimar License Manager";
+			this->Load += new System::EventHandler(this, Form1_Load);
 			this->ModuleLicensePanel->ResumeLayout(false);
 			this->KeyInfoPanel->ResumeLayout(false);
 			this->ResumeLayout(false);
@@ -370,10 +374,10 @@ namespace KeyReaderGUI
 		 
 
 #undef MessageBox
-private: System::Void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
+private: void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
 			 // Stop the SpdStartupService if it's not already stopped.
-			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 ServiceController *licenseServerService = new ServiceController("Solimar License Server", ".");
 			 if (licenseServerService->Status != ServiceControllerStatus::StopPending &&
 				 licenseServerService->Status != ServiceControllerStatus::Stopped)
 				 licenseServerService->Stop();
@@ -383,9 +387,9 @@ private: System::Void File_ShutdownServer_Click(System::Object *  sender, System
 			 MessageBox::Show(this, "License Server shutdown complete.", "Shutdown License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
 		 }
 
-private: System::Void File_StartupServer_Click(System::Object *  sender, System::EventArgs *  e)
+private: void File_StartupServer_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
-			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 ServiceController *licenseServerService = new ServiceController("Solimar License Server", ".");
 			 if (licenseServerService->Status != ServiceControllerStatus::StartPending &&
 				 licenseServerService->Status != ServiceControllerStatus::Running)
 				 licenseServerService->Start();
@@ -395,7 +399,7 @@ private: System::Void File_StartupServer_Click(System::Object *  sender, System:
 			 MessageBox::Show(this, "License Server startup complete.", "Startup License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
 		 }
 
-private: System::Void KeyInfoListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+private: void KeyInfoListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
 		 {
 			if(e->KeyCode == Keys::F5)
 			{
@@ -404,7 +408,7 @@ private: System::Void KeyInfoListView_KeyUp(System::Object *  sender, System::Wi
 			}
 		 }
 
-private: System::Void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+private: void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
 		 {
 			if(e->KeyCode == Keys::F5)
 			{
@@ -412,8 +416,8 @@ private: System::Void ModLicenseListView_KeyUp(System::Object *  sender, System:
 				this->Refresh();
 			}
 		 }
-
 };
+
 }
 
 #endif //form1.h

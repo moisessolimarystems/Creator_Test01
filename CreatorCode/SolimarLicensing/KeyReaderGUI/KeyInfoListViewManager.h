@@ -6,7 +6,6 @@
 
 namespace KeyViewManager
 {
-
 	using namespace System;
 	using namespace System::IO;
 	using namespace System::Data;
@@ -15,14 +14,13 @@ namespace KeyViewManager
 	using namespace ModuleViewManager;
 	using namespace System::ComponentModel;
 
-
-
 	__gc class KeyInfoListViewManager
 	{
 	public:
 		KeyInfoListViewManager(ListView* KeyInfoListView);
 		~KeyInfoListViewManager();
 		bool PopulateView();
+		bool Connect();
 
 	private:
 		bool FillRow(KeyInfoStructure TheKeyInfoStructure);

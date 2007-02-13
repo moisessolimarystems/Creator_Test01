@@ -3,6 +3,7 @@
 
 using namespace ModuleViewManager;
 
+#undef MessageBox
 //constructor...initialize the member variables
 ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewManager)
 							: TheModView(TheModViewManager)
@@ -13,15 +14,15 @@ ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewM
 	//new up a commlink object
 	OurCommLink = new CommunicationLink();
 
-	//connect to the solimar license server
-	OurCommLink->Connect();
+	if(!OurCommLink)
+		return;
 }
 
 ModuleLicenseListViewManager::~ModuleLicenseListViewManager()
 {
 	//disconnect from the solimar license server
    //new
-   OurCommLink->UnInitializeModuleLicenseConnection();
+	OurCommLink->UnInitializeModuleLicenseConnection();
 	OurCommLink->Disconnect();
 	delete OurCommLink;
 	OurCommLink = 0;
@@ -33,6 +34,17 @@ bool ModuleLicenseListViewManager::IsInitialized()
 	if(OurCommLink)
 		return OurCommLink->IsModInitialized();
 
+	return false;
+}
+
+bool ModuleLicenseListViewManager::Connect()
+{
+	//connect to the solimar license server
+	if(OurCommLink)
+	{
+		if(SUCCEEDED(OurCommLink->Connect()))
+			return true;
+	}
 	return false;
 }
 
