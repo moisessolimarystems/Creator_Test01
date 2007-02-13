@@ -1638,15 +1638,11 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
    SYSTEMTIME CurrentTime;
    VARIANT varTime;
    varTime.vt = VT_DATE;
+               GetLocalTime(&CurrentTime);
+               SystemTimeToVariantTime(&CurrentTime, &varTime.date);
+               varTime.date += days;
 
-   GetLocalTime(&CurrentTime);
-   SystemTimeToVariantTime(&CurrentTime, &varTime.date);
-   varTime.date += days; //730.0;      //add 2 years to the expiration date.
-
-   int PasswordIDs[1024];
-   memset(PasswordIDs, 0, 1024);
-
-   int PasswordIDIndex = 0;
+   int PasswordID;
 
    char* buffer = NULL;
    PasswordPacketDirectory = getcwd(buffer, MAXPATH);
@@ -1665,12 +1661,15 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
          while( !PasswordQuery->Eof )
          {
            tmpMark = PasswordQuery->GetBookmark();
-           hr = keyMaster->InitPasswordPacket();
            AnsiDescription = PswdGrid->Columns->Items[1]->Field->AsString;
            if(AnsiDescription.AnsiPos("Extend") > 0)   // Found Extension Password to create packet
            {
-               PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
-               PasswordIDIndex++;
+               GetLocalTime(&CurrentTime);
+               SystemTimeToVariantTime(&CurrentTime, &varTime.date);
+               varTime.date += days;
+
+               hr = keyMaster->InitPasswordPacket();
+               PasswordID = PasswordQuery->FieldByName("TDid")->AsInteger;
 
                AnsiPassword = PswdGrid->Columns->Items[3]->Field->AsString;
                PasswordBufSize = AnsiPassword.WideCharBufSize();
@@ -1680,7 +1679,8 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
                SysFreeString(bstrPassword);
                hr = keyMaster->FinalizePasswordPacket();
 
-               varTime.date -= days; //730.0;    //remove the 2 years that was added before
+
+               varTime.date -= days;
                memset(TheFileName, 0, 128);
                sprintf(TheFileName, " %s_Extension_%d_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
                                     key_record->pkey->getProductText(),
@@ -1770,15 +1770,12 @@ void TFCustomerKeys::createExtensionPackets(unsigned short days)
                        int PasswordPacketID;
                        PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
 
-                       for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
-                       {
-                           UtilityQuery->Close();
-                           UtilityQuery->SQL->Clear();
-                           UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
-                           UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
-                           UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
-                           UtilityQuery->ExecSQL();
-                       }
+                       UtilityQuery->Close();
+                       UtilityQuery->SQL->Clear();
+                       UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
+                       UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
+                       UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordID;
+                       UtilityQuery->ExecSQL();
                    }
                    else
                    {
@@ -1845,17 +1842,11 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
       try
       {
-         hr = keyMaster->InitPasswordPacket();
-/*         if(SUCCEEDED(hr))
-         {
-             Application->MessageBox(ErrorMsg.sprintf("Failed to initialize password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
-         }
-*/
+
          tmpMark = PasswordQuery->GetBookmark();
          PasswordQuery->DisableControls();
-
          PasswordQuery->First();
-
+         hr = keyMaster->InitPasswordPacket();
          while( !PasswordQuery->Eof )
          {
            AnsiDescription = PswdGrid->Columns->Items[1]->Field->AsString;
@@ -1865,29 +1856,27 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
                PasswordIDIndex++;
 
+
                AnsiPassword = PswdGrid->Columns->Items[3]->Field->AsString;
                PasswordBufSize = AnsiPassword.WideCharBufSize();
                AnsiPassword.WideChar(wcharPassword, PasswordBufSize);
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
-           /*    if(!SUCCEEDED(hr))
-                   Application->MessageBox(ErrorMsg.sprintf("Failed to append password : %s to packet\nHResult = 0x%i",AnsiDescription.c_str(),hr).c_str(),"Error", MB_OK);
-           */
                SysFreeString(bstrPassword);
              }
              PasswordQuery->Next();
          }
          hr = keyMaster->FinalizePasswordPacket();
-         /*if(!SUCCEEDED(hr))
-             Application->MessageBox(ErrorMsg.sprintf("Failed to finalize password packet\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
-         */
-         varTime.date -= days;    //remove the 2 years that was added before
+         if(PasswordIDIndex > 0)
+         {
 
-         //create the filename
-         char TheFileName[128];
-         memset(TheFileName, 0, 128);
+             varTime.date -= days;    //remove the 2 years that was added before
 
-         sprintf(TheFileName, " %s_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
+             //create the filename
+             char TheFileName[128];
+             memset(TheFileName, 0, 128);
+
+             sprintf(TheFileName, " %s_PasswordPacket%s-%s_%d-%d-%d_%d-%d-%d-%d.pkt",
                                key_record->pkey->getProductText(),
                                IntToHex(key_record->pkey->customerNumber, 3),
                                IntToHex(key_record->pkey->keyNumber, 2),
@@ -1895,38 +1884,38 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                                CurrentTime.wHour, CurrentTime.wMinute, CurrentTime.wSecond, CurrentTime.wMilliseconds
                              );
 
-         PktList->Add(AnsiString(TheFileName));
-         //Create the FilePath
-         char FilePath[1024];
-         memset(FilePath, 0, 1024);
-         sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
+             PktList->Add(AnsiString(TheFileName));
+             //Create the FilePath
+             char FilePath[1024];
+             memset(FilePath, 0, 1024);
+             sprintf(FilePath, "%s%s", PasswordPacketDirectory /*.c_str()*/, TheFileName);
 
-         // Create the password packet file
-         HANDLE hFile = CreateFile(FilePath,
+             // Create the password packet file
+             HANDLE hFile = CreateFile(FilePath,
                                     GENERIC_WRITE,
                                     FILE_SHARE_WRITE,
                                     0,
                                     CREATE_NEW, 0, 0);
 
-         hr = HRESULT_FROM_WIN32(::GetLastError());
-         if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
-         {
-            Application->MessageBox( "Error: File Exists","Error", MB_OK);
-            return;
-         }
+             hr = HRESULT_FROM_WIN32(::GetLastError());
+             if(HRESULT_FROM_WIN32(ERROR_FILE_EXISTS) == hr)
+             {
+                 Application->MessageBox( "Error: File Exists","Error", MB_OK);
+                 return;
+             }
 
-         // create a variant safearray
-         VARIANT vtPacket;
-         VariantInit(&vtPacket);
-         BYTE* pData = 0;
+             // create a variant safearray
+             VARIANT vtPacket;
+             VariantInit(&vtPacket);
+             BYTE* pData = 0;
 
-         //Get the password packet and write it to the file
-         hr = keyMaster->GetPasswordPacket(&vtPacket);
-         if(!SUCCEEDED(hr))
-            Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
+             //Get the password packet and write it to the file
+             hr = keyMaster->GetPasswordPacket(&vtPacket);
+             if(!SUCCEEDED(hr))
+                 Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
 
-         if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
-         {
+             if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
+             {
                DWORD bytes_written(0);
                if (!WriteFile(hFile,
                     pData,
@@ -1940,72 +1929,72 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
                SafeArrayUnaccessData(vtPacket.parray);
                pData = 0;
-         }
+             }
 
          //Get the verification code and store it in the DB
-         hr = keyMaster->GetVerificationCode(&VerificationCode);
+             hr = keyMaster->GetVerificationCode(&VerificationCode);
 /*         if(!SUCCEEDED(hr))
             Application->MessageBox(ErrorMsg.sprintf("Failed to get verification code\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
 */
          //
          //Update database
-         try
-         {
-            Database1->StartTransaction();
+             try
+             {
+                 Database1->StartTransaction();
 
-            UtilityQuery->Close();
-            UtilityQuery->SQL->Clear();
-            UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
-            UtilityQuery->ParamByName("path")->AsString = TheFileName;
-            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-            UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
-            UtilityQuery->ExecSQL();
+                 UtilityQuery->Close();
+                 UtilityQuery->SQL->Clear();
+                 UtilityQuery->SQL->Add("INSERT INTO sPasswordPacket (packet_path, packet_verification, packet_created) values (:path, :ver_code, :date_created)");
+                 UtilityQuery->ParamByName("path")->AsString = TheFileName;
+                 UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+                 UtilityQuery->ParamByName("date_created")->AsDateTime = varTime.date;
+                 UtilityQuery->ExecSQL();
 
-            Database1->Commit();
-            RefreshKeyPage();
+                 Database1->Commit();
+                 RefreshKeyPage();
 
             //Get the password packet ID
-            UtilityQuery->Close();
-            UtilityQuery->SQL->Clear();
-            UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
-            UtilityQuery->ParamByName("path")->AsString = TheFileName;
-            UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
-            UtilityQuery->Prepare();
-            UtilityQuery->Open();
-
-            //If the ID was found
-            if( UtilityQuery->RecordCount )
-            {
-               //Store each password in the packet with its corresponding packet ID
-               int PasswordPacketID;
-               PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
-
-               for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
-               {
                   UtilityQuery->Close();
                   UtilityQuery->SQL->Clear();
-                  UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
-                  UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
-                  UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
-                  UtilityQuery->ExecSQL();
-               }
-            }
-            else
-            {
-            	Application->MessageBox("Program Failed", "Key Message", MB_OK );
-            }
-         }
-         catch(EDBEngineError &e)
-         {
-            Database1->Rollback(); //error occurred rollback db changes
-            Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
-         }
-        CloseHandle(hFile); //Release handle to the packet file.
-        VariantClear(&vtPacket);
-        PasswordQuery->GotoBookmark( tmpMark );
-     	PasswordQuery->FreeBookmark( tmpMark );
-      	PasswordQuery->EnableControls();
+                  UtilityQuery->SQL->Add("SELECT * FROM sPasswordPacket WHERE packet_path = :path AND packet_verification = :ver_code");
+                  UtilityQuery->ParamByName("path")->AsString = TheFileName;
+                  UtilityQuery->ParamByName("ver_code")->AsString = VerificationCode;
+                  UtilityQuery->Prepare();
+                  UtilityQuery->Open();
 
+                  //If the ID was found
+                  if( UtilityQuery->RecordCount )
+                  {
+                      //Store each password in the packet with its corresponding packet ID
+                      int PasswordPacketID;
+                      PasswordPacketID = UtilityQuery->FieldValues["packet_id"];
+
+                      for(int tempIndex = 0; tempIndex < PasswordIDIndex; tempIndex++)
+                      {
+                          UtilityQuery->Close();
+                          UtilityQuery->SQL->Clear();
+                          UtilityQuery->SQL->Add("INSERT INTO sPasswordPacketRelationship (packet_id, password_id) values (:pack_id, :pwd_id)");
+                          UtilityQuery->ParamByName("pack_id")->AsInteger = PasswordPacketID;
+                          UtilityQuery->ParamByName("pwd_id")->AsInteger =  PasswordIDs[tempIndex];
+                          UtilityQuery->ExecSQL();
+                      }
+                  }
+                  else
+                  {
+            	      Application->MessageBox("Program Failed", "Key Message", MB_OK );
+                  }
+            }
+            catch(EDBEngineError &e)
+            {
+                Database1->Rollback(); //error occurred rollback db changes
+                Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+            }
+            CloseHandle(hFile); //Release handle to the packet file.
+            VariantClear(&vtPacket);
+            PasswordQuery->GotoBookmark( tmpMark );
+     	    PasswordQuery->FreeBookmark( tmpMark );
+      	    PasswordQuery->EnableControls();
+         }
       }
       catch(EDBEngineError &e)
       {
@@ -2015,8 +2004,8 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
          Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
       }
-   free(buffer); //clear the buffer holding the current working directory
-   VariantClear(&varTime);
+      free(buffer); //clear the buffer holding the current working directory
+      VariantClear(&varTime);
 }
 
 
