@@ -2,6 +2,7 @@
 #define __GIT_H
 
 #include "safemutex.h"
+#include <objidl.h>
 
 /*
  * AutoReleasePtr
@@ -358,7 +359,7 @@ private:
       }
       else
       {
-		   IGlobalInterfaceTable* pIGIT(NULL) ;
+		   IGlobalInterfaceTable* pIGIT = NULL;
 
 		   hr = CreateGIT(&pIGIT);
          if (FAILED(hr))
