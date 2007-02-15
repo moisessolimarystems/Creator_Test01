@@ -244,22 +244,22 @@ const char* KDPasswordText[] =
    "300 days/850 hrs - TL",      // 10
    "330 days/935 hrs - TL",      // 11
    "365 days/1000 hrs - TL",     // 12
-   "30 days/750 hrs - DL",       // 13  Element #13-16 is the Development License
-   "90 days/2250 hrs - DL",      // 14
-   "180 days/4500 hrs - DL",     // 15
-   "365 days/9000 hrs - DL",     // 16
-   "365 days/250 hrs - PDSL",    // 17 Elements #17-#20 are Partner Demo and Support Licenses
-   "365 days/375 hrs - PDSL",    // 18
-   "365 days/500 hrs - PDSL",    // 19
-   "365 days/750 hrs - PDSL",    // 20
-   "730 days/18000 hrs - MYDL",  // 21 Elements #21-#24 are multi-year prepaid Development Licenses
-   "1095 days/27000 hrs - MYDL", // 22
-   "1460 days/36000 hrs - MYDL", // 23
-   "1825 days/45000 hrs - MYDL", // 24
-   "730 days/2000 hrs - MYTL",   // 25 Elements #25-#28 are multi-year prepaid Test License
-   "1095 days/3000 hrs - MYTL",  // 26
-   "1460 days/4000 hrs - MYTL",  // 27
-   "1825 days/5000 hrs - MYTL",  // 28
+   "365 days/9000 hrs - DL",     // 13 Element #13 is the Development License
+   "365 days/250 hrs - PDSL",    // 14 Elements #14-#17 are Partner Demo and Support Licenses
+   "365 days/375 hrs - PDSL",    // 15
+   "365 days/500 hrs - PDSL",    // 16
+   "365 days/750 hrs - PDSL",    // 17
+   "730 days/18000 hrs - MYDL",  // 18 Elements #18-#21 are multi-year prepaid Development Licenses
+   "1095 days/27000 hrs - MYDL", // 19
+   "1460 days/36000 hrs - MYDL", // 20
+   "1825 days/45000 hrs - MYDL", // 21
+   "730 days/2000 hrs - MYTL",   // 22 Elements #22-#25 are multi-year prepaid Test License
+   "1095 days/3000 hrs - MYTL",  // 23
+   "1460 days/4000 hrs - MYTL",  // 24
+   "1825 days/5000 hrs - MYTL",  // 25
+   "30 days/750 hrs - DL",       // 26  Element #26-28 are additional Development License
+   "90 days/2250 hrs - DL",      // 27
+   "180 days/4500 hrs - DL",     // 28
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -278,22 +278,22 @@ const unsigned short KDPasswordDays[] =
    300, 	// 10
    330, 	// 11
    365, 	// 12
-   30,          // 13 Element #13-#16 is the Development License
-   90,          // 14
-   180,         // 15
+   365, 	// 13 Element #26-#28 is the Development License
+   365, 	// 14 Elements #14-#17 are Partner Demo and Support Licenses
+   365, 	// 15
    365, 	// 16
-   365, 	// 17 Elements #16-#20 are Partner Demo and Support Licenses
-   365, 	// 18
-   365, 	// 19
-   365, 	// 20
-   730, 	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
-   1095,        // 22
-   1460,        // 23
-   1825,        // 24
-   730,         // 25 Elements #25-#28 are multi-year prepaid Test License
-   1095,        // 26
-   1460,        // 27
-   1825,        // 28
+   365, 	// 17
+   730, 	// 18 Elements #18-#21 are multi-year prepaid Development Licenses
+   1095,        // 19
+   1460,        // 20
+   1825,        // 21
+   730,         // 22 Elements #22-#25 are multi-year prepaid Test License
+   1095,        // 23
+   1460,        // 24
+   1825,        // 25
+   30,          // 26 Element #26-#28 are additional Development License
+   90,          // 27
+   180,         // 28
 };
 
 /* KDPasswordHours[]
