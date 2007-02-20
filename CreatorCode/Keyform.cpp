@@ -536,9 +536,10 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                         // initialize module tab and make it visible
                         SolSearcherDetails->Initialize(2, TabDataOnChange);//keyform mode
                         SolSearcherDetails->Load(key_record);
-                        KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);                        
+                        KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);
                         PageControl1->Pages[1]->TabVisible = true;
                         PageControl1->Pages[2]->TabVisible = true;
+                        free(buffer);
                 }
                 else if( key_record->pkey->productId==SPDE_PRODUCT)
                 {
@@ -803,18 +804,6 @@ void __fastcall TFCustomerKeys::resetPhysicalFlag()
             PHYSICAL_FLAG |= pf_PROGRAM;
          else
          {
-/*            SKeyRecord *attached_key = new SKeyRecord();  // key connected to the pc
-            //try to read info from key
-            if(!keyMaster->read(attached_key)) //success returns 0
-            {
-                 //verify attached key is selected in creator
-                 if( key_record->pkey->customerNumber == attached_key->pkey->customerNumber &&
-                     key_record->pkey->keyNumber == attached_key->pkey->keyNumber )
-                     PHYSICAL_FLAG |= pf_REPROGRAM;
-            }
-            if(attached_key)
-               delete(attached_key);
-*/
             //set base on key status and type
             int key_status(key_record->pkey->status);
 
@@ -2168,7 +2157,7 @@ bool TFCustomerKeys::dbSaveKey(SKeyRecord* programmed, TKeyWizardFrm* wizard)
          strftime(tempdate,20,"%x",area);
          AnsiString test2 = tempdate;//asctime(area);
          UtilityQuery->ParamByName("expirationDate")->AsString = test2;
-         delete tempdate;
+         delete[] tempdate;
 //-----------------------------------------------------------
       }
       else // key is permanent, do not need to set programmedDays or expirationDate

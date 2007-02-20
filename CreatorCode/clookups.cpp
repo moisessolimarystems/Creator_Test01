@@ -172,9 +172,7 @@ unsigned short CLookup::getCurrentVersion(unsigned short productId, bool SPD_DOS
       return product_list[4].version;
 
    if(productId <= MAX_SOLIMAR_PRODUCTS)
-   {
       return product_list[productId].version;
-   }
    else
       return 0x0000;
 }
@@ -261,7 +259,7 @@ bool CLookup::resetModuleList()
    int spdeCount(0);
    int currentCount;
    char query[64];
-   //int max_solscript;
+
    ModuleDetail** pModuleList(NULL);
 
    //initialize module contents in list to point to unassigned module defaults

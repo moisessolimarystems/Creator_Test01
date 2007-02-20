@@ -68,11 +68,11 @@ public:
    void getUserSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, ushort, long);
 
-   AnsiString getIndexServersPassword(SSProtectionKey*, ushort);
-   AnsiString getReportServersPassword(SSProtectionKey*, ushort);
-   AnsiString getConcurrentUsersPassword(SSProtectionKey*, ushort);
-   AnsiString getApplicationServerPassword(SSProtectionKey*, ushort);
-   AnsiString getDocumentAssemblerPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getIndexServersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getReportServersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getConcurrentUsersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getApplicationServerPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getDocumentAssemblerPassword(SSProtectionKey*, ushort);
 
    //simulate applying password to ProtectionKey passed in
    void applyModZeroPassword(SKeyRecord* key_record, ModuleDetail* detail, unsigned short units);

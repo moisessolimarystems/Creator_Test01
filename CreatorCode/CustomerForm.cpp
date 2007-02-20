@@ -124,6 +124,9 @@ __fastcall TCustForm::~TCustForm()
   if( keyMaster )
      delete keyMaster;
 
+  if( lookup )
+      delete lookup;
+
   if(attached_key)
      delete attached_key;
 }
@@ -460,7 +463,7 @@ void __fastcall TCustForm::Close1Click(TObject *Sender)
 //==============================================================================
 void __fastcall TCustForm::SeekCustomer(TObject *Sender)
 {
-	SKeyRecord *keyrec = new SKeyRecord();
+   SKeyRecord *keyrec = new SKeyRecord();
    TBookmark lastValid;
    AnsiString prevSQL;
 

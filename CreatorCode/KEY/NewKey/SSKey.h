@@ -17,6 +17,9 @@
 
 #include <windows.h>
 #include <classes.hpp>
+#include <memory>
+
+using std::auto_ptr;
 
 #define SSE_TOTAL_RESOURCES                    5
 #define SSE_MODULE_OFFSET                      128
@@ -65,11 +68,11 @@ public:
    void setDocumentAssembler(ushort units_licensed);
 
    // Key I/O functions.
-   AnsiString getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   AnsiString getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   AnsiString getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   AnsiString getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   AnsiString getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   auto_ptr<AnsiString> getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   auto_ptr<AnsiString> getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   auto_ptr<AnsiString> getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   auto_ptr<AnsiString> getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   auto_ptr<AnsiString> getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
 
 protected:
    // Protection key data (references into keyDataBlock).

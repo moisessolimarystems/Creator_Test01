@@ -30,8 +30,7 @@
  *   Contains database data for one protection key.                   *
  *                                                                    *
  *--------------------------------------------------------------------*/
-
-/* static members
+ /* static members
 ---------------------------------------------------------------------------*/
 char* SKeyRecord::text = new char[255];
 

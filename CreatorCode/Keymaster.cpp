@@ -198,46 +198,6 @@ void  KeyMaster::getModulePassword(ProtectionKey* key,
                                                password_number,
                                                Password_String
                                               );
-/*
-   switch(product_id) {
-       case SOLSEARCHER_ENTERPRISE_PRODUCT :
-           {
-           if(pTheServer)
-                    ((SSProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                               product_id,
-                                                               product_version,
-                                                               pTheServer,
-                                                               password_number,
-                                                               Password_String
-                                                              );
-           }
-           break;
-       case SPDE_PRODUCT:
-           {
-              if(pTheServer)
-                    ((SpdeProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                                 product_id,
-                                                                 product_version,
-                                                                 pTheServer,
-                                                                 password_number,
-                                                                 Password_String
-                                                                 );
-           }
-           break;
-       default :
-           {
-               if(pTheServer)
-                    ((SpdProtectionKey*)key)->getModulePassword(mod_id, units,
-                                                                product_id,
-                                                                product_version,
-                                                                pTheServer,
-                                                                password_number,
-                                                                Password_String
-                                                                );
-           }
-           break;
-   }
-*/
 }
 
 //==============================================================================
@@ -257,23 +217,6 @@ void KeyMaster::getOutputPassword(SpdProtectionKey* key,
      key->getOutputPassword(output_units, pTheServer, Password_Number, Password_String);
 }
 
-//==============================================================================
-// Function:    getOutputPassword()
-// Purpose:
-// Parameters:  ProtectionKey* - key
-//              ushort - output_units
-// Returns:     ulong
-// Note:
-//==============================================================================
-/*void KeyMaster::getOutputPassword(SpdeProtectionKey* key,
-                                   ushort output_units,
-                                   ushort Password_Number,
-                                   char* Password_String )
-{
-   if(pTheServer)
-     key->getOutputPassword(output_units, pTheServer, Password_Number, Password_String);
-}
-*/
 //==============================================================================
 // Function:    getOutputPassword()
 // Purpose:
@@ -376,13 +319,14 @@ void KeyMaster::getProductVersionPassword(ProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-AnsiString KeyMaster::getIndexServersPassword(SSProtectionKey* key,
+auto_ptr<AnsiString> KeyMaster::getIndexServersPassword(SSProtectionKey* key,
                                          ushort units_licensed)
 {
+   auto_ptr<AnsiString> pwd;
    if(pTheServer)
       return key->getIndexServersPassword(units_licensed, pTheServer);
 
-   return 0;
+   return pwd;
 }
 
 //==============================================================================
@@ -394,13 +338,14 @@ AnsiString KeyMaster::getIndexServersPassword(SSProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-AnsiString KeyMaster::getReportServersPassword(SSProtectionKey* key,
+auto_ptr<AnsiString> KeyMaster::getReportServersPassword(SSProtectionKey* key,
                                           ushort units_licensed)
 {
+   auto_ptr<AnsiString> pwd;
    if(pTheServer)
       return key->getReportServersPassword(units_licensed, pTheServer);
 
-   return 0;
+   return pwd;
 }
 
 //==============================================================================
@@ -412,31 +357,52 @@ AnsiString KeyMaster::getReportServersPassword(SSProtectionKey* key,
 // Returns:     ulong
 // Note:
 //==============================================================================
-AnsiString KeyMaster::getConcurrentUsersPassword(SSProtectionKey* key,
+auto_ptr<AnsiString> KeyMaster::getConcurrentUsersPassword(SSProtectionKey* key,
                                                  ushort units_licensed)
 {
+   auto_ptr<AnsiString> pwd;
    if(pTheServer)
       return key->getConcurrentUsersPassword(units_licensed, pTheServer);
 
-   return 0;
+   return pwd;
 }
 
-AnsiString KeyMaster::getApplicationServerPassword(SSProtectionKey* key,
+//==============================================================================
+// Function:    getApplicationServerPassword()
+// Purpose:     Gets the application server password used for SSE
+//              keys.
+// Parameters:  SSProtectionKey* - key
+//              ushort - units_licensed
+// Returns:     ulong
+// Note:
+//==============================================================================
+auto_ptr<AnsiString> KeyMaster::getApplicationServerPassword(SSProtectionKey* key,
                                               ushort units_licensed)
 {
+   auto_ptr<AnsiString> pwd;
    if(pTheServer)
          return key->getApplicationsPassword(units_licensed, pTheServer);
 
-   return 0;
+   return pwd;
 }
 
-AnsiString KeyMaster::getDocumentAssemblerPassword(SSProtectionKey* key,
+//==============================================================================
+// Function:    getDocumentAssemblerPassword()
+// Purpose:     Gets the document assembler password used for the SSE
+//              keys.
+// Parameters:  SSProtectionKey* - key
+//              ushort - units_licensed
+// Returns:     ulong
+// Note:
+//==============================================================================
+auto_ptr<AnsiString> KeyMaster::getDocumentAssemblerPassword(SSProtectionKey* key,
                                               ushort units_licensed)
 {
+   auto_ptr<AnsiString> pwd;
    if(pTheServer)
          return key->getDocumentAssemblerPassword(units_licensed, pTheServer);
 
-   return 0;
+   return pwd;
 }
 
 //==============================================================================
@@ -713,7 +679,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
    {
       int NumModules = 0;
       int TotalModules = SSE_TOTAL_KEY_MODULES + SSE_TOTAL_RESOURCES;
-      int* ModuleIds = new int(TotalModules);
+      int* ModuleIds = (int*)malloc(sizeof(int) * TotalModules);
 
       for(int mod_id =0; mod_id<SSE_TOTAL_KEY_MODULES;mod_id++)
       {
@@ -795,7 +761,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
          index.pop_back();
          index.pop_back();         //wipe out index array to process for next module
       }
-      delete ModuleIds;
+      free(ModuleIds);
    }
    if(pTheServer)
       ret = key->ProgramKey(pTheServer, CurrentKeyID, key_record->num_days, &ModuleArray);

@@ -979,6 +979,7 @@ const short OFFSET_INDEX = 2;
 const short NUM_CELLS_INDEX = 1;
 short ProtectionKey::readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID)
 {
+   bool bVal = true;
    if(!pServer)
       return FAILURE;
 
@@ -990,24 +991,31 @@ short ProtectionKey::readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID)
    HRESULT hr;
    //reads the raw data from the key and returns a safe array of bytes
    if(!SUCCEEDED(hr = pServer->KeyReadRaw(*KeyID, pKeyData)))
-      return FAILURE;
+       bVal = false;
 
-   // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions
-	//needed to access safe array data
-	if(SUCCEEDED(SafeArrayAccessData(pKeyData->parray, (void**)&pCellValue)))
+   if(bVal)
    {
-      FirstDataCell = ((DWORD*)pCellValue)[OFFSET_INDEX];
-      NumberOfCells = ((DWORD*)pCellValue)[NUM_CELLS_INDEX];
+       // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions
+       //needed to access safe array data
+       if(SUCCEEDED(SafeArrayAccessData(pKeyData->parray, (void**)&pCellValue)))
+       {
+           FirstDataCell = ((DWORD*)pCellValue)[OFFSET_INDEX];
+           NumberOfCells = ((DWORD*)pCellValue)[NUM_CELLS_INDEX];
 
-      //i=8 because we need to skip over the first 8 cells after the header
-      for(DWORD i = 8; i < NumberOfCells; i++)
-         keyDataBlock.data[i-8] = ((ushort*)(pCellValue+FirstDataCell))[i];
+           //i=8 because we need to skip over the first 8 cells after the header
+           for(DWORD i = 8; i < NumberOfCells; i++)
+               keyDataBlock.data[i-8] = ((ushort*)(pCellValue+FirstDataCell))[i];
+
+           if (!SUCCEEDED(SafeArrayUnaccessData(pKeyData->parray)))
+              bVal = false;
+       }
+       else
+           bVal = false;
    }
-   else
-      return FAILURE;
 
-   if (SUCCEEDED(SafeArrayUnaccessData(pKeyData->parray)))
-         return SUCCESS;
+   delete pKeyData;
+   if(bVal)
+        return SUCCESS;
 
    return FAILURE;
 }
