@@ -5,6 +5,8 @@
 
 #include "SetUnitsDlg.h"
 #include "SolSearcherEnterpriseDetails.h"
+#include "SSKey.h"
+
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -119,7 +121,7 @@ void TSolSearcherDetails::GeneratePassword(int type)
    unsigned short min(0);
    unsigned short max;
 //   unsigned long ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
-AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
+auto_ptr<AnsiString> ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
    void ( __closure *ApplyPassword)(SKeyRecord* keyrec, unsigned short units_licensed);
 
    switch (type) {
@@ -177,6 +179,9 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
    //
    // get new total of units licensed.
    TUnitsDlg *dlg = new TUnitsDlg(this, max);
+   //Concurrent User module needs to be in units of 25
+   if(type == CONCURRENT_USERS_25_CELL)
+       dlg->SetMinUnits(_25_UNITS_LICENSED_PER_CONCURRENT_USERS_25);
    dlg->Edit1->Text = min;
 
    if( dlg->ShowModal() == IDYES ) {
@@ -194,8 +199,8 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
       }
 
       //generate password
-      AnsiString password = CreatePassword(m_pKey, units);
-      if(!password.c_str()) {
+      auto_ptr<AnsiString> password = CreatePassword(m_pKey, units);
+      if(!password->c_str()) {
          Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
          return;
       }
@@ -204,8 +209,7 @@ AnsiString ( __closure *CreatePassword)(SSProtectionKey*, unsigned short);
       ApplyPassword(m_pKeyRecord, units);
 
       //format password
-//      sprintf( password_string, "%8X-%1d", password.c_str();, units);
-        sprintf( password_string, "%8s", password.c_str());
+        sprintf( password_string, "%8s", password->c_str());
       //Update database
       try
       {
@@ -314,326 +318,7 @@ void TSolSearcherDetails::Initialize(int mode, void( __closure *fp_OnDetailUpdat
 
    m_bInitialized = true;
 }
-/*
-//==============================================================================
-// Function:    createIndexServersPassword()
-// Purpose:     creates an index server password, and updates the information in the
-//              SKeyRecord and STransactionDetail tables based on the key record
-//              id number.
-// Parameters:  ( int ) - units_licensed
-// Returns:     None
-//==============================================================================
-void TSolSearcherDetails::CreateIndexServersPassword(unsigned short units_licensed)
-{
-   char password_string[14];
 
-   //check if key is attached
-   if( keyMaster->found() == false )
-   {
-      Application->MessageBox("No key attached.", "Information Message", MB_OK);
-      return;
-   }
-   //check if attached key is programmed
-   if( keyMaster->programmed() == false )
-   {
-      Application->MessageBox("Attached key must be programmed.", "Information Message", MB_OK);
-      return;
-   }
-
-   //
-   //generate password
-   unsigned long password = keyMaster->getIndexServersPassword(m_pKey, units_licensed);
-   if(!password)
-   {
-      Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-
-   //
-   //apply password to key
-   keyMaster->applyIndexServersPassword(m_pKeyRecord, units_licensed);
-
-   //
-   //format password
-   sprintf( password_string, "%8X-%1d", password, units_licensed);
-
-   //
-   //Update database
-   try
-   {
-      m_pDatabase->StartTransaction();
-
-      DetailSQL->Close();
-      DetailSQL->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRindexServers = :units WHERE SKRid = :keyId ");
-      else
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRindexServers = :units WHERE SKRid = :keyId ");
-
-      DetailSQL->ParamByName("units")->AsInteger = ss_key->getIndexServers();
-      DetailSQL->ParamByName("keyId")->AsInteger = m_pKeyRecord->skr_id;
-      DetailSQL->ExecSQL();
-
-      DetailSQL->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      DetailSQL->ParamByName("key_id")->AsInteger = m_pKeyRecord->skr_id;
-      DetailSQL->ParamByName("password")->AsString = password_string;
-      DetailSQL->ParamByName("units")->AsInteger = units_licensed;
-      DetailSQL->ParamByName("descriptionid")->AsInteger = 600;  // 600 = Index Servers
-      DetailSQL->ExecSQL();
-
-      m_pDatabase->Commit();
-      //RefreshKeyPage(0);
-      //RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      m_pDatabase->Rollback();
-   }
-}
-
-//==============================================================================
-// Function:    createReportServersPassword()
-// Purpose:     creates an index server password, and updates the information in the
-//              SKeyRecord and STransactionDetail tables based on the key record
-//              id number.
-// Parameters:  ( int ) - units_licensed
-// Returns:     None
-//==============================================================================
-void TSolSearcherDetails::CreateReportServersPassword(unsigned short units_licensed)
-{
-   char password_string[14];
-
-   //
-   // If for some reason you're in this function and not a SSKey
-   if (key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
-        return;
-
-   //
-   // check attached key status - need to have a programmed key attached
-   // pkey should always be SSProtectionKey
-   SSProtectionKey* ss_key = ((SSProtectionKey*)(key_record->pkey));
-
-   //
-   // check if key is attached
-   if(!isAttachedKeyReady())
-      return;
-
-   //
-   // generate password
-   unsigned long password = keyMaster->getReportServersPassword(ss_key, units_licensed);
-   if(!password)
-   {
-      Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-
-   //
-   // apply password to key
-   keyMaster->applyReportServersPassword(key_record, units_licensed);
-
-   //
-   // format password
-   sprintf( password_string, "%8X-%1d", password, units_licensed);
-
-   //
-   // Update database
-   try
-   {
-      m_pDatabase->StartTransaction();
-
-      DetailSQL->Close();
-      DetailSQL->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRreportServers = :units WHERE SKRid = :keyId ");
-      else
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRreportServers = :units WHERE SKRid = :keyId ");
-
-      DetailSQL->ParamByName("units")->AsInteger = ss_key->getReportServers();
-      DetailSQL->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      DetailSQL->ExecSQL();
-
-      DetailSQL->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      DetailSQL->ParamByName("key_id")->AsInteger = key_record->skr_id;
-      DetailSQL->ParamByName("password")->AsString = password_string;
-      DetailSQL->ParamByName("units")->AsInteger = units_licensed;
-      DetailSQL->ParamByName("descriptionid")->AsInteger = 601;  // 601 = Report Servers
-      DetailSQL->ExecSQL();
-
-      m_pDatabase->Commit();
-      ///RefreshKeyPage(0);
-      ///RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      m_pDatabase->Rollback();
-   }
-}
-
-
-//==============================================================================
-// Function:    createConcurrentUsersPassword()
-// Purpose:     creates an index server password, and updates the information in
-//              the SKeyRecord and STransactionDetail tables based on the key
-//              record id number.
-// Parameters:  ( int ) - units_licensed
-// Returns:     None
-//==============================================================================
-void TSolSearcherDetails::CreateConcurrentUsersPassword(unsigned short units_licensed)
-{
-   char password_string[14];
-
-   //
-   // If for some reason you're in this function and not a SSKey
-   if (key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
-        return;
-
-   //
-   // check attached key status - need to have a programmed key attached
-   // pkey should always be SSProtectionKey
-   SSProtectionKey* ss_key = ((SSProtectionKey*)(key_record->pkey));
-
-   //
-   // check if key is attached
-   if(!isAttachedKeyReady())
-      return;
-
-   //
-   // generate password
-   unsigned long password = keyMaster->getConcurrentUsersPassword(ss_key, units_licensed);
-   if(!password)
-   {
-      Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-
-   //
-   // apply password to key
-   keyMaster->applyConcurrentUsersPassword(key_record, units_licensed);
-
-   //
-   // format password
-   sprintf( password_string, "%8X-%1d", password, units_licensed);
-
-   //
-   // Update database
-   try
-   {
-      m_pDatabase->StartTransaction();
-
-      DetailSQL->Close();
-      DetailSQL->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRconcurrentUsers = :units WHERE SKRid = :keyId ");
-      else
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRconcurrentUsers = :units WHERE SKRid = :keyId ");
-
-      DetailSQL->ParamByName("units")->AsInteger = ss_key->getConcurrentUsers();
-      DetailSQL->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      DetailSQL->ExecSQL();
-
-      DetailSQL->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      DetailSQL->ParamByName("key_id")->AsInteger = key_record->skr_id;
-      DetailSQL->ParamByName("password")->AsString = password_string;
-      DetailSQL->ParamByName("units")->AsInteger = units_licensed;
-      DetailSQL->ParamByName("descriptionid")->AsInteger = 602;  // 602 = Concurrent Users
-      DetailSQL->ExecSQL();
-
-      m_pDatabase->Commit();
-      RefreshKeyPage(0);
-      RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      m_pDatabase->Rollback();
-   }
-}
-
-//==============================================================================
-// Function:    createApplicationPassword()
-// Purpose:     creates an application server password, and updates the information in
-//              the SKeyRecord and STransactionDetail tables based on the key
-//              record id number.
-// Parameters:  ( int ) - units_licensed
-// Returns:     None
-//==============================================================================
-void TSolSearcherDetails::CreateApplicationPassword(unsigned short units_licensed)
-{
-   char password_string[14];
-
-   //
-   // If for some reason you're in this function and not a SSKey
-   if (key_record->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
-        return;
-
-   //
-   // check attached key status - need to have a programmed key attached
-   // pkey should always be SSProtectionKey
-   SSProtectionKey* ss_key = ((SSProtectionKey*)(key_record->pkey));
-
-   //
-   // check if key is attached
-   if(!isAttachedKeyReady())
-      return;
-
-   //
-   // generate password
-   unsigned long password = keyMaster->getApplicationServerPassword(ss_key, units_licensed);
-   if(!password)
-   {
-      Application->MessageBox("Unable to generate password. Check to see if the key is a slave key.", "Key Message", MB_OK|MB_ICONERROR );
-      return;
-   }
-
-   //
-   // apply password to key
-   keyMaster->applyApplicationPassword(key_record, units_licensed);
-
-   //
-   // format password
-   sprintf( password_string, "%8X-%1d", password, units_licensed);
-
-   //
-   // Update database
-   try
-   {
-      m_pDatabase->StartTransaction();
-
-      DetailSQL->Close();
-      DetailSQL->SQL->Clear();
-
-      if (key_record->non_perm_ktf == true)
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRconcurrentUsers = :units WHERE SKRid = :keyId ");
-      else
-         DetailSQL->SQL->Add("UPDATE SKeyRecord SET SKRstatus = 2, SKRapplications = :units WHERE SKRid = :keyId ");
-
-      DetailSQL->ParamByName("units")->AsInteger = ss_key->getApplications();
-      DetailSQL->ParamByName("keyId")->AsInteger = key_record->skr_id;
-      DetailSQL->ExecSQL();
-
-      DetailSQL->SQL->Add("INSERT INTO sTransactionDetail (SKRid, TDpassword, SDRid, TDunits, TDrow_id) values (:key_id, :password, :descriptionid, :units, 0)");
-      DetailSQL->ParamByName("key_id")->AsInteger = key_record->skr_id;
-      DetailSQL->ParamByName("password")->AsString = password_string;
-      DetailSQL->ParamByName("units")->AsInteger = units_licensed;
-      DetailSQL->ParamByName("descriptionid")->AsInteger = 603;  // 603 = Application Servers
-      DetailSQL->ExecSQL();
-
-      m_pDatabase->Commit();
-      RefreshKeyPage(0);
-      RefreshKeyPage();
-   }
-   catch( Exception *e )
-   {
-      Application->MessageBox( e->Message.c_str(), "Database Failure", MB_OK);
-      m_pDatabase->Rollback();
-   }
-}
-*/
 
 
 
