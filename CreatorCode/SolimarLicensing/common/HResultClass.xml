@@ -10,7 +10,8 @@
 	<!--	-->
 	<!-- Offset defines -->
 	<!--	-->
-	<Offset name="ITF_MIN"		      value="0x0000"  base="HRESULT_BASE"/>
+	<Offset name="ITF_OFFSET"		  value="0x0000"  base=""/>	
+	<Offset name="ITF_MIN"		      value="ITF_OFFSET"  base="HRESULT_BASE"/>
 	<Offset name="ITF_CR_MIN"	      value="0x9000"  base="ITF_MIN"/>
 	<Offset name="ITF_LIC_SVR_OFFSET" value="0x0000"  base="ITF_CR_MIN"/>
 	<Offset name="ITF_RNBO_OFFSET"    value="0x0100"  base="ITF_CR_MIN"/>    
