@@ -123,12 +123,12 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Connect(std::wstring server
 	return SUCCEEDED(hr);
 }
 
-bool SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level)
+bool SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes)
 {
 	SafeMutex mutex(m_MemberLock);
 	
 	BSTR bstrSpecificSingleKey = SysAllocString(specific_single_key_ident.c_str());
-	HRESULT hr = m_licenseManagerPtr->Initialize(product, prod_ver_major, prod_ver_minor, (single_key ? VARIANT_TRUE : VARIANT_FALSE), bstrSpecificSingleKey, (lock_keys ? VARIANT_TRUE : VARIANT_FALSE), ui_level);
+	HRESULT hr = m_licenseManagerPtr->Initialize2(product, prod_ver_major, prod_ver_minor, (single_key ? VARIANT_TRUE : VARIANT_FALSE), bstrSpecificSingleKey, (lock_keys ? VARIANT_TRUE : VARIANT_FALSE), ui_level, grace_period_minutes);
 	SysFreeString(bstrSpecificSingleKey);
 	
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::Initialize()", hr);

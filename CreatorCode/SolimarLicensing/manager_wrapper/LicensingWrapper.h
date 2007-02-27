@@ -6,10 +6,12 @@
 
 #include <string>
 #include "..\SolimarLicenseManager\_SolimarLicenseManager.h"
+#include "..\SolimarLicenseManager\ISolimarLicenseMgr.h"
 #include "..\SolimarLicenseServer\KeySpec.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\LicensingMessage.h"
 #include "..\Common\GIT.h"
+#include "..\common\LicenseError.h"
 
 // Usage:
 // 1) Create a LicensingWrapper object.
@@ -28,7 +30,7 @@ namespace SolimarLicenseManagerWrapper
 	if(FAILED(hr)) \
 	{ \
 		wchar_t debug_buf[1024]; \
-		_snwprintf(debug_buf, 1024, L"%s - Error = 0x%08X", header, hr); \
+		_snwprintf(debug_buf, 1024, L"%s - %s", header, LicenseServerError::GetErrorMessage(hr).c_str()); \
 		debug_buf[1023] = 0; \
 		OutputDebugStringW(debug_buf); \
 	} \
@@ -43,18 +45,9 @@ public:
 	virtual ~LicensingWrapper();
 	bool Connect(std::wstring server);
 
-	enum {
-		UI_IGNORE =				0x00,
-		UI_LEVEL_ALL =			0x01,
-		UI_LEVEL_RESPONSE =		0x02,
-		UI_LEVEL_CRITICAL =		0x04,
-		UI_STYLE_DIALOG =		0x10,
-		UI_STYLE_EVENT_LOG =	0x20,
-	};
-	
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	
-	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE);
+	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0);
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
 	bool ModuleLicenseTotal(long module, long* license_count);
@@ -72,7 +65,7 @@ public:
 	long LookupHeaderID(std::string header);
 	
 	static KeySpec keyspec;
-	
+
 private:
 	
 	static BYTE challenge_key_manager_userauththis_public[];
