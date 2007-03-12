@@ -110,6 +110,10 @@ public:
             {
                OutputDebugStringW(L"\nGITPtr::Attach() - pIGIT->RegisterInterfaceInGlobal() failed.") ;
             }
+				else
+				{
+					pItf->Release();
+				}
 		   }
       }
 		return hr;
