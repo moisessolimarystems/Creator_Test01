@@ -128,7 +128,7 @@ HRESULT CommunicationLink::InitializeModuleLicenseConnection(Object* TheKeyNumbe
 		retval.ChangeType(VT_BSTR);
 		
 		VARIANT temp;
-      VariantInit(&temp);
+		VariantInit(&temp);
 		HRESULT hr = 0;
 
 		//get the list of modules

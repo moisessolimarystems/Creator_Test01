@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 
 using namespace System::Reflection;
 using namespace System::Runtime::CompilerServices;
@@ -8,11 +8,11 @@ using namespace System::Runtime::CompilerServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly:AssemblyTitleAttribute("")];
-[assembly:AssemblyDescriptionAttribute("")];
+[assembly:AssemblyTitleAttribute("Solimar License Manager")];
+[assembly:AssemblyDescriptionAttribute("Solimar License Manager")];
 [assembly:AssemblyConfigurationAttribute("")];
-[assembly:AssemblyCompanyAttribute("")];
-[assembly:AssemblyProductAttribute("")];
+[assembly:AssemblyCompanyAttribute("Solimar Systems")];
+[assembly:AssemblyProductAttribute("Solimar License Manager")];
 [assembly:AssemblyCopyrightAttribute("")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];		

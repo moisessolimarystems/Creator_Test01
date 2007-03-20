@@ -20,7 +20,6 @@
 
 using namespace KeyReaderGUI;
 
-
 static System::String* ExceptionStringFormater(Exception* e, int depth)
 {  
 	System::Object *o[] = {e->Source,
@@ -52,9 +51,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	{
 		System::String* estr = System::String::Format("An exception was thrown.\r\n\r\n{0}\r\n\r\nLicense Manager will now close. ",ExceptionStringFormater(e,0));		
 		MessageBox::Show(estr,"Unexpected Error", MessageBoxButtons::OK, MessageBoxIcon::Error); 
-		//MessageBox::Show("An exception was thrown.\r\n\r\n\r\n\r\nLicense Manager will now close.", "Unexpected Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
-
 	return 0;
 }
 
@@ -67,8 +64,9 @@ Form1::Form1()
 	//The Sizing Manager scales the size of the form with respect to the monitor resolution
 	this->TheSizingManager = new ControlSizing(this);
 
-	//SaveConfig is used to save the form/control sizes into the registry
-	SaveConfig = new SaveConfigurations(this);	
+	//SaveCfg is used to save the form/control sizes into the registry
+	this->SaveCfg = new SaveConfigurations(this);
+	this->SaveCfg->LoadSettings();
 	
 	//add all of the components to the form
 	InitializeComponent();
@@ -78,10 +76,7 @@ Form1::Form1()
 	InitializeModListView();
 	InitializeMainMenu();
 	InitializeForm();
-    InitializeModPanel();
 	InitializeGUITimer();
-
-	TheAboutBox = new AboutBox();
 
 	this->KeyInfoPanel->ResumeLayout(false);
 	this->ModuleLicensePanel->ResumeLayout(false);
@@ -148,10 +143,11 @@ void Form1::Dispose(Boolean disposing)
 		delete TheSizingManager;
 		TheSizingManager = NULL;
 	}
-	if(this->SaveConfig)
+
+	if(this->SaveCfg)
 	{
-		delete SaveConfig;
-		SaveConfig = NULL;
+		delete SaveCfg;
+		SaveCfg = NULL;
 	}
 	__super::Dispose(disposing);
 }
@@ -185,50 +181,28 @@ void Form1::InitializeGUITimer()
 void Form1::InitializeForm()
 {
 	//init form size and location
-	int width, height, x_coord, y_coord;
+	//int width, height, x_coord, y_coord
+	System::Drawing::Point FormLocation;
+	System::Drawing::Size FormSize;
 
 	//get the saved form configurations from the registry
-	SaveConfig->LoadFormConfigs(&width, &height, &x_coord, &y_coord);
+	SaveCfg->LoadFormConfigs(&FormLocation, &FormSize);
 	
-	//if one of those values is -1 than we know that this is the first time the app has ever run
-	/*if(width == -1)
+	if(FormSize.Width < 0)
 	{
+		// Set the size of the form to be 3/4 the size of working rectangle.
 		this->TheSizingManager->InitializeFormSize();
 		this->TheSizingManager->InitializeFormLocation();
 	}
-
 	else
 	{
-	*/
-	if(width != -1)
-	{
 		// Set the size of the form to be 3/4 the size of working rectangle.
-		this->Size = *(__nogc new System::Drawing::Size(width, height));
-		this->Location = *(__nogc new System::Drawing::Point(x_coord, y_coord));
+		this->Size = FormSize; //*(__nogc new System::Drawing::Size(width, height));
+		this->Location = FormLocation; //*(__nogc new System::Drawing::Point(x_coord, y_coord));
 	}
 
 	//declare a form closing even handler that will be used to save the user's configs in reg.
 	this->Closed += new System::EventHandler(this, &Form1::Form1_Closing);
-}
-
-//The ModPanel is the panel on the right of the form. It contains a list that displays the module
-//license information. When the form loads we want to intialize it to the same size it was when
-//user last closed the application. In order to do this we need to set the size of the mod panel 
-//and the entire form and every other control will follow because of how everything is docked. 
-void Form1::InitializeModPanel()
-{
-   	//init form size and location
-	int width, height, x_coord, y_coord;
-
-	//get the saved form configurations from the registry
-	SaveConfig->LoadModPanelConfig(&width, &height, &x_coord, &y_coord);
-	
-	//if one of those values is -1 than we know that this is the first time the app has ever run
-	if(width != -1)
-	{
-      this->ModuleLicensePanel->Height = height;
-      this->ModuleLicensePanel->Width = width;
-	}
 }
 
 //The Key info list view is located on the left side of the form and it displays all of
@@ -242,7 +216,6 @@ void Form1::InitializeKeyInfoListView()
 	this->Active->Text = S"Active";
 	this->HoursLeft->Text = S"Days Left";
 	this->ExpirationDate->Text = S"Expiration Date";
-
 
 	//set the list view attributes
 	this->KeyInfoListView->Alignment = ListViewAlignment::SnapToGrid;
@@ -263,8 +236,8 @@ void Form1::InitializeKeyInfoListView()
 	memset(&KeyConfigStruct, 0 , sizeof(KeyConfigStruct));
 
 	//Load the saved configurations from the registry.
-	this->SaveConfig->LoadKeyListConfig(&KeyConfigStruct);
-	
+	this->SaveCfg->LoadKeyListConfig(&KeyConfigStruct);
+
 	// -1 represents the first time running this app
 	if(KeyConfigStruct.width == -1)
 	{
@@ -328,7 +301,7 @@ void Form1::InitializeModListView()
 	memset(&ModConfigStruct, 0 , sizeof(ModConfigStruct));
 
 	//load the mod list view info from registry
-	this->SaveConfig->LoadModListConfig(&ModConfigStruct);
+	this->SaveCfg->LoadModListConfig(&ModConfigStruct);
 
 	//-1 represents the first time running this app
 	if(ModConfigStruct.width == -1)
@@ -340,9 +313,9 @@ void Form1::InitializeModListView()
 	//load the init values from registry
 	else
 	{	
-		this->ModuleName->Width = ModConfigStruct.FirstModColumnWidth;
-		this->TotalLicenses->Width = ModConfigStruct.SecondModColumnWidth;
-		this->LicensesInUse->Width = ModConfigStruct.ThirdModColumnWidth;
+		this->ModuleName->Width = ModConfigStruct.ColumnWidth[0];
+		this->TotalLicenses->Width = ModConfigStruct.ColumnWidth[1]; 
+		this->LicensesInUse->Width = ModConfigStruct.ColumnWidth[2]; 
 		
       //set the order of the columns in the view
 		//get the current column order
@@ -384,6 +357,7 @@ void Form1::InitializeMainMenu()
 
 void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e)
 {
+	TheAboutBox = new AboutBox();
 	TheAboutBox->ShowDialog();
 }
 
@@ -672,13 +646,11 @@ void Form1::ModList_MouseDown(Object* sender, MouseEventArgs* e)
 
 void Form1::Form1_Closing(Object* sender, EventArgs* e)
 {
-	if(SaveConfig)
+	if(SaveCfg)
 	{
-		SaveConfig->SaveFormConfigs();
-		SaveConfig->SaveKeyPanelConfig(this->KeyInfoPanel);
-		SaveConfig->SaveModPanelConfig(this->ModuleLicensePanel);
-		SaveConfig->SaveKeyListConfig(this->KeyInfoListView);
-		SaveConfig->SaveModListConfig(this->ModLicenseListView);
-		SaveConfig->SaveSplitterConfig(this->splitter1);
+		SaveCfg->SaveFormConfigs();
+		SaveCfg->SaveKeyListConfig(this->KeyInfoListView);
+		SaveCfg->SaveModListConfig(this->ModLicenseListView);
+		SaveCfg->SaveSettings();
 	}
 }

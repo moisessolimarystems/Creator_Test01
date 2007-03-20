@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ControlSizing.h"
 
-#define WIDTH_SCALAR .79
-#define HEIGHT_SCALAR .70
+#define WIDTH_SCALAR .69
+#define HEIGHT_SCALAR .60
 #define FORM_LOC_X_COORD 55
 #define FORM_LOC_Y_COORD 55
 
@@ -28,7 +28,7 @@ ControlSizing::~ControlSizing()
 void ControlSizing::InitializeFormSize()
 {
 	// Set the size of the form to be 3/4 the size of working rectangle.
-	MainForm->Size = *(__nogc new Size((int)(FormWidth * WIDTH_SCALAR), 
+	MainForm->Size =  *(__nogc new Size((int)(FormWidth * WIDTH_SCALAR), 
 									   (int)(FormHeight * HEIGHT_SCALAR)));
 }
 

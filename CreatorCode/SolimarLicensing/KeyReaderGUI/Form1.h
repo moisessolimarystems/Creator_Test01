@@ -21,7 +21,7 @@ namespace KeyReaderGUI
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
-	using namespace System::Data;
+//	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::ServiceProcess;
 	using namespace KeyViewManager;
@@ -52,13 +52,12 @@ namespace KeyReaderGUI
 	private:
 		//private methods
 		void SelectCurrentKey();
-      void StartTimer();
-      void StopTimer();
-      void UpdateKeyListView();
+		void StartTimer();
+		void StopTimer();
+		void UpdateKeyListView();
 		void UpdateViews();
 
 		//helper methods used to initialize the components on the form
-      void InitializeModPanel();
 		void InitializeKeyInfoListView();
 		void InitializeModListView();
 		void InitializeMainMenu();
@@ -137,8 +136,6 @@ namespace KeyReaderGUI
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-
-
 		void InitializeComponent(void)
 		{
 			System::Resources::ResourceManager *  resources = new System::Resources::ResourceManager(__typeof(KeyReaderGUI::Form1));
@@ -283,9 +280,9 @@ namespace KeyReaderGUI
 			// 
 			this->ModuleLicensePanel->Controls->Add(this->ModLicenseListView);
 			this->ModuleLicensePanel->Dock = System::Windows::Forms::DockStyle::Right;
-			this->ModuleLicensePanel->Location = System::Drawing::Point(512, 0);
+			this->ModuleLicensePanel->Location = System::Drawing::Point(424, 0);
 			this->ModuleLicensePanel->Name = S"ModuleLicensePanel";
-			this->ModuleLicensePanel->Size = System::Drawing::Size(200, 373);
+			this->ModuleLicensePanel->Size = System::Drawing::Size(288, 373);
 			this->ModuleLicensePanel->TabIndex = 1;
 			// 
 			// ModLicenseListView
@@ -295,7 +292,7 @@ namespace KeyReaderGUI
 			this->ModLicenseListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->ModLicenseListView->Location = System::Drawing::Point(0, 0);
 			this->ModLicenseListView->Name = S"ModLicenseListView";
-			this->ModLicenseListView->Size = System::Drawing::Size(200, 373);
+			this->ModLicenseListView->Size = System::Drawing::Size(288, 373);
 			this->ModLicenseListView->TabIndex = 0;
 			this->ModLicenseListView->View = System::Windows::Forms::View::Details;
 			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, ModLicenseListView_KeyUp);
@@ -304,7 +301,7 @@ namespace KeyReaderGUI
 			// 
 			this->splitter1->BackColor = System::Drawing::SystemColors::ActiveBorder;
 			this->splitter1->Dock = System::Windows::Forms::DockStyle::Right;
-			this->splitter1->Location = System::Drawing::Point(509, 0);
+			this->splitter1->Location = System::Drawing::Point(421, 0);
 			this->splitter1->Name = S"splitter1";
 			this->splitter1->Size = System::Drawing::Size(3, 373);
 			this->splitter1->TabIndex = 2;
@@ -316,7 +313,7 @@ namespace KeyReaderGUI
 			this->KeyInfoPanel->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->KeyInfoPanel->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoPanel->Name = S"KeyInfoPanel";
-			this->KeyInfoPanel->Size = System::Drawing::Size(509, 373);
+			this->KeyInfoPanel->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoPanel->TabIndex = 3;
 			// 
 			// KeyInfoListView
@@ -334,7 +331,7 @@ namespace KeyReaderGUI
 			this->KeyInfoListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->KeyInfoListView->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoListView->Name = S"KeyInfoListView";
-			this->KeyInfoListView->Size = System::Drawing::Size(509, 373);
+			this->KeyInfoListView->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoListView->TabIndex = 0;
 			this->KeyInfoListView->View = System::Windows::Forms::View::Details;
 			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, KeyInfoListView_KeyUp);
@@ -369,9 +366,7 @@ namespace KeyReaderGUI
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
 		ControlSizing* TheSizingManager;
-        SaveConfigurations* SaveConfig;
-
-		 
+        SaveConfigurations* SaveCfg;
 
 #undef MessageBox
 private: void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
