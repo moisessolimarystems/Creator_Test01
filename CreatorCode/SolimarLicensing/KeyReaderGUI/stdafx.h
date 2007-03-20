@@ -48,25 +48,21 @@ typedef struct
 
 typedef struct
 {
-	int height;
-	int width;
 	int x_coord;
 	int y_coord;
-	char* FirstModColumnName;
-	char* SecondModColumnName;
-	char* ThirdModColumnName;
-	int FirstModColumnWidth;
-	int SecondModColumnWidth;
-	int ThirdModColumnWidth;
+	int height;
+	int width;
+	int ColumnWidth[NUM_MOD_COLS];
 	int ColOrder[NUM_MOD_COLS];
 }ModuleGUIConfigurationStruct, *ModuleGUIConfigurationStructPtr;
 
+
 typedef struct
 {
-	int height;
-	int width;
 	int x_coord;
 	int y_coord;
+	int height;
+	int width;
 	int ColWidths[NUM_KEY_COLS];
 	int ColOrder[NUM_KEY_COLS];
 }KeyGUIConfigurationStruct, *KeyGUIConfigurationStructPtr;

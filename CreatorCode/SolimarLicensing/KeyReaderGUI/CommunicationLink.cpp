@@ -38,20 +38,26 @@ CommunicationLink::~CommunicationLink()
 //connects to the solimar license server
 HRESULT CommunicationLink::Connect()
 {
-	HRESULT hr = 0;	
+	HRESULT hr = 0;
 	void* temp = 0;
 
 	//connects to the solimar license server
-	hr = CoCreateInstance(CLSID_CSolimarLicenseSvr, 
+	hr = CoCreateInstance(
+						  __uuidof(CSolimarLicenseSvr),
 						  NULL, 
 						  CLSCTX_LOCAL_SERVER, 
-						  IID_ISolimarLicenseSvr, 
+						  __uuidof(ISolimarLicenseSvr2),
 						  &temp
 						 );
+
 	if(SUCCEEDED(hr))
 	{
 		//if cocreateinstance succeeds save the pointer to the server
-		pTheServer = reinterpret_cast<ISolimarLicenseSvr*>(temp);
+		pTheServer = reinterpret_cast<ISolimarLicenseSvr2*>(temp);
+	}
+	else
+	{
+		return hr;
 	}
 
 	ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
@@ -94,7 +100,8 @@ HRESULT CommunicationLink::InitializeKeyInfoConnection()
 	pKeyList = new VARIANT();
 
 	//get the list of keys
-	hr = pTheServer->KeyEnumerate(pKeyList);
+	if(pTheServer)
+		hr = pTheServer->KeyEnumerate(pKeyList);
 
 	return hr;
 }
@@ -121,7 +128,7 @@ HRESULT CommunicationLink::InitializeModuleLicenseConnection(Object* TheKeyNumbe
 		retval.ChangeType(VT_BSTR);
 		
 		VARIANT temp;
-      VariantInit(&temp);
+		VariantInit(&temp);
 		HRESULT hr = 0;
 
 		//get the list of modules
@@ -188,10 +195,13 @@ int CommunicationLink::GetNumKeys()
 	HRESULT hr = 0;
 
 	//get the list of keys
-	hr = pTheServer->KeyEnumerate(pKeyList);
+	if(pTheServer)
+	{	
+		hr = pTheServer->KeyEnumerate(pKeyList);
 
-	if(SUCCEEDED(hr))
-		return pKeyList->parray->rgsabound[0].cElements;
+		if(SUCCEEDED(hr))
+			return pKeyList->parray->rgsabound[0].cElements;
+	}	
 
 	return 0;
 }
@@ -293,7 +303,7 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 											  &(TheModStruct.TotalLicenses)
 											 );
 
-			pTheServer->KeyModuleLicenseInUse(retval.bstrVal,
+			pTheServer->KeyModuleInUse(retval.bstrVal,
 											  (TheModStruct.ModuleID).lVal,
 											  &(TheModStruct.LicensesInUse)
 											  );
