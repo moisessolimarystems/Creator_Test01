@@ -210,13 +210,13 @@ namespace KeyReaderGUI
 			this->File_StartupServer->Index = 0;
 			this->File_StartupServer->Text = S"Startup Server";
 			this->File_StartupServer->Visible = false;
-			this->File_StartupServer->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::File_StartupServer_Click);
+			this->File_StartupServer->Click += new System::EventHandler(this, File_StartupServer_Click);
 			// 
 			// File_ShutdownServer
 			// 
 			this->File_ShutdownServer->Index = 1;
 			this->File_ShutdownServer->Text = S"Shutdown Server";
-			this->File_ShutdownServer->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::File_ShutdownServer_Click);
+			this->File_ShutdownServer->Click += new System::EventHandler(this, File_ShutdownServer_Click);
 			// 
 			// menuItem2
 			// 
@@ -227,7 +227,7 @@ namespace KeyReaderGUI
 			// 
 			this->ExitMenuItem->Index = 3;
 			this->ExitMenuItem->Text = S"&Exit";
-			this->ExitMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::ExitMenuItem_Click);
+			this->ExitMenuItem->Click += new System::EventHandler(this, ExitMenuItem_Click);
 			// 
 			// viewMenuItem
 			// 
@@ -250,7 +250,7 @@ namespace KeyReaderGUI
 			__mcTemp__4[1] = this->AddPasswordPacketMenuItem;
 			this->PasswordMenuItem->MenuItems->AddRange(__mcTemp__4);
 			this->PasswordMenuItem->Text = S"Password";
-			this->PasswordMenuItem->Select += new System::EventHandler(this, &KeyReaderGUI::Form1::PasswordMenuItem_Select);
+			this->PasswordMenuItem->Select += new System::EventHandler(this, PasswordMenuItem_Select);
 			// 
 			// EnterPasswordMenuItem
 			// 
@@ -261,7 +261,7 @@ namespace KeyReaderGUI
 			// 
 			this->AddPasswordPacketMenuItem->Index = 1;
 			this->AddPasswordPacketMenuItem->Text = S"&Add Password Packet";
-			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::AddPasswordPacketMenuItem_Click);
+			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, AddPasswordPacketMenuItem_Click);
 			// 
 			// HelpMenuItem
 			// 
@@ -295,7 +295,7 @@ namespace KeyReaderGUI
 			this->ModLicenseListView->Size = System::Drawing::Size(288, 373);
 			this->ModLicenseListView->TabIndex = 0;
 			this->ModLicenseListView->View = System::Windows::Forms::View::Details;
-			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, &KeyReaderGUI::Form1::ModLicenseListView_KeyUp);
+			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, ModLicenseListView_KeyUp);
 			// 
 			// splitter1
 			// 
@@ -334,7 +334,7 @@ namespace KeyReaderGUI
 			this->KeyInfoListView->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoListView->TabIndex = 0;
 			this->KeyInfoListView->View = System::Windows::Forms::View::Details;
-			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, &KeyReaderGUI::Form1::KeyInfoListView_KeyUp);
+			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, KeyInfoListView_KeyUp);
 			// 
 			// Form1
 			// 
@@ -348,7 +348,7 @@ namespace KeyReaderGUI
 			this->Menu = this->mainMenu1;
 			this->Name = S"Form1";
 			this->Text = S"Solimar License Manager";
-			this->Load += new System::EventHandler(this, &KeyReaderGUI::Form1::Form1_Load);
+			this->Load += new System::EventHandler(this, Form1_Load);
 			this->ModuleLicensePanel->ResumeLayout(false);
 			this->KeyInfoPanel->ResumeLayout(false);
 			this->ResumeLayout(false);

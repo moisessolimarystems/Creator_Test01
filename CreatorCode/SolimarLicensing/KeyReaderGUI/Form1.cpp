@@ -350,9 +350,9 @@ System::Void Form1::ExitMenuItem_Click(System::Object *  sender, System::EventAr
 
 void Form1::InitializeMainMenu()
 {
-   this->refreshMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::refreshMenuItem_Click);
-   this->EnterPasswordMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::EnterPasswordMenuItem_Click);
-   this->AboutSolimar->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::AboutSolimar_Click);
+   this->refreshMenuItem->Click += new System::EventHandler(this, Form1::refreshMenuItem_Click);
+   this->EnterPasswordMenuItem->Click += new System::EventHandler(this, Form1::EnterPasswordMenuItem_Click);
+   this->AboutSolimar->Click += new System::EventHandler(this, Form1::AboutSolimar_Click);
 }
 
 void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e)
