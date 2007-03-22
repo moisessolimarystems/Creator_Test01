@@ -532,7 +532,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       else // ...otherwise create a password
       {
          // SolScript module passwords are not incremental
-         if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
+         //if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
             units = 0;
          //applies module password to key
          //keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
