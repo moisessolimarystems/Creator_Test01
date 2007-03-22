@@ -664,9 +664,14 @@ HRESULT KeyServer::PasswordPacketInitialize(BSTR license_id)
 HRESULT KeyServer::PasswordPacketAppendPassword(BSTR license_id, VARIANT vtExpires, BSTR password)
 {
 	SafeMutex mutex(PasswordPacketListLock);
-	_bstr_t lid(license_id,true);
-	password_packets[lid].passwords.push_back(ExpirePasswordPair(vtExpires,_bstr_t(password,true)));
-	
+
+	RainbowDriver::ArgumentList password_arguments;
+	HRESULT hr = RainbowDriver::ParsePassword(password, password_arguments);
+	if (SUCCEEDED(hr) && !password_arguments.legacy)	//Don't let legacy passwords be put into password packets.
+	{
+		_bstr_t lid(license_id,true);
+		password_packets[lid].passwords.push_back(ExpirePasswordPair(vtExpires,_bstr_t(password,true)));
+	}
 	return S_OK;
 }
 
