@@ -89,12 +89,6 @@ public:
    //--- Pages Per Minute Functions
    void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, ushort password_number, long);
 
-   ushort getPagesPerMinuteExtensions();
-   ushort getPagesPerMinute(ushort/*mod_id*/);
-   short setPagesPerMinuteExtensions(ushort/*extensions*/);
-   short setPagesPerMinute(ulong/*mod_id*/, ulong/*pages*/);
-   //short incrementPagesPerMinuteExtensions(ushort/*extensions*/);
-
 protected:
    // protection key data (references into ProtectionKey::keyDataBlock)
    ushort* moduleCells;

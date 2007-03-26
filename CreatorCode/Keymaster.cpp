@@ -424,6 +424,20 @@ HRESULT KeyMaster::initDriver()
 			                (void**)&pTheServer
 	  		               );
 
+
+	// Try to create an ISolimarLicenseServer proxy to the server
+/*        COSERVERINFO	serverInfo	= {0, L"jlan5", NULL, 0};
+//	COSERVERINFO	serverInfo	= {0, KeyServer, NULL, 0};
+	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
+
+	hr = CoCreateInstanceEx(
+		__uuidof(CSolimarLicenseSvr),
+		NULL,
+		CLSCTX_REMOTE_SERVER,
+		&serverInfo,
+		1,
+		&multiQI);
+*/
    if(!SUCCEEDED(hr))
    {
       Application->MessageBox("The Solimar License Server Is Not Running", "Key Message", MB_OK|MB_ICONERROR );
@@ -1370,15 +1384,6 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
                 key_record->xch_ps_dbcs_ppm = 0;
                 key_record->xch_pcl_ppm = 0;
                 key_record->afpds_ps_ppm = 0;
-
-                if (key_record->pkey->productId != ICONVERT_PRODUCT) {
-                   // CREATES the pages per minute values in the registry.
-                   spd_key->setPagesPerMinute(XCH_PS_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_PCL_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_PS_DBCS_ID, 0);
-                   spd_key->setPagesPerMinute(XCH_IPDS_ID, 0);
-                   spd_key->setPagesPerMinute(AFPDS_PS_ID, 0);
-                }
             }
             break;
        case SPDE_PRODUCT:

@@ -92,7 +92,6 @@
 #ifdef __WIN32__ // the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
    moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
@@ -100,7 +99,6 @@ SpdProtectionKey::SpdProtectionKey() :
 #else // not the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL])
    moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
@@ -111,7 +109,6 @@ SpdProtectionKey::SpdProtectionKey() :
 ---------------------------------------------------------------------------*/
 SpdProtectionKey::SpdProtectionKey(const SpdProtectionKey& pkey) :
    ProtectionKey(pkey),
-//   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
    moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
@@ -252,12 +249,11 @@ void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
    if(pServer)
    {
       BSTR password;
-      DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
       if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    productId,
                                                    ModID,
-                                                   ppm_struct,
+                                                   pages,
                                                    password_number,
                                                    &password
                                                   )))
@@ -268,182 +264,6 @@ void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
       }
       SysFreeString(password);
    }
-}
-
-
-//==============================================================================
-// Function:    getPagesPerMinute()
-// Purpose:     This function will return the number of pages per minute.
-//              It will check the registry for certain settings.
-//		Under the Solimar\\Solimar Print/Director key there will be an
-//		entry based on the customer number, key number, mod id, and
-//		pages per minute. The DWORD entry is found based on the key number
-//		that it is looking for, and then the pages are extracted from the
-//		DWORD value.
-//		n = (0x00000FFF & pages) |
-//		  ((0x000000FF & mod_id)<<12) |
-//		  ((0x000000FF & keyNumber)<<20);
-// Parameters:  ushort - mod_id
-// Returns:     ushort - the pages per minute
-//==============================================================================
-ushort SpdProtectionKey::getPagesPerMinute(ushort mod_id)
-{
-   DWORD pages(0);
-   DWORD regKeyInfo(0);
-   HKEY hKey;
-
-   if ( isOnTrial() )
-	   return MAX_PAGES_PER_MINUTE;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, KEY_ALL_ACCESS, &hKey)==ERROR_SUCCESS)
-   {
-        DWORD dwValue =(DWORD)-1;
-		  DWORD dwType,dwLen=sizeof(DWORD);
-
-        LPCSTR lpValueName;
-        sprintf( scratchBuf, "%03hX%02hd%03hd", customerNumber, keyNumber, mod_id );
- 		  lpValueName = scratchBuf;
-
-   	switch(mod_id)
-		{
-			case XCH_IPDS_ID:      //Xchange::IPDS
-         case XCH_PCL_ID:       //Xchange::PCL
-         case XCH_PS_ID:        //Xchange::PS
-         case XCH_PS_DBCS_ID:   //Xchange::PS (Double byte character support)
-         case AFPDS_PS_ID:      //AFPDS::PS
-         	regKeyInfo = (RegQueryValueEx(hKey, lpValueName, NULL, &dwType,(BYTE*)&dwValue,&dwLen) != ERROR_SUCCESS) ? 0 : dwValue;
-            pages = (0x00000FFF & regKeyInfo);
-            break;
-         default:
-            pages = 0;
-            break;
-      }
-   }
-
-   RegCloseKey(hKey);
-   return (ushort)pages;
-}
-
-//==============================================================================
-// Function:    setPagesPerMinute()
-// Purpose:     This function will set the number of pages per minute in the
-//		registry. We will code it so that it is not recognizeable to
-//		the user.
-// Parameters:  ulong mod_id -
-//		ulong pages -
-// Returns:     None
-//==============================================================================
-short SpdProtectionKey::setPagesPerMinute(ulong mod_id, ulong pages)
-{
-   HKEY hKey;
-   DWORD disp ;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp)==ERROR_SUCCESS)
-   {
-		LPCTSTR lpValueName;
-      switch(mod_id)
-      {
-      	case XCH_IPDS_ID:      //Xchange::IPDS
-      	case XCH_PCL_ID:       //Xchange::PCL
-      	case XCH_PS_ID:        //Xchange::PS
-      	case XCH_PS_DBCS_ID:   //Xchange::PS (Double byte character support)
-      	case AFPDS_PS_ID:      //AFPDS::PS
-      		sprintf( scratchBuf, "%03hX%02hd%03hd", customerNumber, keyNumber, mod_id );
-      		lpValueName = scratchBuf;
-      		break;
-      	default:
-      		lpValueName = "";
-      		break;
-      }
-
-      DWORD n = (0x00000FFF & pages) | ((0x000000FF & mod_id)<<12) | ((0x000000FF & keyNumber)<<20);
-      if (RegSetValueEx(hKey, lpValueName, NULL, REG_DWORD, (BYTE *) &n, sizeof(DWORD)) != ERROR_SUCCESS)
-      {
-      	MessageBox(NULL, "Error Updating Registry.", "", MB_OK | MB_ICONWARNING);
-         return FAILURE;
-      }
-      // end of registry
-	}
-	RegCloseKey(hKey);
-   return SUCCESS;
-
-}
-
-
-//==============================================================================
-// Function:    getPagesPerMinuteExtensions()
-// Purpose:     This function will return the number of extensions from the key
-//              The extensions are stored in the output units cell, and are the
-//              4 most significant bits of 0xAFFF where A houses the number of
-//              extensions.  Since 4095 is the max number of outputs, we will use
-//              This value for the pages per minute extensions.  That way, the
-//              key is responsible for the number of extensions.
-// Parameters:  None
-// Returns:     ulong - password
-//==============================================================================
-ushort SpdProtectionKey::getPagesPerMinuteExtensions()
-{
-   DWORD ext(0);
-   DWORD regKeyInfo(0);
-   HKEY hKey;
-
-   if ( isOnTrial() )
-        return 0;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, KEY_ALL_ACCESS, &hKey)==ERROR_SUCCESS)
-   {
-
-        DWORD dwValue =(DWORD)-1;
-        DWORD dwType,dwLen=sizeof(DWORD);
-
-        LPCSTR lpValueName;
-        sprintf( scratchBuf, "%03hX%02hX", customerNumber, keyNumber);
-        lpValueName = scratchBuf;
-
-   	  regKeyInfo = (RegQueryValueEx(hKey, lpValueName, NULL, &dwType,(BYTE*)&dwValue,&dwLen) != ERROR_SUCCESS) ? 0 : dwValue;
-        ext = (0x000000FF & regKeyInfo);
-   }
-
-   RegCloseKey(hKey);
-   return (ushort)ext;
-}
-
-//==============================================================================
-// Function:    setPagesPerMinuteExtensions()
-// Purpose:     This function will set the number of extensions for the key
-//              The extensions are stored in the output units cell, and are the
-//              4 most significant bits of 0xAFFF where A houses the number of
-//              extensions.  Since 4095 is the max number of outputs, we will use
-//              This value for the pages per minute extensions.  That way, the
-//              key is responsible for the number of extensions.
-// Parameters:  ushort - extensions
-// Returns:     ulong - password
-//==============================================================================
-short SpdProtectionKey::setPagesPerMinuteExtensions(ushort ext)
-{
-   HKEY hKey;
-   DWORD disp ;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp)==ERROR_SUCCESS)
-   {
-      LPCTSTR lpValueName;
-      sprintf( scratchBuf, "%03hX%02hX", customerNumber, keyNumber);
-      lpValueName = scratchBuf;
-
-      DWORD n = (0x000000FF & ext) | ((0x000000FF & keyNumber)<<12) | ((0x00000FFF & customerNumber)<<20);
-      if (RegSetValueEx(hKey, lpValueName, NULL, REG_DWORD, (BYTE *) &n, sizeof(DWORD)) != ERROR_SUCCESS)
-      {
-      	MessageBox(NULL, "Error Updating Registry.", "", MB_OK | MB_ICONWARNING);
-         return FAILURE;
-      }
-      // end of registry
-   }
-   RegCloseKey(hKey);
-   return SUCCESS;
 }
 
 /* licenseMods()

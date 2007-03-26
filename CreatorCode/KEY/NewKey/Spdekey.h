@@ -67,16 +67,6 @@ public:
   void getOperatorSessionPassword(ushort, ISolimarLicenseSvr*, ushort, char*);
   void getUserSessionPassword(ushort, ISolimarLicenseSvr*, ushort, char*);
 
-
-   //--- Pages Per Minute Functions
-   void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, ushort, long);
-
-   ushort getPagesPerMinuteExtensions();
-   short setPagesPerMinuteExtensions(ushort/*extensions*/);
-
-   void getCounterPassword(ushort, ushort, ISolimarLicenseSvr*, char*, long);
-
-
 protected:
     // top 8 bits -> userSession units
    //               bottom 8 bits -> operatorSession units
