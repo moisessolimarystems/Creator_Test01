@@ -209,7 +209,6 @@ void SpdProtectionKey::getModulePassword(uchar mod_id,
    if(pServer)
    {
       BSTR password;
-
       if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    product_id,
@@ -249,18 +248,38 @@ void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
    if(pServer)
    {
       BSTR password;
-      if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
-                                                   keyNumber,
-                                                   productId,
-                                                   ModID,
-                                                   pages,
-                                                   password_number,
-                                                   &password
-                                                  )))
+      if(productId == SPD_PRODUCT)
       {
-         AnsiString* pwd = new AnsiString(password);
-         strcpy(Password_String, pwd->c_str());
-         delete pwd;
+          DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
+          if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
+                                                        keyNumber,
+                                                        productId,
+                                                        ModID,
+                                                        ppm_struct,
+                                                        password_number,
+                                                        &password
+                                                        )))
+          {
+              AnsiString* pwd = new AnsiString(password);
+              strcpy(Password_String, pwd->c_str());
+              delete pwd;
+          }
+      }
+      else
+      {
+          if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
+                                                        keyNumber,
+                                                        productId,
+                                                        ModID,
+                                                        pages,
+                                                        password_number,
+                                                        &password
+                                                        )))
+          {
+              AnsiString* pwd = new AnsiString(password);
+              strcpy(Password_String, pwd->c_str());
+              delete pwd;
+          }
       }
       SysFreeString(password);
    }
@@ -355,8 +374,6 @@ void SpdProtectionKey::setLicensesToZero()
    for (ushort i = 0; i < TOTAL_MODULE_CELLS; i++)
       moduleCells[i] = 0;
 }
-
-
 
 // getOutputUnits - returns the number of outputs licensed for the key
 ushort SpdProtectionKey::getOutputUnits()

@@ -1031,11 +1031,10 @@ bool TModuleFrame::createPagesPerMinutePassword()
       }
       else // ...otherwise create a password
       {
-         /*if(key_record->pkey->productId == SPDE_PRODUCT)
-                keyMaster->getPagesPerMinutePassword(spde_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
+         if(key_record->pkey->productId == SPDE_PRODUCT)
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, key_record->incrementPasswordNumber(), ppmModID);
          else
-         */
-                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, 0, ppmModID);
 
          //applies module password to key
          keyMaster->applyPagesPerMinutePassword(key_record);
@@ -1048,7 +1047,11 @@ bool TModuleFrame::createPagesPerMinutePassword()
       int available(ext < MAX_PPM_EXTENSIONS);
       if( available > 0 )
       {
-         keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, ++key_record->passwordNumber, ppmModID);
+         if(key_record->pkey->productId == SPDE_PRODUCT)
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, key_record->incrementPasswordNumber(), ppmModID);
+         else
+                keyMaster->getPagesPerMinutePassword(spd_key, ext, pages, password_string, 0, ppmModID);
+
          keyMaster->applyPagesPerMinutePassword(key_record);
       }
       else
