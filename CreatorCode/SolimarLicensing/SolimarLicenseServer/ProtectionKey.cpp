@@ -1855,9 +1855,12 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 	
 	password_string[0]=0;
 	
-	//Generate old style passwords if password number is 0, else force the 
+	//  Generate old style passwords if password number is 0, else force the 
 	//use of new style passwords
-	if(password_number == 0)
+	//  License_count is the ppm_struct that is passed in and used only for legacy 
+	//products ppm passwords, which need to be this old style.
+	
+	if(password_number == 0 || license_count != 0)
 	{
 		// different products have different module password functions for reasons of legacy code compatiblity
 		switch(product.id)
