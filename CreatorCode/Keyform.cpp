@@ -275,6 +275,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
          mmMaxLU->Visible = (key_record->getProductId() == ICONVERT_PRODUCT) ? true : false;
          KeyFormModuleFrame->mmPagesPerMinute->Enabled = true;
          KeyFormModuleFrame->mmIncrementModule->Enabled = true;
+         KeyFormModuleFrame->mmSetModule->Enabled = true;
      }
 
      // set Version
@@ -301,6 +302,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
              mmSPDEUserSessions->Visible = false;
              mmMaxLU->Visible = false;
              KeyFormModuleFrame->mmIncrementModule->Enabled = false;
+             KeyFormModuleFrame->mmSetModule->Enabled = false;
              mmPermanent->Enabled = false;
              // NOTE: the user can still make the key a BASE key, and the key
              // from that point on can go permanent.
@@ -884,6 +886,7 @@ void __fastcall TFCustomerKeys::clearPermissions()
    // Module Features
    KeyFormModuleFrame->mmPagesPerMinute->Enabled = false;
    KeyFormModuleFrame->mmIncrementModule->Enabled = false;
+   KeyFormModuleFrame->mmSetModule->Enabled = false;
 
 }
 
