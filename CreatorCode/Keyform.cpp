@@ -303,6 +303,8 @@ void __fastcall TFCustomerKeys::setGUIOptions()
              mmMaxLU->Visible = false;
              KeyFormModuleFrame->mmIncrementModule->Enabled = false;
              KeyFormModuleFrame->mmSetModule->Enabled = false;
+             SolSearcherDetails->GeneratePasswordMenuItem->Enabled = false;
+             SolSearcherDetails->SetValueMenuItem->Enabled = false;
              mmPermanent->Enabled = false;
              // NOTE: the user can still make the key a BASE key, and the key
              // from that point on can go permanent.
@@ -328,6 +330,9 @@ void __fastcall TFCustomerKeys::setGUIOptions()
         // Enable ability to mark the key LOST or RETURNED
         mmLost->Enabled = true;
         mmReturned->Enabled = true;
+
+        SolSearcherDetails->GeneratePasswordMenuItem->Enabled = true;
+        SolSearcherDetails->SetValueMenuItem->Enabled = true;
      }
 
      if ((PERMISSION_FLAG & permanent_pwd) &&
@@ -887,6 +892,8 @@ void __fastcall TFCustomerKeys::clearPermissions()
    KeyFormModuleFrame->mmPagesPerMinute->Enabled = false;
    KeyFormModuleFrame->mmIncrementModule->Enabled = false;
    KeyFormModuleFrame->mmSetModule->Enabled = false;
+   SolSearcherDetails->GeneratePasswordMenuItem->Enabled = false;
+   SolSearcherDetails->SetValueMenuItem->Enabled = false;
 
 }
 

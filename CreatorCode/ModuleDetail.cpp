@@ -531,11 +531,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       }
       else // ...otherwise create a password
       {
-         // SolScript module passwords are not incremental
-         //if (key_record->pkey->productId != SOLSCRIPT_PRODUCT)
-            units = 0;
-         //applies module password to key
-         //keyMaster->applyModZeroPassword(key_record, detail->id, units+1);
+         if(units < 0) units = 0;
 
          keyMaster->applyModZeroPassword(key_record, detail, units+1);
 
@@ -650,12 +646,26 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       {
         ModuleDetailQuery->Close();
         ModuleDetailQuery->SQL->Clear();
-        ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchipds = :ipds, SKRppmxchpcl = :pcl, SKRppmxchps = :ps, SKRppmxchpsdbcs = :dbcs, SKRppmafpdsps = :afpds where SKRid= :skr_id");
+        ModuleDetailQuery->SQL->Add("Update SKeyRecord set SKRppmxchipds = :ipds, "
+                                    "SKRppmxchpcl = :pcl, "
+                                    "SKRppmxchps = :ps, "
+                                    "SKRppmxchpsdbcs = :dbcs, "
+                                    "SKRppmafpdsps = :afpds, "
+                                    "SKRindexServers =:indexServers, "
+                                    "SKRreportServers =:reportServers, "
+                                    "SKRconcurrentUsers =:concurrentUsers, "
+                                    "SKRapplications =:applications, "
+                                    "SKRdocumentAssembler =:documentAssembler where SKRid= :skr_id");
         ModuleDetailQuery->ParamByName("ipds")->AsInteger = 0;
         ModuleDetailQuery->ParamByName("pcl")->AsInteger = 0;
         ModuleDetailQuery->ParamByName("ps")->AsInteger = 0;
         ModuleDetailQuery->ParamByName("dbcs")->AsInteger = 0;
         ModuleDetailQuery->ParamByName("afpds")->AsInteger = 0;
+        ModuleDetailQuery->ParamByName("indexServers")->AsInteger = 0;
+        ModuleDetailQuery->ParamByName("reportServers")->AsInteger = 0;
+        ModuleDetailQuery->ParamByName("concurrentUsers")->AsInteger = 0;
+        ModuleDetailQuery->ParamByName("applications")->AsInteger = 0;
+        ModuleDetailQuery->ParamByName("documentAssembler")->AsInteger = 0;
         ModuleDetailQuery->ParamByName("skr_id")->AsInteger = key_record->skr_id;
         ModuleDetailQuery->Prepare();
         ModuleDetailQuery->ExecSQL();
