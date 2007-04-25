@@ -77,7 +77,6 @@ STDMETHODIMP CSolimarLicenseSvr::Heartbeat()
 STDMETHODIMP CSolimarLicenseSvr::KeyEnumerate(VARIANT *keylist)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	keyserver.ResynchronizeKeys();
 	return keyserver.KeyEnumerate(keylist);
 }
 
