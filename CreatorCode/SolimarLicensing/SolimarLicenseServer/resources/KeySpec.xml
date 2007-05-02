@@ -627,7 +627,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>		
-		<KeyLayout name="SPD">
+		<KeyLayout name="SPDE">
 			<ModuleList>
 				<!-- Twinax Input -->
 				<!-- Bus/Tag Output (AT) -->
@@ -654,7 +654,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				
 				<Module id="8"  offset="0x08B" bits="1" name="File Queuer" unlimited="1"/>
 				<Module id="9"  offset="0x08A" bits="1" name="FTP Queuer" unlimited="1"/>
+				<!--  Remove this module, it is unnecessary.  Don't reuse its id or offset if possible.
 				<Module id="10" offset="0x089" bits="1" name="IPDS Output" unlimited="1"/>
+				-->
 				<Module id="11" offset="0x088" bits="1" name="Job Separator" unlimited="1"/>
 				
 				<Module id="12" offset="0x08F" bits="1" name="Line Data::AFPDS" unlimited="1"/>
@@ -702,6 +704,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="46"	offset="0x0AD" bits="1" name="PDF::TIFF(PDFL)" unlimited="1"/>
 				<Module id="47"	offset="0x0AC" bits="1" name="PDF::AFPDS(PDFL)" unlimited="1"/>
 				
+				<Module id="48"	offset="0x0B3" bits="1" name="PDF::PostScript(PDFL-RIP)" unlimited="1"/>
+
 				
 				<!-- Module IDs identifying hardware -->
 				<Module id="101"	offset="0x19c" bits="4" name="Bus/Tag Input (polaris)"/>
@@ -735,7 +739,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 			</ModuleList>
 			
 			<ProductList>
-				<Product id="14" name="SPD Server">
+				<Product id="14" name="SPDE">
 					<ModuleInclude id="0" default="1"/>
 					<ModuleInclude id="1" default="0"/>					
 					<ModuleInclude id="2" default="0"/>
@@ -746,7 +750,6 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="7" default="1"/>
 					<ModuleInclude id="8" default="1"/>
 					<ModuleInclude id="9" default="0"/>
-					<ModuleInclude id="10" default="0"/>
 					<ModuleInclude id="11" default="1"/>
 					<ModuleInclude id="12" default="0"/>
 					<ModuleInclude id="13" default="1"/>
@@ -784,6 +787,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="45" default="0"/>
 					<ModuleInclude id="46" default="0"/>
 					<ModuleInclude id="47" default="0"/>
+					<ModuleInclude id="48" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
