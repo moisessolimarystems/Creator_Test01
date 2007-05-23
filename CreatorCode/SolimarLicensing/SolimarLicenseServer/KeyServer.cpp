@@ -100,10 +100,6 @@ KeyServer::KeyServer() :
 
 KeyServer::~KeyServer()
 {
-	//wchar_t tmpbuf[1024];
-	//swprintf_s(tmpbuf, 1024, L"KeyServer::~KeyServer() - Enter");
-	//OutputDebugString(tmpbuf);
-
 	if (UpdateKeysThread)
 		delete UpdateKeysThread;
 	if (HeartbeatCheckThread)
@@ -116,11 +112,6 @@ KeyServer::~KeyServer()
 		CloseHandle(KeyTrialTimeInfoLock);
 	if (MessageClientListLock!=NULL)
 		CloseHandle(MessageClientListLock);
-		
-	keys.clear();
-
-	//swprintf_s(tmpbuf, 1024, L"    KeyServer::~KeyServer() leave");
-	//OutputDebugString(tmpbuf);
 }
 
 
@@ -141,28 +132,7 @@ HRESULT KeyServer::ResynchronizeKeys()
 		{
 			if (keys.find(dkey->first)==keys.end())
 			{
-				_bstr_t keyName = dkey->first;
-				ProtectionKey tmpProKey(dkey->first, dkey->first, &keyspec,&driver, true/*Use Share Licensing*/);
-				long application_instances = 0;
-				tmpProKey.ApplicationInstanceCount(&application_instances);
-				if(application_instances > 1)	
-				{
-					//application_instances == virtual keys this single key will represent
-					for(int idx=1; idx<=application_instances; idx++)
-					{
-						wchar_t key_id[128];
-						_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
-						key_id[127]=0;
-						//Use Share Licensing - only the first key can use the shared licensing.
-						keys.insert(KeyList::value_type(key_id, ProtectionKey(keyName, key_id,&keyspec,&driver, idx==1/*Use Share Licensing*/ )));
-						virtual_key_to_physical_key_list[key_id] = keyName;
-					}
-				}
-				else	//Only 1 Key
-				{
-					keys.insert(KeyList::value_type(dkey->first,tmpProKey));
-					virtual_key_to_physical_key_list[dkey->first] = dkey->first;
-				}
+				keys.insert(KeyList::value_type(dkey->first,ProtectionKey(dkey->first,&keyspec,&driver)));
 			}
 		}
 		
@@ -170,7 +140,7 @@ HRESULT KeyServer::ResynchronizeKeys()
 		KeyServer::KeyList::iterator skey=keys.begin();
 		while (skey!=keys.end())
 		{
-			if (driver.keys.find(virtual_key_to_physical_key_list[skey->first])==driver.keys.end())
+			if (driver.keys.find(skey->first)==driver.keys.end())
 				skey = keys.erase(skey);
 			else
 				++skey;
@@ -194,38 +164,37 @@ HRESULT KeyServer::ResynchronizeKeys()
 	return hr;
 }
 
-
 // Top level functions
-HRESULT KeyServer::AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key)
+HRESULT KeyServer::LicenseSessionInitialize(BSTR license_id)
 {
-	SafeMutex mutex(KeyListLock);
-	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
-	if (key!=keys.end())
-		return key->second.AddApplicationInstance(license_id, application_instance, b_app_instance_lock_key);
-	else
-		return E_INVALIDARG;
-}
-HRESULT KeyServer::RemoveApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance)
-{
-	SafeMutex mutex(KeyListLock);
-	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
-	if (key!=keys.end())
-		return key->second.RemoveApplicationInstance(license_id, application_instance);
-	else
-		return E_INVALIDARG;
-}
-HRESULT KeyServer::GetApplicationInstanceList(BSTR license_id, BSTR key_ident, VARIANT *pvtAppInstanceList)
-{
-	SafeMutex mutex(KeyListLock);
-	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
-	if (key!=keys.end())
-		return key->second.GetApplicationInstanceList(pvtAppInstanceList);
-	else
-		return E_INVALIDARG;
+	_bstr_t lid(license_id,true);
+	
+	SafeMutex mutex(MessageClientListLock);
+	message_clients[lid];
+	
+	return S_OK;
 }
 
+HRESULT KeyServer::LicenseSessionUninitialize(BSTR license_id)
+{
+	_bstr_t lid(license_id,true);
+	{
+	SafeMutex mutex(MessageClientListLock);
+	if (message_clients.find(lid)!=message_clients.end())
+		message_clients.erase(lid);
+	}
 
+	//Needed to remove the license_id from the heartbeats list so the timeout
+	//message is not added to the event log.
+	{
+	SafeMutex mutex2(HeartbeatListLock);
 
+	HeartbeatList::iterator heartbeatIt = heartbeats.find(_bstr_t(license_id,true));
+	if(heartbeatIt != heartbeats.end())
+		heartbeats.erase(license_id);
+	}
+	return S_OK;
+}
 
 HRESULT KeyServer::Heartbeat(BSTR license_id)
 {
@@ -351,9 +320,9 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 	{
 		CryptoHelper context;
 		// this copy is used for strtok
-		hr = context.DecryptData(crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password)/sizeof(BYTE), (BYTE*)pPacketString1, password_packet_length);
+		hr = context.DecryptData(crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password), (BYTE*)pPacketString1, password_packet_length);
 		// this copy is used to verify the hash of the packet data stored in the password packet
-		hr = context.DecryptData(crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password)/sizeof(BYTE), (BYTE*)pPacketString2, password_packet_length);
+		hr = context.DecryptData(crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password), (BYTE*)pPacketString2, password_packet_length);
 	}
 	
 	// we're done with the source variant
@@ -374,27 +343,26 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// parse the password packet
 		PasswordPacket packet;
-		wchar_t *pNextToken;
 		wchar_t* pToken(0);
-		if (!(pToken = wcstok_s(pPacketString1, L"\r\n",&pNextToken)) || wcscmp(pToken,L"ECDBE6C6054746378D93B400527C21EE")!=0) throw(E_FAIL);	//xxx
+		if (!(pToken = wcstok(pPacketString1, L"\r\n")) || wcscmp(pToken,L"ECDBE6C6054746378D93B400527C21EE")!=0) throw(E_FAIL);	//xxx
 		unsigned int expected_headers(0), expected_passwords(0);
-		if (!(pToken = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
+		if (!(pToken = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
 		expected_headers = _wtoi(pToken);
-		if (!(pToken = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
+		if (!(pToken = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
 		expected_passwords = _wtoi(pToken);
 		
 		for (unsigned int i = 0; i < expected_headers; ++i)
 		{
 			wchar_t *ident = 0, *value = 0;
-			if (!(ident = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
-			if (!(value = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
+			if (!(ident = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
+			if (!(value = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
 			packet.headers[ident] = value;
 		}
 		for (unsigned int j = 0; j < expected_passwords; ++j)
 		{
 			wchar_t *expires = 0, *password = 0;
-			if (!(expires = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
-			if (!(password = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
+			if (!(expires = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
+			if (!(password = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
 			// convert expires in to a floating point
 			double dexpires = 1.0;
 			dexpires = _wtof(expires);
@@ -403,8 +371,8 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// grab the hash and the hash signature
 		wchar_t *hash = 0, *signature = 0;
-		if (!(hash = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
-		if (!(signature = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
+		if (!(hash = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
+		if (!(signature = wcstok(NULL, L"\r\n"))) throw(E_FAIL);
 		
 		// calculate the number of bytes to used to calculate the hash
 		DWORD hashed_data_size = (DWORD)((BYTE*)hash - (BYTE*)pPacketString1);
@@ -412,7 +380,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		// hash the string
 		CryptoHelper context;
 		CryptoHelper::Digest computed_digest, provided_digest;
-		CryptoHelper::Key signature_verify_key(context, crypto_key_password_packet_public, sizeof(crypto_key_password_packet_public)/sizeof(BYTE));
+		CryptoHelper::Key signature_verify_key(context, crypto_key_password_packet_public, sizeof(crypto_key_password_packet_public));
 		hr = context.HashData((BYTE*)pPacketString2, hashed_data_size, computed_digest);
 		if (FAILED(hr)) throw(hr);
 		
@@ -522,38 +490,6 @@ HRESULT KeyServer::GenerateBasePassword(long customer_number, long key_number, B
 	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
 }
 
-HRESULT KeyServer::GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password)
-{	
-	HRESULT hr = S_OK;
-
-	SafeMutex mutex(KeyListLock);
-
-	// find a programmed key, and use it to generate the password
-	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
-	{
-		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
-		if (vtValid==VARIANT_TRUE)
-		{
-			BSTR temp_password=0;
-			hr = key->second.GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, &temp_password);
-			if (SUCCEEDED(hr))
-			{
-				*password = temp_password;
-				return S_OK;
-			}
-			else
-			{
-				if (temp_password)
-					SysFreeString(temp_password);
-			}
-		}
-	}
-	
-	*password = SysAllocString(L"");
-	
-	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
-}
 HRESULT KeyServer::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
 {
 	HRESULT hr = S_OK;
@@ -769,7 +705,7 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	// write the passwords
 	for (PasswordList::iterator p = password_packets[lid].passwords.begin(); p != password_packets[lid].passwords.end(); ++p)
 	{
-		swprintf_s(buffer,L"%f",(double)p->first.date);
+		swprintf(buffer,L"%f",(double)p->first.date);
 		packet_string += buffer;
 		packet_string += L"\r\n";
 		packet_string += p->second;
@@ -779,10 +715,9 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	// compute a hash of the file
 	CryptoHelper context;
 	CryptoHelper::Digest digest;
-	CryptoHelper::Key packet_sign_key(context, crypto_key_password_packet_private, sizeof(crypto_key_password_packet_private)/sizeof(BYTE));
+	CryptoHelper::Key packet_sign_key(context, crypto_key_password_packet_private, sizeof(crypto_key_password_packet_private));
 	_variant_t vtSignature;
 	hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length())*sizeof(wchar_t), digest);
-	//hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length()), digest);
 	if (FAILED(hr)) return hr;
 	
 	// sign the hash
@@ -801,7 +736,6 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	
 	// compute the verification code using the hash of the signature
 	if (FAILED(hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length()+1)*sizeof(wchar_t), digest))) return hr;
-	//if (FAILED(hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length()+1), digest))) return hr;
 	
 	// take the first 8 characters from the hex representation of the digest as the verification code
 	password_packets[lid].verification_code = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
@@ -809,17 +743,12 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	// package the string in to a variant
 	password_packets[lid].completed_packet.vt = VT_ARRAY | VT_UI1;
 	password_packets[lid].completed_packet.parray = SafeArrayCreateVector(VT_UI1, 0, (packet_string.length()+1)*sizeof(wchar_t));
-	//password_packets[lid].completed_packet.parray = SafeArrayCreateVector(VT_UI1, 0, (packet_string.length()+1));
 	BYTE *pPacketData = 0;
 	if (FAILED(hr = SafeArrayAccessData(password_packets[lid].completed_packet.parray, (void**)&pPacketData))) return hr;
 	memcpy(pPacketData, (wchar_t*)packet_string, (packet_string.length()+1)*sizeof(wchar_t));
-	//memcpy(pPacketData, (wchar_t*)packet_string, (packet_string.length()+1));
 	
 	// encrypt the password packet
-	hr = context.EncryptData(	crypto_key_password_packet_password, 
-								sizeof(crypto_key_password_packet_password), 
-								pPacketData, 
-								(packet_string.length()+1)*sizeof(wchar_t));
+	hr = context.EncryptData(crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password), pPacketData, (packet_string.length()+1)*sizeof(wchar_t));
 	
 	SafeArrayUnaccessData(password_packets[lid].completed_packet.parray);
 	
@@ -921,7 +850,7 @@ HRESULT KeyServer::KeyIsProgrammed(BSTR key_ident, VARIANT_BOOL *key_programmed)
 
 HRESULT KeyServer::KeyHeaderQuery(BSTR key_ident, long header_ident, VARIANT *value)
 {
-//wchar_t debug_buf1[1024];
+wchar_t debug_buf1[1024];
 //_snwprintf(debug_buf1, 1024, L"KeyServer::KeyHeaderQuery Enter - key_ident = %s, header_ident = %d", key_ident, header_ident);
 //debug_buf1[1023] = 0;
 //OutputDebugStringW(debug_buf1);
@@ -1175,15 +1104,6 @@ HRESULT KeyServer::KeyModuleInUse(BSTR key_ident, long module_ident, long* licen
 	}
 }
 
-HRESULT KeyServer::KeyModuleLicenseUnlimited(BSTR license_id, BSTR key_ident, long module_ident, VARIANT_BOOL b_module_is_unlimited)
-{
-	SafeMutex mutex(KeyListLock);
-	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
-	if (key!=keys.end())
-		return key->second.ModuleLicenseUnlimited(license_id, module_ident, b_module_is_unlimited);
-	else
-		return E_INVALIDARG;
-}
 HRESULT KeyServer::LicenseReleaseAll(BSTR license_id)
 {
 	HRESULT hr = S_OK;
@@ -1218,7 +1138,7 @@ HRESULT KeyServer::KeyFormat(BSTR key_ident, BSTR *new_key_ident)
 }
 
 // Programs a key
-HRESULT KeyServer::KeyProgram(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident)
+HRESULT KeyServer::KeyProgram(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident)
 {
 	HRESULT hr = S_OK;
 	
@@ -1228,7 +1148,7 @@ HRESULT KeyServer::KeyProgram(BSTR key_ident, long customer_number, long key_num
 	
 	if (key!=keys.end())
 	{
-		hr = key->second.Program(customer_number, key_number, product_ident, ver_major, ver_minor, key_type, application_instances, days, module_value_list, new_key_ident);
+		hr = key->second.Program(customer_number, key_number, product_ident, ver_major, ver_minor, key_type, days, module_value_list, new_key_ident);
 		if (FAILED(hr)) return hr;
 		ResynchronizeKeys();
 	}
@@ -1264,7 +1184,7 @@ void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_t
 	va_list pArg;
 	
 	va_start(pArg, LicensingMessageStringTable[MessageLookupID]);
-	_vsnwprintf_s(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
+	_vsnwprintf(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
 	va_end(pArg);
 	message[MAX_MESSAGE_SIZE-1] = 0;
 	
@@ -1282,17 +1202,14 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	double vtimestamp;
 	SYSTEMTIME systimestamp;
 	memset(&systimestamp, 0, sizeof(systimestamp));
-	//tm * tm_struct = NULL;
-	//gmtime_s(tm_struct, &timestamp);
-	tm tm_struct;
-	gmtime_s(&tm_struct, &timestamp);
-	systimestamp.wSecond = tm_struct.tm_sec;
-	systimestamp.wMinute = tm_struct.tm_min;
-	systimestamp.wHour = tm_struct.tm_hour;
-	systimestamp.wDay = tm_struct.tm_mday;
-	systimestamp.wMonth = tm_struct.tm_mon + 1;
-	systimestamp.wYear = tm_struct.tm_year + 1900;
-	systimestamp.wDayOfWeek = tm_struct.tm_wday;
+	tm * tm_struct = gmtime(&timestamp);
+	systimestamp.wSecond = tm_struct->tm_sec;
+	systimestamp.wMinute = tm_struct->tm_min;
+	systimestamp.wHour = tm_struct->tm_hour;
+	systimestamp.wDay = tm_struct->tm_mday;
+	systimestamp.wMonth = tm_struct->tm_mon;
+	systimestamp.wYear = tm_struct->tm_year;
+	systimestamp.wDayOfWeek = tm_struct->tm_wday;
 	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
 		vtTimestamp = _variant_t(vtimestamp, VT_DATE);
 	else
@@ -1338,12 +1255,12 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	switch (message_type)
 	{
 	case MT_INFO:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
+		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
 			key_ident,
 			message);
 		break;
 	case MT_ERROR:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
+		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
 			key_ident,
 			error,
 			str_error_message,
@@ -1403,7 +1320,7 @@ void KeyServer::HeartbeatCheck()
 	HeartbeatList keepers;
 
 	DWORD cur_time = (DWORD)time(0);
-//wchar_t debug_buf1[1024];
+wchar_t debug_buf1[1024];
 //_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Enter - NumberOfHeartBeats = %d", heartbeats.size());
 //debug_buf1[1023] = 0;
 //OutputDebugStringW(debug_buf1);
@@ -1419,7 +1336,7 @@ void KeyServer::HeartbeatCheck()
 			//xxx debug
 			wchar_t debug_buf[1024];
 			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
 			debug_buf[1023] = 0;
 			OutputDebugStringW(debug_buf);
 
@@ -1551,12 +1468,11 @@ void KeyServer::USBEventCallback(LPVOID pContext)
 
 _bstr_t KeyServer::BinaryToString(BYTE *pData, DWORD length)
 {
-	size_t sizeOfStr = (length*2)+1;
-	wchar_t *pStr = new wchar_t[sizeOfStr];
-	memset(pStr,0,sizeOfStr);
+	wchar_t *pStr = new wchar_t[(length*2)+1];
+	memset(pStr,0,(length*2)+1);
 	for (unsigned int b = 0; b < length; ++b)
 	{
-		swprintf_s(pStr+2*b, sizeOfStr,L"%02x",(unsigned int)pData[b]);
+		swprintf(pStr+2*b,L"%02x",(unsigned int)pData[b]);
 	}
     return pStr;
 }
@@ -1574,7 +1490,7 @@ void KeyServer::StringToBinary(_bstr_t str, BYTE *pData, DWORD length)
 	for (unsigned int b = 0; b < length; ++b)
 	{
 		unsigned int i(0);
-		swscanf_s(((wchar_t*)str)+2*b, L"%02x", &i);
+		swscanf(((wchar_t*)str)+2*b, L"%02x", &i);
 		pData[b] = (BYTE)i;
 	}
 }
