@@ -276,14 +276,14 @@ HRESULT KeyServer::EnterPassword(BSTR password)
 			if (hr == S_OK)
 			{
 				password_entered = true;
-				InterlockedExchange(&failed_password_attempts,0);
 				break;
 			}
-			else
-			{
-				InterlockedIncrement(&failed_password_attempts);
-			}
 		}
+
+		if (hr == S_OK)
+			InterlockedExchange(&failed_password_attempts,0);
+		else
+			InterlockedIncrement(&failed_password_attempts);
 	}
 	catch(_com_error &e)
 	{
@@ -1304,9 +1304,9 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 // returns the number of milliseconds to delay before checking a password
 DWORD KeyServer::PasswordEntryDelay(long failed_attempts)
 {
-	if (failed_attempts<5)
+	if (failed_attempts<40)
 		return 0;
-	return (DWORD)(10*failed_attempts*failed_attempts*failed_attempts);
+	return (DWORD)(10*failed_attempts*failed_attempts);
 }
 
 // checks if client heartbeats have exprired
