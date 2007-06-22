@@ -13,6 +13,7 @@
 #include "CustQueryDlg.h"
 #include "KeyForm.h"
 #include "ModuleEditorDlg.h"
+#include "ConnectionEditor.h"
 
 
 #include <Db.hpp>
@@ -130,6 +131,7 @@ __published:	// IDE-managed Components
         TLabel *operatorUnits;
         TLabel *Label4;
         TLabel *userUnits;
+        TMenuItem *mmConnectionEditor;
 	void __fastcall Number1Click(TObject *Sender);
 	void __fastcall mmAllClick(TObject *Sender);
 	void __fastcall Name1Click(TObject *Sender);
@@ -151,6 +153,7 @@ __published:	// IDE-managed Components
           TShiftState Shift);
         void __fastcall ModuleEditorClick(TObject *Sender);
         void __fastcall CellViewScrollBarChange(TObject *Sender);
+        void __fastcall mmConnectionEditorClick(TObject *Sender);
 private:	// User declarations
 	void __fastcall SetCustomerForm();
 public:		// User declarations

@@ -21,6 +21,7 @@ USEFORM("DevelopmentPasswordDlg.cpp", DlgDevelopmentPassword);
 USEFORM("keySearchDlg.cpp", ksdSearchDlg);
 USEFORM("keyDateSearchDlg.cpp", dsSearchDlg);
 USEFORM("SolSearcherEnterpriseDetails.cpp", SolSearcherDetails); /* TFrame: File Type */
+USEFORM("ConnectionEditor.cpp", ConnectionEditorDlg);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -29,13 +30,14 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
          Application->Initialize();
          Application->Title = "Creator";
          Application->CreateForm(__classid(TCustForm), &CustForm);
-         Application->CreateForm(__classid(TModuleEditorForm), &ModuleEditorForm);
-         Application->CreateForm(__classid(TModuleEditorDetailsDlg), &ModuleEditorDetailsDlg);
-         Application->CreateForm(__classid(TDlgPPM), &DlgPPM);
-         Application->CreateForm(__classid(TDlgDevelopmentPassword), &DlgDevelopmentPassword);
-         Application->CreateForm(__classid(TksdSearchDlg), &ksdSearchDlg);
-         Application->CreateForm(__classid(TdsSearchDlg), &dsSearchDlg);
-         Application->Run();
+                 Application->CreateForm(__classid(TModuleEditorForm), &ModuleEditorForm);
+                 Application->CreateForm(__classid(TModuleEditorDetailsDlg), &ModuleEditorDetailsDlg);
+                 Application->CreateForm(__classid(TDlgPPM), &DlgPPM);
+                 Application->CreateForm(__classid(TDlgDevelopmentPassword), &DlgDevelopmentPassword);
+                 Application->CreateForm(__classid(TksdSearchDlg), &ksdSearchDlg);
+                 Application->CreateForm(__classid(TdsSearchDlg), &dsSearchDlg);
+                 Application->CreateForm(__classid(TConnectionEditorDlg), &ConnectionEditorDlg);
+                 Application->Run();
       }
       catch (Exception &exception)
       {

@@ -48,7 +48,8 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
    QueryDialog = NULL;
    TRegistry *Registry;
    resetScroll = true;
-
+   AnsiString keyServer;
+   wchar_t wcharServer[128];
    try
    {
        Registry = new TRegistry(KEY_READ);
@@ -58,11 +59,18 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
           Application->MessageBox("The Solimar Internal Server Is Not Installed", "Key Message", MB_OK|MB_ICONERROR );
           Application->Terminate();
        }
+       Registry->CloseKey();
+
+       if(Registry->OpenKey("SOFTWARE\\Solimar Systems\\Creator", false))
+       {
+           keyServer = Registry->ReadString("KeyServer");
+           Registry->CloseKey();
+       }
    }
    __finally { delete Registry; }
 
    keyMaster = new KeyMaster();
-   keyMaster->initDriver();
+   keyMaster->initDriver(keyServer.WideChar(wcharServer ,keyServer.WideCharBufSize()));
 
    // base query for all queries executed by the customer form
    baseSQL = "SELECT SCustomerRecord.SCRnumber, SCustomerRecord.SCRname, (select COUNT(*) FROM SKeyRecord WHERE SKeyRecord.SCRnumber = SCustomerRecord.SCRnumber ) AS Expr1 FROM SCustomerRecord";
@@ -1145,6 +1153,19 @@ void __fastcall TCustForm::CellViewScrollBarChange(TObject *Sender)
         resetScroll = false;
         KeyCellGridClick(Sender);
         resetScroll = true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TCustForm::mmConnectionEditorClick(TObject *Sender)
+{
+     //Launch Connection Editor
+     //allow modification of database and key server connections.
+     TConnectionEditorDlg *connectionEditorDlg = new TConnectionEditorDlg(this);
+     if(connectionEditorDlg->ShowModal() == mrOk)
+     {
+          Application->MessageBox("Settings will not take into effect until Creator is restarted.", "Information", MB_OK);
+     }
+     delete(connectionEditorDlg);
 }
 //---------------------------------------------------------------------------
 

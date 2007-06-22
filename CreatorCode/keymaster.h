@@ -95,7 +95,7 @@ public:
    short clear();
    short deactivate();
    bool found();
-   HRESULT initDriver();
+   HRESULT initDriver(wchar_t*);
    ProtectionKey* newKey(KeyDataBlock*);
    ProtectionKey* newKey(ProductId product_id) {return ProtectionKey::newKey(product_id);}
    void resetKey(SKeyRecord*, ProductId);

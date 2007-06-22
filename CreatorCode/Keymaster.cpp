@@ -67,6 +67,7 @@ KeyMaster::KeyMaster()
 //==============================================================================
 KeyMaster::~KeyMaster()
 {
+
    VariantClear(pKeyList);
    delete pKeyList;
 
@@ -412,55 +413,52 @@ auto_ptr<AnsiString> KeyMaster::getDocumentAssemblerPassword(SSProtectionKey* ke
 // Returns:     short
 // Note:
 //==============================================================================
-HRESULT KeyMaster::initDriver()
+HRESULT KeyMaster::initDriver(wchar_t* keyServer)
 {
-   HRESULT hr = 0;
+        HRESULT hr = 0;
 
-   //connects to the solimar license server
-	hr = CoCreateInstance(CLSID_CSolimarLicenseSvr,
-  			                NULL,
-    			             CLSCTX_LOCAL_SERVER,
-      			          IID_ISolimarLicenseSvr,
-			                (void**)&pTheServer
-	  		               );
+        //connects to the solimar license server
+        if(keyServer == L"")
+            keyServer = L"localhost";
 
+        COSERVERINFO	serverInfo	= {0, keyServer, NULL, 0};
+        MULTI_QI        multiQI         = {&IID_ISolimarLicenseSvr, NULL, NOERROR};
 
-	// Try to create an ISolimarLicenseServer proxy to the server
-/*        COSERVERINFO	serverInfo	= {0, L"jlan5", NULL, 0};
-//	COSERVERINFO	serverInfo	= {0, KeyServer, NULL, 0};
-	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
+        hr = CoCreateInstanceEx(
+             __uuidof(CSolimarLicenseSvr),
+             NULL,
+             CLSCTX_REMOTE_SERVER | CLSCTX_LOCAL_SERVER,
+             &serverInfo,
+             1,
+             &multiQI);
 
-	hr = CoCreateInstanceEx(
-		__uuidof(CSolimarLicenseSvr),
-		NULL,
-		CLSCTX_REMOTE_SERVER,
-		&serverInfo,
-		1,
-		&multiQI);
-*/
-   if(!SUCCEEDED(hr))
-   {
-      Application->MessageBox("The Solimar License Server Is Not Running", "Key Message", MB_OK|MB_ICONERROR );
-      Application->Terminate();
-      return hr;
-   }
+        if (SUCCEEDED(hr))
+        {
+             pTheServer = (ISolimarLicenseSvr*)multiQI.pItf;
+        }
+        else
+        {
+             AnsiString errMsg("Failed to connect to the Solimar License Server\nKey Server Name: " + AnsiString(keyServer));
+             Application->MessageBox(errMsg.c_str(), "Key Message", MB_OK|MB_ICONERROR );
+             Application->Terminate();
+             return hr;
+        }
 
+        ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
 
-   ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
+        hr = cr.AuthenticateServer(pTheServer);
+        if(!SUCCEEDED(hr))
+             return hr;
 
-	hr = cr.AuthenticateServer(pTheServer);
-	if(!SUCCEEDED(hr))
-      return hr;
+        // let the license server authenticate this client
+        hr = cr.AuthenticateToServer(pTheServer);
+        if(!SUCCEEDED(hr))
+             return hr;
 
-	// let the license server authenticate this client
-	hr = cr.AuthenticateToServer(pTheServer);
-	if(!SUCCEEDED(hr))
-      return hr;
+        //get the list of keys
+        hr = pTheServer->KeyEnumerate(pKeyList);
 
-   //get the list of keys
-   hr = pTheServer->KeyEnumerate(pKeyList);
-
-   return hr;
+        return hr;
 }
 
 

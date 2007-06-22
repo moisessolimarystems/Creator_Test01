@@ -16,7 +16,7 @@
       objs\CryptoHelper.obj objs\ChallengeResponseHelper.obj 
       objs\ChallengeResponse.obj objs\MultidimensionalSafeArray.obj 
       objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj 
-      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj"/>
+      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj objs\ConnectionEditor.obj"/>
     <RESFILES value="CreatorProject.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) CustomerForm.dfm CreatorAbout.dfm CustQueryDlg.dfm 
@@ -24,7 +24,7 @@
       setunitsdlg.dfm KeyWizard.dfm ModuleDetail.dfm PasswordReportFrm.dfm 
       ModuleEditor.dfm ModuleEditorDlg.dfm ModuleEditorDetailDlg.dfm PPMDlg.dfm 
       DevelopmentPasswordDlg.dfm keySearchDlg.dfm keyDateSearchDlg.dfm 
-      SolSearcherEnterpriseDetails.dfm"/>
+      SolSearcherEnterpriseDetails.dfm ConnectionEditor.dfm"/>
     <LIBFILES value=""/>
     <LIBRARIES value="DCLUSR.lib vcldb.lib dbrtl.lib bdertl.lib vclx.lib qrpt.lib vcl.lib rtl.lib"/>
     <SPARELIBS value="rtl.lib vcl.lib qrpt.lib vclx.lib bdertl.lib dbrtl.lib vcldb.lib DCLUSR.lib"/>
@@ -39,7 +39,7 @@
     <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
     <RELEASELIBPATH value="$(BCB)\lib\release"/>
     <LINKER value="ilink32"/>
-    <USERDEFINES value=""/>
+    <USERDEFINES value="_DEBUG"/>
     <SYSDEFINES value="NO_STRICT"/>
     <MAINSOURCE value="CreatorProject.cpp"/>
     <INCLUDEPATH value="SolimarLicensing\common;KEY\NewKey;KEY;$(BCB)\Projects;$(BCB)\Imports;$(BCB)\include;$(BCB)\include\vcl;..\SolimarLicensing\common"/>
@@ -48,12 +48,12 @@
     <OTHERFILES value=""/>
   </MACROS>
   <OPTIONS>
-    <CFLAG1 value="-O2 -H=c:\PROGRA~1\borland\CBUILD~2\lib\vcl60.csm -Hc -Vx -Ve -X- -a8 -b- 
-      -k- -vi -c -tW -tWM"/>
-    <PFLAGS value="-N2objs -N0objs -$Y- -$L- -$D- -$A8 -v -JPHNE -M"/>
+    <CFLAG1 value="-Od -H=c:\PROGRA~1\borland\CBUILD~2\lib\vcl60.csm -Hc -Vx -Ve -X- -r- -a8 
+      -b- -k -y -v -vi- -c -tW -tWM"/>
+    <PFLAGS value="-N2objs -N0objs -$Y+ -$W -$O- -$A8 -v -JPHNE -M"/>
     <RFLAGS value=""/>
-    <AFLAGS value="/mx /w2 /zn"/>
-    <LFLAGS value="-Iobjs -D&quot;&quot; -aa -Tpe -x -Gn"/>
+    <AFLAGS value="/mx /w2 /zi"/>
+    <LFLAGS value="-Iobjs -D&quot;&quot; -aa -Tpe -x -Gn -v"/>
     <OTHERFILES value=""/>
   </OPTIONS>
   <LINKER>
@@ -64,7 +64,7 @@
   </LINKER>
   <FILELIST>
       <FILE FILENAME="CreatorProject.cpp" FORMNAME="" UNITNAME="CreatorProject" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="CreatorProject.res" FORMNAME="" UNITNAME="CreatorProject" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="CreatorProject.res" FORMNAME="" UNITNAME="CreatorProject.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Keymaster.cpp" FORMNAME="" UNITNAME="Keymaster" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Kyslevel.cpp" FORMNAME="" UNITNAME="Kyslevel" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="CustomerForm.cpp" FORMNAME="CustForm" UNITNAME="customerform" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
@@ -99,6 +99,7 @@
       <FILE FILENAME="KEY\NewKey\sdxkey.cpp" FORMNAME="" UNITNAME="sdxkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\pdfkey.cpp" FORMNAME="" UNITNAME="pdfkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\Spdekey.cpp" FORMNAME="" UNITNAME="Spdekey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="ConnectionEditor.cpp" FORMNAME="ConnectionEditorDlg" UNITNAME="ConnectionEditor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>
