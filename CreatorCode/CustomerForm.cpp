@@ -11,6 +11,7 @@ const int CREATOR_VERSION = 0x226;
 
 #include "CLookups.h"
 #include "CustomerForm.h"
+#include <Registry.hpp>
 
 //Globals
 KeyMaster *keyMaster;
@@ -36,7 +37,6 @@ char* TCustForm::sort_type[] =
    NULL,
 };
 
-
 //==============================================================================
 // Fuction:     TCustForm
 // Purpose:     Constructor
@@ -46,10 +46,31 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
 {
    KeyGridPtr = NULL;
    QueryDialog = NULL;
-
+   TRegistry *Registry;
    resetScroll = true;
+   AnsiString keyServer;
+   wchar_t wcharServer[128];
+   try
+   {
+       Registry = new TRegistry(KEY_READ);
+       Registry->RootKey = HKEY_LOCAL_MACHINE;
+       if(!Registry->OpenKey("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease", false))
+       {
+          Application->MessageBox("The Solimar Internal Server Is Not Installed", "Key Message", MB_OK|MB_ICONERROR );
+          Application->Terminate();
+       }
+       Registry->CloseKey();
+
+       if(Registry->OpenKey("SOFTWARE\\Solimar Systems\\Creator", false))
+       {
+           keyServer = Registry->ReadString("KeyServer");
+           Registry->CloseKey();
+       }
+   }
+   __finally { delete Registry; }
+
    keyMaster = new KeyMaster();
-   keyMaster->initDriver();
+   keyMaster->initDriver(keyServer.WideChar(wcharServer ,keyServer.WideCharBufSize()));
 
    // base query for all queries executed by the customer form
    baseSQL = "SELECT SCustomerRecord.SCRnumber, SCustomerRecord.SCRname, (select COUNT(*) FROM SKeyRecord WHERE SKeyRecord.SCRnumber = SCustomerRecord.SCRnumber ) AS Expr1 FROM SCustomerRecord";
@@ -64,15 +85,12 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
    try
    {
       CFdatabase->Connected = true;
-
       //CLookup uses Database1 connection
       lookup = new CLookup();
-
 
       //set permissions for currrent user
       SetPermissions();
       SetCustomerForm();
-      ///initializeVersionLookup();
 
       //check version of creator
       UtilityQuery1->Close();
@@ -81,9 +99,7 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
       UtilityQuery1->Open();
 
       if(CREATOR_VERSION < UtilityQuery1->FieldByName("Version")->AsInteger)
-      {
          Application->MessageBox("Your version of creator is out-of-date.  Please install the latest version.", "The Word of BERT", MB_OK);
-      }
       else
          LOGIN = true;
    }
@@ -99,12 +115,11 @@ __fastcall TCustForm::TCustForm(TComponent* Owner)
 
    //if login was not successful terminate application
    if(LOGIN == false )
-   	Application->Terminate();
+      Application->Terminate();
 
    //set pagecontrol size and then initialize
    AttachedKeyModuleFrame->Height = 229;
    AttachedKeyModuleFrame->Width = 392;
-   //AttachedKeyModuleFrame->initialize(MODE_1, SPD_PRODUCT); // Default
 }
 
 
@@ -116,6 +131,9 @@ __fastcall TCustForm::~TCustForm()
 {
   if( keyMaster )
      delete keyMaster;
+
+  if( lookup )
+      delete lookup;
 
   if(attached_key)
      delete attached_key;
@@ -453,7 +471,7 @@ void __fastcall TCustForm::Close1Click(TObject *Sender)
 //==============================================================================
 void __fastcall TCustForm::SeekCustomer(TObject *Sender)
 {
-	SKeyRecord *keyrec = new SKeyRecord();
+   SKeyRecord *keyrec = new SKeyRecord();
    TBookmark lastValid;
    AnsiString prevSQL;
 
@@ -739,13 +757,11 @@ bool __fastcall TCustForm::LoadKeyInfo()
          AttachedKeyModuleFrame->Visible = false;
       }
 
-
       //set key summary tab
       keyLabel->Caption = Format("%03X-%03X", OPENARRAY(TVarRec,(attached_key->pkey->customerNumber, attached_key->pkey->keyNumber)));
       productLabel->Caption = attached_key->getProductText();
       versionLabel->Caption = attached_key->getVersionText();
       licenseLabel->Caption = attached_key->getStatusText();
-      //outputUnits->Text = attached
 
       //set CellDetailTab
       int col, row;
@@ -797,8 +813,9 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    char my_time[50];
 
    SpdProtectionKey* spd_key;
-   SpdeProtectionKey* spde_key;
-   SSProtectionKey* ss_key;
+   spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
+   //SpdeProtectionKey* spde_key;
+   //SSProtectionKey* ss_key;
 
    //Initialize ZoomCells
    ZoomDetailTextDescription0->Visible = false;
@@ -823,28 +840,28 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
       // For all keys that are not SOLSEARCHER_ENTERPRISE_PRODUCT keys & SPDE keys
       if (attached_key->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT && attached_key->pkey->productId != SPDE_PRODUCT)
       {
-         spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
+//         spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
          unsigned short base_cell = cell*4;
          //display module information
          ZoomDetailTextDescription0->Caption = module_detail_list[(base_cell)]->name;
          ZoomDetailTextDescription0->Visible = true;
-         uchar test = spd_key->getLicense(base_cell);
+         uchar test = spd_key->getLicense(module_detail_list[(base_cell)]->offset, module_detail_list[(base_cell)]->bits);
          ZoomDetailValue0->Text = test;
          ZoomDetailValue0->Visible = true;
 
          ZoomDetailTextDescription1->Caption = module_detail_list[(base_cell+1)]->name;
          ZoomDetailTextDescription1->Visible = true;
-         ZoomDetailValue1->Text = spd_key->getLicense(base_cell+1);
+         ZoomDetailValue1->Text = spd_key->getLicense(module_detail_list[(base_cell+1)]->offset, module_detail_list[(base_cell+1)]->bits);
          ZoomDetailValue1->Visible = true;
 
          ZoomDetailTextDescription2->Caption = module_detail_list[(base_cell+2)]->name;
          ZoomDetailTextDescription2->Visible = true;
-         ZoomDetailValue2->Text = spd_key->getLicense(base_cell+2);
+         ZoomDetailValue2->Text = spd_key->getLicense(module_detail_list[(base_cell+2)]->offset, module_detail_list[(base_cell+2)]->bits);
          ZoomDetailValue2->Visible = true;
 
          ZoomDetailTextDescription3->Caption = module_detail_list[(base_cell+3)]->name;
          ZoomDetailTextDescription3->Visible = true;
-         ZoomDetailValue3->Text = spd_key->getLicense(base_cell+3);
+         ZoomDetailValue3->Text = spd_key->getLicense(module_detail_list[(base_cell+3)]->offset, module_detail_list[(base_cell+3)]->bits);
          ZoomDetailValue3->Visible = true;
       }    
       else if (attached_key->pkey->productId == SPDE_PRODUCT )
@@ -855,7 +872,7 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
           int i = 0;  //keeps count of modules per list
           int pageCount = 0;   //keeps count of modules on each page
            //split into 2 cases one for software modules one for hardware modules
-          spde_key = reinterpret_cast<SpdeProtectionKey*>(attached_key->pkey);
+//          spde_key = reinterpret_cast<SpdeProtectionKey*>(attached_key->pkey);
 
           unsigned short base_cell = cell*16 + (CellViewScrollBar->Position*4);
           while(pageCount < 4 && i < 64)     //only 4 pages per cell
@@ -879,192 +896,87 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
 
           ZoomDetailTextDescription0->Caption = module_detail_list[pageValue[3]]->name;
           ZoomDetailTextDescription0->Visible = true;
-          ZoomDetailValue0->Text = spde_key->getLicense(module_detail_list[pageValue[3]]->id);
+          ZoomDetailValue0->Text = spd_key->getLicense(module_detail_list[pageValue[3]]->offset, module_detail_list[pageValue[3]]->bits);
           ZoomDetailValue0->Visible = true;
 
           ZoomDetailTextDescription1->Caption = module_detail_list[pageValue[2]]->name;
           ZoomDetailTextDescription1->Visible = true;
-          ZoomDetailValue1->Text = spde_key->getLicense(module_detail_list[pageValue[2]]->id);
+          ZoomDetailValue1->Text = spd_key->getLicense(module_detail_list[pageValue[2]]->offset, module_detail_list[pageValue[2]]->bits);
           ZoomDetailValue1->Visible = true;
 
           ZoomDetailTextDescription2->Caption = module_detail_list[pageValue[1]]->name;
           ZoomDetailTextDescription2->Visible = true;
-          ZoomDetailValue2->Text = spde_key->getLicense(module_detail_list[pageValue[1]]->id);
+          ZoomDetailValue2->Text = spd_key->getLicense(module_detail_list[pageValue[1]]->id, module_detail_list[pageValue[1]]->bits);
           ZoomDetailValue2->Visible = true;
 
           ZoomDetailTextDescription3->Caption = module_detail_list[pageValue[0]]->name;
           ZoomDetailTextDescription3->Visible = true;
-          ZoomDetailValue3->Text = spde_key->getLicense(module_detail_list[pageValue[0]]->id);
+          ZoomDetailValue3->Text = spd_key->getLicense(module_detail_list[pageValue[0]]->offset, module_detail_list[pageValue[0]]->bits);
           ZoomDetailValue3->Visible = true;
 
           CellViewScrollBar->Visible = true;
         }
-
-/*
-          if(cell == HARDWARE_CELL_I )
-          {
-                        SpdeProtectionKey* spde_key;
-                        spde_key = ((SpdeProtectionKey*)(attached_key->pkey));
-
-                        unsigned short base_cell = cell*4;
-                        //display module information
-                        ZoomDetailTextDescription0->Caption = module_detail_list[(base_cell)]->name;
-                        ZoomDetailTextDescription0->Visible = true;
-                        uchar test = spd_key->getLicense(base_cell);
-                        ZoomDetailValue0->Visible = true;
-
-                        ZoomDetailTextDescription1->Caption = module_detail_list[(base_cell+1)]->name;
-                        ZoomDetailTextDescription1->Visible = true;
-                        ZoomDetailValue1->Text = spd_key->getLicense(base_cell+1);
-                        ZoomDetailValue1->Visible = true;
-
-                        ZoomDetailTextDescription2->Caption = module_detail_list[(base_cell+2)]->name;
-                         ZoomDetailTextDescription2->Visible = true;
-                        ZoomDetailValue2->Text = spd_key->getLicense(base_cell+2);
-                        ZoomDetailValue2->Visible = true;
-
-                        ZoomDetailTextDescription3->Visible = true;
-                        ZoomDetailTextDescription3->Caption = "SCSI SDI Output";
-
-                        ZoomDetailValue3->Visible = true;
-                        itoa(spde_key->keyDataBlock.data[SCSIOUT_CELL], cell_text, 10 );
-                        ZoomDetailValue3->Text = cell_text;
-         }
-         else if( cell == HARDWARE_CELL_II)
-         {
-                        SpdeProtectionKey* spde_key;
-                        spde_key = ((SpdeProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Parallel Output";
-
-                        ZoomDetailValue0->Visible = true;
-                        itoa(spde_key->keyDataBlock.data[PARALLELOUT_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
-
-                        ZoomDetailTextDescription1->Visible = true;
-                        ZoomDetailTextDescription1->Caption = "Parallel Input";
-
-                        ZoomDetailValue1->Visible = true;
-                        itoa(spde_key->keyDataBlock.data[PARALLELIN_CELL], cell_text, 10 );
-                        ZoomDetailValue1->Text = cell_text;
-
-                        ZoomDetailTextDescription2->Visible = true;
-                        ZoomDetailTextDescription2->Caption = "Bus/Tag Output (PCI)";
-
-                        ZoomDetailValue2->Visible = true;
-                        itoa(spde_key->keyDataBlock.data[BUSTAGOUT_CELL], cell_text, 10 );
-                        ZoomDetailValue2->Text = cell_text;
-
-                        ZoomDetailTextDescription3->Visible = true;
-                        ZoomDetailTextDescription3->Caption = "Bus/Tag Input (polaris)";
-
-                        ZoomDetailValue3->Visible = true;
-                        itoa(spde_key->keyDataBlock.data[BUSTAGIN_CELL], cell_text, 10 );
-                        ZoomDetailValue3->Text = cell_text;
-         }
-         else if( cell == RESOURCES_CELL)
-         {
-                        SpdeProtectionKey* spde_key;
-                        spde_key = ((SpdeProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription2->Visible = true;
-                        ZoomDetailTextDescription2->Caption = "PS Interpreter";
-
-                        ZoomDetailValue2->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[PSINTERP_CELL], cell_text, 10 );
-                        ZoomDetailValue2->Text = cell_text;
-
-             /*           ZoomDetailTextDescription3->Visible = true;
-                        ZoomDetailTextDescription3->Caption = "Page Per Minute Extensions";
-
-                        ZoomDetailValue3->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[REPORT_SERVERS_CELL], cell_text, 10 );
-                        ZoomDetailValue3->Text = cell_text;
-                        */
          else {}
       }
       else if(attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
       {
-         //
-         // SOLsearcher Key Information
-         if( cell == INDEX_SERVERS_CELL )
-         {
-                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-                {
-                        SSProtectionKey* ss_key;
-                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+                        //SSProtectionKey* ss_key;
+          switch(cell) {
+              case INDEX_SERVERS_CELL:
+                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Index Servers";
 
                         ZoomDetailValue0->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[INDEX_SERVERS_CELL], cell_text, 10 );
+                        itoa(spd_key->keyDataBlock.data[INDEX_SERVERS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
-                }
-         }
-         else if( cell == REPORT_SERVERS_CELL )
-         {
-                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-                {
-                        SSProtectionKey* ss_key;
-                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+                   break;
+              case REPORT_SERVERS_CELL:
+                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Report Servers";
 
                         ZoomDetailValue0->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[REPORT_SERVERS_CELL], cell_text, 10 );
+                        itoa(spd_key->keyDataBlock.data[REPORT_SERVERS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
-                }
-         }
-         else if( cell == APPLICATIONS_CELL )
-         {
-                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-                {
-                        SSProtectionKey* ss_key;
-                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+                   break;
+              case APPLICATIONS_CELL :
+                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Aplication Databases";
 
                         ZoomDetailValue0->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );
+                        itoa(spd_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
-                }
-         }
-         else if( cell == DOCUMENT_ASSEMBLER_CELL )
-         {
-                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-                {
-                        SSProtectionKey* ss_key;
-                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+                   break;
+              case DOCUMENT_ASSEMBLER_CELL :
+                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Document Assembler";
 
                         ZoomDetailValue0->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL], cell_text, 10 );
+                        itoa(spd_key->keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
-                }
-         }
-         else if( cell == CONCURRENT_USERS_25_CELL )
-         {
-                if (attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
-                {
-                        SSProtectionKey* ss_key;
-                        ss_key = ((SSProtectionKey*)(attached_key->pkey));
+                   break;
+              case CONCURRENT_USERS_25_CELL :
+                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
 
                         ZoomDetailTextDescription0->Visible = true;
                         ZoomDetailTextDescription0->Caption = "Concurrent Users";
 
                         ZoomDetailValue0->Visible = true;
-                        itoa(ss_key->keyDataBlock.data[CONCURRENT_USERS_25_CELL], cell_text, 10 );
+                        itoa(spd_key->keyDataBlock.data[CONCURRENT_USERS_25_CELL], cell_text, 10 );
                         ZoomDetailValue0->Text = cell_text;
+                   break;
+              //TODO -> case for modules in cell 40-43
+              default :
+                   break;
                 }
          }
-         else{}
-      }  // end if (prodID != SOLSEARCHER_ENTERPRISE_PRODUCT)
    }
    else if( cell == INITIAL_COUNTER_CELL )
    {
@@ -1241,6 +1153,19 @@ void __fastcall TCustForm::CellViewScrollBarChange(TObject *Sender)
         resetScroll = false;
         KeyCellGridClick(Sender);
         resetScroll = true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TCustForm::mmConnectionEditorClick(TObject *Sender)
+{
+     //Launch Connection Editor
+     //allow modification of database and key server connections.
+     TConnectionEditorDlg *connectionEditorDlg = new TConnectionEditorDlg(this);
+     if(connectionEditorDlg->ShowModal() == mrOk)
+     {
+          Application->MessageBox("Settings will not take into effect until Creator is restarted.", "Information", MB_OK);
+     }
+     delete(connectionEditorDlg);
 }
 //---------------------------------------------------------------------------
 

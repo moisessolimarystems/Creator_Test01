@@ -21,6 +21,7 @@ USEFORM("DevelopmentPasswordDlg.cpp", DlgDevelopmentPassword);
 USEFORM("keySearchDlg.cpp", ksdSearchDlg);
 USEFORM("keyDateSearchDlg.cpp", dsSearchDlg);
 USEFORM("SolSearcherEnterpriseDetails.cpp", SolSearcherDetails); /* TFrame: File Type */
+USEFORM("ConnectionEditor.cpp", ConnectionEditorDlg);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -35,6 +36,7 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
                  Application->CreateForm(__classid(TDlgDevelopmentPassword), &DlgDevelopmentPassword);
                  Application->CreateForm(__classid(TksdSearchDlg), &ksdSearchDlg);
                  Application->CreateForm(__classid(TdsSearchDlg), &dsSearchDlg);
+                 Application->CreateForm(__classid(TConnectionEditorDlg), &ConnectionEditorDlg);
                  Application->Run();
       }
       catch (Exception &exception)
