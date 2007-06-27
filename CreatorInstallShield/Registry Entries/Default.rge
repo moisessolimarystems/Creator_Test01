@@ -9,4 +9,23 @@ Set0=<Default>
 ---Comment---=
 ---FileGroup0---=
 ---Default---=Yes
+HKLM0=SOFTWARE
+HKLM1=SOFTWARE\Solimar Systems
+HKLM2=SOFTWARE\Solimar Systems\Creator
+
+[<Default>:HKLM:SOFTWARE]
+---Shared---=No
+---Comment---=
+(Default)=S,
+
+[<Default>:HKLM:SOFTWARE\Solimar Systems]
+---Shared---=No
+---Comment---=
+(Default)=S,
+
+[<Default>:HKLM:SOFTWARE\Solimar Systems\Creator]
+---Shared---=No
+---Comment---=
+(Default)=S,
+KeyServer=S,localhost
 
