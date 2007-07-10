@@ -73,7 +73,7 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageSystemDriver*/ L"Protection key driver initialization error.",
 
 // invalid/insufficient licensing
-	/*MessageViolationVersion*/ L"Key is not licensed for product version %hx.%03hx. The key will be inactive until licensing is modified.",
+	/*MessageViolationVersion*/ L"Key is not licensed for product version %d.%02x. The key will be inactive until licensing is modified.",
 	/*MessageViolation*/ L"You have been in violation for %d day(s). %s",
 	/*MessageViolationInactive*/ L"The key will be inactive until licensing is modified.",
 	/*MessageViolationInactiveSoon*/ L"The key will soon be inactive until licensing is modified.",
