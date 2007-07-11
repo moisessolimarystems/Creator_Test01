@@ -181,7 +181,7 @@ void SaveConfigurations::LoadSettings()
 			stream->Close();
 		}
 	}
-	catch(Exception* e)
+	catch(Exception*)
 	{
 		//Exception thrown trying to retrieve IsolatedStorage. Skip loading settings.
 	}
@@ -211,7 +211,7 @@ void SaveConfigurations::SaveSettings()
 			stream->Close();
 		}
 	}
-	catch(Exception* e)
+	catch(Exception*)
 	{
 		//Exception thrown trying to retrieve IsolatedStorage. Skip saving settings.
 	}

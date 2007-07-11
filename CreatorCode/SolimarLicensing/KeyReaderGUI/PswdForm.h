@@ -85,7 +85,7 @@ namespace KeyReaderGUI
 			this->OkBtn->Name = S"OkBtn";
 			this->OkBtn->TabIndex = 1;
 			this->OkBtn->Text = S"OK";
-			this->OkBtn->Click += new System::EventHandler(this, OkBtn_Click);
+			this->OkBtn->Click += new System::EventHandler(this, &KeyReaderGUI::PswdForm::OkBtn_Click);
 			// 
 			// CancelBtn
 			// 
@@ -94,7 +94,7 @@ namespace KeyReaderGUI
 			this->CancelBtn->Name = S"CancelBtn";
 			this->CancelBtn->TabIndex = 2;
 			this->CancelBtn->Text = S"Cancel";
-			this->CancelBtn->Click += new System::EventHandler(this, CancelBtn_Click);
+			this->CancelBtn->Click += new System::EventHandler(this, &KeyReaderGUI::PswdForm::CancelBtn_Click);
 			// 
 			// PswdTextBox
 			// 
@@ -106,8 +106,8 @@ namespace KeyReaderGUI
 			this->PswdTextBox->Size = System::Drawing::Size(248, 20);
 			this->PswdTextBox->TabIndex = 0;
 			this->PswdTextBox->Text = S"";
-			this->PswdTextBox->Validating += new System::ComponentModel::CancelEventHandler(this, PswdTextBox_Validating);
-			this->PswdTextBox->Validated += new System::EventHandler(this, PswdTextBox_Validated);
+			this->PswdTextBox->Validating += new System::ComponentModel::CancelEventHandler(this, &KeyReaderGUI::PswdForm::PswdTextBox_Validating);
+			this->PswdTextBox->Validated += new System::EventHandler(this, &KeyReaderGUI::PswdForm::PswdTextBox_Validated);
 			// 
 			// groupBox1
 			// 

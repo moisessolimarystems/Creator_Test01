@@ -99,7 +99,7 @@ bool KeyInfoListViewManager::PopulateView()
 		int MinorVersion = (TheKeyInfoStructure.ProductVersion.lVal & 0x0fff) >> 4;
 
 		//%x hexadecimal integer format
-		sprintf(ProductVersion, "%x.%02x", MajorVersion, MinorVersion);
+		sprintf_s(ProductVersion, sizeof(ProductVersion)/sizeof(char), "%x.%02x", MajorVersion, MinorVersion);
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
@@ -237,7 +237,7 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 	else
 	{	
 		char retval[10];
-		sprintf(retval, "%d", TheKeyInfoStructure.HoursLeft);
+		sprintf_s(retval, sizeof(retval)/sizeof(char), "%d", TheKeyInfoStructure.HoursLeft);
 		listViewItem1->SubItems->Add(retval);
 	}
 
