@@ -3,6 +3,7 @@
 
 using namespace ModuleViewManager;
 
+#undef MessageBox
 //constructor...initialize the member variables
 ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewManager)
 							: TheModView(TheModViewManager)
@@ -13,15 +14,15 @@ ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewM
 	//new up a commlink object
 	OurCommLink = new CommunicationLink();
 
-	//connect to the solimar license server
-	OurCommLink->Connect();
+	if(!OurCommLink)
+		return;
 }
 
 ModuleLicenseListViewManager::~ModuleLicenseListViewManager()
 {
 	//disconnect from the solimar license server
    //new
-   OurCommLink->UnInitializeModuleLicenseConnection();
+	OurCommLink->UnInitializeModuleLicenseConnection();
 	OurCommLink->Disconnect();
 	delete OurCommLink;
 	OurCommLink = 0;
@@ -33,6 +34,17 @@ bool ModuleLicenseListViewManager::IsInitialized()
 	if(OurCommLink)
 		return OurCommLink->IsModInitialized();
 
+	return false;
+}
+
+bool ModuleLicenseListViewManager::Connect()
+{
+	//connect to the solimar license server
+	if(OurCommLink)
+	{
+		if(SUCCEEDED(OurCommLink->Connect()))
+			return true;
+	}
 	return false;
 }
 
@@ -75,12 +87,12 @@ void ModuleLicenseListViewManager::FillRow(ModuleLicensingStructure TheModuleLic
 	}
 	else
 	{
-		sprintf(retval, "%d", TheModuleLicStructure.TotalLicenses);
+		sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.TotalLicenses);
 		listViewItem1->SubItems->Add(retval);
 	}
 
 	//convert the licenses in use to a string and insert it as a subitem
-	sprintf(retval, "%d", TheModuleLicStructure.LicensesInUse);
+	sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.LicensesInUse);
 	listViewItem1->SubItems->Add(retval);
 
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];

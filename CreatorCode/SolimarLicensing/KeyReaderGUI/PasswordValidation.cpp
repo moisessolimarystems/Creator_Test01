@@ -74,7 +74,7 @@ HRESULT PasswordValidation::ProcessPasswordFile(BSTR TheFileName)
 		MessageBox::Show("Error Communicating With SolimarLicenseServer");
 	}
 	wchar_t buf[256];
-	swprintf(buf, L"The Verification Code Is : %s", verification_code);
+	swprintf_s(buf, sizeof(buf)/sizeof(wchar_t), L"The Verification Code Is : %s", verification_code);
 	MessageBox::Show(buf);
 
 	// free up the variant safearray

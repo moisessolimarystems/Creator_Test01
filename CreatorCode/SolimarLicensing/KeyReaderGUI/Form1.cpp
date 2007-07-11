@@ -20,13 +20,38 @@
 
 using namespace KeyReaderGUI;
 
+static System::String* ExceptionStringFormater(Exception* e, int depth)
+{  
+	System::Object *o[] = {e->Source,
+						   e->Message,
+						   e->StackTrace,
+						   e->InnerException != NULL ? ExceptionStringFormater(e->InnerException, depth+1) : ""
+						  }; 
+	return System::String::Format(								 	
+								 "Source: {0}\r\nMessage: {1}\r\nStack Trace:\r\n{2}\r\n\r\n{3}",
+								 o
+								 );
+}
+
+
+#undef MessageBox
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
 {
-	System::Threading::Thread::CurrentThread->ApartmentState = System::Threading::ApartmentState::STA;
-	Application::Run(new Form1());
+	try
+	{
+		System::Threading::Thread::CurrentThread->ApartmentState = System::Threading::ApartmentState::STA;
+		Application::EnableVisualStyles();
+		Form1* f1 = new Form1();
+		Application::Run(f1);
+	}
+	catch(Exception* e)
+	{
+		System::String* estr = System::String::Format("An exception was thrown.\r\n\r\n{0}\r\n\r\nLicense Manager will now close. ",ExceptionStringFormater(e,0));		
+		MessageBox::Show(estr,"Unexpected Error", MessageBoxButtons::OK, MessageBoxIcon::Error); 
+	}
 	return 0;
 }
 
@@ -36,13 +61,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 Form1::Form1()
 {
 	CurrentKeySelected = NULL;
-
 	//The Sizing Manager scales the size of the form with respect to the monitor resolution
 	this->TheSizingManager = new ControlSizing(this);
 
-	//SaveConfig is used to save the form/control sizes into the registry
-	SaveConfig = new SaveConfigurations(this);
-	
+	//SaveCfg is used to save the form/control sizes into the registry
+	this->SaveCfg = new SaveConfigurations(this);
+	this->SaveCfg->LoadSettings();
 	
 	//add all of the components to the form
 	InitializeComponent();
@@ -52,16 +76,7 @@ Form1::Form1()
 	InitializeModListView();
 	InitializeMainMenu();
 	InitializeForm();
-    InitializeModPanel();
 	InitializeGUITimer();
-
-	TheAboutBox = new AboutBox_Form();
-
-	//new up a key view manager to manage the key list view
-	this->TheKeyViewManager = new KeyInfoListViewManager(this->KeyInfoListView);
-
-    //fill in the key list view with the appropriate values
-	TheKeyViewManager->PopulateView();
 
 	this->KeyInfoPanel->ResumeLayout(false);
 	this->ModuleLicensePanel->ResumeLayout(false);
@@ -77,8 +92,25 @@ Form1::Form1()
 	//now create the comparer for the mod list view
 	mlvwColumnSorter = new ModListViewComparer();
 	this->ModLicenseListView->ListViewItemSorter = mlvwColumnSorter;
+}
 
-    UpdateKeyListView();
+System::Void Form1::Form1_Load(System::Object *  sender, System::EventArgs *  e)
+{
+	//new up a key view manager to manage the key list view
+	this->TheKeyViewManager = new KeyInfoListViewManager(this->KeyInfoListView);
+	//New up a mod view manager to manage the list view
+	this->TheModViewManager = new ModuleLicenseListViewManager(this->ModLicenseListView);
+
+	if(!TheKeyViewManager->Connect() || !TheModViewManager->Connect())
+	{	
+		MessageBox::Show("Failed to connect to the License Server. License Manager will now close.", "License Server Error", MessageBoxButtons::OK, MessageBoxIcon::Error);			
+		Application::Exit();
+	}
+	else
+		//fill in the key list view with the appropriate values
+		TheKeyViewManager->PopulateView();
+
+	UpdateKeyListView();
 }
 
 void Form1::Dispose(Boolean disposing)
@@ -111,13 +143,16 @@ void Form1::Dispose(Boolean disposing)
 		delete TheSizingManager;
 		TheSizingManager = NULL;
 	}
-	if(this->SaveConfig)
+
+	if(this->SaveCfg)
 	{
-		delete SaveConfig;
-		SaveConfig = NULL;
+		delete SaveCfg;
+		SaveCfg = NULL;
 	}
 	__super::Dispose(disposing);
 }
+
+
 
 //Initializes the form. This function loads the form size and location from registry
 void Form1::InitializeGUITimer()
@@ -134,7 +169,6 @@ void Form1::InitializeGUITimer()
 	process the timer event to the timer. */
 	myTimer->Tick += new EventHandler(this, &Form1::TimerEventProcessor);
 
-
 	//raises the event.
 	while(exitFlag == false) 
 	{
@@ -147,47 +181,28 @@ void Form1::InitializeGUITimer()
 void Form1::InitializeForm()
 {
 	//init form size and location
-	int width, height, x_coord, y_coord;
+	//int width, height, x_coord, y_coord
+	System::Drawing::Point FormLocation;
+	System::Drawing::Size FormSize;
 
 	//get the saved form configurations from the registry
-	SaveConfig->LoadFormConfigs(&width, &height, &x_coord, &y_coord);
+	SaveCfg->LoadFormConfigs(&FormLocation, &FormSize);
 	
-	//if one of those values is -1 than we know that this is the first time the app has ever run
-	if(width == -1)
+	if(FormSize.Width < 0)
 	{
+		// Set the size of the form to be 3/4 the size of working rectangle.
 		this->TheSizingManager->InitializeFormSize();
 		this->TheSizingManager->InitializeFormLocation();
 	}
-
 	else
 	{
 		// Set the size of the form to be 3/4 the size of working rectangle.
-		this->Size = *(__nogc new System::Drawing::Size(width, height));
-		this->Location = *(__nogc new System::Drawing::Point(x_coord, y_coord));
+		this->Size = FormSize; //*(__nogc new System::Drawing::Size(width, height));
+		this->Location = FormLocation; //*(__nogc new System::Drawing::Point(x_coord, y_coord));
 	}
 
 	//declare a form closing even handler that will be used to save the user's configs in reg.
 	this->Closed += new System::EventHandler(this, &Form1::Form1_Closing);
-}
-
-//The ModPanel is the panel on the right of the form. It contains a list that displays the module
-//license information. When the form loads we want to intialize it to the same size it was when
-//user last closed the application. In order to do this we need to set the size of the mod panel 
-//and the entire form and every other control will follow because of how everything is docked. 
-void Form1::InitializeModPanel()
-{
-   	//init form size and location
-	int width, height, x_coord, y_coord;
-
-	//get the saved form configurations from the registry
-	SaveConfig->LoadModPanelConfig(&width, &height, &x_coord, &y_coord);
-	
-	//if one of those values is -1 than we know that this is the first time the app has ever run
-	if(width != -1)
-	{
-      this->ModuleLicensePanel->Height = height;
-      this->ModuleLicensePanel->Width = width;
-	}
 }
 
 //The Key info list view is located on the left side of the form and it displays all of
@@ -202,7 +217,6 @@ void Form1::InitializeKeyInfoListView()
 	this->HoursLeft->Text = S"Days Left";
 	this->ExpirationDate->Text = S"Expiration Date";
 
-
 	//set the list view attributes
 	this->KeyInfoListView->Alignment = ListViewAlignment::SnapToGrid;
 	this->KeyInfoListView->AllowColumnReorder = true;
@@ -216,14 +230,14 @@ void Form1::InitializeKeyInfoListView()
 	this->KeyInfoListView->MultiSelect = false;
 
 	// Set the initial sorting type for the ListView.
-   this->KeyInfoListView->Sorting = SortOrder::None;
+    this->KeyInfoListView->Sorting = SortOrder::None;
 
 	KeyGUIConfigurationStruct KeyConfigStruct;
 	memset(&KeyConfigStruct, 0 , sizeof(KeyConfigStruct));
 
 	//Load the saved configurations from the registry.
-	this->SaveConfig->LoadKeyListConfig(&KeyConfigStruct);
-	
+	this->SaveCfg->LoadKeyListConfig(&KeyConfigStruct);
+
 	// -1 represents the first time running this app
 	if(KeyConfigStruct.width == -1)
 	{
@@ -235,7 +249,6 @@ void Form1::InitializeKeyInfoListView()
 		this->HoursLeft->Width = HOURS_LEFT_COL_WIDTH;
 		this->ExpirationDate->Width = EXPIRATION_COL_WIDTH;
 	}
-
 	else
 	{
 		this->KeyNumber->Width = KeyConfigStruct.ColWidths[0];
@@ -245,8 +258,7 @@ void Form1::InitializeKeyInfoListView()
 		this->Active->Width = KeyConfigStruct.ColWidths[4];
 		this->HoursLeft->Width = KeyConfigStruct.ColWidths[5];
 		this->ExpirationDate->Width = KeyConfigStruct.ColWidths[6];
-
-
+	
 		//set the order of the columns in the view
 		//get the current column order
 		int LCount = KeyInfoListView->Columns->Count;
@@ -254,7 +266,6 @@ void Form1::InitializeKeyInfoListView()
 		HWND m_HWND = reinterpret_cast<HWND> (KeyViewHandle.ToPointer());
 		ListView_SetColumnOrderArray(m_HWND, LCount, KeyConfigStruct.ColOrder); 
 	}
-
 
 	//add the event handlers
 	this->KeyInfoListView->SelectedIndexChanged += new System::
@@ -279,7 +290,6 @@ void Form1::InitializeModListView()
 	this->LicensesInUse->Text = "In Use";
 	this->TotalLicenses->Text = "Total Licenses";
 	
-
 	//add the column headers
 	ColumnHeader* __mcTemp__3[] = new ColumnHeader*[NUM_MOD_COLUMNS];
 	__mcTemp__3[0] = this->ModuleName;
@@ -291,7 +301,7 @@ void Form1::InitializeModListView()
 	memset(&ModConfigStruct, 0 , sizeof(ModConfigStruct));
 
 	//load the mod list view info from registry
-	this->SaveConfig->LoadModListConfig(&ModConfigStruct);
+	this->SaveCfg->LoadModListConfig(&ModConfigStruct);
 
 	//-1 represents the first time running this app
 	if(ModConfigStruct.width == -1)
@@ -300,13 +310,12 @@ void Form1::InitializeModListView()
 		this->LicensesInUse->Width = IN_USE_COL_WIDTH;
 		this->TotalLicenses->Width = TOTAL_LICENSES_COL_WIDTH;
 	}
-
 	//load the init values from registry
 	else
-	{
-		this->ModuleName->Width = ModConfigStruct.FirstModColumnWidth;
-		this->TotalLicenses->Width = ModConfigStruct.SecondModColumnWidth;
-		this->LicensesInUse->Width = ModConfigStruct.ThirdModColumnWidth;
+	{	
+		this->ModuleName->Width = ModConfigStruct.ColumnWidth[0];
+		this->TotalLicenses->Width = ModConfigStruct.ColumnWidth[1]; 
+		this->LicensesInUse->Width = ModConfigStruct.ColumnWidth[2]; 
 		
       //set the order of the columns in the view
 		//get the current column order
@@ -315,9 +324,6 @@ void Form1::InitializeModListView()
 		HWND m_HWND = reinterpret_cast<HWND> (ModViewHandle.ToPointer());
 		ListView_SetColumnOrderArray(m_HWND, LCount, ModConfigStruct.ColOrder); 
 	}
-
-	//New up a mod view manager to manage the list view
-	this->TheModViewManager = new ModuleLicenseListViewManager(this->ModLicenseListView);
 
 	//add the event handlers for the mod list view
 	this->ModLicenseListView->MouseUp += new MouseEventHandler(this, 
@@ -344,16 +350,16 @@ System::Void Form1::ExitMenuItem_Click(System::Object *  sender, System::EventAr
 
 void Form1::InitializeMainMenu()
 {
-   this->refreshMenuItem->Click += new System::EventHandler(this, Form1::refreshMenuItem_Click);
-   this->EnterPasswordMenuItem->Click += new System::EventHandler(this, Form1::EnterPasswordMenuItem_Click);
-   this->AboutSolimar->Click += new System::EventHandler(this, Form1::AboutSolimar_Click);
+   this->refreshMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::refreshMenuItem_Click);
+   this->EnterPasswordMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::EnterPasswordMenuItem_Click);
+   this->AboutSolimar->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::AboutSolimar_Click);
 }
 
 void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e)
 {
+	TheAboutBox = new AboutBox();
 	TheAboutBox->ShowDialog();
 }
-
 
 System::Void Form1::PasswordMenuItem_Select(System::Object *  sender, System::EventArgs *  e)
 {
@@ -371,10 +377,9 @@ System::Void Form1::PasswordMenuItem_Select(System::Object *  sender, System::Ev
 
 void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e) 
 {
-	ThePasswordForm = new PasswordForm(PasswordValidater);
+	ThePasswordForm = new PswdForm(PasswordValidater);
 	ThePasswordForm->ShowDialog();
 	UpdateViews();
-	ThePasswordForm->Dispose(true);
 	delete ThePasswordForm;
 	ThePasswordForm = NULL;
 }
@@ -384,12 +389,10 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 {
 		// Show the FolderBrowserDialog.
     System::Windows::Forms::DialogResult result = openFileDialog1->ShowDialog();
-
 	
 	//if OK button was pressed
 	if (result == DialogResult::OK) 
 	{
-		
 			//get the file name
 			String* TheFileName = openFileDialog1->FileName;
 			BSTR bstr_FileName;
@@ -402,9 +405,9 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 			PasswordValidater->ProcessPasswordFile(bstr_FileName);
 			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
     }
+	UpdateViews();
+	this->Refresh();
 }
-
-
 
 // Refresh the window
 void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e) 
@@ -558,11 +561,11 @@ void Form1::UpdateKeyListView()
 												ListViewItemCollection(this->KeyInfoListView);
 
 	//clear the key view; populate with the new values and select the current key
-	EveryKeyItem->Clear();
-	if(!this->TheKeyViewManager->PopulateView())
+   EveryKeyItem->Clear();
+   if(!this->TheKeyViewManager->PopulateView())
 		return;
 
-	SelectCurrentKey();
+   SelectCurrentKey();
    StartTimer();
 }
 
@@ -643,10 +646,11 @@ void Form1::ModList_MouseDown(Object* sender, MouseEventArgs* e)
 
 void Form1::Form1_Closing(Object* sender, EventArgs* e)
 {
-	SaveConfig->SaveFormConfigs();
-	SaveConfig->SaveKeyPanelConfig(this->KeyInfoPanel);
-	SaveConfig->SaveModPanelConfig(this->ModuleLicensePanel);
-	SaveConfig->SaveKeyListConfig(this->KeyInfoListView);
-	SaveConfig->SaveModListConfig(this->ModLicenseListView);
-	SaveConfig->SaveSplitterConfig(this->splitter1);
+	if(SaveCfg)
+	{
+		SaveCfg->SaveFormConfigs();
+		SaveCfg->SaveKeyListConfig(this->KeyInfoListView);
+		SaveCfg->SaveModListConfig(this->ModLicenseListView);
+		SaveCfg->SaveSettings();
+	}
 }

@@ -13,7 +13,6 @@ ChallengeResponse::Message::Message() : data_size(MESSAGE_BUFFER_SIZE)
 	// generate random data to use as a random challenge message
 	memset(data,0,MESSAGE_BUFFER_SIZE);
 	CryptoHelper crypt;
-	CryptoHelper::Digest digest;
 	crypt.GenerateRandomBytes(data, MESSAGE_BUFFER_SIZE);
 }
 		

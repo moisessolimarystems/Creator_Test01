@@ -3,8 +3,8 @@
 
 #include "KeyInfoListViewManager.h"
 #include "PasswordValidation.h"
-#include "PasswordForm.h"
-#include "AboutBox_Form.h"
+#include "PswdForm.h"
+#include "AboutBox.h"
 #include "ListViewItemComparer.h"
 #include "ModListViewItemComparer.h"
 #include "ControlSizing.h"
@@ -21,16 +21,16 @@ namespace KeyReaderGUI
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
-	using namespace System::Data;
+//	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::ServiceProcess;
 	using namespace KeyViewManager;
 	using namespace PWDValidation;
-	using namespace PWDForm;
 	using namespace ListViewComparer;
 	using namespace ModListViewItemComparer;
 	using namespace SizeControl;
 	using namespace SaveConfig;
+
 
 	/// <summary> 
 	/// Summary for Form1
@@ -52,13 +52,12 @@ namespace KeyReaderGUI
 	private:
 		//private methods
 		void SelectCurrentKey();
-      void StartTimer();
-      void StopTimer();
-      void UpdateKeyListView();
+		void StartTimer();
+		void StopTimer();
+		void UpdateKeyListView();
 		void UpdateViews();
 
 		//helper methods used to initialize the components on the form
-      void InitializeModPanel();
 		void InitializeKeyInfoListView();
 		void InitializeModListView();
 		void InitializeMainMenu();
@@ -113,7 +112,9 @@ namespace KeyReaderGUI
 	void Form1::EnterPasswordMenuItem_Click(Object* sender, System::EventArgs* e);
   	void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e);
 	void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e);
-	void Form1_Closing(Object* sender, EventArgs* e);
+	void Form1::Form1_Closing(Object* sender, EventArgs* e);
+	
+	System::Void Form1_Load(System::Object *  sender, System::EventArgs *  e);
 
 	//method that runs when the Timer is signaled
 	void TimerEventProcessor(Object* myObject, EventArgs* myEventArgs);
@@ -135,8 +136,6 @@ namespace KeyReaderGUI
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
-
-
 		void InitializeComponent(void)
 		{
 			System::Resources::ResourceManager *  resources = new System::Resources::ResourceManager(__typeof(KeyReaderGUI::Form1));
@@ -211,13 +210,13 @@ namespace KeyReaderGUI
 			this->File_StartupServer->Index = 0;
 			this->File_StartupServer->Text = S"Startup Server";
 			this->File_StartupServer->Visible = false;
-			this->File_StartupServer->Click += new System::EventHandler(this, File_StartupServer_Click);
+			this->File_StartupServer->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::File_StartupServer_Click);
 			// 
 			// File_ShutdownServer
 			// 
 			this->File_ShutdownServer->Index = 1;
-			this->File_ShutdownServer->Text = S"Shudown Server";
-			this->File_ShutdownServer->Click += new System::EventHandler(this, File_ShutdownServer_Click);
+			this->File_ShutdownServer->Text = S"Shutdown Server";
+			this->File_ShutdownServer->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::File_ShutdownServer_Click);
 			// 
 			// menuItem2
 			// 
@@ -228,7 +227,7 @@ namespace KeyReaderGUI
 			// 
 			this->ExitMenuItem->Index = 3;
 			this->ExitMenuItem->Text = S"&Exit";
-			this->ExitMenuItem->Click += new System::EventHandler(this, ExitMenuItem_Click);
+			this->ExitMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::ExitMenuItem_Click);
 			// 
 			// viewMenuItem
 			// 
@@ -251,7 +250,7 @@ namespace KeyReaderGUI
 			__mcTemp__4[1] = this->AddPasswordPacketMenuItem;
 			this->PasswordMenuItem->MenuItems->AddRange(__mcTemp__4);
 			this->PasswordMenuItem->Text = S"Password";
-			this->PasswordMenuItem->Select += new System::EventHandler(this, PasswordMenuItem_Select);
+			this->PasswordMenuItem->Select += new System::EventHandler(this, &KeyReaderGUI::Form1::PasswordMenuItem_Select);
 			// 
 			// EnterPasswordMenuItem
 			// 
@@ -262,7 +261,7 @@ namespace KeyReaderGUI
 			// 
 			this->AddPasswordPacketMenuItem->Index = 1;
 			this->AddPasswordPacketMenuItem->Text = S"&Add Password Packet";
-			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, AddPasswordPacketMenuItem_Click);
+			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, &KeyReaderGUI::Form1::AddPasswordPacketMenuItem_Click);
 			// 
 			// HelpMenuItem
 			// 
@@ -281,26 +280,28 @@ namespace KeyReaderGUI
 			// 
 			this->ModuleLicensePanel->Controls->Add(this->ModLicenseListView);
 			this->ModuleLicensePanel->Dock = System::Windows::Forms::DockStyle::Right;
-			this->ModuleLicensePanel->Location = System::Drawing::Point(512, 0);
+			this->ModuleLicensePanel->Location = System::Drawing::Point(424, 0);
 			this->ModuleLicensePanel->Name = S"ModuleLicensePanel";
-			this->ModuleLicensePanel->Size = System::Drawing::Size(200, 373);
+			this->ModuleLicensePanel->Size = System::Drawing::Size(288, 373);
 			this->ModuleLicensePanel->TabIndex = 1;
 			// 
 			// ModLicenseListView
 			// 
 			this->ModLicenseListView->BackColor = System::Drawing::SystemColors::InactiveBorder;
 			this->ModLicenseListView->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->ModLicenseListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->ModLicenseListView->Location = System::Drawing::Point(0, 0);
 			this->ModLicenseListView->Name = S"ModLicenseListView";
-			this->ModLicenseListView->Size = System::Drawing::Size(200, 373);
+			this->ModLicenseListView->Size = System::Drawing::Size(288, 373);
 			this->ModLicenseListView->TabIndex = 0;
 			this->ModLicenseListView->View = System::Windows::Forms::View::Details;
+			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, &KeyReaderGUI::Form1::ModLicenseListView_KeyUp);
 			// 
 			// splitter1
 			// 
 			this->splitter1->BackColor = System::Drawing::SystemColors::ActiveBorder;
 			this->splitter1->Dock = System::Windows::Forms::DockStyle::Right;
-			this->splitter1->Location = System::Drawing::Point(509, 0);
+			this->splitter1->Location = System::Drawing::Point(421, 0);
 			this->splitter1->Name = S"splitter1";
 			this->splitter1->Size = System::Drawing::Size(3, 373);
 			this->splitter1->TabIndex = 2;
@@ -312,7 +313,7 @@ namespace KeyReaderGUI
 			this->KeyInfoPanel->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->KeyInfoPanel->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoPanel->Name = S"KeyInfoPanel";
-			this->KeyInfoPanel->Size = System::Drawing::Size(509, 373);
+			this->KeyInfoPanel->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoPanel->TabIndex = 3;
 			// 
 			// KeyInfoListView
@@ -327,11 +328,13 @@ namespace KeyReaderGUI
 			__mcTemp__6[6] = this->ExpirationDate;
 			this->KeyInfoListView->Columns->AddRange(__mcTemp__6);
 			this->KeyInfoListView->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->KeyInfoListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
 			this->KeyInfoListView->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoListView->Name = S"KeyInfoListView";
-			this->KeyInfoListView->Size = System::Drawing::Size(509, 373);
+			this->KeyInfoListView->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoListView->TabIndex = 0;
 			this->KeyInfoListView->View = System::Windows::Forms::View::Details;
+			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, &KeyReaderGUI::Form1::KeyInfoListView_KeyUp);
 			// 
 			// Form1
 			// 
@@ -345,6 +348,7 @@ namespace KeyReaderGUI
 			this->Menu = this->mainMenu1;
 			this->Name = S"Form1";
 			this->Text = S"Solimar License Manager";
+			this->Load += new System::EventHandler(this, &KeyReaderGUI::Form1::Form1_Load);
 			this->ModuleLicensePanel->ResumeLayout(false);
 			this->KeyInfoPanel->ResumeLayout(false);
 			this->ResumeLayout(false);
@@ -357,20 +361,18 @@ namespace KeyReaderGUI
 		bool exitFlag;
 		Object* CurrentKeySelected;
 		PasswordValidation* PasswordValidater;
-		PasswordForm* ThePasswordForm;
-		AboutBox_Form* TheAboutBox;
+		PswdForm* ThePasswordForm;
+		AboutBox* TheAboutBox;
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
 		ControlSizing* TheSizingManager;
-        SaveConfigurations* SaveConfig;
-
-		 
+        SaveConfigurations* SaveCfg;
 
 #undef MessageBox
-private: System::Void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
+private: void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
 			 // Stop the SpdStartupService if it's not already stopped.
-			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 ServiceController *licenseServerService = new ServiceController("Solimar License Server", ".");
 			 if (licenseServerService->Status != ServiceControllerStatus::StopPending &&
 				 licenseServerService->Status != ServiceControllerStatus::Stopped)
 				 licenseServerService->Stop();
@@ -380,9 +382,9 @@ private: System::Void File_ShutdownServer_Click(System::Object *  sender, System
 			 MessageBox::Show(this, "License Server shutdown complete.", "Shutdown License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
 		 }
 
-private: System::Void File_StartupServer_Click(System::Object *  sender, System::EventArgs *  e)
+private: void File_StartupServer_Click(System::Object *  sender, System::EventArgs *  e)
 		 {
-			 ServiceController *licenseServerService = new ServiceController("SolimarLicenseServer", ".");
+			 ServiceController *licenseServerService = new ServiceController("Solimar License Server", ".");
 			 if (licenseServerService->Status != ServiceControllerStatus::StartPending &&
 				 licenseServerService->Status != ServiceControllerStatus::Running)
 				 licenseServerService->Start();
@@ -392,7 +394,25 @@ private: System::Void File_StartupServer_Click(System::Object *  sender, System:
 			 MessageBox::Show(this, "License Server startup complete.", "Startup License Server", MessageBoxButtons::OK, MessageBoxIcon::Information);
 		 }
 
+private: void KeyInfoListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+		 {
+			if(e->KeyCode == Keys::F5)
+			{
+				UpdateViews();
+				this->Refresh();
+			}
+		 }
+
+private: void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows::Forms::KeyEventArgs *  e)
+		 {
+			if(e->KeyCode == Keys::F5)
+			{
+				UpdateViews();
+				this->Refresh();
+			}
+		 }
 };
+
 }
 
 #endif //form1.h
