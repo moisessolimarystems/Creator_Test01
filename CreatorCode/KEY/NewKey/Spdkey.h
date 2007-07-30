@@ -30,7 +30,7 @@
 
 // key cell specifications
 #define OUTPUT_UNIT_CELL         0x20
-#define TOTAL_MODULE_CELLS       16
+#define TOTAL_MODULE_CELLS       17
 #define MODS_PER_CELL            4
 #define TOTAL_KEY_MODULES        TOTAL_MODULE_CELLS*MODS_PER_CELL
 #define MAX_MOD_UNITS_LICENSED   0xF
@@ -55,45 +55,43 @@ class SpdProtectionKey : public ProtectionKey
 {
 public:
    SpdProtectionKey();
+   virtual ~SpdProtectionKey() {}
    SpdProtectionKey(const SpdProtectionKey&);
 
    // protection key data (references into keyDataBlock)
    ushort& outputUnits;
 
    // functions that do not perform key I/O
-   uchar getLicense(ushort mod_id) const;
+   //uchar getLicense(ushort mod_id) const;
+   ushort getLicense(ushort mod_offset, ushort mod_bits) const;
    void licenseMods();
    void licenseDevices();
-   void setLicense(ushort mod_id, ushort units_licensed);
+   //void setLicense(ushort mod_id, ushort units_licensed);
+   void setLicense(ushort mod_offset, ushort mod_bits, ushort units_licensed);
    void setLicensesToZero(); //setSpdKeyCellsToZero
    void setLicenses(ushort* buffer);
    ushort getOutputUnits();
+   void   setOutputUnits(ushort units);
 
    // simple key I/O functions
-   void getModulePassword(uchar mod_id,
+   virtual void getModulePassword(uchar mod_id,
                            unsigned int units_licensed,
                            ProductId product_id,
                            ushort product_version,
-                           ISolimarLicenseSvr* pServer,
+                           ISolimarLicenseSvr3* pServer,
                            ushort password_number,
                            char* Password_String
                            );
 
    //---Output Unit Functions
-   void getOutputPassword(ushort, ISolimarLicenseSvr*, ushort password_number, char*);
+   virtual void getOutputPassword(ushort, ISolimarLicenseSvr3*, ushort password_number, char*);
 
    //--- Pages Per Minute Functions
-   void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, ushort password_number, long);
-
-   ushort getPagesPerMinuteExtensions();
-   ushort getPagesPerMinute(ushort/*mod_id*/);
-   short setPagesPerMinuteExtensions(ushort/*extensions*/);
-   short setPagesPerMinute(ulong/*mod_id*/, ulong/*pages*/);
-   //short incrementPagesPerMinuteExtensions(ushort/*extensions*/);
+   void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr3*, char*, ushort password_number, long);
 
 protected:
    // protection key data (references into ProtectionKey::keyDataBlock)
-   ModuleCell* moduleCells;
+   ushort* moduleCells;
    // above is equivalent to ModuleCell moduleCells[TOTAL_MODULE_CELLS]
 };
 

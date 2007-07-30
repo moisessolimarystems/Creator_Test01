@@ -77,33 +77,6 @@
 #endif
 #endif
 
-
-/*-------------------------------------------------------------------------*
- *                                                                         *
- *    ModuleCell Class:                                                    *
- *                                                                         *
- *    This class corresponds to one cell of the protection key.  Using     *
- *    ModuleCell, you can access a ushort by nibble (4 bits).  ModuleCells *
- *    are used primarily to store the module licensing information from    *
- *    the protection key.                                                  *
- *                                                                         *
- *-------------------------------------------------------------------------*/
-enum Nibbles {NIBBLE_A, NIBBLE_B, NIBBLE_C, NIBBLE_D};
-class ModuleCell
-{
-public:
-   ModuleCell() : a(0), b(0), c(0), d(0) {};
-   operator ushort() const {return *((ushort*)this);}
-
-   enum {NIBBLE=4};
-   ushort d:NIBBLE;
-   ushort c:NIBBLE;
-   ushort b:NIBBLE;
-   ushort a:NIBBLE;
-};
-
-
-
 /*-------------------------------------------------------------------------*
  *                                                                         *
  *    SpdProtectionKey Class:                                              *
@@ -119,14 +92,14 @@ public:
 #ifdef __WIN32__ // the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
+   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
 #else // not the Win32 rainbow library
 SpdProtectionKey::SpdProtectionKey() :
    ProtectionKey(),
-   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL])
+   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
@@ -136,33 +109,38 @@ SpdProtectionKey::SpdProtectionKey() :
 ---------------------------------------------------------------------------*/
 SpdProtectionKey::SpdProtectionKey(const SpdProtectionKey& pkey) :
    ProtectionKey(pkey),
-   moduleCells((ModuleCell*)&keyDataBlock.data[MODULE_START_CELL]),
+   moduleCells(&keyDataBlock.data[MODULE_START_CELL]),
    outputUnits(keyDataBlock.data[OUTPUT_UNIT_CELL])
 {
 }
 
-/* getLicense()
- *    Get and return the license of module mod_id in the moduleCells[] array.
----------------------------------------------------------------------------*/
-uchar SpdProtectionKey::getLicense(ushort mod_id) const
+ushort SpdProtectionKey::getLicense(ushort mod_offset, ushort mod_bits) const
 {
-   ushort units_licensed = 0;
-   ushort mcell = ushort(mod_id>>2); // >>2 same as /4
-   Nibbles offset = (Nibbles)(mod_id&3); // same as %4
-   switch(offset) {
-      case NIBBLE_A:
-         units_licensed = moduleCells[mcell].a;
-         break;
-      case NIBBLE_B:
-         units_licensed = moduleCells[mcell].b;
-         break;
-      case NIBBLE_C:
-         units_licensed = moduleCells[mcell].c;
-         break;
-      case NIBBLE_D:
-         units_licensed = moduleCells[mcell].d;
-   }
-   return (uchar)units_licensed;
+    ushort unitsLicensed = 0;
+    //16 bits in a cell, offset by 0x80
+    ushort mCell = (mod_offset / 16) - 8;   //Cell in ModuleArray, remove offset
+    ushort mOffset = mod_offset%16; //Position in Cell
+
+    unitsLicensed = moduleCells[mCell] >> mOffset;
+    //unitsLicensed >> mOffset; //shift right
+    switch(mod_bits) {
+        case 1  :
+             unitsLicensed &= 0x0001;  //return value in bit 1
+             break;
+        case 2  :
+             unitsLicensed &= 0x0003;  //return value in bits 1,2
+             break;
+        case 4  :
+             unitsLicensed &= 0x000F;  //return value in bits 1-4
+             break;
+        case 8  :
+             unitsLicensed &= 0x00FF;  //return value in bits 1-8
+             break;
+        default :
+             break;
+    }
+
+    return unitsLicensed;
 }
 /* getOutputPassword()
  *
@@ -176,7 +154,7 @@ uchar SpdProtectionKey::getLicense(ushort mod_id) const
  -----------------------------------------------------------------------------*/
  const uchar OUTPUT_POOL_MODULE_ID = 128;
  void SpdProtectionKey::getOutputPassword(ushort output_units,
-                                          ISolimarLicenseSvr* pServer,
+                                          ISolimarLicenseSvr3* pServer,
                                           ushort password_number,
                                           char* Password_String)
  {
@@ -223,7 +201,7 @@ void SpdProtectionKey::getModulePassword(uchar mod_id,
                                           unsigned int units_licensed,
                                           ProductId product_id,
                                           ushort product_version,
-                                          ISolimarLicenseSvr* pServer,
+                                          ISolimarLicenseSvr3* pServer,
                                           ushort password_number,
                                           char* Password_String
                                           )
@@ -231,7 +209,6 @@ void SpdProtectionKey::getModulePassword(uchar mod_id,
    if(pServer)
    {
       BSTR password;
-
       if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
                                                    keyNumber,
                                                    product_id,
@@ -263,7 +240,7 @@ void SpdProtectionKey::getModulePassword(uchar mod_id,
 //==============================================================================
 void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
                                                  ushort pages,
-                                                 ISolimarLicenseSvr* pServer,
+                                                 ISolimarLicenseSvr3* pServer,
                                                  char* Password_String,
                                                  ushort password_number,
                                                  long ModID)
@@ -271,198 +248,41 @@ void SpdProtectionKey::getPagesPerMinutePassword(ushort ext,
    if(pServer)
    {
       BSTR password;
-      DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
-      if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
-                                                   keyNumber,
-                                                   productId,
-                                                   ModID,
-                                                   ppm_struct,
-                                                   password_number,
-                                                   &password
-                                                  )))
+      if(productId == SPD_PRODUCT)
       {
-         AnsiString* pwd = new AnsiString(password);
-         strcpy(Password_String, pwd->c_str());
-         delete pwd;
+          DWORD ppm_struct = (((pages & 0x0000FFFF) << 16) | (ext & 0x0000FFFF));
+          if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
+                                                        keyNumber,
+                                                        productId,
+                                                        ModID,
+                                                        ppm_struct,
+                                                        password_number,
+                                                        &password
+                                                        )))
+          {
+              AnsiString* pwd = new AnsiString(password);
+              strcpy(Password_String, pwd->c_str());
+              delete pwd;
+          }
+      }
+      else
+      {
+          if(SUCCEEDED(pServer->GenerateModulePassword2(customerNumber,
+                                                        keyNumber,
+                                                        productId,
+                                                        ModID,
+                                                        pages,
+                                                        password_number,
+                                                        &password
+                                                        )))
+          {
+              AnsiString* pwd = new AnsiString(password);
+              strcpy(Password_String, pwd->c_str());
+              delete pwd;
+          }
       }
       SysFreeString(password);
    }
-}
-
-
-//==============================================================================
-// Function:    getPagesPerMinute()
-// Purpose:     This function will return the number of pages per minute.
-//              It will check the registry for certain settings.
-//		Under the Solimar\\Solimar Print/Director key there will be an
-//		entry based on the customer number, key number, mod id, and
-//		pages per minute. The DWORD entry is found based on the key number
-//		that it is looking for, and then the pages are extracted from the
-//		DWORD value.
-//		n = (0x00000FFF & pages) |
-//		  ((0x000000FF & mod_id)<<12) |
-//		  ((0x000000FF & keyNumber)<<20);
-// Parameters:  ushort - mod_id
-// Returns:     ushort - the pages per minute
-//==============================================================================
-ushort SpdProtectionKey::getPagesPerMinute(ushort mod_id)
-{
-   DWORD pages(0);
-   DWORD regKeyInfo(0);
-   HKEY hKey;
-
-   if ( isOnTrial() )
-	   return MAX_PAGES_PER_MINUTE;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, KEY_ALL_ACCESS, &hKey)==ERROR_SUCCESS)
-   {
-        DWORD dwValue =(DWORD)-1;
-		  DWORD dwType,dwLen=sizeof(DWORD);
-
-        LPCSTR lpValueName;
-        sprintf( scratchBuf, "%03hX%02hd%03hd", customerNumber, keyNumber, mod_id );
- 		  lpValueName = scratchBuf;
-
-   	switch(mod_id)
-		{
-			case XCH_IPDS_ID:      //Xchange::IPDS
-         case XCH_PCL_ID:       //Xchange::PCL
-         case XCH_PS_ID:        //Xchange::PS
-         case XCH_PS_DBCS_ID:   //Xchange::PS (Double byte character support)
-         case AFPDS_PS_ID:      //AFPDS::PS
-         	regKeyInfo = (RegQueryValueEx(hKey, lpValueName, NULL, &dwType,(BYTE*)&dwValue,&dwLen) != ERROR_SUCCESS) ? 0 : dwValue;
-            pages = (0x00000FFF & regKeyInfo);
-            break;
-         default:
-            pages = 0;
-            break;
-      }
-   }
-
-   RegCloseKey(hKey);
-   return (ushort)pages;
-}
-
-//==============================================================================
-// Function:    setPagesPerMinute()
-// Purpose:     This function will set the number of pages per minute in the
-//		registry. We will code it so that it is not recognizeable to
-//		the user.
-// Parameters:  ulong mod_id -
-//		ulong pages -
-// Returns:     None
-//==============================================================================
-short SpdProtectionKey::setPagesPerMinute(ulong mod_id, ulong pages)
-{
-   HKEY hKey;
-   DWORD disp ;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp)==ERROR_SUCCESS)
-   {
-		LPCTSTR lpValueName;
-      switch(mod_id)
-      {
-      	case XCH_IPDS_ID:      //Xchange::IPDS
-      	case XCH_PCL_ID:       //Xchange::PCL
-      	case XCH_PS_ID:        //Xchange::PS
-      	case XCH_PS_DBCS_ID:   //Xchange::PS (Double byte character support)
-      	case AFPDS_PS_ID:      //AFPDS::PS
-      		sprintf( scratchBuf, "%03hX%02hd%03hd", customerNumber, keyNumber, mod_id );
-      		lpValueName = scratchBuf;
-      		break;
-      	default:
-      		lpValueName = "";
-      		break;
-      }
-
-      DWORD n = (0x00000FFF & pages) | ((0x000000FF & mod_id)<<12) | ((0x000000FF & keyNumber)<<20);
-      if (RegSetValueEx(hKey, lpValueName, NULL, REG_DWORD, (BYTE *) &n, sizeof(DWORD)) != ERROR_SUCCESS)
-      {
-      	MessageBox(NULL, "Error Updating Registry.", "", MB_OK | MB_ICONWARNING);
-         return FAILURE;
-      }
-      // end of registry
-	}
-	RegCloseKey(hKey);
-   return SUCCESS;
-
-}
-
-
-//==============================================================================
-// Function:    getPagesPerMinuteExtensions()
-// Purpose:     This function will return the number of extensions from the key
-//              The extensions are stored in the output units cell, and are the
-//              4 most significant bits of 0xAFFF where A houses the number of
-//              extensions.  Since 4095 is the max number of outputs, we will use
-//              This value for the pages per minute extensions.  That way, the
-//              key is responsible for the number of extensions.
-// Parameters:  None
-// Returns:     ulong - password
-//==============================================================================
-ushort SpdProtectionKey::getPagesPerMinuteExtensions()
-{
-   DWORD ext(0);
-   DWORD regKeyInfo(0);
-   HKEY hKey;
-
-   if ( isOnTrial() )
-        return 0;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, KEY_ALL_ACCESS, &hKey)==ERROR_SUCCESS)
-   {
-
-        DWORD dwValue =(DWORD)-1;
-        DWORD dwType,dwLen=sizeof(DWORD);
-
-        LPCSTR lpValueName;
-        sprintf( scratchBuf, "%03hX%02hX", customerNumber, keyNumber);
-        lpValueName = scratchBuf;
-
-   	  regKeyInfo = (RegQueryValueEx(hKey, lpValueName, NULL, &dwType,(BYTE*)&dwValue,&dwLen) != ERROR_SUCCESS) ? 0 : dwValue;
-        ext = (0x000000FF & regKeyInfo);
-   }
-
-   RegCloseKey(hKey);
-   return (ushort)ext;
-}
-
-//==============================================================================
-// Function:    setPagesPerMinuteExtensions()
-// Purpose:     This function will set the number of extensions for the key
-//              The extensions are stored in the output units cell, and are the
-//              4 most significant bits of 0xAFFF where A houses the number of
-//              extensions.  Since 4095 is the max number of outputs, we will use
-//              This value for the pages per minute extensions.  That way, the
-//              key is responsible for the number of extensions.
-// Parameters:  ushort - extensions
-// Returns:     ulong - password
-//==============================================================================
-short SpdProtectionKey::setPagesPerMinuteExtensions(ushort ext)
-{
-   HKEY hKey;
-   DWORD disp ;
-
-   sprintf( scratchBuf, "SOFTWARE\\Solimar\\Solimar Print/Director");
-   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, scratchBuf, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp)==ERROR_SUCCESS)
-   {
-      LPCTSTR lpValueName;
-      sprintf( scratchBuf, "%03hX%02hX", customerNumber, keyNumber);
-      lpValueName = scratchBuf;
-
-      DWORD n = (0x000000FF & ext) | ((0x000000FF & keyNumber)<<12) | ((0x00000FFF & customerNumber)<<20);
-      if (RegSetValueEx(hKey, lpValueName, NULL, REG_DWORD, (BYTE *) &n, sizeof(DWORD)) != ERROR_SUCCESS)
-      {
-      	MessageBox(NULL, "Error Updating Registry.", "", MB_OK | MB_ICONWARNING);
-         return FAILURE;
-      }
-      // end of registry
-   }
-   RegCloseKey(hKey);
-   return SUCCESS;
 }
 
 /* licenseMods()
@@ -496,36 +316,46 @@ void SpdProtectionKey::licenseDevices()
 #endif
 }
 
-
-/* setLicense()
- *    Set the license of module mod_id in the moduleCells[] array to
- *    units_licensed.
----------------------------------------------------------------------------*/
-void SpdProtectionKey::setLicense(ushort mod_id, ushort units_licensed)
+void SpdProtectionKey::setLicense(ushort mod_offset, ushort mod_bits, ushort units_licensed)
 {
-   ushort mcell = ushort(mod_id>>2); // >>2 same as /4
-   Nibbles offset = (Nibbles)(mod_id&3); // same as %4
-   switch(offset) {
-      case NIBBLE_A:
-         moduleCells[mcell].a = units_licensed;
-         break;
-      case NIBBLE_B:
-         moduleCells[mcell].b = units_licensed;
-         break;
-      case NIBBLE_C:
-         moduleCells[mcell].c = units_licensed;
-         break;
-      case NIBBLE_D:
-         moduleCells[mcell].d = units_licensed;
-   }
+    ushort mCellVal;
+    ushort mVal;
+    //16 bit per cell, offset by 0x80
+    ushort mCell = (mod_offset/16)-8;    //Cell in ModuleArray, remove offset
+    ushort mOffset = mod_offset%16;      //Position within Cell
+    ushort mask = 0x0000;                //used to clear out entire cell
+    mCellVal = moduleCells[mCell];
+    mVal = (units_licensed << (mOffset));
+    switch(mod_bits) {
+        case 1 :
+            //clear moduleCells[mCell] position where bit should be set
+            mask = ~(0x0001 << mOffset) ;
+            break;
+        case 2 :
+            mask = ~(0x0003 << mOffset);
+            break;
+        case 4 :
+            mask = ~(0x000F << mOffset);
+            break;
+        case 8 :
+            mask = ~(0x00FF << mOffset);
+            break;
+        default :
+            break;
+    }
+    mCellVal &= mask;         //Clear bits in position to set
+    mCellVal |=  (units_licensed << (mOffset));
+    moduleCells[mCell] = mCellVal;
+    mVal = getLicense(mod_offset, mod_bits);
 }
+
 
 /* setLicenses(ushort* buffer)
  *    Should only be used by creator.
 ---------------------------------------------------------------------------*/
 void SpdProtectionKey::setLicenses(ushort* buffer)
 {
-   memcpy( moduleCells, buffer, 32 );
+   memcpy( moduleCells, buffer, 36 );
 }
 
 
@@ -540,9 +370,9 @@ void SpdProtectionKey::setLicensesToZero()
    outputUnits = 0x0000;
 
    //zero out modules
-   ushort total_modules = TOTAL_MODULE_CELLS*MODS_PER_CELL;
-   for (ushort i = 0; i < total_modules; i++)
-      setLicense(i, 0);
+   //ushort total_modules = TOTAL_MODULE_CELLS*MODS_PER_CELL;
+   for (ushort i = 0; i < TOTAL_MODULE_CELLS; i++)
+      moduleCells[i] = 0;
 }
 
 // getOutputUnits - returns the number of outputs licensed for the key
@@ -551,6 +381,9 @@ ushort SpdProtectionKey::getOutputUnits()
 	return outputUnits;
 }
 
-
+void SpdProtectionKey::setOutputUnits(ushort units)
+{
+        outputUnits = units;
+}
 
 

@@ -18,6 +18,7 @@
 #include <classes.hpp>
 #include "keyprod.h"
 #include "pkey.h"
+#include "spdkey.h"
 #include "SSKey.h"
 
 /*----------------------------------------------------------------------------*
@@ -32,11 +33,11 @@
 /* constructor
 ------------------------------------------------------------------------------*/
 SSProtectionKey::SSProtectionKey() :
-   ProtectionKey(),
-   indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
-   reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
-   concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
-   applications(keyDataBlock.data[APPLICATIONS_CELL]),
+   SpdProtectionKey(),
+   indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),  //0x00
+   reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),//0x01
+   concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]), //0x02
+   applications(keyDataBlock.data[APPLICATIONS_CELL]), //0x03
    documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
@@ -46,7 +47,7 @@ SSProtectionKey::SSProtectionKey() :
 /* copy constructor
 ------------------------------------------------------------------------------*/
 SSProtectionKey::SSProtectionKey(const SSProtectionKey& pkey) :
-   ProtectionKey(pkey),
+   SpdProtectionKey(pkey),
    indexServers(keyDataBlock.data[INDEX_SERVERS_CELL]),
    reportServers(keyDataBlock.data[REPORT_SERVERS_CELL]),
    concurrentUsers25(keyDataBlock.data[CONCURRENT_USERS_25_CELL]),
@@ -54,8 +55,6 @@ SSProtectionKey::SSProtectionKey(const SSProtectionKey& pkey) :
    documentAssembler(keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL])
 {
 }
-
-
 
 /* getIndexServers()
  *    Return the number of index servers licensed on the key.
@@ -65,8 +64,6 @@ ushort SSProtectionKey::getIndexServers() const
    return indexServers;
 }
 
-
-
 /* getReportServers()
  *    Return the number of report servers licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -75,8 +72,6 @@ ushort SSProtectionKey::getReportServers() const
    return reportServers;
 }
 
-
-
 /* getConcurrentUsers()
  *    Return the number of concurrent users licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -84,8 +79,6 @@ ushort SSProtectionKey::getConcurrentUsers() const
 {
    return concurrentUsers25 * _25_UNITS_LICENSED_PER_CONCURRENT_USERS_25;
 }
-
-
 
 /* getApplications()
  *    Return the number of applications licensed on the key.
@@ -110,8 +103,6 @@ void SSProtectionKey::setIndexServers(ushort units_licensed)
    indexServers = units_licensed;
 }
 
-
-
 /* setReportServers()
  *    Set the number of report servers licensed on the key.
 ------------------------------------------------------------------------------*/
@@ -119,8 +110,6 @@ void SSProtectionKey::setReportServers(ushort units_licensed)
 {
    reportServers = units_licensed;
 }
-
-
 
 /* setConcurrentUsers()
  *    Set the number of concurrent users licensed on the key. Since the
@@ -133,8 +122,6 @@ void SSProtectionKey::setConcurrentUsers(ushort units_licensed)
    concurrentUsers25 =
       units_licensed / _25_UNITS_LICENSED_PER_CONCURRENT_USERS_25;
 }
-
-
 
 /* setApplications()
  *    Set the number of applications licensed on the key.
@@ -152,8 +139,6 @@ void SSProtectionKey::setDocumentAssembler(ushort units_licensed)
    documentAssembler = units_licensed;
 }
 
-
-
 /* getIndexServersPassword()
  *    Calculate and return the password for the number of index servers
  *    specified by units_licensed (0 through 255) by querying the secondary
@@ -164,9 +149,10 @@ void SSProtectionKey::setDocumentAssembler(ushort units_licensed)
  *    customer, with this key, and with this many index servers licensed.
 ------------------------------------------------------------------------------*/
 const long INDEX_SERVERS_MODULE_ID = 0;
-AnsiString SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+auto_ptr<AnsiString> SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr3* pServer)
 {
-   AnsiString* pwd  = NULL;
+   //AnsiString* pwd  = NULL;
+   auto_ptr<AnsiString> pwd;
 
    if(pServer)
    {
@@ -181,15 +167,13 @@ AnsiString SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISoli
                                                  )))
       {
          //convert the password from BSTR to and int
-         pwd = new AnsiString(password);
+         pwd = auto_ptr<AnsiString>(new AnsiString(password));
 
          SysFreeString(password);
       }
    }
-   return *pwd;
+   return pwd;
 }
-
-
 
 /* getReportServersPassword()
  *    Calculate and return the password for the number of report servers
@@ -202,9 +186,10 @@ AnsiString SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISoli
  *    customer, with this key, and with this many report servers licensed.
 ------------------------------------------------------------------------------*/
 const long REPORT_SERVERS_MODULE_ID = 1;
-AnsiString SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+auto_ptr<AnsiString> SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr3* pServer)
 {
-   AnsiString* pwd = NULL;
+   //AnsiString* pwd = NULL;
+   auto_ptr<AnsiString> pwd;
 
    if(pServer)
    {
@@ -219,14 +204,12 @@ AnsiString SSProtectionKey::getReportServersPassword(ushort units_licensed, ISol
                                                  )))
       {
          //convert the password from BSTR to and int
-         pwd = new AnsiString(password);
+         pwd = auto_ptr<AnsiString>(new AnsiString(password));
          SysFreeString(password);
       }
    }
-   return *pwd;
+   return pwd;
 }
-
-
 
 /* getConcurrentUsersPassword()
  *    Calculate and return the password for the number of concurrent users
@@ -244,10 +227,10 @@ AnsiString SSProtectionKey::getReportServersPassword(ushort units_licensed, ISol
  *    overlap.
 ------------------------------------------------------------------------------*/
 const long CONCURRENT_USERS_MODULE_ID = 2;
-AnsiString SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+auto_ptr<AnsiString> SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr3* pServer)
 {
-   AnsiString* pwd = 0;
-
+   //AnsiString* pwd = 0;
+   auto_ptr<AnsiString> pwd;
    if(pServer)
    {
       BSTR password;
@@ -261,12 +244,12 @@ AnsiString SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, IS
                                                  )))
       {
          //convert the password from BSTR to and int
-         pwd = new AnsiString(password);
+         pwd = auto_ptr<AnsiString>(new AnsiString(password));
 
          SysFreeString(password);
       }
    }
-   return *pwd;
+   return pwd;
 }
 
 /* getApplicationsPassword()
@@ -279,10 +262,10 @@ AnsiString SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, IS
  *    customer, with this key, and with this many applications licensed.
 ------------------------------------------------------------------------------*/
 const uchar APPLICATION_DATABASES_MODULE_ID = 3;
-AnsiString SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+auto_ptr<AnsiString> SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr3* pServer)
 {
-   AnsiString* pwd = 0;
-
+   //AnsiString* pwd = 0;
+   auto_ptr<AnsiString> pwd;
    if(pServer)
    {
       BSTR password;
@@ -296,11 +279,11 @@ AnsiString SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISoli
                                                  )))
       {
          //convert the password from BSTR to and int
-         pwd = new AnsiString(password);
+         pwd = auto_ptr<AnsiString>(new AnsiString(password));
          SysFreeString(password);
       }
    }
-   return *pwd;
+   return pwd;
 }
 
 /* getApplicationsPassword()
@@ -313,10 +296,10 @@ AnsiString SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISoli
  *    customer, with this key, and with this many applications licensed.
 ------------------------------------------------------------------------------*/
 const uchar DOCUMENT_ASSEMBLER_MODULE_ID = 4;
-AnsiString SSProtectionKey::getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+auto_ptr<AnsiString> SSProtectionKey::getDocumentAssemblerPassword(ushort units_licensed, ISolimarLicenseSvr3* pServer)
 {
-   AnsiString* pwd = 0;
-
+   //AnsiString* pwd = 0;
+   auto_ptr<AnsiString> pwd;
    if(pServer)
    {
       BSTR password;
@@ -330,9 +313,9 @@ AnsiString SSProtectionKey::getDocumentAssemblerPassword(ushort units_licensed, 
                                                  )))
       {
          //convert the password from BSTR to and int
-         pwd = new AnsiString(password);
+         pwd = auto_ptr<AnsiString>(new AnsiString(password));
          SysFreeString(password);
       }
    }
-   return *pwd;
+   return pwd;
 }

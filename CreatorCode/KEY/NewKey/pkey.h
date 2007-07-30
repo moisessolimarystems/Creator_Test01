@@ -29,8 +29,9 @@
 // key cell specifications
 #define TOTAL_CELLS              56
 
+
 // key cell numbers
-#define KEY_START_ADDRESS        0x08
+#define KEY_START_ADDRESS        0x00
 #define INITIAL_COUNTER_CELL     0x12
 #define EXTENDED_COUNTER_CELL    0x13
 #define PRIMARY_ALG_CELL         0x14
@@ -159,7 +160,7 @@ public:
 
    // static functions used to create key objects
    static ProtectionKey* newKey(ProductId product_id);
-   static ProtectionKey* newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer);
+   static ProtectionKey* newKey(BSTR* KeyID, ISolimarLicenseSvr3* pServer);
    static ProtectionKey* newKey(const ProtectionKey*); // copy key
 
    // function to display platform-independent message box
@@ -180,7 +181,7 @@ public:
    void setExpirationDays(ushort);
    const char* getKeyStatusText() const;
    const char* getProductText() const;
-   ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr*, BSTR*, int, VARIANT*);
+   ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr3*, BSTR*, int, short, VARIANT*);
    static const char* getKeyStatusText(KeyStatus key_status);
    static const char* getProductText(ProductId product_id, ProductLength product_length=SHORT_PRODUCT_NAME);
 
@@ -193,21 +194,26 @@ public:
 public:
 
    // simple key I/O functions
-   HRESULT clearKeyData(BSTR* TheKeyID, ISolimarLicenseSvr* pServer);
+   HRESULT clearKeyData(BSTR* TheKeyID, ISolimarLicenseSvr3* pServer);
 
-   void getBasePassword(ISolimarLicenseSvr* pServer, char* Password_String);
+   void getBasePassword(ISolimarLicenseSvr3* pServer, char* Password_String);
    enum {MAX_EXTENSION_NUM = 4};
+
+   void getAppInstancePassword(ISolimarLicenseSvr3* pServer,
+                            ushort appInstances,
+                            ushort password_number,
+                            char* password);
 
    void getExtensionPassword(ushort extension_days,
                               ushort extension_num,
-                              ISolimarLicenseSvr* pServer,
+                              ISolimarLicenseSvr3* pServer,
                               char* password);
 
    void getProductVersionPassword(ushort product_version,
-                                   ISolimarLicenseSvr* pServer,
+                                   ISolimarLicenseSvr3* pServer,
                                    char* Password_String
                                    );
-   short readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID);
+   short readKeyData(ISolimarLicenseSvr3* pServer, BSTR* KeyID);
 
    short writeKeyData();
    short writeStatus(ushort);
