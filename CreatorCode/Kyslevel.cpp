@@ -30,8 +30,7 @@
  *   Contains database data for one protection key.                   *
  *                                                                    *
  *--------------------------------------------------------------------*/
-
-/* static members
+ /* static members
 ---------------------------------------------------------------------------*/
 char* SKeyRecord::text = new char[255];
 
@@ -472,25 +471,56 @@ const char* SKeyRecord::getStatusText(unsigned short status)
       return "Unknown";
 }
 
+void SKeyRecord::setAppInstances(ushort value)
+{
+    appInstances = value;
+}
+
+void SKeyRecord::setPasswordNumber(ushort value)
+{
+    passwordNumber = value;
+}
+
 unsigned short SKeyRecord::incrementPasswordNumber()
 {
-      ushort value(0);
+
       switch(getProductId())
       {
           case SPDE_PRODUCT :
           case RUBIKA_PRODUCT :
-               value = ++passwordNumber;
+          case SDX_DESIGNER_PRODUCT :
+          case SOLSEARCHER_ENTERPRISE_PRODUCT :
+               passwordNumber++;
                break;
           case ICONVERT_PRODUCT :
                if(pkey->productVersion > 0x9050)
-                  value = ++passwordNumber;
+                  passwordNumber++;
                break;
           default :
                break;
       }
-      return value;
+      return passwordNumber;
 }
 
+unsigned short SKeyRecord::decrementPasswordNumber()
+{
+      switch(getProductId())
+      {
+          case SPDE_PRODUCT :
+          case RUBIKA_PRODUCT :
+          case SDX_DESIGNER_PRODUCT :
+          case SOLSEARCHER_ENTERPRISE_PRODUCT :
+               passwordNumber--;
+               break;
+          case ICONVERT_PRODUCT :
+               if(pkey->productVersion > 0x9050)
+                  passwordNumber--;
+               break;
+          default :
+               break;
+      }
+      return passwordNumber;
+}
 
 
 

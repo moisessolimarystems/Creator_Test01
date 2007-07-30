@@ -37,12 +37,14 @@ private:
 public:
    virtual __fastcall TUnitsDlg(TComponent* AOwner, unsigned int max);
    unsigned int GetUnits() {return m_Units;}
-   void SetCounterUnits(unsigned int m_Val) {
+
+   void SetMinUnits(unsigned int m_Val) { m_MinUnits = m_Val;}
+   void SetCounterUnits(unsigned int m_Val, unsigned int m_MaxVal) {
                                              m_CounterUnits = m_Val;
                                              Edit1->Text = m_CounterUnits;
+                                             UpDownBtn->Max = ((m_MaxVal/m_Val) - 1);
                                              }
    void EnableCounter(bool m_Val) {UpDownBtn->Visible = m_Val;}
-
 };
 //----------------------------------------------------------------------------
 extern TUnitsDlg *UnitsDlg;

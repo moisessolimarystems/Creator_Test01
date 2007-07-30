@@ -16,7 +16,7 @@
       objs\CryptoHelper.obj objs\ChallengeResponseHelper.obj 
       objs\ChallengeResponse.obj objs\MultidimensionalSafeArray.obj 
       objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj 
-      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj"/>
+      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj objs\ConnectionEditor.obj"/>
     <RESFILES value="CreatorProject.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) CustomerForm.dfm CreatorAbout.dfm CustQueryDlg.dfm 
@@ -24,7 +24,7 @@
       setunitsdlg.dfm KeyWizard.dfm ModuleDetail.dfm PasswordReportFrm.dfm 
       ModuleEditor.dfm ModuleEditorDlg.dfm ModuleEditorDetailDlg.dfm PPMDlg.dfm 
       DevelopmentPasswordDlg.dfm keySearchDlg.dfm keyDateSearchDlg.dfm 
-      SolSearcherEnterpriseDetails.dfm"/>
+      SolSearcherEnterpriseDetails.dfm ConnectionEditor.dfm"/>
     <LIBFILES value=""/>
     <LIBRARIES value="DCLUSR.lib vcldb.lib dbrtl.lib bdertl.lib vclx.lib qrpt.lib vcl.lib rtl.lib"/>
     <SPARELIBS value="rtl.lib vcl.lib qrpt.lib vclx.lib bdertl.lib dbrtl.lib vcldb.lib DCLUSR.lib"/>
@@ -32,7 +32,7 @@
       bdertl.bpi vcldbx.bpi teeui.bpi teedb.bpi tee.bpi teeqr.bpi ibxpress.bpi 
       bcbie.bpi vclie.bpi inetdb.bpi inet.bpi nmfast.bpi dclocx.bpi 
       bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;SolimarLicensing\common;KEY\NewKey"/>
+    <PATHCPP value=".;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -64,7 +64,7 @@
   </LINKER>
   <FILELIST>
       <FILE FILENAME="CreatorProject.cpp" FORMNAME="" UNITNAME="CreatorProject" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
-      <FILE FILENAME="CreatorProject.res" FORMNAME="" UNITNAME="CreatorProject" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="CreatorProject.res" FORMNAME="" UNITNAME="CreatorProject.res" CONTAINERID="ResTool" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Keymaster.cpp" FORMNAME="" UNITNAME="Keymaster" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="Kyslevel.cpp" FORMNAME="" UNITNAME="Kyslevel" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="CustomerForm.cpp" FORMNAME="CustForm" UNITNAME="customerform" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
@@ -99,6 +99,7 @@
       <FILE FILENAME="KEY\NewKey\sdxkey.cpp" FORMNAME="" UNITNAME="sdxkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\pdfkey.cpp" FORMNAME="" UNITNAME="pdfkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\Spdekey.cpp" FORMNAME="" UNITNAME="Spdekey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="ConnectionEditor.cpp" FORMNAME="ConnectionEditorDlg" UNITNAME="ConnectionEditor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>
@@ -133,11 +134,10 @@ Comments=
 
 [Excluded Packages]
 c:\program files\borland\cbuilder6\Bin\bcbie60.bpl=Borland C++Builder Internet Explorer 5 Components Package
+c:\program files\borland\cbuilder6\Bin\dclite60.bpl=Borland Integrated Translation Environment
 c:\program files\borland\cbuilder6\Bin\dclindy60.bpl=Internet Direct (Indy) for D6 Property and Component Editors
 c:\program files\borland\cbuilder6\Bin\bcb2kaxserver60.bpl=Borland C++Builder COM Server Components Sample Package
-c:\program files\borland\cbuilder6\Projects\Bpl\DndListViewPkg.bpl=DndListViewPkg
 c:\program files\borland\cbuilder6\Projects\Bpl\dclusr60.bpl=Borland User Components
-c:\program files\borland\cbuilder6\Bin\dclite60.bpl=Borland Integrated Translation Environment
 
 [HistoryLists\hlIncludePath]
 Count=25
@@ -238,7 +238,7 @@ RemoteDebug=0
 
 [Compiler]
 ShowInfoMsgs=0
-LinkDebugVcl=0
+LinkDebugVcl=1
 LinkCGLIB=0
   </IDEOPTIONS>
 </PROJECT>

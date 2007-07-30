@@ -53,6 +53,7 @@ public:
    //operate on ProtectionKey passed in
    void getPermanentPassword(ProtectionKey*, char*);
    void getProductVersionPassword(ProtectionKey*, ushort, char*);
+   void getAppInstancePassword(ProtectionKey*, ushort, ushort, char*);
    void getExtensionPassword(ProtectionKey*,
                              ushort,
                              ProductId,
@@ -60,24 +61,23 @@ public:
                              ushort,
                              char*
                             );
-   void getModulePassword(SpdProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
+   void getModulePassword(ProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
    void getOutputPassword(SpdProtectionKey*, ushort, ushort, char*);
    void getPagesPerMinutePassword(SpdProtectionKey*, ushort, ushort, char*, ushort, long);
-   void getModulePassword(SpdeProtectionKey*, uchar, ProductId, ushort, unsigned int, ushort, char*);
-   void getOutputPassword(SpdeProtectionKey*, ushort, ushort, char*);
+   //void getOutputPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getOperatorSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getUserSessionPassword(SpdeProtectionKey*, ushort, ushort, char*);
    void getPagesPerMinutePassword(SpdeProtectionKey*, ushort, ushort, char*, ushort, long);
 
-   AnsiString getIndexServersPassword(SSProtectionKey*, ushort);
-   AnsiString getReportServersPassword(SSProtectionKey*, ushort);
-   AnsiString getConcurrentUsersPassword(SSProtectionKey*, ushort);
-   AnsiString getApplicationServerPassword(SSProtectionKey*, ushort);
-   AnsiString getDocumentAssemblerPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getIndexServersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getReportServersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getConcurrentUsersPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getApplicationServerPassword(SSProtectionKey*, ushort);
+   auto_ptr<AnsiString> getDocumentAssemblerPassword(SSProtectionKey*, ushort);
 
    //simulate applying password to ProtectionKey passed in
-   void applyModZeroPassword(SKeyRecord* key_record, unsigned short mod_id, unsigned short units);
-   void applyModPassword(SKeyRecord* keyrec, unsigned char module_id, unsigned short units);
+   void applyModZeroPassword(SKeyRecord* key_record, ModuleDetail* detail, unsigned short units);
+   void applyModPassword(SKeyRecord* keyrec, /*unsigned char module_id,*/ ModuleDetail* detail, unsigned short units);
    void applyOutputPassword(SKeyRecord* keyrec, int output_units);
    void applyOperatorSessionPassword(SKeyRecord* keyrec, int operator_session);
    void applyUserSessionPassword(SKeyRecord* keyrec, int user_session);
@@ -96,7 +96,7 @@ public:
    short clear();
    short deactivate();
    bool found();
-   HRESULT initDriver();
+   HRESULT initDriver(wchar_t*);
    ProtectionKey* newKey(KeyDataBlock*);
    ProtectionKey* newKey(ProductId product_id) {return ProtectionKey::newKey(product_id);}
    void resetKey(SKeyRecord*, ProductId);
@@ -106,10 +106,6 @@ public:
    //operate on specificed SKeyRecord
    void initializeMaxModules(SKeyRecord*);
    void initializeMinModules(SKeyRecord*);
-   void initializeMaxValues(SKeyRecord*);
-   void initializeMinValues(SKeyRecord*);
-   void initializeMinMod(SKeyRecord*);
-   void initializeMaxMod(SKeyRecord*);
    short read(SKeyRecord*);
    short read(SKeyRecord*, ProductId);
 
@@ -123,7 +119,7 @@ protected:
    HRESULT KeyMaster::setHandle();
 
    //ptr to the server object. Used to access the lower layer code.
-   ISolimarLicenseSvr* pTheServer;
+   ISolimarLicenseSvr3* pTheServer;
 
    //The list of keys returned from the lower layer app
    VARIANT* pKeyList;
