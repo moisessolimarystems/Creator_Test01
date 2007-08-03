@@ -1,5 +1,5 @@
 #include "RainbowDriver.h"
-#include "KeyError.h"
+#include "..\common\LicenseError.h"
 #include "..\common\SafeMutex.h"
 #include <objbase.h>
 
@@ -31,7 +31,8 @@ const RainbowDriver::AccessCode RainbowDriver::accessCode[] =
 
 
 RainbowDriver::RainbowDriver() : 
-	keys_lock(CreateMutex(0, 0, 0))
+	keys_lock(CreateMutex(0, 0, 0)),
+	bAtLeastOneParallelKey(true)
 {
 	;
 }
@@ -59,7 +60,7 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 			// if the key is programmed
 			if (keynumber!=0 || customer!=0)
 			{
-				_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
+				_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
 				key_id[127]=0;
 				*physical_key_ident = _bstr_t(key_id).Detach();
 			}
@@ -88,8 +89,10 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 	return S_OK;
 }
 
+
 HRESULT RainbowDriver::RefreshKeyList()
 {
+//OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Enter");
 	// DCM 12.nov.02 - In version 6.3 of the SuperPro libraries, Rainbow
 	// changed the way that the FindFirst/FindNext functions work. My opinion
 	// is that the new behavior is flawed, but Rainbow insists that this
@@ -109,26 +112,24 @@ HRESULT RainbowDriver::RefreshKeyList()
 	// errors, we create a packet and call FindFirst/FindNext the appropriate
 	// number of times to get to that key. While ugly, this is the method
 	// recommended by Rainbow.
-
 	HRESULT hr = S_OK;
 	KeyList newkeys;
-	
 	RBP_SPRO_APIPACKET packet = new RB_SPRO_APIPACKET;
-
+	bool bLocalAtLeastOneParallelKey = false;
 	if (!packet)
 		hr = E_FAIL;
 	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproFormatPacket(packet, sizeof(RB_SPRO_APIPACKET)));
-	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproInitialize(packet));
-	
+	if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
+		hr = TranslateRainbowError(RNBOsproCheckTerminalservice(packet, SP_TERM_SERV_CHECK_OFF));
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
 		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
-	
-wchar_t tmpBuf[256];
+
+//wchar_t tmpBuf[256];
 //wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - RNBOsproSetContactServer() - hr = %x", hr);
 //OutputDebugStringW(tmpBuf);
 
@@ -139,24 +140,22 @@ wchar_t tmpBuf[256];
 	unsigned short retVal = RNBOsproFindFirstUnit(packet, DEVELOPER_ID);
 	if(retVal != 0)
 	{
-		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
-		wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st Looking for first key - %d", retVal);
-		OutputDebugStringW(tmpBuf);
+//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindFirstUnit() - retVal = %d", retVal);
+//OutputDebugStringW(tmpBuf);
 	}
 
 	while(retVal == 0)
 	{
 		++key_count;
 		retVal = RNBOsproFindNextUnit(packet);
-		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindNextUnit() - retVal = %d", retVal);
-		//OutputDebugStringW(tmpBuf);
+//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 1st RNBOsproFindNextUnit() - retVal = %d", retVal);
+//OutputDebugStringW(tmpBuf);
 	}
 	
 	if (packet)
 	{
 		delete packet;
 	}
-
 	// run through the list of keys backwards (see note above) storing each key's packet
 	for (int i = key_count - 1; i >= 0; i--)
 	{
@@ -166,20 +165,20 @@ wchar_t tmpBuf[256];
 		
 		if (SUCCEEDED(hr))
 			hr = TranslateRainbowError(RNBOsproFormatPacket(keypacket, sizeof(RB_SPRO_APIPACKET)));
-		
 		if (SUCCEEDED(hr))
 			hr = TranslateRainbowError(RNBOsproInitialize(keypacket));
+
+		if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
+			hr = TranslateRainbowError(RNBOsproCheckTerminalservice(keypacket, SP_TERM_SERV_CHECK_OFF));
 		
 		if (SUCCEEDED(hr))
 			TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_STANDALONE"));
 			//TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_SPN_LOCAL"));
 			
-		
 		// iterate to the ith key
 		unsigned short retVal = RNBOsproFindFirstUnit(keypacket, DEVELOPER_ID);
 		//wsprintf(tmpBuf, L"RainbowDriver::RefreshKeyList() - 2nd RNBOsproFindFirstUnit() - retVal = %d", retVal);
 		//OutputDebugStringW(tmpBuf);
-
 		int j = 0;
 		while(retVal == 0 && j<i)
 		{
@@ -237,13 +236,38 @@ wchar_t tmpBuf[256];
 				// if key is programmed, use the key number and customer number as the key id
 				else
 				{
-					_snwprintf(key_id, 128, L"%03x-%02x", customer, keynumber);
-					//wsprintf(tmpBuf, L"Key Found: %s", key_id);
-					//OutputDebugStringW(tmpBuf);
+					_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
+//wsprintf(tmpBuf, L"Key Found: %s", key_id);
+//OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
 					valid_key_id = true;
 				}
 				
+				
+				if(!bLocalAtLeastOneParallelKey)
+				{
+					// determine if key is usb or parallel
+					unsigned short keyFamily;
+					unsigned short keyFormFactor;
+					unsigned short keyMemorySize;
+					hr = TranslateRainbowError(RNBOsproGetKeyType(
+									keypacket,
+									&keyFamily,
+									&keyFormFactor,
+									&keyMemorySize));
+					if(SUCCEEDED(hr))
+					{
+						/*
+						* Key Family - The key family parameter will return 0 or 1, where 0 denotes the
+						*		SuperPro keys (the SSP keys) and 1 denotes the UltraPro keys (the SUP keys).
+						* Form Factor - The form factor parameter will return 0 or 1, where 0 denotes the
+ 						*		parallel keys and 1 denotes the USB keys.
+						* Memory Size - The number of cells (inclusive of the reserved cells).
+						*/
+						bLocalAtLeastOneParallelKey = keyFormFactor == 0;
+					}
+				}
+
 				if (valid_key_id)
 				{
 					newkeys[key_id] = keypacket;
@@ -251,7 +275,6 @@ wchar_t tmpBuf[256];
 				}
 			}
 		}
-		
 		// cleanup
 		if (keypacket)
 		{
@@ -264,7 +287,7 @@ wchar_t tmpBuf[256];
 	if (SUCCEEDED(hr))
 	{
 		SafeMutex mutex(keys_lock);
-		
+		bAtLeastOneParallelKey = bLocalAtLeastOneParallelKey;
 		// delete old key packets
 		while(!keys.empty())
 		{
@@ -272,7 +295,6 @@ wchar_t tmpBuf[256];
 			delete keys.begin()->second;
 			keys.erase(keys.begin());
 		}
-		
 		keys.insert(newkeys.begin(), newkeys.end());
 		newkeys.clear();
 	}
@@ -285,9 +307,15 @@ wchar_t tmpBuf[256];
 			newkeys.erase(newkeys.begin());
 		}
 	}
+//OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Leave");
 	return hr;
 }
 
+bool RainbowDriver::AtLeastOneParallelKey()
+{
+	SafeMutex mutex(keys_lock);
+	return bAtLeastOneParallelKey;
+}
 HRESULT RainbowDriver::ReadCell(_bstr_t key, unsigned short cell, unsigned short *value)
 {
 	SafeMutex mutex(keys_lock);
@@ -425,27 +453,28 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 	// copy the password in to an editable buffer for use with strtok
 	unsigned int tokbuflen = min(password.length()+1,100);
 	wchar_t *tokbuf = new wchar_t[tokbuflen];
-	wcsncpy(tokbuf,(wchar_t*)password,tokbuflen-1);
+	wcscpy_s(tokbuf, tokbuflen, (wchar_t*)password);
 	tokbuf[tokbuflen-1]=0;
 	
-	wchar_t* pass_txt = wcstok(tokbuf,L"- ");
-	wchar_t* arg_txt = (pass_txt ? wcstok(NULL,L"- ") : 0);
+	wchar_t *pNextToken;
+	wchar_t* pass_txt = wcstok_s(tokbuf,L"- ", &pNextToken);
+	wchar_t* arg_txt = (pass_txt ? wcstok_s(NULL,L"- ",&pNextToken) : 0);
 	
 	if (pass_txt)
 	{
-		swscanf(pass_txt, L"%x", &arguments.password);
+		swscanf_s(pass_txt, L"%x", &arguments.password);
 	}
 	if (arg_txt)
 	{
 		unsigned int arg1_decimal, arg1_hex;
-		swscanf(arg_txt, L"%d", &arg1_decimal);
-		swscanf(arg_txt, L"%x", &arg1_hex);
+		swscanf_s(arg_txt, L"%d", &arg1_decimal);
+		swscanf_s(arg_txt, L"%x", &arg1_hex);
 		arguments.units_licensed = arg1_decimal;
 		arguments.pages_per_minute_struct = arg1_hex;
 		arguments.version = (unsigned short)arg1_hex;
 	}
 	
-	for (unsigned int extended_arg = 0; arg_txt = (arg_txt ? wcstok(NULL,L"- ") : 0); ++extended_arg)
+	for (unsigned int extended_arg = 0; arg_txt = (arg_txt ? wcstok_s(NULL,L"- ",&pNextToken) : 0); ++extended_arg)
 	{
 		arguments.legacy = false;
 		
@@ -457,11 +486,11 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 			break;
 		// customer number
 		case 1:
-			swscanf(arg_txt, L"%hx", &arguments.customer);
+			swscanf_s(arg_txt, L"%hx", &arguments.customer);
 			//arguments.customer=(unsigned short)_wtoi(arg_txt);
 			break;
 		case 2:
-			swscanf(arg_txt, L"%hx", &arguments.key);
+			swscanf_s(arg_txt, L"%hx", &arguments.key);
 			//arguments.key=(unsigned short)_wtoi(arg_txt);
 			break;
 		case 3:
@@ -484,11 +513,15 @@ HRESULT RainbowDriver::ParsePassword(_bstr_t password, ArgumentList &arguments)
 			case 2:
 				arguments.extend_num=(unsigned short)_wtoi(arg_txt);
 				break;
-			// module case
-			case 4:
+			
+			case 4:	// module case
+			case 5:	// application instances case
 				arguments.password_number=(unsigned int)_wtoi(arg_txt);
 				break;
 			}
+			break;
+		
+			
 			break;
 		default:
 			break;
