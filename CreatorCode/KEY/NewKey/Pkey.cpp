@@ -144,7 +144,7 @@ const ushort DEVELOPER_ID = 0xFEA8;
 #define SECONDS_PER_HOUR         3600
 #define SECONDS_PER_DAY          86400L
 #define TWO_HRS                  7200L
-#define PASSWORD_INDEX           25
+#define PASSWORD_INDEX           28
 
 //IDs that are used for the license server
 const long ProductID = 10021;
@@ -257,6 +257,9 @@ const char* KDPasswordText[] =
    "1095 days/3000 hrs - MYTL",  // 23
    "1460 days/4000 hrs - MYTL",  // 24
    "1825 days/5000 hrs - MYTL",  // 25
+   "30 days/750 hrs - DL",       // 26  Element #26-28 are additional Development License
+   "90 days/2250 hrs - DL",      // 27
+   "180 days/4500 hrs - DL",     // 28
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -275,19 +278,22 @@ const unsigned short KDPasswordDays[] =
    300, 	// 10
    330, 	// 11
    365, 	// 12
-   365, 	// 13 Element #13 is the Development License
+   365, 	// 13 Element #26-#28 is the Development License
    365, 	// 14 Elements #14-#17 are Partner Demo and Support Licenses
    365, 	// 15
    365, 	// 16
    365, 	// 17
    730, 	// 18 Elements #18-#21 are multi-year prepaid Development Licenses
-   1095, // 19
-   1460, // 20
-   1825, // 21
-   730,  // 22 Elements #22-#25 are multi-year prepaid Test License
-   1095, // 23
-   1460, // 24
-   1825, // 25
+   1095,        // 19
+   1460,        // 20
+   1825,        // 21
+   730,         // 22 Elements #22-#25 are multi-year prepaid Test License
+   1095,        // 23
+   1460,        // 24
+   1825,        // 25
+   30,          // 26 Element #26-#28 are additional Development License
+   90,          // 27
+   180,         // 28
 };
 
 /* KDPasswordHours[]
@@ -307,19 +313,22 @@ const unsigned short KDPasswordHours[] =
    850,     // 10
    935,     // 11
    1000,    // 12
-   9000,    // 13 Element #13 is the Development License
-   250,    	// 14 Elements #14-#17 are Partner Demo and Support Licenses
-   375,    	// 15
-   500,    	// 16
-   750,    	// 17
-   18000,  	// 18 Elements #18-#21 are multi-year prepaid Development Licenses
-   27000, 	// 19
-   36000, 	// 20
-   45000, 	// 21
-   2000,  	// 22 Elements #22-#25 are multi-year prepaid Test License
-   3000,  	// 23
-   4000,   	// 24
-   5000, 	// 25
+   9000,     // 13     Element #13-#16 is the Development License
+   250,    // 14
+   375,    // 15
+   500,    // 16
+   750,    	// 17 Elements #17-#20 are Partner Demo and Support Licenses
+   18000,    	// 18
+   27000,    	// 19
+   36000,    	// 20
+   45000,  	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
+   2000, 	// 22
+   3000, 	// 23
+   4000, 	// 24
+   5000,  	// 25 Elements #25-#28 are multi-year prepaid Test License
+   750,  	// 26
+   2250,   	// 27
+   4500, 	// 28
 };
 
 
@@ -430,7 +439,7 @@ ushort ProtectionKey::getProductVersion() const
  *    overwrite passwords be passed as parameters.  Returns SUCCESS or
  *    FAILURE.
 ---------------------------------------------------------------------------*/
-HRESULT ProtectionKey::clearKeyData(BSTR* TheKeyID, ISolimarLicenseSvr* pServer)
+HRESULT ProtectionKey::clearKeyData(BSTR* TheKeyID, ISolimarLicenseSvr3* pServer)
 {
    if(pServer)
       return (pServer->KeyFormat(*TheKeyID, TheKeyID));
@@ -474,7 +483,7 @@ void ProtectionKey::inactiveWarningBox()
  *    by querying the secondary algorithm of the protection key.  If
  *    successful, returns the base password, otherwise returns 0.
 ---------------------------------------------------------------------------*/
-void ProtectionKey::getBasePassword(ISolimarLicenseSvr* pServer, char* Password_String)
+void ProtectionKey::getBasePassword(ISolimarLicenseSvr3* pServer, char* Password_String)
 {
    if(pServer)
    {
@@ -489,12 +498,34 @@ void ProtectionKey::getBasePassword(ISolimarLicenseSvr* pServer, char* Password_
    }
 }
 
+//HRESULT GenerateApplicationInstancePassword([in] long customer_number, [in] long key_number, [in] long license_count, [in] long password_number, [out,retval] BSTR *password);
+/* getMultiplePassword()
+ *    Calculate and return the password to change to key's status to base
+ *    by querying the secondary algorithm of the protection key.  If
+ *    successful, returns the base password, otherwise returns 0.
+---------------------------------------------------------------------------*/
+void ProtectionKey::getAppInstancePassword(ISolimarLicenseSvr3* pServer, ushort appInstances, ushort password_number, char* Password_String)
+{
+   if(pServer)
+   {
+      BSTR password;
+      if(SUCCEEDED(pServer->GenerateApplicationInstancePassword(customerNumber, keyNumber, appInstances, password_number, &password)))
+      {
+         AnsiString* pwd = new AnsiString(password);
+         strcpy(Password_String, pwd->c_str());
+         delete pwd;
+      }
+      SysFreeString(password);
+   }
+}
+
 /* ProgramsKey
  *    Programs the key
 ---------------------------------------------------------------------------*/
-ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr* pServer,
+ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr3* pServer,
                                 BSTR* pTheKeyID,
                                 int num_days,
+                                short app_instances,
                                 VARIANT* pModSafeArray
                                 )
 {
@@ -515,17 +546,18 @@ ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr* pServer,
 
    HRESULT hr = 0;
 
-   hr = pServer->KeyProgram(*pTheKeyID,         //the current key ID
-                            keyDataBlock.data[CUSTOMER_NUMBER_CELL],
-                            keyDataBlock.data[KEY_NUMBER_CELL],
-                            keyDataBlock.data[PRODUCT_ID_CELL],
-                            MajorVersion,
-                            MinorVersion,
-                            keyDataBlock.data[KEY_TYPE_CELL],
-                            num_days,
-                            *pModSafeArray,
-                            pTheKeyID       //the key id after being programmed
-                           );
+   hr = pServer->KeyProgram2(*pTheKeyID,         //the current key ID
+                             keyDataBlock.data[CUSTOMER_NUMBER_CELL],
+                             keyDataBlock.data[KEY_NUMBER_CELL],
+                             keyDataBlock.data[PRODUCT_ID_CELL],
+                             MajorVersion,
+                             MinorVersion,
+                             keyDataBlock.data[KEY_TYPE_CELL],
+                             app_instances,
+                             num_days,
+                             *pModSafeArray,
+                             pTheKeyID       //the key id after being programmed
+                            );
 
    if(FAILED(hr))
    {
@@ -604,6 +636,7 @@ short ProtectionKey::getExpirationDays() const
 
 
 
+
 /* getExtensionPassword()
  *    Calculate and return the password for the specified number of
  *    extension_days by querying the secondary algorithm of the protection
@@ -613,7 +646,7 @@ short ProtectionKey::getExpirationDays() const
 ---------------------------------------------------------------------------*/
 void ProtectionKey::getExtensionPassword(ushort extension_days,
                                           ushort extension_num,
-                                          ISolimarLicenseSvr* pServer,
+                                          ISolimarLicenseSvr3* pServer,
                                           char* password
                                           )
 {
@@ -736,7 +769,7 @@ const unsigned short ProtectionKey::getKDPasswordHours(unsigned short index) con
  *
 ---------------------------------------------------------------------------*/
 void ProtectionKey::getProductVersionPassword(ushort product_version,
-                                              ISolimarLicenseSvr* pServer,
+                                              ISolimarLicenseSvr3* pServer,
                                               char* Password_String
                                              )
 {
@@ -829,9 +862,11 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
       default:
          new_key = new ProtectionKey();
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
@@ -855,7 +890,7 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
  *    Create a key object based on the product_id which is figured out by the KeyID.  This is a STATIC
  *    function.
 ---------------------------------------------------------------------------*/
-ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
+ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr3* pServer)
 {
 //NEED TO TEST RH
 	if(!pServer)
@@ -888,12 +923,15 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
+
       default:
          new_key = new ProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
          break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
@@ -932,12 +970,15 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case XIMAGENT_PRODUCT:
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
-      case SDX_DESIGNER_PRODUCT:
+
       default:
          new_key = new ProtectionKey(*pkey);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);
+         break;
+      case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
          break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey(*(PDFUtilityProtectionKey*)pkey);
@@ -960,8 +1001,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
 ---------------------------------------------------------------------------*/
 const short OFFSET_INDEX = 2;
 const short NUM_CELLS_INDEX = 1;
-short ProtectionKey::readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID)
+short ProtectionKey::readKeyData(ISolimarLicenseSvr3* pServer, BSTR* KeyID)
 {
+   bool bVal = true;
    if(!pServer)
       return FAILURE;
 
@@ -973,24 +1015,31 @@ short ProtectionKey::readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID)
    HRESULT hr;
    //reads the raw data from the key and returns a safe array of bytes
    if(!SUCCEEDED(hr = pServer->KeyReadRaw(*KeyID, pKeyData)))
-      return FAILURE;
+       bVal = false;
 
-   // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions
-	//needed to access safe array data
-	if(SUCCEEDED(SafeArrayAccessData(pKeyData->parray, (void**)&pCellValue)))
+   if(bVal)
    {
-      FirstDataCell = ((DWORD*)pCellValue)[OFFSET_INDEX];
-      NumberOfCells = ((DWORD*)pCellValue)[NUM_CELLS_INDEX];
+       // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions
+       //needed to access safe array data
+       if(SUCCEEDED(SafeArrayAccessData(pKeyData->parray, (void**)&pCellValue)))
+       {
+           FirstDataCell = ((DWORD*)pCellValue)[OFFSET_INDEX];
+           NumberOfCells = ((DWORD*)pCellValue)[NUM_CELLS_INDEX];
 
-      //i=8 because we need to skip over the first 8 cells after the header
-      for(DWORD i = 8; i < NumberOfCells; i++)
-         keyDataBlock.data[i-8] = ((ushort*)(pCellValue+FirstDataCell))[i];
+           //i=8 because we need to skip over the first 8 cells after the header
+           for(DWORD i = 8; i < NumberOfCells; i++)
+               keyDataBlock.data[i-8] = ((ushort*)(pCellValue+FirstDataCell))[i];
+
+           if (!SUCCEEDED(SafeArrayUnaccessData(pKeyData->parray)))
+              bVal = false;
+       }
+       else
+           bVal = false;
    }
-   else
-      return FAILURE;
 
-   if (SUCCEEDED(SafeArrayUnaccessData(pKeyData->parray)))
-         return SUCCESS;
+   delete pKeyData;
+   if(bVal)
+        return SUCCESS;
 
    return FAILURE;
 }
