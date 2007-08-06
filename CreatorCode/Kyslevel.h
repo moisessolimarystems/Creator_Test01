@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 #define MAX_KEY_DESCRIPTION         30
 #define MAX_COMPANY_NAME_LENGTH     50
-#define KD_PASSWORD_MAX             25
+#define KD_PASSWORD_MAX             28
 #include <list>
 
 class SKeyRecord;
@@ -60,6 +60,8 @@ extern const char* status_text[];
 class SKeyRecord
 {
 private:
+   ushort passwordNumber;   // Password Count
+   ushort appInstances;     // Application Instances
 
 public:
    SKeyRecord();
@@ -70,6 +72,8 @@ public:
    void setCustomerNumber(ushort);
    void setKeyNumber(ushort);
    void setStatus(ushort);
+   void setAppInstances(ushort);
+   void setPasswordNumber(ushort);
    int getKeyTypeIntegerValue(unsigned short);
    unsigned short getKeyNumber();
    unsigned short getCustomerNumber();
@@ -79,6 +83,8 @@ public:
    unsigned short getNextExtension(); //helper function that i do not want to put at key lvl
    unsigned short getNextExtensionP();
    unsigned short getKeyTypeEnumValue(int);
+   unsigned short getAppInstances(){return appInstances;};
+   unsigned short getPasswordNumber(){return passwordNumber;};
    const char* getVersionText();
    const char* getProductText();
    const char* getKeyTypeText(unsigned short iEnumValue);
@@ -87,6 +93,8 @@ public:
    bool loadKeyRow(char*);
    bool hasAssociatedKey(){return parent_skr_id;}
    unsigned short incrementPasswordNumber();
+   unsigned short decrementPasswordNumber();
+
 
    ProtectionKey* pkey;
    static char *text;
@@ -108,7 +116,8 @@ public:
    // Database Tracking Numbers
    int po;                  // PK Number for DacEasy
    AnsiString eBOnumber;    // epicore BackOffice order number
-   ushort passwordNumber;   // Password Count
+
+   //
 
    //
    // Key Information
