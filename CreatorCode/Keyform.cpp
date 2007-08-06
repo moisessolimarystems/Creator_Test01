@@ -1243,8 +1243,9 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
 
    //
    //generate password
+   //days passed in as 1-based, while license server is expecting 0-based mapping
    keyMaster->getExtensionPassword(key_record->pkey,
-                                   days,
+                                   days - 1,
                                    static_cast<ProductId>(key_record->pkey->productId),
                                    key_record->pkey->productVersion,
                                    key_record->getNextExtensionP(),

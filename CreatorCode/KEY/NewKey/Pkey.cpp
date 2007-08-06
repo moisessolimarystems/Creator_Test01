@@ -313,22 +313,22 @@ const unsigned short KDPasswordHours[] =
    850,     // 10
    935,     // 11
    1000,    // 12
-   750,     // 13     Element #13-#16 is the Development License
-   2250,    // 14
-   4500,    // 15
-   9000,    // 16
-   250,    	// 17 Elements #17-#20 are Partner Demo and Support Licenses
-   375,    	// 18
-   500,    	// 19
-   750,    	// 20
-   18000,  	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
-   27000, 	// 22
-   36000, 	// 23
-   45000, 	// 24
-   2000,  	// 25 Elements #25-#28 are multi-year prepaid Test License
-   3000,  	// 26
-   4000,   	// 27
-   5000, 	// 28
+   9000,     // 13     Element #13-#16 is the Development License
+   250,    // 14
+   375,    // 15
+   500,    // 16
+   750,    	// 17 Elements #17-#20 are Partner Demo and Support Licenses
+   18000,    	// 18
+   27000,    	// 19
+   36000,    	// 20
+   45000,  	// 21 Elements #21-#24 are multi-year prepaid Development Licenses
+   2000, 	// 22
+   3000, 	// 23
+   4000, 	// 24
+   5000,  	// 25 Elements #25-#28 are multi-year prepaid Test License
+   750,  	// 26
+   2250,   	// 27
+   4500, 	// 28
 };
 
 
