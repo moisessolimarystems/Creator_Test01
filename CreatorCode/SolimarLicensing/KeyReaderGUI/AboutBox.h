@@ -127,7 +127,7 @@ namespace KeyReaderGUI
 			this->linkLabel1->TabIndex = 22;
 			this->linkLabel1->TabStop = true;
 			this->linkLabel1->Text = S"ftp://downloads.solimarsystems.com";
-			this->linkLabel1->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &KeyReaderGUI::AboutBox::LinkLabel_Click);
+			this->linkLabel1->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, LinkLabel_Click);
 			// 
 			// linkWebsite
 			// 
@@ -140,7 +140,7 @@ namespace KeyReaderGUI
 			this->linkWebsite->TabIndex = 19;
 			this->linkWebsite->TabStop = true;
 			this->linkWebsite->Text = S"http://www.solimarsystems.com";
-			this->linkWebsite->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &KeyReaderGUI::AboutBox::LinkLabel_Click);
+			this->linkWebsite->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, LinkLabel_Click);
 			// 
 			// labelCopyright
 			// 
@@ -203,7 +203,7 @@ namespace KeyReaderGUI
 			this->linkTechSupport->TabIndex = 20;
 			this->linkTechSupport->TabStop = true;
 			this->linkTechSupport->Text = S"tech.support@solimarsystems.com";
-			this->linkTechSupport->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &KeyReaderGUI::AboutBox::EmailLink_Click);
+			this->linkTechSupport->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, EmailLink_Click);
 			// 
 			// linkSales
 			// 
@@ -216,7 +216,7 @@ namespace KeyReaderGUI
 			this->linkSales->TabIndex = 21;
 			this->linkSales->TabStop = true;
 			this->linkSales->Text = S"sales@solimarsystems.com";
-			this->linkSales->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, &KeyReaderGUI::AboutBox::EmailLink_Click);
+			this->linkSales->LinkClicked += new System::Windows::Forms::LinkLabelLinkClickedEventHandler(this, EmailLink_Click);
 			// 
 			// labelFtp
 			// 
@@ -312,8 +312,8 @@ namespace KeyReaderGUI
 			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::None;
 			this->Name = S"AboutBox";
 			this->Text = S"AboutBox";
-			this->Click += new System::EventHandler(this, &KeyReaderGUI::AboutBox::AboutBox_Click);
-			this->Load += new System::EventHandler(this, &KeyReaderGUI::AboutBox::AboutBox_Load);
+			this->Click += new System::EventHandler(this, AboutBox_Click);
+			this->Load += new System::EventHandler(this, AboutBox_Load);
 			this->ResumeLayout(false);
 
 		}		
