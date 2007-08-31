@@ -1,4 +1,4 @@
-#include "VersionInfo.h"
+#include "..\common\VersionInfo.h"
 
 #pragma once
 
