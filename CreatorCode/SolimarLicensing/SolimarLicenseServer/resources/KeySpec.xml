@@ -159,6 +159,12 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					licenseWrite can be called and counter will be set back to 0.  If you want the first call to decementLicense 
 					to subtract a value from the key, then the default value of counter should equal licenseRead(1)-1 or 24 in the
 					example above.
+					
+	isSharable		true | false	(default: false)
+					If the connection through the license manager is set to sharable only modules with the sharable
+					property can be seen and used.  If the connection through the license manager has sharable set 
+					to false then all modules can be seen and used.
+					
 -->
 
 
@@ -191,7 +197,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		<HeaderField id="10021"	offset="0x390" bits="16" name="Product ID"/>
 		<HeaderField id="10022"	offset="0x3A0" bits="16" name="Product Version"/>
 		<HeaderField id="10023"	offset="0x3B0" bits="16" name="Key Version"/>
-		<HeaderField id="10024"	offset="0x3C0" bits="16" name="Uses"/>
+		<HeaderField id="10024"	offset="0x3C0" bits="16" name="Application Instances"/>
 		<HeaderField id="10025"	offset="0x3D0" bits="16" name="Status"/>
 		<HeaderField id="10026"	offset="0x3E0" bits="16" name="Customer Number"/>
 		<HeaderField id="10027"	offset="0x3F0" bits="16" name="Key Number"/>
@@ -460,7 +466,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
-       			<Module id="31" offset="0x0F4" bits="4" name="Process Builders"/>
+       	<Module id="31" offset="0x0F4" bits="4" name="Process Builders"/>
 				
 			</ModuleList>
 			<ProductList>
@@ -707,6 +713,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="47"	offset="0x0AC" bits="1" name="PDF::AFPDS(PDFL)" unlimited="1"/>
 				
 				<Module id="48"	offset="0x0C3" bits="1" name="PDF::PostScript(PDFL-RIP)" unlimited="1"/>
+				<Module id="49"	offset="0x0C2" bits="1" name="PDF::AFPDS" unlimited="1"/>
 
 				
 				<!-- Module IDs identifying hardware -->
@@ -735,7 +742,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="305"	offset="0x338" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
 				
 				<!-- Client licensing -->
-				<Module id="400"	offset="0x0B0" bits="8" name="Concurrent Operator Sessions" unlimited="255"/>
+				<Module id="400"	offset="0x0B0" bits="8" name="Concurrent Operator Sessions" unlimited="255" isSharable="true"/>
 				<Module id="401"	offset="0x0B8" bits="8" name="Named User Sessions" unlimited="255"/>
 				<!-- <Module id="402"	offset="0x0C0" bits="8" name="Concurrent Administrator Sessions" unlimited="255"/> -->
 			</ModuleList>
@@ -790,6 +797,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="46" default="0"/>
 					<ModuleInclude id="47" default="0"/>
 					<ModuleInclude id="48" default="0"/>
+          <ModuleInclude id="49" default="0"/>
 					
 					<ModuleInclude id="101" default="0"/>
 					<ModuleInclude id="102" default="0"/>
