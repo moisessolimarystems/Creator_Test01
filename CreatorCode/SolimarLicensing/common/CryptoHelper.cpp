@@ -259,11 +259,18 @@ CryptoHelper::CryptoHelper() : m_context(0), m_error(S_OK)
 #if !defined(UNICODE) && !defined(_UNICODE)
 	wcstombs(tstr_guid, wstr_guid, sizeof(tstr_guid)/sizeof(TCHAR));
 	tstr_guid[sizeof(tstr_guid)/sizeof(TCHAR)-1]=0;
-#else
+#elif _MSC_VER < 1400
 	wcscpy(tstr_guid, wstr_guid);
+#else
+	wcscpy_s(tstr_guid, wstr_guid);
 #endif
 	
+#if _MSC_VER < 1400
 	_stprintf(m_str_container,TEXT("Solimar Key Container %s"),tstr_guid);
+#else
+	_stprintf_s(m_str_container,TEXT("Solimar Key Container %s"),tstr_guid);
+#endif
+
 	m_str_container[sizeof(m_str_container)/sizeof(TCHAR)-1] = 0;		// ensure null termination
 	
 	if (!CryptAcquireContext(&m_context, m_str_container, PROVIDER, PROVIDER_TYPE, CRYPT_NEWKEYSET))
