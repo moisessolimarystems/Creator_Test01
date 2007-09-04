@@ -257,8 +257,7 @@ CryptoHelper::CryptoHelper() : m_context(0), m_error(S_OK)
 // suport for both UNICODE and non-unicode builds. 
 // Can't just use UNICODE because of the PROVIDER string definition being tied to the _UNICODE/UNICODE defines
 #if !defined(UNICODE) && !defined(_UNICODE)
-	size_t stCharCount(0) ;
-	wcstombs_s(&stCharCount, tstr_guid, sizeof(tstr_guid)/sizeof(TCHAR), wstr_guid, sizeof(wstr_guid)/sizeof(TCHAR));
+	wcstombs(tstr_guid, wstr_guid, sizeof(tstr_guid)/sizeof(TCHAR));
 	tstr_guid[sizeof(tstr_guid)/sizeof(TCHAR)-1]=0;
 #elif _MSC_VER < 1400
 	wcscpy(tstr_guid, wstr_guid);
