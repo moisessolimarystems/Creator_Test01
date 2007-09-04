@@ -2,6 +2,7 @@
 #define __GIT_H
 
 #include "safemutex.h"
+#include <objidl.h>
 
 /*
  * AutoReleasePtr
@@ -109,6 +110,10 @@ public:
             {
                OutputDebugStringW(L"\nGITPtr::Attach() - pIGIT->RegisterInterfaceInGlobal() failed.") ;
             }
+				else
+				{
+					pItf->Release();
+				}
 		   }
       }
 		return hr;
@@ -157,8 +162,12 @@ public:
                catch (...)
                {
                   wchar_t wcsMsg[128] ;
+				#if _MSC_VER < 1400
                   _snwprintf(
-                     wcsMsg, sizeof(wcsMsg),
+				#else
+				  _snwprintf_s(
+				#endif
+                     wcsMsg, sizeof(wcsMsg)/sizeof(wchar_t),
                      L"\nGITPtr::CopyTo() - general exception while calling pIGIT->GetInterfaceFromGlobal() cookie(%08X)",
                      m_cookie
                      ) ;
@@ -168,8 +177,13 @@ public:
                if (FAILED(hr))
                {
                   wchar_t wcsMsg[128] ;
+				#if _MSC_VER < 1400
                   _snwprintf(
-                     wcsMsg, sizeof(wcsMsg),
+				#else
+				  _snwprintf_s(
+				#endif
+					
+                     wcsMsg, sizeof(wcsMsg)/sizeof(wchar_t),
                      L"\nGITPtr::CopyTo() - pIGIT->GetInterfaceFromGlobal() failed. hr(%08X), cookie(%08X)",
                      hr,
                      m_cookie
@@ -179,9 +193,13 @@ public:
 			   }
             catch (...)
             {
-               wchar_t wcsMsg[128] ;
-               _snwprintf(
-                  wcsMsg, sizeof(wcsMsg),
+				wchar_t wcsMsg[128] ;
+				#if _MSC_VER < 1400
+                  _snwprintf(
+				#else
+				  _snwprintf_s(
+				#endif
+                  wcsMsg, sizeof(wcsMsg)/sizeof(wchar_t),
                   L"\nGITPtr::CopyTo() - General exception caught hr(%08X) cookie(%08X)",
                   hr,
                   m_cookie
@@ -358,7 +376,7 @@ private:
       }
       else
       {
-		   IGlobalInterfaceTable* pIGIT(NULL) ;
+		   IGlobalInterfaceTable* pIGIT = NULL;
 
 		   hr = CreateGIT(&pIGIT);
          if (FAILED(hr))
