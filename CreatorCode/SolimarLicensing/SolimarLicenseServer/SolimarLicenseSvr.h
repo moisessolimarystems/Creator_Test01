@@ -75,13 +75,46 @@ __interface ISolimarLicenseSvr : IDispatch
 
 };
 
+// ISolimarLicenseSvr2
+[
+	object,
+	uuid("4852B206-97BA-4934-AFD8-35E85F7FC855"),
+	dual,	helpstring("ISolimarLicenseSvr2 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseSvr2 : ISolimarLicenseSvr
+{
+	[id(70),helpstring("method KeyModuleLicenseInUse2")] HRESULT KeyModuleLicenseInUse2([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
+	[id(71),helpstring("method KeyModuleInUse")] HRESULT KeyModuleInUse([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
+};
 
+// ISolimarLicenseSvr3
+[
+	object,
+	uuid("BDA195D0-FC1A-4814-9DE0-364394D8D810"),
+	dual,	helpstring("ISolimarLicenseSvr3 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseSvr3 : ISolimarLicenseSvr2
+{
+	[id(72),helpstring("method GenerateApplicationInstancePassword")] HRESULT GenerateApplicationInstancePassword([in] long customer_number, [in] long key_number, [in] long license_count, [in] long password_number, [out,retval] BSTR *password);
+	// Programs a key
+	[id(73),helpstring("method KeyProgram2")] HRESULT KeyProgram2([in] BSTR key_ident, [in] long customer_number, [in] long key_number, [in] long product_ident, [in] long ver_major, [in] long ver_minor, [in] long key_type, [in] long application_instances, [in] long days, [in] VARIANT module_value_list, [out,retval] BSTR *new_key_ident);
+	// Gets the Version of the License Server
+	[id(74),helpstring("method GetVersionLicenseServer")] HRESULT GetVersionLicenseServer([out] long* p_ver_major, [out] long* p_ver_minor, [out] long* p_ver_build);
+	[id(75),helpstring("method AddApplicationInstance")] HRESULT AddApplicationInstance([in] BSTR key_ident, [in] BSTR application_instance, [in] VARIANT_BOOL b_app_instance_lock_key);
+	[id(76),helpstring("method RemoveApplicationInstance")] HRESULT RemoveApplicationInstance([in] BSTR key_ident, [in] BSTR application_instance);
+	[id(77),helpstring("method GetApplicationInstanceList")] HRESULT GetApplicationInstanceList([in] BSTR key_ident, [out,retval] VARIANT *pvtAppInstanceList);
 
+	// Sets to treat the Module License as Unlimited
+	[id(78),helpstring("method KeyModuleLicenseUnlimited")] HRESULT KeyModuleLicenseUnlimited([in] BSTR key_ident, [in] long module_ident, [in] VARIANT_BOOL b_module_is_unlimited);
+
+};
 // CSolimarLicenseSvr
 
 [
 	coclass,
-	threading("free"),
+	threading(free),
 	support_error_info("ISolimarLicenseSvr"),
 	vi_progid("SolimarLicenseServer.SolimarLicenseSvr"),
 	progid("SolimarLicenseServer.SolimarLicenseSv.1"),
@@ -90,7 +123,7 @@ __interface ISolimarLicenseSvr : IDispatch
 	helpstring("SolimarLicenseSvr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
-	public ISolimarLicenseSvr, 
+	public ISolimarLicenseSvr3, 
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -113,18 +146,19 @@ public:
 		buffer[0]=0;
 		StringFromGUID2(guid, buffer, 128);
 		m_licenseId = buffer;
-		
-		keyserver.LicenseSessionInitialize(m_licenseId);
-		keyserver.Heartbeat(m_licenseId);
+
+		//keyserver.LicenseSessionInitialize(m_licenseId);
+
+		//No longer start heart beat requirement until a key or license is obtained.
+		//keyserver.Heartbeat(m_licenseId);
 		
 		return S_OK;
 	}
 	
 	void FinalRelease() 
 	{
-		keyserver.LicenseSessionUninitialize(m_licenseId);
+		//keyserver.LicenseSessionUninitialize(m_licenseId);
 	}
-
 public:
 	// IObjectAuthentication
 	STDMETHOD(Challenge)(VARIANT vtChallenge, VARIANT *pvtResponse);
@@ -133,11 +167,17 @@ public:
 	
 	// ISolimarLicenseMgr
 	// Top level functions
-	STDMETHOD(Heartbeat)();
+	STDMETHOD(AddApplicationInstance)(BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key);
+	STDMETHOD(RemoveApplicationInstance)(BSTR key_ident, BSTR application_instance);
+	STDMETHOD(GetApplicationInstanceList)(BSTR key_ident, VARIANT *pvtAppInstanceList);
+
+	STDMETHOD(GetVersionLicenseServer) (long* p_ver_major, long* p_ver_minor, long* p_ver_build);
+	STDMETHOD(Heartbeat)();	//Any function that obtains or checks out licensing function needs to maintain a heart beat
 	STDMETHOD(KeyEnumerate)(VARIANT *keylist);
 	STDMETHOD(EnterPassword)(BSTR password);
 	STDMETHOD(EnterPasswordPacket)(VARIANT vtPasswordPacket, BSTR *verification_code);
 	STDMETHOD(GenerateBasePassword)(long customer_number, long key_number, BSTR *password);
+	STDMETHOD(GenerateApplicationInstancePassword)(long customer_number, long key_number, long license_count, long password_number, BSTR *password);
 	STDMETHOD(GenerateVersionPassword)(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password);
 	STDMETHOD(GenerateExtensionPassword)(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	STDMETHOD(GenerateModulePassword)(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
@@ -176,17 +216,23 @@ public:
 	STDMETHOD(KeyModuleLicenseObtain)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseRelease)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseCounterDecrement)(BSTR key_ident, long module_ident, long license_count);
+	STDMETHOD(KeyModuleLicenseInUse2)(BSTR key_ident, long module_ident, long* license_count);
+	STDMETHOD(KeyModuleInUse)(BSTR key_ident, long module_ident, long* license_count);
+	STDMETHOD(KeyModuleLicenseUnlimited)(BSTR key_ident, long module_ident, VARIANT_BOOL b_module_is_unlimited);
 	
 	// Sets all writable cells on a key to zero
 	STDMETHOD(KeyFormat)(BSTR key_ident, BSTR *new_key_ident);
 	// Programs a key
 	STDMETHOD(KeyProgram)(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident);
+	STDMETHOD(KeyProgram2)(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident);
 	// Reads raw data off of the key
 	STDMETHOD(KeyReadRaw)(BSTR key_ident, VARIANT *pvtKeyData);
 
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
+
+	
 	
 	
 private:
