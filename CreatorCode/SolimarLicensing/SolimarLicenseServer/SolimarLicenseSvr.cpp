@@ -3,6 +3,7 @@
 #include "SolimarLicenseSvr.h"
 #include "KeyServer.h"
 #include "..\common\ChallengeResponse.h"
+#include "..\common\VersionInfo.h"
 
 // The macro SOLIMAR_INTERNAL_PROTECTED_FUNCTION will return from a function immediately for release builds.
 // The purpose of this is to protect some licensing functions from being accessable to the customer.
@@ -28,7 +29,7 @@ BYTE CSolimarLicenseSvr::challenge_key_server_userauththis_private[] = {
 //KeyServer CSolimarLicenseSvr::keyserver;
 
 CSolimarLicenseSvr::CSolimarLicenseSvr() : 
-	ChallengeResponseHelper(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private), challenge_key_server_thisauthuser_public, sizeof(challenge_key_server_thisauthuser_public))
+	ChallengeResponseHelper(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private)/sizeof(BYTE), challenge_key_server_thisauthuser_public, sizeof(challenge_key_server_thisauthuser_public)/sizeof(BYTE))
 {
 	keyserver.ResynchronizeKeys();
 }
@@ -38,15 +39,48 @@ CSolimarLicenseSvr::~CSolimarLicenseSvr()
 	keyserver.LicenseReleaseAll(m_licenseId);
 }
 
-// CSolimarLicenseSvr
+
+STDMETHODIMP CSolimarLicenseSvr::AddApplicationInstance(BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.AddApplicationInstance(m_licenseId, key_ident, application_instance, b_app_instance_lock_key);
+}
+STDMETHODIMP CSolimarLicenseSvr::RemoveApplicationInstance(BSTR key_ident, BSTR application_instance)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.RemoveApplicationInstance(m_licenseId, key_ident, application_instance);
+}
+STDMETHODIMP CSolimarLicenseSvr::GetApplicationInstanceList(BSTR key_ident, VARIANT *pvtAppInstanceList)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GetApplicationInstanceList(m_licenseId, key_ident, pvtAppInstanceList);
+}
+
+
+
+STDMETHODIMP CSolimarLicenseSvr::GetVersionLicenseServer(long* p_ver_major, long* p_ver_minor, long* p_ver_build)
+{
+	*p_ver_major = MAJOR_REVISION_NUMBER;
+	*p_ver_minor = MINOR_REVISION_NUMBER;
+	*p_ver_build = BUILD_NUMBER;
+	return S_OK;
+}
+
 STDMETHODIMP CSolimarLicenseSvr::Challenge(VARIANT vtChallenge, VARIANT *pvtResponse)
 {
+/*
+const size_t debugStringSize = 1024;
+wchar_t debug_buf[debugStringSize];
+_snwprintf_s(debug_buf, debugStringSize, L"CSolimarLicenseSvr::Challenge 1)");
+debug_buf[debugStringSize-1] = 0;
+OutputDebugStringW(debug_buf);
+*/
 	HRESULT hr = S_OK;
 	
 	VariantClear(pvtResponse);
 	
 	// Initialize the ChallengeResponse class with the private key, to decrypt the message
-	ChallengeResponse CR(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private));
+	ChallengeResponse CR(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private)/sizeof(BYTE));
 	ChallengeResponse::Message challenge(vtChallenge), response;
 	
 	hr = CR.GenerateResponse(challenge,response);
@@ -100,6 +134,12 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateBasePassword(long customer_number, long
 	return keyserver.GenerateBasePassword(customer_number, key_number, password);
 }
 
+STDMETHODIMP CSolimarLicenseSvr::GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, password);
+}
 STDMETHODIMP CSolimarLicenseSvr::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
 {
 	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
@@ -303,6 +343,11 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleInUse(BSTR key_ident, long module_iden
 }
 
 
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseUnlimited(BSTR key_ident, long module_ident, VARIANT_BOOL b_module_is_unlimited)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseUnlimited(m_licenseId, key_ident, module_ident, b_module_is_unlimited);
+}
 // Sets all writable cells on a key to zero
 STDMETHODIMP CSolimarLicenseSvr::KeyFormat(BSTR key_ident, BSTR *new_key_ident)
 {
@@ -316,8 +361,15 @@ STDMETHODIMP CSolimarLicenseSvr::KeyProgram(BSTR key_ident, long customer_number
 {
 	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
 	CHECK_CLIENT_AUTHENTICATION;
-	return keyserver.KeyProgram(key_ident, customer_number, key_number, product_ident, ver_major, ver_minor, key_type, days, module_value_list, new_key_ident);
+	return keyserver.KeyProgram(key_ident, customer_number, key_number, product_ident, ver_major, ver_minor, key_type, 1/*application_instances*/, days, module_value_list, new_key_ident);
 }
+STDMETHODIMP CSolimarLicenseSvr::KeyProgram2(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyProgram(key_ident, customer_number, key_number, product_ident, ver_major, ver_minor, key_type, application_instances, days, module_value_list, new_key_ident);
+}
+
 
 // Reads raw data off of the key
 STDMETHODIMP CSolimarLicenseSvr::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
