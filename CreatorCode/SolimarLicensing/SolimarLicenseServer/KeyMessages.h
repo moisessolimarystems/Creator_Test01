@@ -55,6 +55,19 @@ static const unsigned int MessageLMTempKeyExpired = 22;
 static const unsigned int MessageLMTempKeyActive = 23;
 static const unsigned int MessageLMTempKeyStatus = 24;
 
+// grace period
+static const unsigned int MessageGracePeriodStarted = 25;
+static const unsigned int MessageGracePeriodEnded = 26;
+
+//application instance key errors
+static const unsigned int MessageBaseKeysNotMatchingModuleByModule = 27;
+static const unsigned int MessageKeysNotMatchingApplicationInstance = 28;
+static const unsigned int MessageKeysNoApplicationInstance = 29;
+static const unsigned int MessageKeysNoBaseKey = 30;
+
+// backup server
+static const unsigned int MessageKeysRestoreKeyServer = 31;
+static const unsigned int MessageKeysUseBackupKeyServer = 32;
 
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
@@ -69,7 +82,7 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageSystemDriver*/ L"Protection key driver initialization error.",
 
 // invalid/insufficient licensing
-	/*MessageViolationVersion*/ L"Key is not licensed for product version %hx.%03hx. The key will be inactive until licensing is modified.",
+	/*MessageViolationVersion*/ L"Key is not licensed for product version %d.%02x. The key will be inactive until licensing is modified.",
 	/*MessageViolation*/ L"You have been in violation for %d day(s). %s",
 	/*MessageViolationInactive*/ L"The key will be inactive until licensing is modified.",
 	/*MessageViolationInactiveSoon*/ L"The key will soon be inactive until licensing is modified.",
@@ -102,6 +115,23 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageTempKeyExpired*/ L"Trial key has expired and is no longer active. Hours Left: %d, Expires: %s.",
 	/*MessageTempActive*/ L"Trial key is now active. Hours Left: %d, Expires: %s.",
 	/*MessageTempStatus*/ L"Trial key status update. Hours Left: %d, Expires: %s.",
+
+// grace period
+	/*MessageGracePeriodStarted*/ L"Licensing has entered its grace period. The most common reasons for this are one of your keys has expired or communication to one of your key servers has been lost.",
+	/*MessageGracePeriodEnded*/ L"Licensing has been restored, the grace period has ended.",
+
+//application instance key errors
+	/*MessageBaseKeysNotMatchingModuleByModule*/ L"Base Keys do not match module for module, all keys on Server \"%s\" will be ignored.",
+	/*MessageKeysNotMatchingApplicationInstance*/ L"Keys do not match by Application Instances for all the Key on the server, all keys on Server \"%s\" will be ignored.",
+	/*MessageKeysNoApplicationInstance*/ L"Unable to find an available Application Instance, all keys on Server \"%s\" will be ignored.",
+	/*MessageKeysNoBaseKey*/ L"Unable to locate a Base Key on the Server, all keys on Server \"%s\" will be ignored.",
+	
+//backup key server messages
+	/*MessageKeysRestoreKeyServer*/	L"Licensing has been restored on Key Server \"%s\".",
+	/*MessageKeysUseBackupKeyServer*/	L"Unable to validate licensing on Key Server \"%s\", switching to Backup Key Server \"%s\".",
+
+// general errors
+	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
 };
 
 
