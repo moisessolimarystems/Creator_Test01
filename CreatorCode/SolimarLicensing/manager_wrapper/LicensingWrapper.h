@@ -30,7 +30,7 @@ namespace SolimarLicenseManagerWrapper
 	if(FAILED(hr)) \
 	{ \
 		wchar_t debug_buf[1024]; \
-		_snwprintf(debug_buf, 1024, L"%s - %s", header, LicenseServerError::GetErrorMessage(hr).c_str()); \
+		_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"%s - %s", header, LicenseServerError::GetErrorMessage(hr).c_str()); \
 		debug_buf[1023] = 0; \
 		OutputDebugStringW(debug_buf); \
 	} \
@@ -44,10 +44,18 @@ public:
 	LicensingWrapper& operator=(const LicensingWrapper &o);
 	virtual ~LicensingWrapper();
 	bool Connect(std::wstring server);
+	bool Connect(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	
 	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0);
+
+	//unsigned long grace_period_minutes - How long license can still be validated after there is a violation because of no keys on the system.
+	//bool app_instance_lock_key - Will lock the first base on each license server.  Will lock all add-on key, all bases keys on the system must match.
+	//bool bypass_remote_key_restriction - True means the restriction of remote license managers using non-remote keys has been lifted.
+	bool Initialize(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false);
+
+
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
 	bool ModuleLicenseTotal(long module, long* license_count);
@@ -63,8 +71,14 @@ public:
 	long LookupModuleID(long product_id, std::string module);
 	long LookupHeaderID(std::wstring header);
 	long LookupHeaderID(std::string header);
+
+	bool GetVersionLicenseManager(long* p_ver_major, long* p_ver_minor, long* p_ver_build);
+	bool GetVersionLicenseServer(std::wstring, long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 	
 	static KeySpec keyspec;
+
+	//MOVE FOR TESTING
+	//GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
 
 private:
 	
@@ -86,7 +100,7 @@ private:
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
 
-	GITPtr<ISolimarLicenseMgr4> m_licenseManagerPtr;
+	GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
 
 	std::wstring StringToWstring(const std::string &s);
 };

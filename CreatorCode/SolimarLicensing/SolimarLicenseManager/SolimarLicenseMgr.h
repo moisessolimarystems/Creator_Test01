@@ -80,7 +80,7 @@
 { /* begin scope */ \
 	static const int MAX_MESSAGE_SIZE = 1024; \
 	wchar_t message[MAX_MESSAGE_SIZE]; \
-	_snwprintf(message, MAX_MESSAGE_SIZE, MessageValue); \
+	_snwprintf_s(message, sizeof(message)/sizeof(wchar_t), MessageValue); \
 	message[MAX_MESSAGE_SIZE-1] = 0; \
 	/* convert the time_t in to a variant date */ \
 	time_t timestamp = time(0); \
@@ -88,14 +88,15 @@
 	double vtimestamp; \
 	SYSTEMTIME systimestamp; \
 	memset(&systimestamp, 0, sizeof(systimestamp)); \
-	tm * tm_struct = gmtime(&timestamp); \
-	systimestamp.wSecond = tm_struct->tm_sec; \
-	systimestamp.wMinute = tm_struct->tm_min; \
-	systimestamp.wHour = tm_struct->tm_hour; \
-	systimestamp.wDay = tm_struct->tm_mday; \
-	systimestamp.wMonth = tm_struct->tm_mon; \
-	systimestamp.wYear = tm_struct->tm_year; \
-	systimestamp.wDayOfWeek = tm_struct->tm_wday; \
+	tm tm_struct; \
+	gmtime_s(&tm_struct, &timestamp); \
+	systimestamp.wSecond = tm_struct.tm_sec; \
+	systimestamp.wMinute = tm_struct.tm_min; \
+	systimestamp.wHour = tm_struct.tm_hour; \
+	systimestamp.wDay = tm_struct.tm_mday; \
+	systimestamp.wMonth = tm_struct.tm_mon + 1; \
+	systimestamp.wYear = tm_struct.tm_year + 1900; \
+	systimestamp.wDayOfWeek = tm_struct.tm_wday; \
 	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp)) \
 		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
 	else \
@@ -103,13 +104,77 @@
 	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
 } /* end scope */ \
 
+#define SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp) \
+{ /* begin scope */ \
+	/* convert the time_t in to a variant date */ \
+	time_t timestamp = time(0); \
+	double vtimestamp; \
+	SYSTEMTIME systimestamp; \
+	memset(&systimestamp, 0, sizeof(systimestamp)); \
+	tm tm_struct; \
+	gmtime_s(&tm_struct, &timestamp); \
+	systimestamp.wSecond = tm_struct.tm_sec; \
+	systimestamp.wMinute = tm_struct.tm_min; \
+	systimestamp.wHour = tm_struct.tm_hour; \
+	systimestamp.wDay = tm_struct.tm_mday; \
+	systimestamp.wMonth = tm_struct.tm_mon + 1; \
+	systimestamp.wYear = tm_struct.tm_year + 1900; \
+	systimestamp.wDayOfWeek = tm_struct.tm_wday; \
+	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp)) \
+		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
+	else \
+		vtTimestamp = _variant_t(0.0, VT_DATE); \
+} /* end scope */ \
+
+#define SS_CONVERT_LICENSE_HR_TO_LICENSE_MESSAGE(hr, wcs_licensing_message_buffer, int_lic_message, bstr_server) \
+{ /* begin scope */ \
+	if(hr == LicenseServerError::EHR_KEY_BASE_NOT_MATCHING) \
+	{ \
+		int_lic_message = MessageBaseKeysNotMatchingModuleByModule;	\
+		swprintf_s(	wcs_licensing_message_buffer, \
+					sizeof(wcs_licensing_message_buffer)/sizeof(wchar_t), \
+					LicensingMessageStringTable[MessageBaseKeysNotMatchingModuleByModule], \
+					(wchar_t*)bstr_server); \
+	} \
+	else if(hr == LicenseServerError::EHR_KEY_NOT_MATCHING_INSTANCES) \
+	{ \
+		int_lic_message = MessageKeysNotMatchingApplicationInstance; \
+		swprintf_s(	wcs_licensing_message_buffer, \
+				sizeof(wcs_licensing_message_buffer)/sizeof(wchar_t), \
+				LicensingMessageStringTable[MessageKeysNotMatchingApplicationInstance], \
+				(wchar_t*)bstr_server); \
+	} \
+	else if(hr == LicenseServerError::EHR_KEY_NO_FREE_APP_INSTANCE) \
+	{ \
+		int_lic_message = MessageKeysNoApplicationInstance; \
+		swprintf_s(	wcs_licensing_message_buffer, \
+				sizeof(wcs_licensing_message_buffer)/sizeof(wchar_t), \
+				LicensingMessageStringTable[MessageKeysNoApplicationInstance], \
+				(wchar_t*)bstr_server); \
+	} \
+	else if(hr == LicenseServerError::EHR_KEY_NO_BASE_KEY) \
+	{ \
+		int_lic_message = MessageKeysNoBaseKey; \
+		swprintf_s(	wcs_licensing_message_buffer, \
+				sizeof(wcs_licensing_message_buffer)/sizeof(wchar_t), \
+				LicensingMessageStringTable[MessageKeysNoApplicationInstance], \
+				(wchar_t*)bstr_server); \
+	} \
+	else \
+	{ \
+		swprintf_s(	wcs_licensing_message_buffer,  \
+				sizeof(wcs_licensing_message_buffer)/sizeof(wchar_t), \
+				L"%s", \
+				LicenseServerError::GetErrorMessage(hr)); \
+	} \
+} /* end scope */ \
 
 // CSolimarLicenseMgr
 
 [
 	coclass,
-	threading("free"),
-	support_error_info("ISolimarLicenseMgr4"),
+	threading(free),
+	support_error_info("ISolimarLicenseMgr5"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -117,7 +182,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr4,
+	public ISolimarLicenseMgr5,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -163,6 +228,12 @@ public:
 
 	// ISolimarLicenseMgr4
 	STDMETHOD(Initialize2)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes);
+
+	// ISolimarLicenseMgr5
+	STDMETHOD(Connect2)(BSTR server, VARIANT_BOOL bUseOnlySharedLicenses, VARIANT_BOOL bUseAsBackup);
+	STDMETHOD(Initialize3)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes, VARIANT_BOOL b_app_instance_lock_key, VARIANT_BOOL b_bypass_remote_key_restriction);
+	STDMETHOD(GetVersionLicenseManager) (long* p_ver_major, long* p_ver_minor, long* p_ver_build);
+	STDMETHOD(GetVersionLicenseServer) (BSTR server, long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
@@ -217,14 +288,15 @@ private:
 	public:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
-		ServerInfo(_bstr_t servername, GITPtr<ISolimarLicenseSvr2> pILicenseServer);
+		ServerInfo(_bstr_t servername, bool useOnlySharedLicenses, GITPtr<ISolimarLicenseSvr3> pILicenseServer);
 		~ServerInfo();
 
 		_bstr_t name;
+		bool bUseOnlySharedLicenses;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		KeyList keys;
 
-		GITPtr<ISolimarLicenseSvr2> LicenseServer;
+		GITPtr<ISolimarLicenseSvr3> LicenseServer;
 
 		HRESULT Connect();
 
@@ -253,11 +325,35 @@ private:
 	// refresh the list of the keys on the currently connected servers
 	HRESULT RefreshKeyList(bool _bLogError = false);
 
+	// if m_bLockKeyByAppInstance then makes sure that all the keys types match up module by module.
+	// also verifies that each key configuration (unique by the modules the keys are licensed for) all have the same number of application instances
+	HRESULT ValidateKeyList(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count);
+
+	// locks application instance with each keys configuration (unique by the modules the keys are licensed for)
+	// adds locked keys to the cache
+	HRESULT LockOneOfEachKeyConfiguration(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
+
+	// associates application instance with a base key
+	// adds all keys to the cache
+	HRESULT AssociateAppInstanceToBaseKey(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
+
+	_bstr_t GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR bstrKeyIdent, bool bLogError);
+
+	// adds an individual key to the cache
+	HRESULT AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyIdent, bool bLogError);
+
+	// removes all keys from the cache, and disassociates all keys with the given Application Instance to empty...
+	HRESULT FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
+
+	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.
+	HRESULT SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
+
+
 	// checks that all licenses checked out are accounted for by some key
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
 
-	// checks if there is valid licensing, 2nd Param tellls whether to enter Grace Period if FAILS
-	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool enter_grace_period_on_error);
+	// checks if there is valid licensing, 2nd Param tells whether to use backup servers or enter Grace Period if FAILS
+	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error);
 
 	// re-allocates any unallocated or invalidated licenses (if possible)
 	HRESULT ReallocateLicenses();
@@ -278,6 +374,9 @@ private:
 	// adds a message to the list of unretrieved messages
 	HRESULT AddLicensingMessage(LicensingMessage &message);
 	
+	bool IsLocalMachine(_bstr_t server);
+
+
 	LicensingMessageList licensing_message_cache;
 	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
@@ -292,6 +391,10 @@ private:
 	
 	KeySpec m_keyspec;
 	ServerList m_servers;
+	ServerList m_backupServers;
+	bool m_bUsingBackupServers;
+	bool m_bBypassRemoteKeyRestrictions;
+
 	KeyIdentList m_productkeys;
 
 	bool m_single_key, m_lock_keys, m_initialized;	
@@ -301,6 +404,9 @@ private:
 	ModuleLicenseMap m_allocated_licenses;
 	time_t m_dtGracePeriodStart;
 	unsigned long m_dtGracePeriod;	//in minutes
+	bool m_bLockKeyByAppInstance;
+	_bstr_t m_applicationInstance;
+
 
 	time_t m_dtRefreshKeyList;
 
