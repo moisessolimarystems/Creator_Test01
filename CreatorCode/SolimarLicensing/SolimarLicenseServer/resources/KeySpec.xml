@@ -428,8 +428,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
 				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
 				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
+				<Module id="50"	offset="0x144" bits="4" name="PostScript::AFPDS"/>	
 				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF"/>
-				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
+				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>										
 			</ModuleList>
 			<ProductList>
 				<Product id="9" name="SolScript">
@@ -439,6 +440,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="21" default="0"/>
 					<ModuleInclude id="25" default="0"/>
 					<ModuleInclude id="46" default="0"/>
+					<ModuleInclude id="50" default="0"/>					
 					<ModuleInclude id="52" default="0"/>
 					<ModuleInclude id="53" default="0"/>
 				</Product>
