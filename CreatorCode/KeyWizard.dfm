@@ -1,6 +1,6 @@
 object KeyWizardFrm: TKeyWizardFrm
-  Left = 407
-  Top = 343
+  Left = 514
+  Top = 175
   Width = 796
   Height = 536
   BorderWidth = 5
@@ -18,7 +18,7 @@ object KeyWizardFrm: TKeyWizardFrm
     Left = 161
     Top = 0
     Width = 617
-    Height = 459
+    Height = 453
     Align = alClient
     BevelOuter = bvNone
     BorderStyle = bsSingle
@@ -142,7 +142,7 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 209
       Top = 119
       Width = 16
-      Height = 19
+      Height = 21
       Associate = ui_days
       Min = -10
       Max = 90
@@ -151,8 +151,8 @@ object KeyWizardFrm: TKeyWizardFrm
       Wrap = False
     end
     object SelectModules: TCheckBox
-      Left = 256
-      Top = 62
+      Left = 272
+      Top = 32
       Width = 289
       Height = 17
       Caption = 'Specify modules to be programed.'
@@ -208,12 +208,20 @@ object KeyWizardFrm: TKeyWizardFrm
       TabOrder = 10
       OnChange = passwordComboBoxChange
     end
+    object RemoteKey_CHB: TCheckBox
+      Left = 272
+      Top = 48
+      Width = 249
+      Height = 17
+      Caption = 'Remote Key'
+      TabOrder = 11
+    end
   end
   object FinalPanel: TPanel
     Left = 161
     Top = 0
     Width = 617
-    Height = 459
+    Height = 453
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -225,7 +233,7 @@ object KeyWizardFrm: TKeyWizardFrm
     Left = 161
     Top = 0
     Width = 617
-    Height = 459
+    Height = 453
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 5
@@ -237,21 +245,6 @@ object KeyWizardFrm: TKeyWizardFrm
       Color = clBackground
       ParentColor = False
       TabOrder = 0
-      inherited SolSearcherPropertyList: TListView
-        Left = 15
-        Top = 22
-        Width = 201
-        Height = 239
-        Columns = <
-          item
-            Caption = 'Property'
-            Width = 139
-          end
-          item
-            Caption = 'Licenses'
-            Width = 56
-          end>
-      end
       inherited DetailSQL: TQuery
         Left = 46
         Top = 235
@@ -266,7 +259,7 @@ object KeyWizardFrm: TKeyWizardFrm
     Left = 161
     Top = 0
     Width = 617
-    Height = 459
+    Height = 453
     Align = alClient
     BorderWidth = 5
     BorderStyle = bsSingle
@@ -286,6 +279,43 @@ object KeyWizardFrm: TKeyWizardFrm
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
+    end
+    object ConcurrentLabel: TLabel
+      Left = 285
+      Top = 365
+      Width = 101
+      Height = 13
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Concurrent Operators'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+    end
+    object NamedLabel: TLabel
+      Left = 285
+      Top = 390
+      Width = 101
+      Height = 13
+      Alignment = taRightJustify
+      AutoSize = False
+      Caption = 'Named Users'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+    end
+    object AppInstanceLabel: TLabel
+      Left = 8
+      Top = 344
+      Width = 101
+      Height = 13
+      Caption = 'Application Instances'
     end
     inline WizardModuleFrame: TModuleFrame
       Left = 10
@@ -312,7 +342,7 @@ object KeyWizardFrm: TKeyWizardFrm
       Left = 436
       Top = 337
       Width = 16
-      Height = 20
+      Height = 21
       Associate = OutputEdit
       Min = 0
       Max = 4095
@@ -321,10 +351,73 @@ object KeyWizardFrm: TKeyWizardFrm
       Thousands = False
       Wrap = False
     end
+    object ConcurrentEdit: TMaskEdit
+      Left = 400
+      Top = 362
+      Width = 36
+      Height = 21
+      TabOrder = 3
+      Text = '255'
+    end
+    object NamedEdit: TMaskEdit
+      Left = 400
+      Top = 387
+      Width = 36
+      Height = 21
+      TabOrder = 4
+      Text = '255'
+    end
+    object ConcurrentUnits: TUpDown
+      Left = 436
+      Top = 362
+      Width = 15
+      Height = 21
+      Associate = ConcurrentEdit
+      Min = 0
+      Max = 255
+      Position = 255
+      TabOrder = 5
+      Thousands = False
+      Wrap = False
+    end
+    object NamedUnits: TUpDown
+      Left = 436
+      Top = 387
+      Width = 15
+      Height = 21
+      Associate = NamedEdit
+      Min = 0
+      Max = 255
+      Position = 255
+      TabOrder = 6
+      Thousands = False
+      Wrap = False
+    end
+    object AppInstanceUnits: TUpDown
+      Left = 156
+      Top = 340
+      Width = 16
+      Height = 21
+      Associate = AppInstanceEdit
+      Min = 0
+      Max = 99
+      Position = 0
+      TabOrder = 7
+      Thousands = False
+      Wrap = False
+    end
+    object AppInstanceEdit: TMaskEdit
+      Left = 120
+      Top = 340
+      Width = 36
+      Height = 21
+      TabOrder = 8
+      Text = '0'
+    end
   end
   object ButtonPanel: TPanel
     Left = 0
-    Top = 459
+    Top = 453
     Width = 778
     Height = 39
     Align = alBottom
@@ -388,7 +481,7 @@ object KeyWizardFrm: TKeyWizardFrm
     Left = 0
     Top = 0
     Width = 161
-    Height = 459
+    Height = 453
     Align = alLeft
     BevelOuter = bvLowered
     BorderWidth = 5
