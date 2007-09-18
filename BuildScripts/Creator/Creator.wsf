@@ -83,7 +83,10 @@ Sub GenerateNewBuild()
     Dim MKS
     Set MKS = New CMKS
     Set MKS.Build = g_Build    
+
+    g_Build.SendEmail "Building " & g_Build.ProductName & " Version " & g_Build.NewBuild.versionNum & " ......", ""
     MKS.GenerateSandBox "New"	
+    UpdateFileVersions
     ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
     BuildMainCode 
     MoveAndCheckInBuiltFiles MKS
@@ -97,8 +100,9 @@ Sub GenerateNewBuild()
     Set MoveFiles = New CMoveFiles
     Set MoveFiles.Build = g_Build
     MoveFiles.MoveCDImageToNetwork g_Build.ProductName, Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
+    MoveFiles.MoveCDImageFTPToRCPath g_Build.ProductName, g_Build.NewBuild.VersionNum 
     MKS.RefreshFile g_Build.mBuildPath & "\buildScript.pj", "BuildRegistry.txt"	  'make sure we have the most updated build registry file.
-    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
+    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
     g_Build.NewBuild.IncrementBuildNum "CreatorBuildNumber", MKS
     MKS.Disconnect
     Set MoveFiles = Nothing
@@ -128,8 +132,8 @@ Sub GenerateRelease()
     Set MoveFiles = New CMoveFiles
     Set MoveFiles.Build = g_Build
     MoveFiles.MoveRCPathToNetwork g_Build.ProductName, versionNum
-    g_Build.Release.AddReleaseToMKS MKS, MoveFiles, versionNum
-    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", Left(versionNum, Len(versionNum) - 7)
+    'g_Build.Release.AddReleaseToMKS MKS, MoveFiles, versionNum
+    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + Left(versionNum, Len(versionNum) - 7)
     g_Build.Release.UpdateReleaseFile MKS, "Configuration\CreatorRelease.txt"
     Set MKS = Nothing
     Set MoveFiles = Nothing
@@ -142,10 +146,19 @@ Sub CreateBranch()
     Set MKS.Build = g_Build
     MKS.CreateNewDevPath g_Build.MainProjPath, g_Build.MainPJFile
     g_Build.UpdateRegVersionVals "CreatorNextVersion", "CreatorCurrentVersion"
-    'g_Build.SendEmail
-    'UpdateVersionInFiles MKS 'taken out since we dont have the trunk sandbox available
+    'g_Build.SendEmail g_Build.GetEmailSubject, g_Build.GetEmailBody
+    UpdateVersionInFiles MKS 'taken out since we dont have the trunk sandbox available
     Set MKS = Nothing
 End Sub
+
+Sub UpdateFileVersions()
+    g_Build.WriteToDlgAndFile "Updating File Version Using: " & CStr(g_Build.NewBuild.versionNum)
+    g_Build.RunCmd "attrib -r " + g_Build.MainProjPath & "\CreatorCode\*.* /S"
+    g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"
+    g_Build.UpdateFileVersion g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h", "const int BUILD_NUMBER = ",  CInt(Right(g_Build.NewBuild.versionNum, 3)) & ";"
+    g_Build.RunCmd "attrib +r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"              
+End Sub
+
    
 Sub BuildMainCode()
     g_Build.WriteToDlgAndFile "Building Main Code"
@@ -344,6 +357,23 @@ Sub CreateInstallShieldDirs(CD_IMAGE_SOLIMAR_LICENSING)
     MoveFiles.DeleteFileOrFolder "File", g_Build.ImageDirPath & "\Common\SolimarLicensing\SolimarLicenseServer.msi", True
     Set MoveFiles = Nothing
 End Sub
+
+' Name          : UpdateVersionFiles
+' Description   : updates the version number in certain files during a release build
+' Parameters    : aMKS - handle to access common MKS functions such as locking and checking in
+' Files Updated : vem.lic.temp.demo.txt
+'                 SSMBuild.h
+'
+Sub UpdateVersionInFiles(aMKS)
+    Dim FileToUpdate, pattern, programVersion, versionNum
+    versionNum = Right(g_Build.NewNextVersion, 4)       'strips prefix
+    FileToUpdate = Creator_Next + "\CreatorCode\CustomerForm.cpp"
+    pattern = "const int CREATOR_VERSION = "
+    programVersion = "0x" + Left(versionNum, 1) + Right(versionNum, 2)
+    g_Build.UpdateFileVersion FileToUpdate, pattern, programVersion & ";"
+    aMKS.LockFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
+    aMKS.CheckInFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
+End Sub
           
 'read the values in from a file.  The information in the file must be in the exact format that
 'is expected by the function, otherwise it will fail.  Some of the values may be empty or
@@ -416,15 +446,18 @@ End Sub
 '               MSIPackages.
 '==================================================================================
 Sub ConfigureSubProjectForLicensing(aMKS, aLicenseVersion)
-	
+	Dim ExclusionList 
+	ExclusionList = Array(".pj")	
 	g_Build.WriteToDlgAndFile "configuring Licensing Subprojects"
 	aMKS.ConfigureSubProject g_Build.MainCodePJFile  , _
 				 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", aLicenseVersion
+	g_Build.CleanFolders g_Build.MainCodePath & "\SolimarLicensing", ExclusionList
 	aMKS.Refresh g_Build.MainCodePJFile , g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj"
 	aMKS.ConfigureSubProject g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
 				 g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj", aLicenseVersion
-        aMKS.Refresh g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
-		     g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj" 
+	g_Build.CleanFolders g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing", ExclusionList	
+        aMKS.Refresh g_Build.MainCodePath & "\..\Image\Common\Common.pj", _
+		     g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj" 
 End Sub
 
 Sub CreateVersionTextAndExtractingFile(aType)
