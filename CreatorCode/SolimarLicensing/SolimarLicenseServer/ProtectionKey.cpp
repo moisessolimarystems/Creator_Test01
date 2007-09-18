@@ -8,6 +8,8 @@
 #include "..\common\TimeHelper.h"
 #include "KeyServerInstance.h"
 #include <time.h>
+#include <algorithm>		//for std::find
+
 
 /* KDPasswordText[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -42,7 +44,6 @@ const char* ProtectionKey::KDPasswordText[] =
    "30 days/750 hrs - DL",       // 26  Element #26-28 are additional Development License
    "90 days/2250 hrs - DL",      // 27
    "180 days/4500 hrs - DL",     // 28
-
 };
 /* KDPasswordDays[]
  *    This is the text for Test/Dev key types which can be any key.
@@ -133,13 +134,13 @@ void OutputFormattedDebugString(const wchar_t *fmt, ...)
 	va_start(list, fmt);
 	wchar_t buf[1024];
 	memset(buf, 0, sizeof(buf));
-	_vsnwprintf(buf, 1024, fmt, list);
+	_vsnwprintf_s(buf, sizeof(buf)/sizeof(wchar_t), fmt, list);
 	OutputDebugStringW(buf);
 }
 
 
 
-ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0)
+ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0), b_use_shared_licensing(false)
 {
 	;
 }
@@ -148,9 +149,13 @@ ProtectionKey::ProtectionKey(const ProtectionKey &k) :
 	key_owned(false),
 	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
-	m_keyident(k.m_keyident), 
+	m_physicalKeyIdent(k.m_physicalKeyIdent),
+	m_virtualKeyIdent(k.m_virtualKeyIdent),
 	m_keyspec(k.m_keyspec), 
-	m_driver(k.m_driver)
+	m_driver(k.m_driver),
+	b_use_shared_licensing(k.b_use_shared_licensing),
+	m_application_instance(k.m_application_instance),
+	m_license_connection_type(k.m_license_connection_type)
 {
 	try
 	{
@@ -163,13 +168,17 @@ ProtectionKey::ProtectionKey(const ProtectionKey &k) :
 	}
 }
 
-ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *driver) : 
+ProtectionKey::ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, KeySpec *keyspec, RainbowDriver *driver, bool bUseSharedLicensing) :
 	key_owned(false),
 	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
-	m_keyident(keyident),
+	m_physicalKeyIdent(physicalKeyIdent),
+	m_virtualKeyIdent(virtualKeyIdent),
 	m_keyspec(keyspec),
-	m_driver(driver)
+	m_driver(driver),
+	m_application_instance(L""),
+	b_use_shared_licensing(bUseSharedLicensing),
+	m_license_connection_type(LCT_ASSOCIATE_APPLICATION_INSTANCE)
 {
 	try
 	{
@@ -181,7 +190,23 @@ ProtectionKey::ProtectionKey(_bstr_t keyident, KeySpec *keyspec, RainbowDriver *
 		e.Error();
 	}
 }
+ProtectionKey::~ProtectionKey()
+{
+	if (cells_lock!=NULL)
+		CloseHandle(cells_lock);
+	if (license_use_lock!=NULL)
+		CloseHandle(license_use_lock);
 
+	key_use.clear();
+	license_use.clear();
+	license_unlimited_list.clear();
+	appInstance_to_connectionType_list.clear();
+	module_app_use.clear();
+	license_to_app.clear();
+
+	m_keyspec = NULL;
+	m_driver = NULL;
+}
 
 HRESULT ProtectionKey::TrialExpires(VARIANT *expire_date)
 {
@@ -267,6 +292,12 @@ HRESULT ProtectionKey::HeaderQuery(long header_ident, VARIANT *value)
 	return hr;
 }
 
+HRESULT ProtectionKey::ApplicationInstanceCount(long* application_instance_count)
+{
+	*application_instance_count = ReadHeaderCache(L"Application Instances").uiVal;
+	return S_OK;
+}
+
 HRESULT ProtectionKey::IsPresent(VARIANT_BOOL *key_present)
 {
 	HRESULT hr = S_OK;
@@ -277,7 +308,7 @@ HRESULT ProtectionKey::IsPresent(VARIANT_BOOL *key_present)
 	{
 		KeySpec::Header &header(m_keyspec->headers[L"Key Number"]);
 		unsigned short value;
-		hr = m_driver->ReadCell(m_keyident, header.offset >> 4, &value);
+		hr = m_driver->ReadCell(m_physicalKeyIdent, header.offset >> 4, &value);
 		if (FAILED(hr))
 			throw _com_error(hr);
 		
@@ -345,7 +376,7 @@ HRESULT ProtectionKey::Release(BSTR license_id)
 	key_use[_bstr_t(license_id,true)]--;
 	if (key_use[_bstr_t(license_id,true)]<0)
 	{
-		keyserver.GenerateMessage(m_keyident, MT_INFO, S_OK, time(0), MessageTooManyReleases);
+		keyserver.GenerateMessage(m_virtualKeyIdent, MT_INFO, S_OK, time(0), MessageTooManyReleases);
 		key_use[_bstr_t(license_id,true)]=0;
 	}
 	return S_OK;
@@ -390,7 +421,8 @@ HRESULT ProtectionKey::ValidateLicense(BSTR license_id, VARIANT_BOOL *license_va
 			{
 				module_use += use->second[module->id];
 			}
-			if (module_use > (long)LicenseEffectiveValue(module->id))
+
+			if (module_use > (long)LicenseEffectiveValue(license_id, module->id))
 			{
 				*license_valid = VARIANT_FALSE;
 				break;
@@ -482,12 +514,17 @@ HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, lo
 		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
 		if (!module.isLicense)
 			return E_INVALIDARG;
-		
-		unsigned int effective_value = LicenseEffectiveValue(module.id);
-		if (*license_count >= 0x7FFFFFFF || effective_value>= 0x7FFFFFFF)
-			*license_count = 0x7FFFFFFF;
-		else
-			*license_count += (long) effective_value;
+
+		if(module.isSharable && !b_use_shared_licensing)	//Check for shared licensing
+			*license_count = 0;
+		else	//
+		{
+			unsigned int effective_value = LicenseEffectiveValue(license_id, module.id);
+			if (*license_count >= 0x7FFFFFFF || effective_value>= 0x7FFFFFFF)
+				*license_count = 0x7FFFFFFF;
+			else
+				*license_count += (long) effective_value;
+		}
 	}
 	catch (_com_error &e)
 	{
@@ -557,17 +594,28 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 	{
 		_variant_t module_value = ReadModuleCache(module_ident);
 		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
-		
+
 		SafeMutex mutex(license_use_lock);
-		
-		ModuleLicenseUseList &module_license_use = license_use[license_id];
-		if (module_license_use[module.id] + license_count <= (long)LicenseEffectiveValue(module.id))
+		if(module.isSharable && !b_use_shared_licensing)	//Check for shared licensing
 		{
-			module_license_use[module.id] += license_count;
+			throw _com_error(LicenseServerError::EHR_LICENSE_INSUFFICIENT);
 		}
 		else
 		{
-			throw _com_error(LicenseServerError::EHR_LICENSE_INSUFFICIENT);
+			//Success
+			hr = AddLicenseApplicationInstance(license_id, module_ident);
+			if(SUCCEEDED(hr))
+			{
+				ModuleLicenseUseList &module_license_use = license_use[license_id];
+				if (module_license_use[module.id] + license_count <= (long)LicenseEffectiveValue(license_id, module.id))
+				{
+					module_license_use[module.id] += license_count;
+				}
+				else
+				{
+					throw _com_error(LicenseServerError::EHR_LICENSE_INSUFFICIENT);
+				}
+			}
 		}
 	}
 	catch (_com_error &e)
@@ -576,6 +624,232 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 	}
 	return hr;
 }
+
+
+
+HRESULT ProtectionKey::ModuleLicenseUnlimited(BSTR license_id, long module_ident, VARIANT_BOOL b_module_is_unlimited)
+{
+	HRESULT hr(S_OK);
+	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
+	module_unlimited_list[module_ident] = b_module_is_unlimited == VARIANT_TRUE ? true : false;
+	//license_unlimited_list[module_ident] = b_module_is_unlimited == VARIANT_TRUE ? true : false;
+	return hr;
+}
+
+//Returns S_OK on success, else S_FALSE
+HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_id, VARIANT_BOOL b_app_instance_lock_key)
+{
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"ProtectionKey::AddApplicationInstance(%s, %s, %s, %s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id, b_app_instance_lock_key==VARIANT_TRUE ? L"true" : L"false");
+//OutputDebugString(tmpbuf);
+//OutputFormattedDebugString(L"%s - ProtectionKey::AddApplicationInstance(%s, %s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id);
+
+
+	SafeMutex mutex(license_use_lock);
+	HRESULT hr(S_OK);
+	AppInstanceConnectionTypeList::iterator appIt = appInstance_to_connectionType_list.find(_bstr_t(application_id,true));
+
+	//Don't add empty application id to the connection type list...
+	if(wcscmp(application_id, L"") != 0)	
+	{
+		bool bContinue = true;
+		_bstr_t bstrAppInstanceWithLock = _bstr_t(L"");
+
+		if(b_app_instance_lock_key==VARIANT_TRUE) //only allow one key to have the true value
+		{
+			//cycle through appInstance_to_connectionType_list and make sure only 1 has a LCT_LOCK_APPLICATION_INSTANCE
+			for(AppInstanceConnectionTypeList::iterator cycleAppIt = appInstance_to_connectionType_list.begin();
+				cycleAppIt != appInstance_to_connectionType_list.end();
+				cycleAppIt++)
+			{
+				
+				if(cycleAppIt->second == ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE)
+				{
+					bstrAppInstanceWithLock = _bstr_t(cycleAppIt->first, true);
+					break;
+				}
+			}
+
+			if((wcscmp(bstrAppInstanceWithLock, L"") != 0) && (wcscmp(application_id, bstrAppInstanceWithLock) != 0))
+			{
+				//this is the case where there is an application instance with a lock, and it is not the one passed in
+				//do not allow.
+				bContinue = false;
+			}
+		}
+
+		
+		if(bContinue)
+		{
+			license_to_app[_bstr_t(license_id,true)] = _bstr_t(application_id,true);
+			if(appIt == appInstance_to_connectionType_list.end())	//New
+			{
+				appInstance_to_connectionType_list[_bstr_t(application_id,true)] = b_app_instance_lock_key == VARIANT_TRUE ? ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE : ProtectionKey::LCT_ASSOCIATE_APPLICATION_INSTANCE;
+				hr = S_OK;
+			}
+			else	//Already in list
+			{
+				if(appIt->second == ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE && b_app_instance_lock_key == VARIANT_FALSE)
+				{
+					//Don't allow locked app instance to be 
+					hr = S_FALSE;
+				}
+				else
+				{
+					appIt->second = b_app_instance_lock_key == VARIANT_TRUE ? ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE : ProtectionKey::LCT_ASSOCIATE_APPLICATION_INSTANCE;
+					hr = S_OK;
+				}
+			}
+		}
+		else
+		{
+			hr = S_FALSE;
+		}
+	}
+	else //if(wcscmp(application_id, L"") == 0)
+	{
+		license_to_app[_bstr_t(license_id,true)] = _bstr_t(application_id,true);
+	}
+	return hr;
+}
+//Returns S_OK on success, else S_FALSE
+HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR application_id)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(license_use_lock);
+	AppInstanceConnectionTypeList::iterator appIt = appInstance_to_connectionType_list.find(_bstr_t(application_id,true));
+	if(appIt != appInstance_to_connectionType_list.end())
+	{
+		appInstance_to_connectionType_list.erase(appIt);
+	}
+
+	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
+	if(licAppIt != license_to_app.end())
+	{
+		license_to_app.erase(licAppIt);
+		hr = S_OK;
+	}
+	
+	return hr;
+}
+
+////Might not need this function...
+//Returns S_OK on success, else S_FALSE
+//Vector returned with BSTR name, VARIANT_BOOL bLock
+HRESULT ProtectionKey::GetApplicationInstanceList(VARIANT *pvtAppInstanceList)
+{
+	HRESULT hr(S_OK);
+	VariantInit(pvtAppInstanceList);
+	try
+	{
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"ProtectionKey::GetApplicationInstanceList(%s)", (wchar_t*)m_virtualKeyIdent);
+//OutputDebugString(tmpbuf);
+		SAFEARRAY *pSA = SafeArrayCreateVector(VT_VARIANT, 0, (unsigned int)appInstance_to_connectionType_list.size()*2);
+		VARIANT *pElement = 0;
+		hr = SafeArrayAccessData(pSA, (void**)&pElement);
+		if (SUCCEEDED(hr))
+		{
+			SafeMutex mutex(license_use_lock);
+
+			//Change here to return the connection type of each Application Instance...
+			int index = 0;
+			for(AppInstanceConnectionTypeList::iterator appIt = appInstance_to_connectionType_list.begin();
+				appIt != appInstance_to_connectionType_list.end();
+				appIt++, index++)
+			{
+				VariantClear(&pElement[2*index]);
+				pElement[2*index].vt = VT_BSTR;
+				pElement[2*index].bstrVal = (appIt->first).copy();
+				VariantClear(&pElement[(2*index)+1]);
+				pElement[(2*index)+1].vt = VT_BOOL;
+				pElement[(2*index)+1].boolVal = appIt->second == ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE ? VARIANT_TRUE : VARIANT_FALSE;
+//swprintf_s(tmpbuf, 1024, L"    [%d] = %s", 2*index, pElement[2*index].bstrVal);
+//OutputDebugString(tmpbuf);
+//swprintf_s(tmpbuf, 1024, L"    [%d] = %s", (2*index)+1, pElement[(2*index)+1].boolVal == VARIANT_TRUE ? L"true" : L"false");
+//OutputDebugString(tmpbuf);
+			
+			//swprintf_s(tmpbuf, 1024, L"    (%s, %s): (%s, %s)", 
+			//(wchar_t*)appIt->first, 
+			//appIt->second == LicenseConnectionType::LCT_LOCK_APPLICATION_INSTANCE ? L"true" : L"false",
+			//pElement[2*index].bstrVal,
+			//pElement[(2*index)+1].boolVal == VARIANT_TRUE ? L"true" : L"false"
+			//);
+			//OutputDebugString(tmpbuf);
+			
+
+			}
+			SafeArrayUnaccessData(pSA);
+			
+			pvtAppInstanceList->vt = VT_VARIANT | VT_ARRAY;
+			pvtAppInstanceList->parray = pSA;
+		}
+		
+		if (FAILED(hr))
+		{
+			SafeArrayDestroy(pSA);
+		}
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
+
+
+
+// Returns S_OK if was able to add application instance to the module, or if the application
+//	instance is already associated with the module.
+//  On/Off modules can only have 1 application instance associated with it, the others can have multiple
+HRESULT ProtectionKey::AddLicenseApplicationInstance(BSTR license_id, long module_ident)
+{
+	SafeMutex mutex(license_use_lock);
+	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
+	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
+
+	if(!module.isSharable && licAppIt == license_to_app.end())
+	{
+		return E_FAIL;	//Unknown Application Instance...
+	}
+	_bstr_t appID = licAppIt!=license_to_app.end() ? _bstr_t(licAppIt->second,true) : _bstr_t(L"",true);
+
+	ApplicationList &app_list = module_app_use[module_ident];
+
+	HRESULT hr = S_OK;
+	
+	bool bAddAppToList = false;
+	if(app_list.size() == 0)
+		bAddAppToList = true;	// Not in list, add to known list
+	else
+	{
+		//Know there is atleast one app instance associated here
+		ApplicationList::iterator app_listIT;
+		app_listIT = std::find(app_list.begin(), app_list.end(), appID);
+		
+
+		// Not currently in the list, see if there is room to add
+		if(app_listIT == app_list.end())
+		{	
+			if(module.unlimited != 1 || module.isSharable)
+			{
+				// Not in list, add to known list
+				bAddAppToList = true;	
+			}
+			else
+			{
+				hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
+			}
+		}
+	}
+
+	//Add to list
+	if(bAddAppToList)
+		app_list.push_back(appID);
+
+	return hr;
+}	
 
 HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count)
 {
@@ -588,9 +862,15 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 		
 		SafeMutex mutex(license_use_lock);
 		
-		LicenseUseList::iterator i = license_use.find(license_id);
+		LicenseUseList::iterator i = license_use.find(_bstr_t(license_id,true));
 		if (i!=license_use.end())
 			i->second[module.id] = max(i->second[module.id]-license_count,0);
+
+		if(i->second[module.id] == 0)
+		{
+			// Only do this for certain module types, not sure what type yet...
+			RemoveLicenseApplicationInstance(license_id, module_ident);
+		}
 	}
 	catch (_com_error &e)
 	{
@@ -609,8 +889,8 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 		unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
 		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
 
-		//Only decrement counter if license count is not unlimited and not key status is not initial_trial
-		if(module.isCounter && !LicenseIsUnlimited(module.id) && key_status != INITIAL_TRIAL)
+		//Only decrement counter if license count is not unlimited
+		if(module.isCounter && !LicenseIsUnlimited(license_id, module.id))
 		{
 			hr = S_OK;
 			if(module.fn_read(ReadModuleCache(module.id).ulVal) >= module.counter+license_count)
@@ -619,7 +899,7 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 				hr = S_OK;
 				if(module.counter / module.fn_read(1))	//Actually decrement from the key.
 				{
-					hr = WriteLicenseDecrementCounter(module_ident, module.counter);
+					hr = WriteLicenseDecrementCounter(license_id, module_ident, module.counter);
 					module.counter = module.counter % module.fn_read(1); 
 				}
 			}
@@ -629,7 +909,7 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 			}
 		}
 	}
-	catch (_com_error &e)
+ 	catch (_com_error &e)
 	{
 		hr = e.Error();
 	}
@@ -638,12 +918,19 @@ HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long modul
 HRESULT ProtectionKey::LicenseReleaseAll(BSTR license_id)
 {
 	SafeMutex mutex(license_use_lock);
-	
+//OutputFormattedDebugString(L"%s -   ProtectionKey::LicenseReleaseAll(%s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id);
 	// release the key for this license id
 	key_use.erase(_bstr_t(license_id,true));
 	
 	// release the licenses obtained for this license id
 	license_use.erase(_bstr_t(license_id,true));
+
+
+	// release all application instances tied with the license
+	for(ModuleApplicationUseList::iterator moduleAppUseIt = module_app_use.begin(); moduleAppUseIt != module_app_use.end(); moduleAppUseIt++)
+		RemoveLicenseApplicationInstance(license_id, moduleAppUseIt->first);
+
+
 	
 	// unlock the key if this id has the lock
 	if (key_owned && key_owner==_bstr_t(license_id,true))
@@ -651,6 +938,26 @@ HRESULT ProtectionKey::LicenseReleaseAll(BSTR license_id)
 	
 	return S_OK;
 }
+
+
+void ProtectionKey::RemoveLicenseApplicationInstance(BSTR license_id, long module_ident)
+{
+
+	// Remove application instance from eating up module use.
+	SafeMutex mutex(license_use_lock);
+//OutputFormattedDebugString(L"%s -   ProtectionKey::RemoveLicenseApplicationInstance(%s, %d)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, module_ident);
+
+	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
+	if(licAppIt != license_to_app.end())
+	{
+		ApplicationList &app_list = module_app_use[module_ident];
+		ApplicationList::iterator app_listIT;
+		app_listIT = std::find(app_list.begin(), app_list.end(), licAppIt->second/*appID*/);
+		if(app_listIT != app_list.end())
+			app_list.erase(app_listIT);
+	}
+}
+
 
 // Sets all writable cells on a key to zero
 HRESULT ProtectionKey::Format(BSTR *new_key_ident)
@@ -677,12 +984,12 @@ HRESULT ProtectionKey::Format(BSTR *new_key_ident)
 	}
 	
 	// write a guid identifier to the key
-	hr = m_driver->WriteKeyUnprogrammedIdentifier(_bstr_t(m_keyident,true));
+	hr = m_driver->WriteKeyUnprogrammedIdentifier(_bstr_t(m_physicalKeyIdent,true));
 	
 	// obtain the string representation of the guid to use as the key identifier
 	if (new_key_ident)
 	{
-		hr = m_driver->ComputeCurrentKeyIdent(_bstr_t(m_keyident,true), new_key_ident);
+		hr = m_driver->ComputeCurrentKeyIdent(_bstr_t(m_physicalKeyIdent,true), new_key_ident);
 	}
 	
 	return S_OK;
@@ -704,7 +1011,7 @@ HRESULT ProtectionKey::Format(BSTR *new_key_ident)
 					VARIANT		(license count/value)
 			...
 	*/
-HRESULT ProtectionKey::Program(long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident)
+HRESULT ProtectionKey::Program(long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident)
 {
 	HRESULT hr = S_OK;
 	
@@ -727,6 +1034,7 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Produc
 	WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
 	WriteHeader(L"Key Type",(unsigned int)(unsigned short)key_type);
 	WriteHeader(L"Status",(unsigned int)(unsigned short)INITIAL_TRIAL);
+	WriteHeader(L"Application Instances",(unsigned int)(unsigned short)application_instances);
 	
 //xxx debug
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteCounterDays(%d)", days);
@@ -752,11 +1060,11 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Custom
 //xxx debug
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentKeyIdent()");
 		
-	    hr = m_driver->ComputeCurrentKeyIdent(m_keyident, new_key_ident);
+	    hr = m_driver->ComputeCurrentKeyIdent(m_physicalKeyIdent, new_key_ident);
 		if (FAILED(hr)) throw _com_error(hr);
 	}
 
-	m_driver->ClearKeyUnprogrammedIdentifier(m_keyident);
+	m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);
 	InitializePasswordNumber();	// Set the module password number to 0
 	
 //xxx debug
@@ -1190,7 +1498,7 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 							xchangePS_PPM = ReadModuleCache(L"XCHANGE::PS PPM").uiVal;
 							xchangePSDBCS_PPM = ReadModuleCache(L"XCHANGE::PS(DBCS) PPM").uiVal;
 						}
-						hr = m_driver->ClearKeyUnprogrammedIdentifier(m_keyident);
+						hr = m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);
 						InitializePasswordNumber();
 
 						if (product_id==12)		// SPDE
@@ -1210,8 +1518,14 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 					{
 						if (EnterModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed, password_arguments.password_number))
 							return S_OK;
-
 					}
+					break;
+				}
+				// application instance password
+				case 5:
+				{
+					if (EnterApplicationInstancePassword(user_password, customer_number, key_number, password_arguments.units_licensed, password_arguments.password_number))
+						return S_OK;
 					break;
 				}
 				default:
@@ -1318,26 +1632,26 @@ bool ProtectionKey::EnterBasePassword(DWORD user_password, bool trial_key, bool 
 	{
 		if (!permanent_allowed_key)
 		{
-			keyserver.GenerateMessage(m_keyident, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 			throw _com_error(LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED);
 		}
 		else if (!trial_key)
 		{
-			keyserver.GenerateMessage(m_keyident, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 			throw _com_error(E_FAIL);
 		}
 		else
 		{
 			try
 			{
-				hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+				hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 				if (FAILED(hr)) throw _com_error(hr);
 				hr = WriteStatus(BASE);
 				if (FAILED(hr)) throw _com_error(hr);
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 				throw e;
 			}
 			
@@ -1361,7 +1675,7 @@ bool ProtectionKey::EnterProductVersionPassword(DWORD user_password, bool trial_
 		}
 		catch (_com_error &e)
 		{
-			keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 			throw e;
 		}
 		
@@ -1417,7 +1731,7 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 		// expiration date to reflect the new trial period
 		try
 		{
-			hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+			hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 			if (FAILED(hr)) throw _com_error(hr);
 			hr = WriteStatus(new_status);
 			if (FAILED(hr)) throw _com_error(hr);
@@ -1428,7 +1742,7 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 		}
 		catch (_com_error &e)
 		{
-			keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 			throw e;
 		}
 		
@@ -1447,20 +1761,28 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 	// if trial key
 	if (GetModulePassword(customer_number, key_number, module_id, units_licensed, password_number) == user_password)
 	{
-		if (trial_key && permanent_allowed_key)
+		bool bModuleIsCounter = false;
+		{
+		SafeMutex mutex(license_use_lock);
+		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_id]);
+		bModuleIsCounter = module.isCounter;
+		}
+
+		//Do not make key permanent if module isCounter
+		if (!bModuleIsCounter &&trial_key && permanent_allowed_key)
 		{
 			// the password is for a trial key -> activate the algorithm,
 			// initialize licensing, and set status to BASE
 			try
 			{
-				hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+				hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 				if (FAILED(hr)) throw _com_error(hr);
 				hr = WriteStatus(BASE);
 				if (FAILED(hr)) throw _com_error(hr);
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -1477,13 +1799,36 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 			
 			// success
 			return true;
 		}
+	}
+	
+	return false;
+}
+
+bool ProtectionKey::EnterApplicationInstancePassword(DWORD user_password, unsigned short customer_number, unsigned short key_number, unsigned int units_licensed, unsigned int password_number)
+{
+	HRESULT hr = S_OK;
+
+	KeySpec::Header &header_app_instance = m_keyspec->headers[L"Application Instances"];
+
+	if(GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)header_app_instance.id, (unsigned int)units_licensed, (unsigned int)password_number) == user_password)
+	{
+		try
+		{
+			WriteHeader(L"Application Instances", units_licensed);
+		}
+		catch (_com_error &e)
+		{
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			throw e;
+		}
+		return true;
 	}
 	
 	return false;
@@ -1511,14 +1856,14 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 			// initialize licensing, and set status to BASE
 			try
 			{
-				hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+				hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 				if (FAILED(hr)) throw _com_error(hr);
 				hr = WriteStatus(BASE);
 				if (FAILED(hr)) throw _com_error(hr);
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -1549,14 +1894,14 @@ bool ProtectionKey::EnterSPDOutputPassword(DWORD user_password, bool trial_key, 
 			// initialize licensing, and set status to BASE
 			try
 			{
-				hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+				hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 				if (FAILED(hr)) throw _com_error(hr);
 				hr = WriteStatus(BASE);
 				if (FAILED(hr)) throw _com_error(hr);
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -1659,7 +2004,7 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 			{
 				if (trial_key && permanent_allowed_key)
 				{
-					hr = m_driver->Activate(m_keyident, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
+					hr = m_driver->Activate(m_physicalKeyIdent, m_keyspec->headers[L"Primary Descriptor"].offset >> 4);
 					if (FAILED(hr)) throw _com_error(hr);
 					hr = WriteStatus(BASE);
 					if (FAILED(hr)) throw _com_error(hr);
@@ -1669,7 +2014,7 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 			}
 			catch(_com_error &e)
 			{
-				keyserver.GenerateMessage(m_keyident, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 			
@@ -1688,6 +2033,9 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 // Extension passwords:		<password,16>				new: <password,16>-0-2-<customer_number,10>-<key_number,10>-<extend_days,10>-<extension_num,10>
 // Version passwords:		<password,16>-<version,16>	new: <password,16>-<version,16>-3-<customer_number,10>-<key_number,10>
 // Module passwords:		<password,16>-<units,10>	new: <password,16>-<units,10>-4-<customer_number,10>-<key_number,10>-<module.id,10>
+// Module passwords:		<password,16>-<units,10>	new: <password,16>-<units,10>-4-<customer_number,10>-<key_number,10>-<module.id,10>-<passwordnumber,10>
+// Application Instances passwords:	none				new: <password,16>-<units,10>-5-<customer_number,10>-<key_number,10>-<header.offset,10>-<passwordnumber,10>
+// header.id and module.id do not conflict
 
 HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_number, BSTR *password)
 {
@@ -1697,12 +2045,27 @@ HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_numbe
 	password_string[0]=0;
 	
 	password_hash = GetBasePassword((unsigned short)customer_number, (unsigned short)key_number);
-	swprintf(password_string, L"%x-0-1-%x-%x", password_hash, customer_number, key_number);
+	swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-0-1-%x-%x", password_hash, customer_number, key_number);
 	
 	*password = SysAllocString(password_string);
 	
 	return S_OK;
 }
+
+
+HRESULT ProtectionKey::GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password)
+{
+	DWORD password_hash;
+	wchar_t password_string[128];
+	KeySpec::Header &header_app_instance = m_keyspec->headers[L"Application Instances"];
+
+	password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)header_app_instance.id, (unsigned int)license_count, (unsigned int)password_number);
+	swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-5-%x-%x-%d-%d", password_hash, license_count, customer_number, key_number, header_app_instance.id, password_number);
+
+	*password = SysAllocString(password_string);
+	return S_OK;
+}
+
 
 HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
 {
@@ -1714,7 +2077,7 @@ HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_nu
 	password_string[0]=0;
 	
 	password_hash = GetProductVersionPassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned short)version);
-	swprintf(password_string, L"%x-%04x-3-%x-%x", password_hash, version, customer_number, key_number);
+	swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%04x-3-%x-%x", password_hash, version, customer_number, key_number);
 	
 	*password = SysAllocString(password_string);
 	
@@ -1729,7 +2092,7 @@ HRESULT ProtectionKey::GenerateExtensionPassword(long customer_number, long key_
 	password_string[0]=0;
 	
 	password_hash = GetExtensionPassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned short)extend_days, (unsigned short)extension_num);
-	swprintf(password_string, L"%x-0-2-%x-%x-%d-%d", password_hash, customer_number, key_number, extend_days, extension_num);
+	swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-0-2-%x-%x-%d-%d", password_hash, customer_number, key_number, extend_days, extension_num);
 	
 	*password = SysAllocString(password_string);
 	
@@ -1764,7 +2127,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 			if (module.id==128)
 			{
 				password_hash = GetSPDOutputPassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+				swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 				password_generated = true;
 			}
 			// if the module is a pages per minute module (andt he product is an spd or spd derivative)
@@ -1805,7 +2168,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 				
 				unsigned int pages_per_minute_struct = ((ppm_underlying_module & 0xFF) << 12) | (ppm_pages & 0x00FFF);
 				
-				swprintf(password_string, L"%x-%x-4-%x-%x-%d", password_hash, pages_per_minute_struct, customer_number, key_number, module.id);
+				swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%x-4-%x-%x-%d", password_hash, pages_per_minute_struct, customer_number, key_number, module.id);
 				
 				password_generated = true;
 			}
@@ -1813,7 +2176,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 			else
 			{
 				password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+				swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 				password_generated = true;
 			}
 			break;
@@ -1827,7 +2190,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 			if (module.id<=4)
 			{
 				password_hash = GetSolsearcherModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+				swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 				password_generated = true;
 			}
 			break;
@@ -1837,7 +2200,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		{
 			// for spd modules (all modules are currently legacy spd style modules)
 			password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+			swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 			password_generated = true;
 			break;
 		}
@@ -1847,7 +2210,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 	if (!password_generated)
 	{
 		password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-		swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+		swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 	}
 	
 	*password = SysAllocString(password_string);
@@ -1886,7 +2249,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 				if (module.id==128)
 				{
 					password_hash = GetSPDOutputPassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)license_count);
-					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+					swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 					password_generated = true;
 				}
 				// if the module is a pages per minute module (andt he product is an spd or spd derivative)
@@ -1927,7 +2290,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 					
 					unsigned int pages_per_minute_struct = ((ppm_underlying_module & 0xFF) << 12) | (ppm_pages & 0x00FFF);
 					
-					swprintf(password_string, L"%x-%x-4-%x-%x-%d", password_hash, pages_per_minute_struct, customer_number, key_number, module.id);
+					swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%x-4-%x-%x-%d", password_hash, pages_per_minute_struct, customer_number, key_number, module.id);
 					
 					password_generated = true;
 				}
@@ -1935,7 +2298,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 				else
 				{
 					password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+					swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 					password_generated = true;
 				}
 				break;
@@ -1949,7 +2312,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 				if (module.id<=4)
 				{
 					password_hash = GetSolsearcherModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-					swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+					swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 					password_generated = true;
 				}
 				break;
@@ -1959,7 +2322,7 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 			{
 				// for spd modules (all modules are currently legacy spd style modules)
 				password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
+				swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count+1, customer_number, key_number, module.id);
 				password_generated = true;
 				break;
 			}
@@ -1972,12 +2335,12 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		if(password_number == 0)
 		{
 			password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+			swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
 		}
 		else
 		{
 			password_hash = GetModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count, (unsigned int)password_number);
-			swprintf(password_string, L"%x-%d-4-%x-%x-%d-%d", password_hash, license_count, customer_number, key_number, module.id, password_number);
+			swprintf_s(password_string, sizeof(password_string)/sizeof(wchar_t), L"%x-%d-4-%x-%x-%d-%d", password_hash, license_count, customer_number, key_number, module.id, password_number);
 		}
 	}
 	
@@ -1991,7 +2354,7 @@ unsigned short ProtectionKey::ReadCellPhysical(unsigned short cell)
 {
 	HRESULT hr = S_OK;
 	unsigned short value;
-	hr = m_driver->ReadCell(m_keyident, cell, &value);
+	hr = m_driver->ReadCell(m_physicalKeyIdent, cell, &value);
 	if (FAILED(hr))
 		throw _com_error(hr);
 	return value;
@@ -2000,7 +2363,7 @@ unsigned short ProtectionKey::ReadCellPhysical(unsigned short cell)
 void ProtectionKey::WriteCellPhysical(unsigned short cell, unsigned short value)
 {
 	HRESULT hr = S_OK;
-	hr = m_driver->WriteCell(m_keyident, cell, value);
+	hr = m_driver->WriteCell(m_physicalKeyIdent, cell, value);
 	if (FAILED(hr))
 		throw _com_error(hr);
 	
@@ -2010,7 +2373,7 @@ void ProtectionKey::WriteCellPhysical(unsigned short cell, unsigned short value)
 void ProtectionKey::FormatCellPhysical(unsigned short cell)
 {
 	HRESULT hr = S_OK;
-	hr = m_driver->FormatCell(m_keyident, cell);
+	hr = m_driver->FormatCell(m_physicalKeyIdent, cell);
 	if (FAILED(hr))
 		throw _com_error(hr);
 	
@@ -2174,11 +2537,11 @@ void ProtectionKey::WriteLicense(unsigned int id, unsigned int value)
 		WriteBitsPhysical(module.offset, module.bits, _variant_t(module.fn_write(value)));
 }
 
-HRESULT ProtectionKey::WriteLicenseDecrementCounter(wchar_t* id, unsigned int value)
+HRESULT ProtectionKey::WriteLicenseDecrementCounter(BSTR license_id, wchar_t* id, unsigned int value)
 {
 	HRESULT hr(S_OK);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	if(module.isCounter && !LicenseIsUnlimited(id))
+	if(module.isCounter && !LicenseIsUnlimited(license_id, id))
 	{
 		long writeValue = module.fn_write(module.fn_read(ReadModuleCache(id).ulVal) - value) + ((value % module.fn_read(1)) > 0 ? 1 : 0);
 		if(module.fn_read(ReadModuleCache(id).ulVal) >= value)
@@ -2190,11 +2553,11 @@ HRESULT ProtectionKey::WriteLicenseDecrementCounter(wchar_t* id, unsigned int va
 		hr = E_INVALIDARG;
 	return hr;
 }
-HRESULT ProtectionKey::WriteLicenseDecrementCounter(unsigned int id, unsigned int value)
+HRESULT ProtectionKey::WriteLicenseDecrementCounter(BSTR license_id, unsigned int id, unsigned int value)
 {
 	HRESULT hr(S_OK);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	if(module.isCounter && !LicenseIsUnlimited(id))
+	if(module.isCounter && !LicenseIsUnlimited(license_id, id))
 	{
 		long writeValue = module.fn_write(module.fn_read(ReadModuleCache(id).ulVal) - value) + ((value % module.fn_read(1)) > 0 ? 1 : 0);
 		if(module.fn_read(ReadModuleCache(id).ulVal) >= value)
@@ -2209,35 +2572,33 @@ HRESULT ProtectionKey::WriteLicenseDecrementCounter(unsigned int id, unsigned in
 
 
 // License information helpers
-bool ProtectionKey::LicenseIsUnlimited(wchar_t* id)
+bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, wchar_t* id)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	
-	// not a pooled license
+	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	if (!LicenseIsPooled(id))
 	{
-		return (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)));
+		return module_unlimited_list[module.id] && module.fn_read(ReadModuleCache(id).ulVal) > 0;
 	}
 	else
 	{
-		KeySpec::Module &pool(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module.pool]);
-		return (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)) && pool.isUnlimited(module.fn_read(ReadModuleCache(pool.id).ulVal)));
+		return module_unlimited_list[module.id] && module.fn_read(ReadModuleCache(id).ulVal) > 0
+			&& module_unlimited_list[module.pool] && module.fn_read(ReadModuleCache(module.pool).ulVal) > 0;
 	}
 }
 
-bool ProtectionKey::LicenseIsUnlimited(unsigned int id)
+bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, unsigned int id)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
-	
-	// not a pooled license
+	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	if (!LicenseIsPooled(id))
 	{
-		return (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)));
+		return module_unlimited_list[module.id] && module.fn_read(ReadModuleCache(id).ulVal) > 0;
 	}
 	else
 	{
-		KeySpec::Module &pool(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module.pool]);
-		return (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)) && pool.isUnlimited(module.fn_read(ReadModuleCache(pool.id).ulVal)));
+		return module_unlimited_list[module.id] && module.fn_read(ReadModuleCache(id).ulVal) > 0
+			&& module_unlimited_list[module.pool] && module.fn_read(ReadModuleCache(module.pool).ulVal) > 0;
 	}
 }
 
@@ -2253,12 +2614,12 @@ bool ProtectionKey::LicenseIsPooled(unsigned int id)
 	return (module.pool!=0);
 }
 
-unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
+unsigned int ProtectionKey::LicenseEffectiveValue(BSTR license_id, wchar_t* id)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	
 	// assumes that 2 billion is much greater than valid license values
-	if (LicenseIsUnlimited(id))
+	if (LicenseIsUnlimited(license_id, id))
 	{
 		return 0x7FFFFFFF;
 	}
@@ -2272,7 +2633,8 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 			// at unlimited in order to participate in the pool
 			if (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)))
 			{
-				return LicenseEffectiveValue(pool.id);
+				return ReadModuleCache(pool.id).ulVal;
+				//return LicenseEffectiveValue(pool.id);
 			}
 			else
 			{
@@ -2281,10 +2643,6 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 		}
 		else if(module.isCounter)
 		{
-			//if(module.id == 10)
-			//	return module.fn_read(65536) - module.counter;
-			//else
-
 			// module.counter is not tied to a key on purpose, the only side effect
 			// is that if you have multiple keys attached to a system, then -module.counter
 			// is applied to all keys.
@@ -2297,12 +2655,12 @@ unsigned int ProtectionKey::LicenseEffectiveValue(wchar_t* id)
 	}
 }
 
-unsigned int ProtectionKey::LicenseEffectiveValue(unsigned int id)
+unsigned int ProtectionKey::LicenseEffectiveValue(BSTR license_id, unsigned int id)
 {
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	
 	// assumes that 2 billion is much greater than valid license values
-	if (LicenseIsUnlimited(id))
+	if (LicenseIsUnlimited(license_id, id))
 	{
 		return 0x7FFFFFFF;
 	}
@@ -2316,7 +2674,7 @@ unsigned int ProtectionKey::LicenseEffectiveValue(unsigned int id)
 			// at unlimited in order to participate in the pool
 			if (module.isUnlimited(module.fn_read(ReadModuleCache(id).ulVal)))
 			{
-				return LicenseEffectiveValue(pool.id);
+				return LicenseEffectiveValue(license_id, pool.id);
 			}
 			else
 			{
@@ -2325,9 +2683,6 @@ unsigned int ProtectionKey::LicenseEffectiveValue(unsigned int id)
 		}
 		else if(module.isCounter)
 		{
-			//if(module.id == 10)
-			//	return module.fn_read(65536) - module.counter;
-			//else
 			return module.fn_read(ReadModuleCache(id).ulVal) - module.counter;
 		}
 		else
@@ -2431,7 +2786,7 @@ DWORD ProtectionKey::GetPassword(DWORD query)
 		query_string[i] = BYTE(BYTE(query>>j) & 0xFF);
 	
 	KeySpec::Header &header(m_keyspec->headers[L"Secondary Descriptor"]);
-	hr = m_driver->Query(m_keyident, header.offset >> 4, query_string, &(password.ulVal), sizeof(password.ulVal));
+	hr = m_driver->Query(m_physicalKeyIdent, header.offset >> 4, query_string, &(password.ulVal), sizeof(password.ulVal));
 	if (FAILED(hr))
 		throw _com_error(hr);
 	
