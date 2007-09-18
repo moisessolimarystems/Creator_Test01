@@ -47,6 +47,7 @@
 #define permanent_pwd	      0x8
 #define module_pwd	      0x10
 
+
 #define prod_spd_dos 	      4
 
 //values of dirty flag - specifies if information on tab needs to be updated.
@@ -66,7 +67,7 @@
 #define SORT_KEYTYPE          7
 #define SORT_STATUS           8
 #define SORT_SYSTEM           9
-
+#define SORT_APPINSTANCE           10
 
 
 // PhysicalFlag -
@@ -202,6 +203,10 @@ __published:	// IDE-managed Components
         TLabel *UserSessionLabel;
         TMenuItem *mmSPDEOperatorSessions;
         TMenuItem *mmSPDEUserSessions;
+        TMenuItem *mmApplicationInstance;
+        TGroupBox *AppInstanceGroupBox;
+        TLabel *AppInstanceLabel;
+        TEdit *AppInstanceEdit;
 	void __fastcall OnKeyRowChange(TObject *Sender);
         void __fastcall mmExtensionClick(TObject* Sender);
 	void __fastcall mmProgramClick(TObject *Sender);
@@ -255,6 +260,9 @@ __published:	// IDE-managed Components
         void __fastcall DescriptionMemoChange(TObject *Sender);
         void __fastcall mmSPDEOperatorSessionsClick(TObject *Sender);
         void __fastcall mmSPDEUserSessionsClick(TObject *Sender);
+        void __fastcall KeyFormModuleFramemmSetModuleClick(
+          TObject *Sender);
+        void __fastcall mmApplicationInstanceClick(TObject *Sender);
 
 private:
         // User declarations
@@ -265,6 +273,7 @@ private:
         static char* key_sort_type[];   // list of sort types for sql statement
         SKeyRecord* key_record;
         TDatabase* Database1;
+        TStringList* PktList;
         unsigned int dirty_tab;
         unsigned int PHYSICAL_FLAG;
         unsigned short tmp_modules[TOTAL_MODULE_CELLS];
@@ -293,6 +302,7 @@ private:
         void TabDataOnChange(bool);
         void setOperatorSessionUnitsDisplay(unsigned short units);
         void setUserSessionUnitsDisplay(unsigned short units);
+        void setApplicationInstanceUnitsDisplay(unsigned short units);
 
         //
         // Search functions
@@ -308,7 +318,10 @@ public:
         //constructor(s) and destructor(s)
         __fastcall TFCustomerKeys(TComponent* Owner):TForm(Owner){}
         __fastcall TFCustomerKeys(TComponent* Owner, AnsiString, int, int searchKey = -1 );
-        virtual __fastcall ~TFCustomerKeys(){}
+        virtual __fastcall ~TFCustomerKeys(){
+                                              delete PktList;
+                                              delete key_record;
+                                            }
 
         //
         // Member variables
@@ -320,6 +333,8 @@ public:
         String productStatus;
         String versionStatus;
 
+
+
         //
         // Password Functions
         void createExtensionPassword(unsigned short days);
@@ -328,13 +343,12 @@ public:
         void createOperatorSessionPassword(int operator_sessions);
         void createUserSessionPassword(int user_sessions);
         void createVersionPassword(unsigned short version);
+        void createAppInstancePassword(unsigned short appInstances, ushort password_number);
         void modulePasswordCreated();
-        void createBusTagInPassword(int output_units);
-        void createBusTagOutPassword(int output_units);
-        void createParallelInPassword(int output_units);
-        void createParallelOutPassword(int output_units);
-        void createSCSIOutPassword(int output_units);
-        void createPSInterpPassword(int output_units);
+
+        //Packet Functions
+        void createExtensionPackets(unsigned short days);
+        void createPasswordPackets(unsigned short days);
 
         void createConcurrentUsersPassword(unsigned short units_licensed);
         void createIndexServersPassword(unsigned short units_licensed);
