@@ -39,6 +39,9 @@ const char* ProtectionKey::KDPasswordText[] =
    "1095 days/3000 hrs - MYTL",  // 23
    "1460 days/4000 hrs - MYTL",  // 24
    "1825 days/5000 hrs - MYTL",  // 25
+   "30 days/750 hrs - DL",       // 26  Element #26-28 are additional Development License
+   "90 days/2250 hrs - DL",      // 27
+   "180 days/4500 hrs - DL",     // 28
 
 };
 /* KDPasswordDays[]
@@ -71,6 +74,9 @@ const unsigned short ProtectionKey::KDPasswordDays[] =
    1095, // 23
    1460, // 24
    1825, // 25
+   30,      // 26 Element #26-#28 are additional Development License
+   90,      // 27
+   180,     // 28
 };
 
 /* KDPasswordHours[]
@@ -103,6 +109,9 @@ const unsigned short ProtectionKey::KDPasswordHours[] =
    3000,  	// 23
    4000,   	// 24
    5000, 	// 25
+   750,  	// 26
+   2250,   	// 27
+   4500, 	// 28
 };
 
 const BYTE ProtectionKey::predefined_queries[8][5] = 
