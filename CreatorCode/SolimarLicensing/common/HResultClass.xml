@@ -80,7 +80,13 @@
 		<HResult name="EHR_KEY_NO_SUITABLE_KEY"     ecode="EC_KEY_NO_SUITABLE_KEY"		value="16" alias="No suitable key found (Key server)"/>
 		<HResult name="EHR_KEY_LOCKED"				ecode="EC_KEY_LOCKED"				value="17" alias="Key locked (Key server)"/>
 		<HResult name="EHR_CLIENT_TIMEOUT"          ecode="EC_CLIENT_TIMEOUT"			value="18" alias="Client timeout (Key server)"/>
-		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>		
+		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>
+		<HResult name="EHR_KEY_BASE_NOT_MATCHING"	ecode="EC_KEY_BASE_NOT_MATCHING"	value="20" alias="Base Keys do not match module for module, all keys on this server will be ignored (Key server)"/>
+		<HResult name="EHR_KEY_NOT_MATCHING_INSTANCES" ecode="EC_KEY_NOT_MATCHING_INSTANCES"			value="21" alias="Keys do not match by Application Instances for all the Key on the server, all keys on this server will be ignored (Key server)"/>
+		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Unable to obtain an Application Instances on the server, all keys on this server will be ignored (Key server)"/>
+		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Unable to locate a Base Key on the server, all keys on this server will be ignored (Key server)"/>
+		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the Key Server has been restored (Key server)"/>
+		<HResult name="EHR_KEY_USE_BACKUP_KEY_SERVER"	ecode="EC_KEY_USE_BACKUP_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"/>
 	</HResultType>
 	<!--	-->
 	<!-- HResults with offset ITF_CR_APP_MIN -->

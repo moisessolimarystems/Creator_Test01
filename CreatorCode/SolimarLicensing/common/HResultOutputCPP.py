@@ -47,7 +47,7 @@ class HResultOutputCPP(AttribsOutput):
                     class_text += '\n'
                     for hresult_group in ordered_hresults.values():
                         if(i < len(ordered_hresults)-1):
-        		    class_text += "\t{%s,\t\t\t\t\t\t%s,\t\t\t\t\t\tL\"%s\"),\n" % (hresult_group['ecode'], hresult_group['name'],hresult_group['alias'])
+        		    class_text += "\t{%s,\t\t\t\t\t\t%s,\t\t\t\t\t\tL\"%s\"},\n" % (hresult_group['ecode'], hresult_group['name'],hresult_group['alias'])
                             i+=1
 
                 class_text += '};\n'
@@ -67,7 +67,7 @@ class HResultOutputCPP(AttribsOutput):
                 class_text += '\t\t\tNULL,                 // no user security identifier\n'
                 class_text += '\t\t\t1,                    // one substitution string\n'
                 class_text += '\t\t\t0,                    // no data\n'
-                class_text += '\t\t\t{LPCWSTR*)&event_log_msg,       // pointer to string array\n'
+                class_text += '\t\t\t(LPCWSTR*)&event_log_msg,       // pointer to string array\n'
                 class_text += '\t\t\tNULL))                // pointer to data\n'
                 class_text += '\t\thr = HRESULT_FROM_WIN32(GetLastError());\n\n'
                 class_text += '\tDeregisterEventSource(h);\n\n'
@@ -76,7 +76,7 @@ class HResultOutputCPP(AttribsOutput):
                 #function: HRESULT WriteEventLog                
                 class_text += 'std::wstring GetErrorMessage(HRESULT hr)\n{\n'
                 class_text += '\twchar_t hrErrMsg[256];\n'
-                class_text += '\tswprintf(hrErrMsg, L" [0x%08X]", hr);\n'
+                class_text += '\tswprintf_s(hrErrMsg, sizeof(hrErrMsg)/sizeof(wchar_t), L" [0x%08X]", hr);\n'
                 class_text += '\tstd::wstring retVal(L"Unknown Error");\n\n'
                 class_text += '\tif(SL_IS_LIC_HR(hr))\n\t{\n'
                 class_text += '\t\t//Detect a Solimar License error\n\t\tretVal = GetECMessage(SL_EC_FROM_EHR(hr));\n\t}\n'
@@ -117,7 +117,7 @@ class HResultOutputCPP(AttribsOutput):
                 class_text += '\tfor (int i=0; i<SL_ERROR_COUNT; i++) {\n'
                 class_text += '\t\tif (SLErrors[i].EC == ec)\n'
                 class_text += '\t\t\treturn std::wstring(SLErrors[i].message);\n\t}\n'
-                class_text += '\treturn std::wstring(SLErrors[i].message);\n}\n'
+                class_text += '\treturn std::wstring(SLErrors[0].message); //Unknown\n}\n'
 
                 #close class
                 class_text += '};'
