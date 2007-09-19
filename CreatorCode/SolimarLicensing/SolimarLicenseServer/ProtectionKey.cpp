@@ -383,6 +383,8 @@ HRESULT ProtectionKey::Release(BSTR license_id)
 }
 
 
+
+//Calls IsPresent(), IsProgrammed() & IsActive()
 HRESULT ProtectionKey::ValidateLicense(BSTR license_id, VARIANT_BOOL *license_valid)
 {
 	HRESULT hr = S_OK;

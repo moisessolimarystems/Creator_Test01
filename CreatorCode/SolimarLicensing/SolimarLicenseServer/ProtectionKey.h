@@ -72,7 +72,8 @@ public:
 	HRESULT Obtain(BSTR license_id);
 	HRESULT Release(BSTR license_id);
 	
-	HRESULT ValidateLicense(BSTR license_id, VARIANT_BOOL *license_valid);
+   
+	HRESULT ValidateLicense(BSTR license_id, VARIANT_BOOL *license_valid);  //Calls IsPresent(), IsProgrammed() & IsActive()
 	HRESULT ModuleEnumerate(VARIANT *pvtModuleList);
 	HRESULT ModuleQuery(long module_ident, VARIANT *vtValue);
 	//Results based on the license_id.
