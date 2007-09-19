@@ -45,7 +45,7 @@ class HResultOutputH(AttribsOutput):
                     else:
 			class_text += '\tconst unsigned long %s = %s+%s\n' % (offset['name'],offset['base'],offset['value'])
 
-                class_text += '\n#ifndef SP_ACC_DENIED\t//RAINBOW API Error Codes\n'
+                class_text += '\n#ifndef SP_ACCESS_DENIED\t//RAINBOW API Error Codes\n'
 
 		# Rainbow Error Codes
 		for rnbo in OutputOrderDictionaryValues(hresults_class['rnbos']):  
