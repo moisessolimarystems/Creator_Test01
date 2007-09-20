@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 #define MAX_KEY_DESCRIPTION         30
 #define MAX_COMPANY_NAME_LENGTH     50
-#define KD_PASSWORD_MAX             25
+#define KD_PASSWORD_MAX             28
 #include <list>
 
 class SKeyRecord;

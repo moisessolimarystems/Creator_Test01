@@ -144,7 +144,7 @@ const ushort DEVELOPER_ID = 0xFEA8;
 #define SECONDS_PER_HOUR         3600
 #define SECONDS_PER_DAY          86400L
 #define TWO_HRS                  7200L
-#define PASSWORD_INDEX           25
+#define PASSWORD_INDEX           28
 
 //IDs that are used for the license server
 const long ProductID = 10021;
