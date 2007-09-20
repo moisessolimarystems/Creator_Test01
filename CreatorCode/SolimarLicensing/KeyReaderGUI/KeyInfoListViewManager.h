@@ -17,10 +17,11 @@ namespace KeyViewManager
 	__gc class KeyInfoListViewManager
 	{
 	public:
-		KeyInfoListViewManager(ListView* KeyInfoListView);
+		KeyInfoListViewManager(CommunicationLink* CommLink, ListView* KeyInfoListView);
 		~KeyInfoListViewManager();
 		bool PopulateView();
 		bool Connect();
+		bool Disconnect();
 
 	private:
 		bool FillRow(KeyInfoStructure TheKeyInfoStructure);
@@ -32,6 +33,10 @@ namespace KeyViewManager
 		//maps the status id returned from the lower layer app
 		//to the corresponding license as described in status.txt
 		char* MapLicenseID(int* pLicenseID);
+
+		//maps the key type id returned from the lower layer app
+		//to the corresponding license as described in status.txt
+		char*MapKeyTypeID(int* pKeyTypeID);
 
 		String* UnicodeStrToString(String* unicode);
 
