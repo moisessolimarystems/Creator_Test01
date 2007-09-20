@@ -32,6 +32,7 @@ class SolScriptProtectionKey : public SpdProtectionKey
 {
 public:
    SolScriptProtectionKey() : SpdProtectionKey() {}
+   ~SolScriptProtectionKey() {}
    SolScriptProtectionKey(const SolScriptProtectionKey& pkey) : SpdProtectionKey(pkey) {}
 
 protected:

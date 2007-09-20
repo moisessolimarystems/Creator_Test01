@@ -4,7 +4,7 @@ Class CProductBuild
     Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo, mVersionNum
     Private mLockedPJFile, mLockedFile  'had to put these here instead of in MKS class b/c there should be only 1 instance of these
     Private mLogFileName, mInputFile
-    Public mNewBuild, mErrCount, mBuildPath
+    Public mNewBuild, mErrCount, mBuildPath, mEngBuild
 
     Public Sub Class_Initialize() 'set default values
         Set mShell = wscript.CreateObject("Wscript.Shell")
@@ -12,10 +12,11 @@ Class CProductBuild
         Set mBuildDialog = wscript.CreateObject("BuildDialog.BuildDialogB6", "BuildDiag_")
         Set mProjPaths = New CProjectPaths
         mDebug = "N"
+        mEngBuild = "N"
         mNewBuild = Null
         mRelease = Null
         mStartTime = Time
- 		mErrcount = 0
+ 	mErrcount = 0
         
 	Err.Clear
 	If mFSO.FileExists("..\Done.txt") = True Then
@@ -75,6 +76,9 @@ Class CProductBuild
     '* -EDP   mExistingDevPath    Existing Development Path to use
     '* -SE    mIgnoreMsgBox       Y or N for suppressing all messageboxes
     '* -DB    mDebug              Y or N switch for debug in product scripts
+    '* -LB    mLastBuild          
+    '* -LIC   licenseVersion      version of solimar licensing to use 
+    '* -EB    mEngBuild           Y or N Engineering Build
     '***************************************************************************************************
     Public Sub GetParams()
 
@@ -85,29 +89,31 @@ Class CProductBuild
 
                Select Case wscript.Arguments(iParam)
                     Case "-BT"
-					  mBuildType = wscript.Arguments(iParam + 1)
+				        mBuildType = wscript.Arguments(iParam + 1)
                     Case "-MPP"
-				      mProjPaths.SetMainProjPath wscript.Arguments(iParam + 1)
+				        mProjPaths.SetMainProjPath wscript.Arguments(iParam + 1)
                     Case "-PL"
-				      mPrevLabel = wscript.Arguments(iParam + 1)
+				        mPrevLabel = wscript.Arguments(iParam + 1)
                     Case "-NNV"
-					  mNewNextVersion = wscript.Arguments(iParam + 1)
+					mNewNextVersion = wscript.Arguments(iParam + 1)
                     Case "-NDP"
-					  mNewDevPath = wscript.Arguments(iParam + 1)
+					mNewDevPath = wscript.Arguments(iParam + 1)
                     Case "-CBT"
-					  CodeBuildType = wscript.Arguments(iParam + 1)
+					CodeBuildType = wscript.Arguments(iParam + 1)
                     Case "-EDP"
-					   ExistingDevPath = wscript.Arguments(iParam + 1)
+				        ExistingDevPath = wscript.Arguments(iParam + 1)
                     Case "-VN"
-					   mVersionNum = wscript.Arguments(iParam + 1)
+					mVersionNum = wscript.Arguments(iParam + 1)
                     Case "-SE"
-					  mIgnoreMsgBox = wscript.Arguments(iParam + 1)
+					mIgnoreMsgBox = wscript.Arguments(iParam + 1)
                     Case "-DB"
-					   mDebug = wscript.Arguments(iParam + 1)
+				        mDebug = wscript.Arguments(iParam + 1)
                     Case "-LB"
-					    mLastBuild = wscript.Arguments(iParam + 1)
-					Case "-LIC"
-						licenseVersion = wscript.Arguments(iParam + 1)
+					mLastBuild = wscript.Arguments(iParam + 1)
+		    Case "-LIC"
+					licenseVersion = wscript.Arguments(iParam + 1)	
+		    Case "-EB"	
+					mEngBuild = wscript.Arguments(iParam + 1)
                End Select
             Next
 
@@ -181,6 +187,8 @@ Class CProductBuild
     End Function
 
     'Accessor Methods
+
+    
   
     Function ProductDebug()
          ProductDebug = mDebug
@@ -192,7 +200,7 @@ Class CProductBuild
 
     Public Property Get FSO()
             Set FSO = mFSO
-        End Property
+    End Property
 
     Public Property Get Shell()
             Set Shell = mShell
@@ -212,7 +220,11 @@ Class CProductBuild
 
     Public Property Get BuildType()
             BuildType = mBuildType
-        End Property
+    End Property
+
+    Public Property Get EngOption()
+	EngOption = mEngBuild
+    End Property
 
     Public Property Get PrevLabel()
             PrevLabel = mPrevLabel
@@ -568,7 +580,7 @@ Class CProductBuild
                 Do While Not readFile.AtEndOfStream
                         Line = RTrim(readFile.ReadLine)
                         If InStr(Line, patternKey) <> 0 Then
-                            writeFile.writeLine Left(Line, Len(Line) - Len(newPattern)) & newPattern
+                            writeFile.writeLine Left(Line, (InStr(Line,patternKey) + Len(patternKey))-1) & newPattern
                         Else
                             writeFile.writeLine Line
                         End If
@@ -685,16 +697,16 @@ Class CProductBuild
                 RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*.use"
                 RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*.use"
                 RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*\*.use"
-                WriteToDlgAndFile "Removing Lib Files from: " & InstallSrcPath
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*.lib"
-                RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*\*.lib"
+                'WriteToDlgAndFile "Removing Lib Files from: " & InstallSrcPath
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*.lib"
+                'RunCmd "rm -R -f " & Chr(34) & InstallSrcPath & Chr(34) & "\*\*\*\*\*\*\*\*\*.lib"
 		WriteToDlgAndFile "Removing PJ Files from: " & ImageDirPath
 		RunCmd "rm -R -f " & Chr(34) & ImageDirPath & Chr(34) & "\*.pj"
                 RunCmd "rm -R -f " & Chr(34) & ImageDirPath & Chr(34) & "\*\*.pj"
@@ -1107,7 +1119,7 @@ Class CProductBuild
 					& "should make their current development sandboxes for " & oldDevPath & ". The new Next Version is "     & vbNewLine _
 				  	& newDevPath & " which is now the main trunk. " & vbNewLine _
 					& "	   " & "I have an additional comment regarding the " & oldDevPath & " release. When we made "    & vbNewLine _
-					& "the " & oldDevPath & " development path we branched off the " & PrevLabel & "label. This means that " & vbNewLine _
+					& "the " & oldDevPath & " development path we branched off the " & PrevLabel & " label. This means that " & vbNewLine _
 					& "if you checked any files into " & oldDevPath & " after build " & PrevLabel & " your changes did not " & vbNewLine _
 					& "actually make it into the " & oldDevPath & " branch and need to be merged into " & newDevPath & "."   & vbNewLine _
 					& "Please double check your changes for any files may need to be merged." _
@@ -1116,10 +1128,10 @@ Class CProductBuild
 	Function GetEmailSubject()
 		Dim oldDevPath, newDevPath 
 		oldDevPath = GetBuildVersion(ProductName & "CurrentVersion")
-		GetEmailSubject = ProductName & oldDevPath & " release and your sandboxes." 
+		GetEmailSubject = ProductName & " " & oldDevPath & " release and your sandboxes." 
 	End Function
 	
-    Function SendEmail()
+    Function SendEmail(aSubject,aMsg)
            WriteToDlgAndFile "Sending the email"
             Dim oSMTP
             Set oSMTP = wscript.CreateObject("SoftArtisans.SMTPMail") 'SMTPControl.SMTP")
@@ -1128,12 +1140,16 @@ Class CProductBuild
             Err.Clear    
              With oSMTP
              .RemoteHost = "mail.corp.solimarsystems.com"
-             .MailFromAddress = "achou@solimarsystems.com"
-             .FromName = "achou@solimarsystems.com"
-             .AddRecipient "achou@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
-             .Charset = 1
-             .Subject = GetEmailSubject
-             .BodyText = GetEmailBody
+             .MailFromAddress = "alan.chou@solimarsystems.com"
+             .FromName = "alan.chou@solimarsystems.com"
+	     If mBuildType <> "CB" Then
+             	.AddRecipient "Tech.Support.Internal@SolimarSystems.com" 
+	     End If
+  	     .AddRecipient "Engineering@SolimarSystems.com"
+	     .AddCC "alan.chou@solimarsystems.com" 
+	     .Charset = 1
+             .Subject = aSubject
+             .BodyText = aMsg
              .SendMail
              End With
             

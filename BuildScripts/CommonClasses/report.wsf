@@ -19,7 +19,7 @@
   g_Report.SetConnection g_Access
   
   SetProjPaths
-  g_Report.SetStartLabel
+  g_Report.SetLabels
   If g_Report.PopDataBase <> "N" Then
     g_Report.PopulateDataBase g_Access
   End If

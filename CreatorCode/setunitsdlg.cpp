@@ -18,21 +18,30 @@ __fastcall TUnitsDlg::TUnitsDlg(TComponent* AOwner, unsigned int max)
    char maxString[32];
    sprintf(maxString, "%d\0", m_MaxUnits);
    Edit1->MaxLength = strlen(maxString);
-   m_MinUnits = 0;
+   m_MinUnits = 1;
 }
 //---------------------------------------------------------------------
 void __fastcall TUnitsDlg::OkBtnClick(TObject *Sender)
 {
+   AnsiString WarnMsg("");
    try {
       m_Units = Edit1->Text.ToInt();
+
       if (m_Units > m_MaxUnits) {
-   	   //Application->MessageBox("Invalid Number of Units"/*message*/ , "Information", MB_OK|MB_ICONWARNING );
+         Application->MessageBox("Invalid Number of Units" , "Information", MB_OK|MB_ICONWARNING );
          Edit1->Text = m_MaxUnits;
+         Edit1->SetFocus();
+      }
+      else if((m_Units%m_MinUnits) != 0) {       //checks if units are acceptable
+         Application->MessageBox(WarnMsg.sprintf("Number of Units Must Be a Multiple of %i.", m_MinUnits).c_str() , "Information", MB_OK|MB_ICONWARNING );
+         if(m_Units < m_MinUnits)                //set units to minimum
+            Edit1->Text = m_MinUnits;
+         else                                    //set units to a valid number(last valid number)
+            Edit1->Text = m_Units - (m_Units%m_MinUnits);
          Edit1->SetFocus();
       }
       else
          ModalResult = mrYes;
-
    }
    catch (...) {
       //invalid entry

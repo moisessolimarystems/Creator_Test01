@@ -14,6 +14,9 @@ Class CMoveFiles
 
     Public Property Set Build(ByRef aBuild) 
         Set mBuild = aBuild
+	If aBuild.EngOption <> "N" Then
+		mNetworkBasePath = "L:\cd_images\Engineering Builds\"
+	End If
     End Property
 
     Public Property Get NetworkBasePath()
@@ -30,14 +33,10 @@ Class CMoveFiles
 		Dim DestPath, tempDestPath
 		tempDestPath =  GetOutputPath + aDestFolder + "\Temp"
         DestPath = GetOutputPath + aDestFolder + "\" + aDestFolderName
-	mBuild.WriteToDlgAndFile "Copying CD image files to the network" 
-        If mBuild.FSO.FolderExists(DestPath) Then 
-			DeleteFileOrFolder "Folder", DestPath, True
-	End If
+		mBuild.WriteToDlgAndFile "Copying CD image files to the network" 
         mBuild.WriteToDlgAndFile "Creating: " & tempDestPath
-        'mBuild.FSO.CreateFolder tempDestPath   
-	CreateFileOrFolder "Folder", tempDestPath, True 
-	Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
+		CreateFileOrFolder "Folder", tempDestPath, True 
+		Set Folder1 = mBuild.FSO.GetFolder(mBuild.ImageDirPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
             CopyFileOrFolder "Folder", mBuild.ImageDirPath & "\*", tempDestPath & "\", True
@@ -46,9 +45,11 @@ Class CMoveFiles
         If Files1.Count <> 0 Then
             CopyFileOrFolder "File", mBuild.ImageDirPath & "\*", tempDestPath & "\", True
         End If
-	'mBuild.FSO.CreateFolder DestPath
-	CreateFileOrFolder "Folder", DestPath, True
-	Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
+        If mBuild.FSO.FolderExists(DestPath) Then 
+			DeleteFileOrFolder "Folder", DestPath, True
+		End If
+		CreateFileOrFolder "Folder", DestPath, True
+		Set Folder1 = mBuild.FSO.GetFolder(tempDestPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
 			MoveFileOrFolder "Folder", tempDestPath & "\*", DestPath & "\"
@@ -80,6 +81,34 @@ Class CMoveFiles
         End If
     End Sub
 
+	Function MakeDir (strPath)
+		Dim strParentPath
+		Err.Clear
+		On Error Resume Next		
+		strParentPath = mBuild.FSO.GetParentFolderName(strPath)
+		If Not mBuild.FSO.FolderExists(strParentPath) Then MakeDir strParentPath
+		If Not mBuild.FSO.FolderExists(strPath) Then mBuild.FSO.CreateFolder strPath
+		If Err Then
+		    mBuild.BuildError "Error attempting to create " + strPath
+		    mBuild.WriteToDlgAndfile Err.Description
+		End If
+		MakeDir = mBuild.FSO.FolderExists(strPath)
+	End Function
+    
+    Sub DeleteFolderContents(aFolderPath)
+        Dim Folder, SubFolders, Files
+		Set Folder = mBuild.FSO.GetFolder(aFolderPath)
+        Set SubFolders = Folder.SubFolders
+		For Each f1 in SubFolders	 
+			DeleteFileOrFolder "Folder", f1, True 
+		Next
+
+        Set Files = Folder.Files
+		For Each f1 in Files	 
+            DeleteFileOrFolder "File", f1, True 
+		Next
+    End Sub
+
     Private Function GetOutputPath()
 		If mBuild.BuildType = "R" Then    'Release
 		    GetOutputPath = mNetworkBasePath & "CurrentVersion\release\"  
@@ -96,32 +125,34 @@ Class CMoveFiles
 
     Public Function DeleteFileOrFolder(aDeleteType, aPath, aOverride)
         mBuild.WriteToDlgAndFile "Deleting: " & aPath
-	    Err.Clear
-	    On Error Resume Next
+		Err.Clear
+		On Error Resume Next
         If aDeleteType = "File" Then
             mBuild.FSO.DeleteFile aPath, aOverride
 		Else 
-	        mBuild.FSO.DeleteFolder aPath, aOverride  'remove contents of the folder
+			mBuild.FSO.DeleteFolder aPath, aOverride  'remove contents of the folder
 		End If
-	    If Err Then
-		    mBuild.BuildError "Error attempting to delete " + aDeleteType + ": " + aPath
-		    mBuild.WriteToDlgAndfile Err.Description
-	    End If
+		If Err Then
+			mBuild.BuildError "Error attempting to delete " + aDeleteType + ": " + aPath
+			mBuild.WriteToDlgAndfile Err.Description
+		End If
     End Function
 
     Public Function CreateFileOrFolder(aCreateType, aPath, aOverride)
+        Dim retVal
+        retVal = True
         mBuild.WriteToDlgAndFile "Creating: " & aPath
 	    Err.Clear
 	    On Error Resume Next
         If aCreateType = "File" Then
 	        mBuild.FSO.CreateTextFile aPath, aOverride
-	Else 
-	        mBuild.FSO.CreateFolder aPath  'remove contents of the folder
-	End If
-	If Err Then
+		Else 
+	        retVal = MakeDir(aPath)  'remove contents of the folder
+		End If
+		If Err Or retVal = False Then
 		    mBuild.BuildError "Error attempting to create " + aCreateType + ": " + aPath
 		    mBuild.WriteToDlgAndfile Err.Description
-	End If
+		End If
     End Function	
 
     'Had to put the copying of files and folders into a seperate function so On Error Resume Next would be isolated
@@ -204,6 +235,25 @@ Class CMoveFiles
 		Next
     End Sub
 
+    '=================================================================================
+    ' Function    : MoveCDImageFTPToNetwork
+    ' Parameters  : aDestFolder - product name
+    '               aDestFolderName - product version number 
+    '               aFileName - ftp executable name
+    ' Description : Copies built ftp from build directory to network          
+    '      	    
+    '=================================================================================	
+    Sub MoveCDImageFTPToNetwork()
+	Dim f1
+	Set Folder1 = mBuild.FSO.GetFolder(mBuild.MainProjPath + "\FTP")
+	Set Files1 = Folder1.Files
+	For Each f1 in Files1	 
+	    If InStr(f1.Name, ".exe") > 0 Then	'possibly to have multiple ftp exe
+		    CopyFileOrFolder "File", f1, GetOutPutPath & "FTP\", True  
+	    End If
+	Next
+    End Sub
+
     '===============================================================================
     ' Function    : MoveRCPathToNetwork
     ' Parameters  : aVersionNum - version number of product to look for in RC folder
@@ -213,17 +263,17 @@ Class CMoveFiles
     '		    Copies build to release folder and ftp exe to FTP folder.	
     '===============================================================================	
     Sub MoveRCPathToNetwork(aProductName, aVersionNum)
-		Dim DestPath, SrcPath, FTPSrcPath, VersionNum, f1
-		DestPath = GetOutputPath + aProductName + "\" + Left(aVersionNum, 4)	
-		SrcPath = mReleaseCandidatePath + aProductName + "\" + aVersionNum
-		FTPSrcPath = mReleaseCandidatePath & aProductName  
-		If mBuild.FSO.FolderExists(DestPath) Then 
-			DeleteFileOrFolder "Folder", DestPath, True
-		End If
-		mBuild.WriteToDlgAndFile "Creating: " & DestPath
+	Dim DestPath, SrcPath, FTPSrcPath, VersionNum, f1
+	DestPath = GetOutputPath + aProductName + "\" + Left(aVersionNum, 4)	
+	SrcPath = mReleaseCandidatePath + aProductName + "\" + aVersionNum
+	FTPSrcPath = mReleaseCandidatePath & aProductName  
+	If mBuild.FSO.FolderExists(DestPath) Then 
+		DeleteFileOrFolder "Folder", DestPath, True
+	End If
+	mBuild.WriteToDlgAndFile "Creating: " & DestPath
         'mBuild.FSO.CreateFolder DestPath	
 	CreateFileOrFolder "Folder", DestPath, True
-		Set Folder1 = mBuild.FSO.GetFolder(SrcPath)
+	Set Folder1 = mBuild.FSO.GetFolder(SrcPath)
         Set SubFolders1 = Folder1.SubFolders
         If SubFolders1.Count <> 0 Then
             CopyFileOrFolder "Folder", SrcPath & "\*", DestPath & "\", True
@@ -232,14 +282,14 @@ Class CMoveFiles
         If Files1.Count <> 0 Then
             CopyFileOrFolder "File", SrcPath & "\*", DestPath & "\", True
         End If
-		VersionNum = Replace(aVersionNum, ".", "_", 1, 2, 1) 'substitute decimals for underscores
-		Set Folder1 = mBuild.FSO.GetFolder(FTPSrcPath)
-		Set Files1 = Folder1.Files
-		For Each f1 in Files1
-			If InStr(f1.Name, VersionNum) > 0 Then  'possible to have multiple ftp exe	
-				CopyFileOrFolder "File", f1, GetOutPutPath & "FTP\", True
-			End If 
-		Next
+	VersionNum = Replace(aVersionNum, ".", "_", 1, 2, 1) 'substitute decimals for underscores
+	Set Folder1 = mBuild.FSO.GetFolder(FTPSrcPath)
+	Set Files1 = Folder1.Files
+	For Each f1 in Files1
+		If InStr(f1.Name, VersionNum) > 0 Then  'possible to have multiple ftp exe	
+			CopyFileOrFolder "File", f1, GetOutPutPath & "FTP\", True
+		End If 
+	Next
     End Sub
 
     

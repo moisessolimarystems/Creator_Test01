@@ -4,8 +4,8 @@ Class CProductReport
     Private mSrcLabel, mLastBuild, mLastRelease, mBegDevPath, mLastLabel, mPopDataBase, mProject, mLastBuildLabel, mLicenseSummary 
     Private mGenTextFile, mRootProjectDir, mGenAllRelease, mProductChoice, mEmailChoice, mOneStepBldChoice, mStartLabel, mEndLabel
     Private mLogFileName, mInputFile, mksProgram, mCurrentDir, mNumPJFiles, mPJFileArray(2), mFilePathArray(2), mFileNameArray(10), fileNameCount
-    Private eReportFilesError, eEmailSendError, eCancel, mMKS , mFileNameCount			
-    Public mReportPath
+    Private eReportFilesError, eEmailSendError, eCancel, mMKS , mFileNameCount, mLicenseVersion			
+    Public mReportPath, mEngReport
           
     Public Sub Class_Initialize() 'set default values
         Set mShell = wscript.CreateObject("Wscript.Shell")
@@ -24,16 +24,18 @@ Class CProductReport
         mBegDevPath = "N"
         mLastLabel = "N"
         mGenAllRelease = "N"
-        mNumPJFiles = 1
         mOneStepBldChoice = "N"
         mEmailChoice = "B"
         mProject = 1
+        mNumPJFiles = 1
         mDebug = "N"
         mStartTime = Time
         mPopDataBase = "N"
-	mFileNameCount = 0
+		mFileNameCount = 0
+		mEngReport = "N"
+		mLicenseVersion = ""
 		
- 	Dim CurrentDir
+ 		Dim CurrentDir
         CurrentDir = mShell.CurrentDirectory
         mReportPath = mFSO.GetFolder(CurrentDir & "\\")
         If mFSO.FileExists("..\Cancelled.txt") = True Then
@@ -82,46 +84,50 @@ Class CProductReport
     Public Sub GetParams(aMKS)
         Dim iParam, CodeBuildType, ExistingDevPath, VersionNum
         WriteToDlgAndFile "Params passed into the script: "
-            For iParam = 0 To wscript.Arguments.Count - 1 Step 2
-            WriteToDlgAndFile "    " + wscript.Arguments(iParam) + " " + wscript.Arguments(iParam + 1)
-                    Select Case wscript.Arguments(iParam)
-                        Case "-PAR"
-                                mSrcLabel = wscript.Arguments(iParam + 1)
-                        Case "-LB"              'Last Build
-                                mLastBuild = wscript.Arguments(iParam + 1)
-                        Case "-LR"              'Last Build
-                                mLastRelease = wscript.Arguments(iParam + 1)
-                        Case "-BDP"             'Beginnning of Dev Path
-                                mBegDevPath = wscript.Arguments(iParam + 1)
-                        Case "-LBL"             'Specify the label
-                                mLastLabel = wscript.Arguments(iParam + 1)
-                        Case "-LBLB"            'Last Build Label
-                                mLastBuildLabel = wscript.Arguments(iParam + 1)
-                        Case "-POP"             'Populate the database
-                                mPopDataBase = wscript.Arguments(iParam + 1)
-                        Case "-CTF"             'Create Text File
-                                mGenTextFile = wscript.Arguments(iParam + 1)
-                        Case "-PTH"             'Path to the pj files
-                                mRootProjectDir = wscript.Arguments(iParam + 1)
-                        Case "-ARD"             'All Release Differences
-                                mGenAllRelease = wscript.Arguments(iParam + 1)
-                        Case "-PTC"             'Product
-                                mProductChoice = wscript.Arguments(iParam + 1)
-                        Case "-EC"              'Email choice
-                                mEmailChoice = wscript.Arguments(iParam + 1)
-                        Case "-BLD"             '1-Step Bld choice
-                                mOneStepBldChoice = wscript.Arguments(iParam + 1)
-                        Case "-SLB"               'start label
-                                mStartLabel = wscript.Arguments(iParam + 1)
-                        Case "-ELB"             'end label
-                                mEndLabel = wscript.Arguments(iParam + 1)
-                        Case "-DB"              ' debug option
-                                mDebug = wscript.Arguments(iParam + 1)
-			Case "-LS"
-				mLicenseSummary = wscript.Arguments(iParam + 1)
-                 End Select
-            Next
-	    Set mMKS = aMKS	
+        For iParam = 0 To wscript.Arguments.Count - 1 Step 2
+		    WriteToDlgAndFile "    " + wscript.Arguments(iParam) + " " + wscript.Arguments(iParam + 1)
+            Select Case wscript.Arguments(iParam)
+                Case "-PAR"
+                    mSrcLabel = wscript.Arguments(iParam + 1)
+                Case "-LB"              'Last Build
+                    mLastBuild = wscript.Arguments(iParam + 1)
+                Case "-LR"              'Last Build
+                    mLastRelease = wscript.Arguments(iParam + 1)
+                Case "-BDP"             'Beginnning of Dev Path
+                    mBegDevPath = wscript.Arguments(iParam + 1)
+                Case "-LBL"             'Specify the label
+                    mLastLabel = wscript.Arguments(iParam + 1)
+                Case "-LBLB"            'Last Build Label
+                    mLastBuildLabel = wscript.Arguments(iParam + 1)
+                Case "-POP"             'Populate the database
+                    mPopDataBase = wscript.Arguments(iParam + 1)
+                Case "-CTF"             'Create Text File
+                    mGenTextFile = wscript.Arguments(iParam + 1)
+                Case "-PTH"             'Path to the pj files
+                    mRootProjectDir = wscript.Arguments(iParam + 1)
+                Case "-ARD"             'All Release Differences
+                    mGenAllRelease = wscript.Arguments(iParam + 1)
+                Case "-PTC"             'Product
+                    mProductChoice = wscript.Arguments(iParam + 1)
+                Case "-EC"              'Email choice
+                    mEmailChoice = wscript.Arguments(iParam + 1)
+                Case "-BLD"             '1-Step Bld choice
+                    mOneStepBldChoice = wscript.Arguments(iParam + 1)
+                Case "-SLB"               'start label
+                    mStartLabel = wscript.Arguments(iParam + 1)
+                Case "-ELB"             'end label
+                    mEndLabel = wscript.Arguments(iParam + 1)
+                Case "-DB"              ' debug option
+                    mDebug = wscript.Arguments(iParam + 1)                        
+				Case "-LS"				'license summary(not used yet)
+				    LicenseSummary = wscript.Arguments(iParam + 1)
+				Case "-ER"				'Engineering Report
+				 	mEngReport = wscript.Arguments(iParam + 1)
+				Case "-LV"
+					mLicenseVersion = wscript.Arguments(iParam + 1)
+			End Select
+        Next
+	    Set mMKS = aMKS    
     End Sub
 
     Function SetProjPathsVar(aProductName, aProjectName, aProjPath, aInstallSrcArchive, aArchive, aPJFile, bPJFile, cPJFile, _
@@ -141,6 +147,10 @@ Class CProductReport
         mFilePathArray(0) = aFilePath
         mFilePathArray(1) = bFilePath
         mFilePathArray(2) = cFilePath
+        
+        If EngOption <> "N" Then
+			OutputBasePath = "L:\\cd_images\\Engineering Builds\\"  	
+        End If
     End Function
     
     'When running a command using Exec, the object returned can give misleading results for executables.
@@ -220,7 +230,7 @@ Class CProductReport
             BuildError "Error running command: " + aCmdLine & vbNewLine + "Refer to logFolder\StandardOutput.txt " + _
                        "and logFolder\StandardError.txt to see the output from the command that failed. Exit code: " + CStr(aExitCode)
         End If
-        End Function
+    End Function
 
     ' The progress bars that keeps track of time passed only takes integers so have to keep track of missed secs so its more accurate
     Function GetMinsPassed(aTimeStarted, aTimeEnded)
@@ -261,60 +271,7 @@ Class CProductReport
        hrsPassed = CInt((totalMinsPassed - minsPassed) / 60)
        getHrMinSec = CStr(hrsPassed & " Hour(s), " & minsPassed & " Mins, " & secsPassed & " Secs")
    End Function
-
-    '***************************************************************************
-    ' Function    : StripAllPrefix
-    ' Parameters  : Version - the full label/version name 
-    ' Description : Removes the prefix from the label/version name using the 
-    '               VersionPrefix property set during initialization
-    '***************************************************************************
-    Function StripAllPrefix(Version)
-		Dim pos, prefix
-		If InStr(Version, VersionPrefix) <> 0 Then
-			StripAllPrefix = Right(Version, Len(Version) - Len(VersionPrefix))
-		Else
-			For pos=1 To Len(Version)
-				If IsNumeric(Mid(Version, pos, 1)) Then
-					Exit For
-				End If
-			Next
-			StripAllPrefix = Mid(Version, pos)
-		End If
-    End Function 
-	
-    Function GetBuildVersion(aPattern)
-                Dim output, readFile, writeFile
-                Set readFile = mFSO.OpenTextFile(mInputFile)
-                Dim check, line, pos
-                check = 0
-                Do While Not readFile.AtEndOfStream And check = 0
-                        line = readFile.ReadLine
-                        If InStr(line, aPattern) <> 0 And check = 0 Then
-                                'If InStr(Version, Right(Line, Len(Line) - Len(aPattern))) = 0 Then
-                                '        UpdateFileVersion = 1
-                                'End If
-                                check = 1
-                                pos = InStr(line, " ")
-                                GetBuildVersion = Right(line, Len(line) - pos)
-                        End If
-                    
-                Loop
-                readFile.Close
-    End Function
-    
-    Function GetVersionFromFile(aFile, aPattern, aKey)
-        Dim output, readFile, writeFile, pos
-        Set readFile = mFSO.OpenTextFile(aFile)
-        Do While Not readFile.AtEndOfStream
-                line = readFile.ReadLine
-                If InStr(line, aPattern) <> 0 Then
-                        pos = InStr(line, aKey)
-                        GetVersionFromFile = Trim(Left(Right(line, Len(line) - pos), Len(Right(line, Len(line) - pos)) - 1))
-                End If
-        Loop
-        readFile.Close
-    End Function
-                     
+                        
     Function BuildError(aErrMsg)
         WriteToDlgAndFile "ERROR: " + aErrMsg
         NetSendMsg "BUILD ERROR: Refer to " + mLogFileName + " for details"
@@ -348,9 +305,9 @@ Class CProductReport
                                And Not mExecInfo.StdErr.AtEndOfStream
  
             Dim ExitCode
-                        ExitCode = mExecInfo.ExitCode
-                        WriteCmdOutputToFile mReportPath & "\logFolder\StandardOutput.txt", "Build cancelled by user - output is from the last command that was run.", CmdStr
-                        WriteCmdOutputToFile mReportPath & "\logFolder\StandardError.txt", "Build cancelled by user - output is from the last command that was run.", ErrorStr
+            ExitCode = mExecInfo.ExitCode
+            WriteCmdOutputToFile mReportPath & "\logFolder\StandardOutput.txt", "Build cancelled by user - output is from the last command that was run.", CmdStr
+            WriteCmdOutputToFile mReportPath & "\logFolder\StandardError.txt", "Build cancelled by user - output is from the last command that was run.", ErrorStr
  
             If ExitCode <> 0 Then
                 WriteToDlgAndFile "There was an error executing the last command.  Exit code was: " & ExitCode
@@ -366,14 +323,14 @@ Class CProductReport
         endTime = Time
         WriteToDlgAndFile "Time Ended: " & endTime
         WriteToDlgAndFile "Time for Script to Run: " & getHrMinSec(mStartTime, endTime)
-	Dim MoveFiles
-	Set MoveFiles = New CMoveFiles
-	Set MoveFiles.Build = Me
-	DestPath = mReportPath & "\\logFolder\\" & mProductChoice
-	If mFSO.FolderExists(DestPath) <> True Then
-		MoveFiles.CreateFileOrFolder "Folder", DestPath, True
-	End If 	
-	MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & "\\ReportLog - " & mStartLabel & "_" & mEndLabel & ".txt", True 
+		Dim MoveFiles
+		Set MoveFiles = New CMoveFiles
+		Set MoveFiles.Build = Me
+		DestPath = mReportPath & "\\logFolder\\" & mProductChoice
+		If mFSO.FolderExists(DestPath) <> True Then
+			MoveFiles.CreateFileOrFolder "Folder", DestPath, True
+		End If 	
+		MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & "\\ReportLog - " & mStartLabel & "_" & mEndLabel & ".txt", True 
         mCancelDiag.ScriptDone False
         wscript.DisconnectObject mCancelDiag
         Set mCancelDiag = Nothing
@@ -383,21 +340,27 @@ Class CProductReport
         NetSendMsg "The " + mProductChoice + " report has completed."
     End Sub
     
-   Public Function PopulateDataBase(aRepAccess)
-
+    Public Function PopulateDataBase(aRepAccess)			
             If mPopDataBase = "Y" Then
                 WriteToDlgAndFile "Deleting Tables"
                 aRepAccess.DeleteTable ("txm")
                 aRepAccess.DeleteTable ("txs")
                 aRepAccess.DeleteTable ("txr")
                 'Loop through the number of project files
-                Dim nResult
+                
+                Dim nResult            
+				Dim sReportCmd, sDevPathCmd, sDevPath                
                 For loopIndex = 0 To (mNumPJFiles - 1)
                         WriteToDlgAndFile "Generating files from " & mPJFileArray(loopIndex)
-                        wscript.echo "si report --basename=" & Chr(34) & MainProjectName & Chr(34) & " --project=" & _	
-                                MainSrcProjPath + "\" & mPJFileArray(0) & ".pj"    
-                        nResult = mShell.Run("si report --basename=" & Chr(34) & MainProjectName & Chr(34) & " --project=" & _
-                                MainSrcProjPath + "\" & mPJFileArray(0) & ".pj",1, True)    
+                        'Dont know whether endlabel is given, last build, or release
+						sDevPath = GetDevPath(EndLabel)
+						sReportCmd = "si report --basename=" & Chr(34) & MainProjectName & Chr(34) & " --project=" & _	
+                                MainSrcProjPath + "\" & mPJFileArray(0) & ".pj"
+                        If sDevPath <> "" Then	'if label is a devpath, specify for mks report tool
+							sDevPathCmd = " --devpath=" & sDevPath
+                        End If                        
+                        wscript.echo sReportCmd + sDevPathCmd
+                        nResult = mShell.Run(sReportCmd + sDevPathCmd,1, True)    
                         wscript.echo mFilePathArray(loopIndex) & "\" & mPJFileArray(loopIndex) & ".tx*"
                         CopyFileOrFolder "File", mShell.CurrentDirectory & "\" & mPJFileArray(loopIndex) & ".tx*", _
                                           mFilePathArray(loopIndex) & "\", True, eReportFilesError
@@ -411,6 +374,87 @@ Class CProductReport
                         aRepAccess.PopulateTable "txr",  mFilePathArray(loopIndex), mPJFileArray(loopIndex), mArchOffset
                 Next
         End If
+    End Function
+    
+    '***************************************************************************
+    ' Function    : StripAllPrefix
+    ' Parameters  : Label - the full label/version name 
+    ' Description : Removes the prefix from the label/version name using the 
+    '               VersionPrefix property set during initialization
+    '***************************************************************************
+    Function StripAllPrefix(Label)
+		Dim pos
+		If InStr(Label, VersionPrefix) <> 0 Then
+			StripAllPrefix = Right(Label, Len(Label) - Len(VersionPrefix))
+		Else
+			For pos=1 To Len(Label)
+				If IsNumeric(Mid(Label, pos, 1)) Then
+					Exit For
+				End If
+			Next
+			StripAllPrefix = Mid(Label, pos)
+		End If
+    End Function 
+    
+    '***************************************************************************
+    ' Function    : StripAllVersionNum
+    ' Parameters  : Label - the full label/version name 
+    ' Description : Removes the version number from the label/version name, leaving
+    '               the product name
+    '				Expected format of label : ProductName+VersionNum+BuildNum
+    '***************************************************************************
+    Function StripAllVersionNum(Label)
+		Dim pos
+		For pos=1 To Len(Label)
+			If IsNumeric(Mid(Label, pos, 1)) Then
+				Exit For
+			End If
+		Next
+		StripAllVersionNum = Left(Label, pos-1)
+    End Function 
+	
+    '***************************************************************************
+    ' Function    : GetBuildVersion
+    ' Parameters  : aPattern - Key Name in BuildRegistry.txt
+    ' Description : Returns the value associated with the key name in the 
+    '               BuildRegistry.txt. 
+    '				Expected format of KeyPair : "KeyName KeyValue"
+    '***************************************************************************	
+    Function GetBuildVersion(aPattern)
+                Dim output, readFile, writeFile
+                Set readFile = mFSO.OpenTextFile(mInputFile)
+                Dim check, line, pos
+                check = 0
+                Do While Not readFile.AtEndOfStream And check = 0
+                        line = readFile.ReadLine
+                        If InStr(line, aPattern) <> 0 And check = 0 Then
+                                check = 1
+                                pos = InStr(line, " ")
+                                GetBuildVersion = Right(line, Len(line) - pos)
+                        End If                    
+                Loop
+                readFile.Close
+    End Function    
+       
+    '***************************************************************************
+    ' Function    : GetDevPath
+    ' Parameters  : Label - Full string value containing productname, version, build number
+    ' Description : Returns the development path if found in label otherwise  
+    '               empty string. Does comparison to next version found in BuildRegistry.txt
+    '				Label format - PRODUCTNAMEX.XX.XXXXXXX
+    '***************************************************************************	               
+    Function GetDevPath(Label)
+		Dim sProductName, sVersion
+		
+		sProductName = StripAllVersionNum(Label)		
+		'Strip Label of Prefix and build number
+		sVersion = StripAllPrefix(Label)
+		sVersion = Left(sVersion, InStrRev(sVersion, ".") - 1)
+
+		'Compare sVersion to the build registry next version		
+		If sVersion <> GetNextVersionNum Then
+			GetDevPath = sProductName & "_" & Replace(sVersion, ".", "_")
+		End If
     End Function
           
        'Changes "Hello" -> Hello
@@ -496,15 +540,15 @@ Class CProductReport
                         Loop
                         readFile.Close
                 End If
-		If cmdChoice = "PLR" Then
-			Set readFile = mFSO.OpenTextFile(ReleaseFile)        'mRelease is a global var
-                        Do While Not readFile.AtEndOfStream 
-				LastLabel = FindLabel   
-                                FindLabel = readFile.ReadLine
-                        Loop
-                        readFile.Close 			       'need to add prefix to release version nums	
-                        FindLabel =  LastLabel  ' last release before current release
-		End If	
+				If cmdChoice = "PLR" Then
+					Set readFile = mFSO.OpenTextFile(ReleaseFile)        'mRelease is a global var
+                    Do While Not readFile.AtEndOfStream 
+						LastLabel = FindLabel   
+                        FindLabel = readFile.ReadLine
+                    Loop
+                    readFile.Close 			       'need to add prefix to release version nums	
+                    FindLabel =  LastLabel  ' last release before current release
+				End If	
                 If cmdChoice = "LBL" Then
                         FindLabel = mSrcLabel            'Global Var Read in from the parameters
                 End If
@@ -527,7 +571,7 @@ Class CProductReport
         'returns 0 part of the main trunk, 1 if in a var devpath
         Function CheckProjectDetailed(filePath, pjName)
                 Dim line
-		line = mMKS.SandBoxInfo(filePath & "\" & pjName & ".pj")
+				line = mMKS.SandBoxInfo(filePath & "\" & pjName & ".pj")
                 WriteToDlgAndFile filePath & "\" & pjName & ".pj"
                 If (InStr(line, "Variant") = 0) Or (InStr(line, "Build") = 0) Then
                     CheckProjectDetailed = 0        'Main DevPath
@@ -647,30 +691,7 @@ Function GetNextSegment(endVal, line, projFile)
     End If
 
 End Function
-
-'=============================================================================
-' Name        : GetDevPath
-' Parameters  : filepath - path of the sandbox to get SIE info
-'               pjname   - project name in the sandbox
-' Description : Retrieve the development path name of the input sandbox. 
-'               Development Path names have format "_[Major]_[Minor]" where
-'               [Major] is one digit and [Minor] is 2 digits. Information is
-'               retrieved through the mks function "SandBoxInfo". This function
-'               returns a string of sandbox information which is stripped of the 
-'               development path field for GetDevPath to use.
-'==============================================================================
-Function GetDevPath(filePath, pjName)
-                Dim line, field, pos
-				If Project = 1 Then
-					line = mMKS.SandBoxInfo(filePath & "\" & pjName & ".pj") 'returns relevant information about sandbox
-					field = "Development Path: "  
-					pos = InStr(line, field) 	              	
-                    GetDevPath = Mid(line, pos + Len(field), 5) 'format of all dev path : _5_14
-                Else
-                    GetDevPath = "_"
-                End If
-End Function
-  
+ 
  '***** STILL NEED TO CHECK TO MAKE SURE THE REPORTS WERE GENERATED CORRECTLY ******
 Function CopyReports(aInputPath, aOutputPath, arrayFN, counterFN)
     'aOutputPath = aOutputPath & GetProductFolderName & "\"
@@ -724,6 +745,7 @@ End Function
 
 Function GetEmailBody()
     Dim location, lastBldLabel
+    Dim LicVerString
     
     lastBldLabel = FindLabel("LB")
     If mOneStepBldChoice = "R" Then
@@ -739,14 +761,18 @@ Function GetEmailBody()
     Loop
 
     Dim buildNumber
-    'buildNumber = Mid(lastBldLabel, Index, Len(lastBldLabel))
     buildNumber = Mid(lastBldLabel, InStr(lastBldLabel, ".") - 1, Len(lastBldLabel))
   
     Dim FileString
     For Index = 0 To fileNameCount - 1 Step 1
         FileString = FileString & "        " & mFileNameArray(Index) & vbNewLine
     Next
-    
+
+    LicVerString = ""
+    If mLicenseVersion <> "" Then
+		LicVerString = "Solimar License Server Version : " & Mid(mLicenseVersion, InStr(mLicenseVersion, ".") - 1, Len(lastBldLabel))  & " is included with this build. "
+    End If   
+      
     Dim String1
     String1 = "Please review the change notes.  If you see any of your Change Requests in the notes, please verify that the Change Request is fixed." _
               & "  The change will be in the format of CR.FIX.###### where ###### is the Change Request number."
@@ -756,6 +782,7 @@ Function GetEmailBody()
            
     If mOneStepBldChoice = "B" Then 'build
         GetEmailBody = mProductChoice & " " & buildNumber & " is at " & location & "." & vbNewLine & vbNewLine _
+                 & LicVerString & vbNewLine _
                  & "These are the changes since the last " & Left(buildNumber, InStrRev(buildNumber, ".") - 1) & " build." & vbNewLine _
                  & vbNewLine & "Read the attached files to see what has changed." & vbNewLine _
                  & "These notes are also located at:" & vbNewLine _
@@ -764,7 +791,7 @@ Function GetEmailBody()
                  & "If you have any questions, please contact me" _
                  & vbNewLine & vbNewLine & "Alan Chou"
     ElseIf mOneStepBldChoice = "R" Then  'release
-        ftpLocation = GetOutputPath & "ftp\" & ProductName & Replace(buildNumber, ".", "_", 1, -1) & ".exe"
+        ftpLocation = GetOutputPath & "ftp\" & ProductChoice & Replace(buildNumber, ".", "_", 1, -1) & ".exe"
         GetEmailBody = "The version " & mProductChoice & " " & buildNumber & "is released" & vbNewLine _
                  & vbNewLine & "Please burn new cd's and send this version, located at:" & vbNewLine _
                  & location & vbNewLine & vbNewLine & "The self-extracting exe for the ftp site is at:" _
@@ -803,30 +830,39 @@ Function WriteEmailToFile(Subject, Body)
     TextStream1.Close
 End Function
 
-Function SendEmail(Subject, Body, ReportPath, DescReportName, LabelReportName)
+Function SendEmail(Subject, Body, ReportPath, DescReportName, LicenseReportName)
     WriteToDlgAndFile "Sending the email"
     Dim oSMTP
     Set oSMTP = wscript.CreateObject("SoftArtisans.SMTPMail") 'SMTPControl.SMTP")
     
     Error = False
     Err.Clear
-    
-    If mFSO.FileExists(ReportPath & DescReportName) And mFSO.FileExists(ReportPath & LabelReportName) Then
-        With oSMTP
-            .RemoteHost = "mail.corp.solimarsystems.com"
-            .MailFromAddress = "achou@solimarsystems.com"
-            .FromName = "achou@solimarsystems.com"
-            .AddRecipient "all@solimarsystems.com"  '"emester@solimarsystems.com, jlan@solimarsystems.com" 'all@solimarsystems.com
-            .Charset = 1
-            .Subject = Subject
-            .BodyText = Body
-            .AddAttachment (ReportPath & DescReportName)
-            .AddAttachment (ReportPath & LabelReportName)
-            .SendMail
-        End With
-    Else
-        Error = True
-    End If
+    		
+	With oSMTP
+		.RemoteHost = "mail.corp.solimarsystems.com"
+		.MailFromAddress = "alan.chou@solimarsystems.com"
+		.FromName = "alan.chou@solimarsystems.com"
+		.AddRecipient "Engineering@SolimarSystems.com"
+		If EngOption <> "Y" Then
+			.AddRecipient "Tech.Support.Internal@SolimarSystems.com"
+			.AddRecipient "Production@SolimarSystems.com"
+		End If 
+		If mOneStepBldChoice = "R" Then	'Release report
+			.AddRecipient "Sales.Internal@SolimarSystems.com"
+		End If
+		.AddCC "alan.chou@solimarsystems.com"	
+		.Charset = 1
+		.Subject = Subject
+		.BodyText = Body
+		If mFSO.FileExists(ReportPath & DescReportName) Then
+			.AddAttachment (ReportPath & DescReportName)
+		End If
+		If mFSO.FileExists(ReportPath & LabelReportName) Then
+			.AddAttachment (ReportPath & LabelReportName)
+		End If
+		.SendMail
+	End With
+
     If Err.Number <> 0 Then 'There was an error sending out the email
         Error = True
     End If
@@ -900,56 +936,45 @@ End Function
         If mGenAllRelease = "Y" Then
                 g_Access.CreateAllReleaseDesc "reportAllReleaseDesc.txt"
         End If
- End Sub
+	End Sub
 
-Sub SetStartLabel()
-                If mLastBuild = "Y" Then         'Last Build
-                        mStartLabel = FindLabel("LBLB")
-                End If
-                If mLastRelease = "Y" Then       'Last Release
-                        mStartLabel = FindLabel("PLR")
-                End If
-                If mBegDevPath = "Y" Then        'Beginning of Dev Path
-                        mStartLabel = FindLabel("BDP")
-                End If
-                If mLastLabel = "Y" Then         'From Label
-                        mStartLabel = FindLabel("LBL")                  
-                End If
-                If mLastBuildLabel = "Y" Then    'Last Build Label, only used by 1-Step-Build
-                        mStartLabel = FindLabel("LBLB")            
-                End If
-End Sub
+	Sub SetLabels()
+        If mLastBuild = "Y" Then         'Last Build
+            mStartLabel = FindLabel("LBLB")
+        End If
+        If mLastRelease = "Y" Then       'Last Release
+            mStartLabel = FindLabel("PLR")
+        End If
+        If mBegDevPath = "Y" Then        'Beginning of Dev Path
+            mStartLabel = FindLabel("BDP")
+        End If
+        If mLastLabel = "Y" Then         'From Label
+            mStartLabel = FindLabel("LBL")                  
+        End If
+        If mLastBuildLabel = "Y" Then    'Last Build Label, only used by 1-Step-Build
+            mStartLabel = FindLabel("LBLB")            
+        End If
+        If EndLabel = "" Then
+			If mLastRelease <> "Y" Then
+				mEndLabel = FindLabel("LB")
+			Else
+				mEndLabel = FindLabel("LR")
+			End If			
+		End If	        
+	End Sub
 
-Sub GenerateTextFile(g_Access)
+	Sub GenerateTextFile(g_Access)
 		Dim fileName
-                WriteToDlgAndFile "Generating Reports"
-                mProject = CheckProject(mFilePathArray(0), mPJFileArray(0))  'check to see if is a variant project or not
-                mCancelDiag.UpdateDisplay "     Project=" & Project & "   0 = main trunk, 1 = var devpath"
-                If EndLabel = "" Then
-			mEndLabel = FindLabel("LB")
-		End If
+        WriteToDlgAndFile "Generating Reports"
+        mProject = CheckProject(mFilePathArray(0), mPJFileArray(0))  'check to see if is a variant project or not
+        mCancelDiag.UpdateDisplay "     Project=" & Project & "   0 = main trunk, 1 = var devpath"
 				
         mCancelDiag.UpdateDisplay "     LastBuildLabel: " & lastBldLabel
-
-        If mLastBuild = "Y" Then      			   'Last Build
-			CreateDescAndLabelReports mStartLabel, mEndLabel
-        ElseIf mLastRelease = "Y" Then      		   'Last Release
-			mEndLabel = FindLabel("LR")
-			CreateDescAndLabelReports mStartLabel, mEndLabel
-        ElseIf mBegDevPath = "Y" Then      			   'Beginning of Dev Path
-            CreateDescAndLabelReports mStartLabel, mEndLabel
-        ElseIf mLastLabel = "Y" And mLicenseSummary <> "Y" Then        		   'From Label
-			CreateDescAndLabelReports mStartLabel, mEndLabel                    
-        ElseIf mLastBuildLabel = "Y"  Then   		   'Last Build Label, only used by 1-Step-Build
-                        CreateDescAndLabelReports mStartLabel, mEndLabel                   
-		ElseIf mLicenseSummary = "Y" Then 'only for solimar licensing report that lists all labels using license version mStartLabel
+		If mLicenseSummary = "Y" Then
 			fileName = "LicenseSummary_" + ChangeDotToLine(g_Report.StartLabel) + ".txt"	
-			g_Access.CreateTextFileLicenseLabels mStartLabel,  fileName 
 			FormatLicenseSummary mReportPath  & "\Reports\" & fileName, mStartLabel
-		Else						   'startlabel <> "" case
-			CreateDescAndLabelReports StartLabel, EndLabel 	
-        End If
-               
+		End If		
+		CreateDescriptionReports mStartLabel, mEndLabel            
     End Sub
 
 Function IsLicenseAvailable(Prefix)
@@ -1045,24 +1070,23 @@ Sub FormatLicenseSummary(FileName, Label)
 	
 End Sub
     
-Sub CreateDescAndLabelReports(StartLabel, EndLabel)
-			mFileNameArray(mFileNameCount) = FileNamePrefix & "ReportDesc" & ChangeDotToLine(g_Report.StartLabel) & "To" & ChangeDotToLine(g_Report.EndLabel) & ".txt"
-            If mFSO.FileExists(mFileNameArray(mFileNameCount)) Then
-                        WriteToDlgAndFile "Report Description from " & StartLabel & " to " & EndLabel & " Already Exists"
-            Else
-						WriteToDlgAndFile "Creating Description Report file from: " + StartLabel + " to " + EndLabel
-                        g_Access.CreateDescReportLabelToLabel StartLabel, EndLabel, mFileNameArray(mFileNameCount)
-            End If
-            mFileNameCount = mFileNameCount + 1
-            mFileNameArray(mFileNameCount) = FileNamePrefix & "ReportLabel" & ChangeDotToLine(StartLabel) & "To" & ChangeDotToLine(EndLabel) & ".txt"
-            If mFSO.FileExists(mFileNameArray(mFileNameCount)) Then
-                        WriteToDlgAndFile "Report Label from " & StartLabel & " to " & EndLabel & " Already Exists"
-            Else
-                        WriteToDlgAndFile "Creating Label Report file from: " + StartLabel + " to " + EndLabel
-                        g_Access.CreateLabelReportLabelToLabel StartLabel, EndLabel, mFileNameArray(mFileNameCount)
-            End If
-            mFileNameCount = mFileNameCount + 1
-            WriteToDlgAndFile "Finished creating reports from " + StartLabel + " to " + EndLabel
+Sub CreateDescriptionReports(StartLabel, EndLabel)	
+	'Create description report for product
+	mFileNameArray(mFileNameCount) = FileNamePrefix & "ReportDesc" & ChangeDotToLine(g_Report.StartLabel) & "To" & ChangeDotToLine(g_Report.EndLabel) & ".txt"	
+    If mFSO.FileExists(mFileNameArray(mFileNameCount)) Then
+		WriteToDlgAndFile "Report Description from " & StartLabel & " to " & EndLabel & " Already Exists"
+    Else
+		WriteToDlgAndFile "Creating Description Report file from: " + StartLabel + " to " + EndLabel
+        g_Access.CreateDescReportLabelToLabel StartLabel, EndLabel, mFileNameArray(mFileNameCount)
+    End If
+    mFileNameCount = mFileNameCount + 1
+    'Create file with Product Name, Version, License Version
+    If mLicenseVersion <> "" Then
+		mFileNameArray(mFileNameCount) = FileNamePrefix & EndLabel + "_" + mLicenseVersion & ".txt"
+		mFSO.CreateTextFile mReportPath & "\Reports\" & FileNamePrefix & EndLabel + "_" & mLicenseVersion & ".txt"
+		mFileNameCount = mFileNameCount + 1
+    End If
+    WriteToDlgAndFile "Finished creating reports from " + StartLabel + " to " + EndLabel
 End Sub
 
 Function EndProgram(aErrorCode)
@@ -1116,7 +1140,7 @@ End Function
 
     Public Property Get Shell()
             Set Shell = mShell
-    End Property
+    End Property  
 
     Public Property Get CancelDialog()
             Set CancelDialog = mCancelDiag
@@ -1125,6 +1149,10 @@ End Function
     Public Property Get ExecInfo()
             Set ExecInfo = mExecInfo
         End Property
+
+    Public Property Get EngOption()
+            EngOption = mEngReport
+    End Property
 
     Public Property Get SrcLabel()
             ProductName = mSrcLabel

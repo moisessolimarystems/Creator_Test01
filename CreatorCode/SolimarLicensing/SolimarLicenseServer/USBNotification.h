@@ -13,13 +13,14 @@ public:
 	
 private:
 	// detects usb key insertion removal and updates the key list accordingly
-	HWND m_USBNotifyWindow;
+	static HWND m_USBNotifyWindow;
 	HANDLE m_USBNotifyThreadTerminateEvent;
 	HANDLE m_USBNotifyThread;
 	LPVOID m_UserCallbackContext;
 	static const wchar_t* USBNotifyWindowClassName;
 	static LRESULT CALLBACK USBNotifyCallback(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
 	static DWORD WINAPI USBNotifyThreadProc(LPVOID pContext);
+
 };
 
 #endif

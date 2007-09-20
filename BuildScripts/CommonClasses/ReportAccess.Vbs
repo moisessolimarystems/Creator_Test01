@@ -41,7 +41,7 @@ Class CReportAccess
         Set mBuild = aBuild 
 
 	DBString = mBuild.ProductChoice & "db1.mdb"   
-	mBuild.FSO.CopyFile "E:\accessDB\db1.mdb", "E:\accessDB\" & DBString, True           
+        mBuild.FSO.CopyFile "E:\accessDB\db1.mdb", "E:\accessDB\" & DBString, True           
        'Set database path depending which machine it's on
         If mBuild.Shell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\RegisteredOwner") = "Alan Chou" Then
             mConnection.ConnectionString = "driver={Microsoft Access Driver (*.mdb)};DBQ=I:\Alan\db1.mdb"
@@ -69,6 +69,7 @@ Class CReportAccess
     End Function
 
 
+    'used to limit the number of entries into the database. Restricted to startlabel and above.
     Function CheckLabelBounds(aLabel)
 	Dim versionNum, bCheck, startLabel
 	bCheck = False
@@ -76,7 +77,7 @@ Class CReportAccess
 		versionNum = StripLeadingZeros(Replace(Right(aLabel, 6), """", ""))
 		If(IsNumeric(versionNum) <> False) Then
 			startLabel = StripLeadingZeros(Right(mBuild.StartLabel, 6))
-			If(versionNum >= startLabel) Then
+			If(CInt(versionNum) >= CInt(startLabel)) Then
 				bCheck = True
 			End If
 		End If
@@ -602,11 +603,12 @@ Class CReportAccess
                     Author = ResultsTable.Fields("Author")
                     filePath = ResultsTable.Fields("ArchiveName")
                     LogMsgRevNum = ResultsTable.Fields("RevNum")
-                    If ((mBuild.Project = 0 And Len(LogMsgRevNum) = 9) Or mBuild.Project = 1) Then
+                    'If ((mBuild.Project = 0 And Len(LogMsgRevNum) = 9) Or mBuild.Project = 1) Then
+        
                          mCmdTemp.CommandText = "INSERT INTO outputReport (LogMsg, Author, ArchiveName, RevNum) VALUES (' " + _
                                                  LogMsg + "','" + Author + "','" + filePath + "','" + LogMsgRevNum + "')"
                          mCmdTemp.Execute
-                    End If
+                    'End If
                     ResultsTable.MoveNext
                 Loop
             End If
@@ -685,11 +687,11 @@ Class CReportAccess
                     filePath = ResultsTable.Fields("ArchiveName")
                     RevNum = ResultsTable.Fields("RevNum")
                     'If ((RevNum > StartLabelRevNum) And (RevNum <= EndLabelRevNum)) And _
-                    If ((mBuild.Project = 0 And Len(RevNum) = 9) Or mBuild.Project = 1) Then
+                    'If ((mBuild.Project = 0 And Len(RevNum) = 9) Or mBuild.Project = 1) Then
                        mCmdTemp.CommandText = "INSERT INTO outputReport (LogMsg, ArchiveName, RevNum) VALUES (' " + _
                                                Label + "','" + filePath + "','" + RevNum + "')"
                        mCmdTemp.Execute
-                    End If
+                    'End If
                     ResultsTable.MoveNext
                 Loop
             End If
