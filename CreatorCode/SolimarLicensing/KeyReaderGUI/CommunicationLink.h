@@ -14,7 +14,7 @@ public:
 	CommunicationLink();
 
 	//connects to the Solimar License Server
-	HRESULT Connect();
+	HRESULT Connect(String*);
 
 	//Gets the list of keys and the number of keys
 	HRESULT InitializeKeyInfoConnection();
@@ -56,6 +56,7 @@ public:
 	HRESULT EnterPasswordPacket(VARIANT* TheData, BSTR* Verification_Code); 
 
 	bool CommunicationLink::KeyIsProgrammed(BSTR* KeyID);
+	HRESULT GetServerVersion(long* Major, long* Minor, long* Version);
 
 	//disconnects from the solimar license server
 	void Disconnect();
@@ -83,7 +84,7 @@ private:
 	Object* KeyNumber;
 
 	//ptr to the server object. Used to access the lower layer code.
-	ISolimarLicenseSvr2* pTheServer;
+	ISolimarLicenseSvr3* pTheServer;
 
 	bool ModInitialized;
 
