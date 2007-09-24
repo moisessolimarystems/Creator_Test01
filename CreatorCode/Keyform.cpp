@@ -1215,7 +1215,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 
        if( dlg->ShowModal() == IDYES )
        {   //the index should be the value passed into createExtensionPassword. LicenseServer expects index into KDPasswordHour array
-           index = dlg->passwordComboBox->ItemIndex + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
+           index = dlg->passwordComboBox->ItemIndex; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
            createExtensionPassword(index);
        }
 
@@ -1256,7 +1256,7 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
    //Mapping in license server is 0-based
    //days is passed in as 1 based
    keyMaster->getExtensionPassword(key_record->pkey,
-                                   days - 1,
+                                   days,
                                    static_cast<ProductId>(key_record->pkey->productId),
                                    key_record->pkey->productVersion,
                                    key_record->getNextExtensionP(),
@@ -1273,6 +1273,7 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
    keyMaster->applyExtensionPassword(key_record, days);
 
    //Test/Dev keys store index into units field. So need to translate index to actual number of days.
+   //0-based array into PasswordDays Array
    if(key_record->pkey->keyType == KEYDevelopment)
         expire_date = key_record->pkey->getKDPasswordDays(days);
 
@@ -3407,7 +3408,7 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
             // password really is), add the index value
             if( Column->Field->DisplayText == "Extend Trial Period" )
             {
-               int index = PswdGrid->Columns->Items[2]->Field->AsInteger - 1; //Subtact 1 to get proper value in the KDPasswordText array.
+               int index = PswdGrid->Columns->Items[2]->Field->AsInteger; // - 1; //Subtact 1 to get proper value in the KDPasswordText array.
                PswdGrid->Canvas->FillRect( Rect );
                sprintf( scratch, "Extend Trial Period - %s", key_record->pkey->getKDPasswordText(index)); //display unsigned integer as text in the description.
                PswdGrid->Canvas->TextOut( Rect.Left+2, Rect.Top+2, scratch);
