@@ -36,12 +36,14 @@ namespace KeyReaderGUI
 			}
 			__super::Dispose(disposing);
 		}
-        
+	private: System::ComponentModel::IContainer*  components;
+	protected: 
+
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container* components;
+
 		PasswordValidation* PasswordValidater;
 
 		System::Windows::Forms::Label *  PswdLabel;
@@ -59,20 +61,24 @@ namespace KeyReaderGUI
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			this->PswdLabel = new System::Windows::Forms::Label();
-			this->OkBtn = new System::Windows::Forms::Button();
-			this->CancelBtn = new System::Windows::Forms::Button();
-			this->PswdTextBox = new System::Windows::Forms::RichTextBox();
-			this->groupBox1 = new System::Windows::Forms::GroupBox();
-			this->label1 = new System::Windows::Forms::Label();
-			this->PswdFormLabel = new System::Windows::Forms::Label();
-			this->PswdErrorProvider = new System::Windows::Forms::ErrorProvider();
+			this->components = (new System::ComponentModel::Container());
+			System::ComponentModel::ComponentResourceManager*  resources = (new System::ComponentModel::ComponentResourceManager(__typeof(PswdForm)));
+			this->PswdLabel = (new System::Windows::Forms::Label());
+			this->OkBtn = (new System::Windows::Forms::Button());
+			this->CancelBtn = (new System::Windows::Forms::Button());
+			this->PswdTextBox = (new System::Windows::Forms::RichTextBox());
+			this->groupBox1 = (new System::Windows::Forms::GroupBox());
+			this->label1 = (new System::Windows::Forms::Label());
+			this->PswdFormLabel = (new System::Windows::Forms::Label());
+			this->PswdErrorProvider = (new System::Windows::Forms::ErrorProvider(this->components));
 			this->groupBox1->SuspendLayout();
+			(__try_cast<System::ComponentModel::ISupportInitialize*  >(this->PswdErrorProvider))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// PswdLabel
 			// 
-			this->PswdLabel->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
+			this->PswdLabel->Font = (new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point, 
+				(System::Byte)0));
 			this->PswdLabel->Location = System::Drawing::Point(16, 96);
 			this->PswdLabel->Name = S"PswdLabel";
 			this->PswdLabel->Size = System::Drawing::Size(64, 24);
@@ -83,22 +89,24 @@ namespace KeyReaderGUI
 			// 
 			this->OkBtn->Location = System::Drawing::Point(176, 152);
 			this->OkBtn->Name = S"OkBtn";
+			this->OkBtn->Size = System::Drawing::Size(75, 23);
 			this->OkBtn->TabIndex = 1;
 			this->OkBtn->Text = S"OK";
-			this->OkBtn->Click += new System::EventHandler(this, &KeyReaderGUI::PswdForm::OkBtn_Click);
+			this->OkBtn->Click += new System::EventHandler(this, &PswdForm::OkBtn_Click);
 			// 
 			// CancelBtn
 			// 
 			this->CancelBtn->CausesValidation = false;
 			this->CancelBtn->Location = System::Drawing::Point(253, 152);
 			this->CancelBtn->Name = S"CancelBtn";
+			this->CancelBtn->Size = System::Drawing::Size(75, 23);
 			this->CancelBtn->TabIndex = 2;
 			this->CancelBtn->Text = S"Cancel";
-			this->CancelBtn->Click += new System::EventHandler(this, &KeyReaderGUI::PswdForm::CancelBtn_Click);
+			this->CancelBtn->Click += new System::EventHandler(this, &PswdForm::CancelBtn_Click);
 			// 
 			// PswdTextBox
 			// 
-			this->PswdTextBox->Location = System::Drawing::Point(80, 96);
+			this->PswdTextBox->Location = System::Drawing::Point(80, 93);
 			this->PswdTextBox->MaxLength = 50;
 			this->PswdTextBox->Multiline = false;
 			this->PswdTextBox->Name = S"PswdTextBox";
@@ -106,8 +114,9 @@ namespace KeyReaderGUI
 			this->PswdTextBox->Size = System::Drawing::Size(248, 20);
 			this->PswdTextBox->TabIndex = 0;
 			this->PswdTextBox->Text = S"";
-			this->PswdTextBox->Validating += new System::ComponentModel::CancelEventHandler(this, &KeyReaderGUI::PswdForm::PswdTextBox_Validating);
-			this->PswdTextBox->Validated += new System::EventHandler(this, &KeyReaderGUI::PswdForm::PswdTextBox_Validated);
+			this->PswdTextBox->Validating += new System::ComponentModel::CancelEventHandler(this, &PswdForm::PswdTextBox_Validating);
+			this->PswdTextBox->Validated += new System::EventHandler(this, &PswdForm::PswdTextBox_Validated);
+			this->PswdTextBox->KeyDown += new System::Windows::Forms::KeyEventHandler(this, &PswdForm::PswdTextBox_KeyDown);
 			// 
 			// groupBox1
 			// 
@@ -122,6 +131,7 @@ namespace KeyReaderGUI
 			// 
 			this->label1->Location = System::Drawing::Point(3, 16);
 			this->label1->Name = S"label1";
+			this->label1->Size = System::Drawing::Size(100, 23);
 			this->label1->TabIndex = 0;
 			this->label1->Text = S"label1";
 			// 
@@ -131,9 +141,7 @@ namespace KeyReaderGUI
 			this->PswdFormLabel->Name = S"PswdFormLabel";
 			this->PswdFormLabel->Size = System::Drawing::Size(304, 64);
 			this->PswdFormLabel->TabIndex = 5;
-			this->PswdFormLabel->Text = S"This dialog box is for specifying individual passwords. If you are using a passwo" 
-				S"rd packet file(*.pkt) to activate Solimar products, select \"Password->Add Passwo" 
-				S"rd Packet\" and specify the packet file provided by Solimar Systems.";
+			this->PswdFormLabel->Text = resources->GetString(S"PswdFormLabel.Text");
 			// 
 			// PswdErrorProvider
 			// 
@@ -149,29 +157,26 @@ namespace KeyReaderGUI
 			this->Controls->Add(this->CancelBtn);
 			this->Controls->Add(this->OkBtn);
 			this->Controls->Add(this->PswdLabel);
-			this->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
-			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedToolWindow;
+			this->Font = (new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				(System::Byte)0));
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedDialog;
+			this->MaximizeBox = false;
+			this->MinimizeBox = false;
 			this->Name = S"PswdForm";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 			this->Text = S"Please Enter a Password ";
 			this->groupBox1->ResumeLayout(false);
+			(__try_cast<System::ComponentModel::ISupportInitialize*  >(this->PswdErrorProvider))->EndInit();
 			this->ResumeLayout(false);
 
 		}		
-
-
-
-
-
-
-
 
 		System::Void OkBtn_Click(System::Object *  sender, System::EventArgs *  e);			 			 
 		System::Void CancelBtn_Click(System::Object *  sender, System::EventArgs *  e);						 
 		System::Void PswdTextBox_Validated(System::Object *  sender, System::EventArgs *  e);
 		System::Void PswdTextBox_Validating(System::Object *  sender, System::ComponentModel::CancelEventArgs *  e);
 		bool IsValidPassword(String* number, String** errorMessage); 
-
-
-
+		System::Void PswdTextBox_KeyDown(System::Object*  sender, System::Windows::Forms::KeyEventArgs*  e);
+		
 };
 }

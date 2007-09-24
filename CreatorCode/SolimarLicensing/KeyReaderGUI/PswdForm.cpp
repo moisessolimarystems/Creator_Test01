@@ -66,6 +66,14 @@ System::Void PswdForm::PswdTextBox_Validating(System::Object *  sender, System::
     }
 }
 
+System::Void PswdForm::PswdTextBox_KeyDown(System::Object*  sender, System::Windows::Forms::KeyEventArgs*  e)
+{
+	if (e->KeyCode == Keys::Enter || e->KeyCode == Keys::Return)
+		OkBtn_Click(sender,e);	
+	else if (e->KeyCode == Keys::Escape)
+		DialogResult = DialogResult::Cancel;
+}
+
 bool PswdForm::IsValidPassword(String* password,  String** errorMessage) 
 {
         if (password->Length == 0) 
