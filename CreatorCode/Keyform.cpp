@@ -1205,7 +1205,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
 
        if( dlg->ShowModal() == IDYES )
        {   //the index should be the value passed into createExtensionPassword. LicenseServer expects index into KDPasswordHour array
-           index = dlg->passwordComboBox->ItemIndex + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
+           index = dlg->passwordComboBox->ItemIndex; // + 1; //+1 so display of units will be at least 1. Subtract 1 when using this value to index.
            createExtensionPassword(index);
        }
 
@@ -1245,7 +1245,7 @@ void TFCustomerKeys::createExtensionPassword(unsigned short days)
    //generate password
    //days passed in as 1-based, while license server is expecting 0-based mapping
    keyMaster->getExtensionPassword(key_record->pkey,
-                                   days - 1,
+                                   days,
                                    static_cast<ProductId>(key_record->pkey->productId),
                                    key_record->pkey->productVersion,
                                    key_record->getNextExtensionP(),
