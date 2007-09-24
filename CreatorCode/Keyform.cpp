@@ -3388,7 +3388,7 @@ void __fastcall TFCustomerKeys::PswdGridDrawColumnCell(TObject *Sender,
             // password really is), add the index value
             if( Column->Field->DisplayText == "Extend Trial Period" )
             {
-               int index = PswdGrid->Columns->Items[2]->Field->AsInteger - 1; //Subtact 1 to get proper value in the KDPasswordText array.
+               int index = PswdGrid->Columns->Items[2]->Field->AsInteger;
                PswdGrid->Canvas->FillRect( Rect );
                sprintf( scratch, "Extend Trial Period - %s", key_record->pkey->getKDPasswordText(index)); //display unsigned integer as text in the description.
                PswdGrid->Canvas->TextOut( Rect.Left+2, Rect.Top+2, scratch);
