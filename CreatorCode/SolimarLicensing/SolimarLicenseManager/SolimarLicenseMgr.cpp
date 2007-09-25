@@ -435,7 +435,7 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize3(	BSTR application_instance,
 
 STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 {
-//OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - Enter");
+//OutputDebugString(L"<CSolimarLicenseMgr::ValidateLicense() - Enter");
 	HRESULT hr = S_OK;
 	try
 	{
@@ -449,7 +449,7 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 	{
 		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
 	}
-//OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense() - Leave");
+//OutputDebugString(L">CSolimarLicenseMgr::ValidateLicense() - Leave");
 	return hr;
 }
 HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error)
@@ -774,11 +774,8 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 						VARIANT vtKeyProductID, vtKeyProductVersion;
 						
 						// check that the key is present and valid
-						VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-						hr = server->second.LicenseServer->KeyIsPresent(key_ident, &key_present);
-						if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-						hr = server->second.LicenseServer->KeyIsActive(key_ident, &key_active);
-						if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+						VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+						//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
 						hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 						if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 						
@@ -1366,7 +1363,9 @@ BOOL CALLBACK CSolimarLicenseMgr::LicenseDlgProc(HWND hDlg, UINT message, WPARAM
 HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 {
 	HRESULT hr = S_OK;
-	
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshKeyList() - Enter");
+//OutputDebugStringW(debug_buf);	
 	ENSURE_INITIALIZED;
 	
 	SafeMutex mutex(ServerListLock);
@@ -1517,7 +1516,6 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 
 					//Cycle through all the keys, calculate unlimitedness
 					SetUnlimitedModulesOnKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, _bLogError);
-
 					SafeArrayUnaccessData(vtKeyList.parray);
 				}
 			}
@@ -1541,6 +1539,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 	else
 		hr = RemoveObsoleteKeysFromCache();
 
+
 	if (FAILED(hr)) return hr;
     
 	// S_OK if some keys were found
@@ -1554,6 +1553,10 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count)
 {
 	HRESULT hr(S_OK);
+
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ValidateKeyList() - Enter");
+//OutputDebugStringW(debug_buf);	
 
 	if(!m_bLockKeyByAppInstance)
 		return hr;	//Only m_bLockKeyByAppInstance must have all keys match
@@ -1573,11 +1576,9 @@ HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *p
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
 		// check that the key is present and valid
-		VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+		
+		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
 		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 
@@ -1682,8 +1683,6 @@ HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *p
 			refIt!=refCountOfAddonsModuleByModuleMap.end();
 			refIt++)
 		{
-long refCount = refIt->second;
-
 			if(refCountOfBaseModuleByModuleCount != 0 && refCountOfBaseModuleByModuleCount != refIt->second)
 			{
 				hr = LicenseServerError::EHR_KEY_NOT_MATCHING_INSTANCES;
@@ -1698,6 +1697,8 @@ long refCount = refIt->second;
 		FreeAllKeys(pServerInfo, pvtKeyList, count, false);
 	}
 
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ValidateKeyList() - Leave");
+//OutputDebugStringW(debug_buf);
 	return hr;
 }
 
@@ -1710,6 +1711,9 @@ long refCount = refIt->second;
 HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError)
 {
 	HRESULT hr(S_OK);
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::LockOneOfEachKeyConfiguration() - Enter");
+//OutputDebugStringW(debug_buf);
 	if(!m_bLockKeyByAppInstance)
 		return E_FAIL;	//Only m_bLockKeyByAppInstance must have all keys match
 
@@ -1737,11 +1741,7 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
 		// check that the key is present and valid
-		VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
 		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 
@@ -1880,7 +1880,6 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 			}
 		}
 	}	//End for loop
-
 	//Second Part - Cycle through and make sure 1 of each keytype is grabbed, else grab.
 	//List of need keytype that need to be locked to m_applicationInstance
 	std::list<_bstr_t> neededKeyTypeList;
@@ -1898,8 +1897,6 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 		//Add key to the cache
 		hr = AddKeyToCache(pServerInfo, keyTypeIt->first, bLogError);
 	}
-
-	
 		
 	//_bstr_tMap freeAppInstanceMap = appInstanceToKeyInfoMap[L""];	//Free app instances
 
@@ -1960,6 +1957,8 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 		appIt->second.clear();
 	appInstanceToKeyInfoMap.clear();
 
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::LockOneOfEachKeyConfiguration() - Leave");
+//OutputDebugStringW(debug_buf);
 	return hr;
 }
 
@@ -2032,11 +2031,9 @@ HRESULT CSolimarLicenseMgr::FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKey
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
 		// check that the key is present and valid
-		VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+
+		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
 		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 
@@ -2077,6 +2074,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 	std::map<unsigned int, int> moduleCounterMap;
 	int baseKeysSeen = 0;
 	HRESULT hr = S_OK;
+
 	for (ServerInfo::KeyList::iterator keyIt = pServerInfo->keys.begin(); keyIt != pServerInfo->keys.end(); ++keyIt)
 	{
 		KeyInfo tmpSvrInfo = keyIt->second;
@@ -2121,62 +2119,60 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 		}
 	}
 
-	//Calculate Unlimitedness
+   //Calculate Unlimitedness
 	if(baseKeysSeen > 0)
 	{
-		for(std::map<unsigned int, int>::iterator tmpModIt = moduleCounterMap.begin(); tmpModIt != moduleCounterMap.end(); tmpModIt++)
+		for (int i = 0; i<count; ++i)
 		{
-			KeySpec::Module &module(m_keyspec.products[m_product][tmpModIt->first]);
-			bool bSetUnlimited = false;
-			if(module.unlimited > 0)
+			_bstr_t key_ident = pvtKeyList[i].bstrVal;
+			VARIANT vtKeyProductID, vtKeyProductVersion;
+			// check that the key is present and valid
+			VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+
+			//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
+			hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+			if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+
+			// check that the key has the requisite product version and etc.
+			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+			if (FAILED(hr)) {hr = S_OK; continue;}
+
+			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+			if (FAILED(hr)) {hr = S_OK; continue;}
+
+			// if the product id and product version requirements are satisfied
+			if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
+				m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
 			{
-				if(module.pool != 0)	//Is a pooled module
+				for(std::map<unsigned int, int>::iterator tmpModIt = moduleCounterMap.begin(); tmpModIt != moduleCounterMap.end(); tmpModIt++)
 				{
-					//Factor in base keys in unlimited Calculation
-					KeySpec::Module &pool(m_keyspec.products[m_product][module.pool]);
-					bSetUnlimited = baseKeysSeen * (int)module.unlimited <= moduleCounterMap[module.id] && baseKeysSeen * (int)pool.unlimited <= moduleCounterMap[pool.id];
-				}
-				else if(module.isSharable != 0)	//Is a shared module
-				{
-					//Don't factor in base keys in unlimited Calculation
-					bSetUnlimited = (int)module.unlimited <= moduleCounterMap[module.id];
-				}
-				else if(module.unlimited == 1)
-				{
-					//Don't factor in base keys in unlimited Calculation
-					bSetUnlimited = (int)module.unlimited <= moduleCounterMap[module.id];
-				}
-				else	//non-on/off Modules
-				{
-					//Factor in base keys in unlimited Calculation
-					bSetUnlimited = baseKeysSeen * (int)module.unlimited <= moduleCounterMap[module.id];
-				}
-			}
+					KeySpec::Module &module(m_keyspec.products[m_product][tmpModIt->first]);
+					bool bSetUnlimited = false;
+					if(module.unlimited > 0)
+					{
+						if(module.pool != 0)	//Is a pooled module
+						{
+							//Factor in base keys in unlimited Calculation
+							KeySpec::Module &pool(m_keyspec.products[m_product][module.pool]);
+							bSetUnlimited = baseKeysSeen * (int)module.unlimited <= moduleCounterMap[module.id] && baseKeysSeen * (int)pool.unlimited <= moduleCounterMap[pool.id];
+						}
+						else if(module.isSharable != 0)	//Is a shared module
+						{
+							//Don't factor in base keys in unlimited Calculation
+							bSetUnlimited = (int)module.unlimited <= moduleCounterMap[module.id];
+						}
+						else if(module.unlimited == 1)
+						{
+							//Don't factor in base keys in unlimited Calculation
+							bSetUnlimited = (int)module.unlimited <= moduleCounterMap[module.id];
+						}
+						else	//non-on/off Modules
+						{
+							//Factor in base keys in unlimited Calculation
+							bSetUnlimited = baseKeysSeen * (int)module.unlimited <= moduleCounterMap[module.id];
+						}
+					}
 
-
-			for (int i = 0; i<count; ++i)
-			{
-				_bstr_t key_ident = pvtKeyList[i].bstrVal;
-				VARIANT vtKeyProductID, vtKeyProductVersion;
-				// check that the key is present and valid
-				VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-				hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-				if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-				hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-				if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
-				hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-				if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
-
-				// check that the key has the requisite product version and etc.
-				hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
-				if (FAILED(hr)) {hr = S_OK; continue;}
-				hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-				if (FAILED(hr)) {hr = S_OK; continue;}
-
-				// if the product id and product version requirements are satisfied
-				if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-					m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
-				{
 					//Only set for the right product key
 					pServerInfo->LicenseServer->KeyModuleLicenseUnlimited(pvtKeyList[i].bstrVal, module.id, bSetUnlimited ? VARIANT_TRUE : VARIANT_FALSE);
 				}
@@ -2191,6 +2187,9 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError)
 {
 	HRESULT hr(S_OK);
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey() - Enter");
+//OutputDebugStringW(debug_buf);
 	if(m_bLockKeyByAppInstance)
 		return E_FAIL;	//Only m_bLockKeyByAppInstance must have all keys match
 
@@ -2205,11 +2204,9 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
 		// check that the key is present and valid
-		VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
-		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+      
+		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
 		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 
@@ -2380,6 +2377,9 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 	baseKeyWithNoAppInstanceSecondPrefList.clear();
 	keyToAddList.clear();
 
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey() - Leave");
+//OutputDebugStringW(debug_buf);
+
 	return hr;
 }
 
@@ -2390,7 +2390,7 @@ _bstr_t CSolimarLicenseMgr::GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR 
 	VARIANT vtAppInstanceList;
 	//SS_SLSERVER_FTCALL_HR(&pServerInfo, GetApplicationInstanceList, (key_ident, &pvtAppInstanceList), hr);
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::GetAppInstanceFromKey - pServerInfo->LicenseServer->GetApplicationInstanceList(%s, %s)", (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstance, (wchar_t*)app_instance_key_ident);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::GetAppInstanceFromKey() - Enter - pServerInfo->LicenseServer->GetApplicationInstanceList(%s, %s)", (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstance, (wchar_t*)app_instance_key_ident);
 //OutputDebugString(tmpbuf);
 
 	HRESULT hr = pServerInfo->LicenseServer->GetApplicationInstanceList(bstrKeyIdent, &vtAppInstanceList);
@@ -2438,11 +2438,13 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 	for(;;)
 	{
 		// check that the key is present and valid
-		VARIANT_BOOL key_present(VARIANT_FALSE), key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
-		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; break;}
+		VARIANT_BOOL key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
+		
+		//Need result of KeyIsActive below
 		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
 		if (FAILED(hr)) {hr = S_OK; break;}
+
+		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
 		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
 		if (FAILED(hr)) {hr = S_OK; break;}
 		
@@ -2474,7 +2476,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 				if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 				{
 					pServerInfo->keys[key_ident].KeyPresent = true;
-					pServerInfo->keys[key_ident].KeyValid = (key_license_valid != VARIANT_FALSE && key_active != VARIANT_FALSE);
+					pServerInfo->keys[key_ident].KeyValid = (key_license_valid != VARIANT_FALSE);
 					
 					// trial information and messages
 					bool TrialInfoInitialized = pServerInfo->keys[key_ident].KeyTrialInfoInitialized;
@@ -2648,7 +2650,6 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses)
 {
 	ENSURE_INITIALIZED;
-	
 	SafeMutex mutex(ServerListLock);	
 	
 	outstanding_licenses = m_allocated_licenses;
@@ -2679,8 +2680,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 				}
 			}
 		}
-	}
-	
+	}	
 	return S_OK;
 }
 
@@ -2688,6 +2688,10 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 HRESULT CSolimarLicenseMgr::RefreshLicenses()
 {
 	HRESULT hr = S_OK;
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicenses() - Enter");
+//OutputDebugStringW(debug_buf);
+
 	ENSURE_INITIALIZED;
 	
 	SafeMutex mutex(ServerListLock);
@@ -2696,8 +2700,8 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 	time_t timeNow = time(NULL);
 	double timeDiffSeconds = difftime(m_dtRefreshKeyList, timeNow);
 
-	// don't call RefreshKeyList if just made the same call within the last second
-	if(abs(timeDiffSeconds) > 1.0)	
+	// don't call RefreshKeyList if just made the same call within the last 5 seconds
+	if(abs(timeDiffSeconds) > 5.0)	
 	{
 		hr = RefreshKeyList();
 		if(SUCCEEDED(hr))
@@ -2730,6 +2734,8 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 		}
 	}
 	
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicenses() - Leave");
+//OutputDebugStringW(debug_buf);
 	return hr;
 }
 
