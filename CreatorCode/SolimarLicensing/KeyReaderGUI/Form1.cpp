@@ -6,13 +6,13 @@
 #define NUM_KEY_COLUMNS					   7
 #define NUM_MOD_COLUMNS					   3
 
-#define KEY_NUMBER_COL_WIDTH			   72
-#define PRODUCT_ID_COL_WIDTH			   120
-#define PRODUCT_VERSION_COL_WIDTH		   87
-#define LICENSES_COL_WIDTH				   49
-#define ACTIVE_COL_WIDTH				   42
-#define HOURS_LEFT_COL_WIDTH			   71
-#define EXPIRATION_COL_WIDTH			   150
+#define KEY_NUMBER_COL_WIDTH			   90
+#define PRODUCT_ID_COL_WIDTH			   90
+#define PRODUCT_VERSION_COL_WIDTH		   60
+#define LICENSES_COL_WIDTH				   70
+#define HOURS_LEFT_COL_WIDTH			   60
+#define EXPIRATION_COL_WIDTH			   140
+#define KEY_TYPE_COL_WIDTH				   90	
 
 #define MODULE_NAME_COL_WIDTH			   160
 #define IN_USE_COL_WIDTH				   48
@@ -61,12 +61,17 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 Form1::Form1()
 {
 	CurrentKeySelected = NULL;
+
+	//Object to connect with the license server
+	TheCommLink = new CommunicationLink();
+	
 	//The Sizing Manager scales the size of the form with respect to the monitor resolution
 	this->TheSizingManager = new ControlSizing(this);
 
 	//SaveCfg is used to save the form/control sizes into the registry
 	this->SaveCfg = new SaveConfigurations(this);
 	this->SaveCfg->LoadSettings();
+	ServerList = this->SaveCfg->LoadServerConfig();
 	
 	//add all of the components to the form
 	InitializeComponent();
@@ -82,9 +87,6 @@ Form1::Form1()
 	this->ModuleLicensePanel->ResumeLayout(false);
 	this->ResumeLayout(false);
 
-	//create a new password validator
-	PasswordValidater = new PasswordValidation();
-
 	//create the comparer for the key list view
 	lvwColumnSorter = new ListViewItemComparer();
 	this->KeyInfoListView->ListViewItemSorter = lvwColumnSorter;
@@ -96,21 +98,61 @@ Form1::Form1()
 
 System::Void Form1::Form1_Load(System::Object *  sender, System::EventArgs *  e)
 {
-	//new up a key view manager to manage the key list view
-	this->TheKeyViewManager = new KeyInfoListViewManager(this->KeyInfoListView);
-	//New up a mod view manager to manage the list view
-	this->TheModViewManager = new ModuleLicenseListViewManager(this->ModLicenseListView);
+	int listCount = ServerList->Count;
+	if(listCount > 0)
+	{
+		for(int i=0; i < listCount; i++)
+		{	
+			if(ConnectLink(ServerList->Item[i]->ToString()))
+				return;		
+		}		
+	} 
+	//failed to connect to saved connections or found none.
+	ConnectServer();
+}
 
-	if(!TheKeyViewManager->Connect() || !TheModViewManager->Connect())
-	{	
-		MessageBox::Show("Failed to connect to the License Server. License Manager will now close.", "License Server Error", MessageBoxButtons::OK, MessageBoxIcon::Error);			
-		Application::Exit();
+bool Form1::ConnectLink(String* ServerName)
+{
+	if(!SUCCEEDED(TheCommLink->Connect(ServerName))) 
+	{		
+		tabCtrl_Server->TabPages->Item[0]->Text = S"Not Connected";
+		EnableMenuItems(false);
+		return false;
 	}
-	else
-		//fill in the key list view with the appropriate values
-		TheKeyViewManager->PopulateView();
-
-	UpdateKeyListView();
+	//new up a key view manager to manage the key list view
+	this->TheKeyViewManager = new KeyInfoListViewManager(this->TheCommLink, this->KeyInfoListView);
+	//New up a mod view manager to manage the list view
+	this->TheModViewManager = new ModuleLicenseListViewManager(this->TheCommLink, this->ModLicenseListView);
+	//create a new password validator
+	PasswordValidater = new PasswordValidation(this->TheCommLink);		
+	//Update tab with connected server name
+	tabCtrl_Server->TabPages->Item[0]->Text = ServerName;
+	UpdateViews();
+	EnableMenuItems(true);
+	return true;
+}
+bool Form1::DisconnectLink()
+{
+	if(TheKeyViewManager)
+	{
+		delete TheKeyViewManager;
+		TheKeyViewManager = NULL;
+	}
+	if(this->TheModViewManager)
+	{
+		delete TheModViewManager;
+		TheModViewManager = NULL;
+	}
+	if(PasswordValidater)
+	{
+		delete PasswordValidater;
+		PasswordValidater = NULL;
+	}
+	//Clear Module & Key view	
+	this->ModLicenseListView->Items->Clear();
+	this->KeyInfoListView->Items->Clear();
+	TheCommLink->Disconnect();
+	return true;
 }
 
 void Form1::Dispose(Boolean disposing)
@@ -151,8 +193,6 @@ void Form1::Dispose(Boolean disposing)
 	}
 	__super::Dispose(disposing);
 }
-
-
 
 //Initializes the form. This function loads the form size and location from registry
 void Form1::InitializeGUITimer()
@@ -211,11 +251,11 @@ void Form1::InitializeKeyInfoListView()
 {
 	this->KeyNumber->Text = S"Key Number";
 	this->ProductID->Text = S"Product ID";
-	this->ProductVersion->Text = S"Product Version";
+	this->ProductVersion->Text = S"Version";
 	this->License->Text = S"License";
-	this->Active->Text = S"Active";
 	this->HoursLeft->Text = S"Days Left";
 	this->ExpirationDate->Text = S"Expiration Date";
+	this->KeyType->Text = S"Key Type";
 
 	//set the list view attributes
 	this->KeyInfoListView->Alignment = ListViewAlignment::SnapToGrid;
@@ -245,20 +285,20 @@ void Form1::InitializeKeyInfoListView()
 		this->ProductID->Width = PRODUCT_ID_COL_WIDTH;
 		this->ProductVersion->Width = PRODUCT_VERSION_COL_WIDTH;
 		this->License->Width = LICENSES_COL_WIDTH;
-		this->Active->Width = ACTIVE_COL_WIDTH;
 		this->HoursLeft->Width = HOURS_LEFT_COL_WIDTH;
 		this->ExpirationDate->Width = EXPIRATION_COL_WIDTH;
+		this->KeyType->Width = KEY_TYPE_COL_WIDTH;
 	}
 	else
 	{
-		this->KeyNumber->Width = KeyConfigStruct.ColWidths[0];
-		this->ProductID->Width = KeyConfigStruct.ColWidths[1];
-		this->ProductVersion->Width = KeyConfigStruct.ColWidths[2];
-		this->License->Width = KeyConfigStruct.ColWidths[3];
-		this->Active->Width = KeyConfigStruct.ColWidths[4];
+		this->KeyType->Width = KeyConfigStruct.ColWidths[0];
+		this->KeyNumber->Width = KeyConfigStruct.ColWidths[1];
+		this->ProductID->Width = KeyConfigStruct.ColWidths[2];
+		this->ProductVersion->Width = KeyConfigStruct.ColWidths[3];
+		this->License->Width = KeyConfigStruct.ColWidths[4];
 		this->HoursLeft->Width = KeyConfigStruct.ColWidths[5];
 		this->ExpirationDate->Width = KeyConfigStruct.ColWidths[6];
-	
+
 		//set the order of the columns in the view
 		//get the current column order
 		int LCount = KeyInfoListView->Columns->Count;
@@ -342,6 +382,35 @@ void Form1::InitializeModListView()
 																	   &Form1::ModList_RowChange
 																	  );
 }
+System::Void Form1::File_ConnectServer_Click(System::Object *  sender, System::EventArgs *  e)
+{	
+	ConnectServer();
+}
+
+System::Void Form1::ConnectServer()
+{
+	String* ConnectedServer;
+	TheConnectToForm = new ConnectToForm(ServerList);
+	if(TheConnectToForm->ShowDialog() == DialogResult::OK)
+	{	//Connection is validated at this point
+		ConnectedServer = TheConnectToForm->GetServerName();
+		DisconnectLink();
+		if(!ConnectLink(ConnectedServer))			
+		{
+			//System::String* estr = System::String::Format("An exception was thrown.\r\n\r\n{0}\r\n\r\nLicense Manager will now close. ",ExceptionStringFormater(e,0));		
+			MessageBox::Show("Failed to connect successfully to any known license server","Connection Error", MessageBoxButtons::OK, MessageBoxIcon::Error); 
+		}
+		else				
+		{	//remove from current position if already exist
+			if(ServerList->Contains(ConnectedServer))
+				ServerList->Remove(ConnectedServer);
+			ServerList->Insert(0, ConnectedServer);
+		}
+	}	
+	delete TheConnectToForm;
+	TheConnectToForm = NULL;
+}
+
 System::Void Form1::ExitMenuItem_Click(System::Object *  sender, System::EventArgs *  e)
 {
 	Form1_Closing(sender, e);
@@ -357,7 +426,14 @@ void Form1::InitializeMainMenu()
 
 void Form1::AboutSolimar_Click(Object* sender, System::EventArgs* e)
 {
-	TheAboutBox = new AboutBox();
+	long Major, Minor, Version;
+	String* version = S"XX.XX.XXXXXX";
+
+	TheAboutBox = new AboutBox();	
+	if(SUCCEEDED(TheCommLink->GetServerVersion(&Major, &Minor, &Version)))	
+		version = String::Concat(((int)Major).ToString(),S".",((int)Minor).ToString(),S".", ((int)Version).ToString());			
+	
+	TheAboutBox->SetServerVersion(version);
 	TheAboutBox->ShowDialog();
 }
 
@@ -435,16 +511,19 @@ void Form1::KeyList_RowChange(Object* sender, System::EventArgs* e)
 	
 	//enumerate through the selected rows
 	System::Collections::IEnumerator* myEnum = RowItems->GetEnumerator();
+	System::Windows::Forms::Cursor* storedCursor = this->Cursor;
+	this->Cursor = Cursors::WaitCursor;
 	while (myEnum->MoveNext())
 	{
 		//grab the key number from the selected row  and populate the 
 		//mod license list view based on the new key value
 		ListViewItem* CurrentItem = __try_cast<ListViewItem*>(myEnum->Current);
-		CurrentKeySelected = CurrentItem->Text;
+		CurrentKeySelected = CurrentItem->SubItems->Item[1]->Text; //key number is 1st subitem
 		this->TheModViewManager->SetKeyID(CurrentKeySelected);
 		TheModViewManager->PopulateView();
 	}
 	this->ModLicenseListView->EndUpdate();
+	this->Cursor = storedCursor;
 
 	//restart the timer
 	myTimer->Enabled = true;
@@ -619,6 +698,12 @@ void Form1::SelectCurrentKey()
 	}
 }
 
+void Form1::EnableMenuItems(bool bVal)
+{
+	this->viewMenuItem->Enabled = bVal;
+	this->PasswordMenuItem->Enabled = bVal;
+}
+
 //Highlights the entire row when the user clicks on an individual cell
 void Form1::KeyList_MouseUp(Object* sender, MouseEventArgs* e)
 {
@@ -649,6 +734,7 @@ void Form1::Form1_Closing(Object* sender, EventArgs* e)
 	if(SaveCfg)
 	{
 		SaveCfg->SaveFormConfigs();
+		SaveCfg->SaveServerConfig(this->ServerList);
 		SaveCfg->SaveKeyListConfig(this->KeyInfoListView);
 		SaveCfg->SaveModListConfig(this->ModLicenseListView);
 		SaveCfg->SaveSettings();

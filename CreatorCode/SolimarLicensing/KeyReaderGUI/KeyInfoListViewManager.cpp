@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "KeyInfoListViewManager.h"
 
-
 //Used to Map the Product IDs as specified in KeySpec.xml
 const int SPDProductID = 0;
 const int XImageProductID = 1;
@@ -30,56 +29,77 @@ const int ExtendedTrialID5 = 7;
 const int Unused = 10;
 const int Deactivated = 11;
 
+//Used to map the key type as specified in KeySpec.xml
+const int KEYNone			=0;
+const int KEYAddon		    =1;
+const int KEYBase			=2;
+const int KEYReplacement	=3;
+const int KEYRelicense	    =4;
+const int KEYInventory	    =5;
+const int KEYBackup		    =6;
+const int KEYEmergency	    =7;
+//const int //KEYSolimar	    =8
+const int KEYCustom		    =9;
+const int KEYLoan			=10;
+const int KEYDemo			=11;
+const int KEYRental		    =12;
+const int KEYDevelopment	=13;
+const int KEYReserved		=14;
+
 using namespace KeyViewManager;
 
 #undef MessageBox
-KeyInfoListViewManager::KeyInfoListViewManager(ListView* KeyInfoListView)
+KeyInfoListViewManager::KeyInfoListViewManager(CommunicationLink* CommLink, ListView* KeyInfoListView)
 			:TheKeyListView(KeyInfoListView)
 {
 	//new up a commlink object
-	OurCommLink = new CommunicationLink();
-	if(!OurCommLink)
-		return;
+	OurCommLink = CommLink;	
+	Connect();
 }
 
 KeyInfoListViewManager::~KeyInfoListViewManager()
 {
-	OurCommLink->UnInitializeKeyInfoConnection();
-	OurCommLink->Disconnect();
-	delete OurCommLink;
-	OurCommLink = 0;
+	Disconnect();
+	OurCommLink = NULL;
 
 	if(TheModViewManager)
 	{
 		delete TheModViewManager;
 		TheModViewManager = NULL;
 	}
-
 }
 
 bool KeyInfoListViewManager::Connect()
 {	
 	if(OurCommLink)
 	{
-			//connect to the solimar license server
-		if(SUCCEEDED(OurCommLink->Connect()))
-		{
-			//initializes the commlink object to be KeyInfo connection 
-			if(SUCCEEDED(OurCommLink->InitializeKeyInfoConnection()))
-				return true;
-		}
+		//initializes the commlink object to be KeyInfo connection 
+		if(SUCCEEDED(OurCommLink->InitializeKeyInfoConnection()))
+			return true;
+	}
+	return false;
+}
+
+bool KeyInfoListViewManager::Disconnect()
+{	
+	if(OurCommLink)
+	{		
+		OurCommLink->UnInitializeKeyInfoConnection();	
+		return true;			
 	}
 	return false;
 }
 
 bool KeyInfoListViewManager::PopulateView()
 {
-   bool FillRowSuccess = true;
+    bool FillRowSuccess = true;
 	KeyInfoStructure TheKeyInfoStructure;
-	int numkeys = OurCommLink->GetNumKeys();
+	if(!OurCommLink)
+		return false;
 
+	int	numKeys = OurCommLink->GetNumKeys();
 	//creates a new row for each key number in the key
-	for(int i = 0; i < numkeys; i++)
+	for(int i = 0; i < numKeys; i++)
 	{
 		memset(&TheKeyInfoStructure, 0, sizeof(KeyInfoStructure));
 		OurCommLink->GetKeyInfoStructure(TheKeyInfoStructure, i);
@@ -105,6 +125,10 @@ bool KeyInfoListViewManager::PopulateView()
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
 		retval = MapLicenseID(&LicenseID);
 		TheKeyInfoStructure.License.SetString(retval);
+
+		int KeyTypeID = ((int)(TheKeyInfoStructure.KeyType));
+		retval = MapKeyTypeID(&KeyTypeID);
+		TheKeyInfoStructure.KeyType.SetString(retval);
 
 		//fills the row with the info stored in the structure
 		FillRowSuccess = FillRow(TheKeyInfoStructure);
@@ -152,6 +176,48 @@ char* KeyInfoListViewManager::MapLicenseID(int* pLicenseID)
 				return retval = "Deactivated";
 			default :
 				return retval = "Unknown License";
+		}
+}
+
+//maps the status id returned from the lower layer app
+//to the corresponding license as described in status.txt
+char* KeyInfoListViewManager::MapKeyTypeID(int* pKeyTypeID)
+{
+		char* retval;
+
+		//map the Product ID according to KeySpec.xml
+		switch (*pKeyTypeID)
+		{
+			case KEYNone :
+				return retval = "Uninitialized Trial";
+			case KEYAddon :
+				return retval = "Addon";				
+			case KEYBase :
+				return retval = "Base";
+			case KEYReplacement :
+				return retval = "Replacement";				
+			case KEYRelicense :
+				return retval = "Relicense";				
+			case KEYInventory :
+				return retval = "Inventory";				
+			case KEYBackup :
+				return retval = "Backup";								
+			case KEYEmergency :
+				return retval = "Emergency";				
+			//case //KEYSolimar :
+			//	return retval = "Unused";				
+			case KEYCustom : 
+				return retval = "Custom";
+			case KEYLoan :
+				return retval = "Loan";
+			case KEYDemo :
+				return retval = "Demo";
+			case KEYRental :
+				return retval = "Rental";
+			case KEYDevelopment :
+				return retval = "Development";
+			default :
+				return retval = "Reserved";
 		}
 }
 
@@ -214,22 +280,32 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 //Fills a row with the info in the key info structure
 bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
-	bool bRetVal = false;
 	ListViewItem*  listViewItem1 = new ListViewItem();
-	listViewItem1->Text = TheKeyInfoStructure.KeyNumber.bstrVal;
-	
-	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductID.bstrVal);
-	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductVersion.bstrVal);
-	listViewItem1->SubItems->Add(TheKeyInfoStructure.License.bstrVal);
-
+	listViewItem1->UseItemStyleForSubItems = true;
+	//Active Status - Red,Italic or Black
 	if(TheKeyInfoStructure.Active.intVal == 0) 
-		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u2212"));
-		listViewItem1->SubItems->Add(S"-"); 
-	else
-		//listViewItem1->SubItems->Add(UnicodeStrToString(S"\u002B")); 
-		listViewItem1->SubItems->Add(S"+"); 
+	{
+		listViewItem1->Font = new System::Drawing::Font(listViewItem1->Font,System::Drawing::FontStyle::Italic);
+		listViewItem1->ForeColor = System::Drawing::Color::Red;
+	}
 
-   //Convert the hours left into Days Left as requested by Tech Support
+	//Connection Type - Remote(Blue) or Local(Black)
+	if(TheKeyInfoStructure.ApplicationInstance.intVal > 0) 
+	{
+		listViewItem1->ForeColor = System::Drawing::Color::SteelBlue;
+	}
+	//Key Type Column
+	listViewItem1->Text = TheKeyInfoStructure.KeyType.bstrVal;
+	//KeyNumber Column
+	listViewItem1->SubItems->Add(TheKeyInfoStructure.KeyNumber.bstrVal);	
+	//Product ID Column
+	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductID.bstrVal);
+	//Product Version Column
+	listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductVersion.bstrVal);
+	//License Status Column
+	listViewItem1->SubItems->Add(TheKeyInfoStructure.License.bstrVal);
+	//Days Left Column
+    //Convert the hours left into Days Left as requested by Tech Support
     TheKeyInfoStructure.HoursLeft /= 24;
 	//Permanent Key
 	if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
@@ -240,7 +316,6 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		sprintf_s(retval, sizeof(retval)/sizeof(char), "%d", TheKeyInfoStructure.HoursLeft);
 		listViewItem1->SubItems->Add(retval);
 	}
-
 	//Convert from UTC time to Local time.
 	SYSTEMTIME st;
 	FILETIME ft, dft;
@@ -252,6 +327,7 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
     li.HighPart = dft.dwHighDateTime;    
 	System::DateTime utc_t = System::DateTime::FromFileTimeUtc(li.QuadPart);
 
+	//Expiration Date Column
 	if(TheKeyInfoStructure.ExpirationDate)
 	{
 		//Permanent Key
@@ -259,13 +335,11 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 			listViewItem1->SubItems->Add(S"Unlimited");
 		else	
 			listViewItem1->SubItems->Add(utc_t.ToString());
-
-		ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
-    	__mcTemp__2[0] = listViewItem1;
-		this->TheKeyListView->Items->AddRange(__mcTemp__2);
-		bRetVal = true;
 	}
-	return bRetVal;
+	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
+    __mcTemp__2[0] = listViewItem1;
+	this->TheKeyListView->Items->AddRange(__mcTemp__2);
+	return true;
 }
 
 String* KeyInfoListViewManager::UnicodeStrToString(String* uniStr)

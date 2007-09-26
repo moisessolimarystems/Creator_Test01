@@ -3,19 +3,16 @@
 
 using namespace PWDValidation;
 
-PasswordValidation::PasswordValidation()
+PasswordValidation::PasswordValidation(CommunicationLink* CommLink)
 {
-	TheCommLink = new CommunicationLink();
-	TheCommLink->Connect();
+	TheCommLink = CommLink;
+	//TheCommLink->Connect();
 }
 
 PasswordValidation::~PasswordValidation()
 {
-	if(TheCommLink)
-	{
-		delete TheCommLink;
-		TheCommLink = NULL;
-	}
+	if(TheCommLink)	
+		TheCommLink = NULL;	
 }
 
 HRESULT PasswordValidation::ProcessPasswordFile(BSTR TheFileName)

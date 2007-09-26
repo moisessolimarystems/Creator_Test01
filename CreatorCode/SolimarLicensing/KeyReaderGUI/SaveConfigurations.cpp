@@ -7,7 +7,7 @@ using namespace SaveConfig;
 SaveConfigurations::SaveConfigurations(Form* TheForm) 
 									  : MainForm(TheForm)	
 {
-	settingsFileName = "SolimarLicenseManager.config";
+	settingsFileName = "SolimarLicenseManager2.config";
 	formConfig = new FormSettings();
 }
 
@@ -23,8 +23,7 @@ void SaveConfigurations::SaveFormConfigs()
 void SaveConfigurations::LoadFormConfigs(Point* FormLocation, Size* FormSize)
 {
 	//if the return value is -1 then set width = -1 so the calling function knows that 
-	//this is the first run through
-	
+	//this is the first run through	
 	if(formConfig->FormSize.Width < 0) //figure out how to detect first time
 	{
 		FormSize->Width = -1;
@@ -35,6 +34,15 @@ void SaveConfigurations::LoadFormConfigs(Point* FormLocation, Size* FormSize)
 	*FormSize = formConfig->FormSize;
 }
 
+void SaveConfigurations::SaveServerConfig(ArrayList* ServerList)
+{
+	formConfig->ServerList = ServerList;
+}
+
+ArrayList* SaveConfigurations::LoadServerConfig()
+{	
+	return formConfig->ServerList;
+}
 
 void SaveConfigurations::SaveModListConfig(ListView* TheModListView)
 {
@@ -146,8 +154,9 @@ void SaveConfigurations::LoadKeyListConfig(KeyGUIConfigurationStructPtr TheKeyCo
 	//next group of data deals with the column headers
 	for(int count = 0; count < NUM_KEY_COLS; count++)
 	{
+		//need to add verification of values in case they get corrupt
 		TheKeyConfigStruct->ColWidths[count] =  formConfig->KeyColWidth[count];
-		TheKeyConfigStruct->ColOrder[count] = formConfig->KeyColOrder[count];
+		TheKeyConfigStruct->ColOrder[count] = count;//formConfig->KeyColOrder[count];
 	}
 }
 
@@ -165,7 +174,7 @@ void SaveConfigurations::LoadSettings()
 		}
 
 		// Read the stream from Isolated Storage.
-		Stream* stream = new IsolatedStorageFileStream(settingsFileName, FileMode::OpenOrCreate, isoStore );
+		Stream* stream = new IsolatedStorageFileStream(settingsFileName, FileMode::Open, isoStore );
 		if ( stream != NULL )
 		{
 			try
@@ -181,7 +190,7 @@ void SaveConfigurations::LoadSettings()
 			stream->Close();
 		}
 	}
-	catch(Exception*)
+	catch(Exception* e)
 	{
 		//Exception thrown trying to retrieve IsolatedStorage. Skip loading settings.
 	}
@@ -193,9 +202,7 @@ void SaveConfigurations::SaveSettings()
 	try
 	{
 		IsolatedStorageFile* isoStore = IsolatedStorageFile::GetUserStoreForDomain();
-
-		Stream* stream = new IsolatedStorageFileStream(settingsFileName, FileMode::Create, isoStore );
-
+		Stream* stream = new IsolatedStorageFileStream(settingsFileName, FileMode::OpenOrCreate, isoStore );
 		if ( stream != NULL )
 		{
 			try
@@ -211,7 +218,7 @@ void SaveConfigurations::SaveSettings()
 			stream->Close();
 		}
 	}
-	catch(Exception*)
+	catch(Exception* e)
 	{
 		//Exception thrown trying to retrieve IsolatedStorage. Skip saving settings.
 	}

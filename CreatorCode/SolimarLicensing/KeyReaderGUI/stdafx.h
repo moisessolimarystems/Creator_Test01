@@ -32,10 +32,12 @@ typedef struct
 	_variant_t		KeyNumber;
 	_variant_t		ProductID;
 	_variant_t		ProductVersion;
+	_variant_t		ApplicationInstance;
 	_variant_t		License;
 	long			HoursLeft;
 	_variant_t		Active;
 	_variant_t		ExpirationDate;
+	_variant_t		KeyType;
 }KeyInfoStructure, *KeyInfoStructurePtr;
 
 typedef struct
