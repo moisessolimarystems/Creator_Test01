@@ -16,7 +16,7 @@ BYTE challenge_key_manager_thisauthuser_private[] = {
 const long KeyTypeID = 10020;
 const long ProductID = 10021;
 const long ProductVersionID = 10022;
-const long ApplicationInstanceID = 10025;
+const long ApplicationInstanceID = 10024;
 const long LicenseID = 10025;	
 
 using namespace System::Runtime::InteropServices; // for class Marshal
