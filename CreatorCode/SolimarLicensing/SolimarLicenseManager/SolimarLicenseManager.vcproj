@@ -443,6 +443,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\COMUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\CryptoHelper.cpp"
 				>
 			</File>
@@ -464,6 +468,10 @@
 			</File>
 			<File
 				RelativePath="..\common\NetworkUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\Registry.cpp"
 				>
 			</File>
 			<File
@@ -501,6 +509,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\COMUtils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\CryptoHelper.h"
 				>
 			</File>
@@ -533,11 +545,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicenseRegistryKeys.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicensingMessage.h"
 				>
 			</File>
 			<File
 				RelativePath="..\common\NetworkUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\Registry.h"
 				>
 			</File>
 			<File
