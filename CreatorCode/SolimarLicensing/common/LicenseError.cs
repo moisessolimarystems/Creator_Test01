@@ -86,6 +86,8 @@ namespace Solimar
 			private const uint EHR_KEY_NO_BASE_KEY = ITF_LIC_SVR_OFFSET + 23;
 			private const uint EHR_KEY_RESTORED_KEY_SERVER = ITF_LIC_SVR_OFFSET + 24;
 			private const uint EHR_KEY_USE_BACKUP_KEY_SERVER = ITF_LIC_SVR_OFFSET + 25;
+			private const uint EHR_KEY_USE_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET + 26;
+			
 		
 			// Rainbow driver errors
 			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -158,6 +160,7 @@ namespace Solimar
 				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY, "Unable to locate a Base Key on the server, all keys on this server will be ignored (Key server)");
 				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER, "Licensing on the Key Server has been restored (Key server)");
 				SolLicErrors.Add(EHR_KEY_USE_BACKUP_KEY_SERVER, "Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER, "License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)");
 				SolLicErrors.Add(EHR_SP_INVALID_FUNCTION_CODE,"Invalid function code (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_PACKET,"Invalid packet (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_UNIT_NOT_FOUND,"Unit not found (Rainbow driver)");
