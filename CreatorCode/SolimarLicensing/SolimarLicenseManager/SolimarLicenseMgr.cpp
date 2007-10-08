@@ -11,7 +11,9 @@
 #include "..\common\LicenseError.h"
 #include "..\common\VersionInfo.h"
 #include "..\common\NetworkUtils.h"
+#include "..\common\Registry.h"
 #include "..\SolimarLicenseServer\KeyMessages.h"
+#include "..\common\LicenseRegistryKeys.h"
 #include "resource.h"
 #include <string>
 #include "list"
@@ -165,6 +167,7 @@ CSolimarLicenseMgr::CSolimarLicenseMgr() :
 
 CSolimarLicenseMgr::~CSolimarLicenseMgr()
 {
+//OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr()");	
 	Disconnect();
 	if (HeartbeatThread)
 		delete HeartbeatThread;
@@ -239,7 +242,6 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 		return hr;	//Return is already connected to the server
 	}
 	
-
 	// Try to create an ISolimarLicenseServer proxy to the server
 	COSERVERINFO	serverInfo	= {0, server, NULL, 0};
 	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
@@ -277,10 +279,123 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 			pILicenseServer->Release();
 		}
 	}
+	else	//CoCreateInstanceEx() Failed
+	{
+		//Try to call CoCreateInstanceEx() for ISolimarLicenseSvr2, if this succeeds then the machine has a license server installed,
+		//but the version of the license server doesn't support remote connections.
+		COSERVERINFO	serverInfoLegacy	= {0, server, NULL, 0};
+		MULTI_QI		multiQILegacy		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
+		hr = CoCreateInstanceEx(
+			__uuidof(CSolimarLicenseSvr), 
+			NULL, 
+			CLSCTX_REMOTE_SERVER, 
+			&serverInfoLegacy, 
+			1, 
+			&multiQILegacy);
+		if (SUCCEEDED(hr))
+		{	
+			//Log a message that the license server you are connecting to is at a version that doesn't allow remote connections.
+			hr = LicenseServerError::EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER;
+			//hr = S_FALSE;
+		}
+	}
 
 	m_initialized = false;
 
 //swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 leave - hr: 0x%08x", hr);
+//OutputDebugString(tmpbuf); 
+	return hr;
+}
+STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUseSharedLicenseServers)
+{
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d) - Enter", product);
+//OutputDebugString(tmpbuf); 
+
+	HRESULT hr(S_OK);
+
+	//Find the product in the registry
+	//Cycle through all the Keys, each key contains 1 server to contact
+	HKEY kKeyRoot = HKEY_LOCAL_MACHINE;
+	wchar_t strProduct[32];
+	swprintf_s(strProduct, 32, L"%d", product);
+	BSTR key = REGISTRY_LICENSING_BASE + _bstr_t(L"\\") + REGISTRY_LICENSINGSERVER_KEY + _bstr_t(L"\\") + _bstr_t(strProduct);
+	_bstr_t subKey;
+	bool bConnectedToAtleastOneComputer = false;
+
+	REGSAM samDesired=0;
+	for(DWORD index = 0;;index++)	//Loop forever
+	{
+		//Returns S_FALSE when there are no more sub keys to enumerate.
+		hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
+		if(index==0 && hr == S_FALSE) //Special case no key found on first query
+		{
+			//check both the 64 bit and 32 bit registry incase you are on a 64 bit machine.  Not specifying either will defaultly check
+			//the appropiate registry, so need to check both because you do not know if you are currently loaded into a 64-bit or 32-bit
+			//process on a 64 bit machine.
+			try
+			{
+				for(;;)
+				{
+					samDesired = KEY_WOW64_32KEY;	//Access a 32-bit key from either a 32-bit or 64-bit application.
+					hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
+					if(hr == S_OK)
+						break;
+
+					samDesired = KEY_WOW64_64KEY;	//Access a 64-bit key from either a 32-bit or 64-bit application.
+					hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
+					if(hr == S_OK)
+						break;
+
+					break;//Unconditional break;
+				}
+			}
+			catch(...)//checking for3 32 or 64 bit registry on windows 2000 is not supported and may throw an exception
+			{
+				samDesired = 0;
+			}
+		}
+		if(hr == S_FALSE)
+		{
+			hr = S_OK;
+			break;	//No more keys to enumerate...
+		}
+		else if(SUCCEEDED(hr))
+		{
+			_bstr_t newKey = key + _bstr_t(L"\\") + subKey;
+			_variant_t vtValueName;
+			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_SERVERNAME_VALUE, vtValueName, samDesired);
+			if(FAILED(hr) || vtValueName.vt != VT_BSTR) continue;
+
+			_variant_t vtValueBackupServer;
+			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_BACKUP_VALUE, vtValueBackupServer, samDesired);
+			if(FAILED(hr) || vtValueBackupServer.vt != VT_UI4) continue;
+
+			_variant_t vtValueSharedServer;
+			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_SHARED_VALUE, vtValueSharedServer, samDesired);
+			if(FAILED(hr) || vtValueSharedServer.vt != VT_UI4) continue;
+
+			if((bUseSharedLicenseServers == VARIANT_TRUE && vtValueSharedServer.ulVal==1) ||
+				(bUseSharedLicenseServers == VARIANT_FALSE && vtValueSharedServer.ulVal==0))
+			{
+				hr = Connect2(vtValueName.bstrVal, vtValueSharedServer.ulVal==0 ? VARIANT_FALSE : VARIANT_TRUE, vtValueBackupServer.ulVal==0 ? VARIANT_FALSE : VARIANT_TRUE);
+				if(FAILED(hr))
+					break;
+			}
+			bConnectedToAtleastOneComputer = true;
+		}
+	}
+	if(SUCCEEDED(hr) && bConnectedToAtleastOneComputer == false)
+	{
+		//Didn't connect to a PC, try to connect to local host.
+		hr = Connect2(L"localhost", VARIANT_FALSE, VARIANT_FALSE);
+	}
+	if(FAILED(hr))	//if failed any connect call, disconnect from any possible connections made.
+	{
+		Disconnect();
+	}
+
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct leave - hr: 0x%08x", hr);
 //OutputDebugString(tmpbuf); 
 	return hr;
 }
@@ -351,6 +466,72 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 	return S_OK;
 }
 
+
+STDMETHODIMP CSolimarLicenseMgr::KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL *p_bool_key_product_exists)
+{
+	// get the key list form the server
+	HRESULT hr = S_OK;
+	
+	*p_bool_key_product_exists = VARIANT_FALSE;
+	for(int loopIdx=0; loopIdx<2; loopIdx++)
+	{
+		ServerList::iterator server = loopIdx==0 ? m_servers.begin() : m_backupServers.begin();
+		ServerList::iterator serverEnd = loopIdx==0 ? m_servers.end() : m_backupServers.end();
+		// foreach server
+		for (;server != serverEnd; ++server)
+		{
+			// get the key list form the server
+			VARIANT vtKeyList;
+			try 
+			{
+				SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+				if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+				{
+					VARIANT *pvtKeyIdent;
+					if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+					{
+						for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)	//for each key on the server
+						{
+							_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+							VARIANT vtKeyProductID, vtKeyProductVersion;
+							
+							// check that the key is present and valid
+							VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+							//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
+							hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+							if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+							
+							// check that the key has the requisite product version and etc.
+							hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+							if (FAILED(hr)) {hr = S_OK; continue;}
+							hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+							if (FAILED(hr)) {hr = S_OK; continue;}
+							
+							// if the product id and product version requirements are satisfied
+							if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(prod_ver_major, prod_ver_minor, 0, 0)) && product==vtKeyProductID.uiVal)
+							{
+								*p_bool_key_product_exists = VARIANT_TRUE;
+								break;
+							}
+						}	//End for each key on the server
+					}
+				}
+			}
+			catch (_com_error &e) 
+			{
+				if(SS_RPC_FAILED(e.Error()))
+				{
+					//Log Message about RPC failure to Key
+					SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
+					SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				}
+			}
+			if(*p_bool_key_product_exists == VARIANT_TRUE)
+				break;	//Leave Loop
+		}	//End for (;server != serverEnd; ++server)
+	}	//End for(int loopIdx=0; loopIdx<2; loopIdx++)
+	return hr;
+}
 //
 // S_OK if some keys were found
 // S_FALSE if no keys are found
@@ -2074,6 +2255,10 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 	std::map<unsigned int, int> moduleCounterMap;
 	int baseKeysSeen = 0;
 	HRESULT hr = S_OK;
+
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::SetUnlimitedModulesOnKeys (application_instance: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)application_instance, app_instance_lock_key ? L"true" : L"false");
+//OutputDebugString(tmpbuf);
 
 	for (ServerInfo::KeyList::iterator keyIt = pServerInfo->keys.begin(); keyIt != pServerInfo->keys.end(); ++keyIt)
 	{
