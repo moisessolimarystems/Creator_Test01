@@ -30,7 +30,7 @@ namespace SolimarLicenseManagerWrapper
 	if(FAILED(hr)) \
 	{ \
 		wchar_t debug_buf[1024]; \
-		_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"%s - %s", header, LicenseServerError::GetErrorMessage(hr).c_str()); \
+		_snwprintf(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"%s - %s", header, LicenseServerError::GetErrorMessage(hr).c_str()); \
 		debug_buf[1023] = 0; \
 		OutputDebugStringW(debug_buf); \
 	} \
@@ -45,6 +45,7 @@ public:
 	virtual ~LicensingWrapper();
 	bool Connect(std::wstring server);
 	bool Connect(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+	bool ConnectByProduct(long product, bool bUseSharedLicenseServers = false);
 
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	
@@ -54,6 +55,8 @@ public:
 	//bool app_instance_lock_key - Will lock the first base on each license server.  Will lock all add-on key, all bases keys on the system must match.
 	//bool bypass_remote_key_restriction - True means the restriction of remote license managers using non-remote keys has been lifted.
 	bool Initialize(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false);
+
+	bool KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists);
 
 
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);

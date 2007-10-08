@@ -132,6 +132,31 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Connect(std::wstring server
 	return SUCCEEDED(hr);
 }
 
+bool SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProduct(long product, bool bUseSharedLicenseServers)
+{
+	SafeMutex mutex(m_MemberLock);
+	
+	// authenticate
+	ISolimarLicenseMgr5* pISolimarLicenseMgr = NULL;
+	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
+	if (SUCCEEDED(hr))
+	{
+		// try to authenticate the license manager
+		hr = AuthenticateServer(reinterpret_cast<IDispatch*>(pISolimarLicenseMgr));
+		if (SUCCEEDED(hr))
+		{ // let the license manager authenticate this client
+			hr = AuthenticateToServer(reinterpret_cast<IDispatch*>(pISolimarLicenseMgr));
+			if (SUCCEEDED(hr))
+			{
+				// make a connection to the license manager
+				hr = pISolimarLicenseMgr->ConnectByProduct(product, bUseSharedLicenseServers ? VARIANT_TRUE : VARIANT_FALSE);
+			}
+		}	
+		pISolimarLicenseMgr->Release();
+	}
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProduct()", hr);
+	return SUCCEEDED(hr);
+}
 bool SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring &specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes)
 {
    return Initialize(L"", product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes);
@@ -156,6 +181,19 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(std::wstring app
    SysFreeString(bstrApplication_instance);
 
    LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::Initialize()", hr);
+   return SUCCEEDED(hr);
+}
+
+
+bool SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists)
+{
+	SafeMutex mutex(m_MemberLock);
+	VARIANT_BOOL bVtKeyExist = VARIANT_FALSE;
+	HRESULT hr = m_licenseManagerPtr->KeyProductExists(product, prod_ver_major, prod_ver_minor, &bVtKeyExist);
+	if(SUCCEEDED(hr))
+		*bKeyExists = bVtKeyExist==VARIANT_TRUE;
+
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExists()", hr);
    return SUCCEEDED(hr);
 }
 
@@ -317,17 +355,27 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadPro
 
 std::wstring SolimarLicenseManagerWrapper::LicensingWrapper::StringToWstring(const std::string &s)
 {
-	//size_t characters = mbstowcs(0, s.c_str(), 256);
-	size_t characters;
-	mbstowcs_s(&characters, 0, 0, s.c_str(), 256);
+	
+	#if _MSC_VER >= 1400	
+		size_t characters;
+		mbstowcs_s(&characters, 0, 0, s.c_str(), 256);
+	#else
+		size_t characters = mbstowcs(0, s.c_str(), 256);
+	#endif
+
 	wchar_t* ws = new wchar_t[characters];
 	ws[0]=0;
-	size_t tmpValue;
-	mbstowcs_s(	&tmpValue,
-				ws, 
-				wcslen(ws) + 1,	//size in words
-				s.c_str(),
-				characters);
+	
+	#if _MSC_VER >= 1400	
+		size_t tmpValue;
+		mbstowcs_s(	&tmpValue,
+					ws, 
+					wcslen(ws) + 1,	//size in words
+					s.c_str(),
+					characters);
+	#else
+		mbstowcs(ws,s.c_str(),characters);
+	#endif
 	ws[255]=0;
 	std::wstring ret = ws;
 	delete [] ws;

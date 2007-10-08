@@ -234,6 +234,8 @@ public:
 	STDMETHOD(Initialize3)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes, VARIANT_BOOL b_app_instance_lock_key, VARIANT_BOOL b_bypass_remote_key_restriction);
 	STDMETHOD(GetVersionLicenseManager) (long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 	STDMETHOD(GetVersionLicenseServer) (BSTR server, long* p_ver_major, long* p_ver_minor, long* p_ver_build);
+	STDMETHOD(ConnectByProduct)(long product, VARIANT_BOOL bUseSharedLicenseServers);
+	STDMETHOD(KeyProductExists)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL *p_bool_key_product_exists);
 
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);

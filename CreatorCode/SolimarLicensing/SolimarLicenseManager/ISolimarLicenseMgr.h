@@ -107,6 +107,9 @@ __interface ISolimarLicenseMgr5 : ISolimarLicenseMgr4
 	[id(14),helpstring("method Initialize3")] HRESULT Initialize3([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] VARIANT_BOOL single_key, [in] BSTR specific_single_key_ident, [in] VARIANT_BOOL lock_keys, [in] long auto_ui_level, [in] unsigned long grace_period_minutes, [in] VARIANT_BOOL app_instance_lock_key, [in] VARIANT_BOOL b_bypass_remote_key_restriction);
 	[id(15),helpstring("method GetVersionLicenseManager")] HRESULT GetVersionLicenseManager([out] long* p_ver_major, [out] long* p_ver_minor, [out] long* p_ver_build);
 	[id(16),helpstring("method GetVersionLicenseServer")] HRESULT GetVersionLicenseServer([in] BSTR server, [out] long* p_ver_major, [out] long* p_ver_minor, [out] long* p_ver_build);
+	[id(17),helpstring("method ConnectByProduct")] HRESULT ConnectByProduct([in] long product, [in] VARIANT_BOOL use_shared_licenses_servers);
+	[id(18),helpstring("method KeyProductExists")] HRESULT KeyProductExists([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [out] VARIANT_BOOL *p_bool_key_product_exists);
+
 };
 
 #endif
