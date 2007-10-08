@@ -91,4 +91,25 @@ __interface ISolimarLicenseMgr4 : ISolimarLicenseMgr3
 	[id(12),helpstring("method Initialize2")] HRESULT Initialize2([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] VARIANT_BOOL single_key, [in] BSTR specific_single_key_ident, [in] VARIANT_BOOL lock_keys, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
 };
 
+// ISolimarLicenseMgr5
+[
+	object,
+	uuid("9A0AF885-9C33-4f42-BFAA-648400429209"),
+	dual,	helpstring("ISolimarLicenseMgr5 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr5 : ISolimarLicenseMgr4
+{
+	// Connects to a key monitor server.
+	// Can be called multiple times in succession to connect to and aggregate multiple key servers
+	//	if bUseOnlySharedLicenses is set to true, will only use modules with the property SharedUse set.
+	[id(13),helpstring("method Connect2")] HRESULT Connect2([in] BSTR server, [in] VARIANT_BOOL use_only_shared_licenses, [in] VARIANT_BOOL use_as_backup);
+	[id(14),helpstring("method Initialize3")] HRESULT Initialize3([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] VARIANT_BOOL single_key, [in] BSTR specific_single_key_ident, [in] VARIANT_BOOL lock_keys, [in] long auto_ui_level, [in] unsigned long grace_period_minutes, [in] VARIANT_BOOL app_instance_lock_key, [in] VARIANT_BOOL b_bypass_remote_key_restriction);
+	[id(15),helpstring("method GetVersionLicenseManager")] HRESULT GetVersionLicenseManager([out] long* p_ver_major, [out] long* p_ver_minor, [out] long* p_ver_build);
+	[id(16),helpstring("method GetVersionLicenseServer")] HRESULT GetVersionLicenseServer([in] BSTR server, [out] long* p_ver_major, [out] long* p_ver_minor, [out] long* p_ver_build);
+	[id(17),helpstring("method ConnectByProduct")] HRESULT ConnectByProduct([in] long product, [in] VARIANT_BOOL use_shared_licenses_servers);
+	[id(18),helpstring("method KeyProductExists")] HRESULT KeyProductExists([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [out] VARIANT_BOOL *p_bool_key_product_exists);
+
+};
+
 #endif
