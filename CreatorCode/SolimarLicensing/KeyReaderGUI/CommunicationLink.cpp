@@ -64,19 +64,20 @@ HRESULT CommunicationLink::Connect(String* ServerName)
 							 1,
 							 &multiQI);
 	if(SUCCEEDED(hr))
+	{
 		pTheServer = (ISolimarLicenseSvr3*)multiQI.pItf;
-	else
-		return hr;
+		ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
+		// try to authenticate the license server
+		hr = cr.AuthenticateServer(pTheServer);
+		if (SUCCEEDED(hr))
+		{
+			// let the license server authenticate this manager
+			hr = cr.AuthenticateToServer(pTheServer);
+		}
+		if (FAILED(hr))
+			pTheServer->Release();
 
-	ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
-
-	hr = cr.AuthenticateServer(pTheServer);
-	if(!SUCCEEDED(hr))
-      return hr;
-
-	// let the license server authenticate this client
-	hr = cr.AuthenticateToServer(pTheServer);
-		
+	}	
 	return hr;
 }
 

@@ -30,6 +30,9 @@ namespace KeyViewManager
 		//to the corresponding product as described in keyspec.xml
 		char* MapProductID(int* pProductID);
 
+		//maps the product id returned from the lower layer app
+		//to the corresponding product as described in keyspec.xml
+		//static int* MapProductName(String* pProductName);
 		//maps the status id returned from the lower layer app
 		//to the corresponding license as described in status.txt
 		char* MapLicenseID(int* pLicenseID);

@@ -1,51 +1,6 @@
 #include "stdafx.h"
 #include "KeyInfoListViewManager.h"
 
-//Used to Map the Product IDs as specified in KeySpec.xml
-const int SPDProductID = 0;
-const int XImageProductID = 1;
-const int XImageNTProductID = 2;
-const int PCLDriverProductID = 3;
-const int IndexPlugInProductID = 4;
-const int ConnectivityServerProductID = 6;
-const int IConvertProductID = 7;
-const int SolSearcherEnterpriseProductID = 8;
-const int SolScriptProductID = 9;
-const int SDXDesignerProductID = 10;
-const int QuantumServerProductID = 11;
-const int RubikaProductID = 12;
-const int SPDEProductID = 14;
-const int SPProductID = 15;
-
-//Used to map the license as specified in KeySpec.xml
-const int InitialTrialID = 0;
-const int ExtendedTrialID = 1;
-const int Base = 2;
-const int UninitializedTrialID = 3;
-const int ExtendedTrialID2 = 4;
-const int ExtendedTrialID3 = 5;
-const int ExtendedTrialID4 = 6;
-const int ExtendedTrialID5 = 7;
-const int Unused = 10;
-const int Deactivated = 11;
-
-//Used to map the key type as specified in KeySpec.xml
-const int KEYNone			=0;
-const int KEYAddon		    =1;
-const int KEYBase			=2;
-const int KEYReplacement	=3;
-const int KEYRelicense	    =4;
-const int KEYInventory	    =5;
-const int KEYBackup		    =6;
-const int KEYEmergency	    =7;
-//const int //KEYSolimar	    =8
-const int KEYCustom		    =9;
-const int KEYLoan			=10;
-const int KEYDemo			=11;
-const int KEYRental		    =12;
-const int KEYDevelopment	=13;
-const int KEYReserved		=14;
-
 using namespace KeyViewManager;
 
 #undef MessageBox
@@ -277,6 +232,60 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 		}
 }
 
+/*
+int* KeyInfoListViewManager::MapProductName(String* pProductName)
+{
+		int* retVal;
+		//map the Product Name according to KeySpec.xml
+		switch (pProductName)
+		{
+			case L"SP/D Platinum" :
+				return retVal = SPDProductID;
+
+			case L"Connectivity Server" :
+				return retval = ConnectivityServerProductID;
+				
+			case L"Quantum Server" :
+				return retval = QuantumServerProductID;
+
+			case "XImage":
+				return retval = XImageProductID;
+				
+			case "XImage NT" :
+				return retval = XImageNTProductID;
+				
+			case "PCL Driver" :
+				return retval = PCLDriverProductID;
+				
+			case "IndexPlugInProductID" :
+				return retval = IndexPlugInProductID;
+								
+			case "IConvert"  :
+				return retval = IConvertProductID;
+				
+			case "SolSearcher Enterprise"  :
+				return retval = SolSearcherEnterpriseProductID;
+				
+			case "SolScript" : 
+				return retval = SolScriptProductID;
+				
+			case "SDX Designer" :
+				return retval = SDXDesignerProductID;
+
+			case "SSE SP" :
+				return retval = SPProductID;
+
+			case "Rubika" :
+				return retval = RubikaProductID;
+
+			case "SPDE" : 
+				return retval = SPDEProductID;
+
+			default :
+				return retval = 256;
+		}
+}
+*/
 //Fills a row with the info in the key info structure
 bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
@@ -336,6 +345,12 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		else	
 			listViewItem1->SubItems->Add(utc_t.ToString());
 	}
+	
+	/*char retval[10];
+	sprintf_s(retval, sizeof(retval)/sizeof(char), "%d", TheKeyInfoStructure.ApplicationInstance.intVal);
+	listViewItem1->SubItems->Add(retval);
+	*/
+
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     __mcTemp__2[0] = listViewItem1;
 	this->TheKeyListView->Items->AddRange(__mcTemp__2);

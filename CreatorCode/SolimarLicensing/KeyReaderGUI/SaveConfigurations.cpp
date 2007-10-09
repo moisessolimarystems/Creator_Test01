@@ -7,7 +7,7 @@ using namespace SaveConfig;
 SaveConfigurations::SaveConfigurations(Form* TheForm) 
 									  : MainForm(TheForm)	
 {
-	settingsFileName = "SolimarLicenseManager2.config";
+	settingsFileName = "SolimarLicenseManager1.config";
 	formConfig = new FormSettings();
 }
 
