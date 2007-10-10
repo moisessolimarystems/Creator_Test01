@@ -69,7 +69,7 @@ char* TFCustomerKeys::key_sort_type[] =
    " ORDER BY KTid, SCustomerRecord.SCRnumber,SKeyRecord.SKRnumber",                    // SORT_KEYTYPE
    " ORDER BY SKRstatus, SCustomerRecord.SCRnumber,SKeyRecord.SKRnumber",               // SORT_STATUS
    " ORDER BY SDid, SCustomerRecord.SCRnumber, SKeyRecord.SKRnumber",                   // SORT_SYSTEM
-   " ORDER BY SKeyRecord.SKRappInstances",                                              // SOFT_APPINSTANCES
+   " ORDER BY SKeyRecord.SKRappInstance",                                              // SOFT_APPINSTANCES
    NULL,
 };
 
