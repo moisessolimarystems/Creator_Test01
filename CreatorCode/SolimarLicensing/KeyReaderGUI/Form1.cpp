@@ -98,7 +98,7 @@ Form1::Form1()
 
 System::Void Form1::Form1_Load(System::Object *  sender, System::EventArgs *  e)
 {
-	int listCount = ServerList->Count;
+/*	int listCount = ServerList->Count;
 	if(listCount > 0)
 	{
 		for(int i=0; i < listCount; i++)
@@ -107,8 +107,10 @@ System::Void Form1::Form1_Load(System::Object *  sender, System::EventArgs *  e)
 				return;		
 		}		
 	} 
+
 	//failed to connect to saved connections or found none.
 	ConnectServer();
+*/	
 }
 
 bool Form1::ConnectLink(String* ServerName)
@@ -382,6 +384,11 @@ void Form1::InitializeModListView()
 																	   &Form1::ModList_RowChange
 																	  );
 }
+
+System::Void Form1::fileMenuItem_Popup(System::Object*  sender, System::EventArgs*  e)
+{
+
+}
 System::Void Form1::File_ConnectServer_Click(System::Object *  sender, System::EventArgs *  e)
 {	
 	ConnectServer();
@@ -405,10 +412,35 @@ System::Void Form1::ConnectServer()
 			if(ServerList->Contains(ConnectedServer))
 				ServerList->Remove(ConnectedServer);
 			ServerList->Insert(0, ConnectedServer);
+			//check connected server
+			if(IsLocalMachine(ConnectedServer))
+				File_ShutdownServer->Enabled = true;
+			else
+				File_ShutdownServer->Enabled = false;
 		}
 	}	
 	delete TheConnectToForm;
 	TheConnectToForm = NULL;
+}
+
+bool Form1::IsLocalMachine(String* ServerName)
+{
+	String *sName = (ServerName->Trim())->ToLower();
+	if(String::Equals(sName, L"localhost"))
+		return true;
+
+	if(String::Equals(sName, SystemInformation::ComputerName->ToLower()))
+		return true;
+		
+	IPHostEntry* ipEntry = Dns::GetHostEntry(SystemInformation::ComputerName);
+	IPAddress* addr[] = ipEntry->AddressList;
+	for(int i=0; i<addr->Length; i++)
+	{
+		if(String::Equals(addr[i]->ToString(), sName))
+			return true;
+	}
+	//need case to check ip address
+	return false;
 }
 
 System::Void Form1::ExitMenuItem_Click(System::Object *  sender, System::EventArgs *  e)
@@ -490,6 +522,35 @@ void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e)
 {
 	//updates the views
  	UpdateViews();
+}
+
+
+System::Void Form1::OptionsMenuItem_Popup(System::Object*  sender, System::EventArgs*  e)
+{
+	RegistryKey* rkey = Registry::LocalMachine->OpenSubKey(SOLIMAR_KEY);
+	if(rkey)
+	{
+		// Retrieve all the subkeys for the specified key.
+		String* productNames[] = rkey->GetSubKeyNames();
+		rkey->Close();
+		if(productNames->Count > 1)	//Solimar Licensing is one key
+			ServerSettingsMenuItem->Enabled = true;
+		else
+			ServerSettingsMenuItem->Enabled = false;
+
+	}	
+}
+
+System::Void Form1::ServerSettingsMenuItem_Click(System::Object*  sender, System::EventArgs*  e)
+{
+	//Launch Server Configurations form
+	TheServerConfigForm = new ServerConfiguration();
+	if(TheServerConfigForm->ShowDialog() == DialogResult::OK)
+	{	
+
+	}	
+	delete TheServerConfigForm;
+	TheServerConfigForm = NULL;
 }
 
 void Form1::KeyList_RowChange(Object* sender, System::EventArgs* e)

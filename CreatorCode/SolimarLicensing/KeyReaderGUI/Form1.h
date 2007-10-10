@@ -6,6 +6,7 @@
 #include "PswdForm.h"
 #include "AboutBox.h"
 #include "ConnectToForm.h"
+#include "ServerConfiguration.h"
 #include "ListViewItemComparer.h"
 #include "ModListViewItemComparer.h"
 #include "ControlSizing.h"
@@ -31,7 +32,7 @@ namespace KeyReaderGUI
 	using namespace ModListViewItemComparer;
 	using namespace SizeControl;
 	using namespace SaveConfig;
-
+	using namespace System::Net;
 
 	/// <summary> 
 	/// Summary for Form1
@@ -61,6 +62,7 @@ namespace KeyReaderGUI
 		bool DisconnectLink();
 		void ConnectServer();
 		void EnableMenuItems(bool);
+		bool IsLocalMachine(String*);
 
 		//helper methods used to initialize the components on the form
 		void InitializeKeyInfoListView();
@@ -103,6 +105,9 @@ namespace KeyReaderGUI
 	private: System::Windows::Forms::ColumnHeader*  HoursLeft;
 	private: System::Windows::Forms::ColumnHeader*  ExpirationDate;
 	private: System::Windows::Forms::ColumnHeader*  KeyType;
+
+	private: System::Windows::Forms::MenuItem*  OptionsMenuItem;
+	private: System::Windows::Forms::MenuItem*  ServerSettingsMenuItem;
 	private:	System::Windows::Forms::Timer    *  myTimer;
 
    //Event Handler methods
@@ -125,13 +130,20 @@ namespace KeyReaderGUI
 	void TimerEventProcessor(Object* myObject, EventArgs* myEventArgs);
 
 	//File Menu Item Event Handlers
+	System::Void fileMenuItem_Popup(System::Object*  sender, System::EventArgs*  e);
 	System::Void File_ConnectServer_Click(System::Object *  sender, System::EventArgs *  e);
 	System::Void ExitMenuItem_Click(System::Object *  sender, System::EventArgs *  e);
 
 	//Password Menu Item Event Handlers
     System::Void PasswordMenuItem_Select(System::Object *  sender, System::EventArgs *  e);
 	System::Void AddPasswordPacketMenuItem_Click(System::Object *  sender, System::EventArgs *  e);
+	
+	//Options Menu Item Event Handlers	 
+	System::Void OptionsMenuItem_Popup(System::Object*  sender, System::EventArgs*  e);
+	System::Void ServerSettingsMenuItem_Click(System::Object*  sender, System::EventArgs*  e);
+		 	
 	private: System::ComponentModel::IContainer*  components;
+
 
 	private:
 		/// <summary>
@@ -159,6 +171,8 @@ namespace KeyReaderGUI
 			this->PasswordMenuItem = (new System::Windows::Forms::MenuItem());
 			this->EnterPasswordMenuItem = (new System::Windows::Forms::MenuItem());
 			this->AddPasswordPacketMenuItem = (new System::Windows::Forms::MenuItem());
+			this->OptionsMenuItem = (new System::Windows::Forms::MenuItem());
+			this->ServerSettingsMenuItem = (new System::Windows::Forms::MenuItem());
 			this->HelpMenuItem = (new System::Windows::Forms::MenuItem());
 			this->AboutSolimar = (new System::Windows::Forms::MenuItem());
 			this->ModuleLicensePanel = (new System::Windows::Forms::Panel());
@@ -198,11 +212,12 @@ namespace KeyReaderGUI
 			// 
 			// mainMenu1
 			// 
-			System::Windows::Forms::MenuItem* __mcTemp__1[] = new System::Windows::Forms::MenuItem*[4];
+			System::Windows::Forms::MenuItem* __mcTemp__1[] = new System::Windows::Forms::MenuItem*[5];
 			__mcTemp__1[0] = this->fileMenuItem;
 			__mcTemp__1[1] = this->viewMenuItem;
 			__mcTemp__1[2] = this->PasswordMenuItem;
-			__mcTemp__1[3] = this->HelpMenuItem;
+			__mcTemp__1[3] = this->OptionsMenuItem;
+			__mcTemp__1[4] = this->HelpMenuItem;
 			this->mainMenu1->MenuItems->AddRange(__mcTemp__1);
 			// 
 			// fileMenuItem
@@ -216,6 +231,7 @@ namespace KeyReaderGUI
 			__mcTemp__2[4] = this->ExitMenuItem;
 			this->fileMenuItem->MenuItems->AddRange(__mcTemp__2);
 			this->fileMenuItem->Text = S"File";
+			this->fileMenuItem->Popup += new System::EventHandler(this, &Form1::fileMenuItem_Popup);
 			// 
 			// File_ConnectServer
 			// 
@@ -232,6 +248,7 @@ namespace KeyReaderGUI
 			// 
 			// File_ShutdownServer
 			// 
+			this->File_ShutdownServer->Enabled = false;
 			this->File_ShutdownServer->Index = 2;
 			this->File_ShutdownServer->Text = S"Shutdown Server";
 			this->File_ShutdownServer->Click += new System::EventHandler(this, &Form1::File_ShutdownServer_Click);
@@ -283,12 +300,27 @@ namespace KeyReaderGUI
 			this->AddPasswordPacketMenuItem->Text = S"&Add Password Packet";
 			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, &Form1::AddPasswordPacketMenuItem_Click);
 			// 
+			// OptionsMenuItem
+			// 
+			this->OptionsMenuItem->Index = 3;
+			System::Windows::Forms::MenuItem* __mcTemp__5[] = new System::Windows::Forms::MenuItem*[1];
+			__mcTemp__5[0] = this->ServerSettingsMenuItem;
+			this->OptionsMenuItem->MenuItems->AddRange(__mcTemp__5);
+			this->OptionsMenuItem->Text = S"Options";
+			this->OptionsMenuItem->Popup += new System::EventHandler(this, &Form1::OptionsMenuItem_Popup);
+			// 
+			// ServerSettingsMenuItem
+			// 
+			this->ServerSettingsMenuItem->Index = 0;
+			this->ServerSettingsMenuItem->Text = S"Server Settings...";
+			this->ServerSettingsMenuItem->Click += new System::EventHandler(this, &Form1::ServerSettingsMenuItem_Click);
+			// 
 			// HelpMenuItem
 			// 
-			this->HelpMenuItem->Index = 3;
-			System::Windows::Forms::MenuItem* __mcTemp__5[] = new System::Windows::Forms::MenuItem*[1];
-			__mcTemp__5[0] = this->AboutSolimar;
-			this->HelpMenuItem->MenuItems->AddRange(__mcTemp__5);
+			this->HelpMenuItem->Index = 4;
+			System::Windows::Forms::MenuItem* __mcTemp__6[] = new System::Windows::Forms::MenuItem*[1];
+			__mcTemp__6[0] = this->AboutSolimar;
+			this->HelpMenuItem->MenuItems->AddRange(__mcTemp__6);
 			this->HelpMenuItem->Text = S"Help";
 			// 
 			// AboutSolimar
@@ -362,15 +394,15 @@ namespace KeyReaderGUI
 			// 
 			// KeyInfoListView
 			// 
-			System::Windows::Forms::ColumnHeader* __mcTemp__6[] = new System::Windows::Forms::ColumnHeader*[7];
-			__mcTemp__6[0] = this->KeyType;
-			__mcTemp__6[1] = this->KeyNumber;
-			__mcTemp__6[2] = this->ProductID;
-			__mcTemp__6[3] = this->ProductVersion;
-			__mcTemp__6[4] = this->License;
-			__mcTemp__6[5] = this->HoursLeft;
-			__mcTemp__6[6] = this->ExpirationDate;
-			this->KeyInfoListView->Columns->AddRange(__mcTemp__6);
+			System::Windows::Forms::ColumnHeader* __mcTemp__7[] = new System::Windows::Forms::ColumnHeader*[7];
+			__mcTemp__7[0] = this->KeyType;
+			__mcTemp__7[1] = this->KeyNumber;
+			__mcTemp__7[2] = this->ProductID;
+			__mcTemp__7[3] = this->ProductVersion;
+			__mcTemp__7[4] = this->License;
+			__mcTemp__7[5] = this->HoursLeft;
+			__mcTemp__7[6] = this->ExpirationDate;
+			this->KeyInfoListView->Columns->AddRange(__mcTemp__7);
 			this->KeyInfoListView->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->KeyInfoListView->Font = (new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
 				(System::Byte)0));
@@ -440,12 +472,14 @@ namespace KeyReaderGUI
 		PswdForm* ThePasswordForm;
 		AboutBox* TheAboutBox;
 		ConnectToForm* TheConnectToForm;
+		ServerConfiguration* TheServerConfigForm;
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
 		ControlSizing* TheSizingManager;
         SaveConfigurations* SaveCfg;
 		CommunicationLink* TheCommLink;		
 		ArrayList* ServerList;
+
 
 #undef MessageBox
 private: void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
@@ -491,7 +525,6 @@ private: void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows
 			}
 		 }
 };
-
 }
 
 #endif //form1.h
