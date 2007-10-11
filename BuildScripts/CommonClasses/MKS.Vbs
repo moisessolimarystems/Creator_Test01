@@ -50,7 +50,7 @@ Class CMKS
                 Dim Result
                 If g_DEBUG Then
                     Result = MsgBox("Would you like to generate a new sandbox?", vbYesNo, "Generate Sandbox dialog")
-        End If
+				End If
 
                 If Not g_DEBUG Or Result = vbYes Then
                         Select Case aType
@@ -60,7 +60,7 @@ Class CMKS
                                                 + Chr(34) + mBuild.MainPJFile + Chr(34))
                         Case "New"   'Create a new sandbox from the trunk
                                 CleanFolder mBuild.MainProjPath
-                                DropSandbox ("New")
+                                DropSandbox 
                                 If mBuild.NewBuild.GetProjType = "Trunk" Then
                                         mBuild.WriteToDlgAndFile "Creating new sandbox from trunk"
                                         mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --project=" + Chr(34) + mBuild.MainSrcPJFile + _
@@ -76,7 +76,7 @@ Class CMKS
                                                 + Chr(34) + mBuild.MainPJFile + Chr(34))
                                 End If
                         Case "Build"
-                                DropSandbox ("Build")
+                                DropSandbox
                                 mBuild.WriteToDlgAndFile "Creating a build sandbox from label: " + mBuild.PrevLabel
                                 CleanFolder mBuild.MainProjPath
                                 mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --projectRevision=" + mBuild.PrevLabel + " --project=" + _
@@ -84,6 +84,7 @@ Class CMKS
                                 mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
                                                 + Chr(34) + mBuild.MainPJFile + Chr(34))
 			Case "Branch"
+				DropSandbox
 			        mBuild.WriteToDlgAndFile "Creating new sandbox from existing development path"
                                 mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --devpath=" & mBuild.NewDevPath & _
                                                " --project=" + Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + _
@@ -261,24 +262,11 @@ Class CMKS
         End If
     End Sub
   
-    Sub DropSandbox(aType)  
+    Sub DropSandbox()  
              If Not g_DEBUG Or Result = vbYes Then
-                 Select Case aType
-                        Case "New"   'Create a new sandbox from the trunk
-                            If mBuild.NewBuild.GetProjType = "Trunk" Then
-                                   mBuild.WriteToDlgAndFile "Dropping new sandbox "
-                                   mBuild.RunCmd ("si dropsandbox --noconfirm --delete=none --yes " + Chr(34) + mBuild.MainPJFile + Chr(34))
-                            Else
-                                   mBuild.WriteToDlgAndFile "Dropping new sandbox from existing development path"
-                                   mBuild.RunCmd ("si dropsandbox --noconfirm --delete=none --yes " + Chr(34) + _
-                                                   mBuild.MainPJFile + Chr(34))
-                            End If
-                         Case "Build"
-                                   mBuild.WriteToDlgAndFile "Creating a build sandbox from label: " + mBuild.PrevLabel
-                                   mBuild.RunCmd ("si dropsandbox --noconfirm --delete=none --yes " + Chr(34) + mBuild.MainPJFile + Chr(34))
-				End Select
-             End If
-        
+		mBuild.WriteToDlgAndFile "Dropping new sandbox "
+                mBuild.RunCmd ("si dropsandbox --noconfirm --delete=none --yes " + Chr(34) + mBuild.MainPJFile + Chr(34))		
+             End If        
     End Sub
 
     Function ModsProject(aProjPJ)

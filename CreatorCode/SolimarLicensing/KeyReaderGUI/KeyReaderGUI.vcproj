@@ -67,6 +67,7 @@
 				AdditionalDependencies="Ws2_32.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
+				EmbedManagedResourceFile="$(ProjectDir)License-Manager.png"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				SubSystem="2"
@@ -736,7 +737,16 @@
 				>
 			</File>
 			<File
+				RelativePath=".\bitmap1.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\keyLicenseManager16.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\License-Manager.png"
+				FileType="16"
 				>
 			</File>
 		</Filter>

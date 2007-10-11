@@ -23,6 +23,7 @@ namespace SaveConfig
 	using namespace System::Runtime::Serialization::Formatters::Binary;
 	using namespace Microsoft::Win32; 
 
+	//bump version when adding new field to isolated storage!!
 	[Serializable]
 	public __gc class FormSettings
 	{

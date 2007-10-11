@@ -24,12 +24,15 @@ namespace KeyReaderGUI
 		ConnectToForm(ArrayList* _ServerList)
 		{
 			InitializeComponent();
-			for(int i=0; i<_ServerList->Count; i++)
+			if (_ServerList != NULL)
 			{
-				CB_ServerList->Items->Insert(i,_ServerList->Item[i]);
-			}	
-			if(_ServerList->Count > 0)
-				CB_ServerList->SelectedIndex = 0;
+				for(int i=0; i<_ServerList->Count; i++)
+				{
+					CB_ServerList->Items->Insert(i,_ServerList->Item[i]);
+				}	
+				if(_ServerList->Count > 0)
+					CB_ServerList->SelectedIndex = 0;
+			}
 		}
 		~ConnectToForm(){this->Dispose(true);}
         

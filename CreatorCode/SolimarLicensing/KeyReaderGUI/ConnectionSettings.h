@@ -20,17 +20,17 @@ namespace KeyReaderGUI
 			__property String* get_ServerName() { return serverName; }
 			__property void set_ServerName(String* value) { serverName = value; } 
 			
-			[Category("Secondary Connection"), 
-			 Description("Backup server name."),
-			 DisplayName("Name")] 
-			__property String* get_BackupName() { return backupName; }
-			__property void set_BackupName(String* value) { backupName = value; } 
-
 			[Category("Shared Primary Connection"), 
 			 Description("Primary shared server name."),
 			 DisplayName("Name")] 
 			__property String* get_SharedServerName() { return sharedServerName; }
 			__property void set_SharedServerName(String* value) { sharedServerName = value; } 
+
+			[Category("Secondary Connection"), 
+			 Description("Backup server name."),
+			 DisplayName("Name")] 
+			__property String* get_BackupName() { return backupName; }
+			__property void set_BackupName(String* value) { backupName = value; } 
 
 			[Category("Shared Secondary Connection"), 
 			 Description("Backup shared server name"),

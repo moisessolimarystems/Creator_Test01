@@ -606,9 +606,9 @@ Class CProductReport
             segment = Mid(line, startVal, endVal - startVal)
         End If
         
-        Dim Version, VersionNum, BuildNum
+        Dim Version, VersionNum, BuildNum, Temp
         If mSrcLabel <> "" Then
-                Version = Left(StripAllPrefix(mSrcLabel), 4) ', VersionPrefix), 4)
+                Version = Left(Version, InStrRev(Version, ".") - 1)
         Else
                 Version = GetLastVersionNum
         End If
@@ -623,9 +623,9 @@ Class CProductReport
             BuildNum = StripAllPrefix(segment) ', VersionPrefix)
             
             If Mid(BuildNum, 1, 1) = "0" Then           'have to account for leading 0's
-                VersionNum = Mid(BuildNum, 2, 4)
+                VersionNum = Mid(BuildNum, 2, InStrRev(BuildNum, ".") - 1)
             Else
-                VersionNum = Mid(BuildNum, 1, 4)
+                VersionNum = Left(BuildNum, InStrRev(BuildNum, ".") - 1)'Mid(BuildNum, 1, 4)
             End If
             
             If VersionNum = Version Then
@@ -857,8 +857,8 @@ Function SendEmail(Subject, Body, ReportPath, DescReportName, LicenseReportName)
 		If mFSO.FileExists(ReportPath & DescReportName) Then
 			.AddAttachment (ReportPath & DescReportName)
 		End If
-		If mFSO.FileExists(ReportPath & LabelReportName) Then
-			.AddAttachment (ReportPath & LabelReportName)
+		If mFSO.FileExists(ReportPath & LicenseReportName) Then
+			.AddAttachment (ReportPath & LicenseReportName)
 		End If
 		.SendMail
 	End With

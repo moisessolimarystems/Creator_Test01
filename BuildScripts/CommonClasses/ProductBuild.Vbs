@@ -3,7 +3,7 @@ Class CProductBuild
     Private mShell, mFSO, mStartTime, mProductName, mBuildLogFile, mNewDevPath, mNewNextVersion, mIgnoreMsgBox, mDebug, mLastBuild
     Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo, mVersionNum
     Private mLockedPJFile, mLockedFile  'had to put these here instead of in MKS class b/c there should be only 1 instance of these
-    Private mLogFileName, mInputFile
+    Private mLogFileName, mInputFile, mSendNotification
     Public mNewBuild, mErrCount, mBuildPath, mEngBuild
 
     Public Sub Class_Initialize() 'set default values
@@ -79,6 +79,7 @@ Class CProductBuild
     '* -LB    mLastBuild          
     '* -LIC   licenseVersion      version of solimar licensing to use 
     '* -EB    mEngBuild           Y or N Engineering Build
+    '* -SN    mSendNotification   Y or N Send email notifying start of build
     '***************************************************************************************************
     Public Sub GetParams()
 
@@ -114,6 +115,8 @@ Class CProductBuild
 					licenseVersion = wscript.Arguments(iParam + 1)	
 		    Case "-EB"	
 					mEngBuild = wscript.Arguments(iParam + 1)
+		    Case "-SN" 		
+					mSendNotification = wscript.Arguments(iParam + 1)
                End Select
             Next
 
@@ -224,6 +227,10 @@ Class CProductBuild
 
     Public Property Get EngOption()
 	EngOption = mEngBuild
+    End Property
+	
+    Public Property Get SendNotification()
+	SendNotification = mSendNotification
     End Property
 
     Public Property Get PrevLabel()
@@ -1132,7 +1139,8 @@ Class CProductBuild
 	End Function
 	
     Function SendEmail(aSubject,aMsg)
-           WriteToDlgAndFile "Sending the email"
+	If SendNotification <> "N" Then    	
+            WriteToDlgAndFile "Sending the email"
             Dim oSMTP
             Set oSMTP = wscript.CreateObject("SoftArtisans.SMTPMail") 'SMTPControl.SMTP")
     
@@ -1160,6 +1168,7 @@ Class CProductBuild
                 EndProgram eEmailSendError '"Error " & Err.Number & ": " & Err.Description
             End If
 	    Set oSMTP = Nothing
+	End If
     End Function
 
     Function BuildError(aErrMsg)

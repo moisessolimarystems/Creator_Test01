@@ -7,7 +7,8 @@ using namespace SaveConfig;
 SaveConfigurations::SaveConfigurations(Form* TheForm) 
 									  : MainForm(TheForm)	
 {
-	settingsFileName = "SolimarLicenseManager1.config";
+	//bump version when adding new field to isolated storage!!
+	settingsFileName = "SolimarLicenseManager2.config";
 	formConfig = new FormSettings();
 }
 
