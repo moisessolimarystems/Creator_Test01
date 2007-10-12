@@ -69,6 +69,19 @@ namespace KeyReaderGUI
 			System::Diagnostics::Process::Start(String::Concat("Mailto:", (dynamic_cast<LinkLabel*>(sender))->Text));
 		}
 
+		System::Void OnPaint( System::Windows::Forms::PaintEventArgs* e) 
+		{
+		}
+
+		System::Void OnPaintBackground( System::Windows::Forms::PaintEventArgs* pevent)
+		{
+			//base.OnPaintBackground (pevent);
+			System::Drawing::Graphics* gfx = pevent->Graphics;
+			System::Drawing::Image* backImage = this->BackgroundImage; 
+			System::Drawing::Rectangle rect = System::Drawing::Rectangle(0, 0, this->Width, this->Height);
+			gfx->DrawImage(backImage, rect);
+		}
+
 	protected: System::Windows::Forms::LinkLabel *  linkLabel1;
 	protected: System::Windows::Forms::LinkLabel *  linkWebsite;
 	protected: System::Windows::Forms::Label *  labelCopyright;
@@ -154,7 +167,7 @@ namespace KeyReaderGUI
 			this->labelCopyright->BackColor = System::Drawing::Color::Transparent;
 			this->labelCopyright->Font = (new System::Drawing::Font(S"Arial", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
 				(System::Byte)0));
-			this->labelCopyright->Location = System::Drawing::Point(208, 484);
+			this->labelCopyright->Location = System::Drawing::Point(208, 472);
 			this->labelCopyright->Name = S"labelCopyright";
 			this->labelCopyright->Size = System::Drawing::Size(384, 14);
 			this->labelCopyright->TabIndex = 12;
@@ -165,7 +178,7 @@ namespace KeyReaderGUI
 			this->labelRightsReserved->BackColor = System::Drawing::Color::Transparent;
 			this->labelRightsReserved->Font = (new System::Drawing::Font(S"Arial", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
 				(System::Byte)0));
-			this->labelRightsReserved->Location = System::Drawing::Point(208, 500);
+			this->labelRightsReserved->Location = System::Drawing::Point(208, 486);
 			this->labelRightsReserved->Name = S"labelRightsReserved";
 			this->labelRightsReserved->Size = System::Drawing::Size(384, 16);
 			this->labelRightsReserved->TabIndex = 17;
@@ -364,15 +377,5 @@ namespace KeyReaderGUI
 			this->PerformLayout();
 
 		}		
-
-
-
-
-
-
-
-
-
-
 };
 }
