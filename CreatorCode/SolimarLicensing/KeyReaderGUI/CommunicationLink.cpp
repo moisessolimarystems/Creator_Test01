@@ -65,7 +65,7 @@ HRESULT CommunicationLink::Connect(String* ServerName)
 							 &multiQI);
 	if(SUCCEEDED(hr))
 	{
-		pTheServer = (ISolimarLicenseSvr3*)multiQI.pItf;
+		pTheServer = static_cast<ISolimarLicenseSvr3*>(multiQI.pItf);
 		ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
 		// try to authenticate the license server
 		hr = cr.AuthenticateServer(pTheServer);
@@ -91,7 +91,6 @@ HRESULT CommunicationLink::CheckPassword(String* InputString)
 {
 	HRESULT hr = 0;
 	_variant_t retval;
-
 	//converts the string* into a variant
 	System::Runtime::InteropServices::Marshal::
 			GetNativeVariantForObject(InputString, &retval);
@@ -320,6 +319,7 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 		pTheServer->KeyModuleLicenseUnlimited(retval.bstrVal, 
 										  (TheModStruct.ModuleID).lVal,
 										   VARIANT_TRUE);
+	   
 
 		pTheServer->KeyModuleLicenseTotal(retval.bstrVal, 
 										  (TheModStruct.ModuleID).lVal, 

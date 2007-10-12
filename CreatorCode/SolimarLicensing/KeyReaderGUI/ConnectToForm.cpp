@@ -16,6 +16,7 @@ System::Void ConnectToForm::BTN_OK_Click(System::Object *  sender, System::Event
 			ConnectToForm::CB_ServerList->Focused;	
 			bRetVal = false;
 	 }
+	 
 	 this->Cursor = storedCursor;
 	 if(bRetVal)
 	 {
@@ -87,10 +88,10 @@ bool ConnectToForm::IsValidServer(String* ServerName)
 							 &serverInfo,
 							 1,
 							 &multiQI);
+	static_cast<ISolimarLicenseSvr3*>(multiQI.pItf)->Release();
 	if(!SUCCEEDED(hr))
 	{
 		return false;
-	}
-	
+	}	
 	return true;
 }

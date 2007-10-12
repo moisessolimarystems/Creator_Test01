@@ -35,6 +35,7 @@ static System::String* ExceptionStringFormater(Exception* e, int depth)
 
 
 #undef MessageBox
+[STAThreadAttribute]
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPTSTR    lpCmdLine,
@@ -42,7 +43,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 {
 	try
 	{
-		System::Threading::Thread::CurrentThread->ApartmentState = System::Threading::ApartmentState::STA;
 		Application::EnableVisualStyles();
 		Form1* f1 = new Form1();
 		Application::Run(f1);
