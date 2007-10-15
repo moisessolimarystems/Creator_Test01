@@ -20,13 +20,15 @@ PswdForm::~PswdForm()
 System::Void PswdForm::OkBtn_Click(System::Object *  sender, System::EventArgs *  e)
 {
 	String* InputString = this->PswdTextBox->Text; //this->Controls->get_Item(0)->Text;
+	System::Windows::Forms::Cursor* storedCursor = this->Cursor;
+	this->Cursor = Cursors::WaitCursor;	
 	HRESULT hr = PasswordValidater->CheckPassword(InputString);
-
+	this->Cursor = storedCursor;
 #undef MessageBox
 	//The protocol is S_FALSE signifies invalid password
 	if(hr == S_FALSE)
 	{
-		System::Windows::Forms::MessageBox::Show("Invalid Password");
+		System::Windows::Forms::MessageBox::Show("Invalid Password", "Password Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	//S_OK signifies correct password
 	else if(hr == S_OK)
@@ -36,7 +38,7 @@ System::Void PswdForm::OkBtn_Click(System::Object *  sender, System::EventArgs *
 	//else the function failed
 	else
 	{
-		System::Windows::Forms::MessageBox::Show("Function Call Failed");
+		System::Windows::Forms::MessageBox::Show("Failed Trying to Validate Password", "Password Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	this->Close();
 }
