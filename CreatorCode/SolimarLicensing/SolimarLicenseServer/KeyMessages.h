@@ -69,6 +69,13 @@ static const unsigned int MessageKeysNoBaseKey = 30;
 static const unsigned int MessageKeysRestoreKeyServer = 31;
 static const unsigned int MessageKeysUseBackupKeyServer = 32;
 
+// entering passwords2
+static const unsigned int MessagePasswordRemote = 33;
+static const unsigned int MessagePasswordApplicationInstance = 34;
+static const unsigned int MessagePasswordPacketVerificationCode = 35;
+static const unsigned int MessagePasswordSPDPPM2 = 36;
+
+
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
 // Doing so will cause the lookup numbers above to return the wrong strings.
@@ -129,6 +136,13 @@ static const wchar_t* LicensingMessageStringTable[256] =
 //backup key server messages
 	/*MessageKeysRestoreKeyServer*/	L"Licensing has been restored on Key Server \"%s\".",
 	/*MessageKeysUseBackupKeyServer*/	L"Unable to validate licensing on Key Server \"%s\", switching to Backup Key Server \"%s\".",
+
+// entering passwords2
+	/*MessagePasswordRemote*/	L"Password Correct. Key now licensed for remote access.",
+	/*MessagePasswordApplicationInstance*/	L"Password Correct. Key now licensed for %d application instance(s).",
+	/*MessagePasswordPacketVerificationCode*/		L"Password Packet Correct. Verification Code: %s.",
+	/*MessagePasswordSPDPPM2*/ L"Password Correct. \"%s\" module now licensed for %d pages per minute.",
+
 
 // general errors
 	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
