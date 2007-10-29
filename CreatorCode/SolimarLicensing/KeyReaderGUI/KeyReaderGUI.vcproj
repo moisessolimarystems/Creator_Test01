@@ -252,6 +252,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -331,6 +332,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -742,6 +744,10 @@
 			</File>
 			<File
 				RelativePath=".\keyLicenseManager16.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\KeyReaderGUI.exe.manifest"
 				>
 			</File>
 			<File

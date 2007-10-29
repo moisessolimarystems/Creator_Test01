@@ -13,6 +13,14 @@ namespace KeyReaderGUI
 				sharedServerName(L"localhost"), 
 				sharedBackupName(L"localhost") {};
 
+			void ResetSettings(void)
+			{
+				set_ServerName(L"localhost");
+				set_SharedServerName(L"localhost");
+				set_BackupName(L"localhost");
+				set_SharedBackupName(L"localhost");
+			}
+
 		public:
 			[Category("Primary Connection"), 
 			 Description("Primary server name."),
@@ -20,19 +28,19 @@ namespace KeyReaderGUI
 			__property String* get_ServerName() { return serverName; }
 			__property void set_ServerName(String* value) { serverName = value; } 
 			
-			[Category("Shared Primary Connection"), 
+			[Category("Secondary Connection"), 
 			 Description("Primary shared server name."),
 			 DisplayName("Name")] 
 			__property String* get_SharedServerName() { return sharedServerName; }
 			__property void set_SharedServerName(String* value) { sharedServerName = value; } 
 
-			[Category("Secondary Connection"), 
+			[Category("Server Backup Connection"), 
 			 Description("Backup server name."),
 			 DisplayName("Name")] 
 			__property String* get_BackupName() { return backupName; }
 			__property void set_BackupName(String* value) { backupName = value; } 
 
-			[Category("Shared Secondary Connection"), 
+			[Category("Shared Backup Connection"), 
 			 Description("Backup shared server name"),
 			 DisplayName("Name")] 
 			__property String* get_SharedBackupName() { return sharedBackupName; }
