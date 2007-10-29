@@ -38,7 +38,7 @@ const SL_ERROR SLErrors[] =
 	{EC_KEY_NO_BASE_KEY,						EHR_KEY_NO_BASE_KEY,						L"Unable to locate a Base Key on the server, all keys on this server will be ignored (Key server)"},
 	{EC_KEY_RESTORED_KEY_SERVER,						EHR_KEY_RESTORED_KEY_SERVER,						L"Licensing on the Key Server has been restored (Key server)"},
 	{EC_KEY_USE_BACKUP_KEY_SERVER,						EHR_KEY_USE_BACKUP_KEY_SERVER,						L"Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"},
-	{EC_KEY_USE_NO_REMOTE_VERSION_KEY_SERVER,					EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,		L"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"},
+	{EC_KEY_NO_REMOTE_VERSION_KEY_SERVER,					EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,		L"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"},
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
 	{EC_SP_UNIT_NOT_FOUND,						EHR_SP_UNIT_NOT_FOUND,						L"Unit not found (Rainbow driver)"},

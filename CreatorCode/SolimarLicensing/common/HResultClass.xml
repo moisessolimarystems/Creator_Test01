@@ -87,6 +87,7 @@
 		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Unable to locate a Base Key on the server, all keys on this server will be ignored (Key server)"/>
 		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the Key Server has been restored (Key server)"/>
 		<HResult name="EHR_KEY_USE_BACKUP_KEY_SERVER"	ecode="EC_KEY_USE_BACKUP_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"/>
+		<HResult name="EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER"	ecode="EC_KEY_NO_REMOTE_VERSION_KEY_SERVER"			value="26" alias="License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"/>
 	</HResultType>
 	<!--	-->
 	<!-- HResults with offset ITF_CR_APP_MIN -->

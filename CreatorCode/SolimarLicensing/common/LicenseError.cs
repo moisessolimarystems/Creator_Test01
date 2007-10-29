@@ -86,7 +86,7 @@ namespace Solimar
 			private const uint EHR_KEY_NO_BASE_KEY = ITF_LIC_SVR_OFFSET + 23;
 			private const uint EHR_KEY_RESTORED_KEY_SERVER = ITF_LIC_SVR_OFFSET + 24;
 			private const uint EHR_KEY_USE_BACKUP_KEY_SERVER = ITF_LIC_SVR_OFFSET + 25;
-			private const uint EHR_KEY_USE_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET + 26;
+			private const uint EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET + 26;
 			
 		
 			// Rainbow driver errors
