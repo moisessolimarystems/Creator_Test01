@@ -24,7 +24,7 @@ public:
 	KeyServer();
 	~KeyServer();
 	
-	HRESULT ResynchronizeKeys();
+	HRESULT ResynchronizeKeys(bool bForceRefresh = false);
 	
 	// Top level functions
 	HRESULT AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key);
@@ -32,6 +32,7 @@ public:
 	HRESULT GetApplicationInstanceList(BSTR license_id, BSTR key_ident, VARIANT *pvtAppInstanceList);
 
 	HRESULT Heartbeat(BSTR license_id);
+	HRESULT RemoveHeartbeat(BSTR license_id);
 	HRESULT KeyEnumerate(VARIANT *keylist);
 	HRESULT EnterPassword(BSTR password);
 	HRESULT EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verification_code);
@@ -147,7 +148,7 @@ private:
 	HRESULT TimesUp();
 	
 	typedef std::vector<_bstr_t> StringList;
-	typedef std::map<_bstr_t, ProtectionKey> KeyList;
+	typedef std::map<_bstr_t, ProtectionKey*> KeyList;
 	
 	// maps a license_id to a proxy to its LicenseManager's ILicensingManager interface
 	//yyy _COM_SMARTPTR_TYPEDEF(ILicensingMessage,__uuidof(ILicensingMessage));

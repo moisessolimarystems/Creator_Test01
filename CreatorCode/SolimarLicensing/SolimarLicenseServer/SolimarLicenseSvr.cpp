@@ -31,12 +31,25 @@ BYTE CSolimarLicenseSvr::challenge_key_server_userauththis_private[] = {
 CSolimarLicenseSvr::CSolimarLicenseSvr() : 
 	ChallengeResponseHelper(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private)/sizeof(BYTE), challenge_key_server_thisauthuser_public, sizeof(challenge_key_server_thisauthuser_public)/sizeof(BYTE))
 {
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::CSolimarLicenseSvr() - Enter, ThreadID: %d", GetCurrentThreadId());
+//OutputDebugStringW(debug_buf);
 	keyserver.ResynchronizeKeys();
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::CSolimarLicenseSvr() - Leave, ThreadID: %d", GetCurrentThreadId());
+//OutputDebugStringW(debug_buf);
 }
 
 CSolimarLicenseSvr::~CSolimarLicenseSvr()
 {
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Enter, ThreadID: %d", GetCurrentThreadId());
+//OutputDebugStringW(debug_buf);
+
 	keyserver.LicenseReleaseAll(m_licenseId);
+	keyserver.RemoveHeartbeat(m_licenseId);
+	
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Leave, ThreadID: %d", GetCurrentThreadId());
+//OutputDebugStringW(debug_buf);
 }
 
 
@@ -117,7 +130,9 @@ STDMETHODIMP CSolimarLicenseSvr::KeyEnumerate(VARIANT *keylist)
 STDMETHODIMP CSolimarLicenseSvr::EnterPassword(BSTR password)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return keyserver.EnterPassword(password);
+	HRESULT hr = keyserver.EnterPassword(password);
+	keyserver.ResynchronizeKeys(true);
+	return hr;
 }
 
 HRESULT CSolimarLicenseSvr::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verification_code)
