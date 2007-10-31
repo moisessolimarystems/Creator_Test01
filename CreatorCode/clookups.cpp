@@ -367,6 +367,7 @@ bool CLookup::resetModuleList()
             pModuleList[currentCount]->max = cQuery->FieldByName("MDmax")->AsInteger;
             pModuleList[currentCount]->function = cQuery->FieldByName("MDaction")->AsInteger;
             pModuleList[currentCount]->counterUnit = cQuery->FieldByName("MDcounterUnit")->AsInteger;
+            pModuleList[currentCount]->defaultValue = cQuery->FieldByName("MDdefault")->AsInteger;
             pModuleList[currentCount]->spd_default = cQuery->FieldByName("MDspdDefault")->AsBoolean;
             pModuleList[currentCount]->spde_default = cQuery->FieldByName("MDspdeDefault")->AsBoolean;
             pModuleList[currentCount]->con_default = cQuery->FieldByName("MDconnectivityDefault")->AsBoolean;
@@ -1101,9 +1102,12 @@ AnsiString ModuleDetail::getTextForUnits(unsigned short product_id, unsigned sho
 
    if( units != 0 )
    {
-      if(isDefaultForProduct(product_id))
+      //Removed, Default modules can adjust their values now
+      /*if(isDefaultForProduct(product_id))
          result_string = "*";
-      else if(max == 1)
+      else
+      */
+       if(max == 1)
          result_string = "X";
       //else # of units
    }
@@ -1178,6 +1182,7 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
 //              intergrated with creator.
 // Parameters:  unsigned short
 // Returns:     bool
+// notes  :     SpdNT, iConvert, SOLscript, SSE, Rubika, SPDE, XIMAGE
 //==============================================================================
 bool ModuleDetail::isDefaultForProduct(unsigned short product)
 {
@@ -1191,6 +1196,8 @@ bool ModuleDetail::isDefaultForProduct(unsigned short product)
       return iConvert_default;
    else if(product == SPDE_PRODUCT)
       return spde_default;
+   else if(product == RUBIKA_PRODUCT)   //reuse spd_default column in DB for default status
+      return spd_default;
    else
       return false;
 }

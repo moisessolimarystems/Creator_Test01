@@ -42,6 +42,7 @@ public:
    //int max_solscript;                   //0-15 max solscript value
    int function;                        //input, emulation, output, counter
    int counterUnit;                     //unit size for counter
+   int defaultValue;                    //default value for module
    int pid;                             //product id
    unsigned short id;                   //module id
    bool spd_default;                    //spd default
