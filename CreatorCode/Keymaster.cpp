@@ -545,7 +545,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
 
       for(int mod_id =0; mod_id<64;mod_id++)
       {
-         if ((module_detail[mod_id]->bExistingMember))
+         if ((module_detail[mod_id]->bExistingMember) &&
+             (module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion)))
          {
             ModuleIds[NumModules] = mod_id;//module_detail[mod_id]->id;
             NumModules++;
@@ -629,7 +630,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
       int ModuleIds[64];
       for(int mod_id =0; mod_id<64;mod_id++)
       {
-         if ((module_detail[mod_id]->bExistingMember))
+         if ((module_detail[mod_id]->bExistingMember) &&
+             (module_detail[mod_id]->isAvailableForVersion(spde_key->productVersion)))
          {
             ModuleIds[NumModules] = mod_id; //module_detail[mod_id]->id;
             NumModules++;
@@ -712,11 +714,11 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
       int NumModules = 0;
       int TotalModules = SSE_TOTAL_KEY_MODULES + SSE_TOTAL_RESOURCES;
       int* ModuleIds = (int*)malloc(sizeof(int) * TotalModules);
-
+      SpdProtectionKey* spd_key((SpdProtectionKey*)(key_record->pkey));
       for(int mod_id =0; mod_id<SSE_TOTAL_KEY_MODULES;mod_id++)
       {
-         if ((module_detail[mod_id]->bExistingMember)) //&&
-//              module_detail[mod_id]->name != "{ Not Used }")
+         if ((module_detail[mod_id]->bExistingMember) &&
+             (module_detail[mod_id]->isAvailableForVersion(spd_key->productVersion)))
          {
             ModuleIds[NumModules] = mod_id; //module_detail[mod_id]->id;
             NumModules++;
@@ -1382,7 +1384,7 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
           if(ppModuleDetail[mod_idx]->name != "{ Not Used }") {
               if( ppModuleDetail[mod_idx]->isAvailableForVersion(spd_key->productVersion) &&
                   ppModuleDetail[mod_idx]->isDefaultForProduct(spd_key->productId) )
-                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->max);
+                  spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, ppModuleDetail[mod_idx]->defaultValue);
               else
                   spd_key->setLicense(ppModuleDetail[mod_idx]->offset, ppModuleDetail[mod_idx]->bits, 0);
           }
