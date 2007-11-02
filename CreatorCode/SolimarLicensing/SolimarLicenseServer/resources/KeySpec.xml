@@ -220,7 +220,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="13" offset="0x0b8" bits="4" name="PDF::PostScript (Rip)" unlimited ="2"/>
 				<Module id="14"	offset="0x0b4" bits="4" name="PCL::Metacode" unlimited ="1"/>
 				<Module id="15"	offset="0x0b0" bits="4" name="Bus/Tag Output (PCI)"/>
-				<Module id="16"	offset="0x0cc" bits="4" name="Bus/Tag Output (AT)"/>
+				<Module id="16"	offset="0x0cc" bits="4" name="Bus/Tag Output (AT) - ***Deprecated***"/>
 				<Module id="17"	offset="0x0c8" bits="4" name="File Queuer" unlimited ="1"/>
 				<Module id="18"	offset="0x0c4" bits="4" name="Disk Spooler" unlimited ="1"/>
 				<Module id="19"	offset="0x0c0" bits="4" name="Data Converter" unlimited ="1"/>
@@ -234,11 +234,11 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="27"	offset="0x0e0" bits="4" name="FTP Queuer" unlimited ="1"/>
 				<Module id="28"	offset="0x0fc" bits="4" name="TCP/IP lpd Input"/>
 				<Module id="29"	offset="0x0f8" bits="4" name="TCP/IP lpr Output" pool="128" unlimited="1"/>
-				<Module id="30"	offset="0x0f4" bits="4" name="TCP/IP Input (DOS)"/>
-				<Module id="31"	offset="0x0f0" bits="4" name="TCP/IP Output (DOS)"/>
+				<Module id="30"	offset="0x0f4" bits="4" name="TCP/IP Input (DOS) - ***Deprecated***"/>
+				<Module id="31"	offset="0x0f0" bits="4" name="TCP/IP Output (DOS) - ***Deprecated***"/>
 				<Module id="32"	offset="0x10c" bits="4" name="Dummy"/>
 				<Module id="33"	offset="0x108" bits="4" name="Trash Can" unlimited ="1"/>
-				<Module id="34"	offset="0x104" bits="4" name="PostScript Printer" unlimited ="1"/>
+				<Module id="34"	offset="0x104" bits="4" name="PostScript Printer - ***Deprecated***" unlimited ="1"/>
 				<Module id="35"	offset="0x100" bits="4" name="XCHANGE::PCL" unlimited ="1"/>
 				<Module id="36"	offset="0x11c" bits="4" name="RJE/SNA::3211" unlimited ="1"/>
 				<Module id="37"	offset="0x118" bits="4" name="Parallel Output"/>
@@ -450,29 +450,28 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 			<ModuleList>
 				<!-- regular modules -->
 				<Module id="0" offset="0x080" bits="1" name="Merge" unlimited="1"/>
-				<Module id="1" offset="0x081" bits="1" name="Sort" unlimited="1"/>
+				<Module id="1" offset="0x081" bits="1" name="Cleanse &amp; Sort" unlimited="1"/>
 				<Module id="2" offset="0x082" bits="1" name="Split" unlimited="1"/>
-				<Module id="3" offset="0x083" bits="1" name="Finish" unlimited="1"/>
-				<Module id="4" offset="0x084" bits="1" name="Concat" unlimited="1"/>
+				<Module id="3" offset="0x083" bits="1" name="Finishing" unlimited="1"/>
+				<Module id="4" offset="0x084" bits="1" name="Concatentate" unlimited="1"/>
 				<Module id="5" offset="0x085" bits="1" name="Imposition" unlimited="1"/>
 				<Module id="6" offset="0x086" bits="1" name="Underlay" unlimited="1"/>
 				<Module id="7" offset="0x087" bits="1" name="Insert" unlimited="1"/>
-				<Module id="8" offset="0x088" bits="1" name="Segmentation" unlimited="1"/>
-				<Module id="9" offset="0x089" bits="1" name="ArchiveAssistant" unlimited="1"/>
-				<Module id="10" offset="0x08A" bits="1" name="OMR" unlimited="1"/>
-				<Module id="11" offset="0x08B" bits="1" name="Barcode" unlimited="1"/>
-				<Module id="12" offset="0x08C" bits="1" name="Text Marking" unlimited="1"/>
+				<Module id="8" offset="0x088" bits="1" name="Segment" unlimited="1"/>
+				<Module id="9" offset="0x089" bits="1" name="Archive Assistant" unlimited="1"/>				
+				<Module id="10" offset="0x08A" bits="1" name="Mark" unlimited="1"/>
+				<Module id="11" offset="0x08B" bits="1" name="Barcode - ***Deprecated***" unlimited="1"/>		
+				<Module id="12" offset="0x08C" bits="1" name="Text Marking - ***Deprecated***" unlimited="1"/>	
 				<Module id="13" offset="0x08D" bits="1" name="Delete" unlimited="1"/>
 				<Module id="14" offset="0x08E" bits="1" name="Replace" unlimited="1"/>
-        <Module id="15" offset="0x08F" bits="1" name="CSV Export/Import" unlimited="1"/>
-        <Module id="16" offset="0x090" bits="1" name="N-to-1" unlimited="1"/>
-        <Module id="17" offset="0x091" bits="1" name="Book Blocks" unlimited="1"/>
-        <Module id="18" offset="0x092" bits="1" name="2-Up" unlimited="1"/>     
+				<Module id="15" offset="0x08F" bits="1" name="Export / Import" unlimited="1"/>
+				<Module id="16" offset="0x090" bits="1" name="N-to-1" unlimited="1"/>
+				<Module id="17" offset="0x091" bits="1" name="Book Blocks" unlimited="1"/>
+				<Module id="18" offset="0x092" bits="1" name="2-Up" unlimited="1"/>    
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
-       	<Module id="31" offset="0x0F4" bits="4" name="Process Builders"/>
-				
+       	<Module id="31" offset="0x0F4" bits="4" name="Process Builders"/>				
 			</ModuleList>
 			<ProductList>
 				<Product id="12" name="Rubika">
@@ -494,8 +493,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="15" default="0"/>
           <ModuleInclude id="16" default="0"/>
           <ModuleInclude id="17" default="0"/>
-          <ModuleInclude id="18" default="0"/>        
-					<ModuleInclude id="20" default="0"/>
+          <ModuleInclude id="18" default="0"/>
+          <ModuleInclude id="20" default="0"/>
 					<ModuleInclude id="21" default="0"/>
 					<ModuleInclude id="30" default="1"/>
 					<ModuleInclude id="31" default="1"/>
