@@ -81,7 +81,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="2"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -120,7 +120,7 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -181,7 +181,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="2"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -284,7 +284,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -319,7 +319,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
-				CommandLine="&quot;$(TargetPath)&quot; /RegServer&#x0D;&#x0A;cp $(InputDir)_$(InputName).tlb $(OutDir)"
+				CommandLine="&quot;$(TargetPath)&quot; /RegServer&#x0D;&#x0A;cp $(InputDir)_$(InputName).tlb $(OutDir)&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -388,7 +388,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -424,7 +424,7 @@
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
 				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
-				ExcludedFromBuild="false"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -493,7 +493,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -597,7 +597,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\spromeps.lib"
+				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"

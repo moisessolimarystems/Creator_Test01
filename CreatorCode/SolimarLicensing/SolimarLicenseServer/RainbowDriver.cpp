@@ -112,7 +112,9 @@ HRESULT RainbowDriver::RefreshKeyList()
 	// errors, we create a packet and call FindFirst/FindNext the appropriate
 	// number of times to get to that key. While ugly, this is the method
 	// recommended by Rainbow.
+
 	HRESULT hr = S_OK;
+	SafeMutex mutex(keys_lock);
 	KeyList newkeys;
 	RBP_SPRO_APIPACKET packet = new RB_SPRO_APIPACKET;
 	bool bLocalAtLeastOneParallelKey = false;
@@ -124,7 +126,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproInitialize(packet));
 	if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
-		hr = TranslateRainbowError(RNBOsproCheckTerminalservice(packet, SP_TERM_SERV_CHECK_OFF));
+		hr = TranslateRainbowError(RNBOsproCheckTerminalService(packet, SP_TERM_SERV_CHECK_OFF));
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_STANDALONE"));
 		//hr = TranslateRainbowError(RNBOsproSetContactServer(packet, "RNBO_SPN_LOCAL"));
@@ -169,7 +171,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 			hr = TranslateRainbowError(RNBOsproInitialize(keypacket));
 
 		if (SUCCEEDED(hr))	//Turn off chek for Terminal Services (Remote Desktop)
-			hr = TranslateRainbowError(RNBOsproCheckTerminalservice(keypacket, SP_TERM_SERV_CHECK_OFF));
+			hr = TranslateRainbowError(RNBOsproCheckTerminalService(keypacket, SP_TERM_SERV_CHECK_OFF));
 		
 		if (SUCCEEDED(hr))
 			TranslateRainbowError(RNBOsproSetContactServer(keypacket, "RNBO_STANDALONE"));
@@ -307,6 +309,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 			newkeys.erase(newkeys.begin());
 		}
 	}
+	
 //OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Leave");
 	return hr;
 }
