@@ -2,7 +2,7 @@
 #pragma once
 
 #include <windows.h>
-#include "rainbow\spromeps.h"
+#include "rainbow\include\spromeps.h"
 #include <comdef.h>
 #include <vector>
 #include <map>
