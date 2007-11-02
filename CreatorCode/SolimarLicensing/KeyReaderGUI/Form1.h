@@ -437,6 +437,7 @@ namespace KeyReaderGUI
 			// HoursLeft
 			// 
 			this->HoursLeft->DisplayIndex = 4;
+			this->HoursLeft->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
 			// 
 			// ExpirationDate
 			// 

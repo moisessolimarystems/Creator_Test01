@@ -52,7 +52,9 @@ void ModuleLicenseListViewManager::PopulateView()
     {
 		memset(&TheModuleLicStructure, 0, sizeof(TheModuleLicStructure));
 	    OurCommLink->GetModuleLicensingStructureArray(TheModuleLicStructure, i);
-		FillRow(TheModuleLicStructure);
+		//don't show modules that are not licensed
+		if(TheModuleLicStructure.TotalLicenses > 0)			
+			FillRow(TheModuleLicStructure);
 	}
 }
 
@@ -64,15 +66,16 @@ void ModuleLicenseListViewManager::FillRow(ModuleLicensingStructure TheModuleLic
 	listViewItem1->Text = TheModuleLicStructure.ModuleName.bstrVal;
 
 	char retval[10];
-	
-	if((long)TheModuleLicStructure.TotalLicenses == UnlimitedLicenses)
+
+	if((long)TheModuleLicStructure.TotalLicenses >= (long)TheModuleLicStructure.ModuleUnlimited && 
+	   ((long)TheModuleLicStructure.ModuleUnlimited > 0))
 	{
 		listViewItem1->SubItems->Add(S"Unlimited");
 	}
 	else
 	{
 		sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.TotalLicenses);
-		listViewItem1->SubItems->Add(retval);
+		listViewItem1->SubItems->Add(retval);		
 	}
 
 	//convert the licenses in use to a string and insert it as a subitem
