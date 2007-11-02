@@ -5,15 +5,12 @@ using namespace ModuleViewManager;
 
 #undef MessageBox
 //constructor...initialize the member variables
-ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewManager)
+ModuleLicenseListViewManager::ModuleLicenseListViewManager(CommunicationLink* CommLink, ListView* TheModViewManager)
 							: TheModView(TheModViewManager)
 {
 	//initialize the member variables
 	KeyNum = NULL;
-
-	//new up a commlink object
-	OurCommLink = new CommunicationLink();
-
+	OurCommLink = CommLink;
 	if(!OurCommLink)
 		return;
 }
@@ -21,11 +18,8 @@ ModuleLicenseListViewManager::ModuleLicenseListViewManager(ListView* TheModViewM
 ModuleLicenseListViewManager::~ModuleLicenseListViewManager()
 {
 	//disconnect from the solimar license server
-   //new
 	OurCommLink->UnInitializeModuleLicenseConnection();
-	OurCommLink->Disconnect();
-	delete OurCommLink;
-	OurCommLink = 0;
+	OurCommLink = NULL;
 }
 
 //returns whether the object is initialized
@@ -37,22 +31,13 @@ bool ModuleLicenseListViewManager::IsInitialized()
 	return false;
 }
 
-bool ModuleLicenseListViewManager::Connect()
-{
-	//connect to the solimar license server
-	if(OurCommLink)
-	{
-		if(SUCCEEDED(OurCommLink->Connect()))
-			return true;
-	}
-	return false;
-}
-
 //fills in the module license list view
 void ModuleLicenseListViewManager::PopulateView()
 {
 	ModuleLicensingStructure TheModuleLicStructure;
 	_variant_t retval;
+	if(!OurCommLink)
+		return;
 
 	//converts the string* into a variant
 	System::Runtime::InteropServices::Marshal::
@@ -62,14 +47,15 @@ void ModuleLicenseListViewManager::PopulateView()
 	if(!(OurCommLink->KeyIsProgrammed(&(retval.bstrVal))))
 		return;
 
-	for(int i = 0; i < OurCommLink->GetNumModules(); i++)
-   {
+	int numModules = OurCommLink->GetNumModules();
+	for(int i = 0; i < numModules; i++)
+    {
 		memset(&TheModuleLicStructure, 0, sizeof(TheModuleLicStructure));
-	   OurCommLink->GetModuleLicensingStructureArray(TheModuleLicStructure, i);
-	
-		FillRow(TheModuleLicStructure);
+	    OurCommLink->GetModuleLicensingStructureArray(TheModuleLicStructure, i);
+		//don't show modules that are not licensed
+		if(TheModuleLicStructure.TotalLicenses > 0)			
+			FillRow(TheModuleLicStructure);
 	}
-
 }
 
 //populate a row in the module license list view
@@ -80,19 +66,20 @@ void ModuleLicenseListViewManager::FillRow(ModuleLicensingStructure TheModuleLic
 	listViewItem1->Text = TheModuleLicStructure.ModuleName.bstrVal;
 
 	char retval[10];
-	
-	if((long)TheModuleLicStructure.TotalLicenses == UnlimitedLicenses)
+
+	if((long)TheModuleLicStructure.TotalLicenses >= (long)TheModuleLicStructure.ModuleUnlimited && 
+	   ((long)TheModuleLicStructure.ModuleUnlimited > 0))
 	{
 		listViewItem1->SubItems->Add(S"Unlimited");
 	}
 	else
 	{
-		sprintf(retval, "%d", TheModuleLicStructure.TotalLicenses);
-		listViewItem1->SubItems->Add(retval);
+		sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.TotalLicenses);
+		listViewItem1->SubItems->Add(retval);		
 	}
 
 	//convert the licenses in use to a string and insert it as a subitem
-	sprintf(retval, "%d", TheModuleLicStructure.LicensesInUse);
+	sprintf_s(retval, sizeof(retval), "%d", TheModuleLicStructure.LicensesInUse);
 	listViewItem1->SubItems->Add(retval);
 
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
@@ -106,6 +93,9 @@ void ModuleLicenseListViewManager::SetKeyID(Object* NewKeyNumber)
 {
 	//sets the key id and initializes the module license connection based on the 
 	//new key number
+	if(!OurCommLink)
+		return;
+
 	KeyNum = NewKeyNumber;
 	OurCommLink->InitializeModuleLicenseConnection(NewKeyNumber);
 }
