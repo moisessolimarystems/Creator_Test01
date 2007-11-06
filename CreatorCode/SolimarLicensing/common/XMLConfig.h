@@ -2,7 +2,7 @@
 #define __XML_Config_254879240975470943_h__
 
 
-#import <msxml4.dll>
+#import <msxml6.dll>
 
 
 class XMLConfig
