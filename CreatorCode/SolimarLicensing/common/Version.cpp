@@ -41,8 +41,9 @@ Version::ModuleVersion::ModuleVersion(const TinyVersion &t)
 		
 std::wstring Version::ModuleVersion::ToString()
 {
-	wchar_t *versionstring=new wchar_t[64];
-	_snwprintf_s(versionstring, sizeof(versionstring)/sizeof(wchar_t), _TRUNCATE, L"%d.%d.%d.%d", major, minor, submajor, subminor);
+	//arbitrary version length size of 64
+	wchar_t versionstring[64];
+	_snwprintf_s(versionstring, _countof(versionstring), L"%d.%d.%d.%d", major, minor, submajor, subminor);
 	versionstring[63]=0;	// prevent string buffer overflows
 	return versionstring;
 }
