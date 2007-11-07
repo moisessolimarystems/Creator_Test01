@@ -68,11 +68,22 @@ void KeyServer::TimesUpThreadFunction(void* pvThis)
 
 KeyServer::KeyServer() : 
 	KeyListLock(CreateMutex(0,0,0)), 
+	KeyTrialTimeInfoLock(CreateMutex(0,0,0)),
 	HeartbeatListLock(CreateMutex(0,0,0)), 
 	MessageClientListLock(CreateMutex(0,0,0)),
 	failed_password_attempts(0),
 	USBNotification(this)
 {
+	//wchar_t tmpbuf[1024];
+	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
+	//OutputDebugString(tmpbuf);
+	//swprintf_s(tmpbuf, 1024, L"    KeyListLock:0x%08x : ThreadID: %d", KeyListLock, GetCurrentThreadId());
+	//OutputDebugString(tmpbuf);
+	//swprintf_s(tmpbuf, 1024, L"    HeartbeatListLock:0x%08x : ThreadID: %d", HeartbeatListLock, GetCurrentThreadId());
+	//OutputDebugString(tmpbuf);
+	//swprintf_s(tmpbuf, 1024, L"    KeyTrialTimeInfoLock:0x%08x : ThreadID: %d", KeyTrialTimeInfoLock, GetCurrentThreadId());
+	//OutputDebugString(tmpbuf);
+
 	_tzset();
 
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
@@ -96,12 +107,15 @@ KeyServer::KeyServer() :
 	// trigger a key list resynchronize
 	UpdateKeysThread->RevEnable(UpdateKeysThreadHighPeriodSeconds, UpdateKeysThreadLowPeriodSeconds, 20);
 	UpdateKeysThread->Invoke();
+
+	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Leave, ThreadID: %d", GetCurrentThreadId());
+	//OutputDebugString(tmpbuf);
 }
 
 KeyServer::~KeyServer()
 {
 	//wchar_t tmpbuf[1024];
-	//swprintf_s(tmpbuf, 1024, L"KeyServer::~KeyServer() - Enter");
+	//swprintf_s(tmpbuf, 1024, L" KeyServer::~KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
 	if (UpdateKeysThread)
@@ -116,17 +130,24 @@ KeyServer::~KeyServer()
 		CloseHandle(KeyTrialTimeInfoLock);
 	if (MessageClientListLock!=NULL)
 		CloseHandle(MessageClientListLock);
-		
-	keys.clear();
 
-	//swprintf_s(tmpbuf, 1024, L"    KeyServer::~KeyServer() leave");
+
+	while(!keys.empty())
+	{
+		delete keys.begin()->second;
+		keys.erase(keys.begin());
+	}
+
+	//swprintf_s(tmpbuf, 1024, L" KeyServer::~KeyServer() Leave, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 }
 
 
-HRESULT KeyServer::ResynchronizeKeys()
+HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 {
-//OutputDebugStringW(L"KeyServer::ResynchronizeKeys() - Enter");
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Enter, bForceRefresh: %s, ThreadID: %d", bForceRefresh ? L"true" : L"false", GetCurrentThreadId());
+//OutputDebugString(tmpbuf);
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
 		SafeMutex mutex2(KeyListLock);
@@ -135,16 +156,17 @@ HRESULT KeyServer::ResynchronizeKeys()
 		if(driver.AtLeastOneParallelKey())
 			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 		
-		
 		// first pass, add newly found keys
+		ProtectionKey* tmpProKey;
 		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
 		{
 			if (keys.find(dkey->first)==keys.end())
 			{
 				_bstr_t keyName = dkey->first;
-				ProtectionKey tmpProKey(dkey->first, dkey->first, &keyspec,&driver, true/*Use Share Licensing*/);
+				//ProtectionKey tmpProKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
+				tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
 				long application_instances = 0;
-				tmpProKey.ApplicationInstanceCount(&application_instances);
+				tmpProKey->ApplicationInstanceCount(&application_instances);
 				if(application_instances > 1)	
 				{
 					//application_instances == virtual keys this single key will represent
@@ -153,10 +175,17 @@ HRESULT KeyServer::ResynchronizeKeys()
 						wchar_t key_id[128];
 						_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
 						key_id[127]=0;
-						//Use Share Licensing - only the first key can use the shared licensing.
-						keys.insert(KeyList::value_type(key_id, ProtectionKey(keyName, key_id,&keyspec,&driver, idx==1/*Use Share Licensing*/ )));
-						virtual_key_to_physical_key_list[key_id] = keyName;
+
+						if (keys.find(key_id)==keys.end())	//Only add new keys
+						{
+							//Use Share Licensing - only the first key can use the shared licensing.
+							ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
+							tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
+							keys.insert(KeyList::value_type(key_id, tmpVirtProKey));
+							virtual_key_to_physical_key_list[key_id] = keyName;
+						}
 					}
+					delete tmpProKey;
 				}
 				else	//Only 1 Key
 				{
@@ -165,23 +194,38 @@ HRESULT KeyServer::ResynchronizeKeys()
 				}
 			}
 		}
-		
+
 		// second pass, remove keys that are no longer reported by the driver
 		KeyServer::KeyList::iterator skey=keys.begin();
 		while (skey!=keys.end())
 		{
 			if (driver.keys.find(virtual_key_to_physical_key_list[skey->first])==driver.keys.end())
+			{
+				delete skey->second;
 				skey = keys.erase(skey);
+			}
 			else
 				++skey;
 		}
-		
+
+		std::map<_bstr_t, ProtectionKey*> physicalKeyMap;// Performance optimization, used by virtual keys to look at instead of querying physical key.
+
 		// last pass, refresh all of the read-caches
 		for (skey = keys.begin(); skey!=keys.end(); ++skey)
 		{
 			try
 			{
-				skey->second.UpdateCellCache();
+				if(physicalKeyMap.find(skey->second->GetPhysicalKeyIdent()) != physicalKeyMap.end())
+				{
+					//Physical key in cache, copy cells of physical key to this virtual key
+					skey->second->CopyCellCache(*(physicalKeyMap[skey->second->GetPhysicalKeyIdent()]));
+				}
+				else	
+				{
+					//Physical key not in cache, query the physical key
+					skey->second->UpdateAllCellsCache(bForceRefresh);
+					physicalKeyMap[skey->second->GetPhysicalKeyIdent()] = skey->second;
+				}
 			}
 			catch (_com_error &e)
 			{
@@ -190,7 +234,9 @@ HRESULT KeyServer::ResynchronizeKeys()
 			}
 		}
 	} // release the lock on the driver's key list
-//OutputDebugStringW(L"KeyServer::ResynchronizeKeys() - Leave");
+
+//swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave, ThreadID: %d", GetCurrentThreadId());
+//OutputDebugString(tmpbuf);
 	return hr;
 }
 
@@ -201,7 +247,7 @@ HRESULT KeyServer::AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR 
 	SafeMutex mutex(KeyListLock);
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
-		return key->second.AddApplicationInstance(license_id, application_instance, b_app_instance_lock_key);
+		return key->second->AddApplicationInstance(license_id, application_instance, b_app_instance_lock_key);
 	else
 		return E_INVALIDARG;
 }
@@ -210,7 +256,7 @@ HRESULT KeyServer::RemoveApplicationInstance(BSTR license_id, BSTR key_ident, BS
 	SafeMutex mutex(KeyListLock);
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
-		return key->second.RemoveApplicationInstance(license_id, application_instance);
+		return key->second->RemoveApplicationInstance(license_id, application_instance);
 	else
 		return E_INVALIDARG;
 }
@@ -219,7 +265,7 @@ HRESULT KeyServer::GetApplicationInstanceList(BSTR license_id, BSTR key_ident, V
 	SafeMutex mutex(KeyListLock);
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
-		return key->second.GetApplicationInstanceList(pvtAppInstanceList);
+		return key->second->GetApplicationInstanceList(pvtAppInstanceList);
 	else
 		return E_INVALIDARG;
 }
@@ -242,6 +288,21 @@ HRESULT KeyServer::Heartbeat(BSTR license_id)
 
 	return S_OK;
 }
+HRESULT KeyServer::RemoveHeartbeat(BSTR license_id)
+{
+	SafeMutex mutex(HeartbeatListLock);
+	for (HeartbeatList::iterator heartbeatIt = heartbeats.begin(); heartbeatIt != heartbeats.end(); ++heartbeatIt)
+	{
+		if(_wcsicmp(heartbeatIt->first, license_id) == 0)
+		{
+			heartbeats.erase(heartbeatIt);
+			break;
+		}
+	}
+	
+	return S_OK;
+}
+
 
 HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 {
@@ -301,7 +362,7 @@ HRESULT KeyServer::EnterPassword(BSTR password)
 		SafeMutex mutex(KeyListLock);
 		for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 		{
-			hr = key->second.EnterPassword(_bstr_t(password,true));
+			hr = key->second->EnterPassword(_bstr_t(password,true));
 			
 			// update the failed password counter
 			if (hr == S_OK)
@@ -472,6 +533,8 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		
 		// password entry succeeded, provide the verification code to the user
 		*verification_code = verification.Detach();
+
+		GenerateMessage(L"", MT_INFO, S_OK, time(0), MessagePasswordPacketVerificationCode, (wchar_t*)*verification_code);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -499,11 +562,11 @@ HRESULT KeyServer::GenerateBasePassword(long customer_number, long key_number, B
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateBasePassword(customer_number, key_number, &temp_password);
+			hr = key->second->GenerateBasePassword(customer_number, key_number, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -532,11 +595,11 @@ HRESULT KeyServer::GenerateApplicationInstancePassword(long customer_number, lon
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, &temp_password);
+			hr = key->second->GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -564,11 +627,11 @@ HRESULT KeyServer::GenerateVersionPassword(long customer_number, long key_number
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateVersionPassword(customer_number, key_number, ver_major, ver_minor, &temp_password);
+			hr = key->second->GenerateVersionPassword(customer_number, key_number, ver_major, ver_minor, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -597,11 +660,11 @@ HRESULT KeyServer::GenerateExtensionPassword(long customer_number, long key_numb
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateExtensionPassword(customer_number, key_number, extend_days, extension_num, &temp_password);
+			hr = key->second->GenerateExtensionPassword(customer_number, key_number, extend_days, extension_num, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -630,11 +693,11 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, &temp_password);
+			hr = key->second->GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -662,11 +725,11 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
 		VARIANT_BOOL vtValid;
-		hr = key->second.IsProgrammed(&vtValid);
+		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
-			hr = key->second.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password_number, &temp_password);
+			hr = key->second->GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password_number, &temp_password);
 			if (SUCCEEDED(hr))
 			{
 				*password = temp_password;
@@ -859,7 +922,7 @@ HRESULT KeyServer::KeyTrialExpires(BSTR key_ident, VARIANT *expire_date)
 	
 	if (key!=keys.end())
 	{
-		return key->second.TrialExpires(expire_date);
+		return key->second->TrialExpires(expire_date);
 	}
 	else
 	{
@@ -875,7 +938,7 @@ HRESULT KeyServer::KeyTrialHours(BSTR key_ident, long *trial_hours)
 	
 	if (key!=keys.end())
 	{
-		return key->second.TrialHours(trial_hours);
+		return key->second->TrialHours(trial_hours);
 	}
 	else
 	{
@@ -893,7 +956,7 @@ HRESULT KeyServer::KeyIsActive(BSTR key_ident, VARIANT_BOOL *key_active)
 	
 	if (key!=keys.end())
 	{
-		return key->second.IsActive(key_active);
+		return key->second->IsActive(key_active);
 	}
 	else
 	{
@@ -911,7 +974,7 @@ HRESULT KeyServer::KeyIsProgrammed(BSTR key_ident, VARIANT_BOOL *key_programmed)
 	
 	if (key!=keys.end())
 	{
-		return key->second.IsProgrammed(key_programmed);
+		return key->second->IsProgrammed(key_programmed);
 	}
 	else
 	{
@@ -931,7 +994,7 @@ HRESULT KeyServer::KeyHeaderQuery(BSTR key_ident, long header_ident, VARIANT *va
 	
 	if (key!=keys.end())
 	{
-		return key->second.HeaderQuery(header_ident, value);
+		return key->second->HeaderQuery(header_ident, value);
 	}
 	else
 	{
@@ -949,7 +1012,7 @@ HRESULT KeyServer::KeyIsPresent(BSTR key_ident, VARIANT_BOOL *key_present)
 	
 	if (key!=keys.end())
 	{
-		return key->second.IsPresent(key_present);
+		return key->second->IsPresent(key_present);
 	}
 	else
 	{
@@ -968,7 +1031,7 @@ HRESULT KeyServer::KeyLock(BSTR license_id, BSTR key_ident)
 	
 	if (key!=keys.end())
 	{
-		return key->second.Lock(license_id);
+		return key->second->Lock(license_id);
 	}
 	else
 	{
@@ -984,7 +1047,7 @@ HRESULT KeyServer::KeyUnlock(BSTR license_id, BSTR key_ident)
 	
 	if (key!=keys.end())
 	{
-		return key->second.Unlock(license_id);
+		return key->second->Unlock(license_id);
 	}
 	else
 	{
@@ -1001,7 +1064,7 @@ HRESULT KeyServer::KeyObtain(BSTR license_id, BSTR key_ident)
 	
 	if (key!=keys.end())
 	{
-		return key->second.Obtain(license_id);
+		return key->second->Obtain(license_id);
 	}
 	else
 	{
@@ -1017,7 +1080,7 @@ HRESULT KeyServer::KeyRelease(BSTR license_id, BSTR key_ident)
 	
 	if (key!=keys.end())
 	{
-		return key->second.Release(license_id);
+		return key->second->Release(license_id);
 	}
 	else
 	{
@@ -1036,7 +1099,7 @@ HRESULT KeyServer::KeyValidateLicense(BSTR license_id, BSTR key_ident, VARIANT_B
 	
 	if (key!=keys.end())
 	{
-		return key->second.ValidateLicense(license_id, license_valid);
+		return key->second->ValidateLicense(license_id, license_valid);
 	}
 	else
 	{
@@ -1052,7 +1115,7 @@ HRESULT KeyServer::KeyModuleEnumerate(BSTR key_ident, VARIANT *key_module_list)
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleEnumerate(key_module_list);
+		return key->second->ModuleEnumerate(key_module_list);
 	}
 	else
 	{
@@ -1068,7 +1131,7 @@ HRESULT KeyServer::KeyModuleQuery(BSTR key_ident, long module_ident, VARIANT *vt
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleQuery(module_ident, vtValue);
+		return key->second->ModuleQuery(module_ident, vtValue);
 	}
 	else
 	{
@@ -1085,7 +1148,7 @@ HRESULT KeyServer::KeyModuleLicenseTotal(BSTR license_id, BSTR key_ident, long m
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleLicenseTotal(license_id, module_ident, license_count);
+		return key->second->ModuleLicenseTotal(license_id, module_ident, license_count);
 	}
 	else
 	{
@@ -1102,7 +1165,7 @@ HRESULT KeyServer::KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long m
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleLicenseInUse(license_id, module_ident, license_count);
+		return key->second->ModuleLicenseInUse(license_id, module_ident, license_count);
 	}
 	else
 	{
@@ -1118,7 +1181,7 @@ HRESULT KeyServer::KeyModuleLicenseObtain(BSTR license_id, BSTR key_ident, long 
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleLicenseObtain(license_id, module_ident, license_count);
+		return key->second->ModuleLicenseObtain(license_id, module_ident, license_count);
 	}
 	else
 	{
@@ -1134,7 +1197,7 @@ HRESULT KeyServer::KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleLicenseRelease(license_id, module_ident, license_count);
+		return key->second->ModuleLicenseRelease(license_id, module_ident, license_count);
 	}
 	else
 	{
@@ -1150,7 +1213,7 @@ HRESULT KeyServer::KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_id
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleLicenseDecrementCounter(license_id, module_ident, license_count);
+		return key->second->ModuleLicenseDecrementCounter(license_id, module_ident, license_count);
 	}
 	else
 	{
@@ -1167,7 +1230,7 @@ HRESULT KeyServer::KeyModuleInUse(BSTR key_ident, long module_ident, long* licen
 	
 	if (key!=keys.end())
 	{
-		return key->second.ModuleInUse(module_ident, license_count);
+		return key->second->ModuleInUse(module_ident, license_count);
 	}
 	else
 	{
@@ -1180,7 +1243,7 @@ HRESULT KeyServer::KeyModuleLicenseUnlimited(BSTR license_id, BSTR key_ident, lo
 	SafeMutex mutex(KeyListLock);
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
-		return key->second.ModuleLicenseUnlimited(license_id, module_ident, b_module_is_unlimited);
+		return key->second->ModuleLicenseUnlimited(license_id, module_ident, b_module_is_unlimited);
 	else
 		return E_INVALIDARG;
 }
@@ -1192,7 +1255,7 @@ HRESULT KeyServer::LicenseReleaseAll(BSTR license_id)
 	// for each key
 	for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 	{
-		HRESULT h = key->second.LicenseReleaseAll(license_id);
+		HRESULT h = key->second->LicenseReleaseAll(license_id);
 		if (FAILED(h)) hr = h;
 	}
 	
@@ -1209,7 +1272,7 @@ HRESULT KeyServer::KeyFormat(BSTR key_ident, BSTR *new_key_ident)
 	
 	if (key!=keys.end())
 	{
-		return key->second.Format(new_key_ident);
+		return key->second->Format(new_key_ident);
 	}
 	else
 	{
@@ -1228,9 +1291,9 @@ HRESULT KeyServer::KeyProgram(BSTR key_ident, long customer_number, long key_num
 	
 	if (key!=keys.end())
 	{
-		hr = key->second.Program(customer_number, key_number, product_ident, ver_major, ver_minor, key_type, application_instances, days, module_value_list, new_key_ident);
+		hr = key->second->Program(customer_number, key_number, product_ident, ver_major, ver_minor, key_type, application_instances, days, module_value_list, new_key_ident);
 		if (FAILED(hr)) return hr;
-		ResynchronizeKeys();
+		ResynchronizeKeys(true);
 	}
 	else
 	{
@@ -1249,7 +1312,7 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	
 	if (key!=keys.end())
 	{
-		return key->second.ReadRaw(pvtKeyData);
+		return key->second->ReadRaw(pvtKeyData);
 	}
 	else
 	{
@@ -1263,7 +1326,7 @@ void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_t
 	wchar_t message[MAX_MESSAGE_SIZE];
 	va_list pArg;
 	
-	va_start(pArg, LicensingMessageStringTable[MessageLookupID]);
+	va_start(pArg, MessageLookupID);
 	_vsnwprintf_s(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
 	va_end(pArg);
 	message[MAX_MESSAGE_SIZE-1] = 0;
@@ -1426,6 +1489,13 @@ void KeyServer::HeartbeatCheck()
 			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
 						
 			hr = LicenseReleaseAll(heartbeat->first);
+
+			{
+			SafeMutex mutex(HeartbeatListLock);
+			//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
+			for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
+				keyIt->second->RemoveApplicationInstance(heartbeat->first, L"");
+			}
 			
 			// Stop notifying the client of messages
 			SafeMutex mutex(MessageClientListLock);
@@ -1483,7 +1553,7 @@ HRESULT KeyServer::TimesUp()
 		{
 			if ((key = keys.find(tk->first))!=keys.end())
 			{
-				if (key->second.isOnTrial() && key->second.KeyInUse())
+				if (key->second->isOnTrial() && key->second->KeyInUse())
 				{
 					tk->second.key_obtained = true;
 				}
@@ -1495,9 +1565,14 @@ HRESULT KeyServer::TimesUp()
 	// if one of these conditions occurs, decrement an hour from the key
 	{
 		SafeMutex mutex(KeyTrialTimeInfoLock);
-
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"KeyServer::TimesUp() - Loop Start");
+//OutputDebugString(tmpbuf);
 		for (TrialTimeInfoList::iterator tk = trial_keys.begin(); tk != trial_keys.end(); ++tk)
 		{
+//swprintf_s(tmpbuf, 1024, L"    key: %s, lastDecrement: %f", (wchar_t*)tk->first, tk->second.last_decrement);
+//OutputDebugString(tmpbuf);
+
 			static const time_t ONE_HOUR = (time_t)(60*60);
 			time_t cur_time = time(NULL);
 			
@@ -1514,7 +1589,7 @@ HRESULT KeyServer::TimesUp()
 						if ((key = keys.find(tk->first))!=keys.end())
 						{
 							// if the key is no longer a trial key, give up trying to decrement it
-							if (!key->second.isOnTrial())
+							if (!key->second->isOnTrial())
 							{
 								tk->second.key_obtained = false;
 								tk->second.last_decrement = 0;
@@ -1522,7 +1597,9 @@ HRESULT KeyServer::TimesUp()
 							// key is a trial key, decrement the trial hours
 							else
 							{
-								HRESULT hr = key->second.DecrementTrialHours();
+								HRESULT hr = key->second->DecrementTrialHours();
+//swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
+//OutputDebugString(tmpbuf);
 								GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
 								if (SUCCEEDED(hr))
 								{
