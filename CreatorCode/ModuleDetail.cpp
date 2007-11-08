@@ -471,8 +471,8 @@ void __fastcall TModuleFrame::ModuleListKeyPress(TObject *Sender,
 //              table.  The password is dependent upon the customer number which
 //              will make it unique. Also the key automatically becomes a
 //              permanent key when a password is created.
-// Parameters:  module_id - identifies module type of password
-//              row_id - NULL if legacy password, else a db key for ord_list table
+// Parameters:  units - identifies module type of password
+//              bPasswordExt - NULL if legacy password, else a db key for ord_list table
 // Returns:     bool
 //==============================================================================
 bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
@@ -531,10 +531,16 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       }
       else // ...otherwise create a password
       {
-         if(units < 0) units = 0;
+//Key is in initial trial and not permanent
+//1) want units to be 0 then increment
+//2) want units to be 0 then set units
+         //0 out units on increment
+         //if(units < 0) units = 0;
 
-         keyMaster->applyModZeroPassword(key_record, detail, units+1);
+//         keyMaster->applyModZeroPassword(key_record, detail, units+1);
+         keyMaster->applyModZeroPassword(key_record, detail, units);
 
+/*
          //All products using the new licensing scheme will need their units incremented by 1
          switch(key_record->pkey->productId)
          {
@@ -551,6 +557,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
              default :
                  break;
          }
+*/
 
          keyMaster->getModulePassword((key_record->pkey),
                                        detail->id,
@@ -564,15 +571,18 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    }
    else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true)) //key is already permanent
    {
-      if (units == -1)
+      //grab value from key/db then add one for increment or minus one for decrement
+      /*if (units == -1)
          units = ((SpdProtectionKey*)(key_record->pkey))->getLicense(detail->offset, detail->bits);
-
+      */
       //check if license has ability to be incremented
-      int available(detail->max - units);
-      if( available > 0 )
-      {
-         keyMaster->applyModPassword(key_record, detail, units+1);
+      //int available(detail->max - units);
+      //if( available > 0 )
+      //{
+         //keyMaster->applyModPassword(key_record, detail, units+1);
+         keyMaster->applyModPassword(key_record, detail, units);
 
+   /*
          //All products using the new licensing scheme will need their units incremented by 1
          switch(key_record->pkey->productId)
          {
@@ -589,6 +599,7 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
              default :
                  break;
          }                                        //so need to increment units to pass to license server.
+   */
 
          //keyMaster->getModulePassword((SpdProtectionKey*)(key_record->pkey),
          keyMaster->getModulePassword((key_record->pkey),
@@ -600,12 +611,13 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
                                       password_string
                                       );
 
-      }
+      /*}
       else
       {
          Application->MessageBox("Module already set to its maximum value.", "Module Information", MB_OK);
          return false;
       }
+      */
   }
    else //- key_status not valid, do not generate a module password
       return false;
@@ -1245,7 +1257,6 @@ bool TModuleFrame::createPagesPerMinutePassword()
 //==============================================================================
 void __fastcall TModuleFrame::mmIncrementModuleClick(TObject *Sender)
 {
-   //bool result =
    createModulePassword();
 
    //call update function
@@ -1296,7 +1307,7 @@ void __fastcall TModuleFrame::mmSetModuleClick(TObject *Sender)
    ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);
    TUnitsDlg *pDlg = new TUnitsDlg(NULL, detail->max);
    if (pDlg->ShowModal()==IDYES)
-      createModulePassword(pDlg->GetUnits()-1, true);
+      createModulePassword(pDlg->GetUnits(), true);
    delete pDlg;
 
    //call update function
@@ -1323,10 +1334,10 @@ void __fastcall TModuleFrame::ModuleListMouseDown(TObject *Sender,
                 ModulePopup->Items->Items[2]->Visible = true;  //enable counter
            else
            {
-                if(detail->max >= 15)
+                //if(detail->max >= 15)
                    ModulePopup->Items->Items[1]->Visible = true;
-                else
-                   ModulePopup->Items->Items[0]->Visible = true;
+                //else
+                //   ModulePopup->Items->Items[0]->Visible = true;
                 ModulePopup->Items->Items[2]->Visible = false; //disable counter
            }
            if (m_bPopup && Button==mbRight && detail->name != "{ Not Used }")
