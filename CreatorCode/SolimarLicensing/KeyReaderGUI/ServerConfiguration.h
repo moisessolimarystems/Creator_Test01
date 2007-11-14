@@ -11,20 +11,28 @@ using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 using namespace Microsoft::Win32;
+using namespace System::Xml;
+using namespace System::IO;
+using namespace System::Security::AccessControl;
+
 
 //initial key created when installed
 #define SOLIMAR_KEY						L"SOFTWARE\\Solimar"
-#define LICENSE_PARENT_KEY				L"SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer"
 #define LICENSE_PRODUCT					L"Solimar Licensing"
-#define PRIMARY_CONNECTION				L"Primary"
-#define SECONDARY_CONNECTION			L"Secondary"
-#define SHARED_PRIMARY_CONNECTION		L"Primary_Shared"
-#define SHARED_SECONDARY_CONNECTION		L"Secondary_Shared"
-#define SERVER_NAME_KEY_VALUE			L"ServerName"
-#define SHARED_KEY_VALUE				L"Shared"
-#define BACKUP_KEY_VALUE				L"Backup"
-#define REGISTRY_TRUE					1
-#define REGISTRY_FALSE					0
+//XML Elements & Attributes
+#define LICENSING_STRUCTURE_ELEMENT		L"LicensingStructure"
+#define SERVER_STRUCTURE_ELEMENT		L"ServerStructure"
+#define VERSION_ELEMENT					L"Version"
+#define VALUE_ATTRIB					L"value"
+#define SERVER_ELEMENT					L"Server"
+#define PRODUCT_ELEMENT					L"Product"
+#define ID_ATTRIB						L"id"
+#define NAME_ATTRIB						L"name"
+#define BACKUP_ATTRIB					L"backup"
+#define SHARED_ATTRIB					L"shared"
+//XML File/Folder Path
+#define LOCAL_CONNECTION_FILE_PATH		L"\\Solimar\\SolimarLicenseServer\\"
+#define LOCAL_CONNECTION_FILE			L"LocalConnectionSettings.xml"
 	/// <summary> 
 	/// Summary for ServerConfiguration
 	///
@@ -193,6 +201,9 @@ using namespace Microsoft::Win32;
 		bool LoadSettings(int ProductID);
 		bool SaveSettings(int ProductID);
 		int MapProductName(String* ProductName);
+		bool CreateDefaultXML();
+		void AddFileSecurity(String* fileName, String* account, 
+                        FileSystemRights rights, AccessControlType controlType);
 	
 	private:
 		ConnectionSettings* TheConnectionSetting;
