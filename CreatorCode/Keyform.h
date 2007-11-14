@@ -55,7 +55,8 @@
 #define module_tab            0x0002
 #define password_tab          0x0004
 #define solsearcher_tab       0x0008
-#define all_tabs              (key_tab | module_tab | solsearcher_tab | password_tab)
+#define packet_tab            0x0010
+#define all_tabs              (key_tab | module_tab | solsearcher_tab | password_tab | packet_tab)
 
 #define SORT_CUSTOMER         0
 #define SORT_KEY              1
@@ -207,6 +208,10 @@ __published:	// IDE-managed Components
         TGroupBox *AppInstanceGroupBox;
         TLabel *AppInstanceLabel;
         TEdit *AppInstanceEdit;
+        TTabSheet *TabSheetPacketHistory;
+        TDBGrid *PacketDBGrid;
+        TQuery *PacketHistoryQuery;
+        TDataSource *PacketDataSource;
 	void __fastcall OnKeyRowChange(TObject *Sender);
         void __fastcall mmExtensionClick(TObject* Sender);
 	void __fastcall mmProgramClick(TObject *Sender);
@@ -296,6 +301,7 @@ private:
         //
         // GUI functions
         void __fastcall LoadPswdGrid();
+        void __fastcall LoadPacketGrid();
         void __fastcall RefreshKeyPage(int _index = -1);
         void __fastcall resetKey(ProductId);
         void __fastcall SetModFilter();
@@ -332,9 +338,6 @@ public:
         String licenseStatus;
         String productStatus;
         String versionStatus;
-
-
-
         //
         // Password Functions
         void createExtensionPassword(unsigned short days);
