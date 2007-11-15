@@ -1,26 +1,22 @@
 #include "stdafx.h"
 #include "PasswordValidation.h"
+#include "..\common\LicenseError.h"
 
 using namespace PWDValidation;
 
-PasswordValidation::PasswordValidation()
+PasswordValidation::PasswordValidation(CommunicationLink* CommLink)
 {
-	TheCommLink = new CommunicationLink();
-	TheCommLink->Connect();
+	TheCommLink = CommLink;
 }
 
 PasswordValidation::~PasswordValidation()
 {
-	if(TheCommLink)
-	{
-		delete TheCommLink;
-		TheCommLink = NULL;
-	}
+	if(TheCommLink)	
+		TheCommLink = NULL;	
 }
 
 HRESULT PasswordValidation::ProcessPasswordFile(BSTR TheFileName)
-{
-			
+{			
 	HRESULT hr;
 	
 	// open the password packet file
@@ -56,27 +52,34 @@ HRESULT PasswordValidation::ProcessPasswordFile(BSTR TheFileName)
 
 	BSTR verification_code;
 	
-	hr = TheCommLink->EnterPasswordPacket(&vtPacket, &verification_code);
-
-	if(hr == 0x80040213)
+	hr = TheCommLink->EnterPasswordPacket(&vtPacket, &verification_code);	
+	if(hr == LicenseServerError::EHR_PACKET_EXPIRED)
 	{
-		MessageBox::Show("Error: Expired Packet");
+		MessageBox::Show("Expired Packet", "Password Packet Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		return hr;
 	}
-
 	else if(hr == S_FALSE)
 	{
-		MessageBox::Show("Error: Invalid Password");
+		MessageBox::Show("Invalid Password Found in Packet", "Password Packet Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		return hr;
 	}
 	else if(FAILED(hr))
 	{
-		MessageBox::Show("Error Communicating With SolimarLicenseServer");
+		MessageBox::Show("Unknown Error", "Password Packet Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
 	}
 	wchar_t buf[256];
-	swprintf(buf, L"The Verification Code Is : %s", verification_code);
+	swprintf_s(buf, 
+			   sizeof(buf)/sizeof(wchar_t), 
+			   L"The Verification Code Is : %s", 
+			   verification_code);
 	MessageBox::Show(buf);
-
+	//need to only write to eventlog on remote machine
+	swprintf_s(buf, 
+		       sizeof(buf)/sizeof(wchar_t), 
+			   L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nPacket :\r\n%s\r\n\r\nPassword Packet Correct. Verification Code : %s.", 
+			   TheFileName,
+			   verification_code);				
+	TheCommLink->WriteEventLog(buf, EventLogEntryType::Information); 
 	// free up the variant safearray
 	VariantClear(&vtPacket);
 	SysFreeString(verification_code);
