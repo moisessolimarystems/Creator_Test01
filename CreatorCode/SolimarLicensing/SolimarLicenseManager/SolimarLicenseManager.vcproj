@@ -80,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="Ws2_32.lib"
+				AdditionalDependencies="Ws2_32.lib shell32.lib"
 				OutputFile="$(OutDir)/SolimarLicenseManager.dll"
 				LinkIncremental="2"
 				MergedIDLBaseFileName="_SolimarLicenseManager.idl"
@@ -113,7 +113,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
-				CommandLine="regsvr32 /s /c &quot;$(TargetPath)&quot;"
+				CommandLine="python commentOutInclude.py&#x0D;&#x0A;regsvr32 /s /c &quot;$(TargetPath)&quot;&#x0D;&#x0A;"
 				ExcludedFromBuild="false"
 			/>
 		</Configuration>
@@ -212,8 +212,8 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
-				CommandLine="regsvr32 /s /c &quot;$(TargetPath)&quot;"
-				ExcludedFromBuild="true"
+				CommandLine="python commentOutInclude.py"
+				ExcludedFromBuild="false"
 			/>
 		</Configuration>
 		<Configuration
@@ -280,7 +280,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="Ws2_32.lib"
+				AdditionalDependencies="Ws2_32.lib shell32.lib"
 				OutputFile="$(OutDir)/SolimarLicenseManager.dll"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseManager.idl"
@@ -315,7 +315,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
-				CommandLine="regsvr32 /s /c &quot;$(TargetPath)&quot;"
+				CommandLine="python commentOutInclude.py&#x0D;&#x0A;regsvr32 /s /c &quot;$(TargetPath)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -417,7 +417,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
-				CommandLine="regsvr32 /s /c &quot;$(TargetPath)&quot;"
+				CommandLine="python commentOutInclude.py"
 				ExcludedFromBuild="false"
 			/>
 		</Configuration>
@@ -463,15 +463,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicenseSettings.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicensingMessage.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\common\NetworkUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\common\Registry.cpp"
 				>
 			</File>
 			<File
@@ -488,6 +488,10 @@
 			</File>
 			<File
 				RelativePath="..\common\Version.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\XMLConfig.cpp"
 				>
 			</File>
 		</Filter>
@@ -546,6 +550,10 @@
 			</File>
 			<File
 				RelativePath="..\common\LicenseRegistryKeys.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\LicenseSettings.h"
 				>
 			</File>
 			<File

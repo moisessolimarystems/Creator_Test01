@@ -33,7 +33,6 @@ static System::String* ExceptionStringFormater(Exception* e, int depth)
 								 );
 }
 
-
 #undef MessageBox
 [STAThreadAttribute]
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -151,9 +150,12 @@ bool Form1::DisconnectLink()
 		PasswordValidater = NULL;
 	}
 	//Clear Module & Key view	
-	this->ModLicenseListView->Items->Clear();
-	this->KeyInfoListView->Items->Clear();
-	TheCommLink->Disconnect();
+	if(this->ModLicenseListView)
+		this->ModLicenseListView->Items->Clear();
+	if(this->KeyInfoListView)
+		this->KeyInfoListView->Items->Clear();
+	if(TheCommLink)
+		TheCommLink->Disconnect();
 	return true;
 }
 
@@ -397,15 +399,17 @@ System::Void Form1::File_ConnectServer_Click(System::Object *  sender, System::E
 System::Void Form1::ConnectServer()
 {
 	String* ConnectedServer;
-	TheConnectToForm = new ConnectToForm(ServerList);
+	TheConnectToForm = new ConnectToForm(TheCommLink, ServerList);
 	if(TheConnectToForm->ShowDialog() == DialogResult::OK)
 	{	//Connection is validated at this point
 		ConnectedServer = TheConnectToForm->GetServerName();
 		DisconnectLink();
+		System::Windows::Forms::Cursor* storedCursor = this->Cursor;
+		this->Cursor = Cursors::WaitCursor;
 		if(!ConnectLink(ConnectedServer))			
 		{
 			//System::String* estr = System::String::Format("An exception was thrown.\r\n\r\n{0}\r\n\r\nLicense Manager will now close. ",ExceptionStringFormater(e,0));		
-			MessageBox::Show("Failed to connect successfully to any known license server","Connection Error", MessageBoxButtons::OK, MessageBoxIcon::Error); 
+			MessageBox::Show("Failed to connect to specified License Server.","Connection Error", MessageBoxButtons::OK, MessageBoxIcon::Error); 
 		}
 		else				
 		{	//remove from current position if already exist
@@ -418,6 +422,7 @@ System::Void Form1::ConnectServer()
 			else
 				File_ShutdownServer->Enabled = false;
 		}
+		this->Cursor = storedCursor;
 	}	
 	delete TheConnectToForm;
 	TheConnectToForm = NULL;
@@ -501,6 +506,7 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 	//if OK button was pressed
 	if (result == DialogResult::OK) 
 	{
+
 			//get the file name
 			String* TheFileName = openFileDialog1->FileName;
 			BSTR bstr_FileName;
@@ -510,7 +516,10 @@ System::Void Form1::AddPasswordPacketMenuItem_Click(System::Object *  sender, Sy
 			bstr_FileName = (static_cast<BSTR>(static_cast<void *>(ptr)));
 			
 			//process the file
+			System::Windows::Forms::Cursor* storedCursor = this->Cursor;
+			this->Cursor = Cursors::WaitCursor;	
 			PasswordValidater->ProcessPasswordFile(bstr_FileName);
+			this->Cursor = storedCursor;
 			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
     }
 	UpdateViews();
