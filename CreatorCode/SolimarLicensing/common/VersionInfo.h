@@ -13,7 +13,7 @@
 #define __VERSIONINFO_H
 
 // Version of the program
-#define MAJOR_REVISION_NUMBER 2
+#define MAJOR_REVISION_NUMBER 3
 #define MINOR_REVISION_NUMBER 00
 
 //Build Number of the program
