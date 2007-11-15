@@ -8,6 +8,7 @@
 
 #define NUM_MOD_COLS 3
 #define NUM_KEY_COLS 7
+#define NUM_SERVERS 10
 
 namespace SaveConfig
 {
@@ -22,6 +23,7 @@ namespace SaveConfig
 	using namespace System::Runtime::Serialization::Formatters::Binary;
 	using namespace Microsoft::Win32; 
 
+	//bump version when adding new field to isolated storage!!
 	[Serializable]
 	public __gc class FormSettings
 	{
@@ -40,7 +42,8 @@ namespace SaveConfig
 			Point KeyListLocation;
 			Size KeyListSize;
 			int KeyColWidth __gc[];
-			int KeyColOrder __gc[];		
+			int KeyColOrder __gc[];
+			ArrayList* ServerList;
 		public:
 			FormSettings()
 			{
@@ -51,6 +54,17 @@ namespace SaveConfig
 				ModColOrder = new int __gc[NUM_MOD_COLS];
 				KeyColWidth = new int __gc[NUM_KEY_COLS];
 				KeyColOrder = new int __gc[NUM_KEY_COLS];
+				ServerList = new ArrayList(NUM_SERVERS);		
+				for(int i=0; i<NUM_MOD_COLS; i++)
+				{
+					ModColumnWidth[i] = -1;
+					ModColOrder[i] = -1;
+				}
+				for(int i=0; i<NUM_KEY_COLS;i++)
+				{
+					KeyColWidth[i] = -1;
+					KeyColOrder[i] = -1;
+				}
 			}
 	};
 	
@@ -69,7 +83,8 @@ namespace SaveConfig
 		void LoadModListConfig(ModuleGUIConfigurationStructPtr TheModConfigStructPtr);
 		void SaveKeyListConfig(ListView* TheKeyListView);
 		void LoadKeyListConfig(KeyGUIConfigurationStructPtr TheKeyConfigStruct);
-
+		ArrayList* LoadServerConfig();
+		void SaveServerConfig(ArrayList* ServerList);
 		//Load/Save Settings to IsolatedStorage
 		void LoadSettings();
 		void SaveSettings();

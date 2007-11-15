@@ -16,12 +16,12 @@ namespace ModuleViewManager
 	__gc class ModuleLicenseListViewManager
 	{
 		public:
-			ModuleLicenseListViewManager(ListView* TheModViewManager);
+			ModuleLicenseListViewManager(CommunicationLink*, ListView*);
 			~ModuleLicenseListViewManager();
 			void PopulateView();
 			void SetKeyID(Object* NewKeyNumber);
 			bool IsInitialized();
-			bool Connect();
+			//bool Connect();
 
 	private: 
 		CommunicationLink* OurCommLink;
