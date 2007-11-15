@@ -140,34 +140,28 @@ void OutputFormattedDebugString(const wchar_t *fmt, ...)
 
 
 
-ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0), b_use_shared_licensing(false)
+ProtectionKey::ProtectionKey() : m_keyspec(0), m_driver(0), b_use_shared_licensing(false), m_lastTimeCheck(0)
 {
 	;
 }
 
-ProtectionKey::ProtectionKey(const ProtectionKey &k) : 
+
+
+ProtectionKey::ProtectionKey(_bstr_t virtualKeyIdent, const ProtectionKey &k) : 
 	key_owned(false),
 	cells_lock(CreateMutex(0,0,0)),
 	license_use_lock(CreateMutex(0,0,0)),
 	m_physicalKeyIdent(k.m_physicalKeyIdent),
-	m_virtualKeyIdent(k.m_virtualKeyIdent),
+	m_virtualKeyIdent(virtualKeyIdent),
 	m_keyspec(k.m_keyspec), 
 	m_driver(k.m_driver),
 	b_use_shared_licensing(k.b_use_shared_licensing),
+	m_lastTimeCheck(0),
 	m_application_instance(k.m_application_instance),
 	m_license_connection_type(k.m_license_connection_type)
 {
-	try
-	{
-		UpdateCellCache();
-	}
-	catch (_com_error &e)
-	{
-		OutputDebugStringW(L"ProtectionKey::ProtectionKey() - catch (_com_error &e)");
-		e.Error();
-	}
+	CopyCellCache(k);
 }
-
 ProtectionKey::ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, KeySpec *keyspec, RainbowDriver *driver, bool bUseSharedLicensing) :
 	key_owned(false),
 	cells_lock(CreateMutex(0,0,0)),
@@ -176,13 +170,14 @@ ProtectionKey::ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, 
 	m_virtualKeyIdent(virtualKeyIdent),
 	m_keyspec(keyspec),
 	m_driver(driver),
-	m_application_instance(L""),
+	m_application_instance(L""), 
+	m_lastTimeCheck(0),
 	b_use_shared_licensing(bUseSharedLicensing),
 	m_license_connection_type(LCT_ASSOCIATE_APPLICATION_INSTANCE)
 {
 	try
 	{
-		UpdateCellCache();
+		UpdateAllCellsCache();
 	}
 	catch (_com_error &e)
 	{
@@ -193,10 +188,15 @@ ProtectionKey::ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, 
 ProtectionKey::~ProtectionKey()
 {
 	if (cells_lock!=NULL)
+	{
 		CloseHandle(cells_lock);
+		cells_lock = NULL;
+	}
 	if (license_use_lock!=NULL)
+	{
 		CloseHandle(license_use_lock);
-
+		license_use_lock = NULL;
+	}
 	key_use.clear();
 	license_use.clear();
 	license_unlimited_list.clear();
@@ -448,7 +448,7 @@ HRESULT ProtectionKey::ModuleEnumerate(VARIANT *pvtModuleList)
 		
 		MultidimensionalSafeArray::DimensionsType dims,index;
 		dims.push_back((unsigned int)product.data.size());			// number of elements
-		dims.push_back((unsigned int)2);							// [id,name]
+		dims.push_back((unsigned int)5);							// [id,name,unlimited,pool,isSharable]
 		
 		hr = MultidimensionalSafeArray::CreateMultidimensionalSafearray(pvtModuleList, dims);
 		
@@ -472,7 +472,30 @@ HRESULT ProtectionKey::ModuleEnumerate(VARIANT *pvtModuleList)
 				VariantCopy(pElement,&_variant_t(_bstr_t(product.data[module].name)));
 				MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(pvtModuleList, index);
 				index.pop_back();
+
+
+				// unlimited
+				index.push_back(2);
+				MultidimensionalSafeArray::AccessMultidimensionalSafearray(pvtModuleList, index, &pElement);
+				VariantCopy(pElement,&_variant_t(product.data[module].unlimited));
+				MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(pvtModuleList, index);
+				index.pop_back();
+
+				// pool
+				index.push_back(3);
+				MultidimensionalSafeArray::AccessMultidimensionalSafearray(pvtModuleList, index, &pElement);
+				VariantCopy(pElement,&_variant_t(product.data[module].pool));
+				MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(pvtModuleList, index);
+				index.pop_back();
 				
+				
+				// isSharable
+				index.push_back(4);
+				MultidimensionalSafeArray::AccessMultidimensionalSafearray(pvtModuleList, index, &pElement);
+				VariantCopy(pElement,&_variant_t(product.data[module].isSharable));
+				MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(pvtModuleList, index);
+				index.pop_back();
+
 				index.pop_back();
 			}
 		}
@@ -644,7 +667,6 @@ HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, 1024, L"ProtectionKey::AddApplicationInstance(%s, %s, %s, %s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id, b_app_instance_lock_key==VARIANT_TRUE ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
-//OutputFormattedDebugString(L"%s - ProtectionKey::AddApplicationInstance(%s, %s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id);
 
 
 	SafeMutex mutex(license_use_lock);
@@ -717,21 +739,27 @@ HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_
 //Returns S_OK on success, else S_FALSE
 HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR application_id)
 {
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"ProtectionKey::RemoveApplicationInstance(%s, %s, %s)", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id);
+//OutputDebugString(tmpbuf);
 	HRESULT hr(S_OK);
 	SafeMutex mutex(license_use_lock);
-	AppInstanceConnectionTypeList::iterator appIt = appInstance_to_connectionType_list.find(_bstr_t(application_id,true));
-	if(appIt != appInstance_to_connectionType_list.end())
-	{
-		appInstance_to_connectionType_list.erase(appIt);
-	}
 
+	_bstr_t bstrAppId = _bstr_t(application_id,true);
 	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
 	if(licAppIt != license_to_app.end())
 	{
+		if(wcsicmp(bstrAppId, L"") == 0)
+			bstrAppId =  _bstr_t(licAppIt->second,true);
 		license_to_app.erase(licAppIt);
+	}
+
+	AppInstanceConnectionTypeList::iterator appIt = appInstance_to_connectionType_list.find(bstrAppId);
+	if(appIt != appInstance_to_connectionType_list.end())
+	{
+		appInstance_to_connectionType_list.erase(appIt);
 		hr = S_OK;
 	}
-	
 	return hr;
 }
 
@@ -766,11 +794,10 @@ HRESULT ProtectionKey::GetApplicationInstanceList(VARIANT *pvtAppInstanceList)
 				VariantClear(&pElement[(2*index)+1]);
 				pElement[(2*index)+1].vt = VT_BOOL;
 				pElement[(2*index)+1].boolVal = appIt->second == ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE ? VARIANT_TRUE : VARIANT_FALSE;
-//swprintf_s(tmpbuf, 1024, L"    [%d] = %s", 2*index, pElement[2*index].bstrVal);
+
+//swprintf_s(tmpbuf, 1024, L"    %s = %s", (wchar_t*)pElement[2*index].bstrVal, pElement[(2*index)+1].boolVal == VARIANT_TRUE ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
-//swprintf_s(tmpbuf, 1024, L"    [%d] = %s", (2*index)+1, pElement[(2*index)+1].boolVal == VARIANT_TRUE ? L"true" : L"false");
-//OutputDebugString(tmpbuf);
-			
+
 			//swprintf_s(tmpbuf, 1024, L"    (%s, %s): (%s, %s)", 
 			//(wchar_t*)appIt->first, 
 			//appIt->second == LicenseConnectionType::LCT_LOCK_APPLICATION_INSTANCE ? L"true" : L"false",
@@ -1066,7 +1093,7 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentK
 		if (FAILED(hr)) throw _com_error(hr);
 	}
 
-	m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);
+	hr = m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);		if (FAILED(hr)) throw _com_error(hr);
 	InitializePasswordNumber();	// Set the module password number to 0
 	
 //xxx debug
@@ -1157,6 +1184,13 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provide
 		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
 		return E_INVALIDARG;
 	}
+
+	//CR.9124 - Somehow a key that was "Headers Initialized" was not set got programmed, didn't think that was possible.
+	//Do one last validity check here to ensure that it has been set, else return E_FAIL.
+	unsigned int headersInitialized = ReadHeaderCache(L"Headers Initialized").ulVal;
+	if(headersInitialized != HEADER_INITIALIZED)
+		return E_FAIL;
+
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Leave");	
 	return S_OK;
 }
@@ -1215,47 +1249,65 @@ _variant_t ProtectionKey::ReadBitsCache(unsigned short offset, unsigned short bi
 	return ReadBits(offset, bits, false);
 }
 
-
-void ProtectionKey::UpdateCellCache()
+HRESULT ProtectionKey::CopyCellCache(const ProtectionKey &k)
 {
-	// Reads the key contents in to a temporary cache, 
-	// then copies the temporary cache to the persistent cache.
-	// The extra level of indirection is for performance reasons,
-	// reading from the physical key takes some time, the cache
-	// should be highly available and not blocking on key reads.
-
-	bool some_valid_cells = false;
-	
-	unsigned short tmp_cells[KeyCellCount];
-	HRESULT tmp_cells_valid[KeyCellCount];
-	
-	memset(tmp_cells,0,sizeof(tmp_cells));
-	memset(tmp_cells_valid,0,sizeof(tmp_cells));
-	for (unsigned int i=0; i<ProtectionKey::KeyCellCount; ++i)
-	{
-		if (RainbowDriver::accessCode[i]==RainbowDriver::ALGORITHM)
-		{
-			tmp_cells[i] = 0;
-			tmp_cells_valid[i] = LicenseServerError::EHR_SP_ACCESS_DENIED;
-		}
-		else
-		{
-			tmp_cells_valid[i]=S_OK;
-			try {tmp_cells[i]=ReadCellPhysical(i);}
-			catch (_com_error &e) {tmp_cells_valid[i]=e.Error();}
-			if (SUCCEEDED(tmp_cells_valid[i]))
-				some_valid_cells = true;
-		}
-	}
-
 	{ // copy from the temp cache to the persistent cache
-		SafeMutex mutex(cells_lock);
-		memcpy(cells,tmp_cells,sizeof(cells));
-		memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
+		SafeMutex mutex1(cells_lock);
+		SafeMutex mutex2(k.cells_lock);
+		
+		memcpy(cells, k.cells, sizeof(cells));
+		memcpy(cells_valid, k.cells_valid, sizeof(cells_valid));
 	}
-	
-	if (!some_valid_cells)
-		throw _com_error(E_FAIL);
+	return S_OK;
+}
+
+void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
+{
+	time_t cur_time = time(NULL);
+	static const time_t UPDATE_TIME_PERIOD = (time_t)30;//30 Seconds - Don't check more than once every thirty seconds.
+
+	if(bForceRefresh || m_lastTimeCheck == 0 || abs(difftime(cur_time, m_lastTimeCheck)) > UPDATE_TIME_PERIOD)
+	{
+		m_lastTimeCheck = cur_time;
+		// Reads the key contents in to a temporary cache, 
+		// then copies the temporary cache to the persistent cache.
+		// The extra level of indirection is for performance reasons,
+		// reading from the physical key takes some time, the cache
+		// should be highly available and not blocking on key reads.
+
+		bool some_valid_cells = false;
+		
+		unsigned short tmp_cells[KeyCellCount];
+		HRESULT tmp_cells_valid[KeyCellCount];
+		
+		memset(tmp_cells,0,sizeof(tmp_cells));
+		memset(tmp_cells_valid,0,sizeof(tmp_cells));
+		for (unsigned int i=0; i<ProtectionKey::KeyCellCount; ++i)
+		{
+			if (RainbowDriver::accessCode[i]==RainbowDriver::ALGORITHM)
+			{
+				tmp_cells[i] = 0;
+				tmp_cells_valid[i] = LicenseServerError::EHR_SP_ACCESS_DENIED;
+			}
+			else
+			{
+				tmp_cells_valid[i]=S_OK;
+				try {tmp_cells[i]=ReadCellPhysical(i);}
+				catch (_com_error &e) {tmp_cells_valid[i]=e.Error();}
+				if (SUCCEEDED(tmp_cells_valid[i]))
+					some_valid_cells = true;
+			}
+		}
+
+		{ // copy from the temp cache to the persistent cache
+			SafeMutex mutex(cells_lock);
+			memcpy(cells,tmp_cells,sizeof(cells));
+			memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
+		}
+		
+		if (!some_valid_cells)
+			throw _com_error(E_FAIL);
+	}
 }
 
 void ProtectionKey::UpdateCellCache(unsigned int cell)
@@ -1338,6 +1390,8 @@ bool ProtectionKey::TimesUpClockViolation()
 
 HRESULT ProtectionKey::DecrementTrialHours()
 {
+
+
 	//yyy Unfinished. Which key types modify the expiration date here?
 	try
 	{
@@ -1345,7 +1399,7 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
 		unsigned short initial_counter = ReadHeaderCache(_bstr_t(L"Initial Counter")).uiVal;
 		unsigned short extended_counter = ReadHeaderCache(_bstr_t(L"Extended Counter")).uiVal;
-		
+
 		switch(key_status)
 		{
 		case INITIAL_TRIAL:
@@ -1359,6 +1413,17 @@ HRESULT ProtectionKey::DecrementTrialHours()
 		case EXTENDED_TRIAL3:
 		case EXTENDED_TRIAL4:
 		case EXTENDED_TRIAL5:
+		case EXTENDED_TRIAL6:
+		case EXTENDED_TRIAL7:
+		case EXTENDED_TRIAL8:
+		case EXTENDED_TRIAL9:
+		case EXTENDED_TRIAL10:
+		case EXTENDED_TRIAL11:
+		case EXTENDED_TRIAL12:
+		case EXTENDED_TRIAL13:
+		case EXTENDED_TRIAL14:
+		case EXTENDED_TRIAL15:
+		case EXTENDED_TRIAL16:
 			////Causes key to expire immediately, not sure why in is in here.
 			//if (key_type==KEYDevelopment)
 			//	WriteHeader(_bstr_t(L"Expiration Date"), (unsigned int)time(NULL));
@@ -1372,6 +1437,7 @@ HRESULT ProtectionKey::DecrementTrialHours()
 	{
 		return e.Error();
 	}
+
 	
 	return S_OK;
 }
@@ -1674,6 +1740,9 @@ bool ProtectionKey::EnterProductVersionPassword(DWORD user_password, bool trial_
 		try
 		{
 			WriteHeader(L"Product Version", product_version);
+			unsigned short major = product_version >> 12;	//Want last digit of short.
+			unsigned short minor = product_version & 0xFFF; //Want all but last digit of short.
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordVersion, major, minor);
 		}
 		catch (_com_error &e)
 		{
@@ -1720,6 +1789,50 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 		new_status = EXTENDED_TRIAL5;
 		break;
 	case EXTENDED_TRIAL5:
+		new_extension_num = 5;
+		new_status = EXTENDED_TRIAL6;
+		break;
+	case EXTENDED_TRIAL6:
+		new_extension_num = 6;
+		new_status = EXTENDED_TRIAL7;
+		break;
+	case EXTENDED_TRIAL7:
+		new_extension_num = 7;
+		new_status = EXTENDED_TRIAL8;
+		break;
+	case EXTENDED_TRIAL8:
+		new_extension_num = 8;
+		new_status = EXTENDED_TRIAL9;
+		break;
+	case EXTENDED_TRIAL9:
+		new_extension_num = 9;
+		new_status = EXTENDED_TRIAL10;
+		break;
+	case EXTENDED_TRIAL10:
+		new_extension_num = 10;
+		new_status = EXTENDED_TRIAL11;
+		break;
+	case EXTENDED_TRIAL11:
+		new_extension_num = 11;
+		new_status = EXTENDED_TRIAL12;
+		break;
+	case EXTENDED_TRIAL12:
+		new_extension_num = 12;
+		new_status = EXTENDED_TRIAL13;
+		break;
+	case EXTENDED_TRIAL13:
+		new_extension_num = 13;
+		new_status = EXTENDED_TRIAL14;
+		break;
+	case EXTENDED_TRIAL14:
+		new_extension_num = 14;
+		new_status = EXTENDED_TRIAL15;
+		break;
+	case EXTENDED_TRIAL15:
+		new_extension_num = 15;
+		new_status = EXTENDED_TRIAL16;
+		break;
+	case EXTENDED_TRIAL16:
 	default:
 		try_extension_password = false;
 		break;
@@ -1741,6 +1854,8 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 			if (FAILED(hr)) throw _com_error(hr);
 			hr = WriteExpirationDays(extend_days);
 			if (FAILED(hr)) throw _com_error(hr);
+
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordExtension, extend_days);
 		}
 		catch (_com_error &e)
 		{
@@ -1764,10 +1879,12 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 	if (GetModulePassword(customer_number, key_number, module_id, units_licensed, password_number) == user_password)
 	{
 		bool bModuleIsCounter = false;
+		wchar_t* tmpModuleName;
 		{
 		SafeMutex mutex(license_use_lock);
 		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_id]);
 		bModuleIsCounter = module.isCounter;
+		tmpModuleName = module.name;
 		}
 
 		//Do not make key permanent if module isCounter
@@ -1794,6 +1911,9 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 			try
 			{
 				WriteLicense(module_id, units_licensed);
+
+				if (!bModuleIsCounter)
+					keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, tmpModuleName, units_licensed);
 
 				//if password_number > 0 then write it into the PASSWORD_NUMBER cell.
 				if(password_number > 0)
@@ -1823,7 +1943,12 @@ bool ProtectionKey::EnterApplicationInstancePassword(DWORD user_password, unsign
 	{
 		try
 		{
+			unsigned int oldAppInstCount = ReadHeaderCache(L"Application Instances").uiVal;
 			WriteHeader(L"Application Instances", units_licensed);
+
+			if(oldAppInstCount == 0 && units_licensed > 0)
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordRemote);
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordApplicationInstance, units_licensed);
 		}
 		catch (_com_error &e)
 		{
@@ -1872,7 +1997,12 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 		
 		if (trial_key || base_key)
 		{
-			try {WriteLicense(module_id, units_licensed);}
+			try 
+			{
+				WriteLicense(module_id, units_licensed);
+
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
+			}
 			catch(_com_error &e) {throw e;}
 			
 			// success
@@ -1909,7 +2039,11 @@ bool ProtectionKey::EnterSPDOutputPassword(DWORD user_password, bool trial_key, 
 		}
 		if (trial_key || base_key)
 		{
-			try {WriteLicense(L"Output Pool", output_units);}
+			try 
+			{
+				WriteLicense(L"Output Pool", output_units);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDOutput, output_units);
+			}
 			catch(_com_error &e) {throw e;}
 			
 			// success
@@ -1977,7 +2111,8 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 		{
 			// Write the pages per minute license
 			WriteLicense(ppm_module_id, ppm_pages);
-			
+			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDPPM2, ppm_module_id, ppm_pages);
+
 			// Write the pages per minute extension count license
 			KeySpec::Module &extensions_module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][L"Pages Per Minute Extensions"]);
 			WriteBitsPhysical(extensions_module.offset, extensions_module.bits, _variant_t((long)ppm_extensions));
@@ -2011,8 +2146,10 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 					hr = WriteStatus(BASE);
 					if (FAILED(hr)) throw _com_error(hr);
 				}
-			
 				WriteLicense(module_id, units_licensed);
+
+				KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(_bstr_t(L"Product ID")).ulVal][module_id]);
+				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
 			}
 			catch(_com_error &e)
 			{
@@ -2739,6 +2876,17 @@ bool ProtectionKey::isOnTrial()
 		key_status==EXTENDED_TRIAL3 ||
 		key_status==EXTENDED_TRIAL4 ||
 		key_status==EXTENDED_TRIAL5 ||
+		key_status==EXTENDED_TRIAL6 ||
+		key_status==EXTENDED_TRIAL7 ||
+		key_status==EXTENDED_TRIAL8 ||
+		key_status==EXTENDED_TRIAL9 ||
+		key_status==EXTENDED_TRIAL10 ||
+		key_status==EXTENDED_TRIAL11 ||
+		key_status==EXTENDED_TRIAL12 ||
+		key_status==EXTENDED_TRIAL13 ||
+		key_status==EXTENDED_TRIAL14 ||
+		key_status==EXTENDED_TRIAL15 ||
+		key_status==EXTENDED_TRIAL16 ||
 		key_status==UNINITIALIZED_TRIAL
 		);
 	
@@ -3162,6 +3310,8 @@ void ProtectionKey::TrialToPermanent()
 	{
 		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
 	}
+
+	keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordPermanent);
 }
 
 void ProtectionKey::InitializePasswordNumber()
@@ -3207,6 +3357,17 @@ HRESULT ProtectionKey::WriteCounterDays(unsigned short extend_days)
 		case EXTENDED_TRIAL3:
 		case EXTENDED_TRIAL4:
 		case EXTENDED_TRIAL5:
+		case EXTENDED_TRIAL6:
+		case EXTENDED_TRIAL7:
+		case EXTENDED_TRIAL8:
+		case EXTENDED_TRIAL9:
+		case EXTENDED_TRIAL10:
+		case EXTENDED_TRIAL11:
+		case EXTENDED_TRIAL12:
+		case EXTENDED_TRIAL13:
+		case EXTENDED_TRIAL14:
+		case EXTENDED_TRIAL15:
+		case EXTENDED_TRIAL16:
 			WriteHeader(L"Extended Counter", extendedCounter);
 			//WriteCellPhysical(m_keyspec->headers[L"Extended Counter"].offset >> 4, extendedCounter);
 			break;
