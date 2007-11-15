@@ -53,7 +53,7 @@ HRESULT CommunicationLink::Connect(String* ServerName)
 	const char* lpcServerName = (char*)(void*)Marshal::StringToHGlobalAnsi(ServerName);
 	MultiByteToWideChar(CP_ACP, 0, lpcServerName, length, lpwServerName, length);
 	Marshal::FreeHGlobal((System::IntPtr)(void*)lpcServerName);
-	
+
 	COSERVERINFO	serverInfo	= {0, lpwServerName, NULL, 0};
     MULTI_QI        multiQI     = {&IID_ISolimarLicenseSvr3, NULL, NOERROR};
     hr = CoCreateInstanceEx(
@@ -76,15 +76,19 @@ HRESULT CommunicationLink::Connect(String* ServerName)
 		}
 		if (FAILED(hr))
 			pTheServer->Release();
-
 	}	
+	delete lpwServerName;
 	return hr;
 }
 
 void CommunicationLink::Disconnect()
 {
 	//uninitialize the COM object
-	CoUninitialize();
+	if(pTheServer != NULL)
+	{
+		pTheServer->Release();
+		pTheServer = NULL;
+	}
 }
 
 HRESULT CommunicationLink::CheckPassword(String* InputString)
@@ -299,6 +303,7 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 														 unsigned int ModuleIndex
 														)
 {
+	int nElements;
 	VARIANT* ModuleInfo;
 	_variant_t retval;
 
@@ -306,20 +311,28 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 	if (SUCCEEDED(SafeArrayAccessData(Module[ModuleIndex].parray,
 										(void**)(&ModuleInfo))))
 	{
-		TheModStruct.ModuleID = ModuleInfo[0];
-		TheModStruct.ModuleName = ModuleInfo[1];
+		//For backwards compatibility, make sure display in GUI only if elements exist
+		nElements = Module[ModuleIndex].parray->rgsabound->cElements;
+		for(int i=0; i < nElements ; i++)
+		{
+			if(i==0)
+				TheModStruct.ModuleID = ModuleInfo[i];
+			else if(i==1)
+				TheModStruct.ModuleName = ModuleInfo[i];
+			else if(i==2)
+				TheModStruct.ModuleUnlimited = ModuleInfo[i];
+			else if(i==3)
+				TheModStruct.ModulePool = ModuleInfo[i];
+			else if(i==4)
+				TheModStruct.ModuleShared = ModuleInfo[i];
+		}
 
 		//convert the TheKeyNumber from an Object to a variant
 		System::Runtime::InteropServices::Marshal::
 			GetNativeVariantForObject(KeyNumber, &retval);
 
 		//converts the variant to a bstr
-		retval.ChangeType(VT_BSTR);
-		
-		pTheServer->KeyModuleLicenseUnlimited(retval.bstrVal, 
-										  (TheModStruct.ModuleID).lVal,
-										   VARIANT_TRUE);
-	   
+		retval.ChangeType(VT_BSTR);		  
 
 		pTheServer->KeyModuleLicenseTotal(retval.bstrVal, 
 										  (TheModStruct.ModuleID).lVal, 
@@ -405,4 +418,22 @@ HRESULT CommunicationLink::GetServerVersion(long* Major, long* Minor, long* Vers
 		return E_FAIL;
 	hr = pTheServer->GetVersionLicenseServer(Major, Minor, Version);
 	return hr;
+}
+
+void CommunicationLink::WriteEventLog(String* EventLogMsg, EventLogEntryType LogType)
+{
+    // Create the source, if it does not already exist.
+    if ( !EventLog::SourceExists( "Solimar License Viewer" ) )
+    {
+		//An event log source should not be created and immediately used.
+		//There is a latency time to enable the source, it should be created
+		//prior to executing the application that uses the source.
+		//Execute this sample a second time to use the new source.
+		EventLog::CreateEventSource( "Solimar License Viewer", "Application" );
+    }		   
+    // Create an EventLog instance and assign its source.
+    EventLog* myLog = new EventLog;
+    myLog->Source = "Solimar License Viewer";		   
+    // Write an informational entry to the event log.    
+	myLog->WriteEntry(EventLogMsg, LogType);
 }

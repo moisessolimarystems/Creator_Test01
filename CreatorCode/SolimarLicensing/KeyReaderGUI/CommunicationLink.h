@@ -2,12 +2,12 @@
 #define __COMMUNICATIONLINK_H__
 
 using namespace System;
-
+using namespace System::Diagnostics;
 /*
 	The purpose of this class is to connect to the Solimar License Server
 	and to read the key information and module information.
 */
-__gc class CommunicationLink
+public __gc class CommunicationLink
 {
 public:
 	//constructor
@@ -25,7 +25,7 @@ public:
 	bool IsModInitialized();
 
 	//Releases the safe array for the module list
-   HRESULT UnLockModuleList();
+    HRESULT UnLockModuleList();
 
 	void UnInitializeModuleLicenseConnection();
 
@@ -60,6 +60,8 @@ public:
 
 	//disconnects from the solimar license server
 	void Disconnect();
+
+	void WriteEventLog(String* EventLogMsg, EventLogEntryType LogType);
 
 	//destructor
 	~CommunicationLink();
