@@ -4,20 +4,51 @@
 using namespace KeyReaderGUI;
 using namespace System::Runtime::InteropServices; // for class Marshal
 
+ConnectToForm::ConnectToForm(CommunicationLink* CommLink, ArrayList* _ServerList)
+{
+	InitializeComponent();
+	TheCommLink = CommLink;
+	if (_ServerList != NULL)
+	{
+		for(int i=0; i<_ServerList->Count; i++)
+		{
+			CB_ServerList->Items->Insert(i,_ServerList->Item[i]);
+		}	
+		if(_ServerList->Count > 0)
+			CB_ServerList->SelectedIndex = 0;
+	}
+}
+ConnectToForm::~ConnectToForm()
+{
+	TheCommLink = NULL;
+	this->Dispose(true);		
+}
+
 #undef MessageBox
 System::Void ConnectToForm::BTN_OK_Click(System::Object *  sender, System::EventArgs *  e)
 {
+	 HRESULT hr;
 	 bool bRetVal = true;
-	 System::Windows::Forms::Cursor* storedCursor = this->Cursor;
-	 this->Cursor = Cursors::WaitCursor;
-	 if(!IsValidServer(CB_ServerList->Text->Trim()))
-	 { 
-			MessageBox::Show(this, "Failed to connect to specified License Server.", "Connection Error", MessageBoxButtons::OK, MessageBoxIcon::Error);
-			ConnectToForm::CB_ServerList->Focused;	
-			bRetVal = false;
+
+	 if(TheCommLink)
+	 {
+		 System::Windows::Forms::Cursor* storedCursor = this->Cursor;
+		 this->Cursor = Cursors::WaitCursor;
+		 hr = TheCommLink->Connect(CB_ServerList->Text->Trim());//IsValidServer(CB_ServerList->Text->Trim());
+		 if(!SUCCEEDED(hr))
+		 { 
+				MessageBox::Show(this, "Failed to connect to specified License Server.", "Connection Error", MessageBoxButtons::OK, MessageBoxIcon::Error);	
+				TheCommLink->WriteEventLog(String::Format("Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nFailed To Connect To Server: {0}\r\n{1:X8}", 
+														  CB_ServerList->Text->Trim(),									  
+														  hr.ToString("X")),
+										   EventLogEntryType::Error); 
+				ConnectToForm::CB_ServerList->Focused;	
+				bRetVal = false;
+		 }
+		 else
+			 TheCommLink->Disconnect();	//Disconnect after testing successful connection
+		 this->Cursor = storedCursor;
 	 }
-	 
-	 this->Cursor = storedCursor;
 	 if(bRetVal)
 	 {
 		 DialogResult = DialogResult::OK;
@@ -63,35 +94,4 @@ System::Void ConnectToForm::CB_ServerList_Validating(System::Object*  sender, Sy
 	    PswdErrorProvider->SetError(this->PswdTextBox, errorMsg);
     }
 */
-}
-
-bool ConnectToForm::IsValidServer(String* ServerName)
-{
-	HRESULT hr = 0;
-	int length;
-	if(!(ServerName->Length > 0))
-		ServerName = L"localhost";
-	
-	//include null terminating char
-	length = ServerName->Length+1;
-	wchar_t* lpwServerName = new WCHAR[length];
-	const char* lpcServerName = (char*)(void*)Marshal::StringToHGlobalAnsi(ServerName);
-	MultiByteToWideChar(CP_ACP, 0, lpcServerName, length, lpwServerName, length);
-	Marshal::FreeHGlobal((System::IntPtr)(void*)lpcServerName);
-	
-	COSERVERINFO	serverInfo	= {0, lpwServerName, NULL, 0};
-    MULTI_QI        multiQI     = {&IID_ISolimarLicenseSvr3, NULL, NOERROR};   
-	hr = CoCreateInstanceEx(
-						     __uuidof(CSolimarLicenseSvr),
-							 NULL,
-							 CLSCTX_REMOTE_SERVER | CLSCTX_LOCAL_SERVER,
-							 &serverInfo,
-							 1,
-							 &multiQI);
-	static_cast<ISolimarLicenseSvr3*>(multiQI.pItf)->Release();
-	if(!SUCCEEDED(hr))
-	{
-		return false;
-	}	
-	return true;
 }

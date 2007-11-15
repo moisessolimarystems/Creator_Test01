@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommunicationLink.h"
+
 namespace KeyReaderGUI
 {
 	using namespace System;
@@ -8,6 +10,8 @@ namespace KeyReaderGUI
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Diagnostics;
+
 	/// <summary> 
 	/// Summary for ConnectToForm
 	///
@@ -21,21 +25,8 @@ namespace KeyReaderGUI
 	{
 	public: 
 		//list of past valid connections passed in
-		ConnectToForm(ArrayList* _ServerList)
-		{
-			InitializeComponent();
-			if (_ServerList != NULL)
-			{
-				for(int i=0; i<_ServerList->Count; i++)
-				{
-					CB_ServerList->Items->Insert(i,_ServerList->Item[i]);
-				}	
-				if(_ServerList->Count > 0)
-					CB_ServerList->SelectedIndex = 0;
-			}
-		}
-		~ConnectToForm(){this->Dispose(true);}
-        
+		ConnectToForm(CommunicationLink*, ArrayList*);
+		~ConnectToForm();
 	protected: 
 		void Dispose(Boolean disposing)
 		{
@@ -54,15 +45,12 @@ namespace KeyReaderGUI
 	private: System::Windows::Forms::GroupBox*  groupBox1;
 	private: System::Windows::Forms::Label*  label1;
 	private: System::Windows::Forms::ErrorProvider*  ConnectErrorProvider;
-
 	private: System::ComponentModel::IContainer*  components;
-
 
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-
 
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -197,11 +185,12 @@ namespace KeyReaderGUI
 		System::Void CB_ServerList_KeyDown(System::Object*  sender, System::Windows::Forms::KeyEventArgs*  e);
 		System::Void CB_ServerList_Validated(System::Object*  sender, System::EventArgs*  e);
 		System::Void CB_ServerList_Validating(System::Object*  sender, System::ComponentModel::CancelEventArgs*  e); 
-		//
+
 	private :
-		bool IsValidServer(String*);
+		CommunicationLink* TheCommLink;
 
 	public :
 		String* GetServerName(){return this->CB_ServerList->Text;}
+
 };
 }
