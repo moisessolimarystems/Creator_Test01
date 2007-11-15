@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ControlSizing.h"
 
-#define WIDTH_SCALAR .69
-#define HEIGHT_SCALAR .60
+#define WIDTH_SCALAR .63
+#define HEIGHT_SCALAR .55
 #define FORM_LOC_X_COORD 55
 #define FORM_LOC_Y_COORD 55
 
