@@ -2,19 +2,19 @@
 #define __COMMUNICATIONLINK_H__
 
 using namespace System;
-
+using namespace System::Diagnostics;
 /*
 	The purpose of this class is to connect to the Solimar License Server
 	and to read the key information and module information.
 */
-__gc class CommunicationLink
+public __gc class CommunicationLink
 {
 public:
 	//constructor
 	CommunicationLink();
 
 	//connects to the Solimar License Server
-	HRESULT Connect();
+	HRESULT Connect(String*);
 
 	//Gets the list of keys and the number of keys
 	HRESULT InitializeKeyInfoConnection();
@@ -25,7 +25,7 @@ public:
 	bool IsModInitialized();
 
 	//Releases the safe array for the module list
-   HRESULT UnLockModuleList();
+    HRESULT UnLockModuleList();
 
 	void UnInitializeModuleLicenseConnection();
 
@@ -56,9 +56,12 @@ public:
 	HRESULT EnterPasswordPacket(VARIANT* TheData, BSTR* Verification_Code); 
 
 	bool CommunicationLink::KeyIsProgrammed(BSTR* KeyID);
+	HRESULT GetServerVersion(long* Major, long* Minor, long* Version);
 
 	//disconnects from the solimar license server
 	void Disconnect();
+
+	void WriteEventLog(String* EventLogMsg, EventLogEntryType LogType);
 
 	//destructor
 	~CommunicationLink();
@@ -83,7 +86,7 @@ private:
 	Object* KeyNumber;
 
 	//ptr to the server object. Used to access the lower layer code.
-	ISolimarLicenseSvr2* pTheServer;
+	ISolimarLicenseSvr3* pTheServer;
 
 	bool ModInitialized;
 
