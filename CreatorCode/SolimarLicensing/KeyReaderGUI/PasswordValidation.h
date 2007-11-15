@@ -7,7 +7,7 @@ namespace PWDValidation
 {
 	using namespace System::IO;
 	using namespace System::Windows::Forms;
-	
+	using namespace System::Diagnostics;
 
 	__gc class PasswordValidation
 	{
