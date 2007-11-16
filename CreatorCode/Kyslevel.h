@@ -14,6 +14,11 @@
 #define MAX_KEY_DESCRIPTION         30
 #define MAX_COMPANY_NAME_LENGTH     50
 #define KD_PASSWORD_MAX             28
+
+//Extension2 skips from 2 to 4. 
+#define LEGACY_EXTENSION_OFFSET     2
+//new extension (6+) start at 12
+#define EXTENSION_OFFSET            6
 #include <list>
 
 class SKeyRecord;

@@ -19,8 +19,10 @@ __fastcall TDlgExtension::TDlgExtension(TComponent* AOwner, SKeyRecord* keyrec)
 {
    //
    key_record = keyrec;
-
-   switch (key_record->pkey->status)
+   char buf[256];
+   sprintf(buf, "Extended Trial %d", key_record->getNextExtensionP() + 1);
+   Caption = buf;
+   /*switch (key_record->pkey->status)
    {
       case INITIAL_TRIAL:
          //extNum = 0;
@@ -48,6 +50,7 @@ __fastcall TDlgExtension::TDlgExtension(TComponent* AOwner, SKeyRecord* keyrec)
          //new_status = EXTENDED_TRIAL5;
          break;
    }
+   */
 
 }
 

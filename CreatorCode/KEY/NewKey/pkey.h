@@ -88,8 +88,10 @@ enum KeyTypeFlagX {
 
 enum KeyStatus  {UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
                  EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
-                 EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11};
-
+                 EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11, EXTENDED_TRIAL6=12,
+                 EXTENDED_TRIAL7=13, EXTENDED_TRIAL8=14, EXTENDED_TRIAL9=15, EXTENDED_TRIAL10=16,
+                 EXTENDED_TRIAL11=17, EXTENDED_TRIAL12=18, EXTENDED_TRIAL13=19, EXTENDED_TRIAL14=20,
+                 EXTENDED_TRIAL15=21, EXTENDED_TRIAL16=22};
 /* pkXXXX
  *    The pkXXXX constants are ORed together to produce the options
  *    parameter for keyMessageBox().  The return value for keyMessageBox()
@@ -197,7 +199,7 @@ public:
    HRESULT clearKeyData(BSTR* TheKeyID, ISolimarLicenseSvr3* pServer);
 
    void getBasePassword(ISolimarLicenseSvr3* pServer, char* Password_String);
-   enum {MAX_EXTENSION_NUM = 4};
+   enum {MAX_EXTENSION_NUM = 15};
 
    void getAppInstancePassword(ISolimarLicenseSvr3* pServer,
                             ushort appInstances,
@@ -282,6 +284,17 @@ inline bool ProtectionKey::isOnTrial() const
       status==EXTENDED_TRIAL3 ||
       status==EXTENDED_TRIAL4 ||
       status==EXTENDED_TRIAL5 ||
+      status==EXTENDED_TRIAL6||
+      status==EXTENDED_TRIAL7 ||
+      status==EXTENDED_TRIAL8 ||
+      status==EXTENDED_TRIAL9 ||
+      status==EXTENDED_TRIAL10 ||
+      status==EXTENDED_TRIAL11 ||
+      status==EXTENDED_TRIAL12 ||
+      status==EXTENDED_TRIAL13 ||
+      status==EXTENDED_TRIAL14 ||
+      status==EXTENDED_TRIAL15 ||
+      status==EXTENDED_TRIAL16 ||
       status==UNINITIALIZED_TRIAL
    );
 }

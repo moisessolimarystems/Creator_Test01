@@ -588,6 +588,17 @@ short ProtectionKey::getCounter() const
       case EXTENDED_TRIAL3:
       case EXTENDED_TRIAL4:
       case EXTENDED_TRIAL5:
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
          result = extendedCounter;
    }
    return result;
@@ -612,6 +623,17 @@ short ProtectionKey::getCounterDays() const
       case EXTENDED_TRIAL3:
       case EXTENDED_TRIAL4:
       case EXTENDED_TRIAL5:
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
          result = short(extendedCounter/HOURS_PER_DAY);
    }
    return result;
@@ -1062,6 +1084,17 @@ void ProtectionKey::setCounterDays(ushort trial_days)
       case EXTENDED_TRIAL3:
       case EXTENDED_TRIAL4:
       case EXTENDED_TRIAL5:
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
          extendedCounter = ushort(trial_days*(ushort)HOURS_PER_DAY);
    }
 }
@@ -1080,6 +1113,17 @@ void ProtectionKey::setCounterDaysByHours(ushort trial_hours)
       case EXTENDED_TRIAL3:
       case EXTENDED_TRIAL4:
       case EXTENDED_TRIAL5:
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
          extendedCounter = trial_hours;
    }
 }
@@ -1262,6 +1306,17 @@ const char* ProtectionKey::keyStatusText[] =
    NULL,            // 9
    "Unused",        // 10 = UNUSED
    "Deactivated"    // 11 = DEACTIVATED
+   "Extended 6",    // 12 = EXTENDED_TRIAL6
+   "Extended 7",    // 13 = EXTENDED_TRIAL7
+   "Extended 8",    // 14 = EXTENDED_TRIAL8
+   "Extended 9",    // 15 = EXTENDED_TRIAL9
+   "Extended 10",    // 16 = EXTENDED_TRIAL10
+   "Extended 11",    // 17 = EXTENDED_TRIAL11
+   "Extended 12",    // 18 = EXTENDED_TRIAL12
+   "Extended 13",    // 19 = EXTENDED_TRIAL13
+   "Extended 14",    // 20 = EXTENDED_TRIAL14
+   "Extended 15",    // 21 = EXTENDED_TRIAL15
+   "Extended 16",    // 22 = EXTENDED_TRIAL16
 };
 
 
