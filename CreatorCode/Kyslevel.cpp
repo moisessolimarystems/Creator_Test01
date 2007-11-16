@@ -48,6 +48,16 @@ const char* status_text[] =
    " ",
    "Unused",
    "Deactivated",
+   "Extension 6",
+   "Extension 7",
+   "Extension 8",
+   "Extension 9",
+   "Extension 10",
+   "Extension 11",
+   "Extension 12",
+   "Extension 13",
+   "Extension 14",
+   "Extension 15",
 };
 
 
@@ -306,33 +316,32 @@ void SKeyRecord::setStatus(ushort status)
 unsigned short SKeyRecord::getNextExtensionP()
 {
    unsigned short extNum(0);
-
    switch (pkey->status)
    {
       case INITIAL_TRIAL:
          extNum = 0;
-         //Caption = "1st Extension";
-         //next_status = EXTENDED_TRIAL;
          break;
       case EXTENDED_TRIAL:
          extNum = 1;
-         //Caption = "2nd Extension";
-         //next_status = EXTENDED_TRIAL2;
          break;
       case EXTENDED_TRIAL2:
-         extNum = 2;
-         //Caption = "3rd Extension";
-         //next_status = EXTENDED_TRIAL3;
-         break;
       case EXTENDED_TRIAL3:
-         extNum = 3;
-         //Caption = "4th Extension";
-         //next_status = EXTENDED_TRIAL4;
-         break;
       case EXTENDED_TRIAL4:
-      	//Caption = "Final Extension";
-         extNum = 4;
-         //next_status = EXTENDED_TRIAL5;
+      case EXTENDED_TRIAL5:
+         extNum = pkey->status - LEGACY_EXTENSION_OFFSET;
+         break;
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
+         extNum = pkey->status - EXTENSION_OFFSET;
          break;
    }
    return extNum;
@@ -350,30 +359,28 @@ unsigned short SKeyRecord::getNextExtension()
 
    switch (pkey->status)
    {
-      case INITIAL_TRIAL:
-         //extNum = 0;
-         //Caption = "1st Extension";
-         next_status = EXTENDED_TRIAL;
-         break;
       case EXTENDED_TRIAL:
-         //extNum = 1;
-         //Caption = "2nd Extension";
          next_status = EXTENDED_TRIAL2;
          break;
+      case EXTENDED_TRIAL5 :
+         next_status = EXTENDED_TRIAL6;
+         break;
+      case INITIAL_TRIAL:
       case EXTENDED_TRIAL2:
-         //extNum = 2;
-         //Caption = "3rd Extension";
-         next_status = EXTENDED_TRIAL3;
-         break;
       case EXTENDED_TRIAL3:
-         //extNum = 3;
-         //Caption = "4th Extension";
-         next_status = EXTENDED_TRIAL4;
-         break;
       case EXTENDED_TRIAL4:
-      	//Caption = "Final Extension";
-         //extNum = 4;
-         next_status = EXTENDED_TRIAL5;
+      case EXTENDED_TRIAL6:
+      case EXTENDED_TRIAL7:
+      case EXTENDED_TRIAL8:
+      case EXTENDED_TRIAL9:
+      case EXTENDED_TRIAL10:
+      case EXTENDED_TRIAL11:
+      case EXTENDED_TRIAL12:
+      case EXTENDED_TRIAL13:
+      case EXTENDED_TRIAL14:
+      case EXTENDED_TRIAL15:
+      case EXTENDED_TRIAL16:
+         next_status = ++pkey->status;
          break;
    }
    return next_status;
