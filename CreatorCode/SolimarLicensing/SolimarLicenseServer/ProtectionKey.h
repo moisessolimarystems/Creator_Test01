@@ -12,7 +12,7 @@ class ProtectionKey
 public:
 	
 	ProtectionKey();
-	ProtectionKey(const ProtectionKey &k);
+	ProtectionKey(_bstr_t virtualKeyIdent, const ProtectionKey &k);
 	ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, KeySpec *keyspec, RainbowDriver *driver, bool bUseSharedLicensing);
 	~ProtectionKey();
 	
@@ -96,7 +96,7 @@ public:
 	// Reads raw data off of the key
 	HRESULT ReadRaw(VARIANT *pvtKeyData);
 
-	void UpdateCellCache();
+	void UpdateAllCellsCache(bool bForceRefresh = false);
 	void UpdateCellCache(unsigned int cell);
 	HRESULT DecrementTrialHours();
 	bool TimesUp();
@@ -108,10 +108,14 @@ public:
 	bool KeyInUse();
 
 	HRESULT ApplicationInstanceCount(long* application_instance_count);
-
-private:
 	
-	_bstr_t m_physicalKeyIdent;
+	_bstr_t GetPhysicalKeyIdent() {return m_physicalKeyIdent;}
+	void SetUseSharedLicensing(bool value) {b_use_shared_licensing = value;}
+	HRESULT CopyCellCache(const ProtectionKey &k);
+private:
+
+	bool b_use_shared_licensing;
+	_bstr_t m_physicalKeyIdent;	
 	_bstr_t m_virtualKeyIdent;
 	KeySpec *m_keyspec;
 	RainbowDriver *m_driver;
@@ -132,7 +136,10 @@ private:
 	{
 		UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
 		EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
-		EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11
+		EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11, EXTENDED_TRIAL6=12,
+		EXTENDED_TRIAL7=13, EXTENDED_TRIAL8=14, EXTENDED_TRIAL9=15, EXTENDED_TRIAL10=16,
+		EXTENDED_TRIAL11=17, EXTENDED_TRIAL12=18, EXTENDED_TRIAL13=19, EXTENDED_TRIAL14=20,
+		EXTENDED_TRIAL15=21, EXTENDED_TRIAL16=22
 	} KeyStatus;
 	
 	typedef enum {
@@ -153,7 +160,7 @@ private:
 		KEYReserved		=14,
 	} KeyTypeFlagX;
 	
-	static const short MAX_EXTENSION_NUM = 4;
+	static const short MAX_EXTENSION_NUM = 15;
 	static const short INITIAL_TRIAL_DAYS = 30;
 	static const short EXTRA_DAY_BUFFER = 10;
 	static const short MAX_EXTENSION_DAYS = 255;  //before 3/17/98 MAX_EXTENSION_DAYS = 90;
@@ -188,7 +195,7 @@ private:
 	KeyUseList key_use;
 	LicenseUseList license_use;
 	LicenseUnlimitedList license_unlimited_list;
-	bool b_use_shared_licensing;
+	time_t m_lastTimeCheck;
 
 	_bstr_t m_application_instance;
 	LicenseConnectionType m_license_connection_type;
