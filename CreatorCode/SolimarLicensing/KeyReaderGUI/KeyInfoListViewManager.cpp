@@ -78,7 +78,8 @@ bool KeyInfoListViewManager::PopulateView()
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
-		retval = MapLicenseID(&LicenseID);
+		char val[25]; //pass in char[] to get return val	
+		retval = MapLicenseID(&LicenseID, val);
 		TheKeyInfoStructure.License.SetString(retval);
 
 		int KeyTypeID = ((int)(TheKeyInfoStructure.KeyType));
@@ -93,44 +94,47 @@ bool KeyInfoListViewManager::PopulateView()
 
 //maps the status id returned from the lower layer app
 //to the corresponding license as described in status.txt
-char* KeyInfoListViewManager::MapLicenseID(int* pLicenseID)
+char* KeyInfoListViewManager::MapLicenseID(int* pLicenseID, char* retval)
 {
-		char* retval;
-
 		//map the Product ID according to KeySpec.xml
 		switch (*pLicenseID)
 		{
 			case UninitializedTrialID :
 				return retval = "Uninitialized Trial";
-
 			case InitialTrialID :
-				return retval = "Initial Trial";
-				
+				return retval = "Initial Trial";				
 			case ExtendedTrialID :
 				return retval = "Extended Trial";
-
 			case ExtendedTrialID2 :
-				return retval = "Extended Trial2";
-				
+				return retval = "Extended Trial2";				
 			case ExtendedTrialID3 :
-				return retval = "Extended Trial3";
-				
+				return retval = "Extended Trial3";				
 			case ExtendedTrialID4 :
-				return retval = "Extended Trial4";
-				
+				return retval = "Extended Trial4";				
 			case ExtendedTrialID5 :
-				return retval = "Extended Trial5";
-								
+				return retval = "Extended Trial5";								
 			case Base :
-				return retval = "Base";
-				
+				return retval = "Base";				
 			case Unused :
-				return retval = "Unused";
-				
+				return retval = "Unused";				
 			case Deactivated : 
 				return retval = "Deactivated";
+			case ExtendedTrialID6 :
+			case ExtendedTrialID7 :
+			case ExtendedTrialID8 :
+			case ExtendedTrialID9 :
+			case ExtendedTrialID10 :
+			case ExtendedTrialID11 :
+			case ExtendedTrialID12 :
+			case ExtendedTrialID13 :
+			case ExtendedTrialID14 :
+			case ExtendedTrialID15 :
+			{	//Extensions 6-15 are offset by 6 from their real values (ex. 12 = extension 6)
+				sprintf_s(retval, 25, "Extended Trial%d", (*pLicenseID) - ExtendedOffset);				
+				return retval; 
+			}
 			default :
-				return retval = "Unknown License";
+				return retval = "Unknown License";			
 		}
 }
 
@@ -319,6 +323,10 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 	//Permanent Key
 	if(TheKeyInfoStructure.HoursLeft == 0 && TheKeyInfoStructure.Active.intVal != 0)
 		listViewItem1->SubItems->Add(S"Unlimited");
+	else if(!String::Equals(TheKeyInfoStructure.KeyType.bstrVal, S"Development"))	//initial trial key
+	{
+		listViewItem1->SubItems->Add(S"-");
+	}
 	else
 	{	
 		char retval[10];
@@ -346,11 +354,6 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 			listViewItem1->SubItems->Add(utc_t.ToString());
 	}
 	
-	/*char retval[10];
-	sprintf_s(retval, sizeof(retval)/sizeof(char), "%d", TheKeyInfoStructure.ApplicationInstance.intVal);
-	listViewItem1->SubItems->Add(retval);
-	*/
-
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     __mcTemp__2[0] = listViewItem1;
 	this->TheKeyListView->Items->AddRange(__mcTemp__2);

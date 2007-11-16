@@ -35,7 +35,7 @@ namespace KeyViewManager
 		//static int* MapProductName(String* pProductName);
 		//maps the status id returned from the lower layer app
 		//to the corresponding license as described in status.txt
-		char* MapLicenseID(int* pLicenseID);
+		char* MapLicenseID(int* pLicenseID, char* retval);
 
 		//maps the key type id returned from the lower layer app
 		//to the corresponding license as described in status.txt

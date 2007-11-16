@@ -7,6 +7,10 @@
 #pragma once
 #define _WIN32_DCOM
 
+#ifndef _WIN32_IE // Allow use of features specific to IE 4.0 or later.
+#define _WIN32_IE 0x0500 // Change this to the appropriate value to target IE 5.0 or later.
+#endif
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #define NUM_MOD_COLS 3
 #define NUM_KEY_COLS 7
@@ -50,6 +54,19 @@ const int ExtendedTrialID2 = 4;
 const int ExtendedTrialID3 = 5;
 const int ExtendedTrialID4 = 6;
 const int ExtendedTrialID5 = 7;
+const int ExtendedTrialID6 =  12;
+const int ExtendedTrialID7 =  13;
+const int ExtendedTrialID8 =  14;
+const int ExtendedTrialID9 =  15;
+const int ExtendedTrialID10 = 16;
+const int ExtendedTrialID11 = 17;
+const int ExtendedTrialID12 = 18;
+const int ExtendedTrialID13 = 19;
+const int ExtendedTrialID14 = 20;
+const int ExtendedTrialID15 = 21;
+//extensions 6-15 jump from 5 to 12
+const int ExtendedOffset = 6;
+
 const int Unused = 10;
 const int Deactivated = 11;
 
@@ -88,6 +105,9 @@ typedef struct
 {
 	_variant_t ModuleID;
 	_variant_t ModuleName;
+	_variant_t ModuleUnlimited;
+	_variant_t ModulePool;
+	_variant_t ModuleShared;
 	long LicensesInUse;
 	long TotalLicenses;
 }ModuleLicensingStructure, *ModuleLicensingStructurePtr;
