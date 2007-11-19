@@ -11,9 +11,8 @@
 #include "..\common\LicenseError.h"
 #include "..\common\VersionInfo.h"
 #include "..\common\NetworkUtils.h"
-#include "..\common\Registry.h"
+#include "..\common\LicenseSettings.h"
 #include "..\SolimarLicenseServer\KeyMessages.h"
-#include "..\common\LicenseRegistryKeys.h"
 #include "resource.h"
 #include <string>
 #include "list"
@@ -227,7 +226,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect(BSTR server)
 STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlySharedLicenses, VARIANT_BOOL bUseAsBackup)
 {
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s) - Enter", (wchar_t*)server, bUseOnlySharedLicenses ? L"true" : L"false", bUseAsBackup ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s)", (wchar_t*)server, bUseOnlySharedLicenses ? L"true" : L"false", bUseAsBackup ? L"true" : L"false");
 //OutputDebugString(tmpbuf); 
 	HRESULT hr = S_OK;
 	{
@@ -302,89 +301,60 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 
 	m_initialized = false;
 
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 leave - hr: 0x%08x", hr);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 leave1 - hr: 0x%08x, sizeOfServerList: %d", hr, m_servers.size());
 //OutputDebugString(tmpbuf); 
 	return hr;
 }
 STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUseSharedLicenseServers)
 {
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d) - Enter", product);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d, bUseSharedLicenseServers: %s) - Enter", product, bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false");
 //OutputDebugString(tmpbuf); 
 
-	HRESULT hr(S_OK);
-
-	//Find the product in the registry
-	//Cycle through all the Keys, each key contains 1 server to contact
-	HKEY kKeyRoot = HKEY_LOCAL_MACHINE;
-	wchar_t strProduct[32];
-	swprintf_s(strProduct, 32, L"%d", product);
-	BSTR key = REGISTRY_LICENSING_BASE + _bstr_t(L"\\") + REGISTRY_LICENSINGSERVER_KEY + _bstr_t(L"\\") + _bstr_t(strProduct);
-	_bstr_t subKey;
+	HRESULT hr(E_FAIL);
 	bool bConnectedToAtleastOneComputer = false;
-
-	REGSAM samDesired=0;
-	for(DWORD index = 0;;index++)	//Loop forever
+	for(;;)
 	{
-		//Returns S_FALSE when there are no more sub keys to enumerate.
-		hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
-		if(index==0 && hr == S_FALSE) //Special case no key found on first query
+		LicenseSettings* licSettings = new LicenseSettings();
+		hr = licSettings->Initialize();
+		if(FAILED(hr))
 		{
-			//check both the 64 bit and 32 bit registry incase you are on a 64 bit machine.  Not specifying either will defaultly check
-			//the appropiate registry, so need to check both because you do not know if you are currently loaded into a 64-bit or 32-bit
-			//process on a 64 bit machine.
-			try
-			{
-				for(;;)
-				{
-					samDesired = KEY_WOW64_32KEY;	//Access a 32-bit key from either a 32-bit or 64-bit application.
-					hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
-					if(hr == S_OK)
-						break;
-
-					samDesired = KEY_WOW64_64KEY;	//Access a 64-bit key from either a 32-bit or 64-bit application.
-					hr = Registry::EnumKey(kKeyRoot, key, index, subKey, samDesired);
-					if(hr == S_OK)
-						break;
-
-					break;//Unconditional break;
-				}
-			}
-			catch(...)//checking for3 32 or 64 bit registry on windows 2000 is not supported and may throw an exception
-			{
-				samDesired = 0;
-			}
+			hr = S_OK;	//set to ok so try to connect to localhost
+			break;
 		}
-		if(hr == S_FALSE)
+
+		std::list<LicenseSettings::LicenseServerSettings*> licServerSettingsList;
+		hr = licSettings->GetLiceseServerByProduct(product, &licServerSettingsList);
+		if(FAILED(hr))
 		{
-			hr = S_OK;
-			break;	//No more keys to enumerate...
+			hr = S_OK;	//set to ok so try to connect to localhost
+			break;
 		}
-		else if(SUCCEEDED(hr))
+
+		for(std::list<LicenseSettings::LicenseServerSettings*>::iterator licServerSettingsIt = licServerSettingsList.begin();
+			licServerSettingsIt != licServerSettingsList.end();
+			licServerSettingsIt++)
 		{
-			_bstr_t newKey = key + _bstr_t(L"\\") + subKey;
-			_variant_t vtValueName;
-			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_SERVERNAME_VALUE, vtValueName, samDesired);
-			if(FAILED(hr) || vtValueName.vt != VT_BSTR) continue;
+			//swprintf_s(tmpbuf, 1024, L"    name: %s, bIsSharedServer: %s, bIsBackupServer: %s) - bUseSharedLicenseServers: %s", 
+			//	(wchar_t*)(*licServerSettingsIt)->serverName, 
+			//	(*licServerSettingsIt)->bIsSharedServer==true ? L"true" : L"false",
+			//	(*licServerSettingsIt)->bIsBackupServer==true ? L"true" : L"false",
+			//	bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false"
+			//	);
+			//OutputDebugString(tmpbuf); 
 
-			_variant_t vtValueBackupServer;
-			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_BACKUP_VALUE, vtValueBackupServer, samDesired);
-			if(FAILED(hr) || vtValueBackupServer.vt != VT_UI4) continue;
-
-			_variant_t vtValueSharedServer;
-			hr = Registry::GetValue(kKeyRoot, newKey, REGISTRY_LICENSING_SHARED_VALUE, vtValueSharedServer, samDesired);
-			if(FAILED(hr) || vtValueSharedServer.vt != VT_UI4) continue;
-
-			if((bUseSharedLicenseServers == VARIANT_TRUE && vtValueSharedServer.ulVal==1) ||
-				(bUseSharedLicenseServers == VARIANT_FALSE && vtValueSharedServer.ulVal==0))
+			if((bUseSharedLicenseServers == VARIANT_TRUE && (*licServerSettingsIt)->bIsSharedServer==true) ||
+				(bUseSharedLicenseServers == VARIANT_FALSE && (*licServerSettingsIt)->bIsSharedServer==false))
 			{
-				hr = Connect2(vtValueName.bstrVal, vtValueSharedServer.ulVal==0 ? VARIANT_FALSE : VARIANT_TRUE, vtValueBackupServer.ulVal==0 ? VARIANT_FALSE : VARIANT_TRUE);
+				hr = Connect2((*licServerSettingsIt)->serverName, (*licServerSettingsIt)->bIsSharedServer ? VARIANT_TRUE : VARIANT_FALSE, (*licServerSettingsIt)->bIsBackupServer ? VARIANT_TRUE : VARIANT_FALSE);
 				if(FAILED(hr))
 					break;
 			}
 			bConnectedToAtleastOneComputer = true;
 		}
+		break;	//Unconditional Break;
 	}
+
 	if(SUCCEEDED(hr) && bConnectedToAtleastOneComputer == false)
 	{
 		//Didn't connect to a PC, try to connect to local host.
@@ -395,14 +365,15 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 		Disconnect();
 	}
 
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct leave - hr: 0x%08x", hr);
-//OutputDebugString(tmpbuf); 
+	
 	return hr;
 }
 
 STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 {
-//OutputDebugString(L"CSolimarLicenseMgr::Disconnect() - Enter");
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Disconnect() - Enter - AppID: %s", (wchar_t*)m_applicationInstance);
+//OutputDebugString(tmpbuf);
 	SafeMutex mutex(ServerListLock);
 
 	//Free up all the licenses
@@ -873,8 +844,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseInUse(long module_id, long *count)
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 {
 //wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseObtain module_id=%d, count=%d)", module_id, count);
-//debug_buf[1023] = 0;
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseObtain AppID: %s, module_id=%d, count=%d)", (wchar_t*)m_applicationInstance, module_id, count);
 //OutputDebugStringW(debug_buf);
 
 	HRESULT hr = S_OK;
@@ -1622,6 +1592,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 					}
 
 
+					
 					if(m_bLockKeyByAppInstance)
 					{
 						hr = LockOneOfEachKeyConfiguration(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, _bLogError);
@@ -1694,6 +1665,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 							}
 						}
 					}
+
 
 					//Cycle through all the keys, calculate unlimitedness
 					SetUnlimitedModulesOnKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, _bLogError);
@@ -2191,7 +2163,6 @@ bool CSolimarLicenseMgr::IsLocalMachine(_bstr_t serverName)
 				}
 			}
 		}
-
 		break;	//Unconditional break;
 	}
 //swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::IsLocalMachine return: %s", bRetVal ? L"true" : L"false");
@@ -2257,7 +2228,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 	HRESULT hr = S_OK;
 
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::SetUnlimitedModulesOnKeys (application_instance: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)application_instance, app_instance_lock_key ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::SetUnlimitedModulesOnKeys (AppID: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)m_applicationInstance, m_bLockKeyByAppInstance ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
 
 	for (ServerInfo::KeyList::iterator keyIt = pServerInfo->keys.begin(); keyIt != pServerInfo->keys.end(); ++keyIt)
@@ -2311,12 +2282,14 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 		{
 			_bstr_t key_ident = pvtKeyList[i].bstrVal;
 			VARIANT vtKeyProductID, vtKeyProductVersion;
-			// check that the key is present and valid
-			VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+			// check that the key is present, don't check for validity because it is being set to unlimited if suppose to.
+			VARIANT_BOOL key_active(VARIANT_FALSE);
+			hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
+			if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
 
-			//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
-			hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-			if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+			VARIANT_BOOL key_present(VARIANT_FALSE);
+			hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
+			if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
 
 			// check that the key has the requisite product version and etc.
 			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2329,6 +2302,9 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 			if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
 				m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
 			{
+//swprintf_s(tmpbuf, 1024, L"    (key_ident: %s, m_applicationInstance: %s)", (wchar_t*)pvtKeyList[i].bstrVal, (wchar_t*)m_applicationInstance);
+//OutputDebugString(tmpbuf);
+
 				for(std::map<unsigned int, int>::iterator tmpModIt = moduleCounterMap.begin(); tmpModIt != moduleCounterMap.end(); tmpModIt++)
 				{
 					KeySpec::Module &module(m_keyspec.products[m_product][tmpModIt->first]);
@@ -2358,6 +2334,9 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 						}
 					}
 
+					if(pServerInfo->bUseOnlySharedLicenses) 
+						bSetUnlimited = true;
+
 					//Only set for the right product key
 					pServerInfo->LicenseServer->KeyModuleLicenseUnlimited(pvtKeyList[i].bstrVal, module.id, bSetUnlimited ? VARIANT_TRUE : VARIANT_FALSE);
 				}
@@ -2384,6 +2363,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 	std::list<_bstr_t> keyToAddList;	//List of all keys to add to the cache
 	bool bIsLocalServer = IsLocalMachine(pServerInfo->name);
 	bool bFoundAppInstance = false;
+
 	for (int i = 0; i<count; ++i)
 	{
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
@@ -2439,7 +2419,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 					if(wcscmp(bstrApplicationInstance, m_applicationInstance) == 0)
 					{
 						//Found a key that is already associated with the application instance, leave
-						hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstance, VARIANT_TRUE);
+						hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstance, VARIANT_FALSE);
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey - pServerInfo->LicenseServer->AddApplicationInstance(%s, %s, true) = %s", (wchar_t*)key_ident, (wchar_t*)m_applicationInstance, hr==S_OK ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
@@ -2493,7 +2473,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			hr = pServerInfo->LicenseServer->AddApplicationInstance(
 					*keyIt, 
 					m_applicationInstance, 
-					VARIANT_TRUE);	//Don't Lock Key
+					VARIANT_FALSE);	//Don't Lock Key
 			if(SUCCEEDED(hr))	//Successfully locked key...
 			{
 				keysAlreadyAssignedToAnAppInstance = _bstr_t(*keyIt, true);
@@ -2511,7 +2491,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 				hr = pServerInfo->LicenseServer->AddApplicationInstance(
 						*keyIt, 
 						m_applicationInstance, 
-						VARIANT_TRUE);	//Don't Lock Key
+						VARIANT_FALSE);	//Don't Lock Key
 				if(SUCCEEDED(hr))	//Successfully locked key...
 				{
 					keysAlreadyAssignedToAnAppInstance = _bstr_t(*keyIt, true);
@@ -2615,7 +2595,7 @@ _bstr_t CSolimarLicenseMgr::GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR 
 HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyIdent, bool bLogError)
 {
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AddKeyToCache(serverName: %s, bstrKeyIdent: %s)", (wchar_t*)pServerInfo->name, (wchar_t*)bstrKeyIdent);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AddKeyToCache(serverName: %s, bstrKeyIdent: %s) - AppID: %s", (wchar_t*)pServerInfo->name, (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstance);
 //OutputDebugString(tmpbuf);
 	HRESULT hr(S_OK);
 	_bstr_t key_ident = bstrKeyIdent;
@@ -2679,7 +2659,10 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 					{
 						UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
 						EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
-						EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11
+						EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11, EXTENDED_TRIAL6=12,
+						EXTENDED_TRIAL7=13, EXTENDED_TRIAL8=14, EXTENDED_TRIAL9=15, EXTENDED_TRIAL10=16,
+						EXTENDED_TRIAL11=17, EXTENDED_TRIAL12=18, EXTENDED_TRIAL13=19, EXTENDED_TRIAL14=20,
+						EXTENDED_TRIAL15=21, EXTENDED_TRIAL16=22
 					};
 
 					KeyIsTrial = (
@@ -2689,6 +2672,17 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 						vtKeyStatus.ulVal == EXTENDED_TRIAL3 ||
 						vtKeyStatus.ulVal == EXTENDED_TRIAL4 ||
 						vtKeyStatus.ulVal == EXTENDED_TRIAL5 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL6 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL7 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL8 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL9 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL10 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL11 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL12 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL13 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL14 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL15 ||
+						vtKeyStatus.ulVal == EXTENDED_TRIAL16 ||
 						vtKeyStatus.ulVal == UNINITIALIZED_TRIAL
 					);
 					
@@ -2848,7 +2842,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 		// foreach key
 		for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
 		{
-			if (k->second.KeyPresent && k->second.KeyObtained && k->second.KeyValid)
+			if (k->second.KeyPresent && k->second.KeyValid && k->second.KeyObtained)
 			{
 				// for each module
 				for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
@@ -2997,8 +2991,8 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 					long key_licenses_available = k->second.licenses_total[module_id] - k->second.licenses_inuse[module_id];
 					long key_licenses_to_obtain = min(licenses_to_obtain - licenses_obtained, key_licenses_available);
 
-					// if the key has has licenses available and hasn't been obtained yet, obtain it
-					if (!k->second.KeyObtained && key_licenses_to_obtain>0)
+					// if the key has has licenses available and hasn't been obtained yet, obtain it, except for shared licensing
+					if (!k->second.KeyObtained && key_licenses_to_obtain>0 && !((*server).second.bUseOnlySharedLicenses))
 					{
 						try
 						{
@@ -3081,7 +3075,7 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 				if (k->second.KeyPresent && k->second.KeyObtained)
 				{
 					// if the key has already been obtained
-					if (!k->second.KeyObtained)
+					if (!k->second.KeyObtained && !((*server).second.bUseOnlySharedLicenses))
 					{
 						try
 						{
