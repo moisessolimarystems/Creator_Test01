@@ -313,9 +313,9 @@ object KeyWizardFrm: TKeyWizardFrm
     object AppInstanceLabel: TLabel
       Left = 8
       Top = 344
-      Width = 101
+      Width = 86
       Height = 13
-      Caption = 'Application Instances'
+      Caption = 'Remote Instances'
     end
     inline WizardModuleFrame: TModuleFrame
       Left = 10
