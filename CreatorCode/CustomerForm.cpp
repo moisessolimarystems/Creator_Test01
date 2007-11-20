@@ -792,12 +792,11 @@ bool __fastcall TCustForm::LoadKeyInfo()
 void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
 {
    AnsiString listString, module_name, licenseVal;
-   int module_id(0);
+   TListItem  *ListItem;
 
    // Passing in the attatched key so that we know which module list to choose from.
    // depending on the productId
    ModuleDetail** module_detail_list = lookup->getModuleList(attached_key->pkey->productId);
-
    //
    //get selected cell
    TGridRect selected = KeyCellGrid->Selection;
@@ -814,163 +813,74 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
 
    SpdProtectionKey* spd_key;
    spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
-   //SpdeProtectionKey* spde_key;
-   //SSProtectionKey* ss_key;
-
-   //Initialize ZoomCells
-   ZoomDetailTextDescription0->Visible = false;
-   ZoomDetailValue0->Visible = false;
-   ZoomDetailTextDescription1->Visible = false;
-   ZoomDetailValue1->Visible = false;
-   ZoomDetailTextDescription2->Visible = false;
-   ZoomDetailValue2->Visible = false;
-   ZoomDetailTextDescription3->Visible = false;
-   ZoomDetailValue3->Visible = false;
-   ZoomDetailListBox->Visible = false;
-   CellViewScrollBar->Visible = false;
-   if(resetScroll)
-        CellViewScrollBar->Position = 0;
-
    //
    // cell starts at zero
    // Pertains to all keys, including SOLsearcher keys
-   if( cell < TOTAL_MODULE_CELLS) //16    //clicking on a cell on the cell detail tab
+
+   //Clear before display
+   KeyListView->Clear();
+   if( cell <= TOTAL_MODULE_CELLS) //18    //clicking on a cell on the cell detail tab
    {
-      //
-      // For all keys that are not SOLSEARCHER_ENTERPRISE_PRODUCT keys & SPDE keys
-      if (attached_key->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT && attached_key->pkey->productId != SPDE_PRODUCT)
+      //offset - 0x080 = 0 based position
+      if(attached_key->pkey->productId != SOLSEARCHER_ENTERPRISE_PRODUCT)
       {
-//         spd_key = reinterpret_cast<SpdProtectionKey*>(attached_key->pkey);
-         unsigned short base_cell = cell*4;
-         //display module information
-         ZoomDetailTextDescription0->Caption = module_detail_list[(base_cell)]->name;
-         ZoomDetailTextDescription0->Visible = true;
-         uchar test = spd_key->getLicense(module_detail_list[(base_cell)]->offset, module_detail_list[(base_cell)]->bits);
-         ZoomDetailValue0->Text = test;
-         ZoomDetailValue0->Visible = true;
-
-         ZoomDetailTextDescription1->Caption = module_detail_list[(base_cell+1)]->name;
-         ZoomDetailTextDescription1->Visible = true;
-         ZoomDetailValue1->Text = spd_key->getLicense(module_detail_list[(base_cell+1)]->offset, module_detail_list[(base_cell+1)]->bits);
-         ZoomDetailValue1->Visible = true;
-
-         ZoomDetailTextDescription2->Caption = module_detail_list[(base_cell+2)]->name;
-         ZoomDetailTextDescription2->Visible = true;
-         ZoomDetailValue2->Text = spd_key->getLicense(module_detail_list[(base_cell+2)]->offset, module_detail_list[(base_cell+2)]->bits);
-         ZoomDetailValue2->Visible = true;
-
-         ZoomDetailTextDescription3->Caption = module_detail_list[(base_cell+3)]->name;
-         ZoomDetailTextDescription3->Visible = true;
-         ZoomDetailValue3->Text = spd_key->getLicense(module_detail_list[(base_cell+3)]->offset, module_detail_list[(base_cell+3)]->bits);
-         ZoomDetailValue3->Visible = true;
-      }    
-      else if (attached_key->pkey->productId == SPDE_PRODUCT )
-      {
-        if(cell < 3)
-        {
-          ushort pageValue[4] = {0,0,0,0};   //4 entries per pages
           int i = 0;  //keeps count of modules per list
+          ushort pageValue[16];   //4 entries per pages
+          for(int k=0; k < 16; k++)
+               pageValue[k] = -1;
           int pageCount = 0;   //keeps count of modules on each page
-           //split into 2 cases one for software modules one for hardware modules
-//          spde_key = reinterpret_cast<SpdeProtectionKey*>(attached_key->pkey);
-
-          unsigned short base_cell = cell*16 + (CellViewScrollBar->Position*4);
-          while(pageCount < 4 && i < 64)     //only 4 pages per cell
-          {      //base_cell is start pt to look for possible values in list.
-                 module_id = module_detail_list[base_cell+i]->id;
-                 if(module_id < 100)
-                 {
-                     if((base_cell+pageCount) == module_id) //base_cell+pageCount are the values that should be displayed on current page in reverse order.
-                     {        //fill pageValue arr with module IDs to display
-                         pageValue[pageCount] = base_cell+i;  //base_cell+i = position in module_detail_list which holds module_id wanted
-                         pageCount++;
-                     }
-                 }      //keep searching array until pageCount
-                 else  //ugly hack assuming module list will not hit 63.....
-                 {     //need to figure out another solution later....
-                         pageValue[pageCount] = 63;
-                         pageCount++;
-                 }
-                 i++;
+          unsigned short current_offset_cell = 128 + cell*16;
+          unsigned short next_offset_cell = current_offset_cell + 16;
+          for(i=0; i < 64; i++)
+          {
+                if(module_detail_list[i]->offset < next_offset_cell &&
+                   module_detail_list[i]->offset >= current_offset_cell &&
+                   module_detail_list[i]->isAvailableForVersion(spd_key->productVersion)
+                   )
+                {
+                    pageValue[pageCount] = i;  //add index into module_detail_list
+                    pageCount++;
+                }
           }
-
-          ZoomDetailTextDescription0->Caption = module_detail_list[pageValue[3]]->name;
-          ZoomDetailTextDescription0->Visible = true;
-          ZoomDetailValue0->Text = spd_key->getLicense(module_detail_list[pageValue[3]]->offset, module_detail_list[pageValue[3]]->bits);
-          ZoomDetailValue0->Visible = true;
-
-          ZoomDetailTextDescription1->Caption = module_detail_list[pageValue[2]]->name;
-          ZoomDetailTextDescription1->Visible = true;
-          ZoomDetailValue1->Text = spd_key->getLicense(module_detail_list[pageValue[2]]->offset, module_detail_list[pageValue[2]]->bits);
-          ZoomDetailValue1->Visible = true;
-
-          ZoomDetailTextDescription2->Caption = module_detail_list[pageValue[1]]->name;
-          ZoomDetailTextDescription2->Visible = true;
-          ZoomDetailValue2->Text = spd_key->getLicense(module_detail_list[pageValue[1]]->id, module_detail_list[pageValue[1]]->bits);
-          ZoomDetailValue2->Visible = true;
-
-          ZoomDetailTextDescription3->Caption = module_detail_list[pageValue[0]]->name;
-          ZoomDetailTextDescription3->Visible = true;
-          ZoomDetailValue3->Text = spd_key->getLicense(module_detail_list[pageValue[0]]->offset, module_detail_list[pageValue[0]]->bits);
-          ZoomDetailValue3->Visible = true;
-
-          CellViewScrollBar->Visible = true;
-        }
-         else {}
+          for(i=0; i < pageCount; i++)
+          {
+                ListItem = KeyListView->Items->Add();
+                ListItem->Caption = module_detail_list[pageValue[i]]->name;
+                ListItem->SubItems->Add(spd_key->getLicense(module_detail_list[pageValue[i]]->offset, module_detail_list[pageValue[i]]->bits));
+          }
       }
-      else if(attached_key->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT)
+      else
       {
-                        //SSProtectionKey* ss_key;
           switch(cell) {
               case INDEX_SERVERS_CELL:
-                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Index Servers";
-
-                        ZoomDetailValue0->Visible = true;
+                        ListItem = KeyListView->Items->Add();
+                        ListItem->Caption = "Index Servers";
                         itoa(spd_key->keyDataBlock.data[INDEX_SERVERS_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
+                        ListItem->SubItems->Add(cell_text);
                    break;
               case REPORT_SERVERS_CELL:
-                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Report Servers";
-
-                        ZoomDetailValue0->Visible = true;
+                        ListItem = KeyListView->Items->Add();
+                        ListItem->Caption = "Report Servers";
                         itoa(spd_key->keyDataBlock.data[REPORT_SERVERS_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
+                        ListItem->SubItems->Add(cell_text);
                    break;
               case APPLICATIONS_CELL :
-                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Aplication Databases";
-
-                        ZoomDetailValue0->Visible = true;
+                        ListItem = KeyListView->Items->Add();
+                        ListItem->Caption = "Aplication Databases";
                         itoa(spd_key->keyDataBlock.data[APPLICATIONS_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
+                        ListItem->SubItems->Add(cell_text);
                    break;
               case DOCUMENT_ASSEMBLER_CELL :
-                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Document Assembler";
-
-                        ZoomDetailValue0->Visible = true;
+                        ListItem = KeyListView->Items->Add();
+                        ListItem->Caption = "Document Assembler";
                         itoa(spd_key->keyDataBlock.data[DOCUMENT_ASSEMBLER_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
+                        ListItem->SubItems->Add(cell_text);
                    break;
               case CONCURRENT_USERS_25_CELL :
-                        //ss_key = ((SSProtectionKey*)(attached_key->pkey));
-
-                        ZoomDetailTextDescription0->Visible = true;
-                        ZoomDetailTextDescription0->Caption = "Concurrent Users";
-
-                        ZoomDetailValue0->Visible = true;
+                        ListItem = KeyListView->Items->Add();
+                        ListItem->Caption = "Concurrent Users";
                         itoa(spd_key->keyDataBlock.data[CONCURRENT_USERS_25_CELL], cell_text, 10 );
-                        ZoomDetailValue0->Text = cell_text;
+                        ListItem->SubItems->Add(cell_text);
                    break;
               //TODO -> case for modules in cell 40-43
               default :
@@ -980,126 +890,96 @@ void __fastcall TCustForm::KeyCellGridClick(TObject *Sender)
    }
    else if( cell == INITIAL_COUNTER_CELL )
    {
-      //set used description fields to visible
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Initial Counter Cell";
-
-      ZoomDetailValue0->Visible = true;
-
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Initial Counter Cell";
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
       else
          cellNumberValue = atoi( (KeyCellGrid->Cells[selected.Left][selected.Top]).c_str() );
-
       sprintf(textValue, "Days: %d, Hours: %d", cellNumberValue/24, cellNumberValue%24);
-      ZoomDetailValue0->Text = textValue;
+      ListItem->SubItems->Add(textValue);
    }
    else if( cell == EXTENDED_COUNTER_CELL )
    {
-      //set used description fields to visible
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Extended Counter Cell";
-
-      ZoomDetailValue0->Visible = true;
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Extended Counter Cell";
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
       else
          cellNumberValue = atoi( (KeyCellGrid->Cells[selected.Left][selected.Top]).c_str() );
-
       sprintf(textValue, "Days: %d, Hours: %d", cellNumberValue/24, cellNumberValue%24);
-      ZoomDetailValue0->Text = textValue;
+      ListItem->SubItems->Add(textValue);
    }
    else if( cell == EXPIRATION_DATE_CELL)
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Expiration Date";
-
-      ZoomDetailValue0->Visible = true;
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Expiration Date";
       temp_time = (time_t*)(&(attached_key->pkey->keyDataBlock.data[EXPIRATION_DATE_CELL]));
       gmtime_x = gmtime(temp_time);
       strftime( my_time, 50, "%x", gmtime_x );
-      ZoomDetailValue0->Text = my_time;
+      ListItem->SubItems->Add(my_time);
    }
    else if( cell == OUTPUT_UNIT_CELL)
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Max LU/Output Pool Value";
-
-      ZoomDetailValue0->Visible = true;
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Max LU/Output Pool Value";
       if(!hex_view)
          cellNumberValue = strtol(KeyCellGrid->Cells[selected.Left][selected.Top].c_str(), &endptr, 16);
       else
          cellNumberValue = atoi( (KeyCellGrid->Cells[selected.Left][selected.Top]).c_str() );
-
       sprintf(textValue, "%d", cellNumberValue);
-      ZoomDetailValue0->Text = textValue;
-
+      ListItem->SubItems->Add(textValue);
    }
    else if( cell == PRODUCT_ID_CELL)
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Product Type";
-
-      ZoomDetailValue0->Visible = true;
-      ZoomDetailValue0->Text = attached_key->getProductText();
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Product Type";
+      ListItem->SubItems->Add(attached_key->getProductText());
    }
    else if (cell == KEY_TYPE_CELL)
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Key Type";
-
-      ZoomDetailValue0->Visible = true;
-      ZoomDetailValue0->Text = attached_key->getKeyTypeText(attached_key->pkey->keyType);
-
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Key Type";
+      ListItem->SubItems->Add(attached_key->getKeyTypeText(attached_key->pkey->keyType));
    }
    else if( cell == PRODUCT_VERSION_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Product Version";
-
-      ZoomDetailValue0->Visible = true;
-      ZoomDetailValue0->Text = attached_key->getVersionText();
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Product Version";
+      ListItem->SubItems->Add(attached_key->getVersionText());
    }
    else if( cell == KEY_VERSION_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Key Version";
-
-      ZoomDetailValue0->Visible = false;
-      //ZoomDetailValue->Text = attached_key->getVersionText();
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Key Version";
+      ListItem->SubItems->Add(attached_key->getVersionText());
+      //find out appropriate value
    }
    else if( cell == KEY_USES_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Number of times programmed";
-
-      ZoomDetailValue0->Visible = true;
-      ZoomDetailValue0->Text = attached_key->pkey->keyDataBlock.data[KEY_USES_CELL];
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Number of times programmed";
+      ListItem->SubItems->Add(attached_key->pkey->keyDataBlock.data[KEY_USES_CELL]);
    }
    else if( cell == KEY_STATUS_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailValue0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Status";
-      ZoomDetailValue0->Text = attached_key->getStatusText();
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Status";
+      ListItem->SubItems->Add(attached_key->getStatusText());
    }
    else if( cell == CUSTOMER_NUMBER_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Customer Number";
-
-      ZoomDetailValue0->Visible = true;
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Customer Number";
       itoa(attached_key->pkey->keyDataBlock.data[CUSTOMER_NUMBER_CELL], cell_text, 16 );
-      ZoomDetailValue0->Text = cell_text;
+      ListItem->SubItems->Add(cell_text);
    }
    else if( cell == KEY_NUMBER_CELL )
    {
-      ZoomDetailTextDescription0->Visible = true;
-      ZoomDetailTextDescription0->Caption = "Key Number";
-
-      ZoomDetailValue0->Visible = true;
+      ListItem = KeyListView->Items->Add();
+      ListItem->Caption = "Key Number";
       itoa(attached_key->pkey->keyDataBlock.data[KEY_NUMBER_CELL], cell_text, 16 );
-      ZoomDetailValue0->Text = cell_text;
+      ListItem->SubItems->Add(cell_text);
    }
    else{}
 }
