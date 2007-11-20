@@ -48,7 +48,7 @@ ulong keyPasswordDlg( 	const char* text,
 //------------------------------------------------------------------------------
 // Defines
 //------------------------------------------------------------------------------
-enum TabTypes{ tt_KEY_TAB, tt_MODULE_TAB, tt_PASSWORD_TAB};
+enum TabTypes{ tt_KEY_TAB, tt_MODULE_TAB, tt_PASSWORD_TAB, tt_PACKET_TAB};
 enum StatusTypes{ st_TRIAL, st_LAST_TRIAL, st_BASE, st_DEACTIVATED_UNUSED, st_RESERVED };
 
 TFCustomerKeys *FCustomerKeys;
@@ -437,6 +437,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
 {
     void* buffer;
     //set new key value
+
     try
     {
         // if the Query is active, try to access it, else do nothing.
@@ -460,7 +461,6 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 key_record->xch_ipds_ppm = QueryKey->FieldByName("SKRppmxchipds")->AsInteger;
                 key_record->xch_pcl_ppm = QueryKey->FieldByName("SKRppmxchpcl")->AsInteger;
                 key_record->afpds_ps_ppm = QueryKey->FieldByName("SKRppmafpdsps")->AsInteger;
-
                 //
                 // ProtectionKey members
                 key_record->pkey->keyNumber = QueryKey->FieldByName("SKRnumber")->AsInteger;
@@ -473,9 +473,6 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 key_record->setPasswordNumber(QueryKey->FieldByName("SKRpasswordNumber")->AsInteger);
                 key_record->setAppInstances(QueryKey->FieldByName("SKRappInstance")->AsInteger);
                 //
-                // Initialize the List of Modules for each key.
-//                KeyFormModuleFrame->initialize(MODE_2, key_record->pkey->productId, modulePasswordCreated);
-
                 //
                 // SpdProtectionKey members
                 if( key_record->pkey->productId==SPD_PRODUCT ||
@@ -583,6 +580,30 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
 
                   PageControl1->Pages[1]->TabVisible = false;
                   PageControl1->Pages[2]->TabVisible = false;
+                }
+     //Need to figure out why it does not requery correctly.
+     //Query returns dataset that is incorrect sometimes.
+                PacketHistoryQuery->DisableControls();
+                try
+                {
+                     try
+                     {
+                          PacketHistoryQuery->Close();
+                          PacketHistoryQuery->Open();
+                          PacketHistoryQuery->First();
+                     }
+                     catch(EDBEngineError &e)
+                     {
+                          Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+                     }
+                }
+                __finally
+                {
+                        PacketHistoryQuery->EnableControls();
+                        if(PacketHistoryQuery->RecordCount > 0)
+                                PageControl1->Pages[4]->TabVisible = true;
+                        else
+                                PageControl1->Pages[4]->TabVisible = false;
                 }
             }
             else //clear key members
@@ -751,6 +772,7 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
 void __fastcall TFCustomerKeys::resetSqlStatements()
 {
    LoadPswdGrid();
+   LoadPacketGrid();
 }
 
 //==============================================================================
@@ -819,7 +841,8 @@ void __fastcall TFCustomerKeys::resetPhysicalFlag()
             int key_status(key_record->pkey->status);
 
             //if key is not deactivated, unsed, returned, or lost
-            if( key_status < 8 )//&& key_status != 2)
+            //active status from 0-7, 12-21
+            if( key_status < 8 || key_status >= 12)//&& key_status != 2)
             {
                //available for all non-dead keys.... some special cases
                PHYSICAL_FLAG |= pf_MODIFY_STATUS;
@@ -946,6 +969,13 @@ void __fastcall TFCustomerKeys::OnTabChange(TObject*)
             dirty_tab &~password_tab;
          }
         	break;
+      case 4: //packet history
+      	if( dirty_tab & packet_tab )
+         {  //refresh packet tab
+            RefreshKeyPage();         //refreshTab()
+            dirty_tab &~packet_tab;
+         }
+        	break;
    }
 
    clearPermissions();
@@ -983,6 +1013,37 @@ void __fastcall TFCustomerKeys::LoadPswdGrid()
    {
        PasswordQuery->Close();
        PasswordQuery->ParamByName("skrId")->AsInteger = key_record->skr_id;
+   }
+   catch(Exception *e)
+   {
+       Application->MessageBox( e->Message.c_str(), "Key Message", MB_OK|MB_ICONERROR);
+   }
+}
+
+//==============================================================================
+//
+// Function:    LoadPswdGrid
+// Purpose:     This function will retrieve information and pass it into
+//              PacketHistoryQuery. This information contains
+//
+// Parameters:  None
+// Returns:     None
+//
+//==============================================================================
+void __fastcall TFCustomerKeys::LoadPacketGrid()
+{
+   /*
+        SELECT DISTINCT sTransactionDetail.TDid, sPasswordPacket.*,
+        CONVERT(char(12),sPasswordPacket.packet_created,107) As t_date FROM sTransactionDetail
+        INNER JOIN sPasswordPacketRelationship ON sTransactionDetail.TDid = sPasswordPacketRelationship.packet_id
+        INNER JOIN sPasswordPacket ON sPasswordPacketRelationship.packet_id = sPasswordPacket.packet_id
+        WHERE (((sTransactionDetail.SKRid)= skrid));
+   */
+   try
+   {
+
+       PacketHistoryQuery->Close();
+       PacketHistoryQuery->ParamByName("skrId")->AsInteger = key_record->skr_id;
    }
    catch(Exception *e)
    {
@@ -1081,7 +1142,6 @@ void __fastcall TFCustomerKeys::KeyGridDrawColumnCell(TObject *Sender,
        KeyGrid->Canvas->FillRect( Rect );
        KeyGrid->Canvas->TextOut( Rect.Left+8, Rect.Top+2, lookup->getConnectionText(Column->Field->AsInteger));
    }
-
 }
 
 //==============================================================================
@@ -1189,7 +1249,7 @@ void __fastcall TFCustomerKeys::mmExtensionClick(TObject* Sender)
    // Check to see if the key is at the max extension
    switch(key_record->pkey->status)
    {
-       case EXTENDED_TRIAL5:
+       case EXTENDED_TRIAL15:
            Application->MessageBox("Unable to generate password. You have reached the maximum number extensions for this key.", "Key Message", MB_OK|MB_ICONERROR );
            return;
        default:
@@ -1420,30 +1480,34 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
    {
    	case 0 : //key page refresh
    	    QueryKey->DisableControls();
-   	    QueryKey->Close();
-            QueryKey->Open();
-
-            if( QueryKey->RecordCount )
-      	    	QueryKey->First();
-            else
+            try
             {
-            	//QueryKey->EnableControls();
-                break;
+                 try
+                 {
+                      QueryKey->Close();
+                      QueryKey->Open();
+                      if( QueryKey->RecordCount )
+                          QueryKey->First();
+                      while(!QueryKey->Eof && !gFOUND)
+                      {
+                           if( QueryKey->FieldValues["SKRid"] == skrid )
+      		                gFOUND = true;
+                           else
+      			        QueryKey->Next();
+                      }
+                      if( !gFOUND )   // if not found set to start
+                          QueryKey->First();
+                 }
+                 catch(EDBEngineError &e)
+                 {
+                      Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+                 }
             }
-
-            while(!QueryKey->Eof && !gFOUND)
-            {
-      		if( QueryKey->FieldValues["SKRid"] == skrid )
-      		        gFOUND = true;
-                else
-      			QueryKey->Next();
-            }
-      	    if( !gFOUND )   // if not found set to start
-      	    	QueryKey->First();
-
-      	    QueryKey->EnableControls();
-            break;
-
+            __finally
+           {
+                 QueryKey->EnableControls();
+           }
+           break;
       case 1 : //module page refresh
             if ( (key_record->pkey->productId == SPD_PRODUCT) ||
                  (key_record->pkey->productId == CONNECT_PRODUCT) ||
@@ -1469,15 +1533,27 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
             break;
 
       case 2 :  //solsearch details
-            SolSearcherDetails->Load(key_record);
+         SolSearcherDetails->Load(key_record);
          break;
       case 3 :
-         PasswordQuery->DisableControls();
-
-         PasswordQuery->Close();
-         PasswordQuery->Open();
-         PasswordQuery->First();
-         PasswordQuery->EnableControls();
+          PasswordQuery->DisableControls();
+          try
+          {
+               try
+               {
+                    PasswordQuery->Close();
+                    PasswordQuery->Open();
+                    PasswordQuery->First();
+               }
+               catch(EDBEngineError &e)
+               {
+                    Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+               }
+          }
+          __finally
+         {
+               PasswordQuery->EnableControls();
+         }
          //Restrict Password Packets for Legacy Passwords
          //Spdnt, iCvt(below 9.06), SDX/SSE(below 3.00), Ximage
          switch(key_record->pkey->productId)
@@ -1500,8 +1576,27 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                    break;
          }
          break;
+      case 4:
+          PacketHistoryQuery->DisableControls();
+          try
+          {
+               try
+               {
+                   PacketHistoryQuery->Close();
+                   PacketHistoryQuery->Open();
+                   PacketHistoryQuery->First();
+               }
+               catch(EDBEngineError &e)
+               {
+                   Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
+               }
+          }
+          __finally
+          {
+               PacketHistoryQuery->EnableControls();
+          }
+          break;
    }
-
    setStatusValues();
    setKeyInfoValues();
 
@@ -1605,13 +1700,12 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
       {
          tmpMark = PasswordQuery->GetBookmark();
          PasswordQuery->DisableControls();
-
          PasswordQuery->First();
       	 while( !PasswordQuery->Eof )
          {
        		if( PswdGrid->SelectedRows->CurrentRowSelected )
                 {
-         	    report_list += Format("TDid = %d or ", OPENARRAY(TVarRec,(PasswordQuery->FieldByName("TDid")->AsInteger)));;
+         	    report_list += Format("TDid = %d or ", OPENARRAY(TVarRec,(PasswordQuery->FieldByName("TDid")->AsInteger)));
          	}
          	PasswordQuery->Next();
       	 }
@@ -1631,7 +1725,6 @@ void __fastcall TFCustomerKeys::PrintBtnClick(TObject *Sender)
          PasswordQuery->GotoBookmark( tmpMark );
          PasswordQuery->FreeBookmark( tmpMark );
          PasswordQuery->EnableControls();
-
          Application->MessageBox(e.Message.c_str(), "Database Error", MB_OK|MB_ICONERROR);
       }
    }
@@ -1867,7 +1960,7 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
            AnsiDescription = PswdGrid->Columns->Items[1]->Field->AsString;
            //Append passwords that are not extensions
            if(AnsiDescription.AnsiPos("Extend") == 0)
-            {
+           {
                PasswordIDs[PasswordIDIndex] = PasswordQuery->FieldByName("TDid")->AsInteger;
                PasswordIDIndex++;
 
@@ -1878,13 +1971,12 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                bstrPassword = SysAllocString(wcharPassword);
                hr = keyMaster->AppendPasswordToPacket(varTime, bstrPassword);
                SysFreeString(bstrPassword);
-             }
-             PasswordQuery->Next();
+           }
+           PasswordQuery->Next();
          }
          hr = keyMaster->FinalizePasswordPacket();
          if(PasswordIDIndex > 0)
          {
-
              varTime.date -= days;    //remove the 2 years that was added before
 
              //create the filename
@@ -3725,6 +3817,26 @@ void TFCustomerKeys::searchLicense(String customerLicenseSearchValue)
             index = 10;
     else if (customerLicenseSearchValue == "Deactivated")
             index = 11;
+    else if (customerLicenseSearchValue == "Extension 6")
+            index = 12;
+    else if (customerLicenseSearchValue == "Extension 7")
+            index = 13;
+    else if (customerLicenseSearchValue == "Extension 8")
+            index = 14;
+    else if (customerLicenseSearchValue == "Extension 9")
+            index = 15;
+    else if (customerLicenseSearchValue == "Extension 10")
+            index = 16;
+    else if (customerLicenseSearchValue == "Extension 11")
+            index = 17;
+    else if (customerLicenseSearchValue == "Extension 12")
+            index = 18;
+    else if (customerLicenseSearchValue == "Extension 13")
+            index = 19;
+    else if (customerLicenseSearchValue == "Extension 14")
+            index = 20;
+    else if (customerLicenseSearchValue == "Extension 15")
+            index = 21;
     else if (customerLicenseSearchValue == "Returned")
             index = 200;
     else if (customerLicenseSearchValue == "Lost")
