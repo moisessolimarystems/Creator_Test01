@@ -1591,8 +1591,6 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 						}
 					}
 
-
-					
 					if(m_bLockKeyByAppInstance)
 					{
 						hr = LockOneOfEachKeyConfiguration(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, _bLogError);
@@ -2337,8 +2335,15 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 					if(pServerInfo->bUseOnlySharedLicenses) 
 						bSetUnlimited = true;
 
-					//Only set for the right product key
-					pServerInfo->LicenseServer->KeyModuleLicenseUnlimited(pvtKeyList[i].bstrVal, module.id, bSetUnlimited ? VARIANT_TRUE : VARIANT_FALSE);
+					hr = pServerInfo->LicenseServer->KeyModuleLicenseUnlimited(pvtKeyList[i].bstrVal, module.id, bSetUnlimited ? VARIANT_TRUE : VARIANT_FALSE);
+					if(SUCCEEDED(hr))
+					{
+						// get the total number of new licenses 
+						long licenses_total = 0;
+						hr = pServerInfo->LicenseServer->KeyModuleLicenseTotal(pvtKeyList[i].bstrVal, module.id, &licenses_total);
+						if (SUCCEEDED(hr))
+							pServerInfo->keys[pvtKeyList[i].bstrVal].licenses_total[module.id] = licenses_total;
+					}
 				}
 			}
 		}
