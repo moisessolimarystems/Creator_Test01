@@ -88,10 +88,10 @@ Sub GenerateNewBuild()
     Set MKS = New CMKS
     Set MKS.Build = g_Build    
 
-    'g_Build.SendEmail "Building " & g_Build.ProductName & " Version " & g_Build.NewBuild.versionNum & " ......", ""
+    g_Build.SendEmail "Building " & g_Build.ProductName & " Version " & g_Build.NewBuild.versionNum & " ......", ""
     MKS.GenerateSandBox "New"	
     UpdateFileVersions
-    'ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
+    ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
     BuildMainCode 
     MoveAndCheckInBuiltFiles MKS
     g_Build.NewBuild.BuildLabel = g_Build.ProductName + g_Build.NewBuild.versionNum
