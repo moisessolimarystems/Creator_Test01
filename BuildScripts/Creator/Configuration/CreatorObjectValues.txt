@@ -1,23 +1,23 @@
 'SolimarLicenseServer: Depends on nothing
 DependencyList = Null
-CompilerType = mvsNet_Program
-CompilerOption =  /build release /project "SolimarLicenseServer"
+CompilerType = mvsNet8_Program
+CompilerOption =  /rebuild SolimarInternalRelease|Win32 /project "SolimarLicenseServer"
 ProjectLocation = \\CreatorCode\\SolimarLicensing\\
 ProjectFile = SolimarLicensing.sln
 SourceLocation = \CreatorCode\SolimarLicensing\Image\
 DestinationLocation = \CreatorCode\SolimarLicensing\
-FilesArray = SolimarLicenseServer.exe
+FilesArray = Null
 Name = SolimarLicenseServer
 
 'SolimarLicenseManager: Depends on nothing
 DependencyList = Null
-CompilerType = mvsNet_Program
-CompilerOption = /build release /project "SolimarLicenseManager"
+CompilerType = mvsNet8_Program
+CompilerOption = /rebuild Release|Win32 /project "SolimarLicenseManager"
 ProjectLocation = \\CreatorCode\\SolimarLicensing\\
 ProjectFile = SolimarLicensing.sln
 SourceLocation = \CreatorCode\SolimarLicensing\Image\
 DestinationLocation = \CreatorCode\SolimarLicensing\
-FilesArray = SolimarLicenseManager.dll
+FilesArray = Null
 Name = SolimarLicenseManager
 
 'Creator: Depends on nothing

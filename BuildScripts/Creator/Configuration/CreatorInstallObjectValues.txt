@@ -1,10 +1,12 @@
 'Creator: Depends on Nothing
+IpmType = IS2008StandAlone
 IpmLocation = \\CreatorInstallShield\\
-IpmFile = Creator.ipr
-ReleaseMedia = Creator
+IpmFile = Creator.ism
 CompileLoc = 
 CompileFile = 
-PostProcessSrcLoc = InstallShieldProjPath\Media\Creator\Disk Images\DISK1\
+ReleaseMedia = UnCompressed
+ProductConfiguration = Creator
+PostProcessSrcLoc = InstallShieldProjPath\\Creator\\Creator\\UnCompressed\\DiskImages\\DISK1\\
 PostProcessSrcFile = *.*
 PostProcessDestLoc = CD_IMAGE_CREATOR
 PostProcessDestFile = 
