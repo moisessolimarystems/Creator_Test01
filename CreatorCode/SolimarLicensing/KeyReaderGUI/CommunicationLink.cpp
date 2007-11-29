@@ -1,3 +1,4 @@
+#include <vcclr.h>
 #include "stdafx.h"
 #include "CommunicationLink.h"
 #include "..\SolimarLicenseServer\_SolimarLicenseServer_i.c"
@@ -11,12 +12,14 @@ BYTE challenge_key_manager_thisauthuser_private[] = {
 #include "..\common\keys\SolimarLicenseServer.ThisAuthUser.private.key.txt"
 };
 
-
-
 //maps to the IDs specified in KeySpec.xml
+const long KeyTypeID = 10020;
 const long ProductID = 10021;
 const long ProductVersionID = 10022;
+const long ApplicationInstanceID = 10024;
 const long LicenseID = 10025;	
+
+using namespace System::Runtime::InteropServices; // for class Marshal
 
 //initialize the member variables
 CommunicationLink::CommunicationLink()
@@ -36,53 +39,62 @@ CommunicationLink::~CommunicationLink()
 }
 
 //connects to the solimar license server
-HRESULT CommunicationLink::Connect()
+HRESULT CommunicationLink::Connect(String* ServerName)
 {
 	HRESULT hr = 0;
-	void* temp = 0;
+	int length = 0;
 
-	//connects to the solimar license server
-	hr = CoCreateInstance(
-						  __uuidof(CSolimarLicenseSvr),
-						  NULL, 
-						  CLSCTX_LOCAL_SERVER, 
-						  __uuidof(ISolimarLicenseSvr2),
-						  &temp
-						 );
+	if(!(ServerName->Length > 0))
+		ServerName = L"localhost";
+	
+	//include null terminating char
+	length = ServerName->Length+1;
+	wchar_t* lpwServerName = new WCHAR[length];
+	const char* lpcServerName = (char*)(void*)Marshal::StringToHGlobalAnsi(ServerName);
+	MultiByteToWideChar(CP_ACP, 0, lpcServerName, length, lpwServerName, length);
+	Marshal::FreeHGlobal((System::IntPtr)(void*)lpcServerName);
 
+	COSERVERINFO	serverInfo	= {0, lpwServerName, NULL, 0};
+    MULTI_QI        multiQI     = {&IID_ISolimarLicenseSvr3, NULL, NOERROR};
+    hr = CoCreateInstanceEx(
+						     __uuidof(CSolimarLicenseSvr),
+							 NULL,
+							 CLSCTX_REMOTE_SERVER | CLSCTX_LOCAL_SERVER,
+							 &serverInfo,
+							 1,
+							 &multiQI);
 	if(SUCCEEDED(hr))
 	{
-		//if cocreateinstance succeeds save the pointer to the server
-		pTheServer = reinterpret_cast<ISolimarLicenseSvr2*>(temp);
-	}
-	else
-	{
-		return hr;
-	}
-
-	ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
-
-	hr = cr.AuthenticateServer(pTheServer);
-	if(!SUCCEEDED(hr))
-      return hr;
-
-	// let the license server authenticate this client
-	hr = cr.AuthenticateToServer(pTheServer);
-		
+		pTheServer = static_cast<ISolimarLicenseSvr3*>(multiQI.pItf);
+		ChallengeResponseHelper cr(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public));
+		// try to authenticate the license server
+		hr = cr.AuthenticateServer(pTheServer);
+		if (SUCCEEDED(hr))
+		{
+			// let the license server authenticate this manager
+			hr = cr.AuthenticateToServer(pTheServer);
+		}
+		if (FAILED(hr))
+			pTheServer->Release();
+	}	
+	delete lpwServerName;
 	return hr;
 }
 
 void CommunicationLink::Disconnect()
 {
 	//uninitialize the COM object
-	CoUninitialize();
+	if(pTheServer != NULL)
+	{
+		pTheServer->Release();
+		pTheServer = NULL;
+	}
 }
 
 HRESULT CommunicationLink::CheckPassword(String* InputString)
 {
 	HRESULT hr = 0;
 	_variant_t retval;
-
 	//converts the string* into a variant
 	System::Runtime::InteropServices::Marshal::
 			GetNativeVariantForObject(InputString, &retval);
@@ -230,8 +242,8 @@ void CommunicationLink::GetKeyInfoStructure(KeyInfoStructure& TheKeyInfoStruct,
 		VARIANT* pKeyName;
 		HRESULT hr = 0;
 
-      //get the list of keys
-	   hr = pTheServer->KeyEnumerate(pKeyList);
+        //get the list of keys
+	    hr = pTheServer->KeyEnumerate(pKeyList);
 
 		// SafeArrayAccessData and SafeArrayUnaccessData are win32 functions 
 		//needed to access safe array data
@@ -254,11 +266,21 @@ void CommunicationLink::GetKeyInfoStructure(KeyInfoStructure& TheKeyInfoStruct,
 											&(TheKeyInfoStruct.ProductVersion)
 										   );
 
+
+			hr = pTheServer->KeyHeaderQuery(key_identifier, 
+											KeyTypeID, 
+											&(TheKeyInfoStruct.KeyType)
+										   );
+
 			hr = pTheServer->KeyHeaderQuery(key_identifier, 
 											LicenseID, 
 											&(TheKeyInfoStruct.License)
 										   );
 
+			hr = pTheServer->KeyHeaderQuery(key_identifier, 
+											ApplicationInstanceID, 
+											&(TheKeyInfoStruct.ApplicationInstance)
+										   );
 
 			hr = pTheServer->KeyTrialHours(key_identifier, 
 										   &(TheKeyInfoStruct.HoursLeft)
@@ -281,36 +303,50 @@ void CommunicationLink::GetModuleLicensingStructureArray(ModuleLicensingStructur
 														 unsigned int ModuleIndex
 														)
 {
-		VARIANT* ModuleInfo;
-		_variant_t retval;
+	int nElements;
+	VARIANT* ModuleInfo;
+	_variant_t retval;
 
-      InitializeModuleLicenseConnection(KeyNumber);
-		if (SUCCEEDED(SafeArrayAccessData(Module[ModuleIndex].parray,
-											(void**)(&ModuleInfo))))
+    InitializeModuleLicenseConnection(KeyNumber);
+	if (SUCCEEDED(SafeArrayAccessData(Module[ModuleIndex].parray,
+										(void**)(&ModuleInfo))))
+	{
+		//For backwards compatibility, make sure display in GUI only if elements exist
+		nElements = Module[ModuleIndex].parray->rgsabound->cElements;
+		for(int i=0; i < nElements ; i++)
 		{
-			TheModStruct.ModuleID = ModuleInfo[0];
-			TheModStruct.ModuleName = ModuleInfo[1];
-
-			//convert the TheKeyNumber from an Object to a variant
-			System::Runtime::InteropServices::Marshal::
-				GetNativeVariantForObject(KeyNumber, &retval);
-
-			//converts the variant to a bstr
-			retval.ChangeType(VT_BSTR);
-
-			pTheServer->KeyModuleLicenseTotal(retval.bstrVal, 
-											  (TheModStruct.ModuleID).lVal, 
-											  &(TheModStruct.TotalLicenses)
-											 );
-
-			pTheServer->KeyModuleInUse(retval.bstrVal,
-											  (TheModStruct.ModuleID).lVal,
-											  &(TheModStruct.LicensesInUse)
-											  );
+			if(i==0)
+				TheModStruct.ModuleID = ModuleInfo[i];
+			else if(i==1)
+				TheModStruct.ModuleName = ModuleInfo[i];
+			else if(i==2)
+				TheModStruct.ModuleUnlimited = ModuleInfo[i];
+			else if(i==3)
+				TheModStruct.ModulePool = ModuleInfo[i];
+			else if(i==4)
+				TheModStruct.ModuleShared = ModuleInfo[i];
 		}
 
-		// release the lock on the current module
-		SafeArrayUnaccessData(Module[ModuleIndex].parray);
+		//convert the TheKeyNumber from an Object to a variant
+		System::Runtime::InteropServices::Marshal::
+			GetNativeVariantForObject(KeyNumber, &retval);
+
+		//converts the variant to a bstr
+		retval.ChangeType(VT_BSTR);		  
+
+		pTheServer->KeyModuleLicenseTotal(retval.bstrVal, 
+										  (TheModStruct.ModuleID).lVal, 
+										  &(TheModStruct.TotalLicenses)
+										 );
+
+		pTheServer->KeyModuleInUse(retval.bstrVal,
+										  (TheModStruct.ModuleID).lVal,
+										  &(TheModStruct.LicensesInUse)
+										  );
+	}
+
+	// release the lock on the current module
+	SafeArrayUnaccessData(Module[ModuleIndex].parray);
 
       // release the lock on the ModuleList
    	if(IsModInitialized())
@@ -347,7 +383,6 @@ long CommunicationLink::GetTotalLicenses(Object* ModuleID, Object* KeyNumber)
 	//change the Module ID variant to an int
 	ModIDVar.ChangeType(VT_I4);
 	pTheServer->KeyModuleLicenseInUse(KeyNumVar.bstrVal, ModIDVar.lVal, &retval);
-
 	pTheServer->KeyModuleLicenseTotal(KeyNumVar.bstrVal, ModIDVar.lVal, &retval);
 
 	return retval;
@@ -374,4 +409,26 @@ bool CommunicationLink::KeyIsProgrammed(BSTR* KeyID)
 	}
 
 	return false;
+}
+
+HRESULT CommunicationLink::GetServerVersion(long* Major, long* Minor, long* Version)
+{
+	HRESULT hr = S_OK;
+	if(!pTheServer)
+		return E_FAIL;
+	hr = pTheServer->GetVersionLicenseServer(Major, Minor, Version);
+	return hr;
+}
+
+void CommunicationLink::WriteEventLog(String* EventLogMsg, EventLogEntryType LogType)
+{
+    // Create the source, if it does not already exist.
+    if (EventLog::SourceExists( "Solimar License Viewer" ) )
+    {
+		// Create an EventLog instance and assign its source.
+		EventLog* myLog = new EventLog;
+		myLog->Source = "Solimar License Viewer";		   
+		// Write an informational entry to the event log.    
+		myLog->WriteEntry(EventLogMsg, LogType);
+    }		   
 }
