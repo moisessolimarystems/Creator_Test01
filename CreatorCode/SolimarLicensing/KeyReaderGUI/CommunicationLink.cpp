@@ -423,17 +423,12 @@ HRESULT CommunicationLink::GetServerVersion(long* Major, long* Minor, long* Vers
 void CommunicationLink::WriteEventLog(String* EventLogMsg, EventLogEntryType LogType)
 {
     // Create the source, if it does not already exist.
-    if ( !EventLog::SourceExists( "Solimar License Viewer" ) )
+    if (EventLog::SourceExists( "Solimar License Viewer" ) )
     {
-		//An event log source should not be created and immediately used.
-		//There is a latency time to enable the source, it should be created
-		//prior to executing the application that uses the source.
-		//Execute this sample a second time to use the new source.
-		EventLog::CreateEventSource( "Solimar License Viewer", "Application" );
+		// Create an EventLog instance and assign its source.
+		EventLog* myLog = new EventLog;
+		myLog->Source = "Solimar License Viewer";		   
+		// Write an informational entry to the event log.    
+		myLog->WriteEntry(EventLogMsg, LogType);
     }		   
-    // Create an EventLog instance and assign its source.
-    EventLog* myLog = new EventLog;
-    myLog->Source = "Solimar License Viewer";		   
-    // Write an informational entry to the event log.    
-	myLog->WriteEntry(EventLogMsg, LogType);
 }
