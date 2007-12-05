@@ -1,4 +1,4 @@
 #include "KeyServerInstance.h"
 
-KeyServer keyserver;
+//KeyServer keyserver;
 

@@ -3,9 +3,12 @@
 /* This interface is used to facilitate verifying the integrity and authenticity of the code behind a COM proxy */
 
 #pragma once
+#ifndef __ILicensingMessage_Header__
+#define __ILicensingMessage_Header__
+
 #include "resource.h"       // main symbols
 #include "InProcPtr.h"
-
+//
 // IObjectAuthentication
 [
 	object,
@@ -19,3 +22,5 @@ __interface ILicensingMessage : IDispatch
 	[id(4),helpstring("method GetLicenseMessageList")] HRESULT GetLicenseMessageList([in] VARIANT_BOOL clear_messages, [out,retval] VARIANT *pvtMessageList);
 	[id(5),helpstring("method DispatchLicenseMessageList")] HRESULT DispatchLicenseMessageList([in] VARIANT_BOOL clear_messages);
 };
+
+#endif
