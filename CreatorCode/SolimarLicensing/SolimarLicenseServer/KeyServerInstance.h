@@ -2,5 +2,5 @@
 
 #include "KeyServer.h"
 
-extern KeyServer keyserver;
+//extern KeyServer keyserver;
 
