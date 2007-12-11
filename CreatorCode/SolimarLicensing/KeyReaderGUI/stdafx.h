@@ -6,7 +6,10 @@
 // are changed infrequently
 #pragma once
 #define _WIN32_DCOM
-#define _WIN32_WINNT 0x0400
+
+#ifndef _WIN32_IE // Allow use of features specific to IE 4.0 or later.
+#define _WIN32_IE 0x0500 // Change this to the appropriate value to target IE 5.0 or later.
+#endif
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #define NUM_MOD_COLS 3
@@ -26,22 +29,85 @@
 // TODO: reference additional headers your program requires here
 #include "..\SolimarLicenseServer\_SolimarLicenseServer.h"
 
+//Used to Map the Product IDs as specified in KeySpec.xml
+const int SPDProductID = 0;
+const int XImageProductID = 1;
+const int XImageNTProductID = 2;
+const int PCLDriverProductID = 3;
+const int IndexPlugInProductID = 4;
+const int ConnectivityServerProductID = 6;
+const int IConvertProductID = 7;
+const int SolSearcherEnterpriseProductID = 8;
+const int SolScriptProductID = 9;
+const int SDXDesignerProductID = 10;
+const int QuantumServerProductID = 11;
+const int RubikaProductID = 12;
+const int SOLfusionProductID = 13;
+const int SPDEProductID = 14;
+
+//Used to map the license as specified in KeySpec.xml
+const int InitialTrialID = 0;
+const int ExtendedTrialID = 1;
+const int Base = 2;
+const int UninitializedTrialID = 3;
+const int ExtendedTrialID2 = 4;
+const int ExtendedTrialID3 = 5;
+const int ExtendedTrialID4 = 6;
+const int ExtendedTrialID5 = 7;
+const int ExtendedTrialID6 =  12;
+const int ExtendedTrialID7 =  13;
+const int ExtendedTrialID8 =  14;
+const int ExtendedTrialID9 =  15;
+const int ExtendedTrialID10 = 16;
+const int ExtendedTrialID11 = 17;
+const int ExtendedTrialID12 = 18;
+const int ExtendedTrialID13 = 19;
+const int ExtendedTrialID14 = 20;
+const int ExtendedTrialID15 = 21;
+//extensions 6-15 jump from 5 to 12
+const int ExtendedOffset = 6;
+
+const int Unused = 10;
+const int Deactivated = 11;
+
+//Used to map the key type as specified in KeySpec.xml
+const int KEYNone			=0;
+const int KEYAddon		    =1;
+const int KEYBase			=2;
+const int KEYReplacement	=3;
+const int KEYRelicense	    =4;
+const int KEYInventory	    =5;
+const int KEYBackup		    =6;
+const int KEYEmergency	    =7;
+//const int KEYSolimar	    =8
+const int KEYCustom		    =9;
+const int KEYLoan			=10;
+const int KEYDemo			=11;
+const int KEYRental		    =12;
+const int KEYDevelopment	=13;
+const int KEYReserved		=14;
+
 //structures
 typedef struct 
 {
 	_variant_t		KeyNumber;
 	_variant_t		ProductID;
 	_variant_t		ProductVersion;
+	_variant_t		ApplicationInstance;
 	_variant_t		License;
 	long			HoursLeft;
 	_variant_t		Active;
 	_variant_t		ExpirationDate;
+	_variant_t		KeyType;
 }KeyInfoStructure, *KeyInfoStructurePtr;
 
 typedef struct
 {
 	_variant_t ModuleID;
 	_variant_t ModuleName;
+	_variant_t ModuleUnlimited;
+	_variant_t ModulePool;
+	_variant_t ModuleShared;
 	long LicensesInUse;
 	long TotalLicenses;
 }ModuleLicensingStructure, *ModuleLicensingStructurePtr;
