@@ -222,8 +222,8 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
 
-			case SPProductID :
-				return retval = "SSE SP";
+			case SOLfusionProductID :
+				return retval = "SOLfusion";
 
 			case RubikaProductID :
 				return retval = "Rubika";

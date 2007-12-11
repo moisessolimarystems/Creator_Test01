@@ -90,7 +90,7 @@ const int ktfAll = (ktfAddon|ktfBase|ktfReplacement|ktfRelicense|ktfInventory|kt
 const int ktfStandAlone = (ktfBase|ktfInventory|ktfBackup|ktfEmergency|ktfCustom|ktfLoan|ktfDemo|ktfRental);
 const int ktfSPD = ktfAll;
 const int ktfSPDlimited = ktfAll;
-const int ktfProductWithoutModules = (ktfBase|ktfReplacement|ktfInventory|ktfBackup|ktfEmergency|ktfCustom|ktfLoan|ktfDemo|ktfRental);
+const int ktfProductWithoutModules = (ktfBase|ktfReplacement|ktfInventory|ktfBackup|ktfEmergency|ktfCustom|ktfLoan|ktfDemo|ktfRental|ktfDevelopment);
 
 //------------------------------------------------------------------------------
 // Class(es)

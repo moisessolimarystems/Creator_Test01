@@ -107,6 +107,7 @@ object KeyWizardFrm: TKeyWizardFrm
         'SDX Designer'
         'Quantum Server'
         'Rubika'
+        'SOLfusion'
         'SP/D Enterprise')
     end
     object keyTypeComboBox: TComboBox

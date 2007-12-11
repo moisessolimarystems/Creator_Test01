@@ -42,8 +42,8 @@ const int SolScriptProductID = 9;
 const int SDXDesignerProductID = 10;
 const int QuantumServerProductID = 11;
 const int RubikaProductID = 12;
+const int SOLfusionProductID = 13;
 const int SPDEProductID = 14;
-const int SPProductID = 15;
 
 //Used to map the license as specified in KeySpec.xml
 const int InitialTrialID = 0;

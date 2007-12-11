@@ -16,7 +16,8 @@
       objs\CryptoHelper.obj objs\ChallengeResponseHelper.obj 
       objs\ChallengeResponse.obj objs\MultidimensionalSafeArray.obj 
       objs\SSKey.obj objs\Spdkey.obj objs\ssckey.obj objs\Pkey.obj 
-      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj objs\ConnectionEditor.obj"/>
+      objs\sdxkey.obj objs\pdfkey.obj objs\Spdekey.obj objs\ConnectionEditor.obj 
+      objs\SOLfusionkey.obj"/>
     <RESFILES value="CreatorProject.res"/>
     <DEFFILE value=""/>
     <RESDEPEN value="$(RESFILES) CustomerForm.dfm CreatorAbout.dfm CustQueryDlg.dfm 
@@ -26,13 +27,15 @@
       DevelopmentPasswordDlg.dfm keySearchDlg.dfm keyDateSearchDlg.dfm 
       SolSearcherEnterpriseDetails.dfm ConnectionEditor.dfm"/>
     <LIBFILES value=""/>
-    <LIBRARIES value="DCLUSR.lib vcldb.lib dbrtl.lib bdertl.lib vclx.lib qrpt.lib vcl.lib rtl.lib"/>
-    <SPARELIBS value="rtl.lib vcl.lib qrpt.lib vclx.lib bdertl.lib dbrtl.lib vcldb.lib DCLUSR.lib"/>
+    <LIBRARIES value="adortl.lib DCLUSR.lib vcldb.lib dbrtl.lib bdertl.lib vclx.lib qrpt.lib 
+      vcl.lib rtl.lib"/>
+    <SPARELIBS value="rtl.lib vcl.lib qrpt.lib vclx.lib bdertl.lib dbrtl.lib vcldb.lib 
+      DCLUSR.lib adortl.lib"/>
     <PACKAGES value="rtl.bpi vcl.bpi vclx.bpi bcbsmp.bpi qrpt.bpi dbrtl.bpi vcldb.bpi 
       bdertl.bpi vcldbx.bpi teeui.bpi teedb.bpi tee.bpi teeqr.bpi ibxpress.bpi 
       bcbie.bpi vclie.bpi inetdb.bpi inet.bpi nmfast.bpi dclocx.bpi 
       bcb2kaxserver.bpi"/>
-    <PATHCPP value=".;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey"/>
+    <PATHCPP value=".;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;SolimarLicensing\common;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey;KEY\NewKey"/>
     <PATHPAS value=".;"/>
     <PATHRC value=".;"/>
     <PATHASM value=".;"/>
@@ -100,6 +103,7 @@
       <FILE FILENAME="KEY\NewKey\pdfkey.cpp" FORMNAME="" UNITNAME="pdfkey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="KEY\NewKey\Spdekey.cpp" FORMNAME="" UNITNAME="Spdekey.cpp" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
       <FILE FILENAME="ConnectionEditor.cpp" FORMNAME="ConnectionEditorDlg" UNITNAME="ConnectionEditor" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="KEY\NewKey\SOLfusionkey.cpp" FORMNAME="" UNITNAME="SOLfusionkey" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
   </FILELIST>
   <BUILDTOOLS>
   </BUILDTOOLS>

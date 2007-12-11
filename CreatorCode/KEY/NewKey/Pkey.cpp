@@ -131,6 +131,7 @@
 #include "pdfkey.hpp"
 #include "Spdekey.h"
 #include "SPKey.h"
+#include "SOLfusionKey.h"
 
 // protection key passwords and developer ID
 const ushort WRITE_PASSWORD = 0x4AFC;
@@ -172,9 +173,8 @@ const char* ProductText[] =
    "SDX Designer",                                              // SDX_DESIGNER_PRODUCT = 10
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
    "Rubika",                                                    // PDF Utility = 12
-   "???",                                                       //
+   "SOLfusion",                                                 //SOLfusion = 13
    "SPDE",                                                    // SPDE_PRODUCT = 14
-   "SSE SP",                                                    // SSE SP = 15
 // "123456789" <-- Maximum product name length is 9
 };
 
@@ -198,7 +198,7 @@ const char* longProductText[] =
    "SDX Designer ",                                             // SDX_DESIGNER_PRODUCT = 10
 	"Solimar Print/Director, Quantum Server Edition ",           // QUANTUM_PRODUCT = 11
    "Rubika ",                                                   // PDF Utility = 12
-   "???",                                                       // Not Used
+   "SOLfusion",                                                 // SOLfusion = 13
    "Solimar Print/Director, Enterprise Edition",                // SPDE_PRODUCT = 14
    "SOLsearcher Enterprise, Single Platform",                   // SSE SP = 15
 };
@@ -222,7 +222,7 @@ const char* mediumProductText[] =
    "SDX Designer ",                          // SDX_DESIGNER_PRODUCT = 10
    "SP/D, Quantum Server",							// QUANTUM_PRODUCT = 11
    "Rubika",                                 // PDF Utility = 12
-   "???",                                    // Not Used
+   "SOLfusion",                                    // SOLfusion = 13
    "SP/D, Enterprise Edition",               // SPDE_PRODUCT = 14
    "SSE, Single Platform",                    // SSE SP = 15
 };
@@ -887,6 +887,9 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       default:
          new_key = new ProtectionKey();
          break;
+      case SOLFUSION_PRODUCT :
+         new_key = new SOLfusionProtectionKey();
+         break;
       case SDX_DESIGNER_PRODUCT:
          new_key = new SDXDesignerProtectionKey();
          break;
@@ -995,6 +998,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
 
       default:
          new_key = new ProtectionKey(*pkey);
+         break;
+      case SOLFUSION_PRODUCT:
+         new_key = new SOLfusionProtectionKey(*(SOLfusionProtectionKey*)pkey);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);

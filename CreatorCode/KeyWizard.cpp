@@ -29,8 +29,8 @@ TKeyWizardFrm *KeyWizardFrm;
 // Defines
 //------------------------------------------------------------------------------
 //static member initialized
-const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*Rubika*/, 0, 14/*SPDE*/};
-const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, RUBIKA_PRODUCT, SPDE_PRODUCT};
+const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*Rubika*/, 13/*SOLFUSION*/, 14/*SPDE*/};
+const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, RUBIKA_PRODUCT, SOLFUSION_PRODUCT, SPDE_PRODUCT};
 
 
 //==============================================================================

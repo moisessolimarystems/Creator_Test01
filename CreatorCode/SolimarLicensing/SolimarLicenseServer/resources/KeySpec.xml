@@ -641,7 +641,15 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="1" default="0"/>
 				</Product>
 			</ProductList>
-		</KeyLayout>		
+		</KeyLayout>
+    <KeyLayout name="SOLfusion">
+      <ModuleList>
+      </ModuleList>
+      <ProductList>
+        <Product id="13" name="SOLfusion">
+        </Product>
+      </ProductList>
+    </KeyLayout>    
 		<KeyLayout name="SPDE">
 			<ModuleList>
 				<!-- Twinax Input -->

@@ -275,7 +275,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
          KeyFormModuleFrame->mmPagesPerMinute->Enabled = true;
          KeyFormModuleFrame->mmIncrementModule->Enabled = true;
          KeyFormModuleFrame->mmSetModule->Enabled = true;
-         mmApplicationInstance->Visible = true;
+         mmApplicationInstance->Enabled = true;
      }
 
      // set Version, Application Instance
@@ -600,10 +600,6 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 __finally
                 {
                         PacketHistoryQuery->EnableControls();
-                        if(PacketHistoryQuery->RecordCount > 0)
-                                PageControl1->Pages[4]->TabVisible = true;
-                        else
-                                PageControl1->Pages[4]->TabVisible = false;
                 }
             }
             else //clear key members
@@ -907,7 +903,7 @@ void __fastcall TFCustomerKeys::clearPermissions()
    mmPermanent->Enabled = false;
    mmExtension->Enabled = false;
    mmVersion->Enabled = false;
-   mmApplicationInstance->Visible = false;
+   mmApplicationInstance->Enabled = false;
    mmSPDOutput->Visible = false;
    mmSPDEOperatorSessions->Visible = false;
    mmSPDEUserSessions->Visible = false;
@@ -1561,6 +1557,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
               case SPDE_PRODUCT :
               case RUBIKA_PRODUCT :
               case SOLSCRIPT_PRODUCT :
+              case SOLFUSION_PRODUCT :
                    ArchiveBtn->Enabled = true;
               case SDX_DESIGNER_PRODUCT :
               case SOLSEARCHER_ENTERPRISE_PRODUCT :

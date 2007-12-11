@@ -527,7 +527,8 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
 
    ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
    if(key_record->pkey->productId == XIMAGENT_PRODUCT ||
-      key_record->pkey->productId == XIMAGE_PRODUCT)
+      key_record->pkey->productId == XIMAGE_PRODUCT ||
+      key_record->pkey->productId == SOLFUSION_PRODUCT)
    {
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
