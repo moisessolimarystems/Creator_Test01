@@ -527,8 +527,7 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
 
    ModuleDetail** module_detail = lookup->getModuleList(key_record->pkey->productId);
    if(key_record->pkey->productId == XIMAGENT_PRODUCT ||
-      key_record->pkey->productId == XIMAGE_PRODUCT ||
-      key_record->pkey->productId == SOLFUSION_PRODUCT)
+      key_record->pkey->productId == XIMAGE_PRODUCT)
    {
       //set up the dimenstions of the multi dim safe array. 64 mods and each mod has
       //2 fields (mod id and licesne count)
@@ -554,7 +553,9 @@ short KeyMaster::program(SKeyRecord* key_record)   //keyrec has all info needed 
          }
       }
       //SPD and iConvert Keys have an extra one for Output Pool
-      if((key_record->pkey->productId == SPD_PRODUCT) || (key_record->pkey->productId == ICONVERT_PRODUCT)|| (key_record->pkey->productId == SPDE_PRODUCT))
+      if((key_record->pkey->productId == SPD_PRODUCT) ||
+         (key_record->pkey->productId == ICONVERT_PRODUCT)||
+         (key_record->pkey->productId == SPDE_PRODUCT))
       {
          hasOutputPool = true;
          NumModules++;
@@ -1023,6 +1024,7 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
        case SOLSCRIPT_PRODUCT :
        case SDX_DESIGNER_PRODUCT :
        case RUBIKA_PRODUCT :
+       case SOLFUSION_PRODUCT :
             {
                 spd_key->setOutputUnits(0);
 
@@ -1120,6 +1122,7 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
         case SOLSCRIPT_PRODUCT :
         case RUBIKA_PRODUCT :
         case SDX_DESIGNER_PRODUCT :
+        case SOLFUSION_PRODUCT :
              {
 
                  if(spd_key->productVersion > 0x0000)
@@ -1424,6 +1427,7 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
        case SOLSCRIPT_PRODUCT :
        case RUBIKA_PRODUCT :
        case SDX_DESIGNER_PRODUCT :
+       case SOLFUSION_PRODUCT :
             {
                  spd_key->setOutputUnits(0); //does not belong to SOLSCRIPT
                  key_record->xch_ipds_ppm = 0;

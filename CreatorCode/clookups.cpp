@@ -53,6 +53,9 @@ CLookup::CLookup()
       m_SDXDesignerModuleDetail[mod_id] = new ModuleDetail();
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
 
+      m_SOLfusionModuleDetail[mod_id] = new ModuleDetail();
+      m_SOLfusionModuleDetail[mod_id]->id = mod_id;
+
       m_SSEModuleDetail[mod_id] = new ModuleDetail();
       m_SSEModuleDetail[mod_id]->id = mod_id;
 
@@ -135,6 +138,7 @@ CLookup::~CLookup()
       delete m_solScriptModuleDetail[mod_id];
       delete m_PDFUtilityModuleDetail[mod_id];
       delete m_SDXDesignerModuleDetail[mod_id];
+      delete m_SOLfusionModuleDetail[mod_id];
       delete m_SSEModuleDetail[mod_id];
    }
    for( int mod_id=0; mod_id < 64; mod_id++)
@@ -254,6 +258,8 @@ ModuleDetail** CLookup::getModuleList(int productID)
                 return m_SSEModuleDetail;
         case SDX_DESIGNER_PRODUCT :
                 return m_SDXDesignerModuleDetail;
+        case SOLFUSION_PRODUCT :
+                return m_SOLfusionModuleDetail;
         case SPDE_PRODUCT :
                 return m_SpdeModuleDetail;
         default :
@@ -301,6 +307,9 @@ bool CLookup::resetModuleList()
       *m_SDXDesignerModuleDetail[mod_id] = unassigned_module;
       m_SDXDesignerModuleDetail[mod_id]->id = mod_id;
 
+      *m_SOLfusionModuleDetail[mod_id] = unassigned_module;
+      m_SOLfusionModuleDetail[mod_id]->id = mod_id;
+
      *m_SSEModuleDetail[mod_id] = unassigned_module;
       m_SSEModuleDetail[mod_id]->id = mod_id;
    }
@@ -346,6 +355,9 @@ bool CLookup::resetModuleList()
                    break;
               case SOLSCRIPT_PRODUCT:
                    pModuleList = m_solScriptModuleDetail;
+                   break;
+              case SOLFUSION_PRODUCT:
+                   pModuleList = m_SOLfusionModuleDetail;
                    break;
               case SPDE_PRODUCT :
                    pModuleList = m_SpdeModuleDetail;
@@ -1157,6 +1169,9 @@ bool ModuleDetail::isAvailableForProduct(unsigned short product)
          result = static_cast<bool>(max>0);
          break;
       case SDX_DESIGNER_PRODUCT:
+         result = static_cast<bool>(max>0);
+         break;
+      case SOLFUSION_PRODUCT:
          result = static_cast<bool>(max>0);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:

@@ -85,6 +85,7 @@ class CLookup
    ModuleDetail* m_solScriptModuleDetail[64];
    ModuleDetail* m_PDFUtilityModuleDetail[64];
    ModuleDetail* m_SDXDesignerModuleDetail[64];
+   ModuleDetail* m_SOLfusionModuleDetail[64];   
    ModuleDetail* m_SpdeModuleDetail[64];
    ModuleDetail* m_SSEModuleDetail[64];
 

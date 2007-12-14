@@ -958,6 +958,9 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr3* pServer)
       case SDX_DESIGNER_PRODUCT:
          new_key = new SDXDesignerProtectionKey();
          break;
+      case SOLFUSION_PRODUCT:
+         new_key = new SOLfusionProtectionKey();
+         break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
          break;

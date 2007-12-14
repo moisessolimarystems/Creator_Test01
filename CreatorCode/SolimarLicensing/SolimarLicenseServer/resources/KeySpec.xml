@@ -50,10 +50,9 @@ enum ProductId {
 10	SDX_DESIGNER_PRODUCT
 11	QUANTUM_PRODUCT
 12  RUBIKA_PRODUCT
-13  NOT_AVAILABLE
+13  SOLFUSION_PRODUCT
 14  SPDE_PRODUCT
-15  SSE_SP_PRODUCT
-16	NUMBER_OF_PRODUCTS
+15	NUMBER_OF_PRODUCTS
 0xFFFF	UNKNOWN_PRODUCT
 };
 -->
@@ -644,9 +643,11 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		</KeyLayout>
     <KeyLayout name="SOLfusion">
       <ModuleList>
+				<Module id="0"	offset="0x080" bits="16" name="SOLfusion"/>		      
       </ModuleList>
       <ProductList>
         <Product id="13" name="SOLfusion">
+				<ModuleInclude id="0" default="0"/>
         </Product>
       </ProductList>
     </KeyLayout>    

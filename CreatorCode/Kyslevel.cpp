@@ -496,6 +496,7 @@ unsigned short SKeyRecord::incrementPasswordNumber()
           case SPDE_PRODUCT :
           case RUBIKA_PRODUCT :
           case SDX_DESIGNER_PRODUCT :
+          case SOLFUSION_PRODUCT :
           case SOLSEARCHER_ENTERPRISE_PRODUCT :
                passwordNumber++;
                break;
@@ -516,6 +517,7 @@ unsigned short SKeyRecord::decrementPasswordNumber()
           case SPDE_PRODUCT :
           case RUBIKA_PRODUCT :
           case SDX_DESIGNER_PRODUCT :
+          case SOLFUSION_PRODUCT :
           case SOLSEARCHER_ENTERPRISE_PRODUCT :
                passwordNumber--;
                break;

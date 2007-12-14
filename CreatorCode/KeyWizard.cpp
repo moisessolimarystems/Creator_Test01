@@ -208,6 +208,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    }
    else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
             m_selectedProduct == SDX_DESIGNER_PRODUCT ||
+            m_selectedProduct == SOLFUSION_PRODUCT  ||
             m_selectedProduct == RUBIKA_PRODUCT) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
@@ -721,7 +722,8 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
          }
          else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
                   m_selectedProduct == RUBIKA_PRODUCT  ||
-                  m_selectedProduct == SDX_DESIGNER_PRODUCT) {
+                  m_selectedProduct == SOLFUSION_PRODUCT ||
+                  m_selectedProduct == SDX_DESIGNER_PRODUCT ) {
             //Select Modules
             state.push( wsModuleSelection );
             active_panel = ModuleProgramPanel;
@@ -1194,7 +1196,8 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == QUANTUM_PRODUCT   ||
             m_selectedProduct == ICONVERT_PRODUCT  ||
             m_selectedProduct == SOLSCRIPT_PRODUCT ||
-            m_selectedProduct == SDX_DESIGNER_PRODUCT ||            
+            m_selectedProduct == SDX_DESIGNER_PRODUCT ||
+            m_selectedProduct == SOLFUSION_PRODUCT ||
             m_selectedProduct == RUBIKA_PRODUCT) {
       if (moduleState == msClear) {
          SpdProtectionKey* spd_key = static_cast<SpdProtectionKey*>(key_record->pkey);
