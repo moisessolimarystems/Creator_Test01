@@ -518,7 +518,7 @@ begin
     	szMsg1  = "Setup has finished removing " + @PRODUCT_NAME + " from your system.";
     	szTitle = "Uninstallation Complete.";
     	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);	
-    elseif (gstructUNINSTALLTYPE.RemoveAll) then
+    elseif (!ADDREMOVE && gstructUNINSTALLTYPE.RemoveAll) then
 		szMsg1 = "UNINSTALLATION COMPLETE\n\n\nPart I of the 'Remove and Upgrade' process has finished. The application has been removed.\n\nClick 'Upgrade' to restart setup and continue with the upgrade process.";
 		SdFinishCustomDlg(szMsg1);  		
 	else
