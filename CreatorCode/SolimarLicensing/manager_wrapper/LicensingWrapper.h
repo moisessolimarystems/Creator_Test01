@@ -54,6 +54,7 @@ public:
 	bool Connect(std::wstring server) {return SUCCEEDED(ConnectEx(server));}
 	bool Connect(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup) {return SUCCEEDED(ConnectEx(server, bUseOnlySharedLicenses, bUseAsBackup));}
 	bool ConnectByProduct(long product, bool bUseSharedLicenseServers = false) {return SUCCEEDED(ConnectByProductEx(product, bUseSharedLicenseServers));}
+	bool Disconnect() {return SUCCEEDED(DisconnectEx());}
 
 	//unsigned long grace_period_minutes - How long license can still be validated after there is a violation because of no keys on the system.
 	//bool app_instance_lock_key - Will lock the first base on each license server.  Will lock all add-on key, all bases keys on the system must match.
@@ -83,6 +84,7 @@ public:
 	HRESULT ConnectEx(std::wstring server);
 	HRESULT ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 	HRESULT ConnectByProductEx(long product, bool bUseSharedLicenseServers = false);
+	HRESULT DisconnectEx();
 	HRESULT InitializeEx(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0);
 	HRESULT InitializeEx(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false);
 	HRESULT KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists);

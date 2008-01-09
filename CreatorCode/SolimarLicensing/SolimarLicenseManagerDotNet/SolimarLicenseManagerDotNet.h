@@ -28,6 +28,7 @@ namespace SolimarLicenseManagerDotNet {
 			bool Connect(String^ server);
 			bool Connect(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 			bool ConnectByProduct(long product, bool bUseSharedLicenseServers);
+			bool Disconnect();
 			bool Initialize(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes);
 			bool Initialize(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^  specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction);
 
@@ -44,6 +45,7 @@ namespace SolimarLicenseManagerDotNet {
 			HRESULT ConnectEx(String^ server);
 			HRESULT ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 			HRESULT ConnectByProductEx(long product, bool bUseSharedLicenseServers);
+			HRESULT DisconnectEx();
 			HRESULT InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes);
 			HRESULT InitializeEx(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^  specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction);
 			HRESULT KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor, bool% bRefKeyExists);
