@@ -9,9 +9,9 @@ HRESULT LicenseSettings::Initialize()
 {
 
 	HRESULT hr(E_FAIL);
-wchar_t tmpbuf[1024];
-swprintf_s(tmpbuf, 1024, L"LicenseSettings::Initialize() - Enter");
-OutputDebugString(tmpbuf); 
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::Initialize() - Enter");
+//OutputDebugString(tmpbuf); 
 
 	for(;;)
 	{
@@ -49,8 +49,8 @@ OutputDebugString(tmpbuf);
 		break;	//Unconditional break
 	}
 
-swprintf_s(tmpbuf, 1024, L"LicenseSettings::Initialize returns 0x%08x", hr);
-OutputDebugString(tmpbuf); 
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::Initialize returns 0x%08x", hr);
+//OutputDebugString(tmpbuf); 
 	return hr;
 }
 
@@ -74,9 +74,9 @@ OutputDebugString(tmpbuf);
 */
 HRESULT LicenseSettings::GetLiceseServerByProduct(long productID, std::list<LicenseServerSettings*>* pLicenseServerList)
 {
-wchar_t tmpbuf[1024];
-swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (productID: %d", productID);
-OutputDebugString(tmpbuf); 
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (productID: %d", productID);
+//OutputDebugString(tmpbuf); 
 	HRESULT hr(E_FAIL);
 	if(pLicenseServerList == NULL)
 		return hr;
@@ -153,8 +153,8 @@ OutputDebugString(tmpbuf);
 					hr = m_xmlReader.GetAttribute(pProdServerNode, L"shared", sharedServer);
 					if (FAILED(hr))	continue;
 
-swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (name: %s, backup: %s, sharedServer: %s", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)sharedServer);
-OutputDebugString(tmpbuf); 
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (name: %s, backup: %s, sharedServer: %s", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)sharedServer);
+//OutputDebugString(tmpbuf); 
 					LicenseServerSettings* tmpLicSetting = new LicenseServerSettings();
 					tmpLicSetting->serverName = serverName;
 					tmpLicSetting->bIsBackupServer = _wcsicmp(backupServer, L"0") == 0 ? false : true;
@@ -166,7 +166,7 @@ OutputDebugString(tmpbuf);
 		break; //Unconditional break
 	}
 
-swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct returns 0x%08x", hr);
-OutputDebugString(tmpbuf); 
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct returns 0x%08x", hr);
+//OutputDebugString(tmpbuf); 
 	return hr;
 }

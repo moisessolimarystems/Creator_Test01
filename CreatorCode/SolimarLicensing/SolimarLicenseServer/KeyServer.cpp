@@ -299,8 +299,24 @@ HRESULT KeyServer::RemoveHeartbeat(BSTR license_id)
 			break;
 		}
 	}
-	
+	RemoveFromNotification(license_id);
 	return S_OK;
+}
+
+HRESULT KeyServer::RemoveFromNotification(BSTR license_id)
+{
+	SafeMutex mutex(HeartbeatListLock);
+	HRESULT hr = LicenseReleaseAll(license_id);
+	//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
+	for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
+		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), L"");
+	// Stop notifying the client of messages
+	{
+		SafeMutex mutex(MessageClientListLock);
+		message_clients[_bstr_t(license_id, true)].clear();	//Erase all existing messages
+		message_clients.erase(_bstr_t(license_id, true));							//Remove from notifying list
+	}
+	return hr;
 }
 
 
@@ -1421,27 +1437,32 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
 	
-	for (MessageClientList::iterator client = message_clients.begin(); client != message_clients.end(); ++client)
+//wchar_t debug_buf1[1024];
+//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Enter() - NumberOfClients=%d", message_clients.size());
+//OutputDebugStringW(debug_buf1);
+	try
 	{
-		try
+		//xxx might need to make this asynchronous
+		//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
+		//zzz add message to the message lists for all clients
+		//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
+		LicensingMessage m(std::wstring(server_host_name), std::wstring(key_ident), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
+		for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
 		{
-			//xxx might need to make this asynchronous
-			//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
-			//zzz add message to the message lists for all clients
-			//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
-			LicensingMessage m(std::wstring(server_host_name), std::wstring(key_ident), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
-			for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
-			{
-				c->second.push_back(m);
-				//xxx make sure that the message backlog is not excessive.
-				//xxx if it is, cull some of the older messages
-			}
-		}
-		catch (_com_error &e)
-		{
-			e.Error();
+
+			c->second.push_back(m);
+//_snwprintf(debug_buf1, 1024, L"   KeyServer::GenerateMessageInternal LicenseID=%s, SizeOfList=%d", (wchar_t*)c->first, c->second.size());
+//OutputDebugStringW(debug_buf1);
+			//xxx make sure that the message backlog is not excessive.
+			//xxx if it is, cull some of the older messages
 		}
 	}
+	catch (_com_error &e)
+	{
+		e.Error();
+	}
+//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Leave");
+//OutputDebugStringW(debug_buf1);
 }
 
 
@@ -1487,19 +1508,8 @@ void KeyServer::HeartbeatCheck()
 			OutputDebugStringW(debug_buf);
 
 			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
-						
-			hr = LicenseReleaseAll(heartbeat->first);
-
-			{
-			SafeMutex mutex(HeartbeatListLock);
-			//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
-			for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
-				keyIt->second->RemoveApplicationInstance(heartbeat->first, L"");
-			}
 			
-			// Stop notifying the client of messages
-			SafeMutex mutex(MessageClientListLock);
-			message_clients.erase(heartbeat->first);
+			hr = RemoveFromNotification(heartbeat->first);
 		}
 		else
 		{

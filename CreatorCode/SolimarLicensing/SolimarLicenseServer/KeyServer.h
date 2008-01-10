@@ -95,6 +95,7 @@ public:
 	void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
 	
 private:
+	HRESULT RemoveFromNotification(BSTR license_id);
 	
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
