@@ -24,16 +24,20 @@ public:
 	KeyServer();
 	~KeyServer();
 	
-	HRESULT ResynchronizeKeys();
+	HRESULT ResynchronizeKeys(bool bForceRefresh = false);
 	
 	// Top level functions
-	HRESULT LicenseSessionInitialize(BSTR license_id);
-	HRESULT LicenseSessionUninitialize(BSTR license_id);
+	HRESULT AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key);
+	HRESULT RemoveApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance);
+	HRESULT GetApplicationInstanceList(BSTR license_id, BSTR key_ident, VARIANT *pvtAppInstanceList);
+
 	HRESULT Heartbeat(BSTR license_id);
+	HRESULT RemoveHeartbeat(BSTR license_id);
 	HRESULT KeyEnumerate(VARIANT *keylist);
 	HRESULT EnterPassword(BSTR password);
 	HRESULT EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verification_code);
 	HRESULT GenerateBasePassword(long customer_number, long key_number, BSTR *password);
+	HRESULT GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password);
 	HRESULT GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password);
 	HRESULT GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
@@ -74,11 +78,12 @@ public:
 	HRESULT KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT LicenseReleaseAll(BSTR license_id);
 	HRESULT KeyModuleInUse(BSTR key_ident, long module_ident, long* license_count);
+	HRESULT KeyModuleLicenseUnlimited(BSTR license_id, BSTR key_ident, long module_ident, VARIANT_BOOL b_module_is_unlimited);
 	
 	// Sets all writable cells on a key to zero
 	HRESULT KeyFormat(BSTR key_ident, BSTR *new_key_ident);
 	// Programs a key
-	HRESULT KeyProgram(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident);
+	HRESULT KeyProgram(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long application_instances, long days, VARIANT module_value_list, BSTR *new_key_ident);
 	// Reads raw data off of the key
 	HRESULT KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData);
 	
@@ -90,13 +95,12 @@ public:
 	void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
 	
 private:
+	HRESULT RemoveFromNotification(BSTR license_id);
 	
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
 	static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
 	static const unsigned int UpdateKeysThreadLowPeriodSeconds = 300;	//(sec) - 5 Minutes
-	
-	
 
 	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
 	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
@@ -107,6 +111,7 @@ private:
 	
 	// support for generating Password Packet files
 	typedef std::map<_bstr_t, _bstr_t> KeyValueMap;
+	typedef std::map<_bstr_t, _bstr_t> StringToStringMap;
 	typedef std::pair<_variant_t, _bstr_t> ExpirePasswordPair;
 	typedef std::vector<ExpirePasswordPair> PasswordList;
 	class PasswordPacket
@@ -123,6 +128,7 @@ private:
 	HANDLE HeartbeatListLock;
 	HANDLE MessageClientListLock;
 	HANDLE PasswordPacketListLock;		//xxx initialize this member
+	
 	
 	// support for blocking brute force attempts at password cracking
 	long failed_password_attempts;
@@ -143,7 +149,7 @@ private:
 	HRESULT TimesUp();
 	
 	typedef std::vector<_bstr_t> StringList;
-	typedef std::map<_bstr_t, ProtectionKey> KeyList;
+	typedef std::map<_bstr_t, ProtectionKey*> KeyList;
 	
 	// maps a license_id to a proxy to its LicenseManager's ILicensingManager interface
 	//yyy _COM_SMARTPTR_TYPEDEF(ILicensingMessage,__uuidof(ILicensingMessage));
@@ -165,6 +171,7 @@ private:
 	KeySpec keyspec;
 	RainbowDriver driver;
 	KeyList keys;
+	StringToStringMap virtual_key_to_physical_key_list;
 	HeartbeatList heartbeats;
 	TrialTimeInfoList trial_keys;
 	MessageClientList message_clients;
