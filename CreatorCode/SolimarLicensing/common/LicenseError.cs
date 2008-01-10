@@ -154,10 +154,10 @@ namespace Solimar
 				SolLicErrors.Add(EHR_KEY_LOCKED,"Key locked (Key server)");
 				SolLicErrors.Add(EHR_CLIENT_TIMEOUT,"Client timeout (Key server)");
 				SolLicErrors.Add(EHR_PACKET_EXPIRED,"Packet expired (Key server)");
-				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module, all keys on this server will be ignored (Key server)");
-				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server, all keys on this server will be ignored (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE, "Unable to obtain an Application Instances on the server, all keys on this server will be ignored (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY, "Unable to locate a Base Key on the server, all keys on this server will be ignored (Key server)");
+				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module (Key server)");
+				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE, "Insufficient licensing, unable to obtain an Application Instances on the server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY, "Insufficient licensing, unable to locate a Base Key on the server (Key server)");
 				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER, "Licensing on the Key Server has been restored (Key server)");
 				SolLicErrors.Add(EHR_KEY_USE_BACKUP_KEY_SERVER, "Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)");
 				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER, "License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)");
