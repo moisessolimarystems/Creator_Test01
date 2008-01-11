@@ -223,6 +223,8 @@ int ServerConfiguration::MapProductName(String* ProductName)
 			return RubikaProductID;
 		else if(ProductName->Equals(L"SPDE"))
 			return SPDEProductID;
+		else if(ProductName->Equals(L"SOLFUSION"))
+			return SOLfusionProductID;
 	}
 	return -1;
 }
