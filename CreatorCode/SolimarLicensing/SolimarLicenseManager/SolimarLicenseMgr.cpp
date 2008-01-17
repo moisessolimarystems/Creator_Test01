@@ -1891,10 +1891,17 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 	{
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
-		// check that the key is present and valid
-		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
-		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+
+		// check that the key is present & active, don't check for validity because unlimited has not been called yet.
+		VARIANT_BOOL key_active(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
+		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+
+		VARIANT_BOOL key_present(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
+		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+
+
 
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2183,9 +2190,15 @@ HRESULT CSolimarLicenseMgr::FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKey
 		// check that the key is present and valid
 		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
 
-		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
-		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+		// check that the key is present & active, don't check for validity because validatiy should be unimportant when freeing.
+		VARIANT_BOOL key_active(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
+		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+
+		VARIANT_BOOL key_present(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
+		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+
 
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2373,12 +2386,16 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 	{
 		_bstr_t key_ident = pvtKeyList[i].bstrVal;
 		VARIANT vtKeyProductID, vtKeyProductVersion;
-		// check that the key is present and valid
-		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
-      
-		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
-		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-		if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+
+		// check that the key is present & active, don't check for validity because unlimited has not been called yet.
+		VARIANT_BOOL key_active(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
+		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
+
+		VARIANT_BOOL key_present(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
+		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+
 
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2607,16 +2624,16 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 	VARIANT vtKeyProductID, vtKeyProductVersion;
 	for(;;)
 	{
-		// check that the key is present and valid
-		VARIANT_BOOL key_license_valid(VARIANT_FALSE), key_active(VARIANT_FALSE);
-		
-		//Need result of KeyIsActive below
+		// check that the key is present & active, don't check for validity because unlimited has not been called yet.
+		VARIANT_BOOL key_active(VARIANT_FALSE);
 		hr = pServerInfo->LicenseServer->KeyIsActive(key_ident, &key_active);
-		if (FAILED(hr)) {hr = S_OK; break;}
+		if (FAILED(hr) || key_active==VARIANT_FALSE) {hr = S_OK; continue;}
 
-		//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
-		hr = pServerInfo->LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-		if (FAILED(hr)) {hr = S_OK; break;}
+		VARIANT_BOOL key_present(VARIANT_FALSE);
+		hr = pServerInfo->LicenseServer->KeyIsPresent(key_ident, &key_present);
+		if (FAILED(hr) || key_present==VARIANT_FALSE) {hr = S_OK; continue;}
+
+
 		
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2646,7 +2663,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 				if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 				{
 					pServerInfo->keys[key_ident].KeyPresent = true;
-					pServerInfo->keys[key_ident].KeyValid = (key_license_valid != VARIANT_FALSE);
+					pServerInfo->keys[key_ident].KeyValid = VARIANT_TRUE;
 					
 					// trial information and messages
 					bool TrialInfoInitialized = pServerInfo->keys[key_ident].KeyTrialInfoInitialized;
