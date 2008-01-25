@@ -1114,13 +1114,14 @@ AnsiString ModuleDetail::getTextForUnits(unsigned short product_id, unsigned sho
 
    if( units != 0 )
    {
-      //Removed, Default modules can adjust their values now
-      /*if(isDefaultForProduct(product_id))
-         result_string = "*";
+      if(isDefaultForProduct(product_id))
+      {
+           if(max == 1) result_string = "*";
+      }
       else
-      */
-       if(max == 1)
-         result_string = "X";
+      {
+           if(max == 1) result_string = "X";
+      }
       //else # of units
    }
    if(function == mtCounter)
