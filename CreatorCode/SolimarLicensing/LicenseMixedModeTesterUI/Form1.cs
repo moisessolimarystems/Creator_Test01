@@ -6,14 +6,12 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-using SolimarLicenseManagerDotNet;
+using Solimar.Licensing.LicenseManagerWrapper;
 
 namespace LicenseMixedModeTesterUI
 {
 	public partial class Form1 : Form
 	{
-
-		
 		public delegate void Delegate1(IntPtr pContext, string keyIdent, uint messageType, int hrError, ValueType pvtTimestamp, string message);
 
 		public Form1()
@@ -27,12 +25,15 @@ namespace LicenseMixedModeTesterUI
 			//SolimarLicenseManagerDotNet.
 			//SolimarLicenseManagerDotNet.
 
-			int hrResult = 0;
 			int productID = 12;
 			productID = 14;
+			productID = 10;
+			//productID = 55;
 			bool bExists = false, bSuccess;
-			slw = new SolimarLicenseManagerDotNet.SolimarLicenseWrapper();
+			slw = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper();
 			String licenseServer = "jlan5";
+			licenseServer = "fakeServer";
+			licenseServer = "jzak2";
 
 			SolimarLicenseWrapper.DelegateMessageCallbackManaged delMessage;
 			delMessage = new SolimarLicenseWrapper.DelegateMessageCallbackManaged(MessageCallback);
@@ -62,11 +63,11 @@ namespace LicenseMixedModeTesterUI
 
 
 			///*
-			hrResult = TestHrFunctions(slw, licenseServer, productID);
-			if (hrResult == 0)
-				WriteMessage("Successfully called TestHrFunctions()");
-			else
-				WriteMessage("Failed to call TestHrFunctions() " + hrResult.ToString());
+			TestHrFunctions(slw, licenseServer, productID);
+			//if (hrResult == 0)
+			//    WriteMessage("Successfully called TestHrFunctions()");
+			//else
+			//    WriteMessage("Failed to call TestHrFunctions() " + hrResult.ToString());
 			//*/
 			
 			// get a list of the members
@@ -80,7 +81,7 @@ namespace LicenseMixedModeTesterUI
 
 		}
 
-		bool TestFunctions(SolimarLicenseManagerDotNet.SolimarLicenseWrapper sLicWrapper, string licenseServer, int productID)
+		bool TestFunctions(Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper sLicWrapper, string licenseServer, int productID)
 		{
 			bool bSuccess = false;
 			for (; ; )
@@ -100,6 +101,7 @@ namespace LicenseMixedModeTesterUI
 
 
 				bSuccess = sLicWrapper.Initialize(productID, 1, 0, false, "", true, SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG, 0);
+				
 				if (bSuccess)
 					WriteMessage("Successfully Initialized");
 				else
@@ -175,102 +177,103 @@ namespace LicenseMixedModeTesterUI
 			return bSuccess;
 		}
 
-		int TestHrFunctions(SolimarLicenseManagerDotNet.SolimarLicenseWrapper sLicWrapper, string licenseServer, int productID)
+		void TestHrFunctions(Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper sLicWrapper, string licenseServer, int productID)
 		{
-			int hrResult = 0;
-			for (; ; )
+			try
 			{
-				hrResult = sLicWrapper.ConnectEx(licenseServer);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ConnectEx(" + licenseServer + ") hrResult = " + hrResult);
-					break;
-				}
+				sLicWrapper.ConnectEx(licenseServer);
 				WriteMessage("Successfully called ConnectEx(" + licenseServer + ")");
 
-				hrResult = sLicWrapper.InitializeEx(productID, 1, 0, false, "", true, SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG, 0);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called InitializeEx() hrResult = " + hrResult);
-					break;
-				}
+				//hrResult = sLicWrapper.InitializeEx(productID, 1, 0, false, "", true, SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG, 0);
+				sLicWrapper.InitializeEx("AppInstance", productID, 1, 0, false, "", false,
+					SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL, 0, true, false);
 				WriteMessage("Successfully called InitializeEx(" + productID.ToString() + ")");
 
 				bool bExists = false;
-				hrResult = sLicWrapper.KeyProductExistsEx(productID, 1, 0, ref bExists);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called KeyProductExistsEx() hrResult = " + hrResult);
-					break;
-				}
+				bExists = sLicWrapper.KeyProductExistsEx(productID, 1, 0);
 				WriteMessage("Successfully called KeyProductExistsEx(" + productID.ToString() + ") " + bExists.ToString());
 
 
 				int verMajor = 0, verMinor = 0, verBuild = 0;
-				hrResult = sLicWrapper.GetVersionLicenseManagerEx(ref verMajor, ref verMinor, ref verBuild);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called GetVersionLicenseManagerEx() hrResult = " + hrResult);
-					break;
-				}
+				sLicWrapper.GetVersionLicenseManagerEx(ref verMajor, ref verMinor, ref verBuild);
 				WriteMessage("Successfully called GetVersionLicenseManagerEx() " + verMajor.ToString() + "." + verMinor.ToString() + "." + verBuild.ToString());
 
-				hrResult = sLicWrapper.GetVersionLicenseServerEx(licenseServer, ref verMajor, ref verMinor, ref verBuild);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called GetVersionLicenseServerEx() hrResult = " + hrResult);
-					break;
-				}
+				sLicWrapper.GetVersionLicenseServerEx(licenseServer, ref verMajor, ref verMinor, ref verBuild);
 				WriteMessage("Successfully called GetVersionLicenseServerEx(" + licenseServer + ") " + verMajor.ToString() + "." + verMinor.ToString() + "." + verBuild.ToString());
 
-				int modID = 202;
+				int modID = 1;
 				int obtainAmount = 1;
-				hrResult = sLicWrapper.ModuleLicenseObtainEx(modID, obtainAmount);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ModuleLicenseObtainEx() hrResult = " + hrResult);
-					break;
-				}
-				WriteMessage("Successfully called ModuleLicenseObtainEx(" + modID.ToString() + ", " + obtainAmount.ToString() + ")");
+				int sessionID = 0;
 
-				hrResult = sLicWrapper.ModuleLicenseTotalEx(modID, ref obtainAmount);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ModuleLicenseTotalEx() hrResult = " + hrResult);
-					break;
-				}
-				WriteMessage("Successfully called ModuleLicenseTotalEx(" + modID.ToString() + ") " + obtainAmount.ToString());
+				sessionID = sLicWrapper.StartLicensingSessionEx();
+				WriteMessage("Successfully called StartLicensingSessionEx() - sessionID = " + sessionID.ToString());
 
-				hrResult = sLicWrapper.ModuleLicenseInUseEx(modID, ref obtainAmount);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ModuleLicenseInUseEx() hrResult = " + hrResult);
-					break;
-				}
-				WriteMessage("Successfully called ModuleLicenseInUseEx(" + modID.ToString() + ") " + obtainAmount.ToString());
+				sessionID = sLicWrapper.StartLicensingSessionEx();
+				WriteMessage("Successfully called StartLicensingSessionEx() - sessionID = " + sessionID.ToString());
+
+				sLicWrapper.ModuleLicenseObtainLicensingSessionEx(sessionID, modID, obtainAmount);
+				WriteMessage("Successfully called ModuleLicenseObtainLicensingSessionEx()");
+
+
+				obtainAmount = sLicWrapper.ModuleLicenseInUseLicensingSessionEx(sessionID, modID);
+				WriteMessage("Successfully called ModuleLicenseInUseLicensingSessionEx() - obtainAmount = " + obtainAmount.ToString());
+
+				sLicWrapper.EndLicensingSessionEx(sessionID);
+				WriteMessage("Successfully called EndLicensingSessionEx()");
+
+				sessionID = sLicWrapper.StartLicensingSessionEx();
+				WriteMessage("Successfully called StartLicensingSessionEx() - sessionID = " + sessionID.ToString());
+
+				obtainAmount = sLicWrapper.ModuleLicenseInUseLicensingSessionEx(sessionID, modID);
+				WriteMessage("Successfully called ModuleLicenseInUseLicensingSessionEx() - obtainAmount = " + obtainAmount.ToString());
+
+				//hrResult = sLicWrapper.ModuleLicenseObtainEx(modID, obtainAmount);
+				//if (hrResult != 0)
+				//{
+				//    WriteMessage("Failed to called ModuleLicenseObtainEx() hrResult = " + hrResult);
+				//    break;
+				//}
+				//WriteMessage("Successfully called ModuleLicenseObtainEx(" + modID.ToString() + ", " + obtainAmount.ToString() + ")");
+
+				//hrResult = sLicWrapper.ModuleLicenseTotalEx(modID, ref obtainAmount);
+				//if (hrResult != 0)
+				//{
+				//    WriteMessage("Failed to called ModuleLicenseTotalEx() hrResult = " + hrResult);
+				//    break;
+				//}
+				//WriteMessage("Successfully called ModuleLicenseTotalEx(" + modID.ToString() + ") " + obtainAmount.ToString());
+
+				//hrResult = sLicWrapper.ModuleLicenseInUseEx(modID, ref obtainAmount);
+				//if (hrResult != 0)
+				//{
+				//    WriteMessage("Failed to called ModuleLicenseInUseEx() hrResult = " + hrResult);
+				//    break;
+				//}
+				//WriteMessage("Successfully called ModuleLicenseInUseEx(" + modID.ToString() + ") " + obtainAmount.ToString());
 
 				bool bValid = false;
-				hrResult = sLicWrapper.ValidateLicenseEx(ref bValid);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ValidateLicenseEx() hrResult = " + hrResult);
-					break;
-				}
+				bValid = sLicWrapper.ValidateLicenseEx();
 				WriteMessage("Successfully called ValidateLicenseEx() " + bValid.ToString());
-				
 
-				hrResult = sLicWrapper.ModuleLicenseReleaseEx(modID, obtainAmount);
-				if (hrResult != 0)
-				{
-					WriteMessage("Failed to called ModuleLicenseReleaseEx() hrResult = " + hrResult);
-					break;
-				}
-				WriteMessage("Successfully called ModuleLicenseReleaseEx(" + modID.ToString() + ") " + bValid.ToString());
 
-				break;//Unconditional break;
+				//hrResult = sLicWrapper.ModuleLicenseReleaseEx(modID, obtainAmount);
+				//if (hrResult != 0)
+				//{
+				//    WriteMessage("Failed to called ModuleLicenseReleaseEx() hrResult = " + hrResult);
+				//    break;
+				//}
+				//WriteMessage("Successfully called ModuleLicenseReleaseEx(" + modID.ToString() + ") " + bValid.ToString());
+			}
+			catch (System.Runtime.InteropServices.COMException comEX)
+			{
+				WriteMessage(comEX.Message);
+			}
+			catch (Exception ex)
+			{
+				WriteMessage(ex.Message);
 			}
 
-			return hrResult;
+			return ;
 		}
 
 		void WriteMessage(String message)
@@ -348,7 +351,7 @@ namespace LicenseMixedModeTesterUI
 
 
 
-		void InitializeFunctionTree(SolimarLicenseManagerDotNet.SolimarLicenseWrapper paramLicWrapper)
+		void InitializeFunctionTree(Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper paramLicWrapper)
 		{
 			System.Reflection.MethodInfo[] methodList = paramLicWrapper.GetType().GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 			TreeNode rootNode = new TreeNode(paramLicWrapper.GetType().ToString());
@@ -381,7 +384,7 @@ namespace LicenseMixedModeTesterUI
 		}
 
 
-		private SolimarLicenseManagerDotNet.SolimarLicenseWrapper slw;
+		private Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper slw;
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
