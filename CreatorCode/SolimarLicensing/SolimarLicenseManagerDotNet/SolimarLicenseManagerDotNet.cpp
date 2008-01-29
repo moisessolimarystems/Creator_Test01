@@ -62,17 +62,20 @@ namespace SolimarLicenseManagerDotNet
 
 	SolimarLicenseWrapper::SolimarLicenseWrapper()
 	{
-//OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper()");
+//OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper() - Enter");
 		m_pLicenseWrapper = new SolimarLicenseManagerWrapper::LicensingWrapper();
 		m_bRegisteredMessageCallback = false;
 		m_bRegisteredInvalidLicenseCallback = false;
 		m_messageCallbackUnmanaged = gcnew DelegateMessageCallbackUnmanaged(this, &SolimarLicenseWrapper::MessageCallback);
 		m_invalidLicenseCallbackUnmanaged = gcnew DelegateInvalidLicenseCallbackUnmanaged(this, &SolimarLicenseWrapper::InvalidLicenseCallback);
+//OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper() - Leave");
 	}
 	SolimarLicenseWrapper::~SolimarLicenseWrapper()
 	{
-//OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper()");
+//OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper() - Enter");
 		delete m_pLicenseWrapper;
+		m_pLicenseWrapper = NULL;
+//OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper() - Leave");
 	}
 
 	bool SolimarLicenseWrapper::Connect(String^ server)
@@ -108,6 +111,11 @@ namespace SolimarLicenseManagerDotNet
 	{
 		return m_pLicenseWrapper->ConnectByProduct(product, bUseSharedLicenseServers);
 	}
+	bool SolimarLicenseWrapper::Disconnect()
+	{
+//OutputDebugStringW(L"SolimarLicenseWrapper::Disconnect() - Enter");
+		return m_pLicenseWrapper->Disconnect();
+	}
 	bool SolimarLicenseWrapper::Initialize(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes)
 	{
 		BSTR bstrSpecificSingleKeyIdent;
@@ -134,7 +142,7 @@ namespace SolimarLicenseManagerDotNet
 		System::IntPtr ptr2(System::Runtime::InteropServices::Marshal::StringToBSTR(applicationInstance));
 		bstrApplicationInstance = (static_cast<BSTR>(static_cast<void *>(ptr2)));
 
-		bool bResult = m_pLicenseWrapper->Initialize(bstrApplicationInstance, product, prodVerMajor, prodVerMinor, singleKey, bstrSpecificSingleKeyIdent, lockKeys, (DWORD)uiLevel, gracePeriodMinutes);
+		bool bResult = m_pLicenseWrapper->Initialize(bstrApplicationInstance, product, prodVerMajor, prodVerMinor, singleKey, bstrSpecificSingleKeyIdent, lockKeys, (DWORD)uiLevel, gracePeriodMinutes, applicationInstanceLockKeys, bypassRemoteKeyRestriction);
 
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
@@ -248,6 +256,10 @@ namespace SolimarLicenseManagerDotNet
 	{
 		return m_pLicenseWrapper->ConnectByProductEx(product, bUseSharedLicenseServers);
 	}
+	HRESULT SolimarLicenseWrapper::DisconnectEx()
+	{
+		return m_pLicenseWrapper->DisconnectEx();
+	}
 
 	HRESULT SolimarLicenseWrapper::InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes)
 	{
@@ -275,7 +287,7 @@ namespace SolimarLicenseManagerDotNet
 		System::IntPtr ptr2(System::Runtime::InteropServices::Marshal::StringToBSTR(applicationInstance));
 		bstrApplicationInstance = (static_cast<BSTR>(static_cast<void *>(ptr2)));
 
-		HRESULT hrResult = m_pLicenseWrapper->InitializeEx(bstrApplicationInstance, product, prodVerMajor, prodVerMinor, singleKey, bstrSpecificSingleKeyIdent, lockKeys, (DWORD)uiLevel, gracePeriodMinutes);
+		HRESULT hrResult = m_pLicenseWrapper->InitializeEx(bstrApplicationInstance, product, prodVerMajor, prodVerMinor, singleKey, bstrSpecificSingleKeyIdent, lockKeys, (DWORD)uiLevel, gracePeriodMinutes, applicationInstanceLockKeys, bypassRemoteKeyRestriction);
 
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);

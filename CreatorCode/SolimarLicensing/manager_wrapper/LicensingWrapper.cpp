@@ -34,7 +34,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	m_MemberLock(CreateMutex(0, FALSE, 0)),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
-//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper()");
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Enter");
 	ISolimarLicenseMgr5* pLocalLicenseMgr = NULL;
 	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr5), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
@@ -59,6 +59,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 			pLocalLicenseMgr->Release();
 		}
 	}
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Leave");
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper()", hr);
 }
 
@@ -74,10 +75,12 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const Licensing
 	m_validityCheck_LastHr(S_OK),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper(const) - Enter");
 	*this = o;
 	
 	m_MessageDispatchThread = CreateThread(0, 0, MessageDispatchThreadProc, this, 0, 0);
 	m_LicenseValidityThread = CreateThread(0, 0, LicenseValidityThreadProc, this, 0, 0);
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper(const) - Leave");
 }
 
 SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::LicensingWrapper::operator=(const LicensingWrapper &o)
@@ -95,20 +98,23 @@ SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::Li
 
 SolimarLicenseManagerWrapper::LicensingWrapper::~LicensingWrapper()
 {
-//OutputDebugStringW(L"LicensingWrapper::~LicensingWrapper() - Enter");
+OutputDebugStringW(L"LicensingWrapper::~LicensingWrapper() - Enter");
 	// signal the threads to terminate
 
 	SetEvent(m_ThreadKillEvent);
 	
 	// wait for the threads to terminate
 	HANDLE threads[2] = {m_MessageDispatchThread, m_LicenseValidityThread};
-	WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 1000);
-	//WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 15000);
-	
+
+	int retVal = WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 30000);
    if(m_MessageDispatchThread != NULL)
+	{
 	   TerminateThread(m_MessageDispatchThread,0);
+	}
    if(m_LicenseValidityThread != NULL)
+	{
 	   TerminateThread(m_LicenseValidityThread,0);
+	}
 	
 	CloseHandle(m_MessageDispatchThread);
 	CloseHandle(m_LicenseValidityThread);
@@ -179,6 +185,15 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx()", hr);
 	return hr;
 }
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
+{
+	SafeMutex mutex(m_MemberLock);
+	
+	HRESULT hr = m_licenseManagerPtr->Disconnect();
+
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()", hr);
+	return hr;
+}
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes)
 {
    return InitializeEx(L"", product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes);
@@ -226,32 +241,40 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExistsEx(long 
 
 bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback)
 {
+//OutputDebugStringW(L"LicensingWrapper::RegisterMessageCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	m_license_message_callback_context = pContext;
 	m_license_message_callback = LicenseMessageCallback;
+//OutputDebugStringW(L"LicensingWrapper::RegisterMessageCallback() - Leave");
 	return true;
 }
 
 bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterMessageCallback()
 {
+//OutputDebugStringW(L"LicensingWrapper::UnregisterMessageCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	m_license_message_callback_context = 0;
 	m_license_message_callback = 0;
+//OutputDebugStringW(L"LicensingWrapper::UnregisterMessageCallback() - Leave");
 	return true;
 }
 bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterInvalidLicenseCallback(void* pContext, LicenseInvalidCallbackPtr LicenseInvalidCallback)
 {
+//OutputDebugStringW(L"LicensingWrapper::RegisterInvalidLicenseCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	m_license_invalid_callback_context = pContext;
 	m_license_invalid_callback = LicenseInvalidCallback;
+//OutputDebugStringW(L"LicensingWrapper::RegisterInvalidLicenseCallback() - Leave");
 	return true;
 }
 
 bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterInvalidLicenseCallback()
 {
+//OutputDebugStringW(L"LicensingWrapper::UnregisterInvalidLicenseCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	m_license_invalid_callback_context = 0;
 	m_license_invalid_callback = 0;
+//OutputDebugStringW(L"LicensingWrapper::UnregisterInvalidLicenseCallback() - Leave");
 	return true;
 }
 
@@ -328,6 +351,8 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThre
 	ILicensingMessage* pLicenseMessages = NULL;
 	HRESULT hr = S_OK;
 
+	int count(0);
+	int invokeTime(150); //in 100 MilliSeconds //150 == 15000 milliseconds
 	while(1)
 	{
 		// check whether the thread should terminate
@@ -336,9 +361,15 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThre
 			break;
 		}
 		
-		hr = ((LicensingWrapper*)pWrapper)->MessageDispatchThreadProc(pLicenseMessages);
+		if(count % invokeTime == 0)
+		{
+			//Only do once every invokeTime
+			hr = ((LicensingWrapper*)pWrapper)->MessageDispatchThreadProc(pLicenseMessages);
+			count = 0;
+		}
+		count++;
 		
-		Sleep(20000);
+		Sleep(100);	//100 MilliSeconds
 	}
 
 	// Clean up
@@ -350,7 +381,7 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThre
 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages)
 {
-//OutputDebugStringW(L"HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages)"); 
+//OutputDebugStringW(L"HRESULT LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages) - Enter"); 
 
 	
 //wchar_t tmpbuf[1024];
@@ -384,15 +415,18 @@ LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchTh
 			m_license_message_callback(m_license_message_callback_context, m->key_ident.c_str(), m->message_type, m->error, &m->timestamp, m->message.c_str());
 		}
 	}
+//OutputDebugStringW(L"HRESULT LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages) - Leave"); 
 	return S_OK;
 }
 
 DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadProc(LPVOID pWrapper)
 {
 	CoInitializeEx(0, COINIT_MULTITHREADED);
+//OutputDebugStringW(L"WINAPI LicensingWrapper::LicenseValidityThreadProc(LPVOID pWrapper) - Enter"); 
 	HRESULT hr = S_OK;
 	DWORD thread_kill(0);
-	
+	int count(0);
+	int invokeTime(200); //in 100 MilliSeconds //200 == 20000 milliseconds
 	while(1)
 	{
 		// check whether the thread should terminate
@@ -401,10 +435,17 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThre
 			break;
 		}
 		
-		hr = ((LicensingWrapper*)pWrapper)->LicenseValidityThreadProc();
+		if(count % invokeTime == 0)
+		{
+			//Only do once every invokeTime
+			hr = ((LicensingWrapper*)pWrapper)->LicenseValidityThreadProc();
+			count = 0;
+		}
+		count++;
 		
-		Sleep(15000);
+		Sleep(100);	//100 MilliSeconds
 	}
+//OutputDebugStringW(L"WINAPI LicensingWrapper::LicenseValidityThreadProc(LPVOID pWrapper) - Leave"); 
 	CoUninitialize();
 
 	return 0;
