@@ -65,15 +65,11 @@ Class CMKS
                                         mBuild.WriteToDlgAndFile "Creating new sandbox from trunk"
                                         mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --project=" + Chr(34) + mBuild.MainSrcPJFile + _
                                         Chr(34) + " " + Chr(34) + mBuild.MainProjPath + Chr(34))
-                                        mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
-                                                + Chr(34) + mBuild.MainPJFile + Chr(34))
                                 Else
                                         mBuild.WriteToDlgAndFile "Creating new sandbox from existing development path"
                                         mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --devpath=" & mBuild.NewBuild.ExistingDevPath & _
                                                         " --project=" + Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + _
                                                         mBuild.MainProjPath + Chr(34))
-                                        mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
-                                                + Chr(34) + mBuild.MainPJFile + Chr(34))
                                 End If
                         Case "Build"
                                 DropSandbox
@@ -81,20 +77,16 @@ Class CMKS
                                 CleanFolder mBuild.MainProjPath
                                 mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --projectRevision=" + mBuild.PrevLabel + " --project=" + _
                                               Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + mBuild.MainProjPath + Chr(34))
-                                mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
-                                                + Chr(34) + mBuild.MainPJFile + Chr(34))
-			Case "Branch"
-				DropSandbox
-			        mBuild.WriteToDlgAndFile "Creating new sandbox from existing development path"
+						Case "Branch"
+								DropSandbox
+								mBuild.WriteToDlgAndFile "Creating new sandbox from existing development path"
                                 mBuild.RunCmd ("si createsandbox --quiet --recurse --nopopulate --devpath=" & mBuild.NewDevPath & _
                                                " --project=" + Chr(34) + mBuild.MainSrcPJFile + Chr(34) + " " + Chr(34) + _
                                                 mBuild.MainProjPath + Chr(34))
-                                mBuild.RunCmd ("si resync --yes --overwriteChanged --restoreTimestamp --quiet --recurse --sandbox=" _
-                                                + Chr(34) + mBuild.MainPJFile + Chr(34))
                         End Select
                 End If
     End Function
-    
+        
     Function GenerateSubProjectSandbox(aMainPJFile, aMainSrcPJFile, aSandboxPath)
 		 mBuild.WriteToDlgAndFile "Creating a build sandbox from label: " + mBuild.PrevLabel
          CleanFolder mBuild.MainProjPath
@@ -116,17 +108,17 @@ Class CMKS
     End Sub
 
     Private Sub CleanFolder(aPath)
-            Err.Clear
+        Err.Clear
 	    On Error Resume Next
 	    If mBuild.FSO.FolderExists(aPath) Then
                 mBuild.FSO.DeleteFile aPath, 1
                 mBuild.FSO.DeleteFolder aPath, 1
-            End If
+        End If
 	    If Err Then
 	        mBuild.BuildError "Error attempting to clean : " + aPath
 	        mBuild.WriteToDlgAndfile Err.Description
 	    End If
-            mBuild.FSO.CreateFolder aPath
+        mBuild.FSO.CreateFolder aPath
     End Sub
 
     Sub LockFiles(aPJFile, aLockFile)

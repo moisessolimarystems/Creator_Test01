@@ -528,7 +528,7 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile fileInput, 1
                 mFSO.MoveFile output, fileInput
-		If Err.Number <> 0 Then
+				If Err.Number <> 0 Then
                     BuildError "Unable to update file version for: " + fileInput + " : " + Err.Description
                 End If
 
@@ -637,11 +637,33 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile aFilePath, 1
                 mFSO.MoveFile output, aFilePath
-		If Err.Number <> 0 Then
+				If Err.Number <> 0 Then
                     BuildError "Unable to update file for: " + aFilePath + " with " + aPattern + " : " + Err.Description
                 End If   
 
         End Function
+        
+		Function FindAndReplace(aFilePath, aFind, aReplace)
+
+                WriteToDlgAndFile "Updating File : " & fileInput
+                Dim output, readFile, writeFile, FileText, ReplacedText
+                output = "temp"
+                Err.Clear
+                Set readFile = mFSO.OpenTextFile(aFilePath)
+                Set writeFile = mFSO.CreateTextFile(output)
+				FileText = readFile.ReadAll
+				ReplacedText = Replace(FileText, aFind, aReplace)
+
+				writeFile.Write ReplacedText
+                writeFile.Close
+                readFile.Close
+                mFSO.DeleteFile aFilePath, 1
+                mFSO.MoveFile output, aFilePath
+				If Err.Number <> 0 Then
+                    BuildError "Unable to update file for: " + aFilePath + " with " + aFind + " : " + Err.Description
+                End If   
+
+        End Function        
 
 
       '%%% iConvert doesn't use this function.  see if other projects use.  if not take out. if so need to modify it so its correct.
