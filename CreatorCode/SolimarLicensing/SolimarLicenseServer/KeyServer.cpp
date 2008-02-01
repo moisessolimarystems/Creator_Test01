@@ -309,7 +309,11 @@ HRESULT KeyServer::RemoveFromNotification(BSTR license_id)
 	HRESULT hr = LicenseReleaseAll(license_id);
 	//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
 	for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
-		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), L"");
+	{
+		BSTR bstrEmptyString = SysAllocString(L"");
+		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), bstrEmptyString);
+		SysFreeString(bstrEmptyString);
+	}
 	// Stop notifying the client of messages
 	{
 		SafeMutex mutex(MessageClientListLock);
@@ -445,7 +449,9 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		{
 			CryptoHelper context;
 			CryptoHelper::Digest digest;
-			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
+			//if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
+			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, (password_packet_length/sizeof(wchar_t))-1, digest))) throw(hr);
+
 			verification = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 		}
 		
