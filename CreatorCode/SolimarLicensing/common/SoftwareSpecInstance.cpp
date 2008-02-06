@@ -34,9 +34,3 @@ Lic_PackageAttribs::Lic_SoftwareSpecAttribs GlobalSoftwareSpec::GetSoftwareSpec(
 	SafeMutex mutex(GlobalSoftwareSpecLock);
 	return softwareSpec;
 }
-
-void GlobalSoftwareSpec::SetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs newSoftwareSpec)
-{
-   SafeMutex mutex(GlobalSoftwareSpecLock);
-   softwareSpec.InitFromString(newSoftwareSpec.ToString());
-}
