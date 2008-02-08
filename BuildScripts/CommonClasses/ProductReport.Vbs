@@ -353,6 +353,7 @@ Class CProductReport
                 For loopIndex = 0 To (mNumPJFiles - 1)
                         WriteToDlgAndFile "Generating files from " & mPJFileArray(loopIndex)
                         'Dont know whether endlabel is given, last build, or release
+						WriteToDlgAndFile EndLabel
 						sDevPath = GetDevPath(EndLabel)
 						sReportCmd = "si report --basename=" & Chr(34) & MainProjectName & Chr(34) & " --project=" & _	
                                 MainSrcProjPath + "\" & mPJFileArray(0) & ".pj"
@@ -360,6 +361,7 @@ Class CProductReport
 							sDevPathCmd = " --devpath=" & sDevPath
                         End If                        
                         wscript.echo sReportCmd + sDevPathCmd
+                        WriteToDlgAndFile sReportCmd + sDevPathCmd
                         nResult = mShell.Run(sReportCmd + sDevPathCmd,1, True)    
                         wscript.echo mFilePathArray(loopIndex) & "\" & mPJFileArray(loopIndex) & ".tx*"
                         CopyFileOrFolder "File", mShell.CurrentDirectory & "\" & mPJFileArray(loopIndex) & ".tx*", _
@@ -383,17 +385,15 @@ Class CProductReport
     '               VersionPrefix property set during initialization
     '***************************************************************************
     Function StripAllPrefix(Label)
-		Dim pos
+		Dim pos, versionNum
+		versionNum = ""
 		If InStr(Label, VersionPrefix) <> 0 Then
-			StripAllPrefix = Right(Label, Len(Label) - Len(VersionPrefix))
-		Else
-			For pos=1 To Len(Label)
-				If IsNumeric(Mid(Label, pos, 1)) Then
-					Exit For
-				End If
-			Next
-			StripAllPrefix = Mid(Label, pos)
+		    versionNum = Right(Label, Len(Label) - Len(VersionPrefix)) 	
+		    If Not ValidLabel(versionNum) Then			    
+			    versionNum = ""		    
+            End If
 		End If
+		StripAllPrefix = versionNum
     End Function 
     
     '***************************************************************************
@@ -412,6 +412,31 @@ Class CProductReport
 		Next
 		StripAllVersionNum = Left(Label, pos-1)
     End Function 
+    
+    Function IsNumber(aString)
+		Dim pos, bRetVal
+		bRetVal = true
+		For pos=1 To Len(aString)
+			If Not IsNumeric(Mid(aString, pos, 1)) Then
+				bRetVal = false
+				Exit For
+			End If
+		Next    
+		IsNumber = bRetVal		
+    End Function
+    
+    Function ValidLabel(aString)
+        Dim pos, char, bRetVal
+        bRetVal = true
+        For pos = 1 To Len(aString)
+            char = Mid(aString, pos, 1)
+            If (Not IsNumeric(char)) And (Not char = ".") Then
+                bRetVal = false
+                Exit For
+            End If            
+        Next
+        ValidLabel = bRetVal
+    End Function
 	
     '***************************************************************************
     ' Function    : GetBuildVersion
@@ -441,7 +466,7 @@ Class CProductReport
     ' Parameters  : Label - Full string value containing productname, version, build number
     ' Description : Returns the development path if found in label otherwise  
     '               empty string. Does comparison to next version found in BuildRegistry.txt
-    '				Label format - PRODUCTNAMEX.XX.XXXXXXX
+    '				Label format -  PRODUCTNAMEX.X.XXXXXX PRODUCTNAMEX.XX.XXXXXXX
     '***************************************************************************	               
     Function GetDevPath(Label)
 		Dim sProductName, sVersion
@@ -453,6 +478,11 @@ Class CProductReport
 
 		'Compare sVersion to the build registry next version		
 		If sVersion <> GetNextVersionNum Then
+			'DevPath format needs to be X.XX 
+			'If Len(Right(sVersion, Len(sVersion) - InStr(sVersion, "."))) = 1 Then
+				'if format X.X add padding
+			'	sVersion = sVersion & "0"
+			'End If		
 			GetDevPath = sProductName & "_" & Replace(sVersion, ".", "_")
 		End If
     End Function
@@ -613,6 +643,7 @@ Class CProductReport
                 Version = GetLastVersionNum
         End If
         'this loop determines puts version numbers and build numbers into VersionNumArray and BuildNumArray
+        Dim pos
         Do While Done = False And Not projFile.AtEndOfStream
             dotPosition = InStr(segment, "%2E")
             Do Until dotPosition = 0
@@ -620,21 +651,23 @@ Class CProductReport
                 dotPosition = InStr(segment, "%2E")
             Loop
             FullLabel = segment
-            BuildNum = StripAllPrefix(segment) ', VersionPrefix)
-            
-            If Mid(BuildNum, 1, 1) = "0" Then           'have to account for leading 0's
-                VersionNum = Mid(BuildNum, 2, InStrRev(BuildNum, ".") - 1)
-            Else
-                VersionNum = Left(BuildNum, InStrRev(BuildNum, ".") - 1)'Mid(BuildNum, 1, 4)
-            End If
-            
-            If VersionNum = Version Then
-                If BuildNum > curVersion Then
-                    curVersion = FullLabel
-                ElseIf BuildNum > prevVersion Then
-                    prevVersion = FullLabel
+            BuildNum = StripAllPrefix(segment)          
+            If Len(BuildNum) > 0 Then
+			    Dim Format
+			    Set Format = New CFormatting
+			    VersionNum = Format.VersionToMajorMinor(BuildNum)
+			    'version always valid
+			    'VersionNum may be invalid....
+                If CDbl(VersionNum) = CDbl(Version) Then
+                    If BuildNum > curVersion Then
+                        curVersion = FullLabel
+                    ElseIf BuildNum > prevVersion Then
+                        prevVersion = FullLabel
+                    End If
                 End If
-            End If
+			    Set Format = Nothing
+			End If
+
             segment = GetNextSegment(endVal, line, projFile)
             If segment = "" Then
                 Done = True
@@ -813,11 +846,11 @@ Function GetEmailSubject()
     If OneStepBldChoice = "B" Then 'build
          lastBldLabel = FindLabel("LB")
          Version = StripAllPrefix(lastBldLabel)
-         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")) & " is out for test"
+         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")-1) & " is out for test"
     ElseIf OneStepBldChoice = "R" Then  'release
          lastReleaseLabel = FindLabel("LR")
          Version = StripAllPrefix(lastReleaseLabel)
-         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")) & " has been released"
+         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")-1) & " has been released"
     End If
 End Function
         

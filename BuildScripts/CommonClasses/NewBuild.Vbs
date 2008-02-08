@@ -135,13 +135,15 @@ Class CNewBuild
         mBuild.FSO.CreateTextFile mBuild.ImageDirPath & "\Common\SolimarLicensing\" & TextFileName
     End Sub	
 
-    Sub IncrementBuildNum(aPattern, aMKS)
+    Sub IncrementBuildNum(aPattern)
     
-           Dim output, readFile, writeFile, BuildScriptPJ
+           Dim output, readFile, writeFile, BuildScriptPJ           
            output = mBuild.mBuildPath & "\temp.txt"
-           mInputFile = mBuild.mBuildPath & "\BuildRegistry.txt"
-           'aMKS.RefreshFile mBuild.mBuildPath & "\buildScript.pj", mInputFile
-	   aMKS.LockFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
+           mInputFile = mBuild.mBuildPath & "\BuildRegistry.txt"        
+           Dim MKS
+           Set MKS = New CMKS
+           Set MKS.Build = mBuild           
+		   MKS.LockFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
            mBuild.RunCmd "attrib -r " & Chr(34) + mInputFile + Chr(34)
            
            Set readFile = mBuild.FSO.OpenTextFile(mInputFile)
@@ -166,8 +168,8 @@ Class CNewBuild
            readFile.Close
            mBuild.FSO.DeleteFile mInputFile, 1
            mBuild.FSO.MoveFile output, mInputFile
-           aMKS.CheckInFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
-
+           MKS.CheckInFiles mBuild.mBuildPath & "\buildScript.pj", mInputFile
+           Set MKS = Nothing           
       End Sub
 
 End Class

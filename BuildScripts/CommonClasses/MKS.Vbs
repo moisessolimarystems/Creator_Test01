@@ -11,11 +11,11 @@ Class CMKS
        mBuild.WriteToDlgAndFile "Checkpointing and labeling project with " & aLabel
         If Not g_DEBUG Then
             'mBuild.NewBuild.CheckPointedMain = True
-            output = mBuild.RunCmd("si checkpoint --label=" & aLabel & " --labelMembers --recurse --quiet --sandbox=" & _
+            output = mBuild.RunCmd("si checkpoint --label=" & aLabel & " --labelMembers --recurse --yes --quiet --sandbox=" & _
                           Chr(34) & mBuild.MainPJFile & Chr(34) & " --description=build_" & aLabel)
-	    If (InStr(output, "Failed") <> 0) Then
-		mBuild.BuildError "CheckPoint failed! Check in project RCS folders for any locked files( filenames starting with VC_ or _)" & output
-	    End If		  
+			If (InStr(output, "Failed") <> 0) Then
+				mBuild.BuildError "CheckPoint failed! Check in project RCS folders for any locked files( filenames starting with VC_ or _)" & output
+			End If		  
             mBuild.NewBuild.LabeledMain = True
         End If
     End Function
@@ -256,7 +256,7 @@ Class CMKS
   
     Sub DropSandbox()  
              If Not g_DEBUG Or Result = vbYes Then
-		mBuild.WriteToDlgAndFile "Dropping new sandbox "
+				mBuild.WriteToDlgAndFile "Dropping new sandbox "
                 mBuild.RunCmd ("si dropsandbox --noconfirm --delete=none --yes " + Chr(34) + mBuild.MainPJFile + Chr(34))		
              End If        
     End Sub
@@ -307,11 +307,21 @@ Class CMKS
 '               aProject must be the parent of the subproject, not a grandparent.
 '				Resyncs after configuring, to retrieve the correct files.
 '================================================================================
-    Function ConfigureSubProject(aProj, aSubProj, aLabel)
+    Function ConfigureSubProject(aProj, aSubProj, aType, aLabel)
 		
 		mBuild.WriteToDlgAndFile "Configuring " + aSubProj + " to build " + aLabel
-		mBuild.RunCmd "si configuresubproject --sandbox=" & aProj & " --subprojectRevision=" & aLabel & _
-					  " --type=build " & aSubProj
+		Select Case aType
+			Case "normal" 
+				mBuild.RunCmd "si configuresubproject --sandbox=" & aProj & _
+							  " --type=" & aType & " " & aSubProj
+			Case "variant"
+				mBuild.RunCmd "si configuresubproject --sandbox=" & aProj & " --variant=" & aLabel & _
+							  " --type=" & aType & " " & aSubProj
+			Case "build"						
+				mBuild.RunCmd "si configuresubproject --sandbox=" & aProj & " --subprojectRevision=" & aLabel & _
+							  " --type=" & aType & " " & aSubProj					  					  
+		End Select			  
+					  
 					 
     End Function
 

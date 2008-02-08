@@ -4,15 +4,24 @@
 <script language="VBScript" src="..\CommonClasses\ReportAccess.vbs" />
 <script language="VBScript" src="..\CommonClasses\MoveFiles.vbs" />
 <script language="VBScript" src="..\CommonClasses\MKS.vbs" />
+<script language="VBScript" src="..\CommonClasses\Formatting.vbs" />
 <script language="VBScript">
 
   Dim g_Report
   Set g_Report = New CProductReport
   g_Report.SetMembers 
-  Dim MKS
+  Dim MKS, MoveFiles
   Set MKS = New CMKS
   Set MKS.Build = g_Report
+  Set MoveFiles = New CMovefiles
+  Set MoveFiles.Build = g_Report    
   g_Report.GetParams MKS
+  
+      'Delete Successful Build indicator file    
+  If g_Report.FSO.FileExists(g_Report.Shell.CurrentDirectory & "\SUCCESS.txt") Then
+  	 MoveFiles.DeleteFileOrFolder "File", g_Report.Shell.CurrentDirectory & "\SUCCESS.txt",  False
+  End If
+      
   Dim g_Access
   Set g_Access = New CReportAccess
   Set g_Access.Build = g_Report
@@ -29,11 +38,14 @@
   g_Report.CopyToNetworkAndSendEmail g_Access
   MKS.Disconnect
   
+  'Create Successful Build indicator file     
+  If g_Report.FSO.FileExists(g_Report.Shell.CurrentDirectory & "\SUCCESS.txt") <> True Then
+		MoveFiles.CreateFileOrFolder "File", g_Report.Shell.CurrentDirectory & "\SUCCESS.txt", True
+  End If   
+      
   Set MKS = Nothing	
   Set g_Access = Nothing
-  Set g_Report = Nothing
-  
-   
+  Set g_Report = Nothing         
         
 '****************************************End of Main Program**************************************************
           

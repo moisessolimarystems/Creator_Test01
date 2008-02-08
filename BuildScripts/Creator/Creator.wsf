@@ -5,6 +5,7 @@
 <script language="VBScript" src="..\..\CommonClasses\Release.vbs" />
 <script language="VBScript" src="..\..\CommonClasses\MKS.vbs" />
 <script language="VBScript" src="..\..\CommonClasses\MoveFiles.vbs" />
+<script language="VBScript" src="..\..\CommonClasses\Formatting.vbs" />
 <script language="VBScript">
 
 '********************************************* MAIN PROGRAM START ********************************************************
@@ -12,21 +13,30 @@
     Const cabProgram = "cabarc"                    'Used to generate Cab files
     Const signCabFile = "c:\inetsdk\bin\SignCode.exe"
 
-    Dim g_Build, g_DEBUG
+    Dim g_Build, g_Format, g_MoveFiles, g_MKS, g_DEBUG
     Dim gbl_exe, gbl_InstallProject
     Set gbl_exe = Wscript.CreateObject("Scripting.Dictionary")
     Set gbl_InstallProject = Wscript.CreateObject("Scripting.Dictionary")
     
     g_DEBUG = False
     Set g_Build = New CProductBuild 'This should be the only CProductBuild instantiated in the script.
+    Set g_Format = New CFormatting
+    Set g_MoveFiles = New CMoveFiles
+    Set g_MKS = New CMKS
+
+	'Set Build Property 
+    Set g_MoveFiles.Build = g_Build 
+    Set g_MKS.Build = g_Build 
+    
     g_Build.SetMembers 60, "Creator"
     g_Build.GetParams 
-    
-     'Compilers
+  
+    'Vistual Studio Directories
     Const mvs6_0Program = "msdev"                  'MicrosoftVisual6.0
     Const mvsNet_Program = "devenv"                'Microsoft Visual Studio .NET
     Dim mvsNet8_Program 
     mvsNet8_Program = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\Microsoft\VisualStudio\8.0\InstallDir") + "devenv"
+    'Borland Builder Directories
     Dim builder6Program
     builder6Program = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\Borland\C++Builder\6.0\App")
     Dim builder6RootDir
@@ -35,11 +45,12 @@
     builder5Program = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\Borland\C++Builder\5.0\App")
     Dim builder5RootDir
     builder5RootDir = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\Borland\C++Builder\5.0\RootDir")
-   
-    'when g_DEBUG is True, network copies go to I:\erin\cd_images instead of L:\cd_images
-    'g_DEBUG also prevents MKS operations from actually running and prevents other changes
-    'from happening that shouldn't occur for a "fake" build.
-    
+    'InstallShield Directories
+    Dim ISDeveloper7Dir, IS2008Dir, IS8StandAlone, IS2008StandAlone, ISMergeModuleDir
+    ISDeveloper7Dir = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\InstallShield\Developer\7.0\Install Location")
+    IS8StandAlone = g_Build.FSO.GetFolder(ISDeveloper7Dir & "..\StandaloneBuild8SP2") & "\IsSABld.exe"
+    IS2008StandAlone = "C:\Program Files\Macrovision\IS 2008 StandaloneBuild\IsSABld.exe" 
+    ISMergeModuleDir = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\InstallShield\Developer\7.0\MMSearchPath")               
     
     Dim Creator_Current, Creator_Next, Creator_NewDevPath, ProductBuildFiles
     If g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\RegisteredOwner") = "Alan Chou" Then
@@ -58,6 +69,11 @@
     End If
     SetCreatorProjPaths
    
+    'Delete Successful Build indicator file    
+    If g_Build.FSO.FileExists(g_Build.Shell.CurrentDirectory & "\SUCCESS.txt") Then
+		g_MoveFiles.DeleteFileOrFolder "File", g_Build.Shell.CurrentDirectory & "\SUCCESS.txt",  False
+    End If
+        
     Select Case g_Build.BuildType
     Case "NB"
         GenerateNewBuild
@@ -68,96 +84,89 @@
     Case "CB"
         CreateBranch
     End Select
+    
+    'Create Successful Build indicator file     
+    If g_Build.FSO.FileExists(g_Build.Shell.CurrentDirectory & "\SUCCESS.txt") <> True Then
+		g_MoveFiles.CreateFileOrFolder "File", g_Build.Shell.CurrentDirectory & "\SUCCESS.txt", True
+    End If   
    
     Set g_Build = Nothing
+    Set g_Format = Nothing
+    Set g_MoveFiles = Nothing
+    Set g_MKS = Nothing
     
 '********************************************** MAIN PROGRAM END *********************************************************
 Sub SetCreatorProjPaths()
-       g_Build.SetProjPathsVars "CreatorCode", "CreatorInstallSource", "CreatorInstallShield", _
-                          "CreatorMain.pj", "F:\code\MKSCODE\CREATOR", _
-                          "Creator.pj", "F:\code\MKSCODE\CREATOR\CreatorMain.pj", "Image", _
-                          "F:\code\MKSCODE\CREATOR\rcs\CreatorMain.pj", "CreatorInstallSource.pj", _
-                          "F:\code\MKSCODE\CREATOR\CreatorInstallSource\CreatorInstallSource.pj"
+       g_Build.SetProjPathsVars "CreatorCode", _
+								"CreatorInstallSource", _
+								"CreatorInstallShield", _
+								"CreatorMain.pj", _
+								"F:\code\MKSCODE\CREATOR", _
+								"Creator.pj", _
+								"F:\code\MKSCODE\CREATOR\CreatorMain.pj", _
+								"Image", _
+								"F:\code\MKSCODE\CREATOR\rcs\CreatorMain.pj", _
+								"CreatorInstallSource.pj", _
+								"F:\code\MKSCODE\CREATOR\CreatorInstallSource\CreatorInstallSource.pj"
 End Sub
   
 Sub GenerateNewBuild()
     g_Build.WriteToDlgAndFile "Doing a new build"
-    Dim MKS
-    Set MKS = New CMKS
-    Set MKS.Build = g_Build    
 
     g_Build.SendEmail "Building " & g_Build.ProductName & " Version " & g_Build.NewBuild.versionNum & " ......", ""
-    MKS.GenerateSandBox "New"	
-    UpdateFileVersions
-    ConfigureSubProjectForLicensing MKS, "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
+    g_MKS.GenerateSandBox "New"	       	
+    ConfigureSubProjectForLicensing "SolimarLicensing" & g_Build.NewBuild.LicenseVersion
+    g_MKS.GenerateSandBox "Resync"
+	UpdateFileVersions     
     BuildMainCode 
-    MoveAndCheckInBuiltFiles MKS
+    MoveAndCheckInBuiltFiles
     g_Build.NewBuild.BuildLabel = g_Build.ProductName + g_Build.NewBuild.versionNum
-    MKS.CkPtAndLabel g_Build.NewBuild.BuildLabel
+    g_MKS.CkPtAndLabel g_Build.NewBuild.BuildLabel
     g_Build.NewBuild.CleanedIS = True
     g_Build.RemoveExcessFiles
     BuildInstallShieldProject g_Build.NewBuild.versionNum
     CreateVersionTextAndExtractingFile "New"
-    Dim MoveFiles
-    Set MoveFiles = New CMoveFiles
-    Set MoveFiles.Build = g_Build
-    MoveFiles.MoveCDImageToNetwork g_Build.ProductName, Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
-    MoveFiles.MoveCDImageFTPToRCPath g_Build.ProductName, g_Build.NewBuild.VersionNum 
-    MKS.RefreshFile g_Build.mBuildPath & "\buildScript.pj", "BuildRegistry.txt"	  'make sure we have the most updated build registry file.
-    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + Left(g_Build.NewBuild.versionNum, Len(g_Build.NewBuild.versionNum) - 7)
-    g_Build.NewBuild.IncrementBuildNum "CreatorBuildNumber", MKS
-    MKS.Disconnect
-    Set MoveFiles = Nothing
-    Set MKS = Nothing
+    g_MoveFiles.MoveCDImageToNetwork g_Build.ProductName,g_Format.VersionToMajorMinor(g_Build.NewBuild.versionNum)
+    g_MoveFiles.MoveCDImageFTPToRCPath g_Build.ProductName, g_Build.NewBuild.VersionNum 
+    g_MKS.RefreshFile g_Build.mBuildPath & "\buildScript.pj", "BuildRegistry.txt"	  'make sure we have the most updated build registry file.
+    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + g_Format.VersionToMajorMinor(g_Build.NewBuild.versionNum)
+    g_Build.NewBuild.IncrementBuildNum "CreatorBuildNumber"
+    RestoreSubProjectForLicensing
 End Sub
 
 Sub GeneratePrevBuild()
-    Dim MKS
-    Set MKS = New CMKS
-    Set MKS.Build = g_Build
-    MKS.GenerateSandBox "Build"
+    g_MKS.GenerateSandBox "Build"
+    g_MKS.GenerateSandBox "Resync"
     g_Build.RemoveInstallSourceFiles
     g_Build.RunCmd "rm -f " & g_Build.MainProjPath & "\Image\*.pj"
     g_Build.RunCmd "rm -f " & g_Build.MainProjPath & "\Image\*.use"
     BuildInstallShieldProject g_Build.StripPrefix(g_Build.PrevLabel, "Creator")
-    Set MKS = Nothing
 End Sub
    
 Sub GenerateRelease()
-    Dim MKS
-    Set MKS = New CMKS
-    Set MKS.Build = g_Build
-    MKS.GenerateSandBox "Build"
+    g_MKS.GenerateSandBox "Build"
+    g_MKS.GenerateSandBox "Resync"
     Dim versionNum
     versionNum = g_Build.StripPrefix(g_Build.PrevLabel, "Creator")
-    Dim MoveFiles
-    Set MoveFiles = New CMoveFiles
-    Set MoveFiles.Build = g_Build
-    MoveFiles.MoveRCPathToNetwork g_Build.ProductName, versionNum
-    'g_Build.Release.AddReleaseToMKS MKS, MoveFiles, versionNum
-    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + Left(versionNum, Len(versionNum) - 7)
-    g_Build.Release.UpdateReleaseFile MKS, "Configuration\CreatorRelease.txt"
-    Set MKS = Nothing
-    Set MoveFiles = Nothing
+    g_MoveFiles.MoveRCPathToNetwork g_Build.ProductName, versionNum
+    'g_Build.Release.AddReleaseToMKS g_MKS, g_MoveFiles, versionNum
+    g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + g_Format.VersionToMajorMinor(versionNum)
+    g_Build.Release.UpdateReleaseFile "Configuration\CreatorRelease.txt"
 End Sub
    
 'Need to make sure Current and Next sandboxes are up to date.
 Sub CreateBranch()
-    Dim MKS
-    Set MKS = New CMKS
-    Set MKS.Build = g_Build
-    MKS.CreateNewDevPath g_Build.MainProjPath, g_Build.MainPJFile
+    g_MKS.CreateNewDevPath g_Build.MainProjPath, g_Build.MainPJFile
     g_Build.UpdateRegVersionVals "CreatorNextVersion", "CreatorCurrentVersion"
-    'g_Build.SendEmail g_Build.GetEmailSubject, g_Build.GetEmailBody
-    UpdateVersionInFiles MKS 'taken out since we dont have the trunk sandbox available
-    Set MKS = Nothing
+    UpdateVersionInFiles 'taken out since we dont have the trunk sandbox available
+    Set g_MKS = Nothing
 End Sub
 
 Sub UpdateFileVersions()
     g_Build.WriteToDlgAndFile "Updating File Version Using: " & CStr(g_Build.NewBuild.versionNum)
     g_Build.RunCmd "attrib -r " + g_Build.MainProjPath & "\CreatorCode\*.* /S"
     g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"
-    g_Build.UpdateFileVersion g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h", "const int BUILD_NUMBER = ",  CInt(Right(g_Build.NewBuild.versionNum, 3)) & ";"
+    g_Build.UpdateFileVersion g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h", "const int BUILD_NUMBER = ", g_Format.VersionToBuildNum(g_Build.NewBuild.versionNum) & ";"
     g_Build.RunCmd "attrib +r " & g_Build.MainProjPath & "\CreatorCode\CreatorAbout.h"              
 End Sub
 
@@ -239,16 +248,14 @@ Sub BuildProjects()
     Next
 End Sub
        
-Sub MoveAndCheckInBuiltFiles(aMKS)
+Sub MoveAndCheckInBuiltFiles()
     'Checkout all the exe out of the CD source.
-    aMKS.LockFiles g_Build.InstallSrcPath + "\CreatorInstallSource.pj", g_Build.InstallSrcPath & "\CreatorProject.exe"
+    g_MKS.LockFiles g_Build.InstallSrcPath + "\CreatorInstallSource.pj", g_Build.InstallSrcPath & "\CreatorProject.exe"
      
     'Move & Checkin all the exe that were built.
     g_Build.RunCmd "attrib -r " & g_Build.InstallSrcPath & "\*.* /S"
     g_Build.WriteToDlgAndFile "Moving All Built exe's"
-    Dim exeInfo, MoveFiles, exe
-    Set MoveFiles = New CMoveFiles
-    Set MoveFiles.Build = g_Build
+    Dim exeInfo, exe
     exeInfo = gbl_exe.Items
      
     Dim result
@@ -261,120 +268,90 @@ Sub MoveAndCheckInBuiltFiles(aMKS)
             If Not IsNull(exeInfo(exe).m_FilesArray) Then
                 Dim arrayIndex
                 For arrayIndex = 0 To UBound(exeInfo(exe).m_FilesArray)
-                    MoveFiles.CopyFileOrFolder "File", g_Build.MainProjPath & exeInfo(exe).m_SourceLocation & exeInfo(exe).m_FilesArray(arrayIndex), g_Build.MainProjPath & exeInfo(exe).m_DestinationLocation, True
+                    g_MoveFiles.CopyFileOrFolder "File", g_Build.MainProjPath & exeInfo(exe).m_SourceLocation & exeInfo(exe).m_FilesArray(arrayIndex), g_Build.MainProjPath & exeInfo(exe).m_DestinationLocation, True
                 Next
             End If
         Next
     End If
-    aMKS.CheckInFiles g_Build.InstallSrcPath + "\CreatorInstallSource.pj", g_Build.InstallSrcPath & "\CreatorProject.exe"
-    Set MoveFiles = Nothing
-    
+    g_MKS.CheckInFiles g_Build.InstallSrcPath + "\CreatorInstallSource.pj", g_Build.InstallSrcPath & "\CreatorProject.exe"   
 End Sub
 
 Sub BuildInstallShieldProject(aVersionNum)
     Dim aFileName, ISProgram
-    Dim CD_IMAGE_CREATOR, CD_IMAGE_SOLIMAR_LICENSING
+    Dim CD_IMAGE_CREATOR
     CD_IMAGE_CREATOR = g_Build.ImageDirPath 
-    CD_IMAGE_SOLIMAR_LICENSING = g_Build.ImageDirPath & "\SolimarLicensing"
     Dim result
     If g_DEBUG Then
         result = MsgBox("Would you like to build the installshield?", vbYesNo, "Build InstallShield")
     End If
 
     If Not g_DEBUG Or result = vbYes Then
-        SetAllCreatorInstallObjects CD_IMAGE_CREATOR
-        CreateInstallShieldDirs CD_IMAGE_SOLIMAR_LICENSING
-        
+		CreateInstallShieldDirs
+        SetAllCreatorInstallObjects  CD_IMAGE_CREATOR
         g_Build.WriteToDlgAndFile "Building the InstallShield project"
-        Dim installShieldProgram, installShieldCompiler, installShieldBuild
-        Dim installObj, installKey, MoveFiles, installItem
+        Dim installShieldProject, installObj, installKey, installItem
 
-        installShieldProgram = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\InstallShield\InstallShield Professional\6.0\Main\PATH")
-        installShieldCompiler = installShieldProgram & "system\Compile"
-        installShieldBuild = installShieldProgram & "\program\ISbuild"
         installObj = gbl_InstallProject.Items
         installKey = gbl_InstallProject.Keys
-
-        Set MoveFiles = New CMoveFiles
-        Set MoveFiles.Build = g_Build
-                     
-        g_Build.WriteToDlgAndFile "Updating IP File Version"
-		Dim fileInput
-        fileInput = g_Build.InstallShieldProjPath & "\Media\Creator\default.mda"
-        g_Build.UpdateIniFile fileInput, "TagFileInfo", "VERSION=", g_Build.NewBuild.versionNum
-        fileInput = g_Build.InstallShieldProjPath & "\Creator.ipr"
-        g_Build.UpdateIniFile fileInput, "[General]", "Version=", g_Build.NewBuild.versionNum
-        fileInput = g_Build.InstallShieldProjPath & "\Creator.ipr"
-        g_Build.UpdateIniFile fileInput, "Product", "Version=", g_Build.NewBuild.versionNum
-        fileInput = g_Build.InstallShieldProjPath & "\String Tables\0009-English\value.shl"
-        g_Build.UpdateIniFile fileInput, "Data", "PRODUCT_VERSION=", g_Build.NewBuild.versionNum
-
-        For installItem = 0 To gbl_InstallProject.Count - 1 'Cycle through the list of InstallShield packages to compile & build.
+  
+        'Dim ISProject                
+        For installItem = 0 To gbl_InstallProject.Count - 1 'Cycle through the list of InstallShield packages to compile & build.                       
             'No need to compile (generates an obl), just build for all developer 7 projects
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem)
             g_Build.WriteToDlgAndFile "installItem: " & installItem
             g_Build.WriteToDlgAndFile "installKey(" & installItem & "): " & installKey(installItem)
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Updating Version Number"
             g_Build.WriteToDlgAndFile "versionNumber: " & aVersionNum
-            'g_Build.UpdateInstallShieldVersion ISProject, g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, aVersionNum
-            'g_Build.RunCmd Chr(34) & g_Build.InstallShieldProjPath & "\ProjectDir.bat" & Chr(34)
-           
-	    g_Build.WriteToDlgAndFile "Compiling InstallShield Project"
-            g_Build.RunCmd Chr(34) & "C:\Program Files\Common Files\InstallShield\IScript\Compile" & Chr(34) & " " & _
-                       Chr(34) & g_Build.InstallShieldProjPath & "\Script~1\setup.rul" & Chr(34) & " " & _
-                       Chr(34) & InstallShieldProgram & "\Script\IFX\Lib\ifx.obl" & Chr(34) & " " & _
-                       Chr(34) & InstallShieldProgram & "\Script\ISRT\Lib\isrt.obl" & Chr(34) & _
-                       " -I" & Chr(34) & InstallShieldProgram & "\Script\IFX\Include;" & _
-                       InstallShieldProgram & "\Script\ISRT\Include;" & g_Build.InstallShieldProjPath & "\Script Files" & Chr(34) & " "
-
+			g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile
+		    
+			'Update ProductVersion & LicenseVersion properties			
+			g_Build.UpdateInstallShieldProperty  g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, "ProductVersion", aVersionNum			 
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Generate CD Image"
-            g_Build.RunCmd Chr(34) & installShieldBuild & Chr(34) & _
-                            " -p" & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
-                            " -m" & Chr(34) & installObj(installItem).m_ReleaseMedia & Chr(34)
-            aFileName = installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile        
-
+            g_Build.RunCmd Chr(34) & installObj(installItem).m_IpmType & Chr(34) & _
+                            " -p " & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
+							" -o " & Chr(34) & ISMergeModuleDir & Chr(34) & _
+							" -r " & Chr(34) & installObj(installItem).m_ReleaseMedia & Chr(34) & _
+							" -a " & Chr(34) & installObj(installItem).m_ProductConfiguration & Chr(34)
+            aFileName = installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile
+         
             'Copy files to cd_image if there are files to copy
-            'If installObj(installItem).m_PostProcessDestFile <> "" Then
-                MoveFiles.CopyFileOrFolder "File", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
-                                           installObj(installItem).m_PostProcessDestLoc, True ' & installObj(installItem).m_PostProcessDestFile, True
-            'End If
+            If installObj(installItem).m_PostProcessSrcFile <> "" Then
+                g_MoveFiles.CopyFileOrFolder "File", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
+                                           installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile, True
+				g_MoveFiles.CopyFileOrFolder "Folder", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
+                                           installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile , True
+            End If
             g_Build.WriteToDlgAndFile ""
-        Next  
-        
-        Set MoveFiles = Nothing
-    End If
+        Next
+    End If   
 End Sub
     
-Sub CreateInstallShieldDirs(CD_IMAGE_SOLIMAR_LICENSING)
+Sub CreateInstallShieldDirs()
    'Prepare CD_Image, Do everytime a new CD image is needed
     g_Build.RunCmd "attrib -r " & g_Build.InstallShieldProjPath & "\*.* /S "
     g_Build.WriteToDlgAndFile "Creating missing InstallShield directories"
-    'g_Build.CreateNewFolder (CD_IMAGE_SOLIMAR_LICENSING)
 
     'Move Over static files to the cd image.
-    Dim MoveFiles
-    Set MoveFiles = New CMoveFiles
-    Set MoveFiles.Build = g_Build
-	
-    MoveFiles.DeleteFileOrFolder "File", g_Build.ImageDirPath & "\Common\SolimarLicensing\SolimarLicenseServer.msi", True
-    Set MoveFiles = Nothing
+    If g_Build.FSO.FileExists(g_Build.ImageDirPath & "\Common\SolimarLicensing\SolimarLicenseServer.msi") Then	
+		g_MoveFiles.DeleteFileOrFolder "File", g_Build.ImageDirPath & "\Common\SolimarLicensing\SolimarLicenseServer.msi", True
+	End If
 End Sub
 
 ' Name          : UpdateVersionFiles
 ' Description   : updates the version number in certain files during a release build
-' Parameters    : aMKS - handle to access common MKS functions such as locking and checking in
+' Parameters    : aMKS - handle to access common g_MKS functions such as locking and checking in
 ' Files Updated : vem.lic.temp.demo.txt
 '                 SSMBuild.h
 '
-Sub UpdateVersionInFiles(aMKS)
+Sub UpdateVersionInFiles()
     Dim FileToUpdate, pattern, programVersion, versionNum
-    versionNum = Right(g_Build.NewNextVersion, 4)       'strips prefix
+    versionNum = Right(g_Build.NewNextVersion, Len(g_Build.NewNextVersion)-Len("Creator"))       'strips prefix
     FileToUpdate = Creator_Next + "\CreatorCode\CustomerForm.cpp"
     pattern = "const int CREATOR_VERSION = "
-    programVersion = "0x" + Left(versionNum, 1) + Right(versionNum, 2)
+    programVersion = "0x" + Left(versionNum, InStr(".")-1) + Right(versionNum, Len(versionNum)-InStr("."))
     g_Build.UpdateFileVersion FileToUpdate, pattern, programVersion & ";"
-    aMKS.LockFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
-    aMKS.CheckInFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
+    g_MKS.LockFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
+    g_MKS.CheckInFiles Creator_Next + "\CreatorCode\Creator.pj", FileToUpdate
 End Sub
           
 'read the values in from a file.  The information in the file must be in the exact format that
@@ -440,26 +417,55 @@ End Sub
 
 '==================================================================================
 ' Function    : ConfigureSubProjectForLicensing
-' Parameters  : aMKS - handle to access MKS functions
+' Parameters  : aMKS - handle to access g_MKS functions
 '               aLicenseVersion - version to configure subproject 
-' Description : uses MKS function ConfigureSubProject to set a subproject to the
+' Description : uses g_MKS function ConfigureSubProject to set a subproject to the
 '               version given. Files are refreshed to update any changes from the
 '               configuration. This is done for the Solimar Licensing Code and 
 '               MSIPackages.
 '==================================================================================
-Sub ConfigureSubProjectForLicensing(aMKS, aLicenseVersion)
-	Dim ExclusionList 
-	ExclusionList = Array(".pj")	
+Sub ConfigureSubProjectForLicensing(aLicenseVersion)
 	g_Build.WriteToDlgAndFile "configuring Licensing Subprojects"
-	aMKS.ConfigureSubProject g_Build.MainCodePJFile  , _
-				 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", aLicenseVersion
-	g_Build.CleanFolders g_Build.MainCodePath & "\SolimarLicensing", ExclusionList
-	aMKS.Refresh g_Build.MainCodePJFile , g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj"
-	aMKS.ConfigureSubProject g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
-				 g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj", aLicenseVersion
-	g_Build.CleanFolders g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing", ExclusionList	
-    aMKS.Refresh g_Build.MainCodePath & "\..\Image\Common\Common.pj", _
-	  	         g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj" 
+	g_MKS.ConfigureSubProject g_Build.MainCodePJFile  , _
+							 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", _
+							 "build", _
+							 aLicenseVersion
+	g_MKS.ConfigureSubProject g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensing.pj", _
+							 g_Build.MainCodePath & "\..\Image\Common\SolimarLicensing\SolimarLicensingMSIPackages.pj", _
+							 "build", _
+							 aLicenseVersion 
+End Sub
+
+'==================================================================================
+' Function    : RestoreSubProjectForLicensing
+' Parameters  : aMKS - handle to access g_MKS functions
+'               
+' Description : uses g_MKS function ConfigureSubProject to set a subproject to the
+'               version given. Files are refreshed to update any changes from the
+'               configuration. This only needs to be done for the Solimar Licensing Code.
+'               
+'==================================================================================
+Sub RestoreSubProjectForLicensing()
+	
+	Dim aDevPathNum, aNextDevPathNum, aFullDevPath, aType
+	aDevPathNum = Replace(g_Format.VersionToMajorMinor(g_Build.NewBuild.LicenseVersion),".","_",1,-1)
+	aNextDevPathNum = g_Build.GetBuildVersion("SolimarLicensingNextVersion")
+	'Determine whether to revert back to a normal or variant subproject
+	If (aDevPathNum = aNextDevPathNum) Then
+		'set license subproject to trunk
+		aType = "normal"
+		'no need to set devpath for trunk
+		aDevPathNum = Nothing
+	Else
+		'set license subproject to specified variant devpath
+		aType = "variant"
+		'aDevPathNum already set
+	End If
+	g_Build.WriteToDlgAndFile "configuring Licensing Subprojects"
+	g_MKS.ConfigureSubProject g_Build.MainCodePJFile  , _
+							 g_Build.MainCodePath & "\SolimarLicensing\SolimarLicensingCode.pj", _
+							 aType, _
+							 aDevPathNum
 End Sub
 
 Sub CreateVersionTextAndExtractingFile(aType)
@@ -599,24 +605,26 @@ End Function
         UpdatedFile = ProductBuildFiles & "\CreatorInstallObjectValuesRevised.txt"
         
         Dim ValsInFile, ReplaceVals
-        ValsInFile = Array("InstallShieldProjPath", "CD_IMAGE_CREATOR")
-        ReplaceVals = Array(g_Build.InstallShieldProjPath, CD_IMAGE_CREATOR)
+        ValsInFile = Array("InstallShieldProjPath", "CD_IMAGE_CREATOR","ImageDirPath", "IS8StandAlone", "IS2008StandAlone")
+        ReplaceVals = Array(g_Build.InstallShieldProjPath, CD_IMAGE_CREATOR, g_build.ImageDirPath, IS8StandAlone, IS2008StandAlone)
         ReplaceRuntimeVarsInFile OrigFile, UpdatedFile, ValsInFile, ReplaceVals
     
         Set readfile = g_Build.fso.OpenTextFile(UpdatedFile)
         Dim TempObject, Name
         Do While Not readfile.AtEndOfStream
             Set TempObject = New CreatorInstallObject
-            TempObject.m_IpmLocation = GetNextLine(readfile)
-            TempObject.m_IpmFile = GetNextLine(readfile)
-            TempObject.m_ReleaseMedia = GetNextLine(readfile)
-            TempObject.m_CompileLoc = GetNextLine(readfile)
-            TempObject.m_CompileFile = GetNextLine(readfile)
-            TempObject.m_PostProcessSrcLoc = GetNextLine(readfile)
-            TempObject.m_PostProcessSrcFile = GetNextLine(readfile)
-            TempObject.m_PostProcessDestLoc = GetNextLine(readfile)
-            TempObject.m_PostProcessDestFile = GetNextLine(readfile)
-            Name = GetNextLine(readfile)
+			TempObject.m_IpmType = GetNextLine(readfile)
+			TempObject.m_IpmLocation = GetNextLine(readfile)
+			TempObject.m_IpmFile = GetNextLine(readfile)
+			TempObject.m_CompileLoc = GetNextLine(readfile)
+			TempObject.m_CompileFile = GetNextLine(readfile)
+			TempObject.m_ReleaseMedia = GetNextLine(readfile)
+			TempObject.m_ProductConfiguration = GetNextLine(readfile)        
+			TempObject.m_PostProcessSrcLoc = GetNextLine(readfile)
+			TempObject.m_PostProcessSrcFile = GetNextLine(readfile)
+			TempObject.m_PostProcessDestLoc = GetNextLine(readfile)
+			TempObject.m_PostProcessDestFile = GetNextLine(readfile)
+			Name = GetNextLine(readfile)
             gbl_InstallProject.Add Name, TempObject
             If Not readfile.AtEndOfStream Then
                 GetNextLine (readfile) 'a newline separates the entries
@@ -652,15 +660,17 @@ End Sub
 
 
     Class CreatorInstallObject
-        Public m_IpmLocation
-        Public m_IpmFile
-        Public m_CompileLoc
-        Public m_CompileFile
-        Public m_ReleaseMedia
-        Public m_PostProcessSrcLoc
-        Public m_PostProcessSrcFile
-        Public m_PostProcessDestLoc
-        Public m_PostProcessDestFile
+		Public m_IpmType
+		Public m_IpmLocation
+		Public m_IpmFile
+		Public m_CompileLoc
+		Public m_CompileFile
+		Public m_ReleaseMedia
+		Public m_ProductConfiguration
+		Public m_PostProcessSrcLoc
+		Public m_PostProcessSrcFile
+		Public m_PostProcessDestLoc
+		Public m_PostProcessDestFile
     End Class
 </script>
 </job>

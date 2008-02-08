@@ -1,19 +1,24 @@
 
 Class CRelease
-    Public mBuild, mReleaseCandidatePath
+    Public mBuild, mFormat, mReleaseCandidatePath
  
     Public Sub Class_Initialize() 'set default values
+        Set mFormat = New CFormatting
         If g_DEBUG Then
-                    mReleaseCandidatePath = "I:\Alan\release_candidates\"
+			mReleaseCandidatePath = "I:\Alan\release_candidates\"
         Else
-                    mReleaseCandidatePath = "Z:\Release_Candidates\"
+			mReleaseCandidatePath = "Z:\Release_Candidates\"
         End If
     End Sub
-
+    
+    Private Sub Class_Terminate()  'this gets called when the CProductBuild object gets deleted
+		Set mFormat = Nothing
+    End Sub    
    
     Public Property Set Build(ByRef aBuild)
         Set mBuild = aBuild
     End Property
+    
 
     'Checks to make sure all the necessary release params were passed in
     Public Function CheckParams()
@@ -49,17 +54,17 @@ Class CRelease
         Set Folder1 = mBuild.FSO.GetFolder(ReleaseFilePath)
         Set SubFolders1 = Folder1.SubFolders
         For Each f1 In SubFolders1
-                If InStr(f1.Name, aVersionNum) = 0 And InStr(f1.Name, Left(aVersionNum, 4)) > 0 Then
-                    aMoveFiles.DeleteFileOrFolder "Folder", f1, True
+                If InStr(f1.Name, aVersionNum) = 0 And InStr(f1.Name, mFormat.VersionToMajorMinor(aVersionNum)) > 0 Then
+                    aMoveFiles.DeleteFileOrFolder "Folder",  Chr(34) & f1 & Chr(34), True
                 End If
         Next
         Set Files1 = Folder1.Files
         For Each f1 In Files1
             If InStr(f1.Name, versionNum) > 0 Then   'possible to have multiple ftp exe
-               aMKS.AddFiles ReleaseFilePath & mBuild.ProductName & ".pj", f1
+				aMKS.AddFiles ReleaseFilePath & mBuild.ProductName & ".pj", Chr(34) & f1 & Chr(34)
             Else
-                If InStr(f1.Name, ".pj") = 0 And InStr(f1.Name, Left(versionNum, 4)) > 0 Then
-                        aMoveFiles.DeleteFileOrFolder "File", f1, True
+                If InStr(f1.Name, ".pj") = 0 And InStr(f1.Name, mFormat.VersionToMajorMinor(versionNum)) > 0 Then
+                        aMoveFiles.DeleteFileOrFolder "File",  Chr(34) & f1 & Chr(34) , True
                 End If
             End If
         Next
@@ -97,7 +102,7 @@ Class CRelease
                 Set MoveFiles.Build = mBuild
 
                 OutputPath = MoveFiles.NetworkBasePath + "CurrentVersion\release\FTP\"
-        MoveFiles.CopyFileOrFolder "File", mBuild.MainProjPath + "\FTP\" + aFileName, OutputPath, True
+				MoveFiles.CopyFileOrFolder "File", mBuild.MainProjPath + "\FTP\" + aFileName, OutputPath, True
                 Set MoveFiles = Nothing
     End Sub
         

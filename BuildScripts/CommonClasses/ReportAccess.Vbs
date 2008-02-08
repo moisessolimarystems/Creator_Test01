@@ -1,6 +1,6 @@
 Class CReportAccess
  
-    Public mBuild, mConnection, mCmdTemp
+    Public mBuild, mFormat, mConnection, mCmdTemp
     Public mLargestArchSoFar, mArchOffset
 
 '=======================================================================
@@ -15,6 +15,7 @@ Class CReportAccess
         mArchOffset = ""
         Set mConnection = wscript.CreateObject("ADODB.Connection")
         CurRevNum = ""
+        Set mFormat = New CFormatting
     End Sub
 
 '=======================================================================
@@ -25,8 +26,9 @@ Class CReportAccess
 '
 '=======================================================================
     Private Sub Class_Terminate()
-	mConnection.Close
-	mBuild.FSO.DeleteFile "E:\accessDB\" & mBuild.ProductChoice & "db1.mdb", True
+		mConnection.Close
+		mBuild.FSO.DeleteFile "E:\accessDB\" & mBuild.ProductChoice & "db1.mdb", True
+		Set mFormat = Nothing
     End Sub
 
 '=======================================================================
@@ -40,7 +42,7 @@ Class CReportAccess
         Dim DBString
         Set mBuild = aBuild 
 
-	DBString = mBuild.ProductChoice & "db1.mdb"   
+		DBString = mBuild.ProductChoice & "db1.mdb"   
         mBuild.FSO.CopyFile "E:\accessDB\db1.mdb", "E:\accessDB\" & DBString, True           
        'Set database path depending which machine it's on
         If mBuild.Shell.RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\RegisteredOwner") = "Alan Chou" Then
@@ -52,7 +54,7 @@ Class CReportAccess
         Set mCmdTemp = wscript.CreateObject("ADODB.Command")
         mCmdTemp.ActiveConnection = mConnection
                
-    End Property
+    End Property       
 
 	'Changes 000023 ==> 23
     Function StripLeadingZeros(aNumber)
@@ -71,19 +73,18 @@ Class CReportAccess
 
     'used to limit the number of entries into the database. Restricted to startlabel and above.
     Function CheckLabelBounds(aLabel)
-	Dim versionNum, bCheck, startLabel
-	bCheck = False
-	If(InStr(aLabel, mBuild.VersionPrefix) <> 0) Then
-		versionNum = StripLeadingZeros(Replace(Right(aLabel, 6), """", ""))
-		If(IsNumeric(versionNum) <> False) Then
-			startLabel = StripLeadingZeros(Right(mBuild.StartLabel, 6))
-			If(CInt(versionNum) >= CInt(startLabel)) Then
-				bCheck = True
+		Dim versionNum, bRetVal, startLabel	
+		bRetVal = false
+		If(InStr(aLabel, mBuild.VersionPrefix) <> 0) Then
+			versionNum = Replace(mFormat.VersionToBuildNum(aLabel), """", "", 1, -1)
+			startLabel = StripLeadingZeros(mFormat.VersionToBuildNum(mBuild.StartLabel))
+			If mBuild.IsNumber(versionNum) Then
+			    If(CInt(versionNum) >= CInt(startLabel)) Then
+				    bRetVal = True
+			    End If			
 			End If
-		End If
-	End If	
-	CheckLabelBounds = bCheck
-	
+		End If	
+		CheckLabelBounds = bRetVal
     End Function
    
     

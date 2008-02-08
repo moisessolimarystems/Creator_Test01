@@ -4,22 +4,23 @@ Class CProductBuild
     Private mBuildType, mPrevLabel, mProjPaths, mLeftOverSecs, mRelease, mBuildDialog, mExecInfo, mVersionNum
     Private mLockedPJFile, mLockedFile  'had to put these here instead of in MKS class b/c there should be only 1 instance of these
     Private mLogFileName, mInputFile, mSendNotification
-    Public mNewBuild, mErrCount, mBuildPath, mEngBuild
+    Public mNewBuild, mErrCount, mBuildPath, mEngBuild, mFormat
 
     Public Sub Class_Initialize() 'set default values
         Set mShell = wscript.CreateObject("Wscript.Shell")
         Set mFSO = wscript.CreateObject("Scripting.FileSystemObject")
         Set mBuildDialog = wscript.CreateObject("BuildDialog.BuildDialogB6", "BuildDiag_")
         Set mProjPaths = New CProjectPaths
+        Set mFormat = New CFormatting
         mDebug = "N"
         mEngBuild = "N"
         mNewBuild = Null
         mRelease = Null
         mStartTime = Time
- 	mErrcount = 0
+ 		mErrcount = 0
         
-	Err.Clear
-	If mFSO.FileExists("..\Done.txt") = True Then
+		Err.Clear
+		If mFSO.FileExists("..\Done.txt") = True Then
             mFSO.DeleteFile "..\Done.txt", 1
         End If
         If mFSO.FileExists("..\Cancelled.txt") = True Then
@@ -27,7 +28,7 @@ Class CProductBuild
         End If
         mLeftOverTime = 0
 
-	mBuildPath = mFSO.GetFolder(mShell.CurrentDirectory & "\\")
+		mBuildPath = mFSO.GetFolder(mShell.CurrentDirectory & "\\")
         mInputFile = "BuildRegistry.txt"
         
         If mFSO.FileExists("..\logFolder\StandardOutput.txt") Then
@@ -42,15 +43,13 @@ Class CProductBuild
         If Err.Number <> 0 Then
                	BuildError "Unable to create standard output/error files : " + Err.Description
         End If 
-
     End Sub
-
 
     Public Sub SetMembers(aAveBuildTime, aProductName)
         mProductName = aProductName
         mBuildDialog.DisplayCancelDialog "Time Started: " & Time, CInt(aAveBuildTime), CStr(mProductName)
         Err.Clear
-	If Not mFSO.FolderExists(mBuildPath + "\logFolder") Then
+		If Not mFSO.FolderExists(mBuildPath + "\logFolder") Then
             mFSO.CreateFolder mBuildPath + "\logFolder"
         End If
         Dim CurDate, CurTime
@@ -96,27 +95,27 @@ Class CProductBuild
                     Case "-PL"
 				        mPrevLabel = wscript.Arguments(iParam + 1)
                     Case "-NNV"
-					mNewNextVersion = wscript.Arguments(iParam + 1)
+						mNewNextVersion = wscript.Arguments(iParam + 1)
                     Case "-NDP"
-					mNewDevPath = wscript.Arguments(iParam + 1)
+						mNewDevPath = wscript.Arguments(iParam + 1)
                     Case "-CBT"
-					CodeBuildType = wscript.Arguments(iParam + 1)
+						CodeBuildType = wscript.Arguments(iParam + 1)
                     Case "-EDP"
 				        ExistingDevPath = wscript.Arguments(iParam + 1)
                     Case "-VN"
-					mVersionNum = wscript.Arguments(iParam + 1)
+						mVersionNum = wscript.Arguments(iParam + 1)
                     Case "-SE"
-					mIgnoreMsgBox = wscript.Arguments(iParam + 1)
+						mIgnoreMsgBox = wscript.Arguments(iParam + 1)
                     Case "-DB"
 				        mDebug = wscript.Arguments(iParam + 1)
                     Case "-LB"
-					mLastBuild = wscript.Arguments(iParam + 1)
-		    Case "-LIC"
-					licenseVersion = wscript.Arguments(iParam + 1)	
-		    Case "-EB"	
-					mEngBuild = wscript.Arguments(iParam + 1)
-		    Case "-SN" 		
-					mSendNotification = wscript.Arguments(iParam + 1)
+						mLastBuild = wscript.Arguments(iParam + 1)
+					Case "-LIC"
+						licenseVersion = wscript.Arguments(iParam + 1)	
+					Case "-EB"	
+						mEngBuild = wscript.Arguments(iParam + 1)
+					Case "-SN" 		
+						mSendNotification = wscript.Arguments(iParam + 1)
                End Select
             Next
 
@@ -131,6 +130,7 @@ Class CProductBuild
         ElseIf mBuildType = "R" Then  'doing a release
             Set mRelease = New CRelease
             Set mRelease.Build = Me             'Me is vbscript's this equivalent
+            Set mRelease.Format = mFormat            
         End If
 
         CheckParams     'check to make sure all passed params were valid
@@ -230,7 +230,7 @@ Class CProductBuild
     End Property
 	
     Public Property Get SendNotification()
-	SendNotification = mSendNotification
+		SendNotification = mSendNotification
     End Property
 
     Public Property Get PrevLabel()
@@ -531,7 +531,6 @@ Class CProductBuild
 				If Err.Number <> 0 Then
                     BuildError "Unable to update file version for: " + fileInput + " : " + Err.Description
                 End If
-
         End Function
 
      '%%%iconvert doesn't use.  get rid of if other projects don't use either.
@@ -596,7 +595,7 @@ Class CProductBuild
                 readFile.Close
                 mFSO.DeleteFile inputFile, 1
                 mFSO.MoveFile output, inputFile
-		If Err.Number <> 0 Then
+				If Err.Number <> 0 Then
                     BuildError "Unable to update file for: " + inputFile + " with " + newPattern + " : " + Err.Description
                 End If                
 
@@ -1002,7 +1001,7 @@ Class CProductBuild
         writeFile.writeLine "ApplicationName=" + aProjName
         writeFile.writeLine "Description="
         writeFile.writeLine "Comments="
-        writeFile.writeLine "Notice=2004 Copyright Solimar Systems, Inc."
+        writeFile.writeLine "Notice=2008 Copyright Solimar Systems, Inc."
         writeFile.writeLine "Version=" + aVersionNum
         writeFile.writeLine "OutputSpec=" + CStr(mProjPaths.mMainProjPath + "\FTP\" + aExeName)
         writeFile.writeLine "GUIDs=0"
@@ -1059,12 +1058,12 @@ Class CProductBuild
         WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + Right(mNewNextVersion, 4)
         RunCmd "attrib -r " + mInputFile
 
-	Dim MKS
-	Set MKS = New CMKS
-	Set MKS.Build = Me
-	If Not g_DEBUG Then
-	    MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
-  	    MKS.LockFiles mBuildPath & "\buildScript.pj", mInputFile
+		Dim MKS
+		Set MKS = New CMKS
+		Set MKS.Build = Me
+		If Not g_DEBUG Then
+			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+  			MKS.LockFiles mBuildPath & "\buildScript.pj", mInputFile
             UpdateFileVersion mInputFile, aCurrentVersion, " " + current
             UpdateFileVersion mInputFile, aNextVersion, " " + Right(mNewNextVersion, 4)
             MKS.CheckInFiles mBuildPath & "\buildScript.pj", mInputFile
@@ -1076,25 +1075,25 @@ Class CProductBuild
 	        Dim MKS
 	        Set MKS = New CMKS
 	        Set MKS.Build = Me
-		MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
-		Err.Clear
-                Set readFile = mFSO.OpenTextFile(mInputFile)
-                Dim check, Line, pos
-                check = 0
-                Do While Not readFile.AtEndOfStream And check = 0
-                        Line = readFile.ReadLine
-                        If InStr(Line, aPattern) <> 0 And check = 0 Then
+			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
+			Err.Clear
+            Set readFile = mFSO.OpenTextFile(mInputFile)
+            Dim check, Line, pos
+            check = 0
+            Do While Not readFile.AtEndOfStream And check = 0
+				Line = readFile.ReadLine
+                If InStr(Line, aPattern) <> 0 And check = 0 Then
                                 'If InStr(Version, Right(Line, Len(Line) - Len(aPattern))) = 0 Then
                                 '        UpdateFileVersion = 1
                                 'End If
-                                check = 1
-                                pos = InStr(Line, " ")
-                                GetBuildVersion = Right(Line, Len(Line) - pos)
-                        End If 
-                Loop
-                readFile.Close
-		Set MKS = Nothing
-	   	If Err.Number <> 0 Then
+					check = 1
+					pos = InStr(Line, " ")
+                    GetBuildVersion = Right(Line, Len(Line) - pos)
+                End If 
+            Loop
+            readFile.Close
+			Set MKS = Nothing
+	   		If Err.Number <> 0 Then
                 	BuildError "Unable to get build version for : " + aPattern + " : " + Err.Description
           	End If 
     End Function
@@ -1113,7 +1112,7 @@ Class CProductBuild
                 End If
         Loop
         readFile.Close
-  	If Err.Number <> 0 Then
+  		If Err.Number <> 0 Then
                	BuildError "Unable to get version from file : " + aFile + " : " + Err.Description
        	End If 
     End Function
@@ -1161,27 +1160,27 @@ Class CProductBuild
 	End Function
 	
     Function SendEmail(aSubject,aMsg)
-	If SendNotification <> "N" Then    	
+		If SendNotification = "Y" Then    	
             WriteToDlgAndFile "Sending the email"
             Dim oSMTP
             Set oSMTP = wscript.CreateObject("SoftArtisans.SMTPMail") 'SMTPControl.SMTP")
     
             Error = False
             Err.Clear    
-             With oSMTP
+            With oSMTP
              .RemoteHost = "mail.corp.solimarsystems.com"
              .MailFromAddress = "alan.chou@solimarsystems.com"
              .FromName = "alan.chou@solimarsystems.com"
-	     If mBuildType <> "CB" Then
+			If mBuildType <> "CB" Then
              	.AddRecipient "Tech.Support.Internal@SolimarSystems.com" 
-	     End If
-  	     .AddRecipient "Engineering@SolimarSystems.com"
-	     .AddCC "alan.chou@solimarsystems.com" 
-	     .Charset = 1
-             .Subject = aSubject
-             .BodyText = aMsg
-             .SendMail
-             End With
+			End If
+  			.AddRecipient "Engineering@SolimarSystems.com"
+			.AddCC "alan.chou@solimarsystems.com" 
+			.Charset = 1
+            .Subject = aSubject
+            .BodyText = aMsg
+            .SendMail
+            End With
             
             If Err.Number <> 0 Then 'There was an error sending out the email
                 Error = True
@@ -1268,26 +1267,28 @@ Class CProductBuild
         endTime = Time
         WriteToDlgAndFile "Time Ended: " & endTime
         WriteToDlgAndFile "Time for Script to Run: " & getHrMinSec(mStartTime, endTime)
-	Dim MoveFiles
-	Set MoveFiles = New CMoveFiles
-	Set MoveFiles.Build = Me
-	DestPath = mBuildPath & "\\logFolder\\" & mProductName
-	If mFSO.FolderExists(DestPath) <> True Then
-		MoveFiles.CreateFileOrFolder "Folder", DestPath, True
-	End If
-	Dim logFileName
-	Select Case mBuildType 
-               Case "NB"	'New Build 	
-			logFileName = "\\BuildLog - " & mVersionNum& ".txt"
-	       Case "R"		'Release
-			logFileName = "\\ReleaseLog - " & mPrevLabel & ".txt"
-	       Case "CB"	'Branch
-			logFileName = "\\BranchLog - " & mPrevLabel & ".txt"
-	End Select	
-	MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & logfileName, True 
+		Dim MoveFiles
+		Set MoveFiles = New CMoveFiles
+		Set MoveFiles.Build = Me
+		DestPath = mBuildPath & "\\logFolder\\" & mProductName
+		If mFSO.FolderExists(DestPath) <> True Then
+			MoveFiles.CreateFileOrFolder "Folder", DestPath, True
+		End If
+		Dim logFileName
+		Select Case mBuildType 
+            Case "NB"	'New Build 	
+				logFileName = "\\BuildLog - " & mVersionNum& ".txt"
+			Case "R"		'Release
+				logFileName = "\\ReleaseLog - " & mPrevLabel & ".txt"
+	        Case "CB"	'Branch
+				logFileName = "\\BranchLog - " & mPrevLabel & ".txt"
+		End Select	
+		MoveFiles.CopyFileOrFolder "File", mLogFileName , DestPath & logfileName, True 
         mBuildDialog.ScriptDone False
         wscript.DisconnectObject mBuildDialog
         Set mBuildDialog = Nothing
+        Set mFormat = Nothing
+        Set mProjPaths = Nothing
         Dim writeFile
         Set writeFile = mFSO.CreateTextFile("Done.txt")
         writeFile.Close
