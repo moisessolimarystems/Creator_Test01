@@ -92,23 +92,24 @@ int _tmain()
 	
 	unsigned int ProductID = 12;	//Rubika
 	//ProductID = 8;	//SOLsearcher
-	ProductID = 14;	//SPDE
+	//ProductID = 14;	//SPDE
+	//ProductID = 10;	//SDX Designer
 	unsigned int CustomerNumber = 256;
 	//unsigned int KeyNumber = 0x41E;//Alan's Test Key
 	unsigned int KeyNumber = 0x554;//Test Key
 	System::String* inputValue;
 	char tmpbuf[256];
 	//std::wstring licenseServer(L"crosner3");
-	std::wstring licenseServer(L"jlan5");
+	std::wstring licenseServer(L"localhost");
 	//std::wstring licenseServer(L"192.168.10.130");
 	//std::wstring licenseServer(L"bjackson5");
 	//std::wstring backUpLicenseServer(L"jlan3");//jlan3
 	std::wstring backUpLicenseServer(L"");
 	//std::wstring appInstance(L"jlan5");
-	std::wstring appInstance(L"");
+	std::wstring appInstance(L"app1");
 	bool bAppInstanceLockKey(true);
 	bool bUseOnlySharedLicenses(false);
-	bool bBypassRemoteKeyRestrictions(true);
+	bool bBypassRemoteKeyRestrictions(false);
 
 	bool bSuccess;
 	SolimarLicenseManagerWrapper::LicensingWrapper license;
@@ -116,7 +117,8 @@ int _tmain()
 	///*
 	//bSuccess = license.Connect(licenseServer.c_str(), false, false);
 	//bSuccess = license.Connect(backUpLicenseServer.c_str(), false, true);
-	bSuccess = license.Connect(licenseServer.c_str(), bUseOnlySharedLicenses, false);
+	bSuccess = license.ConnectByProduct(ProductID);
+	/*bSuccess = license.Connect(licenseServer.c_str(), bUseOnlySharedLicenses, false);
 	if(!bSuccess)
 	{
 		sprintf_s(tmpbuf, "* Failed to connect to %S", licenseServer.c_str());
@@ -130,7 +132,7 @@ int _tmain()
 			sprintf_s(tmpbuf, "* Failed to connect to %S", backUpLicenseServer.c_str());
 			Console::WriteLine(tmpbuf);
 		}
-	}
+	}*/
 
 	
 	//bSuccess = license.Initialize(ProductID, 1, 0, false, std::wstring(L""), false, 0);
@@ -178,9 +180,15 @@ for (LicensingMessageList::iterator m = message_list.begin(); m != message_list.
 		message_list = vtMessageList;
 	VariantClear(&vtMessageList);
 */
-//long moduleID = 31;	//Process Builder - RUBIKA
-long moduleID = 105;	//SPDE - SCSI SDI Output - value 4
+long moduleID = 31;	//Process Builder - RUBIKA
+//long moduleID = 105;	//SPDE - SCSI SDI Output - value 4
 long moduleID2 = 28;	//SPDE - SMART Output - value 1 (Unlimited)
+//moduleID = 28;	//SPDE - SCSI SDI Output - value 4
+moduleID2 = 105;	//SPDE - SMART Output - value 1 (Unlimited)
+moduleID2 = 5;	//Rubika  - Not sure what module, but it is On/Off value 0/1 (Unlimited)
+
+
+
 long moduleID3 = 240;	//SPDE - Output - value 10 (Unlimited)
 long moduleID4 = 400;	//SPDE - Cuncurrent Operator - value 255 (Unlimited) - isShared
 long incrementAmount = 1;
@@ -265,6 +273,8 @@ long incrementAmount = 20;
 		*/
 		sprintf_s(tmpbuf,"* gp - Generate Password");
 		Console::WriteLine(tmpbuf);
+		sprintf_s(tmpbuf,"* vt - Verify Verification Token");
+		Console::WriteLine(tmpbuf);
 		/*
 		sprintf_s(tmpbuf,"* o - Obtain Licensing Module %d", moduleID);
 		Console::WriteLine(tmpbuf);
@@ -292,6 +302,7 @@ long incrementAmount = 20;
 		//Console::WriteLine("* s - Start Multiple Threads");
 		Console::WriteLine("* lmv - License Manager Version");
 		Console::WriteLine("* lsv - License Server Version");
+		Console::WriteLine("* swl - Software License Query");
 		Console::WriteLine("* x - Exit");
 		//Console::WriteLine("* endless - Start An Endless loop of obtain & release calls");
 		//Console::WriteLine("*");
@@ -495,6 +506,40 @@ Console::WriteLine("*****************************************");
 			Console::WriteLine(tmpbuf);
 		}
 
+		if(System::String::Compare(inputValue, "vt", true) == 0)
+		{
+			for(;;)
+			{
+				ISolimarSoftwareLicenseSvr *pServer=0;
+				HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseSvr), NULL, CLSCTX_LOCAL_SERVER, __uuidof(ISolimarSoftwareLicenseSvr), (void**)&pServer);
+				if(FAILED(hr))
+					break;
+
+				ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+				// try to authenticate the license server
+				hr = CR.AuthenticateServer(pServer);
+				if (FAILED(hr)) break;
+				
+				// let the license server authenticate this manager
+				hr = CR.AuthenticateToServer(pServer);
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("Trying to VerifyToken");
+				hr = pServer->VerifyToken_ByLicense(_bstr_t(L"100-1000"), 1, _bstr_t(L"100-1000"));
+				if(FAILED(hr))
+				{
+					sprintf_s(tmpbuf, "* Failed VerifyToken = %x", hr);
+					Console::WriteLine(tmpbuf);
+					break;
+				}
+				Console::WriteLine("Successfully VerifyToken");
+
+
+
+				break;	//Unconditional last break
+			}
+		}
+
 		if(System::String::Compare(inputValue, "gp", true) == 0)
 		{
 			for(;;)
@@ -664,6 +709,33 @@ Console::WriteLine("*****************************************");
 			license.GetVersionLicenseServer(licenseServer.c_str(), &majorVersion, &minorVersion, &buildVersion);
 			sprintf_s(tmpbuf, "* license.GetVersionLicenseServer - %S = %i.%i.%i", licenseServer.c_str(), majorVersion, minorVersion, buildVersion);
 			Console::WriteLine(tmpbuf);
+		}
+
+		if(System::String::Compare(inputValue, "swl", true) == 0)
+		{
+				ISolimarSoftwareLicenseSvr *pSoftwareLicServer=0;
+				HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseSvr), NULL, CLSCTX_LOCAL_SERVER, __uuidof(ISolimarSoftwareLicenseSvr), (void**)&pSoftwareLicServer);
+				if(FAILED(hr))
+					break;
+
+				ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+				// try to authenticate the license server
+				hr = CR.AuthenticateServer(pSoftwareLicServer);
+				if (FAILED(hr)) break;
+				
+				// let the license server authenticate this manager
+				hr = CR.AuthenticateToServer(pSoftwareLicServer);
+				if (FAILED(hr)) break;	
+
+				BSTR swLicenseInfo = L"Initial";
+				hr = pSoftwareLicServer->GetSoftwareLicenseInfo_ForAll(&swLicenseInfo);
+				if(SUCCEEDED(hr))
+				{
+					sprintf_s(tmpbuf, "* pSoftwareLicServer->GetSoftwareLicenseInfo = %S", swLicenseInfo);
+					Console::WriteLine(tmpbuf);
+				}
+				SysFreeString(swLicenseInfo);
+				pSoftwareLicServer->Release();
 		}
 
 
