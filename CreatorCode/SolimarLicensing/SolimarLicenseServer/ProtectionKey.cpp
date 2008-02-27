@@ -555,7 +555,6 @@ HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, lo
 	{
 		hr = e.Error();
 	}
-	
 	return hr;
 }
 
@@ -606,12 +605,12 @@ HRESULT ProtectionKey::ModuleInUse(long module_ident, long* license_count)
 	{
 		hr = e.Error();
 	}
-
 	return hr;
 }
 
 HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, long license_count)
 {
+//OutputFormattedDebugString(L"ProtectionKey::ModuleLicenseObtain() -- Enter - module_ident: %d, license_count: %d", module_ident, license_count);
 	// lock a license
 	HRESULT hr = S_OK;
 	
@@ -647,6 +646,7 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 	{
 		hr = e.Error();
 	}
+//OutputFormattedDebugString(L"ProtectionKey::ModuleLicenseObtain() -- Leave, hr: 0x%x", hr);
 	return hr;
 }
 
@@ -654,6 +654,9 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 
 HRESULT ProtectionKey::ModuleLicenseUnlimited(BSTR license_id, long module_ident, VARIANT_BOOL b_module_is_unlimited)
 {
+//if(module_ident == 131)
+//	OutputFormattedDebugString(L"ProtectionKey::ModuleLicenseUnlimited(license_id=%s, module_ident=%d, b_module_is_unlimited=%s", (wchar_t*)license_id, module_ident, b_module_is_unlimited==VARIANT_TRUE ? L"true" : L"false");
+//module_use(%d) > (long)LicenseEffectiveValue[%d](license_id(%s), module->id(%d))", module_use, effectiveValue, (wchar_t*)license_id, module->id);
 	HRESULT hr(S_OK);
 	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	module_unlimited_list[module_ident] = b_module_is_unlimited == VARIANT_TRUE ? true : false;
@@ -838,16 +841,22 @@ HRESULT ProtectionKey::AddLicenseApplicationInstance(BSTR license_id, long modul
 	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
 
+	HRESULT hr = S_OK;
+
+	_bstr_t appID = licAppIt!=license_to_app.end() ? _bstr_t(licAppIt->second,true) : _bstr_t(L"",true);
 	if(!module.isSharable && licAppIt == license_to_app.end())
 	{
-		return E_FAIL;	//Unknown Application Instance...
+		//Legacy license managers may have never called AddApplicationInstance(), so pass in blank.
+		hr = AddApplicationInstance(license_id, appID, VARIANT_FALSE);
+		if(FAILED(hr))
+		{
+			return E_FAIL;	//Unknown Application Instance...
+		}
 	}
-	_bstr_t appID = licAppIt!=license_to_app.end() ? _bstr_t(licAppIt->second,true) : _bstr_t(L"",true);
+	
 
 	ApplicationList &app_list = module_app_use[module_ident];
 
-	HRESULT hr = S_OK;
-	
 	bool bAddAppToList = false;
 	if(app_list.size() == 0)
 		bAddAppToList = true;	// Not in list, add to known list
