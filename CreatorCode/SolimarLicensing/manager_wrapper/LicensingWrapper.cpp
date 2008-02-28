@@ -98,7 +98,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::Li
 
 SolimarLicenseManagerWrapper::LicensingWrapper::~LicensingWrapper()
 {
-OutputDebugStringW(L"LicensingWrapper::~LicensingWrapper() - Enter");
+//OutputDebugStringW(L"LicensingWrapper::~LicensingWrapper() - Enter");
 	// signal the threads to terminate
 
 	SetEvent(m_ThreadKillEvent);
@@ -107,6 +107,16 @@ OutputDebugStringW(L"LicensingWrapper::~LicensingWrapper() - Enter");
 	HANDLE threads[2] = {m_MessageDispatchThread, m_LicenseValidityThread};
 
 	int retVal = WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 30000);
+   
+	{
+	SafeMutex mutex(m_MemberLock);
+	while(!m_session_obtained_map.empty())
+	{
+		//Side Effect: Erases the session_id in the m_session_obtained_map if it exists
+		EndLicensingSessionEx(m_session_obtained_map.begin()->first);
+	}
+	}
+
    if(m_MessageDispatchThread != NULL)
 	{
 	   TerminateThread(m_MessageDispatchThread,0);
@@ -187,11 +197,13 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 }
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
 {
+//OutputDebugStringW(L"LicensingWrapper::DisconnectEx() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	
 	HRESULT hr = m_licenseManagerPtr->Disconnect();
 
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()", hr);
+//OutputDebugStringW(L"LicensingWrapper::DisconnectEx() - Leave");
 	return hr;
 }
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes)
@@ -572,5 +584,111 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseServerE
 	SysFreeString(bstrServer);
 
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseServerEx()", hr);
+	return hr;
+}
+
+
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::StartLicensingSessionEx(long* pSessionID)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(m_MemberLock);
+	int newSessionID = 1;
+	while(m_session_obtained_map.find(newSessionID) != m_session_obtained_map.end())
+		newSessionID++;
+
+	std::map<int, int>* pNewMap = new std::map<int, int>();
+	pNewMap->clear();
+	m_session_obtained_map.insert(std::map<int, std::map<int, int>*>::value_type(newSessionID, pNewMap));
+	*pSessionID = newSessionID;
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainLicensingSessionEx(long session_id, long module, long license_count)
+{
+	HRESULT hr(E_INVALIDARG);
+	SafeMutex mutex(m_MemberLock);
+	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
+	if(sessionMapIt != m_session_obtained_map.end())
+	{
+		hr = ModuleLicenseObtainEx(module, license_count);
+		if(SUCCEEDED(hr))
+		{
+			std::map<int, int>* pNewMap = sessionMapIt->second;
+			if(pNewMap != NULL)
+			{
+				std::map<int, int>::iterator mapIt = pNewMap->find(module);
+				if(mapIt == pNewMap->end())	//New item
+					pNewMap->insert(std::map<int, int>::value_type(module, license_count));
+				else	//Update existing item
+					mapIt->second += license_count;
+			}
+		}
+	}
+	return hr;
+}
+
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseLicensingSessionEx(long session_id, long module, long license_count)
+{
+	HRESULT hr(E_INVALIDARG);
+	SafeMutex mutex(m_MemberLock);
+	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
+	if(sessionMapIt != m_session_obtained_map.end())
+	{
+		std::map<int, int>* pNewMap = sessionMapIt->second;
+		std::map<int, int>::iterator mapIt = pNewMap->find(module);
+		if(mapIt != pNewMap->end())
+		{
+			//Verify that this sessionID has obtained enough licenses to release
+			if((long)mapIt->second >= license_count)
+			{
+				hr = ModuleLicenseReleaseEx(module, license_count);
+				if(SUCCEEDED(hr))
+				{
+					mapIt->second -= license_count;
+				}
+			}
+		}
+	}
+	return hr;
+}
+
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseLicensingSessionEx(long session_id, long module, long* plicenseCount)
+{
+	HRESULT hr(E_INVALIDARG);
+	SafeMutex mutex(m_MemberLock);
+	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
+	if(sessionMapIt != m_session_obtained_map.end())
+	{
+		std::map<int, int>* pNewMap = sessionMapIt->second;
+		std::map<int, int>::iterator mapIt = pNewMap->find(module);
+		if(mapIt != pNewMap->end())
+			*plicenseCount = (long)mapIt->second;
+		else
+			*plicenseCount = 0;
+		hr = S_OK;
+	}
+	return hr;
+}
+//Side Effect: Erases the session_id in the m_session_obtained_map if it exists
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::EndLicensingSessionEx(long session_id)
+{
+	HRESULT hr(E_INVALIDARG);
+	SafeMutex mutex(m_MemberLock);
+	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
+	if(sessionMapIt != m_session_obtained_map.end())
+	{
+		std::map<int, int>* pNewMap = sessionMapIt->second;
+		if(pNewMap != NULL)
+		{
+			while(!pNewMap->empty())
+			{
+				//ignore errors releasing...
+				ModuleLicenseReleaseEx(pNewMap->begin()->first, pNewMap->begin()->second);
+				pNewMap->erase(pNewMap->begin());
+			}
+			delete pNewMap;
+			m_session_obtained_map.erase(sessionMapIt);
+		}
+		hr = S_OK;
+	}
 	return hr;
 }

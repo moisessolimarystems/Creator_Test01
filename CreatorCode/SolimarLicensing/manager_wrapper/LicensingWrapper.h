@@ -97,6 +97,13 @@ public:
 	HRESULT GetVersionLicenseManagerEx(long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 	HRESULT GetVersionLicenseServerEx(std::wstring server, long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 
+
+	HRESULT StartLicensingSessionEx(long* session_id);
+	HRESULT ModuleLicenseObtainLicensingSessionEx(long session_id, long module, long license_count);
+	HRESULT ModuleLicenseReleaseLicensingSessionEx(long session_id, long module, long license_count);
+	HRESULT ModuleLicenseInUseLicensingSessionEx(long session_id, long module, long* license_count);
+	HRESULT EndLicensingSessionEx(long session_id);
+	
 	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 	typedef void (*LicenseInvalidCallbackPtr)(void* pContext, HRESULT lastHr, const wchar_t* message);
 
@@ -146,6 +153,9 @@ private:
 	GITPtr<ILicensingMessage> m_licenseMessagePtr;
 
 	std::wstring StringToWstring(const std::string &s);
+
+
+	std::map<int/*sessionID*/, std::map<int/*modID*/, int/*value*/>*> m_session_obtained_map;
 };
 
 };
