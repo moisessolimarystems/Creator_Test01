@@ -256,6 +256,12 @@ void __fastcall TFCustomerKeys::setGUIOptions()
      if( (PERMISSION_FLAG & permanent_pwd) && (PHYSICAL_FLAG & pf_PERMANENT) )
      {
          mmPermanent->Enabled = true;
+
+     }
+     // allow ToBase functionality
+     if (key_record->non_perm_ktf == false && key_record->pkey->keyType != KEYBase)
+     {
+          mmToBase->Enabled = true;
      }
 
      //
@@ -864,7 +870,7 @@ void __fastcall TFCustomerKeys::resetPhysicalFlag()
                      PHYSICAL_FLAG |= PHYSICAL_FLAG |= pf_PERMANENT;
 
                   //if key is on last extension can not generate another extension password
-                  if( key_status != 7 )
+                  if( key_status != EXTENDED_TRIAL16)
                      PHYSICAL_FLAG |= pf_EXTENSION;
                }// end key_status != 2
             } // end key_status < 8
@@ -908,6 +914,7 @@ void __fastcall TFCustomerKeys::clearPermissions()
    mmExtension->Enabled = false;
    mmVersion->Enabled = false;
    mmApplicationInstance->Enabled = false;
+   mmToBase->Enabled = false;
    mmSPDOutput->Visible = false;
    mmSPDEOperatorSessions->Visible = false;
    mmSPDEUserSessions->Visible = false;
@@ -1478,7 +1485,8 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
 
    switch( _index )
    {
-   	case 0 : //key page refresh
+   	case 0 :
+                //key page refresh
    	    QueryKey->DisableControls();
             try
             {
@@ -1601,7 +1609,6 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
    }
    setStatusValues();
    setKeyInfoValues();
-
 }
 
 //==============================================================================
@@ -2021,7 +2028,7 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
              //Get the password packet and write it to the file
              hr = keyMaster->GetPasswordPacket(&vtPacket);
              if(!SUCCEEDED(hr))
-                 Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%i", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
+                 Application->MessageBox(ErrorMsg.sprintf("Failed to get password packet\nHResult = 0x%x", HRESULT_FROM_WIN32(hr)).c_str(),"Error", MB_OK);
 
              if (SUCCEEDED(SafeArrayAccessData(vtPacket.parray, (void**)&pData)))
              {
@@ -2033,7 +2040,7 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
                     0))
                {
                     hr = HRESULT_FROM_WIN32(::GetLastError());
-                    Application->MessageBox(ErrorMsg.sprintf("Failed to write packet data to file\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
+                    Application->MessageBox(ErrorMsg.sprintf("Failed to write packet data to file\nHResult = 0x%x", hr).c_str(),"Error", MB_OK);
                }
 
                SafeArrayUnaccessData(vtPacket.parray);
@@ -2042,9 +2049,9 @@ void TFCustomerKeys::createPasswordPackets(unsigned short days)
 
          //Get the verification code and store it in the DB
              hr = keyMaster->GetVerificationCode(&VerificationCode);
-/*         if(!SUCCEEDED(hr))
-            Application->MessageBox(ErrorMsg.sprintf("Failed to get verification code\nHResult = 0x%i", hr).c_str(),"Error", MB_OK);
-*/
+             if(!SUCCEEDED(hr))
+                Application->MessageBox(ErrorMsg.sprintf("Failed to get verification code\nHResult = 0x%x", hr).c_str(),"Error", MB_OK);
+
          //
          //Update database
              try
@@ -2758,6 +2765,7 @@ void __fastcall TFCustomerKeys::mmLostClick(TObject *Sender)
 
       Database1->Commit();
       RefreshKeyPage(0);
+      RefreshKeyPage();
 
    }
    catch( Exception *e )
@@ -3152,7 +3160,8 @@ void __fastcall TFCustomerKeys::ToBaseClick(TObject *Sender)
          UtilityQuery->Prepare();
          UtilityQuery->ExecSQL();
 
-         RefreshKeyPage(0);
+         RefreshKeyPage();
+         OnKeyRowChange(this);
       }
       catch(EDBEngineError &e)
       {
