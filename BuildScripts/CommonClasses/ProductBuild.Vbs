@@ -129,8 +129,7 @@ Class CProductBuild
             
         ElseIf mBuildType = "R" Then  'doing a release
             Set mRelease = New CRelease
-            Set mRelease.Build = Me             'Me is vbscript's this equivalent
-            Set mRelease.Format = mFormat            
+            Set mRelease.Build = Me             'Me is vbscript's this equivalent       
         End If
 
         CheckParams     'check to make sure all passed params were valid
@@ -1053,9 +1052,10 @@ Class CProductBuild
     End Function
 
     Sub UpdateRegVersionVals(aNextVersion, aCurrentVersion)
-        Dim current, output
+        Dim current, output, versionNum
         current = GetBuildVersion(aNextVersion)
-        WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + Right(mNewNextVersion, 4)
+        versionNum = Right(mNewNextVersion, Len(mNewNextVersion)-Len(Replace(aNextVersion, "NextVersion", "")))       'strips prefix        
+        WriteToDlgAndFile "Updating next version " + aNextVersion + " with value " + versionNum
         RunCmd "attrib -r " + mInputFile
 
 		Dim MKS
@@ -1065,7 +1065,7 @@ Class CProductBuild
 			MKS.RefreshFile mBuildPath & "\buildScript.pj", mInputFile
   			MKS.LockFiles mBuildPath & "\buildScript.pj", mInputFile
             UpdateFileVersion mInputFile, aCurrentVersion, " " + current
-            UpdateFileVersion mInputFile, aNextVersion, " " + Right(mNewNextVersion, 4)
+            UpdateFileVersion mInputFile, aNextVersion, " " + versionNum
             MKS.CheckInFiles mBuildPath & "\buildScript.pj", mInputFile
         End If
     End Sub

@@ -825,7 +825,7 @@ Function GetEmailBody()
                  & vbNewLine & vbNewLine & "Alan Chou"
     ElseIf mOneStepBldChoice = "R" Then  'release
         ftpLocation = GetOutputPath & "ftp\" & ProductChoice & Replace(buildNumber, ".", "_", 1, -1) & ".exe"
-        GetEmailBody = "The version " & mProductChoice & " " & buildNumber & "is released" & vbNewLine _
+        GetEmailBody = "The version " & mProductChoice & " " & buildNumber & " is released" & vbNewLine _
                  & vbNewLine & "Please burn new cd's and send this version, located at:" & vbNewLine _
                  & location & vbNewLine & vbNewLine & "The self-extracting exe for the ftp site is at:" _
                  & vbNewLine & ftpLocation & vbNewLine & vbNewLine _
@@ -846,11 +846,11 @@ Function GetEmailSubject()
     If OneStepBldChoice = "B" Then 'build
          lastBldLabel = FindLabel("LB")
          Version = StripAllPrefix(lastBldLabel)
-         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")-1) & " is out for test"
+         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, Len(Version)-InStrRev(Version, ".")) & " is out for test"
     ElseIf OneStepBldChoice = "R" Then  'release
          lastReleaseLabel = FindLabel("LR")
          Version = StripAllPrefix(lastReleaseLabel)
-         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, InStrRev(Version, ".")-1) & " has been released"
+         GetEmailSubject = mProductChoice & " version " & Left(Version, InStrRev(Version, ".") - 1) & " build " & Right(Version, Len(Version)-InStrRev(Version, ".")) & " has been released"
     End If
 End Function
         
@@ -924,7 +924,7 @@ Function OutputErrorReport(aErrorCode)
     OutputRemainingSteps aErrorCode, TextStream1
   
     If mDebug <> "Y" Then
-            NetSendArry = Array("achou", "DKBZC11")
+            NetSendArry = Array("achou1")
             For i = 0 To UBound(NetSendArry)
                 mShell.Run "net send " & NetSendArry(i) & " There was an error when generating the report scripts." & vbNewLine & _
                          "Refer to " & mReportPath & "ReportError.txt" & " for an error log"

@@ -114,7 +114,7 @@ Class CMoveFiles
 		Next
     End Sub
 
-    Private Function GetOutputPath()
+    Public Function GetOutputPath()
 		If mBuild.BuildType = "R" Then    'Release
 		    GetOutputPath = mNetworkBasePath & "CurrentVersion\release\"  
 		Elseif mBuild.BuildType = "NB" Then   'New Build

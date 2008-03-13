@@ -55,7 +55,7 @@ Class CRelease
         Set SubFolders1 = Folder1.SubFolders
         For Each f1 In SubFolders1
                 If InStr(f1.Name, aVersionNum) = 0 And InStr(f1.Name, mFormat.VersionToMajorMinor(aVersionNum)) > 0 Then
-                    aMoveFiles.DeleteFileOrFolder "Folder",  Chr(34) & f1 & Chr(34), True
+                    aMoveFiles.DeleteFileOrFolder "Folder",  f1, True
                 End If
         Next
         Set Files1 = Folder1.Files
@@ -63,7 +63,7 @@ Class CRelease
             If InStr(f1.Name, versionNum) > 0 Then   'possible to have multiple ftp exe
 				aMKS.AddFiles ReleaseFilePath & mBuild.ProductName & ".pj", Chr(34) & f1 & Chr(34)
             Else
-                If InStr(f1.Name, ".pj") = 0 And InStr(f1.Name, mFormat.VersionToMajorMinor(versionNum)) > 0 Then
+                If InStr(f1.Name, ".pj") = 0 And InStr(f1.Name, mFormat.VersionToMajorMinor(aVersionNum)) > 0 Then
                         aMoveFiles.DeleteFileOrFolder "File",  Chr(34) & f1 & Chr(34) , True
                 End If
             End If
