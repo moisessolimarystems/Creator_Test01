@@ -224,7 +224,7 @@ namespace SolimarLicenseManagerDotNet
 
 
 
-	HRESULT SolimarLicenseWrapper::ConnectEx(String^ server) 
+	void SolimarLicenseWrapper::ConnectEx(String^ server)
 	{
 		BSTR bstrServer;
 		//convert the string* to a BSTR
@@ -236,9 +236,12 @@ namespace SolimarLicenseManagerDotNet
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
 
-		return hrResult;
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup)
+	void SolimarLicenseWrapper::ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup)
 	{
 		BSTR bstrServer;
 		//convert the string* to a BSTR
@@ -250,19 +253,31 @@ namespace SolimarLicenseManagerDotNet
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
 
-		return hrResult;
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::ConnectByProductEx(long product, bool bUseSharedLicenseServers)
+	void SolimarLicenseWrapper::ConnectByProductEx(long product, bool bUseSharedLicenseServers)
 	{
-		return m_pLicenseWrapper->ConnectByProductEx(product, bUseSharedLicenseServers);
+		HRESULT hrResult = m_pLicenseWrapper->ConnectByProductEx(product, bUseSharedLicenseServers);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::DisconnectEx()
+	void SolimarLicenseWrapper::DisconnectEx()
 	{
-		return m_pLicenseWrapper->DisconnectEx();
+		HRESULT hrResult = m_pLicenseWrapper->DisconnectEx();
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
 	}
 
-	HRESULT SolimarLicenseWrapper::InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes)
+
+	// Returns true if there is any licensing for the given products, else false.
+	bool SolimarLicenseWrapper::InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes)
 	{
+		
 		BSTR bstrSpecificSingleKeyIdent;
 		//convert the string* to a BSTR
 		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(specificSingleKeyIdent));
@@ -274,10 +289,15 @@ namespace SolimarLicenseManagerDotNet
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
 
-		return hrResult;
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		//No licensing on license server if hrResult==S_FALSE
+		return (hrResult == S_OK) ? true : false;
 	}
 
-	HRESULT SolimarLicenseWrapper::InitializeEx(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction)
+	// Returns true if there is any licensing for the given products, else false.
+	bool SolimarLicenseWrapper::InitializeEx(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction)
 	{
 		BSTR bstrSpecificSingleKeyIdent, bstrApplicationInstance;
 		//convert the string* to a BSTR
@@ -293,60 +313,79 @@ namespace SolimarLicenseManagerDotNet
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr2);
 
-		return hrResult;
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		//No licensing on license server if hrResult==S_FALSE
+		return (hrResult == S_OK) ? true : false;
 	}
 
-	HRESULT SolimarLicenseWrapper::KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor, bool% bRefKeyExists)
+	bool SolimarLicenseWrapper::KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor)
 	{
-		bool bTmpKeyExists;
-		HRESULT hrResult = m_pLicenseWrapper->KeyProductExistsEx(product, prodVerMajor, prodVerMinor, &bTmpKeyExists);
-		bRefKeyExists = bTmpKeyExists;
-		return hrResult;
-	}
-	HRESULT SolimarLicenseWrapper::ModuleLicenseTotalEx(long module, long% refLicenseCount)
-	{
-		long tmpLicenseCount;
-		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseTotalEx(module, &tmpLicenseCount);
-		refLicenseCount = tmpLicenseCount;
-		return hrResult;
-	}
-	HRESULT SolimarLicenseWrapper::ModuleLicenseInUseEx(long module, long% refLicenseCount)
-	{
-		long tmpLicenseCount;
-		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseInUseEx(module, &tmpLicenseCount);
-		refLicenseCount = tmpLicenseCount;
-		return hrResult;
+		bool bRetValid(false);
+		HRESULT hrResult = m_pLicenseWrapper->KeyProductExistsEx(product, prodVerMajor, prodVerMinor, &bRetValid);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 
+		return bRetValid;
 	}
-	HRESULT SolimarLicenseWrapper::ModuleLicenseObtainEx(long module, long licenseCount)
+	long SolimarLicenseWrapper::ModuleLicenseTotalEx(long module)
 	{
-		return m_pLicenseWrapper->ModuleLicenseObtainEx(module, licenseCount);
+		long retLicenseCount;
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseTotalEx(module, &retLicenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retLicenseCount;
 	}
-	HRESULT SolimarLicenseWrapper::ModuleLicenseReleaseEx(long module, long licenseCount)
+	long SolimarLicenseWrapper::ModuleLicenseInUseEx(long module)
 	{
-		return m_pLicenseWrapper->ModuleLicenseReleaseEx(module, licenseCount);
+		long retLicenseCount;
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseInUseEx(module, &retLicenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retLicenseCount;
 	}
-	HRESULT SolimarLicenseWrapper::ModuleLicenseCounterDecrementEx(long module, long licenseCount)
+	void SolimarLicenseWrapper::ModuleLicenseObtainEx(long module, long licenseCount)
 	{
-		return m_pLicenseWrapper->ModuleLicenseCounterDecrementEx(module, licenseCount);
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseObtainEx(module, licenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::ValidateLicenseEx(bool% bRefValid)
+	void SolimarLicenseWrapper::ModuleLicenseReleaseEx(long module, long licenseCount)
 	{
-		bool bTmpValid;
-		HRESULT hrResult = m_pLicenseWrapper->ValidateLicenseEx(&bTmpValid);
-		bRefValid = bTmpValid;
-		return hrResult;
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseReleaseEx(module, licenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::GetVersionLicenseManagerEx(long% refVerMajor, long% refVerMinor, long% refVerBuild)
+	void SolimarLicenseWrapper::ModuleLicenseCounterDecrementEx(long module, long licenseCount)
+	{
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseCounterDecrementEx(module, licenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
+	}
+	bool SolimarLicenseWrapper::ValidateLicenseEx()
+	{
+		bool bRetValid;
+		HRESULT hrResult = m_pLicenseWrapper->ValidateLicenseEx(&bRetValid);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return bRetValid;
+	}
+	void SolimarLicenseWrapper::GetVersionLicenseManagerEx(long% refVerMajor, long% refVerMinor, long% refVerBuild)
 	{
 		long tmpVerMajor, tmpVerMinor, tmpVerBuild;
 		HRESULT hrResult = m_pLicenseWrapper->GetVersionLicenseManagerEx(&tmpVerMajor, &tmpVerMinor, &tmpVerBuild);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 		refVerMajor = tmpVerMajor;
 		refVerMinor = tmpVerMinor;
 		refVerBuild = tmpVerBuild;
-		return hrResult;
+		return ;
 	}
-	HRESULT SolimarLicenseWrapper::GetVersionLicenseServerEx(String^ server, long% refVerMajor, long% refVerMinor, long% refVerBuild)
+	void SolimarLicenseWrapper::GetVersionLicenseServerEx(String^ server, long% refVerMajor, long% refVerMinor, long% refVerBuild)
 	{
 		BSTR bstrServer;
 		//convert the string* to a BSTR
@@ -355,17 +394,59 @@ namespace SolimarLicenseManagerDotNet
 
 		long tmpVerMajor, tmpVerMinor, tmpVerBuild;
 		HRESULT hrResult = m_pLicenseWrapper->GetVersionLicenseServerEx(bstrServer, &tmpVerMajor, &tmpVerMinor, &tmpVerBuild);
-		refVerMajor = tmpVerMajor;
-		refVerMinor = tmpVerMinor;
-		refVerBuild = tmpVerBuild;
-		return hrResult;
 
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
 
-		return hrResult;
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		refVerMajor = tmpVerMajor;
+		refVerMinor = tmpVerMinor;
+		refVerBuild = tmpVerBuild;
+
+		return ;
 	}
 
+
+
+	long SolimarLicenseWrapper::StartLicensingSessionEx()
+	{
+		long retNewSessionID;
+		HRESULT hrResult = m_pLicenseWrapper->StartLicensingSessionEx(&retNewSessionID);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retNewSessionID;
+	}
+	void SolimarLicenseWrapper::ModuleLicenseObtainLicensingSessionEx(long sessionID, long module, long licenseCount)
+	{
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseObtainLicensingSessionEx(sessionID, module, licenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
+	}
+	void SolimarLicenseWrapper::ModuleLicenseReleaseLicensingSessionEx(long sessionID, long module, long licenseCount)
+	{
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseReleaseLicensingSessionEx(sessionID, module, licenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
+	}
+	long SolimarLicenseWrapper::ModuleLicenseInUseLicensingSessionEx(long sessionID, long module)
+	{
+		long retLicenseCount;
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseInUseLicensingSessionEx(sessionID, module, &retLicenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retLicenseCount;
+	}
+	void SolimarLicenseWrapper::EndLicensingSessionEx(long sessionID)
+	{
+		HRESULT hrResult = m_pLicenseWrapper->EndLicensingSessionEx(sessionID);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
+	}
 
 	long SolimarLicenseWrapper::LookupProductID(String^ product)
 	{
