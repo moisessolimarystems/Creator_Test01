@@ -42,21 +42,30 @@ namespace SolimarLicenseManagerDotNet {
 			bool GetVersionLicenseManager(long% refVerMajor, long% refVerMinor, long% refVerBuild);
 			bool GetVersionLicenseServer(String^ server, long% refVerMajor, long% refVerMinor, long% refVerBuild);
 
-			HRESULT ConnectEx(String^ server);
-			HRESULT ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
-			HRESULT ConnectByProductEx(long product, bool bUseSharedLicenseServers);
-			HRESULT DisconnectEx();
-			HRESULT InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes);
-			HRESULT InitializeEx(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^  specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction);
-			HRESULT KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor, bool% bRefKeyExists);
-			HRESULT ModuleLicenseTotalEx(long module, long% refLicenseCount);
-			HRESULT ModuleLicenseInUseEx(long module, long% refLicenseCount);
-			HRESULT ModuleLicenseObtainEx(long module, long licenseCount);
-			HRESULT ModuleLicenseReleaseEx(long module, long licenseCount);
-			HRESULT ModuleLicenseCounterDecrementEx(long module, long licenseCount);
-			HRESULT ValidateLicenseEx(bool% bRefValid);
-			HRESULT GetVersionLicenseManagerEx(long% refVerMajor, long% refVerMinor, long% refVerBuild);
-			HRESULT GetVersionLicenseServerEx(String^ server, long% refVerMajor, long% refVerMinor, long% refVerBuild);
+			void ConnectEx(String^ server);
+			void ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+			void ConnectByProductEx(long product, bool bUseSharedLicenseServers);
+			void DisconnectEx();
+			// Returns true if there is any licensing for the given products, else false.  If no licensing was present initially,
+			// but licensing is added afterwards, than the initialized connection will be able to have modules obtained against it
+			// and validated.
+			bool InitializeEx(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes);
+			bool InitializeEx(String^ applicationInstance, long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^  specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes, bool applicationInstanceLockKeys, bool bypassRemoteKeyRestriction);
+			bool KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor);
+			long ModuleLicenseTotalEx(long module);
+			long ModuleLicenseInUseEx(long module);
+			void ModuleLicenseObtainEx(long module, long licenseCount);
+			void ModuleLicenseReleaseEx(long module, long licenseCount);
+			void ModuleLicenseCounterDecrementEx(long module, long licenseCount);
+			bool ValidateLicenseEx();
+			void GetVersionLicenseManagerEx(long% refVerMajor, long% refVerMinor, long% refVerBuild);
+			void GetVersionLicenseServerEx(String^ server, long% refVerMajor, long% refVerMinor, long% refVerBuild);
+
+			long StartLicensingSessionEx();
+			void ModuleLicenseObtainLicensingSessionEx(long sessionID, long module, long licenseCount);
+			void ModuleLicenseReleaseLicensingSessionEx(long sessionID, long module, long licenseCount);
+			long ModuleLicenseInUseLicensingSessionEx(long sessionID, long module);
+			void EndLicensingSessionEx(long sessionID);
 
 			long LookupProductID(String^ product);
 			long LookupModuleID(long productId, String^ module);
