@@ -2345,9 +2345,6 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 						}
 					}
 
-					if(pServerInfo->bUseOnlySharedLicenses) 
-						bSetUnlimited = true;
-
 					hr = pServerInfo->LicenseServer->KeyModuleLicenseUnlimited(pvtKeyList[i].bstrVal, module.id, bSetUnlimited ? VARIANT_TRUE : VARIANT_FALSE);
 					if(SUCCEEDED(hr))
 					{
