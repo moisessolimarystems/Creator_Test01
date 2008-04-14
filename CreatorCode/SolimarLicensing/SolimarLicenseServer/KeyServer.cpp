@@ -68,6 +68,7 @@ void KeyServer::TimesUpThreadFunction(void* pvThis)
 
 KeyServer::KeyServer() : 
 	KeyListLock(CreateMutex(0,0,0)), 
+	PasswordPacketListLock(CreateMutex(0,0,0)), 
 	KeyTrialTimeInfoLock(CreateMutex(0,0,0)),
 	HeartbeatListLock(CreateMutex(0,0,0)), 
 	MessageClientListLock(CreateMutex(0,0,0)),
@@ -126,6 +127,8 @@ KeyServer::~KeyServer()
 		delete TimesUpThread;
 	if (KeyListLock!=NULL)
 		CloseHandle(KeyListLock);
+	if (PasswordPacketListLock!=NULL)
+		CloseHandle(PasswordPacketListLock);
 	if (KeyTrialTimeInfoLock!=NULL)
 		CloseHandle(KeyTrialTimeInfoLock);
 	if (MessageClientListLock!=NULL)
@@ -449,9 +452,8 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		{
 			CryptoHelper context;
 			CryptoHelper::Digest digest;
-			//if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
-			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, (password_packet_length/sizeof(wchar_t))-1, digest))) throw(hr);
 
+			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
 			verification = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 		}
 		
@@ -890,7 +892,8 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	
 	// take the first 8 characters from the hex representation of the digest as the verification code
 	password_packets[lid].verification_code = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
-	
+
+
 	// package the string in to a variant
 	password_packets[lid].completed_packet.vt = VT_ARRAY | VT_UI1;
 	password_packets[lid].completed_packet.parray = SafeArrayCreateVector(VT_UI1, 0, (packet_string.length()+1)*sizeof(wchar_t));
