@@ -173,9 +173,6 @@ auto_ptr<AnsiString> ( __closure *CreatePassword)(SSProtectionKey*, unsigned sho
       break;
    }
 
-   if (min>=max)
-      return;
-
    //
    // get new total of units licensed.
    TUnitsDlg *dlg = new TUnitsDlg(this, max);
@@ -223,7 +220,7 @@ auto_ptr<AnsiString> ( __closure *CreatePassword)(SSProtectionKey*, unsigned sho
          else
             DetailSQL->SQL->Add(Format("UPDATE SKeyRecord SET SKRstatus = 2, %s = :units WHERE SKRid = :keyId", OPENARRAY(TVarRec,(fieldName))));
 
-         DetailSQL->ParamByName("units")->AsInteger = m_pKey->getIndexServers();
+         DetailSQL->ParamByName("units")->AsInteger = units;
          DetailSQL->ParamByName("keyId")->AsInteger = m_pKeyRecord->skr_id;
          DetailSQL->ExecSQL();
 
