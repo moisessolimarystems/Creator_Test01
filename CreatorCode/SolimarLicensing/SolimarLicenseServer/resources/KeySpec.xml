@@ -467,7 +467,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="16" offset="0x090" bits="1" name="N-to-1" unlimited="1"/>
 				<Module id="17" offset="0x091" bits="1" name="Book Blocks" unlimited="1"/>
 				<Module id="18" offset="0x092" bits="1" name="2-Up" unlimited="1"/> 
-				<Module id="19" offset="0x093" bits="1" name="Scale &amp; Translate" unlimited="1"/>       
+				<Module id="19" offset="0x093" bits="1" name="Scale &amp; Shift" unlimited="1"/>       
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
