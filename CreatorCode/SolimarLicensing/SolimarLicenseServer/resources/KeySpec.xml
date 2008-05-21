@@ -741,6 +741,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="103"	offset="0x194" bits="4" name="Parallel Input"/>
 				<Module id="104"	offset="0x190" bits="4" name="Parallel Output"/>
 				<Module id="105"	offset="0x18c" bits="4" name="SCSI SDI Output"/>
+        			<Module id="106"	offset="0x188" bits="4" name="Solitrack Input"/>        
 				
 				<!-- Module IDs identifying resources -->
 				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
@@ -824,6 +825,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 					<ModuleInclude id="103" default="0"/>
 					<ModuleInclude id="104" default="0"/>
 					<ModuleInclude id="105" default="0"/>
+					<ModuleInclude id="106" default="0"/>
 					
 					<ModuleInclude id="200" default="0"/>
 					<ModuleInclude id="201" default="0"/>
