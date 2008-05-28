@@ -12,7 +12,7 @@ const SL_ERROR SLErrors[] =
 	// Error Code						HRESULT						Message
 	//----------------------------------------------------------------------------------------------
 	
-	// key server errors
+	// License server errors
 	{EC_UNKNOWN,						EHR_UNKNOWN,						L"Unknown error (Key server)"},
 	{EC_DRIVER_INIT_FAILURE,						EHR_DRIVER_INIT_FAILURE,						L"Driver initialization failure (Key server)"},
 	{EC_PASSWORD_NO_MATCH,						EHR_PASSWORD_NO_MATCH,						L"Passwords do not match (Key server)"},
@@ -38,7 +38,8 @@ const SL_ERROR SLErrors[] =
 	{EC_KEY_NO_BASE_KEY,						EHR_KEY_NO_BASE_KEY,						L"Insufficient licensing, unable to locate a Base Key on the server (Key server)"},
 	{EC_KEY_RESTORED_KEY_SERVER,						EHR_KEY_RESTORED_KEY_SERVER,						L"Licensing on the Key Server has been restored (Key server)"},
 	{EC_KEY_USE_BACKUP_KEY_SERVER,						EHR_KEY_USE_BACKUP_KEY_SERVER,						L"Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"},
-	{EC_KEY_NO_REMOTE_VERSION_KEY_SERVER,					EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,		L"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"},
+	{EC_KEY_NO_REMOTE_VERSION_KEY_SERVER,						EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,						L"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"},
+
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
 	{EC_SP_UNIT_NOT_FOUND,						EHR_SP_UNIT_NOT_FOUND,						L"Unit not found (Rainbow driver)"},
@@ -76,6 +77,9 @@ const SL_ERROR SLErrors[] =
 	{EC_SP_INTERNAL_ERROR,						EHR_SP_INTERNAL_ERROR,						L"An internal error (Rainbow driver)"},
 	{EC_SP_PACKET_ALREADY_INITIALIZED,						EHR_SP_PACKET_ALREADY_INITIALIZED,						L"The packet being initialized was already initialized (Rainbow driver)"},
 	{EC_SP_INVALID_STATUS,						EHR_SP_INVALID_STATUS,						L"An invalid status code was returned (Rainbow driver)"},
+
+	{EC_LIC_MGR_NO_COMPUTER,						EHR_LIC_MGR_NO_COMPUTER,						L"Could not communicate with the computer, verify computer name is correct (License Manager)"},
+	{EC_LIC_MGR_NO_LIC_SERVER,						EHR_LIC_MGR_NO_LIC_SERVER,						L"Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)"},
 };
 
 const unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);
@@ -107,7 +111,7 @@ HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type)
 std::wstring GetErrorMessage(HRESULT hr)
 {
 	wchar_t hrErrMsg[256];
-	#if _MSC_VER >= 1400	
+	#if _MSC_VER >= 1400
 		swprintf_s(hrErrMsg, sizeof(hrErrMsg)/sizeof(wchar_t), L" [0x%08X]", hr);
 	#else
 		swprintf(hrErrMsg, L" [0x%08X]", hr);
@@ -119,11 +123,9 @@ std::wstring GetErrorMessage(HRESULT hr)
 		//Detect a Solimar License error
 		retVal = GetECMessage(SL_EC_FROM_EHR(hr));
 	}
-	else if((hr & 0x80070000) == 0x80070000)  //that location is where win32 errors set their value
+	else
 	{
-		//Detect if it is a Win32 error
-		HRESULT tempHr(hr & 0x0000FFFF); //Convert, take the lower 4
-
+		HRESULT tempHr = ((hr & 0x80070000) == 0x80070000) ? (hr & 0x0000FFFF) : hr;
 		LPVOID lpMsgBuf;
 		FormatMessageW(
 			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
@@ -135,26 +137,25 @@ std::wstring GetErrorMessage(HRESULT hr)
 			NULL);
 		std::wstring tempMsg = (wchar_t*)lpMsgBuf;
 		size_t index(tempMsg.length());
-		while(tempMsg[index]==L'\n' || tempMsg[index]==L'\r')
+		while(tempMsg[index-1]==L'\n' || tempMsg[index-1]==L'\r')
 		{
 			tempMsg[index] = L'\0';
 			index--;
 		}
-		retVal = std::wstring(tempMsg.c_str());
-
+		retVal = std::wstring(tempMsg.substr(0, index));
 		// Free the buffer.
 		LocalFree(lpMsgBuf);
 	}
-	else
+	if(!wcsicmp(retVal.c_str(), L"Unknown Error"))
 	{
 		IErrorInfo* pIErrorInfo = NULL;
-		GetErrorInfo(0, &pIErrorInfo);
-		if (pIErrorInfo)
+		if (GetErrorInfo(0, &pIErrorInfo) == S_OK)
 		{
 			BSTR des;
 			if (SUCCEEDED(pIErrorInfo->GetDescription(&des)))
 			{
 				retVal = std::wstring(des);
+				SetErrorInfo(0, pIErrorInfo);
 				SysFreeString(des);
 			}
 			pIErrorInfo->Release();
@@ -176,6 +177,6 @@ std::wstring GetECMessage(unsigned long echr)
 		if (SLErrors[i].EC == ec)
 			return std::wstring(SLErrors[i].message);
 	}
-	return std::wstring(SLErrors[0].message);   //Unknown
+	return std::wstring(SLErrors[0].message); //Unknown
 }
 };
