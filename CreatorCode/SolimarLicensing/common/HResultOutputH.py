@@ -41,17 +41,26 @@ class HResultOutputH(AttribsOutput):
 		# Offset defines
 		for offset in OutputOrderDictionaryValues(hresults_class['offsets']):
                     if(offset['base'] == 'HRESULT_BASE' or offset['base'] == ''):    #no hresult base for cpp file
-                        class_text += '\tconst unsigned long %s = %s\n' % (offset['name'],offset['value'])
+                        class_text += '\tconst unsigned long %s = %s;\n' % (offset['name'],offset['value'])
                     else:
-			class_text += '\tconst unsigned long %s = %s+%s\n' % (offset['name'],offset['base'],offset['value'])
+			class_text += '\tconst unsigned long %s = %s+%s;\n' % (offset['name'],offset['base'],offset['value'])
 
                 class_text += '\n#ifndef SP_ACCESS_DENIED\t//RAINBOW API Error Codes\n'
 
 		# Rainbow Error Codes
-		for rnbo in OutputOrderDictionaryValues(hresults_class['rnbos']):  
-                        class_text += '\tconst unsigned long %s = %s\n' % (rnbo['name'],rnbo['value'])
+		for rnbo in OutputOrderDictionaryValues(hresults_class['rnbos']):
+			if(rnbo['name'] != 'SP_INVALID_STATUS'):
+	                        class_text += '\tconst unsigned long %s = %s;\n' % (rnbo['name'],rnbo['value'])
 
                 class_text += '#endif\n'
+
+		class_text += '\n'
+                class_text += '\t//07-01-11 - JWL\n'
+		class_text += '\t//Note: This is a rainbow error that is not defined in current 3rd party .h file.\n'
+		class_text += '\t//If receive a new .h file and receive an error because it is already defined, move\n'
+		class_text += '\t//this above.\n'
+		class_text += '\tconst unsigned long SP_INVALID_STATUS = 255;\n'
+
 
                 #Custom HRESULTS
                 for ordered_hresults in OutputOrderDictionaryValues(hresults_class['hresults']):
@@ -92,7 +101,7 @@ class HResultOutputH(AttribsOutput):
                 #define SL_IS_LIC_HR (hr)
                 class_text += '\n\n\t/*\n\t* SL_IS_LIC_HR()\n\t*\n\t* Determine if hr is a Lic HR\n\t*/\n'
                 class_text += '\n\t#define SL_IS_LIC_HR(hr) \\\n'
-                class_text += '\t\t((hr) & ITF_CR_MIN)\n'
+                class_text += '\t\t((hr) & ITF_LIC_MIN)\n'
 
                 #define SL_EC_FROM_EHR (hr)
                 class_text += '\t/*\n\t* SL_EC_FROM_EHR()\n\t*\n\t* Extracts the error code portion from an HRESULT.\n\t*/\n'

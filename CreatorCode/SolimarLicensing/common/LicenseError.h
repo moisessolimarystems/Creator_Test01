@@ -7,12 +7,13 @@
 namespace LicenseServerError
 {
 	/* Custom Error Base   HR Error Codes should all offset from this base. */
-	const unsigned long ITF_LIC_OFFSET = 0x0000;
-	const unsigned long ITF_LIC_MIN = ITF_LIC_OFFSET;
-	const unsigned long ITF_LIC_CR_MIN = ITF_LIC_MIN+0x9000;
-	const unsigned long ITF_LIC_SVR_OFFSET = ITF_LIC_CR_MIN+0x0000;
-	const unsigned long ITF_LIC_RNBO_OFFSET = ITF_LIC_CR_MIN+0x0100;
-	const unsigned long ITF_LIC_MAX = 0xFFFF;
+	const unsigned long ITF_OFFSET = 0x0000;
+	const unsigned long ITF_MIN = ITF_OFFSET;
+	const unsigned long ITF_LIC_MIN = ITF_MIN+0x9000;
+	const unsigned long ITF_LIC_SVR_OFFSET = ITF_LIC_MIN+0x0000;
+	const unsigned long ITF_LIC_RNBO_OFFSET = ITF_LIC_MIN+0x0100;
+	const unsigned long ITF_LIC_MGR_OFFSET = ITF_LIC_MIN+0x0300;
+	const unsigned long ITF_MAX = 0xFFFF;
 
 #ifndef SP_ACCESS_DENIED	//RAINBOW API Error Codes
 	const unsigned long SP_INVALID_FUNCTION_CODE = 1;
@@ -56,8 +57,8 @@ namespace LicenseServerError
 	const unsigned long SP_PACKET_ALREADY_INITIALIZED = 75;
 #endif
 
-	//07-01-11 - JWL 
-	//Note: This is a rainbow error that is not defined in current 3rd party .h file.  
+	//07-01-11 - JWL
+	//Note: This is a rainbow error that is not defined in current 3rd party .h file.
 	//If receive a new .h file and receive an error because it is already defined, move
 	//this above.
 	const unsigned long SP_INVALID_STATUS = 255;
@@ -129,6 +130,10 @@ namespace LicenseServerError
 	const unsigned long EC_SP_PACKET_ALREADY_INITIALIZED = ITF_LIC_RNBO_OFFSET+SP_PACKET_ALREADY_INITIALIZED;
 	const unsigned long EC_SP_INVALID_STATUS = ITF_LIC_RNBO_OFFSET+SP_INVALID_STATUS;
 
+	// Rainbow driver errors
+	const unsigned long EC_LIC_MGR_NO_COMPUTER = ITF_LIC_MGR_OFFSET+1;
+	const unsigned long EC_LIC_MGR_NO_LIC_SERVER = ITF_LIC_MGR_OFFSET+2;
+
 	/* HRESULTS defined from custom error codes above. */
 	const HRESULT EHR_UNKNOWN = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_UNKNOWN);
 	const HRESULT EHR_DRIVER_INIT_FAILURE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_DRIVER_INIT_FAILURE);
@@ -195,6 +200,9 @@ namespace LicenseServerError
 	const HRESULT EHR_SP_PACKET_ALREADY_INITIALIZED = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_PACKET_ALREADY_INITIALIZED);
 	const HRESULT EHR_SP_INVALID_STATUS = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_INVALID_STATUS);
 
+	const HRESULT EHR_LIC_MGR_NO_COMPUTER = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_MGR_NO_COMPUTER);
+	const HRESULT EHR_LIC_MGR_NO_LIC_SERVER = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_MGR_NO_LIC_SERVER);
+
 	/*
 	 * SL_ERROR - Solimar License Error
 	*/
@@ -216,7 +224,7 @@ namespace LicenseServerError
 	*/
 
 	#define SL_IS_LIC_HR(hr) \
-		((hr) & ITF_LIC_CR_MIN)
+		((hr) & ITF_LIC_MIN)
 	/*
 	* SL_EC_FROM_EHR()
 	*

@@ -10,9 +10,10 @@ namespace Solimar
 			private const uint HRESULT_BASE = 0x80040000;
 			private const uint ITF_OFFSET = 0x0000;
 			private const uint ITF_MIN = HRESULT_BASE+ITF_OFFSET;
-			private const uint ITF_CR_MIN = ITF_MIN+0x9000;
-			private const uint ITF_LIC_SVR_OFFSET = ITF_CR_MIN+0x0000;
-			private const uint ITF_RNBO_OFFSET = ITF_CR_MIN+0x0100;
+			private const uint ITF_LIC_MIN = ITF_MIN+0x9000;
+			private const uint ITF_LIC_SVR_OFFSET = ITF_LIC_MIN+0x0000;
+			private const uint ITF_LIC_RNBO_OFFSET = ITF_LIC_MIN+0x0100;
+			private const uint ITF_LIC_MGR_OFFSET = ITF_LIC_MIN+0x0300;
 			private const uint ITF_MAX = 0xFFFF;
 		
 			#region Rainbow Error Codes
@@ -82,51 +83,54 @@ namespace Solimar
 			private const uint EHR_PACKET_EXPIRED = ITF_LIC_SVR_OFFSET+19;
 			private const uint EHR_KEY_BASE_NOT_MATCHING = ITF_LIC_SVR_OFFSET+20;
 			private const uint EHR_KEY_NOT_MATCHING_INSTANCES = ITF_LIC_SVR_OFFSET+21;
-			private const uint EHR_KEY_NO_FREE_APP_INSTANCE = ITF_LIC_SVR_OFFSET + 22;
-			private const uint EHR_KEY_NO_BASE_KEY = ITF_LIC_SVR_OFFSET + 23;
-			private const uint EHR_KEY_RESTORED_KEY_SERVER = ITF_LIC_SVR_OFFSET + 24;
-			private const uint EHR_KEY_USE_BACKUP_KEY_SERVER = ITF_LIC_SVR_OFFSET + 25;
-			private const uint EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET + 26;
-			
+			private const uint EHR_KEY_NO_FREE_APP_INSTANCE = ITF_LIC_SVR_OFFSET+22;
+			private const uint EHR_KEY_NO_BASE_KEY = ITF_LIC_SVR_OFFSET+23;
+			private const uint EHR_KEY_RESTORED_KEY_SERVER = ITF_LIC_SVR_OFFSET+24;
+			private const uint EHR_KEY_USE_BACKUP_KEY_SERVER = ITF_LIC_SVR_OFFSET+25;
+			private const uint EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET+26;
 		
 			// Rainbow driver errors
-			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
-			private const uint EHR_SP_INVALID_PACKET = ITF_RNBO_OFFSET+SP_INVALID_PACKET;
-			private const uint EHR_SP_UNIT_NOT_FOUND = ITF_RNBO_OFFSET+SP_UNIT_NOT_FOUND;
-			private const uint EHR_SP_ACCESS_DENIED = ITF_RNBO_OFFSET+SP_ACCESS_DENIED;
-			private const uint EHR_SP_INVALID_MEMORY_ADDRESS = ITF_RNBO_OFFSET+SP_INVALID_MEMORY_ADDRESS;
-			private const uint EHR_SP_INVALID_ACCESS_CODE = ITF_RNBO_OFFSET+SP_INVALID_ACCESS_CODE;
-			private const uint EHR_SP_PORT_IS_BUSY = ITF_RNBO_OFFSET+SP_PORT_IS_BUSY;
-			private const uint EHR_SP_WRITE_NOT_READY = ITF_RNBO_OFFSET+SP_WRITE_NOT_READY;
-			private const uint EHR_SP_NO_PORT_FOUND = ITF_RNBO_OFFSET+SP_NO_PORT_FOUND;
-			private const uint EHR_SP_ALREADY_ZERO = ITF_RNBO_OFFSET+SP_ALREADY_ZERO;
-			private const uint EHR_SP_DRIVER_NOT_INSTALLED = ITF_RNBO_OFFSET+SP_DRIVER_NOT_INSTALLED;
-			private const uint EHR_SP_VERSION_NOT_SUPPORTED = ITF_RNBO_OFFSET+SP_VERSION_NOT_SUPPORTED;
-			private const uint EHR_SP_QUERY_TOO_LONG = ITF_RNBO_OFFSET+SP_QUERY_TOO_LONG;
-			private const uint EHR_SP_DRIVER_IS_BUSY = ITF_RNBO_OFFSET+SP_DRIVER_IS_BUSY;
-			private const uint EHR_SP_PORT_ALLOCATION_FAILURE = ITF_RNBO_OFFSET+SP_PORT_ALLOCATION_FAILURE;
-			private const uint EHR_SP_PORT_RELEASE_FAILURE = ITF_RNBO_OFFSET+SP_PORT_RELEASE_FAILURE;
-			private const uint EHR_SP_ACQUIRE_PORT_TIMEOUT = ITF_RNBO_OFFSET+SP_ACQUIRE_PORT_TIMEOUT;
-			private const uint EHR_SP_SIGNAL_NOT_SUPPORTED = ITF_RNBO_OFFSET+SP_SIGNAL_NOT_SUPPORTED;
-			private const uint EHR_SP_INIT_NOT_CALLED = ITF_RNBO_OFFSET+SP_INIT_NOT_CALLED;
-			private const uint EHR_SP_FAIL_ON_DRIVER_COMM = ITF_RNBO_OFFSET+SP_FAIL_ON_DRIVER_COMM;
-			private const uint EHR_SP_SERVER_PROBABLY_NOT_UP = ITF_RNBO_OFFSET+SP_SERVER_PROBABLY_NOT_UP;
-			private const uint EHR_SP_UNKNOWN_HOST = ITF_RNBO_OFFSET+SP_UNKNOWN_HOST;
-			private const uint EHR_SP_SENDTO_FAILED = ITF_RNBO_OFFSET+SP_SENDTO_FAILED;
-			private const uint EHR_SP_SOCKET_CREATION_FAILED = ITF_RNBO_OFFSET+SP_SOCKET_CREATION_FAILED;
-			private const uint EHR_SP_NORESOURCES = ITF_RNBO_OFFSET+SP_NORESOURCES;
-			private const uint EHR_SP_BROADCAST_NOT_SUPPORTED = ITF_RNBO_OFFSET+SP_BROADCAST_NOT_SUPPORTED;
-			private const uint EHR_SP_BAD_SERVER_MESSAGE = ITF_RNBO_OFFSET+SP_BAD_SERVER_MESSAGE;
-			private const uint EHR_SP_NO_SERVER_RUNNING = ITF_RNBO_OFFSET+SP_NO_SERVER_RUNNING;
-			private const uint EHR_SP_NO_NETWORK = ITF_RNBO_OFFSET+SP_NO_NETWORK;
-			private const uint EHR_SP_NO_SERVER_RESPONSE = ITF_RNBO_OFFSET+SP_NO_SERVER_RESPONSE;
-			private const uint EHR_SP_NO_LICENSE_AVAILABLE = ITF_RNBO_OFFSET+SP_NO_LICENSE_AVAILABLE;
-			private const uint EHR_SP_INVALID_LICENSE = ITF_RNBO_OFFSET+SP_INVALID_LICENSE;
-			private const uint EHR_SP_INVALID_OPERATION = ITF_RNBO_OFFSET+SP_INVALID_OPERATION;
-			private const uint EHR_SP_BUFFER_TOO_SMALL = ITF_RNBO_OFFSET+SP_BUFFER_TOO_SMALL;
-			private const uint EHR_SP_INTERNAL_ERROR = ITF_RNBO_OFFSET+SP_INTERNAL_ERROR;
-			private const uint EHR_SP_PACKET_ALREADY_INITIALIZED = ITF_RNBO_OFFSET+SP_PACKET_ALREADY_INITIALIZED;
-			private const uint EHR_SP_INVALID_STATUS = ITF_RNBO_OFFSET+SP_INVALID_STATUS;
+			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
+			private const uint EHR_SP_INVALID_PACKET = ITF_LIC_RNBO_OFFSET+SP_INVALID_PACKET;
+			private const uint EHR_SP_UNIT_NOT_FOUND = ITF_LIC_RNBO_OFFSET+SP_UNIT_NOT_FOUND;
+			private const uint EHR_SP_ACCESS_DENIED = ITF_LIC_RNBO_OFFSET+SP_ACCESS_DENIED;
+			private const uint EHR_SP_INVALID_MEMORY_ADDRESS = ITF_LIC_RNBO_OFFSET+SP_INVALID_MEMORY_ADDRESS;
+			private const uint EHR_SP_INVALID_ACCESS_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_ACCESS_CODE;
+			private const uint EHR_SP_PORT_IS_BUSY = ITF_LIC_RNBO_OFFSET+SP_PORT_IS_BUSY;
+			private const uint EHR_SP_WRITE_NOT_READY = ITF_LIC_RNBO_OFFSET+SP_WRITE_NOT_READY;
+			private const uint EHR_SP_NO_PORT_FOUND = ITF_LIC_RNBO_OFFSET+SP_NO_PORT_FOUND;
+			private const uint EHR_SP_ALREADY_ZERO = ITF_LIC_RNBO_OFFSET+SP_ALREADY_ZERO;
+			private const uint EHR_SP_DRIVER_NOT_INSTALLED = ITF_LIC_RNBO_OFFSET+SP_DRIVER_NOT_INSTALLED;
+			private const uint EHR_SP_VERSION_NOT_SUPPORTED = ITF_LIC_RNBO_OFFSET+SP_VERSION_NOT_SUPPORTED;
+			private const uint EHR_SP_QUERY_TOO_LONG = ITF_LIC_RNBO_OFFSET+SP_QUERY_TOO_LONG;
+			private const uint EHR_SP_DRIVER_IS_BUSY = ITF_LIC_RNBO_OFFSET+SP_DRIVER_IS_BUSY;
+			private const uint EHR_SP_PORT_ALLOCATION_FAILURE = ITF_LIC_RNBO_OFFSET+SP_PORT_ALLOCATION_FAILURE;
+			private const uint EHR_SP_PORT_RELEASE_FAILURE = ITF_LIC_RNBO_OFFSET+SP_PORT_RELEASE_FAILURE;
+			private const uint EHR_SP_ACQUIRE_PORT_TIMEOUT = ITF_LIC_RNBO_OFFSET+SP_ACQUIRE_PORT_TIMEOUT;
+			private const uint EHR_SP_SIGNAL_NOT_SUPPORTED = ITF_LIC_RNBO_OFFSET+SP_SIGNAL_NOT_SUPPORTED;
+			private const uint EHR_SP_INIT_NOT_CALLED = ITF_LIC_RNBO_OFFSET+SP_INIT_NOT_CALLED;
+			private const uint EHR_SP_FAIL_ON_DRIVER_COMM = ITF_LIC_RNBO_OFFSET+SP_FAIL_ON_DRIVER_COMM;
+			private const uint EHR_SP_SERVER_PROBABLY_NOT_UP = ITF_LIC_RNBO_OFFSET+SP_SERVER_PROBABLY_NOT_UP;
+			private const uint EHR_SP_UNKNOWN_HOST = ITF_LIC_RNBO_OFFSET+SP_UNKNOWN_HOST;
+			private const uint EHR_SP_SENDTO_FAILED = ITF_LIC_RNBO_OFFSET+SP_SENDTO_FAILED;
+			private const uint EHR_SP_SOCKET_CREATION_FAILED = ITF_LIC_RNBO_OFFSET+SP_SOCKET_CREATION_FAILED;
+			private const uint EHR_SP_NORESOURCES = ITF_LIC_RNBO_OFFSET+SP_NORESOURCES;
+			private const uint EHR_SP_BROADCAST_NOT_SUPPORTED = ITF_LIC_RNBO_OFFSET+SP_BROADCAST_NOT_SUPPORTED;
+			private const uint EHR_SP_BAD_SERVER_MESSAGE = ITF_LIC_RNBO_OFFSET+SP_BAD_SERVER_MESSAGE;
+			private const uint EHR_SP_NO_SERVER_RUNNING = ITF_LIC_RNBO_OFFSET+SP_NO_SERVER_RUNNING;
+			private const uint EHR_SP_NO_NETWORK = ITF_LIC_RNBO_OFFSET+SP_NO_NETWORK;
+			private const uint EHR_SP_NO_SERVER_RESPONSE = ITF_LIC_RNBO_OFFSET+SP_NO_SERVER_RESPONSE;
+			private const uint EHR_SP_NO_LICENSE_AVAILABLE = ITF_LIC_RNBO_OFFSET+SP_NO_LICENSE_AVAILABLE;
+			private const uint EHR_SP_INVALID_LICENSE = ITF_LIC_RNBO_OFFSET+SP_INVALID_LICENSE;
+			private const uint EHR_SP_INVALID_OPERATION = ITF_LIC_RNBO_OFFSET+SP_INVALID_OPERATION;
+			private const uint EHR_SP_BUFFER_TOO_SMALL = ITF_LIC_RNBO_OFFSET+SP_BUFFER_TOO_SMALL;
+			private const uint EHR_SP_INTERNAL_ERROR = ITF_LIC_RNBO_OFFSET+SP_INTERNAL_ERROR;
+			private const uint EHR_SP_PACKET_ALREADY_INITIALIZED = ITF_LIC_RNBO_OFFSET+SP_PACKET_ALREADY_INITIALIZED;
+			private const uint EHR_SP_INVALID_STATUS = ITF_LIC_RNBO_OFFSET+SP_INVALID_STATUS;
+		
+			// Rainbow driver errors
+			private const uint EHR_LIC_MGR_NO_COMPUTER = ITF_LIC_MGR_OFFSET+1;
+			private const uint EHR_LIC_MGR_NO_LIC_SERVER = ITF_LIC_MGR_OFFSET+2;
 			#endregion
 			
 			#region Defines for Custom HRESULTS Messages
@@ -156,11 +160,11 @@ namespace Solimar
 				SolLicErrors.Add(EHR_PACKET_EXPIRED,"Packet expired (Key server)");
 				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module (Key server)");
 				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE, "Insufficient licensing, unable to obtain an Application Instances on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY, "Insufficient licensing, unable to locate a Base Key on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER, "Licensing on the Key Server has been restored (Key server)");
-				SolLicErrors.Add(EHR_KEY_USE_BACKUP_KEY_SERVER, "Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER, "License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE,"Insufficient licensing, unable to obtain an Application Instances on the server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY,"Insufficient licensing, unable to locate a Base Key on the server (Key server)");
+				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER,"Licensing on the Key Server has been restored (Key server)");
+				SolLicErrors.Add(EHR_KEY_USE_BACKUP_KEY_SERVER,"Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)");
+				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)");
 				SolLicErrors.Add(EHR_SP_INVALID_FUNCTION_CODE,"Invalid function code (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_PACKET,"Invalid packet (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_UNIT_NOT_FOUND,"Unit not found (Rainbow driver)");
@@ -198,11 +202,13 @@ namespace Solimar
 				SolLicErrors.Add(EHR_SP_INTERNAL_ERROR,"An internal error (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_PACKET_ALREADY_INITIALIZED,"The packet being initialized was already initialized (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_STATUS,"An invalid status code was returned (Rainbow driver)");
+				SolLicErrors.Add(EHR_LIC_MGR_NO_COMPUTER,"Could not communicate with the computer, verify computer name is correct (License Manager)");
+				SolLicErrors.Add(EHR_LIC_MGR_NO_LIC_SERVER,"Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)");
 			}
 			#endregion
 			public static bool IsCustomHR(uint _hresult)
 			{
-				return (_hresult & (ITF_CR_MIN-ITF_MIN)) > 0;
+				return (_hresult & ITF_LIC_MIN) > 0;
 			}
 			public static string GetHRMessage(uint _hresult)
 			{

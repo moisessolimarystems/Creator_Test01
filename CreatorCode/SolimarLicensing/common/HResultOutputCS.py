@@ -90,7 +90,7 @@ class HResultOutputCS(AttribsOutput):
                 #function : IsCustomHR(uint _hresult)
 		class_text += '\tpublic static bool IsCustomHR(uint _hresult)\n'
                 class_text += '\t{\n'
-                class_text += '\t\treturn (_hresult & (ITF_CR_MIN-ITF_MIN)) > 0;\n'
+                class_text += '\t\treturn (_hresult & ITF_LIC_MIN) > 0;\n'
                 class_text += '\t}\n'
 		
                 #function : GetHRMessage(uint _hresult)    
