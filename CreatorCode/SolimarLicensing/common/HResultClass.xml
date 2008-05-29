@@ -12,9 +12,10 @@
 	<!--	-->
 	<Offset name="ITF_OFFSET"		  value="0x0000"  base=""/>	
 	<Offset name="ITF_MIN"		      value="ITF_OFFSET"  base="HRESULT_BASE"/>
-	<Offset name="ITF_CR_MIN"	      value="0x9000"  base="ITF_MIN"/>
-	<Offset name="ITF_LIC_SVR_OFFSET" value="0x0000"  base="ITF_CR_MIN"/>
-	<Offset name="ITF_RNBO_OFFSET"    value="0x0100"  base="ITF_CR_MIN"/>    
+	<Offset name="ITF_LIC_MIN"	      value="0x9000"  base="ITF_MIN"/>
+	<Offset name="ITF_LIC_SVR_OFFSET" value="0x0000"  base="ITF_LIC_MIN"/>
+	<Offset name="ITF_LIC_RNBO_OFFSET"    value="0x0100"  base="ITF_LIC_MIN"/>
+	<Offset name="ITF_LIC_MGR_OFFSET"	value="0x0300"  base="ITF_LIC_MIN"/>
 	<Offset name="ITF_MAX"			  value="0xFFFF"  base=""/>	
 	<!--	-->
 	<!-- Rainbow Error Codes -->
@@ -80,12 +81,19 @@
 		<HResult name="EHR_KEY_NO_SUITABLE_KEY"     ecode="EC_KEY_NO_SUITABLE_KEY"		value="16" alias="No suitable key found (Key server)"/>
 		<HResult name="EHR_KEY_LOCKED"				ecode="EC_KEY_LOCKED"				value="17" alias="Key locked (Key server)"/>
 		<HResult name="EHR_CLIENT_TIMEOUT"          ecode="EC_CLIENT_TIMEOUT"			value="18" alias="Client timeout (Key server)"/>
-		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>		
+		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>
+		<HResult name="EHR_KEY_BASE_NOT_MATCHING"	ecode="EC_KEY_BASE_NOT_MATCHING"	value="20" alias="Base Keys do not match module for module (Key server)"/>
+		<HResult name="EHR_KEY_NOT_MATCHING_INSTANCES" ecode="EC_KEY_NOT_MATCHING_INSTANCES"			value="21" alias="Keys do not match by Application Instances for all the Key on the server (Key server)"/>
+		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Insufficient licensing, unable to obtain an Application Instances on the server (Key server)"/>
+		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Insufficient licensing, unable to locate a Base Key on the server (Key server)"/>
+		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the Key Server has been restored (Key server)"/>
+		<HResult name="EHR_KEY_USE_BACKUP_KEY_SERVER"	ecode="EC_KEY_USE_BACKUP_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"/>
+		<HResult name="EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER"	ecode="EC_KEY_NO_REMOTE_VERSION_KEY_SERVER"			value="26" alias="License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"/>
 	</HResultType>
 	<!--	-->
 	<!-- HResults with offset ITF_CR_APP_MIN -->
 	<!--	-->
-	<HResultType offset="ITF_RNBO_OFFSET">
+	<HResultType offset="ITF_LIC_RNBO_OFFSET">
 		<HResult name="EHR_SP_INVALID_FUNCTION_CODE"	  ecode="EC_SP_INVALID_FUNCTION_CODE"		value="SP_INVALID_FUNCTION_CODE"		alias="Invalid function code (Rainbow driver)"/>
 		<HResult name="EHR_SP_INVALID_PACKET"			  ecode="EC_SP_INVALID_PACKET"				value="SP_INVALID_PACKET"				alias="Invalid packet (Rainbow driver)"/>	
 		<HResult name="EHR_SP_UNIT_NOT_FOUND"			  ecode="EC_SP_UNIT_NOT_FOUND"				value="SP_UNIT_NOT_FOUND"				alias="Unit not found (Rainbow driver)"/>
@@ -123,6 +131,14 @@
 		<HResult name="EHR_SP_INTERNAL_ERROR"			  ecode="EC_SP_INTERNAL_ERROR"				value="SP_INTERNAL_ERROR"				alias="An internal error (Rainbow driver)"/>
 		<HResult name="EHR_SP_PACKET_ALREADY_INITIALIZED" ecode="EC_SP_PACKET_ALREADY_INITIALIZED"	value="SP_PACKET_ALREADY_INITIALIZED" alias="The packet being initialized was already initialized (Rainbow driver)"/>
 		<HResult name="EHR_SP_INVALID_STATUS"			  ecode="EC_SP_INVALID_STATUS"				value="SP_INVALID_STATUS"			    alias="An invalid status code was returned (Rainbow driver)"/>
+	</HResultType>
+	<!--	-->	
+	
+	<!-- HResults with offset ITF_LIC_MGR_OFFSET-->
+	<!--	-->
+	<HResultType offset="ITF_LIC_MGR_OFFSET">
+		<HResult name="EHR_LIC_MGR_NO_COMPUTER"		ecode="EC_LIC_MGR_NO_COMPUTER"		value="1"  alias="Could not communicate with the computer, verify computer name is correct (License Manager)" /> 
+		<HResult name="EHR_LIC_MGR_NO_LIC_SERVER"		ecode="EC_LIC_MGR_NO_LIC_SERVER"		value="2"  alias="Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)" /> 
 	</HResultType>
 	<!--	-->	
 </HResultClass>
