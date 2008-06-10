@@ -1301,21 +1301,49 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 			else
 			{
 				tmp_cells_valid[i]=S_OK;
-				try {tmp_cells[i]=ReadCellPhysical(i);}
-				catch (_com_error &e) {tmp_cells_valid[i]=e.Error();}
+				try 
+				{
+					tmp_cells[i]=ReadCellPhysical(i);
+				}
+				catch (_com_error &e) 
+				{
+					tmp_cells_valid[i]=e.Error();
+					if(e.Error() == LicenseServerError::EHR_SP_UNIT_NOT_FOUND)
+					{
+						//if can't find Key, don't waste time querying other cells.
+						some_valid_cells = false;
+						break;
+					}
+				}
 				if (SUCCEEDED(tmp_cells_valid[i]))
 					some_valid_cells = true;
 			}
 		}
 
-		{ // copy from the temp cache to the persistent cache
+		//CR.FIX.9976 - JWL - Moved this code to the else statement, introduced hole on initial case if there are
+		//no valid keys, but only update the key cache if there are valid cells.  Think this will help the scenario 
+		//where for some reason there is an error finding keys, which leads to exceptions.  Have only seen this case 
+		//sometimes on PCs with lots of keys.
+
+		//{ // copy from the temp cache to the persistent cache
+		//	SafeMutex mutex(cells_lock);
+		//	memcpy(cells,tmp_cells,sizeof(cells));
+		//	memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
+		//}
+
+		if (!some_valid_cells)
+			throw _com_error(E_FAIL);
+		else
+		{ 
+			// copy from the temp cache to the persistent cache
 			SafeMutex mutex(cells_lock);
 			memcpy(cells,tmp_cells,sizeof(cells));
 			memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
 		}
+
 		
-		if (!some_valid_cells)
-			throw _com_error(E_FAIL);
+		
+		
 	}
 }
 

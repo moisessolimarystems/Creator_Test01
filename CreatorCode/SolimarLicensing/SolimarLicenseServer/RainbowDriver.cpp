@@ -583,5 +583,5 @@ HRESULT RainbowDriver::ClearKeyTempGUID(RBP_SPRO_APIPACKET packet)
 HRESULT RainbowDriver::TranslateRainbowError(unsigned short rnboError)
 {
 	if (0==rnboError) return S_OK;
-	return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, LicenseServerError::ITF_LIC_MIN + LicenseServerError::ITF_LIC_RNBO_OFFSET + rnboError);
+	return MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, LicenseServerError::ITF_LIC_RNBO_OFFSET + rnboError);
 }
