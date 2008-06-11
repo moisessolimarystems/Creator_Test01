@@ -213,8 +213,6 @@ int ServerConfiguration::MapProductName(String* ProductName)
 		ProductName = ProductName->ToUpper();
 		if(ProductName->Equals(L"ICONVERT"))
 			return IConvertProductID;
-		else if(ProductName->Equals(L"SOLSEARCHER"))
-			return SolSearcherEnterpriseProductID;
 		else if(ProductName->Equals(L"SOLSCRIPT"))
 			return SolScriptProductID;
 		else if(ProductName->Equals(L"SDX DESIGNER"))
