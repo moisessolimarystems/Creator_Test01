@@ -85,45 +85,14 @@
 	/* convert the time_t in to a variant date */ \
 	time_t timestamp = time(0); \
 	_variant_t vtTimestamp; \
-	double vtimestamp; \
-	SYSTEMTIME systimestamp; \
-	memset(&systimestamp, 0, sizeof(systimestamp)); \
-	tm tm_struct; \
-	gmtime_s(&tm_struct, &timestamp); \
-	systimestamp.wSecond = tm_struct.tm_sec; \
-	systimestamp.wMinute = tm_struct.tm_min; \
-	systimestamp.wHour = tm_struct.tm_hour; \
-	systimestamp.wDay = tm_struct.tm_mday; \
-	systimestamp.wMonth = tm_struct.tm_mon + 1; \
-	systimestamp.wYear = tm_struct.tm_year + 1900; \
-	systimestamp.wDayOfWeek = tm_struct.tm_wday; \
-	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp)) \
-		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
-	else \
-		vtTimestamp = _variant_t(0.0, VT_DATE); \
+	vtTimestamp = TimeHelper::TimeTToVariant(timestamp, false); \
 	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
 } /* end scope */ \
 
 #define SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp) \
 { /* begin scope */ \
 	/* convert the time_t in to a variant date */ \
-	time_t timestamp = time(0); \
-	double vtimestamp; \
-	SYSTEMTIME systimestamp; \
-	memset(&systimestamp, 0, sizeof(systimestamp)); \
-	tm tm_struct; \
-	gmtime_s(&tm_struct, &timestamp); \
-	systimestamp.wSecond = tm_struct.tm_sec; \
-	systimestamp.wMinute = tm_struct.tm_min; \
-	systimestamp.wHour = tm_struct.tm_hour; \
-	systimestamp.wDay = tm_struct.tm_mday; \
-	systimestamp.wMonth = tm_struct.tm_mon + 1; \
-	systimestamp.wYear = tm_struct.tm_year + 1900; \
-	systimestamp.wDayOfWeek = tm_struct.tm_wday; \
-	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp)) \
-		vtTimestamp = _variant_t(vtimestamp, VT_DATE); \
-	else \
-		vtTimestamp = _variant_t(0.0, VT_DATE); \
+	vtTimestamp = TimeHelper::TimeTToVariant(time(0), false); \
 } /* end scope */ \
 
 #define SS_CONVERT_LICENSE_HR_TO_LICENSE_MESSAGE(hr, wcs_licensing_message_buffer, int_lic_message, bstr_server) \

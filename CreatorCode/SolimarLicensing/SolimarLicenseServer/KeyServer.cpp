@@ -5,6 +5,7 @@
 
 #include "KeyServer.h"
 #include "..\common\LicenseError.h"
+#include "..\common\TimeHelper.h"
 
 #include <string>
 #include <vector>
@@ -158,7 +159,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 		driver.RefreshKeyList();
 		if(driver.AtLeastOneParallelKey())
 			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
-		
+
 		// first pass, add newly found keys
 		ProtectionKey* tmpProKey;
 		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
@@ -197,7 +198,6 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 				}
 			}
 		}
-
 		// second pass, remove keys that are no longer reported by the driver
 		KeyServer::KeyList::iterator skey=keys.begin();
 		while (skey!=keys.end())
@@ -212,7 +212,6 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 		}
 
 		std::map<_bstr_t, ProtectionKey*> physicalKeyMap;// Performance optimization, used by virtual keys to look at instead of querying physical key.
-
 		// last pass, refresh all of the read-caches
 		for (skey = keys.begin(); skey!=keys.end(); ++skey)
 		{
@@ -238,7 +237,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 		}
 	} // release the lock on the driver's key list
 
-//swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave, ThreadID: %d", GetCurrentThreadId());
+//swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave: hr=0x%08x, ThreadID: %d", hr, GetCurrentThreadId());
 //OutputDebugString(tmpbuf);
 	return hr;
 }
@@ -1365,27 +1364,7 @@ void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType m
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
 	
 	_variant_t vtTimestamp;
-	
-	// convert the time_t in to a variant date
-	double vtimestamp;
-	SYSTEMTIME systimestamp;
-	memset(&systimestamp, 0, sizeof(systimestamp));
-	//tm * tm_struct = NULL;
-	//gmtime_s(tm_struct, &timestamp);
-	tm tm_struct;
-	gmtime_s(&tm_struct, &timestamp);
-	systimestamp.wSecond = tm_struct.tm_sec;
-	systimestamp.wMinute = tm_struct.tm_min;
-	systimestamp.wHour = tm_struct.tm_hour;
-	systimestamp.wDay = tm_struct.tm_mday;
-	systimestamp.wMonth = tm_struct.tm_mon + 1;
-	systimestamp.wYear = tm_struct.tm_year + 1900;
-	systimestamp.wDayOfWeek = tm_struct.tm_wday;
-	if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
-		vtTimestamp = _variant_t(vtimestamp, VT_DATE);
-	else
-		vtTimestamp = _variant_t(0.0, VT_DATE);
-	
+	vtTimestamp =  TimeHelper::TimeTToVariant(timestamp, false);	//Convert to local time
 	/*
 	_bstr_t str_timestamp;
 	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
@@ -1641,6 +1620,7 @@ HRESULT KeyServer::TimesUp()
 void KeyServer::USBEventCallback(LPVOID pContext)
 {
 //OutputDebugStringW(L"KeyServer::USBEventCallback() - Enter");
+	//((KeyServer*)pContext)->ResynchronizeKeys();
 	ResynchronizeKeys();
 //OutputDebugStringW(L"KeyServer::USBEventCallback() - Leave");
 }
