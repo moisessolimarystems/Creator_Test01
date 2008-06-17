@@ -61,7 +61,7 @@ enum ProductId {
 <!-- 
 TODO:
 Take in to account on/off (same as unlimited?), pooled, limited and unlimited licenses
-Fill out the Ximage SOLscript and other non-'SPD Style Module' keys with module information
+Fill out the Ximage SolScript and other non-'SPD Style Module' keys with module information
 Write a description of the key layout to aid with adding/modifying entries
 Find a solution for pages per minute that is somewhat transparent to the upper layers (maybe add an attribute to modules that specify storage location (registry vs key))
 Examine the idea of using the key for just a hash of the licensing info and storing all the licensing in a file/registry
@@ -418,7 +418,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
-		<KeyLayout name="SOLscript">
+		<KeyLayout name="SolScript">
 			<ModuleList>
 				<!-- regular modules -->
 				<Module id="0" offset="0x08c" bits="4" name="Distiller"/>
@@ -432,7 +432,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>										
 			</ModuleList>
 			<ProductList>
-				<Product id="9" name="SOLscript">
+				<Product id="9" name="SolScript">
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="12" default="0"/>
@@ -470,7 +470,6 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="19" offset="0x093" bits="1" name="Scale &amp; Shift" unlimited="1"/>       
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
-				<Module id="22" offset="0x120" bits="1" name="Assembly" unlimited="1"/>   
 				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
        	<Module id="31" offset="0x0F4" bits="4" name="Process Builders" isSharable="true"/>				
 			</ModuleList>
@@ -498,7 +497,6 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
           <ModuleInclude id="19" default="0"/>
           <ModuleInclude id="20" default="0"/>
 					<ModuleInclude id="21" default="0"/>
-					<ModuleInclude id="22" default="0"/>
 					<ModuleInclude id="30" default="1"/>
 					<ModuleInclude id="31" default="1"/>
 				</Product>
@@ -536,7 +534,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
-		<KeyLayout name="iCONVERT">
+		<KeyLayout name="iConvert">
 			<ModuleList>
 				<Module id="0"	offset="0x08c" bits="4" name="APPC" pool="128"/>
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
@@ -566,7 +564,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="128" offset="0x280" bits="16" name="Max LU" isPool="true"/>
 			</ModuleList>
 			<ProductList>
-				<Product id="7" name="iCONVERT">
+				<Product id="7" name="iConvert">
 					<ModuleInclude id="0" default="15"/>
 					<ModuleInclude id="1" default="15"/>
 					<ModuleInclude id="2" default="15"/>
@@ -595,7 +593,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
-		<KeyLayout name="SOLsearcher Enterprise">
+		<KeyLayout name="SolSearcher Enterprise">
 			<ModuleList>
 				<Module id="0"	offset="0x080" bits="16" name="Index Servers"/>
 				<Module id="1"	offset="0x090" bits="16" name="Report Servers"/>
@@ -614,7 +612,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="133"  offset="0x106" bits="1" name="Full Text" unlimited="1"/>							
 			</ModuleList>
 			<ProductList>
-				<Product id="8" name="SOLsearcher Enterprise">
+				<Product id="8" name="SolSearcher Enterprise">
 					<ModuleInclude id="0" default="0"/>
 					<ModuleInclude id="1" default="0"/>
 					<ModuleInclude id="2" default="0"/>
