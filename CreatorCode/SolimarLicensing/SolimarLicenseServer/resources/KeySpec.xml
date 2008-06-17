@@ -843,5 +843,13 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
+    <KeyLayout name="VerificationKey">
+      <ModuleList>
+      </ModuleList>
+      <ProductList>
+        <Product id="255" name="Software Verification Key">
+        </Product>
+      </ProductList>
+    </KeyLayout>  		
 	</KeyLayouts>
 </KeyFormat>

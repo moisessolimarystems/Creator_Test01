@@ -158,6 +158,7 @@ private:
 		KEYRental		=12,
 		KEYDevelopment	=13,
 		KEYReserved		=14,
+		KEYVerification=0xff,
 	} KeyTypeFlagX;
 	
 	static const short MAX_EXTENSION_NUM = 15;
