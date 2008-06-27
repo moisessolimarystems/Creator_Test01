@@ -301,6 +301,16 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 
 	m_initialized = false;
 
+
+	
+	if(FAILED(hr))
+	{
+		//CR.FIX.10112 - Return cleaner error messages for ClassNotRegistered and RpcError
+		if(hr == 0x80040154) //ClassNotRegistered
+			hr = LicenseServerError::EHR_LIC_MGR_NO_LIC_SERVER;
+		else if(hr == 0x800706ba)	//RpcErrror
+			hr = LicenseServerError::EHR_LIC_MGR_NO_COMPUTER;
+	}
 //swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 leave1 - hr: 0x%08x, sizeOfServerList: %d", hr, m_servers.size());
 //OutputDebugString(tmpbuf); 
 	return hr;
@@ -2279,7 +2289,10 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 				if (moduleIt->isLicense)
 				{
 					///if((pServerInfo->bUseOnlySharedLicenses && module->isSharable) || !pServerInfo->bUseOnlySharedLicenses)
-					moduleCounterMap[moduleIt->id] += keyIt->second.licenses_total[moduleIt->id];
+					unsigned long newTotal =  moduleCounterMap[moduleIt->id] + keyIt->second.licenses_total[moduleIt->id];
+					if ((keyIt->second.licenses_total[moduleIt->id] >= 0x7FFFFFFF) || (newTotal>= 0x7FFFFFFF))
+						newTotal = 0x7FFFFFFF;
+					moduleCounterMap[moduleIt->id] = newTotal;
 				}
 			}
 
@@ -2337,6 +2350,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 						{
 							//Don't factor in base keys in unlimited Calculation
 							bSetUnlimited = (int)module.unlimited <= moduleCounterMap[module.id];
+
 						}
 						else	//non-on/off Modules
 						{
@@ -2660,7 +2674,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 				if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 				{
 					pServerInfo->keys[key_ident].KeyPresent = true;
-					pServerInfo->keys[key_ident].KeyValid = VARIANT_TRUE;
+					pServerInfo->keys[key_ident].KeyValid = true;
 					
 					// trial information and messages
 					bool TrialInfoInitialized = pServerInfo->keys[key_ident].KeyTrialInfoInitialized;
@@ -2707,22 +2721,26 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 					
 					wchar_t licensing_message_buffer[256];
 					
+					// vtExpirationDate is in universal time, convert to local time for messages.
+					_variant_t vtLocalizedExpirationDate = TimeHelper::TimeTToVariant(TimeHelper::VariantToTimeT(vtExpirationDate), true);
+					
+
 					// if the key has just become inactive add message
 					if (TrialInfoInitialized && !KeyActive && pServerInfo->keys[key_ident].KeyActive)
 					{
-						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtLocalizedExpirationDate));
 						AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)pServerInfo->name), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
 					}
 					// if the key has just become active add message
 					if (TrialInfoInitialized && KeyActive && !pServerInfo->keys[key_ident].KeyActive)
 					{
-						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyActive], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyActive], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtLocalizedExpirationDate));
 						AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)pServerInfo->name), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyActive, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
 					}
 					// if the key had not been seen before and is inactive
 					if (KeyIsTrial && !KeyActive && !TrialInfoInitialized)
 					{
-						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyExpired], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtLocalizedExpirationDate));
 						AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)pServerInfo->name), std::wstring((wchar_t*)key_ident), vtServerTime, MT_WARNING, MessageLMTempKeyExpired, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
 					}
 					if (KeyIsTrial && KeyActive && 
@@ -2735,7 +2753,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 						)
 					)
 					{
-						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyStatus], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtExpirationDate));
+						swprintf_s(licensing_message_buffer, sizeof(licensing_message_buffer)/sizeof(wchar_t), LicensingMessageStringTable[MessageLMTempKeyStatus], KeyTrialHoursLeft, (wchar_t*)_bstr_t(vtLocalizedExpirationDate));
 						AddLicensingMessage(LicensingMessage(std::wstring((wchar_t*)pServerInfo->name), std::wstring((wchar_t*)key_ident), vtServerTime, MT_INFO, MessageLMTempKeyStatus, std::wstring(licensing_message_buffer), 0, vtKeyStatus.ulVal, vtExpirationDate, KeyTrialHoursLeft));
 					}
 					
@@ -2794,23 +2812,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 				// convert the time_t in to a variant date
 				time_t timestamp = time(0);
 				_variant_t vtTimestamp;
-				double vtimestamp;
-				SYSTEMTIME systimestamp;
-				memset(&systimestamp, 0, sizeof(systimestamp));
-				//tm * tm_struct = gmtime(&timestamp);
-				tm tm_struct;
-				gmtime_s(&tm_struct, &timestamp);
-				systimestamp.wSecond = tm_struct.tm_sec;
-				systimestamp.wMinute = tm_struct.tm_min;
-				systimestamp.wHour = tm_struct.tm_hour;
-				systimestamp.wDay = tm_struct.tm_mday;
-				systimestamp.wMonth = tm_struct.tm_mon + 1;
-				systimestamp.wYear = tm_struct.tm_year + 1900;
-				systimestamp.wDayOfWeek = tm_struct.tm_wday;
-				if (SystemTimeToVariantTime(&systimestamp, &vtimestamp))
-					vtTimestamp = _variant_t(vtimestamp, VT_DATE);
-				else
-					vtTimestamp = _variant_t(0.0, VT_DATE);
+				vtTimestamp = TimeHelper::TimeTToVariant(timestamp, false);
 
 				// Add messages to queued list
 				AddLicensingMessage(
@@ -2842,7 +2844,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 	}
 	return hr;
 }
-
+ 
 
 // checks that all licenses checked out are accounted for by some key
 HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses)
