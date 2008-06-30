@@ -887,7 +887,7 @@ void __fastcall TFCustomerKeys::resetPhysicalFlag()
          key_status = key_record->pkey->status;
 
          //if key is base and not deactived
-         if( (key_record->getKeyTypeIntegerValue(key_record->pkey->keyType) == ktfBase && key_status < 8 ) || (key_record->non_perm_ktf == true) )
+         if( (key_record->getKeyTypeIntegerValue(key_record->pkey->keyType) == ktfBase && (key_status < 8 || key_status >= 12)) || (key_record->non_perm_ktf == true) )
          {
             PHYSICAL_FLAG |= pf_MODULE;
          }

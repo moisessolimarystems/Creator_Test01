@@ -151,7 +151,7 @@ Sub GenerateRelease()
     g_MoveFiles.MoveRCPathToNetwork g_Build.ProductName, versionNum
     'g_Build.Release.AddReleaseToMKS g_MKS, g_MoveFiles, versionNum
     g_Build.UpdateFile "BuildRegistry.txt", "lastCreatorBuild", " " + g_Format.VersionToMajorMinor(versionNum)
-    g_Build.Release.UpdateReleaseFile "Configuration\CreatorRelease.txt"
+    g_Build.Release.UpdateReleaseFile g_MKS, "Configuration\CreatorRelease.txt"
 End Sub
    
 'Need to make sure Current and Next sandboxes are up to date.
@@ -291,38 +291,84 @@ Sub BuildInstallShieldProject(aVersionNum)
         g_Build.WriteToDlgAndFile "Building the InstallShield project"
         Dim installShieldProject, installObj, installKey, installItem
 
+        Dim installShieldProgram, installShieldCompiler, installShieldBuild
+        installShieldProgram = g_Build.ReadRegistry("HKEY_LOCAL_MACHINE\Software\InstallShield\InstallShield Professional\6.0\Main\PATH")
+        installShieldCompiler = installShieldProgram & "system\Compile"
+        installShieldBuild = installShieldProgram & "\program\ISbuild"
         installObj = gbl_InstallProject.Items
         installKey = gbl_InstallProject.Keys
   
-        'Dim ISProject                
-        For installItem = 0 To gbl_InstallProject.Count - 1 'Cycle through the list of InstallShield packages to compile & build.                       
+        g_Build.WriteToDlgAndFile "Updating IP File Version"
+		Dim fileInput
+        fileInput = g_Build.InstallShieldProjPath & "\Media\Creator\default.mda"
+        g_Build.UpdateIniFile fileInput, "TagFileInfo", "VERSION=", g_Build.NewBuild.versionNum
+        fileInput = g_Build.InstallShieldProjPath & "\Creator.ipr"
+        g_Build.UpdateIniFile fileInput, "[General]", "Version=", g_Build.NewBuild.versionNum
+        fileInput = g_Build.InstallShieldProjPath & "\Creator.ipr"
+        g_Build.UpdateIniFile fileInput, "Product", "Version=", g_Build.NewBuild.versionNum
+        fileInput = g_Build.InstallShieldProjPath & "\String Tables\0009-English\value.shl"
+        g_Build.UpdateIniFile fileInput, "Data", "PRODUCT_VERSION=", g_Build.NewBuild.versionNum
+        
+        For installItem = 0 To gbl_InstallProject.Count - 1 'Cycle through the list of InstallShield packages to compile & build.
             'No need to compile (generates an obl), just build for all developer 7 projects
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem)
             g_Build.WriteToDlgAndFile "installItem: " & installItem
             g_Build.WriteToDlgAndFile "installKey(" & installItem & "): " & installKey(installItem)
             g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Updating Version Number"
             g_Build.WriteToDlgAndFile "versionNumber: " & aVersionNum
-			g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile
+            'g_Build.UpdateInstallShieldVersion ISProject, g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, aVersionNum
+            'g_Build.RunCmd Chr(34) & g_Build.InstallShieldProjPath & "\ProjectDir.bat" & Chr(34)
+           
+	    g_Build.WriteToDlgAndFile "Compiling InstallShield Project"
+            g_Build.RunCmd Chr(34) & "C:\Program Files\Common Files\InstallShield\IScript\Compile" & Chr(34) & " " & _
+                       Chr(34) & g_Build.InstallShieldProjPath & "\Script~1\setup.rul" & Chr(34) & " " & _
+                       Chr(34) & InstallShieldProgram & "\Script\IFX\Lib\ifx.obl" & Chr(34) & " " & _
+                       Chr(34) & InstallShieldProgram & "\Script\ISRT\Lib\isrt.obl" & Chr(34) & _
+                       " -I" & Chr(34) & InstallShieldProgram & "\Script\IFX\Include;" & _
+                       InstallShieldProgram & "\Script\ISRT\Include;" & g_Build.InstallShieldProjPath & "\Script Files" & Chr(34) & " "
+
+            g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Generate CD Image"
+            g_Build.RunCmd Chr(34) & installShieldBuild & Chr(34) & _
+                            " -p" & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
+                            " -m" & Chr(34) & installObj(installItem).m_ReleaseMedia & Chr(34)
+            aFileName = installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile        
+
+            'Copy files to cd_image if there are files to copy
+            'If installObj(installItem).m_PostProcessDestFile <> "" Then
+                g_MoveFiles.CopyFileOrFolder "File", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
+                                           installObj(installItem).m_PostProcessDestLoc, True ' & installObj(installItem).m_PostProcessDestFile, True
+            'End If
+            g_Build.WriteToDlgAndFile ""
+        Next            
+        'Dim ISProject                
+        'For installItem = 0 To gbl_InstallProject.Count - 1 'Cycle through the list of InstallShield packages to compile & build.                       
+         '   'No need to compile (generates an obl), just build for all developer 7 projects
+         '   g_Build.WriteToDlgAndFile "Building: " & installKey(installItem)
+         '   g_Build.WriteToDlgAndFile "installItem: " & installItem
+         '   g_Build.WriteToDlgAndFile "installKey(" & installItem & "): " & installKey(installItem)
+         '   g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Updating Version Number"
+         '   g_Build.WriteToDlgAndFile "versionNumber: " & aVersionNum
+	'		g_Build.RunCmd "attrib -r " & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile
 		    
 			'Update ProductVersion & LicenseVersion properties			
-			g_Build.UpdateInstallShieldProperty  g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, "ProductVersion", aVersionNum			 
-            g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Generate CD Image"
-            g_Build.RunCmd Chr(34) & installObj(installItem).m_IpmType & Chr(34) & _
-                            " -p " & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
-							" -o " & Chr(34) & ISMergeModuleDir & Chr(34) & _
-							" -r " & Chr(34) & installObj(installItem).m_ReleaseMedia & Chr(34) & _
-							" -a " & Chr(34) & installObj(installItem).m_ProductConfiguration & Chr(34)
-            aFileName = installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile
-         
-            'Copy files to cd_image if there are files to copy
-            If installObj(installItem).m_PostProcessSrcFile <> "" Then
-                g_MoveFiles.CopyFileOrFolder "File", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
-                                           installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile, True
-				g_MoveFiles.CopyFileOrFolder "Folder", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
-                                           installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile , True
-            End If
-            g_Build.WriteToDlgAndFile ""
-        Next
+'			g_Build.UpdateInstallShieldProperty  g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile, "ProductVersion", aVersionNum			 
+ '           g_Build.WriteToDlgAndFile "Building: " & installKey(installItem) & " - Generate CD Image"
+  '          g_Build.RunCmd Chr(34) & installObj(installItem).m_IpmType & Chr(34) & _
+   '                         " -p " & Chr(34) & g_Build.MainProjPath & installObj(installItem).m_IpmLocation & installObj(installItem).m_IpmFile & Chr(34) & _
+	'						" -o " & Chr(34) & ISMergeModuleDir & Chr(34) & _
+	'						" -r " & Chr(34) & installObj(installItem).m_ReleaseMedia & Chr(34) & _
+	'						" -a " & Chr(34) & installObj(installItem).m_ProductConfiguration & Chr(34)
+     '       aFileName = installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile
+      '   
+       '     'Copy files to cd_image if there are files to copy
+        '    If installObj(installItem).m_PostProcessSrcFile <> "" Then
+         '       g_MoveFiles.CopyFileOrFolder "File", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
+          '                                 installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile, True
+		'		g_MoveFiles.CopyFileOrFolder "Folder", installObj(installItem).m_PostProcessSrcLoc & installObj(installItem).m_PostProcessSrcFile, _
+        '                                   installObj(installItem).m_PostProcessDestLoc & installObj(installItem).m_PostProcessDestFile , True
+        '    End If
+        '    g_Build.WriteToDlgAndFile ""
+        'Next
     End If   
 End Sub
     
@@ -448,7 +494,7 @@ End Sub
 Sub RestoreSubProjectForLicensing()
 	
 	Dim aDevPathNum, aNextDevPathNum, aFullDevPath, aType
-	aDevPathNum = Replace(g_Format.VersionToMajorMinor(g_Build.NewBuild.LicenseVersion),".","_",1,-1)
+	aDevPathNum = g_Format.VersionToMajorMinor(g_Build.NewBuild.LicenseVersion)
 	aNextDevPathNum = g_Build.GetBuildVersion("SolimarLicensingNextVersion")
 	'Determine whether to revert back to a normal or variant subproject
 	If (aDevPathNum = aNextDevPathNum) Then
@@ -459,7 +505,7 @@ Sub RestoreSubProjectForLicensing()
 	Else
 		'set license subproject to specified variant devpath
 		aType = "variant"
-		'aDevPathNum already set
+		aDevPathNum = "SolimarLicensing_" + Replace(aDevPathNum,".","_",1,-1)
 	End If
 	g_Build.WriteToDlgAndFile "configuring Licensing Subprojects"
 	g_MKS.ConfigureSubProject g_Build.MainCodePJFile  , _
@@ -613,23 +659,40 @@ End Function
         Dim TempObject, Name
         Do While Not readfile.AtEndOfStream
             Set TempObject = New CreatorInstallObject
-			TempObject.m_IpmType = GetNextLine(readfile)
-			TempObject.m_IpmLocation = GetNextLine(readfile)
-			TempObject.m_IpmFile = GetNextLine(readfile)
-			TempObject.m_CompileLoc = GetNextLine(readfile)
-			TempObject.m_CompileFile = GetNextLine(readfile)
-			TempObject.m_ReleaseMedia = GetNextLine(readfile)
-			TempObject.m_ProductConfiguration = GetNextLine(readfile)        
-			TempObject.m_PostProcessSrcLoc = GetNextLine(readfile)
-			TempObject.m_PostProcessSrcFile = GetNextLine(readfile)
-			TempObject.m_PostProcessDestLoc = GetNextLine(readfile)
-			TempObject.m_PostProcessDestFile = GetNextLine(readfile)
-			Name = GetNextLine(readfile)
+            TempObject.m_IpmLocation = GetNextLine(readfile)
+            TempObject.m_IpmFile = GetNextLine(readfile)
+            TempObject.m_ReleaseMedia = GetNextLine(readfile)
+            TempObject.m_CompileLoc = GetNextLine(readfile)
+            TempObject.m_CompileFile = GetNextLine(readfile)
+            TempObject.m_PostProcessSrcLoc = GetNextLine(readfile)
+            TempObject.m_PostProcessSrcFile = GetNextLine(readfile)
+            TempObject.m_PostProcessDestLoc = GetNextLine(readfile)
+            TempObject.m_PostProcessDestFile = GetNextLine(readfile)
+            Name = GetNextLine(readfile)
             gbl_InstallProject.Add Name, TempObject
             If Not readfile.AtEndOfStream Then
                 GetNextLine (readfile) 'a newline separates the entries
             End If
-        Loop
+        Loop        
+        'Do While Not readfile.AtEndOfStream
+        '    Set TempObject = New CreatorInstallObject
+		'	TempObject.m_IpmType = GetNextLine(readfile)
+		'	TempObject.m_IpmLocation = GetNextLine(readfile)
+		'	TempObject.m_IpmFile = GetNextLine(readfile)
+		'	TempObject.m_CompileLoc = GetNextLine(readfile)
+		'	TempObject.m_CompileFile = GetNextLine(readfile)
+		'	TempObject.m_ReleaseMedia = GetNextLine(readfile)
+		'	TempObject.m_ProductConfiguration = GetNextLine(readfile)        
+		'	TempObject.m_PostProcessSrcLoc = GetNextLine(readfile)
+		'	TempObject.m_PostProcessSrcFile = GetNextLine(readfile)
+		'	TempObject.m_PostProcessDestLoc = GetNextLine(readfile)
+		'	TempObject.m_PostProcessDestFile = GetNextLine(readfile)
+		'	Name = GetNextLine(readfile)
+         '   gbl_InstallProject.Add Name, TempObject
+          '  If Not readfile.AtEndOfStream Then
+           '     GetNextLine (readfile) 'a newline separates the entries
+            'End If
+       ' Loop
     
     End Sub
   
@@ -658,20 +721,31 @@ End Sub
         Public m_PatternNew
     End Class
 
-
     Class CreatorInstallObject
-		Public m_IpmType
-		Public m_IpmLocation
-		Public m_IpmFile
-		Public m_CompileLoc
-		Public m_CompileFile
-		Public m_ReleaseMedia
-		Public m_ProductConfiguration
-		Public m_PostProcessSrcLoc
-		Public m_PostProcessSrcFile
-		Public m_PostProcessDestLoc
-		Public m_PostProcessDestFile
+        Public m_IpmLocation
+        Public m_IpmFile
+        Public m_CompileLoc
+        Public m_CompileFile
+        Public m_ReleaseMedia
+        Public m_PostProcessSrcLoc
+        Public m_PostProcessSrcFile
+        Public m_PostProcessDestLoc
+        Public m_PostProcessDestFile
     End Class
+
+    'Class CreatorInstallObject
+	'	Public m_IpmType
+'		Public m_IpmLocation
+'		Public m_IpmFile
+		'Public m_CompileLoc
+		'Public m_CompileFile
+		'Public m_ReleaseMedia
+		'Public m_ProductConfiguration
+		'Public m_PostProcessSrcLoc
+		'Public m_PostProcessSrcFile
+		'Public m_PostProcessDestLoc
+		'Public m_PostProcessDestFile
+   ' End Class
 </script>
 </job>
 </package>
