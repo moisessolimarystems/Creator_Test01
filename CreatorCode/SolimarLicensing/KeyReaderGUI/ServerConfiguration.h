@@ -18,6 +18,7 @@ using namespace System::Security::AccessControl;
 
 //initial key created when installed
 #define SOLIMAR_KEY						L"SOFTWARE\\Solimar"
+#define SOLIMAR_KEY_32					L"SOFTWARE\\Wow6432Node\\Solimar"
 #define LICENSE_PRODUCT					L"Solimar Licensing"
 //XML Elements & Attributes
 #define LICENSING_STRUCTURE_ELEMENT		L"LicensingStructure"
