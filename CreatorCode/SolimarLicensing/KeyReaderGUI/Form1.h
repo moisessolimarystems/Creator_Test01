@@ -5,10 +5,13 @@
 #include "PasswordValidation.h"
 #include "PswdForm.h"
 #include "AboutBox.h"
+#include "ConnectToForm.h"
+#include "ServerConfiguration.h"
 #include "ListViewItemComparer.h"
 #include "ModListViewItemComparer.h"
 #include "ControlSizing.h"
 #include "SaveConfigurations.h"
+#include "CommunicationLink.h"
 			
 #ifdef GetObject
 #undef GetObject
@@ -21,7 +24,6 @@ namespace KeyReaderGUI
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
 	using namespace System::Windows::Forms;
-//	using namespace System::Data;
 	using namespace System::Drawing;
 	using namespace System::ServiceProcess;
 	using namespace KeyViewManager;
@@ -30,7 +32,7 @@ namespace KeyReaderGUI
 	using namespace ModListViewItemComparer;
 	using namespace SizeControl;
 	using namespace SaveConfig;
-
+	using namespace System::Net;
 
 	/// <summary> 
 	/// Summary for Form1
@@ -56,6 +58,11 @@ namespace KeyReaderGUI
 		void StopTimer();
 		void UpdateKeyListView();
 		void UpdateViews();
+		bool ConnectLink(String*);
+		bool DisconnectLink();
+		void ConnectServer();
+		void EnableMenuItems(bool);
+		bool IsLocalMachine(String*);
 
 		//helper methods used to initialize the components on the form
 		void InitializeKeyInfoListView();
@@ -69,35 +76,38 @@ namespace KeyReaderGUI
    private: System::Windows::Forms::Panel *  ModuleLicensePanel;
    private: System::Windows::Forms::Splitter *  splitter1;
    private: System::Windows::Forms::Panel *  KeyInfoPanel;
-   private: System::Windows::Forms::ListView *  ModLicenseListView;
-   private: System::Windows::Forms::ListView *  KeyInfoListView;
    private: System::Windows::Forms::StatusBar *  KeyReaderStatusBar;
    private: System::Windows::Forms::MenuItem *  fileMenuItem;
-
    private: System::Windows::Forms::MenuItem *  viewMenuItem;
    private: System::Windows::Forms::MenuItem *  refreshMenuItem;
    private: System::Windows::Forms::MenuItem *  PasswordMenuItem;
    private: System::Windows::Forms::MenuItem *  EnterPasswordMenuItem;
    private: System::Windows::Forms::MenuItem *  HelpMenuItem;
    private: System::Windows::Forms::MenuItem *  AboutSolimar;
-
    private: System::Windows::Forms::ColumnHeader *  newcolumn;
+   private: System::Windows::Forms::ColumnHeader*  ModuleName;
+	private: System::Windows::Forms::ColumnHeader*  LicensesInUse;
+	private: System::Windows::Forms::ColumnHeader*  TotalLicenses;
+	private: System::Windows::Forms::MenuItem *  ExitMenuItem;
+	private: System::Windows::Forms::MenuItem *  AddPasswordPacketMenuItem;
+	private: System::Windows::Forms::MenuItem *  menuItem2;
+	private: System::Windows::Forms::MenuItem *  File_ShutdownServer;
+	private: System::Windows::Forms::MenuItem *  File_StartupServer;
+	private: System::Windows::Forms::MenuItem *  File_ConnectServer;
+	private: System::Windows::Forms::ListView*  ModLicenseListView;
+	private: System::Windows::Forms::TabControl*  tabCtrl_Server;
+	private: System::Windows::Forms::TabPage*  tabPage_ServerName;
+	private: System::Windows::Forms::ListView*  KeyInfoListView;
 	private: System::Windows::Forms::ColumnHeader*  KeyNumber;
 	private: System::Windows::Forms::ColumnHeader*  ProductID;
 	private: System::Windows::Forms::ColumnHeader*  ProductVersion;
 	private: System::Windows::Forms::ColumnHeader*  License;
-	private: System::Windows::Forms::ColumnHeader*  Active;
 	private: System::Windows::Forms::ColumnHeader*  HoursLeft;
-   private: System::Windows::Forms::ColumnHeader*  ModuleName;
-	private: System::Windows::Forms::ColumnHeader*  LicensesInUse;
-	private: System::Windows::Forms::ColumnHeader*  TotalLicenses;
 	private: System::Windows::Forms::ColumnHeader*  ExpirationDate;
-	private: System::Windows::Forms::MenuItem *  ExitMenuItem;
-	private: System::Windows::Forms::MenuItem *  AddPasswordPacketMenuItem;
+	private: System::Windows::Forms::ColumnHeader*  KeyType;
 
-	private: System::Windows::Forms::MenuItem *  menuItem2;
-	private: System::Windows::Forms::MenuItem *  File_ShutdownServer;
-	private: System::Windows::Forms::MenuItem *  File_StartupServer;
+	private: System::Windows::Forms::MenuItem*  OptionsMenuItem;
+	private: System::Windows::Forms::MenuItem*  ServerSettingsMenuItem;
 	private:	System::Windows::Forms::Timer    *  myTimer;
 
    //Event Handler methods
@@ -120,57 +130,72 @@ namespace KeyReaderGUI
 	void TimerEventProcessor(Object* myObject, EventArgs* myEventArgs);
 
 	//File Menu Item Event Handlers
+	System::Void fileMenuItem_Popup(System::Object*  sender, System::EventArgs*  e);
+	System::Void File_ConnectServer_Click(System::Object *  sender, System::EventArgs *  e);
 	System::Void ExitMenuItem_Click(System::Object *  sender, System::EventArgs *  e);
 
 	//Password Menu Item Event Handlers
     System::Void PasswordMenuItem_Select(System::Object *  sender, System::EventArgs *  e);
 	System::Void AddPasswordPacketMenuItem_Click(System::Object *  sender, System::EventArgs *  e);
+	
+	//Options Menu Item Event Handlers	 
+	System::Void OptionsMenuItem_Popup(System::Object*  sender, System::EventArgs*  e);
+	System::Void ServerSettingsMenuItem_Click(System::Object*  sender, System::EventArgs*  e);
+		 	
+	private: System::ComponentModel::IContainer*  components;
+
 
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container * components;
-
 		/// <summary>
 		/// Required method for Designer support - do not modify
 		/// the contents of this method with the code editor.
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::Resources::ResourceManager *  resources = new System::Resources::ResourceManager(__typeof(KeyReaderGUI::Form1));
-			this->KeyReaderStatusBar = new System::Windows::Forms::StatusBar();
-			this->openFileDialog1 = new System::Windows::Forms::OpenFileDialog();
-			this->mainMenu1 = new System::Windows::Forms::MainMenu();
-			this->fileMenuItem = new System::Windows::Forms::MenuItem();
-			this->File_StartupServer = new System::Windows::Forms::MenuItem();
-			this->File_ShutdownServer = new System::Windows::Forms::MenuItem();
-			this->menuItem2 = new System::Windows::Forms::MenuItem();
-			this->ExitMenuItem = new System::Windows::Forms::MenuItem();
-			this->viewMenuItem = new System::Windows::Forms::MenuItem();
-			this->refreshMenuItem = new System::Windows::Forms::MenuItem();
-			this->PasswordMenuItem = new System::Windows::Forms::MenuItem();
-			this->EnterPasswordMenuItem = new System::Windows::Forms::MenuItem();
-			this->AddPasswordPacketMenuItem = new System::Windows::Forms::MenuItem();
-			this->HelpMenuItem = new System::Windows::Forms::MenuItem();
-			this->AboutSolimar = new System::Windows::Forms::MenuItem();
-			this->ModuleLicensePanel = new System::Windows::Forms::Panel();
-			this->ModLicenseListView = new System::Windows::Forms::ListView();
-			this->splitter1 = new System::Windows::Forms::Splitter();
-			this->KeyInfoPanel = new System::Windows::Forms::Panel();
-			this->KeyInfoListView = new System::Windows::Forms::ListView();
-			this->KeyNumber = new System::Windows::Forms::ColumnHeader();
-			this->ProductID = new System::Windows::Forms::ColumnHeader();
-			this->ProductVersion = new System::Windows::Forms::ColumnHeader();
-			this->License = new System::Windows::Forms::ColumnHeader();
-			this->Active = new System::Windows::Forms::ColumnHeader();
-			this->HoursLeft = new System::Windows::Forms::ColumnHeader();
-			this->ExpirationDate = new System::Windows::Forms::ColumnHeader();
-			this->ModuleName = new System::Windows::Forms::ColumnHeader();
-			this->LicensesInUse = new System::Windows::Forms::ColumnHeader();
-			this->TotalLicenses = new System::Windows::Forms::ColumnHeader();
+			this->components = (new System::ComponentModel::Container());
+			System::ComponentModel::ComponentResourceManager*  resources = (new System::ComponentModel::ComponentResourceManager(__typeof(Form1)));
+			this->KeyReaderStatusBar = (new System::Windows::Forms::StatusBar());
+			this->openFileDialog1 = (new System::Windows::Forms::OpenFileDialog());
+			this->mainMenu1 = (new System::Windows::Forms::MainMenu(this->components));
+			this->fileMenuItem = (new System::Windows::Forms::MenuItem());
+			this->File_ConnectServer = (new System::Windows::Forms::MenuItem());
+			this->File_StartupServer = (new System::Windows::Forms::MenuItem());
+			this->File_ShutdownServer = (new System::Windows::Forms::MenuItem());
+			this->menuItem2 = (new System::Windows::Forms::MenuItem());
+			this->ExitMenuItem = (new System::Windows::Forms::MenuItem());
+			this->viewMenuItem = (new System::Windows::Forms::MenuItem());
+			this->refreshMenuItem = (new System::Windows::Forms::MenuItem());
+			this->PasswordMenuItem = (new System::Windows::Forms::MenuItem());
+			this->EnterPasswordMenuItem = (new System::Windows::Forms::MenuItem());
+			this->AddPasswordPacketMenuItem = (new System::Windows::Forms::MenuItem());
+			this->OptionsMenuItem = (new System::Windows::Forms::MenuItem());
+			this->ServerSettingsMenuItem = (new System::Windows::Forms::MenuItem());
+			this->HelpMenuItem = (new System::Windows::Forms::MenuItem());
+			this->AboutSolimar = (new System::Windows::Forms::MenuItem());
+			this->ModuleLicensePanel = (new System::Windows::Forms::Panel());
+			this->ModLicenseListView = (new System::Windows::Forms::ListView());
+			this->splitter1 = (new System::Windows::Forms::Splitter());
+			this->KeyInfoPanel = (new System::Windows::Forms::Panel());
+			this->tabCtrl_Server = (new System::Windows::Forms::TabControl());
+			this->tabPage_ServerName = (new System::Windows::Forms::TabPage());
+			this->KeyInfoListView = (new System::Windows::Forms::ListView());
+			this->KeyType = (new System::Windows::Forms::ColumnHeader());
+			this->KeyNumber = (new System::Windows::Forms::ColumnHeader());
+			this->ProductID = (new System::Windows::Forms::ColumnHeader());
+			this->ProductVersion = (new System::Windows::Forms::ColumnHeader());
+			this->License = (new System::Windows::Forms::ColumnHeader());
+			this->HoursLeft = (new System::Windows::Forms::ColumnHeader());
+			this->ExpirationDate = (new System::Windows::Forms::ColumnHeader());
+			this->ModuleName = (new System::Windows::Forms::ColumnHeader());
+			this->LicensesInUse = (new System::Windows::Forms::ColumnHeader());
+			this->TotalLicenses = (new System::Windows::Forms::ColumnHeader());
 			this->ModuleLicensePanel->SuspendLayout();
 			this->KeyInfoPanel->SuspendLayout();
+			this->tabCtrl_Server->SuspendLayout();
+			this->tabPage_ServerName->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// KeyReaderStatusBar
@@ -187,50 +212,61 @@ namespace KeyReaderGUI
 			// 
 			// mainMenu1
 			// 
-			System::Windows::Forms::MenuItem* __mcTemp__1[] = new System::Windows::Forms::MenuItem*[4];
+			System::Windows::Forms::MenuItem* __mcTemp__1[] = new System::Windows::Forms::MenuItem*[5];
 			__mcTemp__1[0] = this->fileMenuItem;
 			__mcTemp__1[1] = this->viewMenuItem;
 			__mcTemp__1[2] = this->PasswordMenuItem;
-			__mcTemp__1[3] = this->HelpMenuItem;
+			__mcTemp__1[3] = this->OptionsMenuItem;
+			__mcTemp__1[4] = this->HelpMenuItem;
 			this->mainMenu1->MenuItems->AddRange(__mcTemp__1);
 			// 
 			// fileMenuItem
 			// 
 			this->fileMenuItem->Index = 0;
-			System::Windows::Forms::MenuItem* __mcTemp__2[] = new System::Windows::Forms::MenuItem*[4];
-			__mcTemp__2[0] = this->File_StartupServer;
-			__mcTemp__2[1] = this->File_ShutdownServer;
-			__mcTemp__2[2] = this->menuItem2;
-			__mcTemp__2[3] = this->ExitMenuItem;
+			System::Windows::Forms::MenuItem* __mcTemp__2[] = new System::Windows::Forms::MenuItem*[5];
+			__mcTemp__2[0] = this->File_ConnectServer;
+			__mcTemp__2[1] = this->File_StartupServer;
+			__mcTemp__2[2] = this->File_ShutdownServer;
+			__mcTemp__2[3] = this->menuItem2;
+			__mcTemp__2[4] = this->ExitMenuItem;
 			this->fileMenuItem->MenuItems->AddRange(__mcTemp__2);
 			this->fileMenuItem->Text = S"File";
+			this->fileMenuItem->Popup += new System::EventHandler(this, &Form1::fileMenuItem_Popup);
+			// 
+			// File_ConnectServer
+			// 
+			this->File_ConnectServer->Index = 0;
+			this->File_ConnectServer->Text = S"Connect ...";
+			this->File_ConnectServer->Click += new System::EventHandler(this, &Form1::File_ConnectServer_Click);
 			// 
 			// File_StartupServer
 			// 
-			this->File_StartupServer->Index = 0;
+			this->File_StartupServer->Index = 1;
 			this->File_StartupServer->Text = S"Startup Server";
 			this->File_StartupServer->Visible = false;
-			this->File_StartupServer->Click += new System::EventHandler(this, File_StartupServer_Click);
+			this->File_StartupServer->Click += new System::EventHandler(this, &Form1::File_StartupServer_Click);
 			// 
 			// File_ShutdownServer
 			// 
-			this->File_ShutdownServer->Index = 1;
+			this->File_ShutdownServer->Enabled = false;
+			this->File_ShutdownServer->Index = 2;
 			this->File_ShutdownServer->Text = S"Shutdown Server";
-			this->File_ShutdownServer->Click += new System::EventHandler(this, File_ShutdownServer_Click);
+			this->File_ShutdownServer->Click += new System::EventHandler(this, &Form1::File_ShutdownServer_Click);
 			// 
 			// menuItem2
 			// 
-			this->menuItem2->Index = 2;
+			this->menuItem2->Index = 3;
 			this->menuItem2->Text = S"-";
 			// 
 			// ExitMenuItem
 			// 
-			this->ExitMenuItem->Index = 3;
+			this->ExitMenuItem->Index = 4;
 			this->ExitMenuItem->Text = S"&Exit";
-			this->ExitMenuItem->Click += new System::EventHandler(this, ExitMenuItem_Click);
+			this->ExitMenuItem->Click += new System::EventHandler(this, &Form1::ExitMenuItem_Click);
 			// 
 			// viewMenuItem
 			// 
+			this->viewMenuItem->Enabled = false;
 			this->viewMenuItem->Index = 1;
 			System::Windows::Forms::MenuItem* __mcTemp__3[] = new System::Windows::Forms::MenuItem*[1];
 			__mcTemp__3[0] = this->refreshMenuItem;
@@ -244,13 +280,14 @@ namespace KeyReaderGUI
 			// 
 			// PasswordMenuItem
 			// 
+			this->PasswordMenuItem->Enabled = false;
 			this->PasswordMenuItem->Index = 2;
 			System::Windows::Forms::MenuItem* __mcTemp__4[] = new System::Windows::Forms::MenuItem*[2];
 			__mcTemp__4[0] = this->EnterPasswordMenuItem;
 			__mcTemp__4[1] = this->AddPasswordPacketMenuItem;
 			this->PasswordMenuItem->MenuItems->AddRange(__mcTemp__4);
 			this->PasswordMenuItem->Text = S"Password";
-			this->PasswordMenuItem->Select += new System::EventHandler(this, PasswordMenuItem_Select);
+			this->PasswordMenuItem->Select += new System::EventHandler(this, &Form1::PasswordMenuItem_Select);
 			// 
 			// EnterPasswordMenuItem
 			// 
@@ -261,14 +298,29 @@ namespace KeyReaderGUI
 			// 
 			this->AddPasswordPacketMenuItem->Index = 1;
 			this->AddPasswordPacketMenuItem->Text = S"&Add Password Packet";
-			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, AddPasswordPacketMenuItem_Click);
+			this->AddPasswordPacketMenuItem->Click += new System::EventHandler(this, &Form1::AddPasswordPacketMenuItem_Click);
+			// 
+			// OptionsMenuItem
+			// 
+			this->OptionsMenuItem->Index = 3;
+			System::Windows::Forms::MenuItem* __mcTemp__5[] = new System::Windows::Forms::MenuItem*[1];
+			__mcTemp__5[0] = this->ServerSettingsMenuItem;
+			this->OptionsMenuItem->MenuItems->AddRange(__mcTemp__5);
+			this->OptionsMenuItem->Text = S"Options";
+			this->OptionsMenuItem->Popup += new System::EventHandler(this, &Form1::OptionsMenuItem_Popup);
+			// 
+			// ServerSettingsMenuItem
+			// 
+			this->ServerSettingsMenuItem->Index = 0;
+			this->ServerSettingsMenuItem->Text = S"Server Settings...";
+			this->ServerSettingsMenuItem->Click += new System::EventHandler(this, &Form1::ServerSettingsMenuItem_Click);
 			// 
 			// HelpMenuItem
 			// 
-			this->HelpMenuItem->Index = 3;
-			System::Windows::Forms::MenuItem* __mcTemp__5[] = new System::Windows::Forms::MenuItem*[1];
-			__mcTemp__5[0] = this->AboutSolimar;
-			this->HelpMenuItem->MenuItems->AddRange(__mcTemp__5);
+			this->HelpMenuItem->Index = 4;
+			System::Windows::Forms::MenuItem* __mcTemp__6[] = new System::Windows::Forms::MenuItem*[1];
+			__mcTemp__6[0] = this->AboutSolimar;
+			this->HelpMenuItem->MenuItems->AddRange(__mcTemp__6);
 			this->HelpMenuItem->Text = S"Help";
 			// 
 			// AboutSolimar
@@ -289,13 +341,15 @@ namespace KeyReaderGUI
 			// 
 			this->ModLicenseListView->BackColor = System::Drawing::SystemColors::InactiveBorder;
 			this->ModLicenseListView->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->ModLicenseListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
+			this->ModLicenseListView->Font = (new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, 
+				System::Drawing::GraphicsUnit::Point, (System::Byte)0));
 			this->ModLicenseListView->Location = System::Drawing::Point(0, 0);
 			this->ModLicenseListView->Name = S"ModLicenseListView";
 			this->ModLicenseListView->Size = System::Drawing::Size(288, 373);
 			this->ModLicenseListView->TabIndex = 0;
+			this->ModLicenseListView->UseCompatibleStateImageBehavior = false;
 			this->ModLicenseListView->View = System::Windows::Forms::View::Details;
-			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, ModLicenseListView_KeyUp);
+			this->ModLicenseListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, &Form1::ModLicenseListView_KeyUp);
 			// 
 			// splitter1
 			// 
@@ -309,32 +363,85 @@ namespace KeyReaderGUI
 			// 
 			// KeyInfoPanel
 			// 
-			this->KeyInfoPanel->Controls->Add(this->KeyInfoListView);
+			this->KeyInfoPanel->Controls->Add(this->tabCtrl_Server);
 			this->KeyInfoPanel->Dock = System::Windows::Forms::DockStyle::Fill;
 			this->KeyInfoPanel->Location = System::Drawing::Point(0, 0);
 			this->KeyInfoPanel->Name = S"KeyInfoPanel";
 			this->KeyInfoPanel->Size = System::Drawing::Size(421, 373);
 			this->KeyInfoPanel->TabIndex = 3;
 			// 
+			// tabCtrl_Server
+			// 
+			this->tabCtrl_Server->Controls->Add(this->tabPage_ServerName);
+			this->tabCtrl_Server->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->tabCtrl_Server->Location = System::Drawing::Point(0, 0);
+			this->tabCtrl_Server->Name = S"tabCtrl_Server";
+			this->tabCtrl_Server->Padding = System::Drawing::Point(18, 3);
+			this->tabCtrl_Server->SelectedIndex = 0;
+			this->tabCtrl_Server->Size = System::Drawing::Size(421, 373);
+			this->tabCtrl_Server->TabIndex = 1;
+			// 
+			// tabPage_ServerName
+			// 
+			this->tabPage_ServerName->Controls->Add(this->KeyInfoListView);
+			this->tabPage_ServerName->Location = System::Drawing::Point(4, 22);
+			this->tabPage_ServerName->Name = S"tabPage_ServerName";
+			this->tabPage_ServerName->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage_ServerName->Size = System::Drawing::Size(413, 347);
+			this->tabPage_ServerName->TabIndex = 0;
+			this->tabPage_ServerName->Text = S"Not Connected";
+			this->tabPage_ServerName->UseVisualStyleBackColor = true;
+			// 
 			// KeyInfoListView
 			// 
-			System::Windows::Forms::ColumnHeader* __mcTemp__6[] = new System::Windows::Forms::ColumnHeader*[7];
-			__mcTemp__6[0] = this->KeyNumber;
-			__mcTemp__6[1] = this->ProductID;
-			__mcTemp__6[2] = this->ProductVersion;
-			__mcTemp__6[3] = this->License;
-			__mcTemp__6[4] = this->Active;
-			__mcTemp__6[5] = this->HoursLeft;
-			__mcTemp__6[6] = this->ExpirationDate;
-			this->KeyInfoListView->Columns->AddRange(__mcTemp__6);
+			System::Windows::Forms::ColumnHeader* __mcTemp__7[] = new System::Windows::Forms::ColumnHeader*[7];
+			__mcTemp__7[0] = this->KeyType;
+			__mcTemp__7[1] = this->KeyNumber;
+			__mcTemp__7[2] = this->ProductID;
+			__mcTemp__7[3] = this->ProductVersion;
+			__mcTemp__7[4] = this->License;
+			__mcTemp__7[5] = this->HoursLeft;
+			__mcTemp__7[6] = this->ExpirationDate;
+			this->KeyInfoListView->Columns->AddRange(__mcTemp__7);
 			this->KeyInfoListView->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->KeyInfoListView->Font = new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, (System::Byte)0);
-			this->KeyInfoListView->Location = System::Drawing::Point(0, 0);
+			this->KeyInfoListView->Font = (new System::Drawing::Font(S"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point, 
+				(System::Byte)0));
+			this->KeyInfoListView->FullRowSelect = true;
+			this->KeyInfoListView->Location = System::Drawing::Point(3, 3);
 			this->KeyInfoListView->Name = S"KeyInfoListView";
-			this->KeyInfoListView->Size = System::Drawing::Size(421, 373);
-			this->KeyInfoListView->TabIndex = 0;
+			this->KeyInfoListView->Size = System::Drawing::Size(407, 341);
+			this->KeyInfoListView->TabIndex = 1;
+			this->KeyInfoListView->UseCompatibleStateImageBehavior = false;
 			this->KeyInfoListView->View = System::Windows::Forms::View::Details;
-			this->KeyInfoListView->KeyUp += new System::Windows::Forms::KeyEventHandler(this, KeyInfoListView_KeyUp);
+			// 
+			// KeyType
+			// 
+			this->KeyType->DisplayIndex = 6;
+			// 
+			// KeyNumber
+			// 
+			this->KeyNumber->DisplayIndex = 0;
+			// 
+			// ProductID
+			// 
+			this->ProductID->DisplayIndex = 1;
+			// 
+			// ProductVersion
+			// 
+			this->ProductVersion->DisplayIndex = 2;
+			// 
+			// License
+			// 
+			this->License->DisplayIndex = 3;
+			// 
+			// HoursLeft
+			// 
+			this->HoursLeft->DisplayIndex = 4;
+			this->HoursLeft->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			// 
+			// ExpirationDate
+			// 
+			this->ExpirationDate->DisplayIndex = 5;
 			// 
 			// Form1
 			// 
@@ -344,13 +451,16 @@ namespace KeyReaderGUI
 			this->Controls->Add(this->splitter1);
 			this->Controls->Add(this->ModuleLicensePanel);
 			this->Controls->Add(this->KeyReaderStatusBar);
-			this->Icon = (__try_cast<System::Drawing::Icon *  >(resources->GetObject(S"$this.Icon")));
+			this->Icon = (__try_cast<System::Drawing::Icon*  >(resources->GetObject(S"$this.Icon")));
 			this->Menu = this->mainMenu1;
 			this->Name = S"Form1";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = S"Solimar License Manager";
-			this->Load += new System::EventHandler(this, Form1_Load);
+			this->Load += new System::EventHandler(this, &Form1::Form1_Load);
 			this->ModuleLicensePanel->ResumeLayout(false);
 			this->KeyInfoPanel->ResumeLayout(false);
+			this->tabCtrl_Server->ResumeLayout(false);
+			this->tabPage_ServerName->ResumeLayout(false);
 			this->ResumeLayout(false);
 
 		}
@@ -363,10 +473,15 @@ namespace KeyReaderGUI
 		PasswordValidation* PasswordValidater;
 		PswdForm* ThePasswordForm;
 		AboutBox* TheAboutBox;
+		ConnectToForm* TheConnectToForm;
+		ServerConfiguration* TheServerConfigForm;
 		ListViewItemComparer* lvwColumnSorter;
 		ModListViewComparer* mlvwColumnSorter;
 		ControlSizing* TheSizingManager;
         SaveConfigurations* SaveCfg;
+		CommunicationLink* TheCommLink;		
+		ArrayList* ServerList;
+
 
 #undef MessageBox
 private: void File_ShutdownServer_Click(System::Object *  sender, System::EventArgs *  e)
@@ -412,7 +527,6 @@ private: void ModLicenseListView_KeyUp(System::Object *  sender, System::Windows
 			}
 		 }
 };
-
 }
 
 #endif //form1.h
