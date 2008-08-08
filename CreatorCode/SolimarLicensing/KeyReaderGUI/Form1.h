@@ -454,6 +454,7 @@ namespace KeyReaderGUI
 			this->Icon = (__try_cast<System::Drawing::Icon*  >(resources->GetObject(S"$this.Icon")));
 			this->Menu = this->mainMenu1;
 			this->Name = S"Form1";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = S"Solimar License Manager";
 			this->Load += new System::EventHandler(this, &Form1::Form1_Load);
 			this->ModuleLicensePanel->ResumeLayout(false);

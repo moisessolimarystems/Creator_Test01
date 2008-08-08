@@ -109,7 +109,9 @@ System::Void Form1::Form1_Load(System::Object *  sender, System::EventArgs *  e)
 
 	//failed to connect to saved connections or found none.
 	ConnectServer();
-*/	
+*/
+	this->Show();
+	ConnectServer();
 }
 
 bool Form1::ConnectLink(String* ServerName)
