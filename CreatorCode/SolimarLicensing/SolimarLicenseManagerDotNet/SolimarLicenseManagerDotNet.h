@@ -24,7 +24,9 @@ namespace SolimarLicenseManagerDotNet {
 			};	
 
 			SolimarLicenseWrapper();
-			~SolimarLicenseWrapper();
+			
+			~SolimarLicenseWrapper();	//Destructor for cleaning up managed resources
+			!SolimarLicenseWrapper();	//Finalizer for cleaning up unmanaged resources
 			bool Connect(String^ server);
 			bool Connect(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 			bool ConnectByProduct(long product, bool bUseSharedLicenseServers);
@@ -92,6 +94,7 @@ namespace SolimarLicenseManagerDotNet {
 			DelegateMessageCallbackUnmanaged^ m_messageCallbackUnmanaged;
 			DelegateMessageCallbackManaged^ m_messageCallbackManaged;
 			bool m_bRegisteredMessageCallback;
+			bool m_bFinalized;
 
 			delegate void DelegateInvalidLicenseCallbackUnmanaged(void* pContext, HRESULT hr, const wchar_t* message);
 			DelegateInvalidLicenseCallbackUnmanaged^ m_invalidLicenseCallbackUnmanaged;

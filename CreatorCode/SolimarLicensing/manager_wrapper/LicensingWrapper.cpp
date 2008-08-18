@@ -102,11 +102,16 @@ SolimarLicenseManagerWrapper::LicensingWrapper::~LicensingWrapper()
 	// signal the threads to terminate
 
 	SetEvent(m_ThreadKillEvent);
-	
-	// wait for the threads to terminate
-	HANDLE threads[2] = {m_MessageDispatchThread, m_LicenseValidityThread};
 
-	int retVal = WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 30000);
+	try
+	{
+		// wait for the threads to terminate
+		HANDLE threads[2] = {m_MessageDispatchThread, m_LicenseValidityThread};
+		int retVal = WaitForMultipleObjects(sizeof(threads)/sizeof(HANDLE), threads, TRUE, 2000);
+	}
+	catch(...)
+	{
+	}
    
 	{
 	SafeMutex mutex(m_MemberLock);

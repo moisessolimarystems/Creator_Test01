@@ -68,14 +68,37 @@ namespace SolimarLicenseManagerDotNet
 		m_bRegisteredInvalidLicenseCallback = false;
 		m_messageCallbackUnmanaged = gcnew DelegateMessageCallbackUnmanaged(this, &SolimarLicenseWrapper::MessageCallback);
 		m_invalidLicenseCallbackUnmanaged = gcnew DelegateInvalidLicenseCallbackUnmanaged(this, &SolimarLicenseWrapper::InvalidLicenseCallback);
+		m_bFinalized = false;
 //OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper() - Leave");
+
 	}
 	SolimarLicenseWrapper::~SolimarLicenseWrapper()
 	{
 //OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper() - Enter");
-		delete m_pLicenseWrapper;
-		m_pLicenseWrapper = NULL;
+		m_messageCallbackUnmanaged = nullptr;
+		m_invalidLicenseCallbackUnmanaged = nullptr;
+		if(!m_bFinalized)
+		{
+			this->!SolimarLicenseWrapper();
+		}
 //OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper() - Leave");
+	}
+	SolimarLicenseWrapper::!SolimarLicenseWrapper()
+	{
+//OutputDebugStringW(L"SolimarLicenseWrapper::!SolimarLicenseWrapper() - Enter");
+		try
+		{
+			if(!m_bFinalized)
+			{
+				delete m_pLicenseWrapper;
+				m_pLicenseWrapper = NULL;
+				m_bFinalized = true;
+			}
+		}
+		catch(...)
+		{
+		}
+//OutputDebugStringW(L"SolimarLicenseWrapper::!SolimarLicenseWrapper() - Leave");
 	}
 
 	bool SolimarLicenseWrapper::Connect(String^ server)

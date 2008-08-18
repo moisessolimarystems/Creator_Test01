@@ -495,6 +495,7 @@ STDMETHODIMP CSolimarLicenseMgr::KeyProductExists(long product, long prod_ver_ma
 								break;
 							}
 						}	//End for each key on the server
+						SafeArrayUnaccessData(vtKeyList.parray);
 					}
 				}
 			}
@@ -2863,7 +2864,9 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 		// foreach key
 		for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
 		{
-			if (k->second.KeyPresent && k->second.KeyValid && k->second.KeyObtained)
+			if (	k->second.KeyPresent && 
+					k->second.KeyValid && 
+					(k->second.KeyObtained || (*server).second.bUseOnlySharedLicenses))
 			{
 				// for each module
 				for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
@@ -3093,7 +3096,7 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 			// foreach key (backwards)
 			for (ServerInfo::KeyList::reverse_iterator k = server->second.keys.rbegin(); k != server->second.keys.rend(); ++k)
 			{
-				if (k->second.KeyPresent && k->second.KeyObtained)
+				if (k->second.KeyPresent && (k->second.KeyObtained || (*server).second.bUseOnlySharedLicenses))
 				{
 					// if the key has already been obtained
 					if (!k->second.KeyObtained && !((*server).second.bUseOnlySharedLicenses))
