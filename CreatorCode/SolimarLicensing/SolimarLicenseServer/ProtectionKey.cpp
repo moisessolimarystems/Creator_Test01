@@ -630,8 +630,16 @@ HRESULT ProtectionKey::ModuleLicenseObtain(BSTR license_id, long module_ident, l
 			hr = AddLicenseApplicationInstance(license_id, module_ident);
 			if(SUCCEEDED(hr))
 			{
+				//Have to cycle through all the license_use for all license_id...
+				long total_module_use = 0;
+				for (LicenseUseList::iterator useIt = license_use.begin(); useIt != license_use.end(); useIt++)
+				{
+					total_module_use += useIt->second[module_ident];
+				}
+
+
 				ModuleLicenseUseList &module_license_use = license_use[license_id];
-				if (module_license_use[module.id] + license_count <= (long)LicenseEffectiveValue(license_id, module.id))
+				if (total_module_use + license_count <= (long)LicenseEffectiveValue(license_id, module.id))
 				{
 					module_license_use[module.id] += license_count;
 				}
@@ -761,6 +769,13 @@ HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR applicati
 	if(appIt != appInstance_to_connectionType_list.end())
 	{
 		appInstance_to_connectionType_list.erase(appIt);
+		hr = S_OK;
+	}
+
+	LicenseUnlimitedList::iterator licUnlimitedIt = license_unlimited_list.find(_bstr_t(license_id,true));
+	if(licUnlimitedIt != license_unlimited_list.end())
+	{
+		license_unlimited_list.erase(licUnlimitedIt);
 		hr = S_OK;
 	}
 	return hr;
