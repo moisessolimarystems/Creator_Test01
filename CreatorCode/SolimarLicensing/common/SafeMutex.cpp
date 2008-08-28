@@ -59,6 +59,7 @@ void SafeMutex::_init(const THandleList &hlMutexList, DWORD dwTo)
          // it will wait for ever...  Hence catch it here.
          //
          assert(hMutex!=INVALID_HANDLE_VALUE) ;
+         break ;
       }
       else
       {  
@@ -71,6 +72,7 @@ void SafeMutex::_init(const THandleList &hlMutexList, DWORD dwTo)
             //
             dwNtErr = GetLastError() ;
             assert(ulWfsoResult!=WAIT_FAILED) ;
+            break ;
          }
          else if (ulWfsoResult==WAIT_TIMEOUT)
          {  //
