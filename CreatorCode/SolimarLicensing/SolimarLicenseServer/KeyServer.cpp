@@ -5,7 +5,7 @@
 
 #include "KeyServer.h"
 #include "..\common\LicenseError.h"
-#include "..\common\TimeHelper.h"
+#include "SoftwareServerInstance.h"
 
 #include <string>
 #include <vector>
@@ -17,6 +17,7 @@
 typedef _bstr_t String;
 typedef std::vector<String> StringList;
 
+#include "..\Common\StringUtils.h"
 #include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
 
@@ -38,43 +39,13 @@ BYTE KeyServer::crypto_key_password_packet_password[] = {
 
 
 #pragma warning(disable:4355)
-//APCTimer::APCTimer(APCFunc pfunc, void* arg, long interval, initfunc, void* initarg);
-
-void KeyServer::UpdateKeysThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	hr = pThis->ResynchronizeKeys();
-//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Leave");
-}
-
-void KeyServer::HeartbeatCheckThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	pThis->HeartbeatCheck();
-//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Leave");
-}
-
-void KeyServer::TimesUpThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	hr = pThis->TimesUp();
-//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Leave");
-}
 
 KeyServer::KeyServer() : 
 	KeyListLock(CreateMutex(0,0,0)), 
 	PasswordPacketListLock(CreateMutex(0,0,0)), 
 	KeyTrialTimeInfoLock(CreateMutex(0,0,0)),
-	HeartbeatListLock(CreateMutex(0,0,0)), 
-	MessageClientListLock(CreateMutex(0,0,0)),
-	failed_password_attempts(0),
-	USBNotification(this)
+	//HeartbeatListLock(CreateMutex(0,0,0)), 
+	failed_password_attempts(0)
 {
 	//wchar_t tmpbuf[1024];
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
@@ -86,30 +57,6 @@ KeyServer::KeyServer() :
 	//swprintf_s(tmpbuf, 1024, L"    KeyTrialTimeInfoLock:0x%08x : ThreadID: %d", KeyTrialTimeInfoLock, GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
-	_tzset();
-
-	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
-	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
-	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
-
-	{
-	SafeMutex mutex(HeartbeatListLock);
-	heartbeats.clear();
-	}
-
-
-	// get the local host name for use in licensing messages
-	wchar_t hostname[1024];
-	DWORD hostname_size = 0;
-	if (GetComputerNameEx(ComputerNameDnsHostname, hostname, &(hostname_size=1024)) || GetComputerNameEx(ComputerNameNetBIOS, hostname, &(hostname_size=1024)))
-	{
-		server_host_name = hostname;
-	}
-	
-	// trigger a key list resynchronize
-	UpdateKeysThread->RevEnable(UpdateKeysThreadHighPeriodSeconds, UpdateKeysThreadLowPeriodSeconds, 20);
-	UpdateKeysThread->Invoke();
-
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Leave, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 }
@@ -120,21 +67,18 @@ KeyServer::~KeyServer()
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::~KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
-	if (UpdateKeysThread)
-		delete UpdateKeysThread;
-	if (HeartbeatCheckThread)
-		delete HeartbeatCheckThread;
-	if (TimesUpThread)
-		delete TimesUpThread;
+	//if (UpdateKeysThread)
+	//	delete UpdateKeysThread;
+	//if (HeartbeatCheckThread)
+	//	delete HeartbeatCheckThread;
+	//if (TimesUpThread)
+	//	delete TimesUpThread;
 	if (KeyListLock!=NULL)
 		CloseHandle(KeyListLock);
 	if (PasswordPacketListLock!=NULL)
 		CloseHandle(PasswordPacketListLock);
 	if (KeyTrialTimeInfoLock!=NULL)
 		CloseHandle(KeyTrialTimeInfoLock);
-	if (MessageClientListLock!=NULL)
-		CloseHandle(MessageClientListLock);
-
 
 	while(!keys.empty())
 	{
@@ -147,6 +91,14 @@ KeyServer::~KeyServer()
 }
 
 
+
+HRESULT KeyServer::Initialize(RainbowDriver* pDriver)
+{
+	pRainbowDriver = pDriver;
+	HRESULT hr(S_OK);
+	hr = ResynchronizeKeys();
+	return hr;
+}
 HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 {
 //wchar_t tmpbuf[1024];
@@ -155,20 +107,22 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
 		SafeMutex mutex2(KeyListLock);
-		SafeMutex mutex1(driver.keys_lock);
-		driver.RefreshKeyList();
-		if(driver.AtLeastOneParallelKey())
-			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
-
+		if(pRainbowDriver == NULL)
+			return hr;
+		SafeMutex mutex1(pRainbowDriver->keys_lock);
+		pRainbowDriver->RefreshKeyList();
+		//if(pRainbowDriver->AtLeastOneParallelKey())
+		//	UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
+		
 		// first pass, add newly found keys
 		ProtectionKey* tmpProKey;
-		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
+		for (RainbowDriver::KeyList::iterator dkey = pRainbowDriver->keys.begin(); dkey!=pRainbowDriver->keys.end(); ++dkey)
 		{
 			if (keys.find(dkey->first)==keys.end())
 			{
 				_bstr_t keyName = dkey->first;
 				//ProtectionKey tmpProKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
-				tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
+				tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
 				long application_instances = 0;
 				tmpProKey->ApplicationInstanceCount(&application_instances);
 				if(application_instances > 1)	
@@ -202,7 +156,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 		KeyServer::KeyList::iterator skey=keys.begin();
 		while (skey!=keys.end())
 		{
-			if (driver.keys.find(virtual_key_to_physical_key_list[skey->first])==driver.keys.end())
+			if (pRainbowDriver->keys.find(virtual_key_to_physical_key_list[skey->first])==pRainbowDriver->keys.end())
 			{
 				delete skey->second;
 				skey = keys.erase(skey);
@@ -273,57 +227,6 @@ HRESULT KeyServer::GetApplicationInstanceList(BSTR license_id, BSTR key_ident, V
 }
 
 
-
-
-HRESULT KeyServer::Heartbeat(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	
-	DWORD cur_time = (DWORD)time(0);	
-
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
-//debug_buf[1023] = 0;
-//OutputDebugStringW(debug_buf);
-
-	heartbeats[_bstr_t(license_id,true)]=cur_time;
-
-	return S_OK;
-}
-HRESULT KeyServer::RemoveHeartbeat(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	for (HeartbeatList::iterator heartbeatIt = heartbeats.begin(); heartbeatIt != heartbeats.end(); ++heartbeatIt)
-	{
-		if(_wcsicmp(heartbeatIt->first, license_id) == 0)
-		{
-			heartbeats.erase(heartbeatIt);
-			break;
-		}
-	}
-	RemoveFromNotification(license_id);
-	return S_OK;
-}
-
-HRESULT KeyServer::RemoveFromNotification(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	HRESULT hr = LicenseReleaseAll(license_id);
-	//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
-	for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
-	{
-		BSTR bstrEmptyString = SysAllocString(L"");
-		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), bstrEmptyString);
-		SysFreeString(bstrEmptyString);
-	}
-	// Stop notifying the client of messages
-	{
-		SafeMutex mutex(MessageClientListLock);
-		message_clients[_bstr_t(license_id, true)].clear();	//Erase all existing messages
-		message_clients.erase(_bstr_t(license_id, true));							//Remove from notifying list
-	}
-	return hr;
-}
 
 
 HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
@@ -453,7 +356,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 			CryptoHelper::Digest digest;
 
 			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
-			verification = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
+			verification = std::wstring((wchar_t*)StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 		}
 		
 		// parse the password packet
@@ -501,8 +404,8 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		if (FAILED(hr)) throw(hr);
 		
 		// compare the signed hash and the computed hash
-		if (StringToBinaryLength(hash)!=provided_digest.DIGEST_SIZE) throw(E_INVALIDARG);
-		StringToBinary(hash, provided_digest.m_digest, provided_digest.DIGEST_SIZE);
+		if (StringUtils::StringToBinaryLength(hash)!=provided_digest.DIGEST_SIZE) throw(E_INVALIDARG);
+		StringUtils::StringToBinary(hash, provided_digest.m_digest, provided_digest.DIGEST_SIZE);
 		if (computed_digest!=provided_digest) throw(E_INVALIDARG);
 		
 		// verify the hash signature
@@ -513,7 +416,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		BYTE *pSignatureData = 0;
 		if (SUCCEEDED(hr = SafeArrayAccessData(vtSignature.parray, (void**)&pSignatureData)))
 		{
-			StringToBinary(signature, pSignatureData, (DWORD)wcslen(signature)/2);
+			StringUtils::StringToBinary(signature, pSignatureData, (DWORD)wcslen(signature)/2);
 			SafeArrayUnaccessData(vtSignature.parray);
 		}
 		hr = context.VerifySignature(computed_digest, &vtSignature, signature_verify_key);
@@ -557,7 +460,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		// password entry succeeded, provide the verification code to the user
 		*verification_code = verification.Detach();
 
-		GenerateMessage(L"", MT_INFO, S_OK, time(0), MessagePasswordPacketVerificationCode, (wchar_t*)*verification_code);
+		g_licenseController.GenerateMessage(L"", MT_INFO, S_OK, time(0), MessagePasswordPacketVerificationCode, (wchar_t*)*verification_code);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -771,35 +674,6 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
 }
 
-HRESULT KeyServer::GetLicenseServerTime(VARIANT *pvtSystemTime)
-{
-	// _variant_t( double dblSrc, VARTYPE vtSrc = VT_R8 );
-	double dSysTime;
-	SYSTEMTIME stSysTime;
-
-	GetSystemTime(&stSysTime);
-	if (SystemTimeToVariantTime(&stSysTime, &dSysTime))
-	{
-		*pvtSystemTime = _variant_t(dSysTime, VT_DATE).Detach();
-		return S_OK;
-	}
-	else
-	{
-		VariantInit(pvtSystemTime);
-		return E_FAIL;
-	}
-}
-
-HRESULT KeyServer::GetLicenseMessageList(BSTR license_id, VARIANT *pvtMessageList)
-{
-	SafeMutex mutex(MessageClientListLock);
-	
-	*pvtMessageList = message_clients[_bstr_t(license_id, true)];
-	message_clients[_bstr_t(license_id, true)].clear();
-	
-	return S_OK;
-}
-
 
 // Password packet management
 HRESULT KeyServer::PasswordPacketInitialize(BSTR license_id)
@@ -876,12 +750,12 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	if (FAILED(hr)) return hr;
 	
     // add the hash and the signature to the string
-	packet_string += BinaryToString(digest.m_digest, digest.DIGEST_SIZE);
+	packet_string += StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE);
 	packet_string += L"\r\n";
 	
 	BYTE *pSignature = 0;
 	if (FAILED(hr = SafeArrayAccessData(vtSignature.parray, (void**)&pSignature))) return hr;
-	packet_string += BinaryToString(pSignature, vtSignature.parray->rgsabound[0].cElements);
+	packet_string += StringUtils::BinaryToString(pSignature, vtSignature.parray->rgsabound[0].cElements);
 	packet_string += L"\r\n";
 	SafeArrayUnaccessData(vtSignature.parray);
 	
@@ -890,7 +764,7 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	//if (FAILED(hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length()+1), digest))) return hr;
 	
 	// take the first 8 characters from the hex representation of the digest as the verification code
-	password_packets[lid].verification_code = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
+	password_packets[lid].verification_code = std::wstring((wchar_t*)StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 
 
 	// package the string in to a variant
@@ -1344,114 +1218,7 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	}
 }
 
-void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...)
-{
-	static const int MAX_MESSAGE_SIZE = 1024;
-	wchar_t message[MAX_MESSAGE_SIZE];
-	va_list pArg;
-	
-	va_start(pArg, MessageLookupID);
-	_vsnwprintf_s(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
-	va_end(pArg);
-	message[MAX_MESSAGE_SIZE-1] = 0;
-	
-	GenerateMessageInternal(key_ident, message_type, error, timestamp, MessageLookupID, message);
-}
 
-void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message)
-{
-	static const int MAX_MESSAGE_SIZE = 1024;
-	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
-	
-	_variant_t vtTimestamp;
-	vtTimestamp =  TimeHelper::TimeTToVariant(timestamp, false);	//Convert to local time
-	/*
-	_bstr_t str_timestamp;
-	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
-	
-	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
-	
-	// convert the date in to a string
-	char cstr_timestamp[256];
-	if (!GetTimeFormatA(LOCALE_USER_DEFAULT, TIME_FORCE24HOURFORMAT, &systimestamp, NULL, cstr_timestamp, 256))
-		str_timestamp = cstr_timestamp;
-	
-	switch (message_type)
-	{
-	case MT_INFO:
-		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n%s\r\nKey: %s\r\n\r\n%s",
-			str_timestamp.GetBSTR(),
-			key_ident,
-			message);
-		break;
-	case MT_ERROR:
-		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n%s\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			str_timestamp.GetBSTR(),
-			key_ident,
-			error,
-			str_error_message,
-			message);
-		break;
-	}
-	*/
-
-
-	//Ignore Timedate stamp for writing to event log, unnecessary because event log
-	//keeps track of Timedate anyways.
-	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
-	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
-	
-	// convert the date in to a string
-	switch (message_type)
-	{
-	case MT_INFO:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
-			key_ident,
-			message);
-		break;
-	case MT_ERROR:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			key_ident,
-			error,
-			str_error_message,
-			message);
-		break;
-	}
-	
-	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
-	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
-	LicenseServerError::WriteEventLog(event_log_msg, event_type);
-	
-	// notify the clients of the message
-	SafeMutex mutex(MessageClientListLock);
-	
-//wchar_t debug_buf1[1024];
-//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Enter() - NumberOfClients=%d", message_clients.size());
-//OutputDebugStringW(debug_buf1);
-	try
-	{
-		//xxx might need to make this asynchronous
-		//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
-		//zzz add message to the message lists for all clients
-		//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
-		LicensingMessage m(std::wstring(server_host_name), std::wstring(key_ident), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
-		for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
-		{
-
-			c->second.push_back(m);
-//_snwprintf(debug_buf1, 1024, L"   KeyServer::GenerateMessageInternal LicenseID=%s, SizeOfList=%d", (wchar_t*)c->first, c->second.size());
-//OutputDebugStringW(debug_buf1);
-			//xxx make sure that the message backlog is not excessive.
-			//xxx if it is, cull some of the older messages
-		}
-	}
-	catch (_com_error &e)
-	{
-		e.Error();
-	}
-//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Leave");
-//OutputDebugStringW(debug_buf1);
-}
 
 
 
@@ -1464,65 +1231,9 @@ DWORD KeyServer::PasswordEntryDelay(long failed_attempts)
 	return (DWORD)(10*failed_attempts*failed_attempts);
 }
 
-// checks if client heartbeats have exprired
-// if they have expried, their licenses are revoked
-void KeyServer::HeartbeatCheck()
-{
-	HRESULT hr = S_OK;
-	
-	SafeMutex mutex(HeartbeatListLock);
-	
-	HeartbeatList keepers;
 
-	DWORD cur_time = (DWORD)time(0);
-//wchar_t debug_buf1[1024];
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Enter - NumberOfHeartBeats = %d", heartbeats.size());
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
 
-	for (HeartbeatList::iterator heartbeat = heartbeats.begin(); heartbeat != heartbeats.end(); ++heartbeat)
-	{
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
-
-		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
-		{
-			//xxx debug
-			wchar_t debug_buf[1024];
-			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			debug_buf[1023] = 0;
-			OutputDebugStringW(debug_buf);
-
-			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
-			
-			hr = RemoveFromNotification(heartbeat->first);
-		}
-		else
-		{
-			HeartbeatList::iterator next_heartbeat = heartbeat;
-			keepers.insert(heartbeat,++next_heartbeat);
-		}
-	}
-	
-	heartbeats = keepers;
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Leave - NumberOfHeartBeats = %d", heartbeats.size());
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
-
-}
-
-/*
-	HANDLE KeyTrialTimeInfoLock;
-	APCTimer *TimesUpThread;
-	static void TimesUpThreadFunction(void* pvThis);
-	typedef struct {time_t last_decrement; bool key_obtained;} TrialTimeInfo;
-	typedef std::map<_bstr_t, time_t> TrialTimeInfoList;
-	// called periodically by the TimesUpThread
-	HRESULT TimesUp();
-*/
-
+//
 HRESULT KeyServer::TimesUp()
 {
 	// get the key list and check if any keys in it are not in the trial key list
@@ -1598,7 +1309,7 @@ HRESULT KeyServer::TimesUp()
 								HRESULT hr = key->second->DecrementTrialHours();
 //swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
 //OutputDebugString(tmpbuf);
-								GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
+								g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
 								if (SUCCEEDED(hr))
 								{
 									tk->second.key_obtained = false;
@@ -1615,43 +1326,3 @@ HRESULT KeyServer::TimesUp()
 	//xxx check for expired keys?
 	return S_OK;
 }
-
-// supports usb device insert/remove notification
-void KeyServer::USBEventCallback(LPVOID pContext)
-{
-//OutputDebugStringW(L"KeyServer::USBEventCallback() - Enter");
-	//((KeyServer*)pContext)->ResynchronizeKeys();
-	ResynchronizeKeys();
-//OutputDebugStringW(L"KeyServer::USBEventCallback() - Leave");
-}
-
-_bstr_t KeyServer::BinaryToString(BYTE *pData, DWORD length)
-{
-	size_t sizeOfStr = (length*2)+1;
-	wchar_t *pStr = new wchar_t[sizeOfStr];
-	memset(pStr,0,sizeOfStr);
-	for (unsigned int b = 0; b < length; ++b)
-	{
-		swprintf_s(pStr+2*b, sizeOfStr,L"%02x",(unsigned int)pData[b]);
-	}
-    return pStr;
-}
-
-DWORD KeyServer::StringToBinaryLength(_bstr_t str)
-{
-	return str.length()/2;
-}
-
-void KeyServer::StringToBinary(_bstr_t str, BYTE *pData, DWORD length)
-{
-	if (length>str.length()/2)
-		return;
-	memset(pData, 0, length);
-	for (unsigned int b = 0; b < length; ++b)
-	{
-		unsigned int i(0);
-		swscanf_s(((wchar_t*)str)+2*b, L"%02x", &i);
-		pData[b] = (BYTE)i;
-	}
-}
-

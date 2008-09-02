@@ -75,6 +75,9 @@ static const unsigned int MessagePasswordApplicationInstance = 34;
 static const unsigned int MessagePasswordPacketVerificationCode = 35;
 static const unsigned int MessagePasswordSPDPPM2 = 36;
 
+// softwareLicenseServer - module expiration
+static const unsigned int MessageSoftwareModuleExpiration = 37;
+
 
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
@@ -143,6 +146,8 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessagePasswordPacketVerificationCode*/		L"Password Packet Correct. Verification Code: %s.",
 	/*MessagePasswordSPDPPM2*/ L"Password Correct. \"%s\" module now licensed for %d pages per minute.",
 
+//softwareLicenseServer - module expiration
+	/*MessageSoftwareModuleExpiration*/ L"Warning, Product: %s (%d)\n%s\n",
 
 // general errors
 	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
