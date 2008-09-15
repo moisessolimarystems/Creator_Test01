@@ -25,28 +25,9 @@ System::Void ServerConfiguration::ServerConfiguration_Load(System::Object*  send
 			}
 		}
 		rkey->Close();
-	}	
-	//Search 32-bit registry on 64-bit machines
-	rkey = Registry::LocalMachine->OpenSubKey(SOLIMAR_KEY_32);
-	if(rkey)
-	{
-		// Retrieve all the subkeys for the specified key.
-		String* productNames[] = rkey->GetSubKeyNames();
-		// Print the contents of the array to the console.
-		System::Collections::IEnumerator* enum0 = productNames->GetEnumerator();
-		while (enum0->MoveNext())
-		{
-			String* s = __try_cast<String*>(enum0->Current);
-			if(!s->Equals(LICENSE_PRODUCT)) 
-			{
-				if(MapProductName(s) >= 0)
-					ProductComboBox->Items->Add(s);
-			}
-		}
-		rkey->Close();			
-	}
-	if(ProductComboBox->Items->Count > 1)	//Solimar Licensing is one key
+		if(productNames->Count > 1)	//Solimar Licensing is one key
 			ProductComboBox->SelectedIndex = 0;
+	}	
 	ServerPropertyGrid->SelectedObject = TheConnectionSetting;
 }
 
@@ -232,6 +213,8 @@ int ServerConfiguration::MapProductName(String* ProductName)
 		ProductName = ProductName->ToUpper();
 		if(ProductName->Equals(L"ICONVERT"))
 			return IConvertProductID;
+		else if(ProductName->Equals(L"SOLSEARCHER"))
+			return SolSearcherEnterpriseProductID;
 		else if(ProductName->Equals(L"SOLSCRIPT"))
 			return SolScriptProductID;
 		else if(ProductName->Equals(L"SDX DESIGNER"))
@@ -260,7 +243,7 @@ bool ServerConfiguration::CreateDefaultXML()
 		if(di->Exists == false)
 			di->Create();
     }
-    catch (Exception* e ) 
+    catch (Exception* /*e*/ ) 
     {
 		return false;
     }     
