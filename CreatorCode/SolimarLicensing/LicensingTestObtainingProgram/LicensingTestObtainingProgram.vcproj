@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsupp.lib Ws2_32.lib User32.lib ..\SolimarLicenseServer\rainbow\lib(x64)\MT\spromeps.lib"
+				AdditionalDependencies="comsupp.lib Ws2_32.lib User32.lib ..\SolimarLicenseServer\rainbow\lib\MT\spromeps.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -291,7 +291,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comsupp.lib Ws2_32.lib User32.lib ..\SolimarLicenseServer\rainbow\lib(x64)\MT\spromeps.lib"
+				AdditionalDependencies="comsupp.lib Ws2_32.lib User32.lib ..\SolimarLicenseServer\rainbow\lib\MT\spromeps.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"

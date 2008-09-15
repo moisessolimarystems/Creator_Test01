@@ -213,13 +213,13 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				return retval = "IndexPlugInProductID";
 								
 			case IConvertProductID :
-				return retval = "iCONVERT";
+				return retval = "IConvert";
 				
 			case SolSearcherEnterpriseProductID :
-				return retval = "SOLsearcher Enterprise";
+				return retval = "SolSearcher Enterprise";
 				
 			case SolScriptProductID : 
-				return retval = "SOLscript";
+				return retval = "SolScript";
 				
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
@@ -303,13 +303,6 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
 	ListViewItem*  listViewItem1 = new ListViewItem();
 	listViewItem1->UseItemStyleForSubItems = true;
-
-	//Connection Type - Remote(Blue) or Local(Black)
-	if(TheKeyInfoStructure.ApplicationInstance.intVal > 0) 
-	{
-		listViewItem1->ForeColor = System::Drawing::Color::SteelBlue;
-	}
-
 	//Active Status - Red,Italic or Black
 	if(TheKeyInfoStructure.Active.intVal == 0) 
 	{
@@ -317,7 +310,11 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		listViewItem1->ForeColor = System::Drawing::Color::Red;
 	}
 
-
+	//Connection Type - Remote(Blue) or Local(Black)
+	if(TheKeyInfoStructure.ApplicationInstance.intVal > 0) 
+	{
+		listViewItem1->ForeColor = System::Drawing::Color::SteelBlue;
+	}
 	//Key Type Column
 	listViewItem1->Text = TheKeyInfoStructure.KeyType.bstrVal;
 	//KeyNumber Column
