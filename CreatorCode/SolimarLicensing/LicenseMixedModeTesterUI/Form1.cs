@@ -32,8 +32,8 @@ namespace LicenseMixedModeTesterUI
 			bool bExists = false, bSuccess;
 			slw = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper();
 			String licenseServer = "jlan5";
-			licenseServer = "fakeServer";
-			licenseServer = "jzak2";
+			//licenseServer = "fakeServer";
+			//licenseServer = "jzak2";
 
 			SolimarLicenseWrapper.DelegateMessageCallbackManaged delMessage;
 			delMessage = new SolimarLicenseWrapper.DelegateMessageCallbackManaged(MessageCallback);
