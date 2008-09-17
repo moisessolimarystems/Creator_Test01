@@ -106,7 +106,7 @@ class HResultOutputCPP(AttribsOutput):
                 class_text += '\t\t// Free the buffer.\n'
                 class_text += '\t\tLocalFree(lpMsgBuf);\n'
                 class_text += '\t}\n'
-                class_text += '\tif(!wcsicmp(retVal.c_str(), L"Unknown Error"))\n'
+                class_text += '\tif(!_wcsicmp(retVal.c_str(), L"Unknown Error"))\n'
                 class_text += '\t{\n'
                 class_text += '\t\tIErrorInfo* pIErrorInfo = NULL;\n'
                 class_text += '\t\tif (GetErrorInfo(0, &pIErrorInfo) == S_OK)\n'

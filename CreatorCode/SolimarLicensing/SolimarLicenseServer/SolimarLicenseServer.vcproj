@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="SolimarLicenseServer"
 	ProjectGUID="{DD791949-C013-44C7-9044-0BD21F9AAB50}"
 	RootNamespace="SolimarLicenseServer"
 	Keyword="AtlProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -56,13 +57,13 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Fx"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -81,14 +82,17 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib\MT\spromeps.lib ..\lib\flatelib.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="2"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="1"
+				KeyFile=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -107,9 +111,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -156,7 +157,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Fx"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;UNICODE;_UNICODE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -181,12 +182,14 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmt.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib ..\lib\flatelib64.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="2"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="17"
 			/>
@@ -207,9 +210,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -259,13 +259,13 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -284,7 +284,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib\MT\spromeps.lib ..\lib\flatelib.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -292,6 +292,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="1"
 			/>
@@ -312,9 +314,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -363,7 +362,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -388,7 +387,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib ..\lib\flatelib64.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServer.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -396,6 +395,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="17"
 			/>
@@ -418,9 +419,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
 				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
@@ -429,7 +427,7 @@
 		</Configuration>
 		<Configuration
 			Name="SolimarInternalRelease|Win32"
-			OutputDirectory="$(SolutionDir)\Image"
+			OutputDirectory="$(SolutionDir)\Image\SolimarInternalRelease"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
@@ -468,7 +466,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -493,7 +491,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib\MT\spromeps.lib ..\lib\flatelib.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -501,6 +499,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="1"
 			/>
@@ -521,9 +521,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -572,7 +569,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;&quot;_WIN32_WINNT 0x0400&quot;;_SOLIMAR_INTERNAL;UNICODE;_UNICODE"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -597,7 +594,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib ..\lib\flatelib.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
@@ -605,6 +602,8 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)/SolimarLicenseServer.lib"
 				TargetMachine="17"
 			/>
@@ -627,12 +626,10 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Performing registration"
 				CommandLine="&quot;$(TargetPath)&quot; /RegServer"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 	</Configurations>
@@ -657,7 +654,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\CryptoAndFlateHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\CryptoHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\FlateHelper.cpp"
 				>
 			</File>
 			<File
@@ -737,7 +742,19 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\LicenseCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LicenseController.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicenseError.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LicenseObject.cpp"
 				>
 			</File>
 			<File
@@ -745,7 +762,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicensingSoftwareMessage.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\MultidimensionalSafeArray.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\NetworkUtils.cpp"
 				>
 			</File>
 			<File
@@ -761,6 +786,26 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\SecurityHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SoftwareServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SoftwareServerDataMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SoftwareServerInstance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\SoftwareSpecInstance.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SolimarLicenseServer.cpp"
 				>
 			</File>
@@ -769,11 +814,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SolimarSoftwareLicenseMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\LicAttribsCPP\SpdUtils.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\USBNotification.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\common\Version.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\WMIHelper.cpp"
 				>
 			</File>
 		</Filter>
@@ -799,6 +856,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicAttribsCPP\CSpdAttribsBase.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\IObjectAuthentication.h"
 				>
 			</File>
@@ -819,11 +880,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicAttribsCPP\Lic_PackageAttribs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\LicAttribsCPP\Lic_PackageAttribsHelper.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\LicAttribsCPP\LicAttribsBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LicenseCache.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicenseError.h"
 				>
 			</File>
 			<File
+				RelativePath=".\LicenseObject.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicensingMessage.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\LicensingSoftwareMessage.h"
 				>
 			</File>
 			<File
@@ -847,11 +932,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SoftwareServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SoftwareServerDataMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\SoftwareSpecInstance.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SolimarLicenseSvr.h"
 				>
 			</File>
 			<File
+				RelativePath=".\SolimarSoftwareLicenseMgr.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\common\StringUtils.h"
 				>
 			</File>
 			<File

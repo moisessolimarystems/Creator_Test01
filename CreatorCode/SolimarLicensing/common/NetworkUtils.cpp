@@ -26,9 +26,9 @@ HRESULT NetworkUtils::SolimarNetworkHelper::GetIPAddresses(_bstr_t computerName,
 					break;
 				
 				_bstr_t address;
-				for (unsigned int i=0; i<pHostInfo->h_length; ++i)
+				for (int i=0; i<pHostInfo->h_length; ++i)
 				{
-					swprintf(ip_addr_buffer, (i+1!=pHostInfo->h_length) ? L"%d." : L"%d", (unsigned int)(unsigned char)ip[i]);
+					swprintf_s(ip_addr_buffer, (i+1!=pHostInfo->h_length) ? L"%d." : L"%d", (unsigned int)(unsigned char)ip[i]);
 					address += ip_addr_buffer;
 				}
 				ipList.push_back(address);
