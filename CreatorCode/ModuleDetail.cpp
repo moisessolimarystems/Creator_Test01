@@ -477,6 +477,7 @@ void __fastcall TModuleFrame::ModuleListKeyPress(TObject *Sender,
 //==============================================================================
 bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
 {
+   int unitValue(units);
    char password_string[128];
    //get selected list item, from list item get pointer to ModuleDetail structure
    TListItem* selected(ModuleList->Selected);
@@ -503,6 +504,12 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    }
 
    ModuleDetail* detail = static_cast<ModuleDetail*>(selected->Data);  //listselected item
+
+   //required due to legacy SPDNT/SOLSCRIPT/ICONVERT(9.05 & below) adding +1 to value
+   if((key_record->pkey->productId == SPD_PRODUCT) ||
+      (key_record->pkey->productId == ICONVERT_PRODUCT && key_record->pkey->productVersion < 0x9060 ) ||
+      (key_record->pkey->productId == SOLSCRIPT_PRODUCT))
+       unitValue = units - 1;
 
    //check if module is default
    if( key_record->pkey->isOnTrial() && key_record->non_perm_ktf == false )
@@ -531,39 +538,13 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
       }
       else // ...otherwise create a password
       {
-//Key is in initial trial and not permanent
-//1) want units to be 0 then increment
-//2) want units to be 0 then set units
-         //0 out units on increment
-         //if(units < 0) units = 0;
-
-//         keyMaster->applyModZeroPassword(key_record, detail, units+1);
          keyMaster->applyModZeroPassword(key_record, detail, units);
-
-/*
-         //All products using the new licensing scheme will need their units incremented by 1
-         switch(key_record->pkey->productId)
-         {
-             case SPDE_PRODUCT :
-             case RUBIKA_PRODUCT :
-             case SDX_DESIGNER_PRODUCT :
-             case SOLSEARCHER_ENTERPRISE_PRODUCT :
-                 units++;
-                 break;
-             case ICONVERT_PRODUCT :
-                 if(key_record->pkey->productVersion > 0x9050)
-                     units++;
-                 break;
-             default :
-                 break;
-         }
-*/
 
          keyMaster->getModulePassword((key_record->pkey),
                                        detail->id,
                                        static_cast<ProductId>(key_record->pkey->productId),
                                        key_record->pkey->productVersion,
-                                       units,
+                                       unitValue,
                                        key_record->incrementPasswordNumber(),
                                        password_string
                                       );
@@ -571,53 +552,16 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
    }
    else if((key_record->pkey->status == 2 || key_record->non_perm_ktf == true)) //key is already permanent
    {
-      //grab value from key/db then add one for increment or minus one for decrement
-      /*if (units == -1)
-         units = ((SpdProtectionKey*)(key_record->pkey))->getLicense(detail->offset, detail->bits);
-      */
-      //check if license has ability to be incremented
-      //int available(detail->max - units);
-      //if( available > 0 )
-      //{
-         //keyMaster->applyModPassword(key_record, detail, units+1);
          keyMaster->applyModPassword(key_record, detail, units);
 
-   /*
-         //All products using the new licensing scheme will need their units incremented by 1
-         switch(key_record->pkey->productId)
-         {
-             case SPDE_PRODUCT :
-             case RUBIKA_PRODUCT :
-             case SDX_DESIGNER_PRODUCT :
-             case SOLSEARCHER_ENTERPRISE_PRODUCT :
-                 units++;
-                 break;
-             case ICONVERT_PRODUCT :
-                 if(key_record->pkey->productVersion > 0x9050)
-                     units++;
-                 break;
-             default :
-                 break;
-         }                                        //so need to increment units to pass to license server.
-   */
-
-         //keyMaster->getModulePassword((SpdProtectionKey*)(key_record->pkey),
          keyMaster->getModulePassword((key_record->pkey),
                                       (uchar)detail->id,
                                       static_cast<ProductId>(key_record->pkey->productId),
                                       key_record->pkey->productVersion,
-                                      units,
+                                      unitValue,
                                       key_record->incrementPasswordNumber(),
                                       password_string
                                       );
-
-      /*}
-      else
-      {
-         Application->MessageBox("Module already set to its maximum value.", "Module Information", MB_OK);
-         return false;
-      }
-      */
   }
    else //- key_status not valid, do not generate a module password
       return false;
