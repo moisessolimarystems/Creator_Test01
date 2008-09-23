@@ -10,7 +10,6 @@ class GlobalSoftwareSpec
 		~GlobalSoftwareSpec();
 
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs GetSoftwareSpec();
-		void SetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs newSoftwareSpec);
 		
 	private:
 		HANDLE GlobalSoftwareSpecLock;
