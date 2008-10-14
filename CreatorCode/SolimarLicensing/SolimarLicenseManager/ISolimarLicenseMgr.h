@@ -112,4 +112,19 @@ __interface ISolimarLicenseMgr5 : ISolimarLicenseMgr4
 
 };
 
+// ISolimarLicenseMgr6
+[
+	object,
+	uuid("60D07071-CE52-462b-B457-C22A5D23F66B"),
+	dual,	helpstring("ISolimarLicenseMgr6 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr6 : ISolimarLicenseMgr5
+{
+	// Methods for Software license server
+	[id(19),helpstring("method Connect3")] HRESULT Connect3([in] BSTR server, [in] long connectionFlags);
+	[id(20),helpstring("method SoftwareLicense_Initialize")] HRESULT SoftwareLicense_Initialize([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
+	[id(21),helpstring("method SoftwareLicense_InitializeViewOnly")] HRESULT SoftwareLicense_InitializeViewOnly([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor);
+};
+
 #endif
