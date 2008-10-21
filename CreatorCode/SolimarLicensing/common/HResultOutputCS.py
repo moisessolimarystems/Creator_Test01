@@ -99,6 +99,10 @@ class HResultOutputCS(AttribsOutput):
 		class_text += '\t\tstring ErrorMessage = "";\n'
 		class_text += '\t\tif(SolLicErrors!=null && SolLicErrors.Contains(_hresult))\n'
 		class_text += '\t\t\tErrorMessage = (string)SolLicErrors[_hresult];\n'
+		class_text += '\t\telse {\n'
+		class_text += '\t\t\ttry { System.Runtime.InteropServices.Marshal.ThrowExceptionForHR((int)_hresult);}\n'
+		class_text += '\t\t\tcatch (Exception ex) { ErrorMessage = ex.Message;}\n'
+		class_text += '\t\t}\n'		
 		class_text += '\t\treturn ErrorMessage;\n'
 		class_text += '\t}\n'
 
