@@ -2,6 +2,7 @@
 
 #include "LicenseSettings.h"
 #include "..\common\SafeMutex.h"
+#include "..\common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include <shlwapi.h>	//For PathAppend
 
 
@@ -57,10 +58,10 @@ HRESULT LicenseSettings::Initialize()
 /*
 //Version 1.0 of XML layout
 <LicensingStructure>
-	<Version value="" />
+	<Version value="1.0" />
 	<ServerStructure>
 		<Product id="">
-			<Server name="" backup="" shared="" />
+			<Server name="[string]" backup="[0/1]" shared="[0/1]" />
 			.
 			.
 			.
@@ -71,227 +72,252 @@ HRESULT LicenseSettings::Initialize()
 		.
 	</ServerStructure>
 </LicensingStructure>
+
+//Version 2.0 of XML layout
+<LicensingStructure>
+	<Version value="2.0" />
+	<ServerStructure>
+		<Product id="">
+			<Server name="[string]" backup="[string]" testDev="[0/1]"/>
+		</Product>
+		.
+		.
+		.
+	</ServerStructure>
+</LicensingStructure>
 */
-HRESULT LicenseSettings::GetLiceseServerByProduct(long productID, std::list<LicenseServerSettings*>* pLicenseServerList)
-{
-	HRESULT hr(E_FAIL);
-	if(pLicenseServerList == NULL)
-		return hr;
-
-	SafeMutex mutex(m_xmlReaderMutex);
-	if(wcscmp(m_bstrXmlSettingsVersion, L"1.0") == 0)	//Version 1.0 settings
-	{
-		hr = GetLiceseServerByProductXmlVersion_1_0(productID, pLicenseServerList);
-	}
-	else if(wcscmp(m_bstrXmlSettingsVersion, L"2.0") == 0)	//Version 2.0 settings
-	{
-		hr = GetLiceseServerByProductXmlVersion_2_0(productID, pLicenseServerList);
-	}
-	return hr;
-}
-
-HRESULT LicenseSettings::GetLiceseServerByProductXmlVersion_1_0(long productID, std::list<LicenseServerSettings*>* pLicenseServerList)
+HRESULT LicenseSettings::GetLiceseServerByProduct(long productID, LicenseServerSettingsTwoPointZero* pLicenseServer)
 {
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProductXmlVersion_1_0 (productID: %d", productID);
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (productID: %d", productID);
 //OutputDebugString(tmpbuf); 
 	HRESULT hr(E_FAIL);
-	if(pLicenseServerList == NULL)
-		return hr;
-
-	for(;;)
+	try
 	{
+		if(pLicenseServer == NULL)
+			throw E_FAIL;
+
 		SafeMutex mutex(m_xmlReaderMutex);
 
-		pLicenseServerList->clear();
-
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct - m_bstrXmlSettingsVersion: %s", (wchar_t*)m_bstrXmlSettingsVersion);
+//OutputDebugString(tmpbuf); 
 		if(wcscmp(m_bstrXmlSettingsVersion, L"1.0") == 0)	//Version 1.0 settings
 		{
-			//Get root
-			MSXML2::IXMLDOMNodePtr pParentNode;
-			MSXML2::IXMLDOMNodePtr pChildNode;
-			hr = m_xmlReader.GetRoot(pParentNode);
-			if (FAILED(hr))
-				break;
+			std::list<LicenseSettings::LicenseServerSettingsOnePointZero*> licServerSettingsList;
+			licServerSettingsList.clear();
 
-			hr = m_xmlReader.GetChildByElement(pParentNode, L"ServerStructure", pChildNode);
-			if (FAILED(hr))
-				break;
+			//find correct ProdID
+			long calProdID = productID;
+			if(productID == Lic_PackageAttribs::pid_SdxDesigner)
+				calProdID = Lic_PackageAttribs::pid_SolIndexer;
+			else if(productID == Lic_PackageAttribs::pid_RubikaProcessBuilder)
+				calProdID = Lic_PackageAttribs::pid_Rubika;
+			else if(productID == Lic_PackageAttribs::pid_SpdeQueueManager)
+				calProdID = Lic_PackageAttribs::pid_Spde;
 
-			int childCount = 0;
-			hr = m_xmlReader.GetChildCount(pChildNode, childCount);
-			if (FAILED(hr))
-				break;
+			hr = LoadVersionOnePointZeroXML(calProdID, &licServerSettingsList);
+			if(FAILED(hr))
+				throw hr;
 
-			bool bFoundNode = false;
-			MSXML2::IXMLDOMNodePtr pProdNode;
-			for(int idx=0; idx<childCount; idx++)
-			{
-				hr = m_xmlReader.GetChildByIndex(pChildNode, idx, pProdNode);
-				if (FAILED(hr))
-					continue;
 
-				//Look for ProductID
-				_bstr_t prodId = L"";
-				hr = m_xmlReader.GetAttribute(pProdNode, L"id", prodId);
-				if (FAILED(hr))
-					continue;
 
-				wchar_t wcstrProdId[256];
-				wsprintf(wcstrProdId, L"%d", productID);
-				if(_wcsicmp(wcstrProdId, prodId) == 0)
-				{
-					bFoundNode = true;	//Found Correct ProductID Node
-					break;
-				}
-			}
 
-			if(bFoundNode)
-			{
-				int prodServerChildCount = 0;
-				MSXML2::IXMLDOMNodePtr pProdServerNode;
-				hr = m_xmlReader.GetChildCount(pProdNode, prodServerChildCount);
-				if (FAILED(hr))
-					break;
-
-				for(int idx=0; idx<prodServerChildCount; idx++)
-				{
-					hr = m_xmlReader.GetChildByIndex(pProdNode, idx, pProdServerNode);
-					if (FAILED(hr))	continue;
-					
-					_bstr_t serverName = L"";
-					hr = m_xmlReader.GetAttribute(pProdServerNode, L"name", serverName);
-					if (FAILED(hr))	continue;
-
-					_bstr_t backupServer = L"";
-					hr = m_xmlReader.GetAttribute(pProdServerNode, L"backup", backupServer);
-					if (FAILED(hr))	continue;
-
-					_bstr_t sharedServer = L"";
-					hr = m_xmlReader.GetAttribute(pProdServerNode, L"shared", sharedServer);
-					if (FAILED(hr))	continue;
-
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (name: %s, backup: %s, sharedServer: %s", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)sharedServer);
+			bool bUseShared = (calProdID != productID);
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct calProdID: %d, bUseShared:%d", calProdID, bUseShared);
 //OutputDebugString(tmpbuf); 
-					LicenseServerSettings* tmpLicSetting = new LicenseServerSettings();
-					tmpLicSetting->serverName = serverName;
-					tmpLicSetting->bIsBackupServer = _wcsicmp(backupServer, L"0") == 0 ? false : true;
-					tmpLicSetting->bIsSharedServer = _wcsicmp(sharedServer, L"0") == 0 ? false : true;
-					pLicenseServerList->insert(pLicenseServerList->end(), tmpLicSetting);
+
+			//convert LicenseServerSettingsOnePointZero to LicenseServerSettingsTwoPointZero
+			pLicenseServer->bIsTestDevLicensing = false;
+			for(	std::list<LicenseSettings::LicenseServerSettingsOnePointZero*>::iterator licServerSettingsIt = licServerSettingsList.begin();
+					licServerSettingsIt != licServerSettingsList.end();
+					licServerSettingsIt++)
+			{
+				if((*licServerSettingsIt)->bIsSharedServer == bUseShared)
+				{
+					if((*licServerSettingsIt)->bIsBackupServer)
+						pLicenseServer->backupServerName = (*licServerSettingsIt)->serverName;
+					else
+						pLicenseServer->serverName = (*licServerSettingsIt)->serverName;
 				}
 			}
 		}
-		break; //Unconditional break
+		else if(wcscmp(m_bstrXmlSettingsVersion, L"2.0") == 0)	//Version 2.0 settings
+		{
+			hr = LoadVersionTwoPointZeroXML(productID, pLicenseServer);
+		}
+		
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
 	}
 
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProductXmlVersion_1_0 returns 0x%08x", hr);
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct returns 0x%08x", hr);
 //OutputDebugString(tmpbuf); 
 	return hr;
 }
 
-HRESULT LicenseSettings::GetLiceseServerByProductXmlVersion_2_0(long productID, std::list<LicenseServerSettings*>* pLicenseServerList)
+HRESULT LicenseSettings::LoadVersionOnePointZeroXML(long productID, std::list<LicenseServerSettingsOnePointZero*>* pLicenseServerList)
 {
-//wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProductXmlVersion_2_0 (productID: %d", productID);
+//	wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::LoadVersionOnePointZeroXML(productID: %d)", productID);
 //OutputDebugString(tmpbuf); 
-	HRESULT hr(E_FAIL);
-	if(pLicenseServerList == NULL)
-		return hr;
-
+	
+	HRESULT hr(S_OK);
 	for(;;)
 	{
-		SafeMutex mutex(m_xmlReaderMutex);
+		//Get root
+		MSXML2::IXMLDOMNodePtr pParentNode;
+		MSXML2::IXMLDOMNodePtr pChildNode;
+		hr = m_xmlReader.GetRoot(pParentNode);
+		if (FAILED(hr))
+			break;
 
-		pLicenseServerList->clear();
+		hr = m_xmlReader.GetChildByElement(pParentNode, L"ServerStructure", pChildNode);
+		if (FAILED(hr))
+			break;
 
-		//if(wcscmp(m_bstrXmlSettingsVersion, L"2.0") == 0)	//Version 1.0 settings
-		if(wcscmp(m_bstrXmlSettingsVersion, L"2.0") == 0)	//Version 1.0 settings
+		int childCount = 0;
+		hr = m_xmlReader.GetChildCount(pChildNode, childCount);
+		if (FAILED(hr))
+			break;
+
+		bool bFoundNode = false;
+		MSXML2::IXMLDOMNodePtr pProdNode;
+		for(int idx=0; idx<childCount; idx++)
 		{
-			//Get root
-			MSXML2::IXMLDOMNodePtr pParentNode;
-			MSXML2::IXMLDOMNodePtr pChildNode;
-			hr = m_xmlReader.GetRoot(pParentNode);
+			hr = m_xmlReader.GetChildByIndex(pChildNode, idx, pProdNode);
 			if (FAILED(hr))
-				break;
+				continue;
 
-			hr = m_xmlReader.GetChildByElement(pParentNode, L"ServerStructure", pChildNode);
+			//Look for ProductID
+			_bstr_t prodId = L"";
+			hr = m_xmlReader.GetAttribute(pProdNode, L"id", prodId);
 			if (FAILED(hr))
-				break;
+				continue;
 
-			int childCount = 0;
-			hr = m_xmlReader.GetChildCount(pChildNode, childCount);
-			if (FAILED(hr))
-				break;
-
-			bool bFoundNode = false;
-			MSXML2::IXMLDOMNodePtr pProdNode;
-			for(int idx=0; idx<childCount; idx++)
+			wchar_t wcstrProdId[256];
+			wsprintf(wcstrProdId, L"%d", productID);
+			if(_wcsicmp(wcstrProdId, prodId) == 0)
 			{
-				hr = m_xmlReader.GetChildByIndex(pChildNode, idx, pProdNode);
-				if (FAILED(hr))
-					continue;
-
-				//Look for ProductID
-				_bstr_t prodId = L"";
-				hr = m_xmlReader.GetAttribute(pProdNode, L"id", prodId);
-				if (FAILED(hr))
-					continue;
-
-				wchar_t wcstrProdId[256];
-				wsprintf(wcstrProdId, L"%d", productID);
-				if(_wcsicmp(wcstrProdId, prodId) == 0)
-				{
-					bFoundNode = true;	//Found Correct ProductID Node
-					break;
-				}
+				bFoundNode = true;	//Found Correct ProductID Node
+				break;
 			}
+		}
 
-			if(bFoundNode)
+		if(bFoundNode)
+		{
+			int prodServerChildCount = 0;
+			MSXML2::IXMLDOMNodePtr pProdServerNode;
+			hr = m_xmlReader.GetChildCount(pProdNode, prodServerChildCount);
+			if (FAILED(hr))
+				break;
+
+			for(int idx=0; idx<prodServerChildCount; idx++)
 			{
-				int prodServerChildCount = 0;
-				MSXML2::IXMLDOMNodePtr pProdServerNode;
-				hr = m_xmlReader.GetChildCount(pProdNode, prodServerChildCount);
-				if (FAILED(hr))
-					break;
+				hr = m_xmlReader.GetChildByIndex(pProdNode, idx, pProdServerNode);
+				if (FAILED(hr))	continue;
+				
+				_bstr_t serverName = L"";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"name", serverName);
+				if (FAILED(hr))	continue;
 
-				for(int idx=0; idx<prodServerChildCount; idx++)
-				{
-					hr = m_xmlReader.GetChildByIndex(pProdNode, idx, pProdServerNode);
-					if (FAILED(hr))	continue;
-					
-					_bstr_t serverName = L"";
-					hr = m_xmlReader.GetAttribute(pProdServerNode, L"name", serverName);
-					if (FAILED(hr))	continue;
+				_bstr_t backupServer = L"";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"backup", backupServer);
+				if (FAILED(hr))	continue;
 
-					_bstr_t backupServer = L"";
-					hr = m_xmlReader.GetAttribute(pProdServerNode, L"backup", backupServer);
-					if (FAILED(hr))	continue;
+				_bstr_t sharedServer = L"";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"shared", sharedServer);
+				if (FAILED(hr))	continue;
 
-					//_bstr_t sharedServer = L"";
-					//hr = m_xmlReader.GetAttribute(pProdServerNode, L"shared", sharedServer);
-					//if (FAILED(hr))	continue;
-
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (name: %s, backup: %s, sharedServer: %s", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)sharedServer);
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::LoadVersionOnePointZeroXML(name: %s, backup: %s, sharedServer: %s", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)sharedServer);
 //OutputDebugString(tmpbuf); 
-					LicenseServerSettings* tmpLicSetting = new LicenseServerSettings();
-					tmpLicSetting->serverName = serverName;
-					tmpLicSetting->bIsBackupServer = false;
-					tmpLicSetting->bIsSharedServer = false;
-					pLicenseServerList->insert(pLicenseServerList->end(), tmpLicSetting);
-
-					tmpLicSetting = new LicenseServerSettings();
-					tmpLicSetting->serverName = backupServer;
-					tmpLicSetting->bIsBackupServer = true;
-					tmpLicSetting->bIsSharedServer = false;
-					pLicenseServerList->insert(pLicenseServerList->end(), tmpLicSetting);
-				}
-
+				LicenseServerSettingsOnePointZero* tmpLicSetting = new LicenseServerSettingsOnePointZero();
+				tmpLicSetting->serverName = serverName;
+				tmpLicSetting->bIsBackupServer = _wcsicmp(backupServer, L"0") == 0 ? false : true;
+				tmpLicSetting->bIsSharedServer = _wcsicmp(sharedServer, L"0") == 0 ? false : true;
+				pLicenseServerList->insert(pLicenseServerList->end(), tmpLicSetting);
 			}
 		}
 		break; //Unconditional break
 	}
+	return hr;
+}
 
-//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProductXmlVersion_2_0 returns 0x%08x", hr);
+HRESULT LicenseSettings::LoadVersionTwoPointZeroXML(long productID, LicenseServerSettingsTwoPointZero* pLicenseServer)
+{
+//	wchar_t tmpbuf[1024];
+	HRESULT hr(S_OK);
+	for(;;)
+	{
+		//Get root
+		MSXML2::IXMLDOMNodePtr pParentNode;
+		MSXML2::IXMLDOMNodePtr pChildNode;
+		hr = m_xmlReader.GetRoot(pParentNode);
+		if (FAILED(hr))
+			break;
+		hr = m_xmlReader.GetChildByElement(pParentNode, L"ServerStructure", pChildNode);
+		if (FAILED(hr))
+			break;
+
+		int childCount = 0;
+		hr = m_xmlReader.GetChildCount(pChildNode, childCount);
+		if (FAILED(hr))
+			break;
+		bool bFoundNode = false;
+		MSXML2::IXMLDOMNodePtr pProdNode;
+		for(int idx=0; idx<childCount; idx++)
+		{
+			hr = m_xmlReader.GetChildByIndex(pChildNode, idx, pProdNode);
+			if (FAILED(hr))
+				continue;
+
+			//Look for ProductID
+			_bstr_t prodId = L"";
+			hr = m_xmlReader.GetAttribute(pProdNode, L"id", prodId);
+			if (FAILED(hr))
+				continue;
+
+			wchar_t wcstrProdId[256];
+			wsprintf(wcstrProdId, L"%d", productID);
+			if(_wcsicmp(wcstrProdId, prodId) == 0)
+			{
+				bFoundNode = true;	//Found Correct ProductID Node
+				break;
+			}
+		}
+		if(bFoundNode)
+		{
+			int prodServerChildCount = 0;
+			MSXML2::IXMLDOMNodePtr pProdServerNode;
+			hr = m_xmlReader.GetChildCount(pProdNode, prodServerChildCount);
+			if (FAILED(hr))
+				break;
+
+			for(int idx=0; idx<prodServerChildCount; idx++)
+			{
+				hr = m_xmlReader.GetChildByIndex(pProdNode, idx, pProdServerNode);
+				if (FAILED(hr))	continue;
+				
+				_bstr_t serverName = L"";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"name", serverName);
+				if (FAILED(hr))	continue;
+
+				_bstr_t backupServer = L"0";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"backup", backupServer);
+
+				_bstr_t testDevLic = L"0";
+				hr = m_xmlReader.GetAttribute(pProdServerNode, L"testDev", testDevLic);
+
+//swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct (name: %s, backup: %s, testDev: %s)", (wchar_t*)serverName, (wchar_t*)backupServer, (wchar_t*)testDevLic);
 //OutputDebugString(tmpbuf); 
+				pLicenseServer->serverName = serverName;
+				pLicenseServer->backupServerName = backupServer;
+				pLicenseServer->bIsTestDevLicensing = _wcsicmp(testDevLic, L"0") == 0 ? false : true;
+				hr = S_OK;
+			}
+		}
+		break; //Unconditional break
+	}
 	return hr;
 }
