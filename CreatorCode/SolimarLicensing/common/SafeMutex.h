@@ -19,8 +19,9 @@ private:
 public:
    SafeMutex(HANDLE hMutex, DWORD dwTo=INFINITE);
    SafeMutex(const THandleList &hlMutexList, DWORD dwTo=INFINITE);
+   SafeMutex() ;
    ~SafeMutex();
-   bool Locked();
+   bool Locked() const ;
    
 private:
    void _init(const THandleList &hlMutexList, DWORD dwTo=INFINITE);
