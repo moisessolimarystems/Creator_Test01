@@ -12,6 +12,12 @@ SafeMutex::SafeMutex(const THandleList &hlMutexList, DWORD dwTo)
 {
    _init(hlMutexList, dwTo) ;
 }
+SafeMutex::SafeMutex()
+{  //
+   // prevent mis-use
+   //
+   assert(false) ;
+}
 SafeMutex::~SafeMutex()
 {
    TItHandleList ithMutex ;
@@ -28,7 +34,7 @@ SafeMutex::~SafeMutex()
    }
 }
 
-bool SafeMutex::Locked() 
+bool SafeMutex::Locked() const
 {
    return m_bSuccess ; 
 }
