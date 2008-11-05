@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="SolimarLicenseManagerDotNet"
 	ProjectGUID="{9394710F-23DA-4816-8F33-B62489F7FB8B}"
 	RootNamespace="SolimarLicenseManagerDotNet"
 	Keyword="ManagedCProj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -62,9 +63,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
+				OutputFile="$(OutDir)\Solimar.Licensing.LicenseManagerWrapper.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 				KeyFile="SolimarLicenseManagerDotNet.snk"
 			/>
@@ -85,9 +89,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -124,6 +125,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -138,9 +140,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
+				OutputFile="$(OutDir)\Solimar.Licensing.LicenseManagerWrapper.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 				KeyFile="SolimarLicenseManagerDotNet.snk"
 			/>
@@ -161,9 +166,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -213,8 +215,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
+				OutputFile="$(OutDir)\Solimar.Licensing.LicenseManagerWrapper.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 				KeyFile="SolimarLicenseManagerDotNet.snk"
 			/>
@@ -235,9 +240,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -288,8 +290,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Ws2_32.lib"
+				OutputFile="$(OutDir)\Solimar.Licensing.LicenseManagerWrapper.dll"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="17"
 				KeyFile="SolimarLicenseManagerDotNet.snk"
 			/>
@@ -312,9 +317,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -323,14 +325,17 @@
 		<AssemblyReference
 			RelativePath="System.dll"
 			AssemblyName="System, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.Data.dll"
 			AssemblyName="System.Data, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86"
+			MinFrameworkVersion="131072"
 		/>
 		<AssemblyReference
 			RelativePath="System.XML.dll"
 			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
 		/>
 	</References>
 	<Files>
@@ -368,7 +373,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LicensingServerWrapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\manager_wrapper\LicensingWrapper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\MultidimensionalSafeArray.cpp"
 				>
 			</File>
 			<File
@@ -379,12 +392,20 @@
 				RelativePath=".\SolimarLicenseManagerDotNet.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\common\LicAttribsCPP\SpdUtils.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\LicensingServerWrapper.h"
+				>
+			</File>
 			<File
 				RelativePath="..\manager_wrapper\LicensingWrapper.h"
 				>
