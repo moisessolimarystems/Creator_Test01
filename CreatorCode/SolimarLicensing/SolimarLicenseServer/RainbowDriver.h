@@ -24,6 +24,13 @@ public:
 	HRESULT Activate(_bstr_t key, unsigned short cell);
 	HRESULT WriteKeyUnprogrammedIdentifier(_bstr_t key);
 	HRESULT ClearKeyUnprogrammedIdentifier(_bstr_t key);
+
+	HRESULT GetSoftwareKeyCode(_bstr_t key, BSTR *key_code);
+	HRESULT SetSoftwareKeyCode(_bstr_t key, BSTR key_code);
+	HRESULT GetSoftwareModifiedDate(_bstr_t key, time_t *modified_date);
+	HRESULT SetSoftwareModifiedDate(_bstr_t key, time_t modified_date);
+	HRESULT GetSoftwareCurrentActivations(_bstr_t key, unsigned short *current_activations);
+	HRESULT SetSoftwareCurrentActivations(_bstr_t key, unsigned short current_activations);
 	
 	typedef std::map<_bstr_t,RBP_SPRO_APIPACKET> KeyList;
 	HANDLE keys_lock;
@@ -73,9 +80,22 @@ private:
 	//Unprogrammed keys have a GUID written from CELL_KEY_GUID to CELL_KEY_GUID+7
 	//There was a bug that the cells CELL_KEY_GUID to CELL_KEY_GUID+7 were not being
 	//cleared out when a key got programmed.
+
+	static const unsigned short CELL_SOFTWARE_CODE_KEY_GUID = (unsigned short)0x08;
+	static const unsigned short CELL_SOFTWARE_CODE_MODIFIED_DATE = (unsigned short)0x10;
+	static const unsigned short CELL_SOFTWARE_CODE_CURRENT_ACTIVATIONS = (unsigned short)0x12;
+	//Software licensing writes a GUID to the Hardwarekeys for Verification
 	
 	// Unique key id management for unprogrammed keys
 	HRESULT WriteKeyTempGUID(RBP_SPRO_APIPACKET packet, GUID &id);
 	HRESULT ReadKeyTempGUID(RBP_SPRO_APIPACKET packet, GUID &id);
 	HRESULT ClearKeyTempGUID(RBP_SPRO_APIPACKET packet);
+
+	// Unique key code for verification GUID for software licensing
+	HRESULT WriteSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet, GUID &id);
+	HRESULT ReadSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet, GUID &id);
+	HRESULT ClearSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet);
+
+	HRESULT WriteSoftwareUnsignedLongAtCell(RBP_SPRO_APIPACKET packet, unsigned long value, unsigned short cell);
+	HRESULT ReadSoftwareUnsignedLongAtCell(RBP_SPRO_APIPACKET packet, unsigned long &value, unsigned short cell);
 };

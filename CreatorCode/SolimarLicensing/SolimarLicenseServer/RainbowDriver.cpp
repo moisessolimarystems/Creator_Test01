@@ -89,6 +89,81 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 	return S_OK;
 }
 
+HRESULT RainbowDriver::GetSoftwareKeyCode(_bstr_t key, BSTR *key_code)
+{
+	SafeMutex mutex(keys_lock);	
+	HRESULT hr(E_INVALIDARG);
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		GUID key_guid;
+		hr = ReadSoftwareVerificationKeyGUID(keyIT->second, key_guid);
+		if (SUCCEEDED(hr))
+		{
+			wchar_t tmp_code[128];
+			
+			StringFromGUID2(key_guid, tmp_code, 128);
+			tmp_code[127]=0;
+			*key_code = _bstr_t(tmp_code).Detach();
+		}
+	}
+	return hr;
+}
+
+HRESULT RainbowDriver::SetSoftwareKeyCode(_bstr_t key, BSTR key_code)
+{
+	SafeMutex mutex(keys_lock);	
+	HRESULT hr(E_INVALIDARG);
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		GUID key_guid;
+		if (key_code[0] == L'{')
+			hr = CLSIDFromString(const_cast<LPWSTR> (key_code), &key_guid);
+		else
+			hr = CLSIDFromProgID(const_cast<LPWSTR> (key_code), &key_guid);
+        
+		if(SUCCEEDED(hr))
+			hr = WriteSoftwareVerificationKeyGUID(keyIT->second, key_guid);
+	}
+	return hr;
+}
+
+HRESULT RainbowDriver::GetSoftwareModifiedDate(_bstr_t key, time_t *modified_date)
+{	
+	SafeMutex mutex(keys_lock);	
+	HRESULT hr(E_INVALIDARG);
+
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		unsigned long modDate = 0;
+		hr = ReadSoftwareUnsignedLongAtCell(keyIT->second, modDate, CELL_SOFTWARE_CODE_MODIFIED_DATE);
+		if(SUCCEEDED(hr))
+			*modified_date = modDate;
+	}
+	return hr;
+}
+
+HRESULT RainbowDriver::SetSoftwareModifiedDate(_bstr_t key, time_t modified_date)
+{	
+	SafeMutex mutex(keys_lock);
+	HRESULT hr(E_INVALIDARG);
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		hr = WriteSoftwareUnsignedLongAtCell(keyIT->second, (unsigned long)modified_date, CELL_SOFTWARE_CODE_MODIFIED_DATE);
+	}
+	return hr;
+}
+HRESULT RainbowDriver::GetSoftwareCurrentActivations(_bstr_t key, unsigned short *current_activations)
+{
+	return ReadCell(key, CELL_SOFTWARE_CODE_CURRENT_ACTIVATIONS, current_activations);
+}
+HRESULT RainbowDriver::SetSoftwareCurrentActivations(_bstr_t key, unsigned short current_activations)
+{
+	return WriteCell(key, CELL_SOFTWARE_CODE_CURRENT_ACTIVATIONS, current_activations);
+}
 
 HRESULT RainbowDriver::RefreshKeyList()
 {
@@ -238,7 +313,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 				// if key is programmed, use the key number and customer number as the key id
 				else
 				{
-					_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
+					_snwprintf_s(key_id, _countof(key_id), L"%04x-%04x", customer, keynumber);
 //wsprintf(tmpBuf, L"Key Found: %s", key_id);
 //OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
@@ -572,6 +647,67 @@ HRESULT RainbowDriver::ClearKeyTempGUID(RBP_SPRO_APIPACKET packet)
 	for (unsigned int i = 0; i<sizeof(GUID)/sizeof(unsigned short); ++i)
 	{
 		unsigned short cell = CELL_KEY_GUID+i;
+		HRESULT hr = TranslateRainbowError(RNBOsproWrite(packet, WRITE_PASSWORD, cell, 0, accessCode[cell]));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+
+HRESULT RainbowDriver::WriteSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet, GUID &id)
+{
+	// write a guid to the key
+	// this guid lives in cells CELL_SOFTWARE_CODE_KEY_GUID to CELL_SOFTWARE_CODE_KEY_GUID+7 inclusive
+	for (unsigned int i = 0; i<sizeof(GUID)/sizeof(unsigned short); ++i)
+	{
+		unsigned short cell = CELL_SOFTWARE_CODE_KEY_GUID+i;
+		unsigned short value = *(((unsigned short*)&id)+i);
+		HRESULT hr = TranslateRainbowError(RNBOsproWrite(packet, WRITE_PASSWORD, cell, value, accessCode[cell]));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+HRESULT RainbowDriver::ReadSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet, GUID &id)
+{
+	// check for the guid written to the key
+	// this guid lives in cells CELL_SOFTWARE_CODE_KEY_GUID to CELL_SOFTWARE_CODE_KEY_GUID+7 inclusive
+	memset(&id,0,sizeof(GUID));
+	for (unsigned int i = 0; i<sizeof(GUID)/sizeof(unsigned short); ++i)
+	{
+		HRESULT hr = TranslateRainbowError(RNBOsproRead(packet, CELL_SOFTWARE_CODE_KEY_GUID+i, (((unsigned short*)&id)+i)));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+
+HRESULT RainbowDriver::WriteSoftwareUnsignedLongAtCell(RBP_SPRO_APIPACKET packet, unsigned long value, unsigned short cell)
+{
+	for (unsigned int i = 0; i<sizeof(unsigned long)/sizeof(unsigned short); ++i)
+	{
+		unsigned short sCell = cell+i;
+		unsigned short sValue = *(((unsigned short*)&value)+i);
+		HRESULT hr = TranslateRainbowError(RNBOsproWrite(packet, WRITE_PASSWORD, sCell, sValue, accessCode[sCell]));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+HRESULT RainbowDriver::ReadSoftwareUnsignedLongAtCell(RBP_SPRO_APIPACKET packet, unsigned long &value, unsigned short cell)
+{
+	memset(&value,0,sizeof(unsigned long));
+	for (unsigned int i = 0; i<sizeof(unsigned long)/sizeof(unsigned short); ++i)
+	{
+		HRESULT hr = TranslateRainbowError(RNBOsproRead(packet, cell+i, (((unsigned short*)&value)+i)));
+		if (FAILED(hr)) return hr;
+	}
+	return S_OK;
+}
+
+HRESULT RainbowDriver::ClearSoftwareVerificationKeyGUID(RBP_SPRO_APIPACKET packet)
+{
+	// erase the guid on the key
+	// this guid lives in cells CELL_SOFTWARE_CODE_KEY_GUID to CELL_SOFTWARE_CODE_KEY_GUID+7 inclusive
+	for (unsigned int i = 0; i<sizeof(GUID)/sizeof(unsigned short); ++i)
+	{
+		unsigned short cell = CELL_SOFTWARE_CODE_KEY_GUID+i;
 		HRESULT hr = TranslateRainbowError(RNBOsproWrite(packet, WRITE_PASSWORD, cell, 0, accessCode[cell]));
 		if (FAILED(hr)) return hr;
 	}
