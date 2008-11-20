@@ -15,6 +15,7 @@
 	<Offset name="ITF_LIC_MIN"	      value="0x9000"  base="ITF_MIN"/>
 	<Offset name="ITF_LIC_SVR_OFFSET" value="0x0000"  base="ITF_LIC_MIN"/>
 	<Offset name="ITF_LIC_RNBO_OFFSET"    value="0x0100"  base="ITF_LIC_MIN"/>
+	<Offset name="ITF_LIC_WRPPR_OFFSET"	value="0x0200"  base="ITF_LIC_MIN"/>    
 	<Offset name="ITF_LIC_MGR_OFFSET"	value="0x0300"  base="ITF_LIC_MIN"/>
 	<Offset name="ITF_MAX"			  value="0xFFFF"  base=""/>	
 	<!--	-->
@@ -63,35 +64,54 @@
 	<!-- HResults with offset ITF_MIN -->
 	<!--	-->
 	<HResultType offset="ITF_LIC_SVR_OFFSET">
-		<HResult name="EHR_UNKNOWN"					ecode="EC_UNKNOWN"			        value="1"  alias="Unknown error (Key server)" /> 
-		<HResult name="EHR_DRIVER_INIT_FAILURE"	    ecode="EC_DRIVER_INIT_FAILURE"		value="2"  alias="Driver initialization failure (Key server)"/> 
-		<HResult name="EHR_PASSWORD_NO_MATCH"       ecode="EC_PASSWORD_NO_MATCH"		value="3"  alias="Passwords do not match (Key server)"/>
-		<HResult name="EHR_PASSWORD_INVALID_FORMAT"	ecode="EC_PASSWORD_INVALID_FORMAT"	value="4"  alias="Invalid password format (Key server)"/>
-		<HResult name="EHR_LICENSE_INSUFFICIENT"    ecode="EC_LICENSE_INSUFFICIENT"		value="5"  alias="Insufficient license (Key server)"/>
-		<HResult name="EHR_LICENSE_INVALID"         ecode="EC_LICENSE_INVALID"			value="6"  alias="Invalid license (Key server)"/>
-		<HResult name="EHR_LICENSE_EXPRIED"         ecode="EC_LICENSE_EXPRIED"			value="7"  alias="License expired (Key server)"/>
-		<HResult name="EHR_KEY_TRIAL_EXPIRED"       ecode="EC_KEY_TRIAL_EXPIRED"		value="8"  alias="Trial Key expired (Key server)"/>
-		<HResult name="EHR_KEY_NOT_PRESENT"         ecode="EC_KEY_NOT_PRESENT"			value="9"  alias="Key not present (Key server)"/>
-		<HResult name="EHR_CLOCK_ERROR"				ecode="EC_CLOCK_ERROR"				value="10" alias="Clock error (Key server)"/>
-		<HResult name="EHR_KEY_WRITE_FAILURE"       ecode="EC_KEY_WRITE_FAILURE"		value="11" alias="Failed writing to the key (Key server)"/>
-		<HResult name="EHR_KEY_WRITE_ACCESS_DENIED" ecode="EC_KEY_WRITE_ACCESS_DENIED"	value="12" alias="Failed writing to the key, access is denied (Key server)"/>
-		<HResult name="EHR_KEY_NOT_ACTIVATED"       ecode="EC_KEY_NOT_ACTIVATED"		value="13" alias="Key not active (Key server)"/>
-		<HResult name="EHR_AUTHENTICATION_FAILURE"  ecode="EC_AUTHENTICATION_FAILURE"	value="14" alias="Authentication failure (Key server)"/>
-		<HResult name="EHR_MANAGER_NOT_INITIALIZED" ecode="EC_MANAGER_NOT_INITIALIZED"	value="15" alias="Manager not initialized (Key server)"/>
-		<HResult name="EHR_KEY_NO_SUITABLE_KEY"     ecode="EC_KEY_NO_SUITABLE_KEY"		value="16" alias="No suitable key found (Key server)"/>
-		<HResult name="EHR_KEY_LOCKED"				ecode="EC_KEY_LOCKED"				value="17" alias="Key locked (Key server)"/>
-		<HResult name="EHR_CLIENT_TIMEOUT"          ecode="EC_CLIENT_TIMEOUT"			value="18" alias="Client timeout (Key server)"/>
-		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>
-		<HResult name="EHR_KEY_BASE_NOT_MATCHING"	ecode="EC_KEY_BASE_NOT_MATCHING"	value="20" alias="Base Keys do not match module for module (Key server)"/>
-		<HResult name="EHR_KEY_NOT_MATCHING_INSTANCES" ecode="EC_KEY_NOT_MATCHING_INSTANCES"			value="21" alias="Keys do not match by Application Instances for all the Key on the server (Key server)"/>
-		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Insufficient licensing, unable to obtain an Application Instances on the server (Key server)"/>
-		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Insufficient licensing, unable to locate a Base Key on the server (Key server)"/>
-		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the Key Server has been restored (Key server)"/>
-		<HResult name="EHR_KEY_USE_BACKUP_KEY_SERVER"	ecode="EC_KEY_USE_BACKUP_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"/>
-		<HResult name="EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER"	ecode="EC_KEY_NO_REMOTE_VERSION_KEY_SERVER"			value="26" alias="License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)"/>
+		<HResult name="EHR_UNKNOWN"					ecode="EC_UNKNOWN"			        value="1"  alias="Unknown error (License server)" /> 
+		<HResult name="EHR_DRIVER_INIT_FAILURE"	    ecode="EC_DRIVER_INIT_FAILURE"		value="2"  alias="Driver initialization failure (License server)"/> 
+		<HResult name="EHR_PASSWORD_NO_MATCH"       ecode="EC_PASSWORD_NO_MATCH"		value="3"  alias="Passwords do not match (License server)"/>
+		<HResult name="EHR_PASSWORD_INVALID_FORMAT"	ecode="EC_PASSWORD_INVALID_FORMAT"	value="4"  alias="Invalid password format (License server)"/>
+		<HResult name="EHR_LICENSE_INSUFFICIENT"    ecode="EC_LICENSE_INSUFFICIENT"		value="5"  alias="Insufficient license (License server)"/>
+		<HResult name="EHR_LICENSE_INVALID"         ecode="EC_LICENSE_INVALID"			value="6"  alias="Invalid license (License server)"/>
+		<HResult name="EHR_LICENSE_EXPRIED"         ecode="EC_LICENSE_EXPRIED"			value="7"  alias="License expired (License server)"/>
+		<HResult name="EHR_KEY_TRIAL_EXPIRED"       ecode="EC_KEY_TRIAL_EXPIRED"		value="8"  alias="Trial Key expired (License server)"/>
+		<HResult name="EHR_KEY_NOT_PRESENT"         ecode="EC_KEY_NOT_PRESENT"			value="9"  alias="Key not present (License server)"/>
+		<HResult name="EHR_CLOCK_ERROR"				ecode="EC_CLOCK_ERROR"				value="10" alias="Clock error (License server)"/>
+		<HResult name="EHR_KEY_WRITE_FAILURE"       ecode="EC_KEY_WRITE_FAILURE"		value="11" alias="Failed writing to the key (License server)"/>
+		<HResult name="EHR_KEY_WRITE_ACCESS_DENIED" ecode="EC_KEY_WRITE_ACCESS_DENIED"	value="12" alias="Failed writing to the key, access is denied (License server)"/>
+		<HResult name="EHR_KEY_NOT_ACTIVATED"       ecode="EC_KEY_NOT_ACTIVATED"		value="13" alias="Key not active (License server)"/>
+		<HResult name="EHR_AUTHENTICATION_FAILURE"  ecode="EC_AUTHENTICATION_FAILURE"	value="14" alias="Authentication failure (License server)"/>
+		<HResult name="EHR_MANAGER_NOT_INITIALIZED" ecode="EC_MANAGER_NOT_INITIALIZED"	value="15" alias="Manager not initialized (License server)"/>
+		<HResult name="EHR_KEY_NO_SUITABLE_KEY"     ecode="EC_KEY_NO_SUITABLE_KEY"		value="16" alias="No suitable key found (License server)"/>
+		<HResult name="EHR_KEY_LOCKED"				ecode="EC_KEY_LOCKED"				value="17" alias="Key locked (License server)"/>
+		<HResult name="EHR_CLIENT_TIMEOUT"          ecode="EC_CLIENT_TIMEOUT"			value="18" alias="Client timeout (License server)"/>
+		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (License server)"/>
+		<HResult name="EHR_KEY_BASE_NOT_MATCHING"	ecode="EC_KEY_BASE_NOT_MATCHING"	value="20" alias="Base Keys do not match module for module (License server)"/>
+		<HResult name="EHR_KEY_NOT_MATCHING_INSTANCES" ecode="EC_KEY_NOT_MATCHING_INSTANCES"			value="21" alias="Keys do not match by Application Instances for all the Key on the server (License server)"/>
+		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Insufficient licensing, unable to obtain an Application Instances on the server (License server)"/>
+		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Insufficient licensing, unable to locate a Base Key on the server (License server)"/>
+		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the License server has been restored (License server)"/>
+		<HResult name="EHR_KEY_USE_FAILOVER_KEY_SERVER"	ecode="EC_KEY_USE_FAILOVER_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the License server, switching to Failover License server (License server)"/>
+		<HResult name="EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER"	ecode="EC_KEY_NO_REMOTE_VERSION_KEY_SERVER"			value="26" alias="License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (License server)"/>
+		<HResult name="EHR_LIC_PROD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_PROD_NO_FREE_APP_INSTANCE"			value="27" alias="Unable to obtain an Application Instance on the server for the given product (License server)"/>
+		<HResult name="EHR_LIC_MOD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_MOD_NO_FREE_APP_INSTANCE"			value="28" alias="Unable to obtain an Application Instance on the server for the given module (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID" value="29" alias="Failed to validate software license with Protection Key ID (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE" value="30" alias="Failed to validate software license with License Code (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_BIOS_SERIALNUMBER"	ecode="EC_LIC_SOFTWARE_VALIDATION_BIOS_SERIALNUMBER" value="31" alias="Failed to validate software license with Bios Serial Number (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_MAC_ADDRESS"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_MAC_ADDRESS" value="32" alias="Failed to validate software license with MAC address (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_COMPUTER_NAME"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_COMPUTER_NAME" value="33" alias="Failed to validate software license with Computer Name (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY" value="34" alias="Can not validate against a Customer Copy (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE" value="35" alias="Can not validate against a License Archive (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_PACKET"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_PACKET" value="36" alias="Can not validate against a License Packet (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_CONNECT_FAILOVER_ONLY"	ecode="EC_LIC_SOFTWARE_CONNECT_FAILOVER_ONLY" value="37" alias="Failed to connect.  This License Server is configured as a Failover License Server and can only be connected to as a failover (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED"	ecode="EC_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED" value="38" alias="Failed to apply Software License Packet.  This Packet has already been applied (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET"	ecode="EC_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET"	value="39" alias="License Server does not support generating License Packets (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY"	ecode="EC_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY"	value="40" alias="Can not generate License Archive that does not validate against a Protection Key (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH"	ecode="EC_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH"	value="41" alias="Failed to apply License Archive. License Codes do not match, probably an trying to use an old License Archive (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_KEY_ID_REQUIRED"	ecode="EC_LIC_SOFTWARE_KEY_ID_REQUIRED"	value="42" alias="Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED"	ecode="EC_LIC_SOFTWARE_LIC_FILE_EXPIRED"	value="43" alias="Software License Expired (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_NO_PRODUCT"	ecode="EC_LIC_SOFTWARE_NO_PRODUCT"	value="44" alias="Software Licensing does not contain licensing for the given product (License Server)"/>
+		
 	</HResultType>
 	<!--	-->
-	<!-- HResults with offset ITF_CR_APP_MIN -->
+	<!-- HResults with offset ITF_LIC_CR_APP_MIN -->
 	<!--	-->
 	<HResultType offset="ITF_LIC_RNBO_OFFSET">
 		<HResult name="EHR_SP_INVALID_FUNCTION_CODE"	  ecode="EC_SP_INVALID_FUNCTION_CODE"		value="SP_INVALID_FUNCTION_CODE"		alias="Invalid function code (Rainbow driver)"/>
@@ -132,13 +152,21 @@
 		<HResult name="EHR_SP_PACKET_ALREADY_INITIALIZED" ecode="EC_SP_PACKET_ALREADY_INITIALIZED"	value="SP_PACKET_ALREADY_INITIALIZED" alias="The packet being initialized was already initialized (Rainbow driver)"/>
 		<HResult name="EHR_SP_INVALID_STATUS"			  ecode="EC_SP_INVALID_STATUS"				value="SP_INVALID_STATUS"			    alias="An invalid status code was returned (Rainbow driver)"/>
 	</HResultType>
-	<!--	-->	
+	<!--	-->
 	
+	<!-- HResults with offset ITF_LIC_WRPPR_OFFSET-->
+	<!--	-->
+	<HResultType offset="ITF_LIC_WRPPR_OFFSET">
+		<HResult name="EHR_WRPPR_SVR_NOT_CONNECTED"		ecode="EC_WRPPR_SVR_NOT_CONNECTED"		value="1"  alias="Not Connected (License Server Wrapper)" /> 
+	</HResultType>
+	<!--	-->		
+
 	<!-- HResults with offset ITF_LIC_MGR_OFFSET-->
 	<!--	-->
 	<HResultType offset="ITF_LIC_MGR_OFFSET">
 		<HResult name="EHR_LIC_MGR_NO_COMPUTER"		ecode="EC_LIC_MGR_NO_COMPUTER"		value="1"  alias="Could not communicate with the computer, verify computer name is correct (License Manager)" /> 
 		<HResult name="EHR_LIC_MGR_NO_LIC_SERVER"		ecode="EC_LIC_MGR_NO_LIC_SERVER"		value="2"  alias="Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)" /> 
+		<HResult name="EHR_LIC_MGR_VIEW_ONLY"	ecode="EC_LIC_MGR_VIEW_ONLY"	value="3" alias="Unable to perform the given action, initialized for view only (License Manager)"/>
 	</HResultType>
 	<!--	-->	
 </HResultClass>
