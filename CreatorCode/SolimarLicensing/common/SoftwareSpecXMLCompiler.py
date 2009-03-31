@@ -82,14 +82,6 @@ def ConvertSoftwareSpecToH(swSpec) :
 		fout_product.write('\tpTmpProdSpec = &((softwareSpec.productSpecMap->find(%s))->second);\n'% (prodSpecKey,))
 		fout_product.write('\tpTmpProdSpec->productID = %s;\n' % (prodSpecKey,))
 		fout_product.write('\tpTmpProdSpec->productName = std::wstring(L"%s");\n' % (prodSpecValue.attribsMap['productName'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_Major')):
-			fout_product.write('\tpTmpProdSpec->softwareSpec_Major = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Major'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_Minor')):
-			fout_product.write('\tpTmpProdSpec->softwareSpec_Minor = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Minor'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_SubMajor')):
-			fout_product.write('\tpTmpProdSpec->softwareSpec_SubMajor = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_SubMajor'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_SubMinor')):
-			fout_product.write('\tpTmpProdSpec->softwareSpec_SubMinor = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_SubMinor'],))
 		if(prodSpecValue.attribsMap.has_key('sameModSpecProductID')):
 			fout_product.write('\tpTmpProdSpec->sameModSpecProductID = %s;\n' % (prodSpecValue.attribsMap['sameModSpecProductID'],))
 		if(prodSpecValue.attribsMap.has_key('prevSharedProductID')):
@@ -179,14 +171,6 @@ def ConvertSoftwareSpecToCS(swSpec) :
 		fout.write('\t\t\ttmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();\n')
 		fout.write('\t\t\ttmpProdSpec.productID.TVal = %s;\n' % ( prodSpecKey,))
 		fout.write('\t\t\ttmpProdSpec.productName.TVal = "%s";\n' % (prodSpecValue.attribsMap['productName'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_Major')):
-			fout.write('\t\t\ttmpProdSpec.softwareSpec_Major.TVal = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Major'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_Minor')):
-			fout.write('\t\t\ttmpProdSpec.softwareSpec_Minor.TVal = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Minor'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_SubMajor')):
-			fout.write('\t\t\ttmpProdSpec.softwareSpec_SubMajor.TVal = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_SubMajor'],))
-		if(prodSpecValue.attribsMap.has_key('softwareSpec_SubMinor')):
-			fout.write('\t\t\ttmpProdSpec.softwareSpec_SubMinor.TVal = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_SubMinor'],))
 		if(prodSpecValue.attribsMap.has_key('sameModSpecProductID')):
 			fout.write('\t\t\ttmpProdSpec.sameModSpecProductID.TVal = %s;\n' % (prodSpecValue.attribsMap['sameModSpecProductID'],))
 		if(prodSpecValue.attribsMap.has_key('prevSharedProductID')):
