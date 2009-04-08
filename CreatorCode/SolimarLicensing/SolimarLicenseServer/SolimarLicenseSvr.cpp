@@ -361,11 +361,6 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleInUse(BSTR key_ident, long module_iden
 	return g_licenseController.keyserver.KeyModuleInUse(key_ident, module_ident, license_count);
 }
 
-STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse_ByApp(BSTR key_ident, long module_ident, long* license_count)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.keyserver.KeyModuleLicenseInUse_ByApp(m_licenseId, key_ident, module_ident, license_count);
-}
 
 STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseUnlimited(BSTR key_ident, long module_ident, VARIANT_BOOL b_module_is_unlimited)
 {
@@ -463,6 +458,7 @@ STDMETHODIMP CSolimarLicenseSvr::SoftwareModuleLicenseInUseByConnection_ByProduc
 	CHECK_CLIENT_AUTHENTICATION;
 	return g_licenseController.softwareServer.ModuleLicenseInUseByLicenseID(productID, m_licenseId, moduleIdent, pLicenseCount);
 }
+
 
 STDMETHODIMP CSolimarLicenseSvr::SoftwareModuleLicenseObtainByApp_ByProduct(long productID, long moduleIdent, long licenseCount)
 {
