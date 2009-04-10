@@ -35,9 +35,9 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	m_MemberLock(CreateMutex(0, FALSE, 0)),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
-//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Enter");
-	ISolimarLicenseMgr7* pLocalLicenseMgr = NULL;
-	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr7), (void**)&pLocalLicenseMgr);
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper()");
+	ISolimarLicenseMgr6* pLocalLicenseMgr = NULL;
+	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr6), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
 		hr = m_licenseManagerPtr.Attach(pLocalLicenseMgr);
@@ -152,7 +152,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
 	// authenticate
-	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -184,7 +184,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	// authenticate
-	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -202,21 +202,6 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 		pISolimarLicenseMgr->Release();
 	}
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx()", hr);
-	return hr;
-}
-HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx(long product, BSTR* p_server, BSTR* p_backup_server, bool* p_bTestDev, bool bUseSharedLicenseServers)
-{
-	SafeMutex mutex(m_MemberLock);
-	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
-	HRESULT hr = S_OK;
-
-	VARIANT_BOOL bVtTestDev = VARIANT_FALSE;
-	hr = m_licenseManagerPtr->GetInfoByProduct(product, bUseSharedLicenseServers ? VARIANT_TRUE : VARIANT_FALSE, p_server, p_backup_server, &bVtTestDev);
-	if(SUCCEEDED(hr))
-	{
-		*p_bTestDev = (bVtTestDev==VARIANT_TRUE) ? true : false;
-	}
-	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx()", hr);
 	return hr;
 }
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
@@ -353,16 +338,6 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseEx(lon
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseInUse(module, license_count);
 	
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseEx()", hr);
-	return hr;
-}
-HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse_ByAppEx(long module, long* license_count)
-{
-	SafeMutex mutex(m_MemberLock);
-	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
-
-	HRESULT hr = m_licenseManagerPtr->ModuleLicenseInUse_ByApp(module, license_count);
-
-	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse_ByAppEx()", hr);
 	return hr;
 }
 
