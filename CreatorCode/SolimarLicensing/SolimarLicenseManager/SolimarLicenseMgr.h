@@ -10,6 +10,7 @@
 #include "..\common\ILicensingMessage.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "..\common\ss_rpc_failed.h"
+#include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 
 #import "..\SolimarLicenseServer\_SolimarLicenseServer.tlb" no_smart_pointers no_namespace raw_interfaces_only exclude("IObjectAuthentication","ILicensingMessage")
 
@@ -23,6 +24,7 @@
 #include "..\common\InProcPtr.h"
 #include "ISolimarLicenseMgr.h"
 #include "..\common\LicensingMessage.h"
+#include "..\common\LicensingSoftwareMessage.h"
 #include "..\common\GIT.h"
 
 /*
@@ -33,6 +35,8 @@
 	{ /* begin hr scope */ \
 	HRESULT hr; \
 	SS_SLSERVER_FTCALL_HR(srvInfoObj func, plist, hr) \
+	if(FAILED(hr)) \
+		throw _com_error(hr); \
 	} /* end hr scope */ \
 
 /*
@@ -40,6 +44,7 @@
  *	Fault tolerant call which sets an HRESULT.
  */
 #define SS_SLSERVER_FTCALL_HR(srvInfoObj, func, plist, hr) \
+{ /* begin hr scope */ \
 	bool __retry; \
 	bool __connected = true; \
 	do { \
@@ -47,10 +52,16 @@
 		{ \
 			__retry = false; \
 			HRESULT connectHR = LicenseServerError::EHR_CLIENT_TIMEOUT; \
-			if (__connected || SUCCEEDED(connectHR = srvInfoObj.Connect())) \
+			if (!__connected ) \
+			{ \
+				connectHR = srvInfoObj.Reconnect(); \
+				ReConnect(&srvInfoObj); \
+			} \
+			if (__connected || SUCCEEDED(connectHR)) \
 			{ \
 				hr = srvInfoObj.LicenseServer->##func##plist; \
-				srvInfoObj.Disconnect(); \
+				if (SS_RPC_FAILED(hr)) \
+					throw _com_error(hr); \
 			} \
 			else \
 				throw _com_error(connectHR); \
@@ -62,23 +73,85 @@
 			/* TRACE("	Function name	= " #func);*/ \
 			/* TRACE("	Parameters		= " #plist);*/ \
 			/* TRACE("	HRESULT			= %X", e.Error());*/ \
- 			srvInfoObj.Disconnect(); \
 			if (SS_RPC_FAILED(e.Error())) \
 			{ \
-				if (SUCCEEDED(srvInfoObj.Connect())) \
+				if (SUCCEEDED(srvInfoObj.Reconnect())) \
 				{ \
+					ReConnect(&srvInfoObj); \
 					__retry = true; \
 					__connected = true; \
 				} \
 			} \
 			if (!__retry) \
-				throw e; /* Pass to outer catch block. */ \
+				hr = e.Error(); \
 		} \
-	} while (__retry);
+	} while (__retry); \
+} /* end scope */ \
+
+/*
+ * SS_SLSERVER_ON_INTERFACE_FTCALL
+ *	Fault tolerant call on an interface from srvInfoObj
+ */
+#define SS_SLSERVER_ON_INTERFACE_FTCALL(interfaceType, srvInfoObj, func, plist) \
+{ /* begin hr scope */ \
+	HRESULT hr; \
+	SS_SLSERVER_ON_INTERFACE_FTCALL_HR(interfaceType, srvInfoObj, func, plist, hr); \
+	if(FAILED(hr)) \
+		throw _com_error(hr); \
+} /* end hr scope */ \
+/*
+ * SS_SLSERVER_ON_INTERFACE_FTCALL_HR 
+ *	Fault tolerant call on an interface from srvInfoObj
+ */
+#define SS_SLSERVER_ON_INTERFACE_FTCALL_HR(interfaceType, srvInfoObj, func, plist, hr) \
+{ /* begin hr scope */ \
+	bool __retry; \
+	bool __connected = true; \
+	do { \
+		try \
+		{ \
+			__retry = false; \
+			HRESULT connectHR = LicenseServerError::EHR_CLIENT_TIMEOUT; \
+			if (!__connected ) \
+			{ \
+				connectHR = srvInfoObj.Reconnect(); \
+				ReConnect(&srvInfoObj); \
+			} \
+			if (__connected || SUCCEEDED(connectHR)) \
+			{ \
+				/* Query for interfaceType */ \
+				##interfaceType* pLocalInterface = NULL; \
+				hr = srvInfoObj.LicenseServer->QueryInterface(__uuidof(##interfaceType), (void**)&pLocalInterface); \
+				if(FAILED(hr)) throw hr; \
+				hr = pLocalInterface->##func##plist; \
+				pLocalInterface->Release(); \
+				if(FAILED(hr)) throw _com_error(hr); \
+			} \
+			else \
+				throw _com_error(connectHR); \
+		} \
+		catch (_com_error& e) \
+		{ \
+			__connected = false; \
+			if (SS_RPC_FAILED(e.Error())) \
+			{ \
+				if (SUCCEEDED(srvInfoObj.Reconnect())) \
+				{ \
+					ReConnect(&srvInfoObj); \
+					__retry = true; \
+					__connected = true; \
+				} \
+			} \
+			if (!__retry) \
+				hr = e.Error(); \
+				/*throw e; /* Pass to outer catch block. */ \
+		} \
+	} while (__retry); \
+} /* end scope */ \
 
 #define SS_GENERATE_AND_DISPATCH_MESSAGE(MessageValue, MessageType, MessageErrorCode) \
 { /* begin scope */ \
-	static const int MAX_MESSAGE_SIZE = 1024; \
+	static const int MAX_MESSAGE_SIZE = 0x2000; \
 	wchar_t message[MAX_MESSAGE_SIZE]; \
 	_snwprintf_s(message, sizeof(message)/sizeof(wchar_t), MessageValue); \
 	message[MAX_MESSAGE_SIZE-1] = 0; \
@@ -151,7 +224,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr5,
+	public ISolimarLicenseMgr6,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -206,6 +279,11 @@ public:
 	STDMETHOD(ConnectByProduct)(long product, VARIANT_BOOL bUseSharedLicenseServers);
 	STDMETHOD(KeyProductExists)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL *p_bool_key_product_exists);
 
+	// ISolimarLicenseMgr6
+	STDMETHOD(Connect3)(BSTR server, long connectionFlags);
+	STDMETHOD(SoftwareLicense_Initialize)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, long auto_ui_level, unsigned long grace_period_minutes);
+	STDMETHOD(SoftwareLicense_InitializeViewOnly)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor);
+
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
@@ -254,22 +332,41 @@ private:
 		long KeyExpiresDaysLeft;
 	};
 
+	class SoftwareLicenseInfo
+	{
+	public:
+		SoftwareLicenseInfo();
+		SoftwareLicenseInfo(const SoftwareLicenseInfo &s);
+
+		ModuleLicenseMap licenses_total;
+		ModuleLicenseMap licenses_allocated;
+		ModuleLicenseMap licenses_inuse;
+
+		bool SoftwareLicenseValid;
+	};
+
 	class ServerInfo
 	{
 	public:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
-		ServerInfo(_bstr_t servername, bool useOnlySharedLicenses, GITPtr<ISolimarLicenseSvr3> pILicenseServer);
+		ServerInfo(_bstr_t servername, 
+			bool useOnlySharedLicenses, 
+			bool useSoftwareLicensing,
+			GITPtr<ISolimarLicenseSvr3> pILicenseServer);
+
 		~ServerInfo();
 
 		_bstr_t name;
 		bool bUseOnlySharedLicenses;
+		bool bUseSoftwareLicensing;	//Not used yet, maybe not needed
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
+		SoftwareLicenseInfo software_license;
 		KeyList keys;
 
 		GITPtr<ISolimarLicenseSvr3> LicenseServer;
 
-		HRESULT Connect();
+		HRESULT Reconnect();
 
 		HRESULT Disconnect()
 		{
@@ -286,6 +383,13 @@ private:
 		UI_STYLE_DIALOG =		0x10,
 		UI_STYLE_EVENT_LOG =	0x20,
 	};
+
+	enum {
+		CF_NONE =	0x00,
+		CF_BACKUP_SERVER = 0x01,
+		CF_ONLY_SHARED_LICENSE = 0x02,
+		CF_SOFTWARE_LICENSING = 0x04,
+	};
 	
 	DWORD m_ui_level;
 	
@@ -293,8 +397,17 @@ private:
 	HANDLE MessageListLock;
 	HANDLE GracePeriodLock;
 	
+	//Call after an RPC error, clear all allocated licenses so they will have to be re-obtained
+	HRESULT ReConnect(ServerInfo* pSrvInfoObj);
+
+	HRESULT Initialize_Internal(VARIANT_BOOL b_configure_for_software_licenses, BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes, VARIANT_BOOL b_app_instance_lock_key, VARIANT_BOOL b_bypass_remote_key_restriction, VARIANT_BOOL b_view_licenses_only);
+
 	// refresh the list of the keys on the currently connected servers
-	HRESULT RefreshKeyList(bool _bLogError = false);
+	HRESULT RefreshLicensingFromLicServers(bool _bLogError = false);
+
+	HRESULT RefreshKeyListFromLicServers(bool _bLogError = false);
+
+	HRESULT RefreshSoftwareLicenseFromLicServers(bool _bLogError = false);
 
 	// if m_bLockKeyByAppInstance then makes sure that all the keys types match up module by module.
 	// also verifies that each key configuration (unique by the modules the keys are licensed for) all have the same number of application instances
@@ -316,6 +429,9 @@ private:
 	// removes all keys from the cache, and disassociates all keys with the given Application Instance to empty...
 	HRESULT FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
+	HRESULT AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError);
+	HRESULT FreeAllSoftwareLicenseFromCache(ServerInfo* pServerInfo, bool bLogError);
+
 	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.
 	HRESULT SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
@@ -335,12 +451,36 @@ private:
 	// removes any keys from the cache that are not present and have no obtained licenses
 	HRESULT RemoveObsoleteKeysFromCache();
 
+	HRESULT ModuleLicenseTotalInternal(long module_id, long *count);
+
+	// Calculates the modules in use by the given Application Instance.
+	// For Software License, goes to the License Server for all the process that are connected
+	// with the same Application Instance.  For Protection Key Licensing, only retrieves the
+	// in use for this given instance.
+	HRESULT ModuleLicenseInUseInternal(long module_id, long *count);
+
 	// attempts to allocate licenses on the known-good keys in the cache
 	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
 	HRESULT ObtainLicensesInternal(long module_id, long license_count);
 
 	// attempts to deallocate licenses on keys that have 
 	HRESULT ReleaseLicensesInternal(long module_id, long license_count);
+
+	// cycles through all servers in server list seeing if they have a newer
+	//software spec than the currently loaded one.  Should call only once probably...
+	//Also, only retrieves the Lic_ProductSoftwareSpecAttribs for the product the
+	//LicenseManager is initialized for...
+	HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec);
+
+
+	// use to determine license scheme (Software License vs Protection Key)
+	// Side Effect - sets pServerInfo->useSoftwareLicensing
+	//HRESULT RefreshLicensingSchemeFromLicenseServer(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
+	HRESULT LicenseServerContainsProtectionKeyLicensingForProduct(long product_id, ServerInfo* pServerInfo, bool* pbHasLicensing);
+	HRESULT LicenseServerContainsSoftwareLicensingForProduct(long product_id, ServerInfo* pServerInfo, bool* pbHasLicensing);
+
+	//Cycles through all the Software Licenses that has the productID, and returns only the first error encountered
+	HRESULT LicenseServerSoftwareLicenseStatusFirstErrorForProduct(long product_id, ServerInfo* pServerInfo);
 
 	// adds a message to the list of unretrieved messages
 	HRESULT AddLicensingMessage(LicensingMessage &message);
@@ -349,6 +489,7 @@ private:
 
 
 	LicensingMessageList licensing_message_cache;
+	LicensingSoftwareMessageList licensing_software_message_cache;
 	
 	typedef std::map<_bstr_t,ServerInfo> ServerList;
 	typedef std::map<_bstr_t,bool> KeyIdentList;	
@@ -360,6 +501,7 @@ private:
 	static void HeartbeatThreadFunction(void* pvThis);
 	void SendHeartbeat();
 	
+	Lic_PackageAttribs::Lic_SoftwareSpecAttribs m_softwareSpec;
 	KeySpec m_keyspec;
 	ServerList m_servers;
 	ServerList m_backupServers;
@@ -369,6 +511,7 @@ private:
 	KeyIdentList m_productkeys;
 
 	bool m_single_key, m_lock_keys, m_initialized;	
+	bool m_bViewLicenseOnly;
 	_bstr_t m_specific_single_key_ident;
 	_bstr_t m_current_single_key;
 	long m_product, m_prod_ver_major, m_prod_ver_minor;
@@ -378,8 +521,10 @@ private:
 	bool m_bLockKeyByAppInstance;
 	_bstr_t m_applicationInstance;
 
+	//bool m_bConfiguredForSoftwareLicense; //either configured for ProtectionKeys or Software Licenses.
 
-	time_t m_dtRefreshKeyList;
+
+	time_t m_dtRefreshLicenses;
 
 	bool InViolationPeriod();
 	bool GracePeriodHasStarted();

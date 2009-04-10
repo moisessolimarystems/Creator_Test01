@@ -39,8 +39,18 @@ namespace SolimarLicenseManagerWrapper
 	} \
 	} /* end scope */ \
 
+#define ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(hr) \
+	{ /* begin scope */ \
+	if(FAILED(hr)) \
+	{ \
+		LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper - Error creating Solimar License Manager", hr); \
+		return hr; \
+	} \
+	} /* end scope */ \
+
 class LicensingWrapper : public ChallengeResponseHelper
 {
+
 public:
 	LicensingWrapper();
 	LicensingWrapper(const LicensingWrapper &o);
@@ -61,6 +71,7 @@ public:
 	//bool bypass_remote_key_restriction - True means the restriction of remote license managers using non-remote keys has been lifted.
 	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0)	{return SUCCEEDED(InitializeEx(product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes));}
 	bool Initialize(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false){return SUCCEEDED(InitializeEx(application_instance, product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes, application_instance_lock_keys, bypass_remote_key_restriction));}
+
 	bool KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists) {return SUCCEEDED(KeyProductExistsEx(product, prod_ver_major, prod_ver_minor, bKeyExists));}
 	bool ModuleLicenseTotal(long module, long* license_count) {return SUCCEEDED(ModuleLicenseTotalEx(module, license_count));}
 	bool ModuleLicenseInUse(long module, long* license_count) {return SUCCEEDED(ModuleLicenseInUseEx(module, license_count));}
@@ -87,6 +98,8 @@ public:
 	HRESULT DisconnectEx();
 	HRESULT InitializeEx(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0);
 	HRESULT InitializeEx(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false);
+	HRESULT InitializeViewOnly(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor);
+
 	HRESULT KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists);
 	HRESULT ModuleLicenseTotalEx(long module, long* license_count);
 	HRESULT ModuleLicenseInUseEx(long module, long* license_count);
@@ -104,8 +117,9 @@ public:
 	HRESULT ModuleLicenseInUseLicensingSessionEx(long session_id, long module, long* license_count);
 	HRESULT EndLicensingSessionEx(long session_id);
 	
-	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
-	typedef void (*LicenseInvalidCallbackPtr)(void* pContext, HRESULT lastHr, const wchar_t* message);
+	// Note the use of __stdcall for compatibility with managed code
+	typedef void (__stdcall *LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
+	typedef void (__stdcall *LicenseInvalidCallbackPtr)(void* pContext, HRESULT lastHr, const wchar_t* message);
 
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
@@ -123,7 +137,7 @@ public:
 	static KeySpec keyspec;
 
 	//MOVE FOR TESTING
-	//GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
+	GITPtr<ISolimarLicenseMgr6> m_licenseManagerPtr;
 
 private:
 	
@@ -142,6 +156,7 @@ private:
 	HANDLE m_MemberLock;
 	HANDLE m_ThreadKillEvent;
 	HRESULT m_validityCheck_LastHr;
+	HRESULT m_constructorHR;
 	
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
@@ -149,7 +164,7 @@ private:
 	void* m_license_invalid_callback_context;
 	LicenseInvalidCallbackPtr m_license_invalid_callback;
 
-	GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
+	//GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
 	GITPtr<ILicensingMessage> m_licenseMessagePtr;
 
 	std::wstring StringToWstring(const std::string &s);
