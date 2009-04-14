@@ -34,7 +34,7 @@ const SL_ERROR SLErrors[] =
 	{EC_PACKET_EXPIRED,						EHR_PACKET_EXPIRED,						L"Packet expired (License server)"},
 	{EC_KEY_BASE_NOT_MATCHING,						EHR_KEY_BASE_NOT_MATCHING,						L"Base Keys do not match module for module (License server)"},
 	{EC_KEY_NOT_MATCHING_INSTANCES,						EHR_KEY_NOT_MATCHING_INSTANCES,						L"Keys do not match by Application Instances for all the Key on the server (License server)"},
-	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instances on the server (License server)"},
+	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instance on the server (License server)"},
 	{EC_KEY_NO_BASE_KEY,						EHR_KEY_NO_BASE_KEY,						L"Insufficient licensing, unable to locate a Base Key on the server (License server)"},
 	{EC_KEY_RESTORED_KEY_SERVER,						EHR_KEY_RESTORED_KEY_SERVER,						L"Licensing on the License server has been restored (License server)"},
 	{EC_KEY_USE_FAILOVER_KEY_SERVER,						EHR_KEY_USE_FAILOVER_KEY_SERVER,						L"Unable to validate Licensing on the License server, switching to Failover License server (License server)"},
@@ -57,7 +57,6 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_SOFTWARE_KEY_ID_REQUIRED,						EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,						L"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)"},
 	{EC_LIC_SOFTWARE_LIC_FILE_EXPIRED,						EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,						L"Software License Expired (License server)"},
 	{EC_LIC_SOFTWARE_NO_PRODUCT,						EHR_LIC_SOFTWARE_NO_PRODUCT,						L"Software Licensing does not contain licensing for the given product (License Server)"},
-	{EC_LIC_SOFTWARE_PRODUCT_NO_VERSION,						EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION,						L"Software Licensing contains licensing for the given product, but not at the desired version (License Server)"},
 
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
