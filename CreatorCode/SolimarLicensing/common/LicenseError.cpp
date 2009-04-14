@@ -34,7 +34,7 @@ const SL_ERROR SLErrors[] =
 	{EC_PACKET_EXPIRED,						EHR_PACKET_EXPIRED,						L"Packet expired (Key server)"},
 	{EC_KEY_BASE_NOT_MATCHING,						EHR_KEY_BASE_NOT_MATCHING,						L"Base Keys do not match module for module (Key server)"},
 	{EC_KEY_NOT_MATCHING_INSTANCES,						EHR_KEY_NOT_MATCHING_INSTANCES,						L"Keys do not match by Application Instances for all the Key on the server (Key server)"},
-	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instances on the server (Key server)"},
+	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instance on the server (Key server)"},
 	{EC_KEY_NO_BASE_KEY,						EHR_KEY_NO_BASE_KEY,						L"Insufficient licensing, unable to locate a Base Key on the server (Key server)"},
 	{EC_KEY_RESTORED_KEY_SERVER,						EHR_KEY_RESTORED_KEY_SERVER,						L"Licensing on the Key Server has been restored (Key server)"},
 	{EC_KEY_USE_BACKUP_KEY_SERVER,						EHR_KEY_USE_BACKUP_KEY_SERVER,						L"Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)"},
