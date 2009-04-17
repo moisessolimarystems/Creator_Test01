@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SolimarLicenseViewer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Solimar License Viewer")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Solimar Systems, Inc.")]
 [assembly: AssemblyProduct("SolimarLicenseViewer")]
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]

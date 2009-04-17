@@ -19,4 +19,9 @@
 //Build Number of the program
 #define BUILD_NUMBER 999999
 
+#define FILEVER 9,9,9999,0
+#define PRODUCTVER 9,9,9999,0
+#define STRFILEVER "9.9.9999.0"
+#define STRPRODUCTVER "9.9.9999.0"
+
 #endif

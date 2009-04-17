@@ -124,7 +124,10 @@ namespace Shared.VisualComponents
             get { return _noItemsMessage; }
             set { _noItemsMessage = value; Invalidate(); }
         }
-
+        public void Reset_NoItemsMessage()
+        {
+            NoItemsMessage = "There are no items to show in this view";
+        }
 
         private int m_ColumnToSort;
         private SortOrder m_OrderOfSort;
