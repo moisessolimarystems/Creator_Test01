@@ -29,6 +29,8 @@ class LicenseSettings
 
 	private:
 		HANDLE m_xmlReaderMutex; 
+		HRESULT GetLiceseServerByProductXmlVersion_1_0(long productID, std::list<LicenseServerSettings*>* pLicenseServerList);
+		HRESULT GetLiceseServerByProductXmlVersion_2_0(long productID, std::list<LicenseServerSettings*>* pLicenseServerList);
 		XMLConfig m_xmlReader;
 		_bstr_t m_bstrXmlSettingsVersion;
 };

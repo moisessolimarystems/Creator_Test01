@@ -207,6 +207,7 @@ using namespace System::Security::AccessControl;
                         FileSystemRights rights, AccessControlType controlType);
 	
 	private:
+		void ConvertSettingsToXml_1_0();
 		ConnectionSettings* TheConnectionSetting;
 		bool m_ValueChanged;
 		String* m_LastSelectedProduct;
