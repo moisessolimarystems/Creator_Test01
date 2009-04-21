@@ -115,11 +115,12 @@ namespace Solimar
 			{
 					map_class_base[L"L_LcSysA"] = new ClassInfoBase(L"L_LcSysA",L"",L"License System Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_LcSysA"));
-					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_ServerDataAttribs"] = AttribInfo(L"Streamed_ServerDataAttribs",L"",L"");
 					map_class_base[L"L_LcSysA"]->attribs[L"ListOfStreamed_InfoAttribs"] = AttribInfo(L"ListOfStreamed_InfoAttribs",L"",L"");
-					map_class_base[L"L_LcSysA"]->attribs[L"ListOfStreamed_KeyAttribs"] = AttribInfo(L"ListOfStreamed_KeyAttribs",L"",L"");
 					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_SystemInfoAttribs"] = AttribInfo(L"Streamed_SystemInfoAttribs",L"",L"");
+					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_SoftwareSpecAttribs"] = AttribInfo(L"Streamed_SoftwareSpecAttribs",L"",L"");
+					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_ServerDataAttribs"] = AttribInfo(L"Streamed_ServerDataAttribs",L"",L"");
 					map_class_base[L"L_LcSysA"]->attribs[L"createdDate"] = AttribInfo(L"createdDate",L"",L"");
+					map_class_base[L"L_LcSysA"]->attribs[L"ListOfStreamed_KeyAttribs"] = AttribInfo(L"ListOfStreamed_KeyAttribs",L"",L"");
 			}
 			void constructor_helper_4()
 			{
