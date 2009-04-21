@@ -16,8 +16,15 @@ namespace SolimarLicenseDiagnosticDataViewer
             InitializeComponent();
         }
 
+        
         public void SetData(string _newText)
         {
+            SetData("", _newText);
+        }
+        public void SetData(string _newTitle, string _newText)
+        {
+            if (_newTitle.Length > 0)
+                this.Text = _newText;
             textBox1.Text = _newText;
         }
 
