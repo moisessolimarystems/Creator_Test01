@@ -14,10 +14,10 @@ namespace SolimarLicenseViewer
     {
         enum IconList
         {
-            SPD,            
+            SPD,
             ICONVERT,
-            RUBIKA, 
-            SDXDESIGNER, 
+            RUBIKA,
+            SDXDESIGNER,
             SOLSEARCHERENTERPRISE,
             SOLFUSION,
             SOLSCRIPT,
@@ -30,7 +30,8 @@ namespace SolimarLicenseViewer
             HISTORY,
             EMPTY,
             PROTECTIONKEYS,
-            PROTECTIONKEY
+            PROTECTIONKEY,
+            RUBIKAPROCESSBUILDER
         }
 
 
