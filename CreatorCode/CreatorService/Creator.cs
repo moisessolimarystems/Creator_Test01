@@ -41,40 +41,40 @@ namespace Service.Creator
         #region ICreator Members
 
         #region Customer Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions)// int pageNumber, int pageSize, bool enableLoadOptions)
         {
             return CustomerTable.GetAllCustomers(searchString, enableLoadOptions);//pageNumber, pageSize, enableLoadOptions);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetCustomerCount(string searchString, bool enableLoadOptions)
         {
             return CustomerTable.GetCustomerCount(searchString, enableLoadOptions);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public CustomerTable GetCustomer(string searchString, bool enableLoadOptions)
         {
             return CustomerTable.GetCustomer(searchString, enableLoadOptions);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateCustomer(CustomerTable custRecord)
         {
             CustomerTable.CreateCustomer(custRecord);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateCustomer(CustomerTable custRecord)
         {
             CustomerTable.UpdateCustomer(custRecord);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteCustomer(CustomerTable custRecord)
         {
             CustomerTable.DeleteCustomer(custRecord);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetLastCustomerID()
         {
             return CustomerTable.GetLastCustomerID();
@@ -82,79 +82,79 @@ namespace Service.Creator
         #endregion
 
         #region License Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetAllLicenses(string searchString, bool enableLoadOptions)
         {
             return LicenseTable.GetAllLicenses(searchString, enableLoadOptions);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions)
         {
             return LicenseTable.GetLicensesByID(custID, destID, groupID, enableLoadOptions);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public LicenseTable GetLicenseByName(string licenseName, bool enableLoadOptions)
         {
             return LicenseTable.GetLicenseByName(licenseName, enableLoadOptions);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public LicenseTable GetLicenseByID(int licID, bool enableLoadOptions)
         {
             return LicenseTable.GetLicenseByID(licID, enableLoadOptions);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetLicenseCountByID(int custID, int destID, int groupID)
         {
             return LicenseTable.GetLicenseCountByID(custID, destID, groupID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetNextGroupID(uint custID, uint destID)
         {
             return LicenseTable.GetNextGroupID(custID, destID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetLastGroupID(uint custID, uint destID)
         {
             return LicenseTable.GetLastGroupID(custID, destID);
         }
 
-        //[OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        //[OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         //public uint GetNextDestinationID(uint custID)
         //{
         //    return CreatorData.License.GetNextDestinationID(custID);
         //}
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetLastDestinationID(uint custID)
         {
             return LicenseTable.GetLastDestinationID(custID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public bool IsLicenseModified(string licenseName) //int custID, int destID, int groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licenseType)
         {
             return LicenseTable.IsLicenseModified(licenseName); //custID, destID, groupID, (Byte)licenseType);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public bool IsLicenseUpdated(string licenseName)
         {
             return LicenseTable.IsLicenseUpdated(licenseName); 
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType)
         {
             //TODO : try not to cast. Performance issues and might truncate and bad practice
             return LicenseTable.GetLicCountByType(custID, destID, groupID, (Byte)licType);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicencesByConditions(IList<Condition> conditionList)
         {
             String value;
@@ -180,7 +180,7 @@ namespace Service.Creator
             return LicenseTable.GetLicensesByConditions(conditionString.ToString());                        
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void GenerateLicensePacket(string packetName, string licenseName, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user)
         {
             //convert licinfo into a string to store into DB and to pass into license server
@@ -207,7 +207,7 @@ namespace Service.Creator
             CreatePacket(newPacket);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate()
         {
             //if (m_licServer. == null)
@@ -218,7 +218,7 @@ namespace Service.Creator
             return m_licServer.KeyEnumerate();
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public string KeyProgramVerification(string key, int customerNumber, int keyNumber)
         {
             //if (m_licServer == null)
@@ -229,17 +229,17 @@ namespace Service.Creator
             return m_licServer.KeyProgramVerification(key, customerNumber, keyNumber);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateLicense(LicenseTable license)
         {
             LicenseTable.CreateLicense(license);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateLicense(LicenseTable license)
         {
             LicenseTable.UpdateLicense(license);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteLicense(LicenseTable license)
         {
             LicenseTable.DeleteLicense(license);
@@ -247,27 +247,27 @@ namespace Service.Creator
         #endregion
 
         #region Packet Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<PacketTable> GetPacketsByLicenseName(string licenseName)
         {
             return PacketTable.GetPacketsByLicenseName(licenseName);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public PacketTable GetPacketByVerificationCode(string verificationCode)
         {
             return PacketTable.GetPacketByVerificationCode(verificationCode);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreatePacket(PacketTable packet)
         {
             PacketTable.CreatePacket(packet);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdatePacket(PacketTable packet)
         {
             PacketTable.UpdatePacket(packet);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeletePacket(PacketTable packet)
         {
             PacketTable.DeletePacket(packet);
@@ -275,35 +275,35 @@ namespace Service.Creator
         #endregion
 
         #region Transaction Implementation 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TransactionTable> GetTransactionsByPacketID(int packetID)
         {
             return TransactionTable.GetTransactionsByPacketID(packetID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TransactionTable> GetNewTransactionsByLicenseName(string licenseName)
         {
             return TransactionTable.GetNewTransactionsByLicenseName(licenseName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID)
         {
             TransactionTable.UpdateSubLicenseTransactionsByOrder(stdLicOrderID, subLicOrderID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateTransaction(TransactionTable ta)
         {
             TransactionTable.CreateTransaction(ta);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateTransaction(TransactionTable ta)
         {
             TransactionTable.UpdateTransaction(ta);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteTransaction(TransactionTable ta)
         {
             TransactionTable.DeleteTransaction(ta);
@@ -312,55 +312,55 @@ namespace Service.Creator
         #endregion
 
         #region Order Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<OrderTable> GetAllOrders()
         {
             return OrderTable.GetAllOrders();
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<OrderTable> GetOrdersByLicenseName(string licenseName)
         {
             return OrderTable.GetOrdersByLicenseName(licenseName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<OrderTable> GetOrdersEqualsProduct(string licenseName, string productName)
         {
             return OrderTable.GetOrdersEqualsProduct(licenseName, productName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public OrderTable GetOrderByOrderName(string orderName)
         {
             return OrderTable.GetOrderByOrderName(orderName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetNextOrderIndex(string licenseName)
         {
             return OrderTable.GetNextOrderIndex(licenseName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetProductVersionFromTable(int productID)
         {
             return OrderTable.GetProductVersionFromTable(productID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateOrder(OrderTable contract)
         {
             OrderTable.CreateOrder(contract);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateOrder(OrderTable contract)
         {
             OrderTable.UpdateOrder(contract);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteOrder(OrderTable contract)
         {
             OrderTable.DeleteOrder(contract);
@@ -368,60 +368,60 @@ namespace Service.Creator
         #endregion
 
         #region Token Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token)
         {
             return TokenTable.GetAllTokens(searchString, (byte)token);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetAvailableHardwareTokensByCustID(uint custID)
         {
             return TokenTable.GetAvailableHardwareTokensByCustID(custID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue)
         {
             return TokenTable.GetHardwareTokenByKeyValue(custID, keyValue);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetTokensByLicenseName(string licenseName)
         {
             return TokenTable.GetTokensByLicenseName(licenseName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public TokenTable GetTokenByLicenseName(string licenseName, byte tokenType)
         {
             return TokenTable.GetTokenByLicenseName(licenseName, tokenType);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public bool TokenExists(uint custID, byte tokenType, string tokenValue)
         {
             return TokenTable.TokenExists(custID, tokenType, tokenValue);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetNextHardwareTokenValue(uint custID)
         {
             return TokenTable.GetNextHardwareTokenValue(custID);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateToken(TokenTable ta)
         {
             TokenTable.CreateToken(ta);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateToken(TokenTable ta)
         {
             TokenTable.UpdateToken(ta);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteToken(TokenTable ta)
         {
             TokenTable.DeleteToken(ta);
@@ -429,7 +429,7 @@ namespace Service.Creator
         #endregion
 
         #region Permission Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public PermissionsTable GetPermissionsByUser(string user)
         {
             return PermissionsTable.GetPermissionByUser(user);
@@ -438,41 +438,41 @@ namespace Service.Creator
         #endregion
 
         #region DestinationName Implementation
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<DestinationNameTable> GetDestNamesByCustID(int custID)
         {
             return DestinationNameTable.GetDestNamesByCustID(custID);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public DestinationNameTable GetDestinationName(int custID, int destID)
         {
             return DestinationNameTable.GetDestinationName(custID, destID);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.Required)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public DestinationNameTable GetDestinationID(int custID, string destName)
         {
             return DestinationNameTable.GetDestinationID(custID, destName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetNextDestinationID(uint custID)
         {
             return DestinationNameTable.GetNextDestinationID(custID);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreateDestinationName(DestinationNameTable destName)
         {
             DestinationNameTable.CreateDestinationName(destName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateDestinationName(DestinationNameTable destName)
         {
             DestinationNameTable.UpdateDestinationName(destName);
         }
 
-        [OperationBehavior(Impersonation = ImpersonationOption.Allowed)]
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteDestinationName(DestinationNameTable destName)
         {
             DestinationNameTable.DeleteDestinationName(destName);

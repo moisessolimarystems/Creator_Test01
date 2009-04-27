@@ -594,7 +594,7 @@
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
 				AdditionalOptions="/NODEFAULTLIB:libc.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrt.lib&#x0D;&#x0A;/NODEFAULTLIB:libcd.lib&#x0D;&#x0A;/NODEFAULTLIB:libcmtd.lib&#x0D;&#x0A;/NODEFAULTLIB:msvcrtd.lib"
-				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib ..\lib\flatelib.lib"
+				AdditionalDependencies="Wbemuuid.lib Ws2_32.lib rainbow\lib(x64)\MT\spromeps.lib ..\lib\flatelib64.lib"
 				OutputFile="$(OutDir)/SolimarLicenseServerInternal.exe"
 				LinkIncremental="1"
 				MergedIDLBaseFileName="_SolimarLicenseServer.idl"
