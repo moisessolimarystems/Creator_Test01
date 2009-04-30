@@ -37,6 +37,7 @@ namespace SolimarLicenseManagerDotNet {
 			bool KeyProductExists(long product, long prodVerMajor, long prodVerMinor, bool% bRefKeyExists);
 			bool ModuleLicenseTotal(long module, long% refLicenseCount);
 			bool ModuleLicenseInUse(long module, long% refLicenseCount);
+			bool ModuleLicenseInUse_ByApp(long module, long% refLicenseCount);
 			bool ModuleLicenseObtain(long module, long licenseCount);
 			bool ModuleLicenseRelease(long module, long licenseCount);
 			bool ModuleLicenseCounterDecrement(long module, long licenseCount);
@@ -56,6 +57,7 @@ namespace SolimarLicenseManagerDotNet {
 			bool KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor);
 			long ModuleLicenseTotalEx(long module);
 			long ModuleLicenseInUseEx(long module);
+			long ModuleLicenseInUse_ByAppEx(long module);
 			void ModuleLicenseObtainEx(long module, long licenseCount);
 			void ModuleLicenseReleaseEx(long module, long licenseCount);
 			void ModuleLicenseCounterDecrementEx(long module, long licenseCount);

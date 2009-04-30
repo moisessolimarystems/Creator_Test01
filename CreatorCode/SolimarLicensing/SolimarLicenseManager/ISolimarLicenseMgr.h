@@ -16,7 +16,6 @@ enum
 
 //#endif
 
-
 #ifndef __ISolimarLicenseMgr_INTERFACE_DEFINED__
 #define __ISolimarLicenseMgr_INTERFACE_DEFINED__
 
@@ -110,6 +109,18 @@ __interface ISolimarLicenseMgr5 : ISolimarLicenseMgr4
 	[id(17),helpstring("method ConnectByProduct")] HRESULT ConnectByProduct([in] long product, [in] VARIANT_BOOL use_shared_licenses_servers);
 	[id(18),helpstring("method KeyProductExists")] HRESULT KeyProductExists([in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [out] VARIANT_BOOL *p_bool_key_product_exists);
 
+};
+
+// ISolimarLicenseMgr6
+[
+	object,
+	uuid("39B8A524-0193-4bf3-BF83-8728413B0DA7"),
+	dual,	helpstring("ISolimarLicenseMgr6 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr6 : ISolimarLicenseMgr5
+{
+	[id(19),helpstring("method ModuleLicenseInUse_ByApp")] HRESULT ModuleLicenseInUse_ByApp([in] long module_id, [out,retval] long *count);
 };
 
 #endif

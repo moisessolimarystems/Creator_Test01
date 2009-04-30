@@ -39,8 +39,18 @@ namespace SolimarLicenseManagerWrapper
 	} \
 	} /* end scope */ \
 
+#define ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(hr) \
+	{ /* begin scope */ \
+	if(FAILED(hr)) \
+	{ \
+		LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper - Error creating Solimar License Manager", hr); \
+		return hr; \
+	} \
+	} /* end scope */ \
+
 class LicensingWrapper : public ChallengeResponseHelper
 {
+
 public:
 	LicensingWrapper();
 	LicensingWrapper(const LicensingWrapper &o);
@@ -64,6 +74,7 @@ public:
 	bool KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists) {return SUCCEEDED(KeyProductExistsEx(product, prod_ver_major, prod_ver_minor, bKeyExists));}
 	bool ModuleLicenseTotal(long module, long* license_count) {return SUCCEEDED(ModuleLicenseTotalEx(module, license_count));}
 	bool ModuleLicenseInUse(long module, long* license_count) {return SUCCEEDED(ModuleLicenseInUseEx(module, license_count));}
+	bool ModuleLicenseInUse_ByApp(long module, long* license_count) {return SUCCEEDED(ModuleLicenseInUse_ByAppEx(module, license_count));}
 	bool ModuleLicenseObtain(long module, long license_count) {return SUCCEEDED(ModuleLicenseObtainEx(module, license_count));}
 	bool ModuleLicenseRelease(long module, long license_count) {return SUCCEEDED(ModuleLicenseReleaseEx(module, license_count));}
 	bool ModuleLicenseCounterDecrement(long module, long license_count) {return SUCCEEDED(ModuleLicenseCounterDecrementEx(module, license_count));}
@@ -90,6 +101,7 @@ public:
 	HRESULT KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists);
 	HRESULT ModuleLicenseTotalEx(long module, long* license_count);
 	HRESULT ModuleLicenseInUseEx(long module, long* license_count);
+	HRESULT ModuleLicenseInUse_ByAppEx(long module, long* license_count);
 	HRESULT ModuleLicenseObtainEx(long module, long license_count);
 	HRESULT ModuleLicenseReleaseEx(long module, long license_count);
 	HRESULT ModuleLicenseCounterDecrementEx(long module, long license_count);
@@ -142,6 +154,7 @@ private:
 	HANDLE m_MemberLock;
 	HANDLE m_ThreadKillEvent;
 	HRESULT m_validityCheck_LastHr;
+	HRESULT m_constructorHR;
 	
 	void* m_license_message_callback_context;
 	LicenseMessageCallbackPtr m_license_message_callback;
@@ -149,7 +162,7 @@ private:
 	void* m_license_invalid_callback_context;
 	LicenseInvalidCallbackPtr m_license_invalid_callback;
 
-	GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
+	GITPtr<ISolimarLicenseMgr6> m_licenseManagerPtr;
 	GITPtr<ILicensingMessage> m_licenseMessagePtr;
 
 	std::wstring StringToWstring(const std::string &s);

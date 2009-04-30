@@ -197,6 +197,14 @@ namespace SolimarLicenseManagerDotNet
 		refLicenseCount = tmpLicenseCount;
 		return bResult;
 	}
+	bool SolimarLicenseWrapper::ModuleLicenseInUse_ByApp(long module, long% refLicenseCount)
+	{
+		long tmpLicenseCount;
+		bool bResult;
+		bResult = m_pLicenseWrapper->ModuleLicenseInUse_ByApp(module, &tmpLicenseCount);
+		refLicenseCount = tmpLicenseCount;
+		return bResult;
+	}
 	bool SolimarLicenseWrapper::ModuleLicenseObtain(long module, long license_count) 
 	{
 		return m_pLicenseWrapper->ModuleLicenseObtain(module, license_count);
@@ -364,6 +372,14 @@ namespace SolimarLicenseManagerDotNet
 	{
 		long retLicenseCount;
 		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseInUseEx(module, &retLicenseCount);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retLicenseCount;
+	}
+	long SolimarLicenseWrapper::ModuleLicenseInUse_ByAppEx(long module)
+	{
+		long retLicenseCount;
+		HRESULT hrResult = m_pLicenseWrapper->ModuleLicenseInUse_ByAppEx(module, &retLicenseCount);
 		if(FAILED(hrResult))
 			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 		return retLicenseCount;

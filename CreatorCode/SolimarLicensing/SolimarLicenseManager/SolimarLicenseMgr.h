@@ -50,7 +50,8 @@
 			if (__connected || SUCCEEDED(connectHR = srvInfoObj.Connect())) \
 			{ \
 				hr = srvInfoObj.LicenseServer->##func##plist; \
-				srvInfoObj.Disconnect(); \
+				if (SS_RPC_FAILED(hr)) \
+					throw _com_error(hr); \
 			} \
 			else \
 				throw _com_error(connectHR); \
@@ -143,7 +144,7 @@
 [
 	coclass,
 	threading(free),
-	support_error_info("ISolimarLicenseMgr5"),
+	support_error_info("ISolimarLicenseMgr6"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -151,7 +152,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr5,
+	public ISolimarLicenseMgr6,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -206,6 +207,9 @@ public:
 	STDMETHOD(ConnectByProduct)(long product, VARIANT_BOOL bUseSharedLicenseServers);
 	STDMETHOD(KeyProductExists)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL *p_bool_key_product_exists);
 
+	// ISolimarLicenseMgr6
+	STDMETHOD(ModuleLicenseInUse_ByApp)(long module_id, long *count);
+
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
@@ -240,6 +244,7 @@ private:
 		ModuleLicenseMap licenses_total;
 		ModuleLicenseMap licenses_allocated;
 		ModuleLicenseMap licenses_inuse;
+		ModuleLicenseMap licenses_inuse_byapp;
 		
 		bool KeyPresent;
 		bool KeyActive;
@@ -259,7 +264,7 @@ private:
 	public:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
-		ServerInfo(_bstr_t servername, bool useOnlySharedLicenses, GITPtr<ISolimarLicenseSvr3> pILicenseServer);
+		ServerInfo(_bstr_t servername, bool useOnlySharedLicenses, GITPtr<ISolimarLicenseSvr4> pILicenseServer);
 		~ServerInfo();
 
 		_bstr_t name;
@@ -267,7 +272,7 @@ private:
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		KeyList keys;
 
-		GITPtr<ISolimarLicenseSvr3> LicenseServer;
+		GITPtr<ISolimarLicenseSvr4> LicenseServer;
 
 		HRESULT Connect();
 
@@ -319,6 +324,8 @@ private:
 	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.
 	HRESULT SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
+	// refresh ApplicationInstance InUse list
+	HRESULT RefreshApplicationInstanceInUseCache(ServerInfo* pServerInfo, bool bLogError);
 
 	// checks that all licenses checked out are accounted for by some key
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
@@ -385,6 +392,7 @@ private:
 	bool GracePeriodHasStarted();
 	void StartGracePeriod();
 	void StopGracePeriod();
+	std::map<unsigned int, int> appInstanceInUseModuleCacheMap;
 
 	
 		

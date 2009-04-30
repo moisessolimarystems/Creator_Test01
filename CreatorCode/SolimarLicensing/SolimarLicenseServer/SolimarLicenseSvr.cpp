@@ -319,6 +319,12 @@ STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse(BSTR key_ident, long modu
 	return keyserver.KeyModuleInUse(key_ident, module_ident, license_count);	//For Backward Compatibility
 }
 
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse_ByApp(BSTR key_ident, long module_ident, long* license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseInUse_ByApp(m_licenseId, key_ident, module_ident, license_count);
+}
+
 STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseObtain(BSTR key_ident, long module_ident, long license_count)
 {
 	CHECK_CLIENT_AUTHENTICATION;

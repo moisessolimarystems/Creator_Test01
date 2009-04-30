@@ -108,7 +108,18 @@ __interface ISolimarLicenseSvr3 : ISolimarLicenseSvr2
 
 	// Sets to treat the Module License as Unlimited
 	[id(78),helpstring("method KeyModuleLicenseUnlimited")] HRESULT KeyModuleLicenseUnlimited([in] BSTR key_ident, [in] long module_ident, [in] VARIANT_BOOL b_module_is_unlimited);
+};
 
+// ISolimarLicenseSvr4
+[
+	object,
+	uuid("70C717AC-46ED-44d8-B0EF-AFCCC63DC98E"),
+	dual,	helpstring("ISolimarLicenseSvr4 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseSvr4 : ISolimarLicenseSvr3
+{
+	[id(79),helpstring("method KeyModuleLicenseInUse_ByApp")] HRESULT KeyModuleLicenseInUse_ByApp([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
 };
 // CSolimarLicenseSvr
 
@@ -123,7 +134,7 @@ __interface ISolimarLicenseSvr3 : ISolimarLicenseSvr2
 	helpstring("SolimarLicenseSvr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
-	public ISolimarLicenseSvr3, 
+	public ISolimarLicenseSvr4, 
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -213,6 +224,7 @@ public:
 	STDMETHOD(KeyModuleQuery)(BSTR key_ident, long module_ident, VARIANT *vtValue);
 	STDMETHOD(KeyModuleLicenseTotal)(BSTR key_ident, long module_ident, long* license_count);
 	STDMETHOD(KeyModuleLicenseInUse)(BSTR key_ident, long module_ident, long* license_count);
+	STDMETHOD(KeyModuleLicenseInUse_ByApp)(BSTR key_ident, long module_ident, long* license_count);
 	STDMETHOD(KeyModuleLicenseObtain)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseRelease)(BSTR key_ident, long module_ident, long license_count);
 	STDMETHOD(KeyModuleLicenseCounterDecrement)(BSTR key_ident, long module_ident, long license_count);

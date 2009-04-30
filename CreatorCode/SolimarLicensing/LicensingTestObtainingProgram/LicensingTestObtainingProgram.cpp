@@ -92,36 +92,51 @@ int _tmain()
 	
 	unsigned int ProductID = 12;	//Rubika
 	//ProductID = 8;	//SOLsearcher
+	ProductID = 10;	//SDX
 	ProductID = 14;	//SPDE
+	//ProductID = 12;
 	unsigned int CustomerNumber = 256;
 	//unsigned int KeyNumber = 0x41E;//Alan's Test Key
 	unsigned int KeyNumber = 0x554;//Test Key
 	System::String* inputValue;
 	char tmpbuf[256];
 	//std::wstring licenseServer(L"crosner3");
-	std::wstring licenseServer(L"jlan5");
-	//std::wstring licenseServer(L"192.168.10.130");
+	std::wstring licenseServer(L"jlan6");
+	//std::wstring licenseServer(L"engrTest2");
 	//std::wstring licenseServer(L"bjackson5");
-	//std::wstring backUpLicenseServer(L"jlan3");//jlan3
+	//std::wstring backUpLicenseServer(L"jlan6");//jlan3
 	std::wstring backUpLicenseServer(L"");
-	//std::wstring appInstance(L"jlan5");
-	std::wstring appInstance(L"");
+	std::wstring appInstance(L"jlan6");
+	//std::wstring appInstance(L"");
 	bool bAppInstanceLockKey(true);
 	bool bUseOnlySharedLicenses(false);
-	bool bBypassRemoteKeyRestrictions(true);
+	bool bBypassRemoteKeyRestrictions(false);
 
-	bool bSuccess;
+	bool bSuccess = true;
 	SolimarLicenseManagerWrapper::LicensingWrapper license;
 	
+   HRESULT hr;
 	///*
-	//bSuccess = license.Connect(licenseServer.c_str(), false, false);
+	//bSuccess = license.ConnectEx(licenseServer.c_str(), false, false);
+   hr = license.ConnectEx(licenseServer.c_str(), bUseOnlySharedLicenses, false);
+   //, hr: 0x%x
 	//bSuccess = license.Connect(backUpLicenseServer.c_str(), false, true);
-	bSuccess = license.Connect(licenseServer.c_str(), bUseOnlySharedLicenses, false);
-	if(!bSuccess)
+	//bSuccess = license.ConnectByProduct(ProductID);
+	if(FAILED(hr))
 	{
-		sprintf_s(tmpbuf, "* Failed to connect to %S", licenseServer.c_str());
+      sprintf_s(tmpbuf, "* Failed to ConnectEx(%S), hr: 0x%x", licenseServer.c_str(), hr);
+		//sprintf_s(tmpbuf, "* Failed to ConnectByProduct(%d), hr: 0x%x", ProductID, hr);
+      //sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseInUse_ByApp = %i, inUse = %i, hr: 0x%x", tmpMod, bSuccess, licenseCount, hr);
+//			Console::WriteLine(tmpbuf);
 		Console::WriteLine(tmpbuf);
 	}
+
+	//bSuccess = license.Connect(licenseServer.c_str(), bUseOnlySharedLicenses, false);
+	//if(!bSuccess)
+	//{
+	//	sprintf_s(tmpbuf, "* Failed to connect to %S", licenseServer.c_str());
+	//	Console::WriteLine(tmpbuf);
+	//}
 	if(backUpLicenseServer.length() != 0)
 	{
 		bSuccess = license.Connect(backUpLicenseServer.c_str(), bUseOnlySharedLicenses, true);
@@ -137,7 +152,16 @@ int _tmain()
 	//bSuccess = license.Initialize(L"jlan5", ProductID, 1, 0, false, std::wstring(L""), false, UI_LEVEL_ALL | UI_STYLE_EVENT_LOG, 0, true);
 	//bSuccess = license.Initialize(L"jlan5", ProductID, 1, 0, false, std::wstring(L""), false, UI_LEVEL_ALL | UI_STYLE_EVENT_LOG, 0, false);
 	//bSuccess = license.Initialize(L"jlan2", ProductID, 1, 0, false, std::wstring(L""), false, UI_LEVEL_ALL | UI_STYLE_EVENT_LOG, 0, true);
-	bSuccess = license.Initialize(appInstance.c_str(), ProductID, 1, 0, false, std::wstring(L""), true, UI_LEVEL_ALL | UI_STYLE_EVENT_LOG, 0, bAppInstanceLockKey, bBypassRemoteKeyRestrictions);
+	bSuccess = license.Initialize(
+		appInstance.c_str(), 
+		ProductID, 1, 0, 
+		false,	//Single Key
+		std::wstring(L""),	
+		false,		//Lock Key
+		UI_LEVEL_ALL | UI_STYLE_EVENT_LOG, 
+		5,    //Grace Period in Minutes
+		bAppInstanceLockKey, 
+		bBypassRemoteKeyRestrictions);
 	//*/
 	//bSuccess = license.Initialize(ProductID, 1, 0, false, std::wstring(L""), false, UI_LEVEL_ALL | UI_STYLE_EVENT_LOG);
 	//license.Initialize(12, 5, 0, false, std::wstring(L""), false, UI_IGNORE);
@@ -179,13 +203,17 @@ for (LicensingMessageList::iterator m = message_list.begin(); m != message_list.
 	VariantClear(&vtMessageList);
 */
 //long moduleID = 31;	//Process Builder - RUBIKA
-long moduleID = 105;	//SPDE - SCSI SDI Output - value 4
+//long moduleID = 105;	//SPDE - SCSI SDI Output - value 4
+long moduleID = 131;	//Ascii - SSE
+moduleID = 1;	//SOLmonitor - SDX
+moduleID = 31;	//Process Builder - RUBIKA
 long moduleID2 = 28;	//SPDE - SMART Output - value 1 (Unlimited)
 long moduleID3 = 240;	//SPDE - Output - value 10 (Unlimited)
 long moduleID4 = 400;	//SPDE - Cuncurrent Operator - value 255 (Unlimited) - isShared
 long incrementAmount = 1;
 
 	if(!bSuccess)
+//if(false)
 	{
 		CoUninitialize();
 
@@ -202,7 +230,7 @@ long moduleID = 400;
 long moduleID2 = 401;
 long incrementAmount = 20;
 //*/
-
+//   HRESULT hr(S_OK);
 	for(;;)
 	{
 		Console::WriteLine("*****************************************");
@@ -228,6 +256,8 @@ long incrementAmount = 20;
 		sprintf_s(tmpbuf,"*     r1 - Release Licensing Module %d", moduleID);
 		Console::WriteLine(tmpbuf);
 		sprintf_s(tmpbuf,"*     q1 - In Use Licensing Module %d", moduleID);
+		Console::WriteLine(tmpbuf);
+      sprintf_s(tmpbuf,"*     u1 - In Use Licensing Module By App n%d", moduleID);
 		Console::WriteLine(tmpbuf);
 		sprintf_s(tmpbuf,"*     t1 - Total Licensing Module %d", moduleID);
 		Console::WriteLine(tmpbuf);
@@ -265,6 +295,8 @@ long incrementAmount = 20;
 		*/
 		sprintf_s(tmpbuf,"* gp - Generate Password");
 		Console::WriteLine(tmpbuf);
+		sprintf_s(tmpbuf,"* pp - Password Packet");
+		Console::WriteLine(tmpbuf);
 		/*
 		sprintf_s(tmpbuf,"* o - Obtain Licensing Module %d", moduleID);
 		Console::WriteLine(tmpbuf);
@@ -297,7 +329,7 @@ long incrementAmount = 20;
 		//Console::WriteLine("*");
 		Console::WriteLine("*****************************************");
 
-		///*	
+/*	
 LicensingMessageList message_list;
 sprintf_s(tmpbuf, "* Licensing Messages", ProductID);
 Console::WriteLine(tmpbuf);
@@ -346,8 +378,11 @@ Console::WriteLine("*****************************************");
 				tmpMod = moduleID3;
 			if(System::String::Compare(inputValue, "o4", true) == 0)
 				tmpMod = moduleID4;
-			bSuccess = license.ModuleLicenseObtain(tmpMod,incrementAmount);
-			sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseObtain = %i", tmpMod, bSuccess);
+			//bSuccess = license.ModuleLicenseObtain(tmpMod,incrementAmount);
+         hr = license.ModuleLicenseObtainEx(tmpMod, incrementAmount);
+         bSuccess = SUCCEEDED(hr);
+         sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseObtain - hr: 0x%x", tmpMod, hr);
+			//sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseObtain = %i", tmpMod, bSuccess);
 			Console::WriteLine(tmpbuf);
 		}
 
@@ -390,6 +425,30 @@ Console::WriteLine("*****************************************");
 			long licenseCount;
 			bSuccess = license.ModuleLicenseInUse(tmpMod,&licenseCount);
 			sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseInUse = %i, inUse = %i", tmpMod, bSuccess, licenseCount);
+			Console::WriteLine(tmpbuf);
+		}
+
+      if(	System::String::Compare(inputValue, "u1", true) == 0 ||
+			System::String::Compare(inputValue, "u2", true) == 0 ||
+			System::String::Compare(inputValue, "u3", true) == 0 ||
+			System::String::Compare(inputValue, "u4", true) == 0)
+
+		{
+			int tmpMod = -1;
+			if(System::String::Compare(inputValue, "u1", true) == 0)
+				tmpMod = moduleID;
+			if(System::String::Compare(inputValue, "u2", true) == 0)
+				tmpMod = moduleID2;
+			if(System::String::Compare(inputValue, "u3", true) == 0)
+				tmpMod = moduleID3;
+			if(System::String::Compare(inputValue, "u4", true) == 0)
+				tmpMod = moduleID4;
+
+			long licenseCount;
+                  
+         hr = license.ModuleLicenseInUse_ByAppEx(tmpMod,&licenseCount);
+         bSuccess = SUCCEEDED(hr);
+			sprintf_s(tmpbuf, "* Module: %d - license.ModuleLicenseInUse_ByApp = %i, inUse = %i, hr: 0x%x", tmpMod, bSuccess, licenseCount, hr);
 			Console::WriteLine(tmpbuf);
 		}
 
@@ -543,6 +602,99 @@ Console::WriteLine("*****************************************");
 
 				break;//Unconditional break
 			}
+		}
+		if(System::String::Compare(inputValue, "pp", true) == 0)	//Password Packet
+		{
+				Console::WriteLine("* pp");
+				ISolimarLicenseSvr *pServer=0;
+				HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseSvr), NULL, CLSCTX_LOCAL_SERVER, __uuidof(ISolimarLicenseSvr), (void**)&pServer);
+				if(FAILED(hr))
+					break;
+				Console::WriteLine("* 1");
+
+				ChallengeResponseHelper CR(challenge_key_server_thisauthuser_private, sizeof(challenge_key_server_thisauthuser_private), challenge_key_server_userauththis_public, sizeof(challenge_key_server_userauththis_public));
+				// try to authenticate the license server
+				hr = CR.AuthenticateServer(pServer);
+				if (FAILED(hr)) break;
+
+				
+				Console::WriteLine("* 2");
+				// let the license server authenticate this manager
+				hr = CR.AuthenticateToServer(pServer);
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* 3");
+
+				hr = pServer->PasswordPacketInitialize();
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* 4");
+
+
+				// get the current date/time
+				_variant_t current_time(0.0,VT_DATE);
+				SYSTEMTIME systime;
+				GetSystemTime(&systime);
+				if (!SystemTimeToVariantTime(&systime, &current_time.date)) 
+					throw(E_FAIL);
+
+				Console::WriteLine("* 5");
+
+				BSTR pw1 = SysAllocString(L"93ac3340-1000000-4-100-6e3-21-1");
+				hr = pServer->PasswordPacketAppendPassword(current_time, pw1);
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* 6");
+
+				hr = pServer->PasswordPacketFinalize();
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* 7");
+
+				BSTR verCodeStart;
+				hr = pServer->PasswordPacketGetVerificationCode(&verCodeStart);
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* 8");
+
+				sprintf_s(tmpbuf, "* verCodeStart: %s", (wchar_t*)verCodeStart);
+				Console::WriteLine(tmpbuf);
+				SysFreeString(verCodeStart);
+
+				_variant_t vtPasswordPacket;
+				hr = pServer->PasswordPacketGetPacket(&vtPasswordPacket);
+				if (FAILED(hr)) break;
+
+				Console::WriteLine("* Successfully generated packet.");
+
+				BSTR verCodeEnd;
+				hr = pServer->EnterPasswordPacket(vtPasswordPacket, &verCodeEnd);
+				if (FAILED(hr)) break;
+
+				sprintf_s(tmpbuf, "* verCodeEnd: %s", (wchar_t*)verCodeEnd);
+				Console::WriteLine(tmpbuf);
+				SysFreeString(verCodeEnd);
+
+				Console::WriteLine("* Successfully applied packet.");
+				
+				
+				//sprintf_s(tmpbuf, "* pServer->GenerateModulePassword2(%d, %d, %d) = %S", moduleID, moduleAmount, passwordNumber, pw1);
+				//Console::WriteLine(tmpbuf);
+				//Console::WriteLine("Successfully Generated Password");
+
+				/*
+				hr = pServer->EnterPassword(pw1);
+				if(FAILED(hr))
+				{
+					sprintf_s(tmpbuf, "* Failed EnterPassword = %x", hr);
+					Console::WriteLine(tmpbuf);
+					break;
+				}
+
+				Console::WriteLine("Password Successfully Applied");
+				//*/
+
+				break;//Unconditional break
 		}
 
 		if(System::String::Compare(inputValue, "ip", true) == 0)

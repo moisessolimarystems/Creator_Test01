@@ -31,12 +31,13 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	m_MessageDispatchThread(0),
 	m_LicenseValidityThread(0),
 	m_validityCheck_LastHr(S_OK),
+	m_constructorHR(S_OK),
 	m_MemberLock(CreateMutex(0, FALSE, 0)),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
 //OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Enter");
-	ISolimarLicenseMgr5* pLocalLicenseMgr = NULL;
-	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr5), (void**)&pLocalLicenseMgr);
+	ISolimarLicenseMgr6* pLocalLicenseMgr = NULL;
+	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr6), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
 		hr = m_licenseManagerPtr.Attach(pLocalLicenseMgr);
@@ -61,6 +62,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	}
 //OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Leave");
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper()", hr);
+	m_constructorHR = hr;
 }
 
 SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const LicensingWrapper &o) : 
@@ -73,6 +75,7 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const Licensing
 	m_LicenseValidityThread(0),
 	m_MemberLock(CreateMutex(0, FALSE, 0)),
 	m_validityCheck_LastHr(S_OK),
+	m_constructorHR(S_OK),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
 //OutputDebugStringW(L"LicensingWrapper::LicensingWrapper(const) - Enter");
@@ -148,9 +151,10 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup)
 {
 	SafeMutex mutex(m_MemberLock);
-	
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	// authenticate
-	ISolimarLicenseMgr5* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -178,9 +182,10 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long product, bool bUseSharedLicenseServers)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	// authenticate
-	ISolimarLicenseMgr5* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -204,6 +209,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
 {
 //OutputDebugStringW(L"LicensingWrapper::DisconnectEx() - Enter");
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->Disconnect();
 
@@ -218,6 +224,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(long produc
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes, bool application_instance_lock_keys, bool bypass_remote_key_restriction)
 {
    SafeMutex mutex(m_MemberLock);
+   ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
    BSTR bstrSpecificSingleKey = SysAllocString(specific_single_key_ident.c_str());
    BSTR bstrApplication_instance = SysAllocString(application_instance.c_str());
@@ -247,6 +254,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(std::wstrin
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	VARIANT_BOOL bVtKeyExist = VARIANT_FALSE;
 	HRESULT hr = m_licenseManagerPtr->KeyProductExists(product, prod_ver_major, prod_ver_minor, &bVtKeyExist);
 	if(SUCCEEDED(hr))
@@ -260,6 +269,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterMessageCallback(voi
 {
 //OutputDebugStringW(L"LicensingWrapper::RegisterMessageCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
+
 	m_license_message_callback_context = pContext;
 	m_license_message_callback = LicenseMessageCallback;
 //OutputDebugStringW(L"LicensingWrapper::RegisterMessageCallback() - Leave");
@@ -270,6 +280,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterMessageCallback()
 {
 //OutputDebugStringW(L"LicensingWrapper::UnregisterMessageCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
+
 	m_license_message_callback_context = 0;
 	m_license_message_callback = 0;
 //OutputDebugStringW(L"LicensingWrapper::UnregisterMessageCallback() - Leave");
@@ -279,6 +290,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterInvalidLicenseCallb
 {
 //OutputDebugStringW(L"LicensingWrapper::RegisterInvalidLicenseCallback() - Enter");
 	SafeMutex mutex(m_MemberLock);
+
 	m_license_invalid_callback_context = pContext;
 	m_license_invalid_callback = LicenseInvalidCallback;
 //OutputDebugStringW(L"LicensingWrapper::RegisterInvalidLicenseCallback() - Leave");
@@ -299,6 +311,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterInvalidLicenseCal
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseTotalEx(long module, long* license_count)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseTotal(module, license_count);
 
@@ -308,16 +321,28 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseTotalEx(lon
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseEx(long module, long* license_count)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseInUse(module, license_count);
 	
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseEx()", hr);
 	return hr;
 }
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse_ByAppEx(long module, long* license_count)
+{
+	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
+	HRESULT hr = m_licenseManagerPtr->ModuleLicenseInUse_ByApp(module, license_count);
+
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse_ByAppEx()", hr);
+	return hr;
+}
 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainEx(long module, long license_count)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseObtain(module, license_count);
 
@@ -328,6 +353,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainEx(lo
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseCounterDecrementEx(long module, long license_count)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseCounterDecrement(module, license_count);
 	
@@ -338,6 +364,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseCounterDecr
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseEx(long module, long license_count)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->ModuleLicenseRelease(module, license_count);
 	
@@ -348,6 +375,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseEx(l
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ValidateLicenseEx(bool* b_valid)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	VARIANT_BOOL license_valid;
 	HRESULT hr = m_licenseManagerPtr->ValidateLicense(&license_valid);
@@ -405,6 +433,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 	HRESULT hr = S_OK;
 	
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	if(m_licenseMessagePtr == NULL)
 		return S_FALSE;
 	
@@ -471,6 +501,8 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThre
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadProc()
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	bool bValid = false;
 	HRESULT hr = ValidateLicenseEx(&bValid);
 	if(SUCCEEDED(hr))	//If succeeded, look at bValid
@@ -574,6 +606,7 @@ long SolimarLicenseManagerWrapper::LicensingWrapper::LookupHeaderID(std::string 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseManagerEx(long* p_ver_major, long* p_ver_minor, long* p_ver_build)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	HRESULT hr = m_licenseManagerPtr->GetVersionLicenseManager(p_ver_major, p_ver_minor, p_ver_build);
 
@@ -583,6 +616,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseManager
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseServerEx(std::wstring server, long* p_ver_major, long* p_ver_minor, long* p_ver_build)
 {
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	BSTR bstrServer = SysAllocString(server.c_str());
 	HRESULT hr = m_licenseManagerPtr->GetVersionLicenseServer(bstrServer, p_ver_major, p_ver_minor, p_ver_build);
@@ -597,6 +631,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::StartLicensingSessionEx(
 {
 	HRESULT hr(S_OK);
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	int newSessionID = 1;
 	while(m_session_obtained_map.find(newSessionID) != m_session_obtained_map.end())
 		newSessionID++;
@@ -611,6 +647,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainLicen
 {
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
 	if(sessionMapIt != m_session_obtained_map.end())
 	{
@@ -635,6 +673,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseLice
 {
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
 	if(sessionMapIt != m_session_obtained_map.end())
 	{
@@ -660,6 +700,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseLicens
 {
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
 	if(sessionMapIt != m_session_obtained_map.end())
 	{
@@ -678,6 +720,8 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::EndLicensingSessionEx(lo
 {
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
 	std::map<int, std::map<int, int>*>::iterator sessionMapIt = m_session_obtained_map.find(session_id);
 	if(sessionMapIt != m_session_obtained_map.end())
 	{
