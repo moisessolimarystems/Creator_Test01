@@ -205,15 +205,15 @@ namespace SolimarLicenseViewer
                     ListViewItem lvItem = new ListViewItem();
                     lvItem.Text = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
                     System.Text.StringBuilder strBuilder = new StringBuilder();
-                    strBuilder.Append(prodInfo.product_Major.ToString());
+                    strBuilder.Append(prodInfo.product_Major.TVal.ToString());
                     strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_Minor.ToString());
+                    strBuilder.Append(prodInfo.product_Minor.TVal.ToString());
                     strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_SubMajor.ToString());
+                    strBuilder.Append(prodInfo.product_SubMajor.TVal.ToString());
                     strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_SubMinor.ToString());
+                    strBuilder.Append(prodInfo.product_SubMinor.TVal.ToString());
                     lvItem.SubItems.Add(strBuilder.ToString());
-                    lvItem.SubItems.Add(prodInfo.productAppInstance);
+                    lvItem.SubItems.Add(prodInfo.productAppInstance.TVal.ToString());
                     lvItem.ForeColor = m_TreeNode.ForeColor;
                     //lvItem.SubItems.Add(prodInfo.productExpirationDate.TVal.ToLocalTime().ToString());
                     lviList.Add(lvItem);
@@ -290,14 +290,16 @@ namespace SolimarLicenseViewer
                 {
                     m_CommLink.GetSoftwareLicenseInfoByLicense(softwareLicense, ref generalStream);
                     licInfoAttrib.AssignMembersFromStream(generalStream);
-                    ListViewItem lvItem = new ListViewItem();
-                    lvItem.Text = softwareLicense;
-                    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verToken in licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal)
+                    // Only display the last item.
+                    if (licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0)
                     {
+                        ListViewItem lvItem = new ListViewItem();
+                        lvItem.Text = softwareLicense;
+                        Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verToken = (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1];
                         lvItem.SubItems.Add(verToken.verificationValue);
                         lvItem.SubItems.Add(verToken.verificationDate.TVal.ToLocalTime().ToString());
+                        this.TheListView.Items.Add(lvItem);
                     }
-                    this.TheListView.Items.Add(lvItem);
                 }
             }
             catch (COMException)
@@ -659,7 +661,7 @@ namespace SolimarLicenseViewer
                         {
                             moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
 
-                            m_CommLink.ModuleLicenseInUse(moduleID, ref licenseCount);
+                            m_CommLink.ModuleLicenseInUse_ByApp(moduleID, ref licenseCount);
                             if (licenseCount > 0)
                             {
                                 ListViewItem lvItem = new ListViewItem();
