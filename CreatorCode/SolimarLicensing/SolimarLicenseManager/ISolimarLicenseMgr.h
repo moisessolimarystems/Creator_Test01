@@ -16,7 +16,6 @@ enum
 
 //#endif
 
-
 #ifndef __ISolimarLicenseMgr_INTERFACE_DEFINED__
 #define __ISolimarLicenseMgr_INTERFACE_DEFINED__
 
@@ -115,16 +114,29 @@ __interface ISolimarLicenseMgr5 : ISolimarLicenseMgr4
 // ISolimarLicenseMgr6
 [
 	object,
-	uuid("60D07071-CE52-462b-B457-C22A5D23F66B"),
+	uuid("39B8A524-0193-4bf3-BF83-8728413B0DA7"),
 	dual,	helpstring("ISolimarLicenseMgr6 Interface"),
 	pointer_default(unique)
 ]
 __interface ISolimarLicenseMgr6 : ISolimarLicenseMgr5
 {
+	[id(19),helpstring("method ModuleLicenseInUse_ByApp")] HRESULT ModuleLicenseInUse_ByApp([in] long module_id, [out,retval] long *count);
+};
+
+// ISolimarLicenseMgr7
+[
+	object,
+	uuid("60D07071-CE52-462b-B457-C22A5D23F66B"),
+	dual,	helpstring("ISolimarLicenseMgr7 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr7 : ISolimarLicenseMgr6
+{
 	// Methods for Software license server
-	[id(19),helpstring("method Connect3")] HRESULT Connect3([in] BSTR server, [in] long connectionFlags);
-	[id(20),helpstring("method SoftwareLicense_Initialize")] HRESULT SoftwareLicense_Initialize([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
-	[id(21),helpstring("method SoftwareLicense_InitializeViewOnly")] HRESULT SoftwareLicense_InitializeViewOnly([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor);
+	[id(20),helpstring("method Connect3")] HRESULT Connect3([in] BSTR server, [in] long connectionFlags);
+	[id(21),helpstring("method SoftwareLicense_Initialize")] HRESULT SoftwareLicense_Initialize([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor, [in] long auto_ui_level, [in] unsigned long grace_period_minutes);
+	[id(22),helpstring("method SoftwareLicense_InitializeViewOnly")] HRESULT SoftwareLicense_InitializeViewOnly([in] BSTR application_instance, [in] long product, [in] long prod_ver_major, [in] long prod_ver_minor);
+	[id(23),helpstring("method GetInfoByProduct")] HRESULT GetInfoByProduct([in] long product, [in] VARIANT_BOOL use_shared_licenses_servers, [out] BSTR* p_server, [out] BSTR* p_backup_server, [out] VARIANT_BOOL* p_bool_use_test_dev_licensing);
 };
 
 #endif
