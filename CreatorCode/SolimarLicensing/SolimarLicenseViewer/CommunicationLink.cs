@@ -53,19 +53,22 @@ namespace SolimarLicenseViewer
         {
             try
             {
-                m_licServer.Disconnect();
-                m_licServer.Connect(serverName);
-                m_licenseWrapper.DisconnectEx();
+                Disconnect();
                 m_licenseWrapper.ConnectEx(serverName);
+                m_licServer.Connect(serverName);
                 m_ServerName = serverName;
             }
             catch (COMException ex)
             {
-                m_licServer.Disconnect();
-                m_licenseWrapper.DisconnectEx();
-                m_ServerName = "";
+                Disconnect();
                 throw;
             }
+        }
+        public void Disconnect()
+        {
+            m_licenseWrapper.DisconnectEx();
+            m_licServer.Disconnect();
+            m_ServerName = "";
         }
 
         //Cache for Software Licenses -
@@ -312,6 +315,18 @@ namespace SolimarLicenseViewer
             }
         }
 
+        public void GenerateLicPackage_BySoftwareLicArchive(Byte[] byteArray, ref String slaStream)
+        {
+            try
+            {
+                slaStream = m_licServer.GenerateLicPackage_BySoftwareLicArchive(byteArray);
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+        }
+
         public void SoftwareLicenseDisasterRecoveryExtendTimeByLicense(String softwareLicense)
         {
             try
@@ -443,6 +458,18 @@ namespace SolimarLicenseViewer
             catch (COMException ex)
             {
                 throw new COMException("InitializeWrapper Failed", ex);
+            }
+        }
+
+        public void ModuleLicenseInUse_ByApp(int modID, ref int licenseCount)
+        {
+            try
+            {
+                licenseCount = m_licenseWrapper.ModuleLicenseInUse_ByAppEx(modID);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("ModuleLicenseInUse_ByApp Failed", ex);
             }
         }
 

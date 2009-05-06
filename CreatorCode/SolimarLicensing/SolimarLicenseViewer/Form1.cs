@@ -89,9 +89,27 @@ namespace SolimarLicenseViewer
             PopulateAllViews();
         }
 
+        private void DisconnectServer()
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            this.treeView.BeginUpdate();
+            this.treeView.Nodes.Clear();
+            this.treeView.EndUpdate();
+
+            this.noFlickerListView.BeginUpdate();
+            this.noFlickerListView.Items.Clear();
+            this.noFlickerListView.EndUpdate();
+
+            m_CommLink.Disconnect();
+            EnableFormItems(false);
+            this.ConnectionStatusLabel.Text = "Disconnected";
+            this.Text = AppConstants.FormTitle + " [Disconnected]";
+            Cursor.Current = Cursors.Default;
+        }
         private int ConnectServer()
         {
             //using keyword forces scope onto object, so it will be disposed after it is done.
+            DisconnectServer();
             using (ConnectDialog cd = new ConnectDialog(m_CommLink))
             {
                 ConnectDialogData data = new ConnectDialogData(m_ServerList.ToArray());
@@ -135,6 +153,7 @@ namespace SolimarLicenseViewer
         {
             fileLicenseToolStripMenuItem.Enabled = status;
             licenseToolStripMenuItem.Enabled = status;
+            viewToolStripMenuItem.Enabled = status;
             usageToolStripMenuItem.Enabled = status;
         }
 
