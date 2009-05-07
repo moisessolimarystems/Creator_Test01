@@ -67,7 +67,6 @@ function InstallLicensing(szParam)
 	BOOL bValue;
 begin                                        
     RemoveOldLicensing(); //remove licensegui/license manager components if they exist.
-    //Modify path to use correct licensing for OS type
     //64 bit machines should not install 32 bit licensing 
 	szPath = WINSYSDIR + "\msiexec.exe";
 	if(SYSINFO.bIsWow64) then
@@ -75,8 +74,8 @@ begin
 		szLicPath = SRCDIR ^ "Common\\SolimarLicensing64" ^ gbl_Array(2) + EXE_EXTENSION; 
 	else
 		szLicPath = SRCDIR ^ "Common\\SolimarLicensing" ^ gbl_Array(2) + EXE_EXTENSION;		
-	endif;                   
-    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);            
+	endif;
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);                                
     bValue = TRUE;   //want to install, only case where false is if equal or newer 			
 	LongPathToQuote(szLicPath, TRUE);     
 		//if licensing component exists check if need to remove/re-install
@@ -90,12 +89,12 @@ begin
 		 	LaunchAppAndWait(szPath, szOpts, WAIT);	
 		endif;     
 	endif;
-     		 	     		 
+     		 	     		     		 	     		 
    	if(bValue) then  //true when not installed and older found 
    	 	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then
      		szOpts = " /S /v\"ALLUSERS=1 /qn\"" + szParam;     
-   			LaunchAppAndWait(szLicPath, szOpts, WAIT);
-   			if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then
+   			LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
+   			if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
 		 	 	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);
 		    endif;	   			
 		else 	
@@ -103,10 +102,10 @@ begin
 		endif; 		
 	endif;                                                        
 			
- 	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY + gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then 	
+ 	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then 	
 	//add product guid in license key registry                                                    			
-		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY + gbl_Array(2), PRODUCT_GUID, nvType, svValue, nvSize) < 0) then
-			RegDBSetKeyValueEx(SOLIMAR_LICENSE_KEY + gbl_Array(2), PRODUCT_GUID, REGDB_STRING_EXPAND, PRODUCT_GUID, -1);  
+		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2), PRODUCT_GUID, nvType, svValue, nvSize) < 0) then
+			RegDBSetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2), PRODUCT_GUID, REGDB_STRING_EXPAND, PRODUCT_GUID, -1);  
 		endif; 
 	endif;
  	
@@ -145,7 +144,7 @@ begin
 		 	//licensing component found so remove current product key from licensing 
 		 if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2), PRODUCT_GUID, nvType, svValue, nvSize) = 0) then           
 		 	if(RegDBDeleteValue(SOLIMAR_LICENSE_KEY ^ gbl_Array(2), PRODUCT_GUID) < 0) then
-		 		MessageBox("Failed to delete : " + SOLIMAR_LICENSE_KEY + gbl_Array(2) + "\\" + PRODUCT_GUID, INFORMATION);
+		 		MessageBox("Failed to delete : " + SOLIMAR_LICENSE_KEY ^ gbl_Array(2) + "\\" + PRODUCT_GUID, INFORMATION);
 		 	endif;		 	
    	 	 endif; 
 	   	 bValue = IsSharedLicenseRegKey(gbl_Array(2));     //check if other products are using licensing
@@ -172,6 +171,7 @@ end;
 // Function: RemoveOldLicensing()
 // Purpose: Remove LicenseGUI/LicenseManager install components. Only need Server
 //			Internal Server Components. 
+//			*** Expects REGDB_OPTIONS to be set ***
 // Parameters:
 // Returns:
 //
@@ -181,10 +181,7 @@ function RemoveOldLicensing()
 	INT nvSize, nvType, iCount;  
 	BOOL bValue;
 begin       
-	szPath = WINSYSDIR + "\msiexec.exe";  
-	if(SYSINFO.bIsWow64) then
-		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
-	endif;  	
+	szPath = WINSYSDIR + "\msiexec.exe";  	
     for iCount = 0 to 2 
 		//if licensing component exists check if need to remove/re-install	    
     	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(iCount),"CurrentVersion", nvType, svValue, nvSize) = 0) then  		 	
@@ -195,10 +192,7 @@ begin
 		 		MessageBox ("Unable to uninstall "+ gbl_Array(iCount) +". Please retry from source.",SEVERE);
 		 	endif;
 	    endif;                  	
-    endfor; 
-    if(SYSINFO.bIsWow64) then
- 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
- 	endif;	  
+    endfor;   
 end;    
 
 //=============================================================================  
@@ -234,7 +228,11 @@ begin
     	nvSize = StrFind(svValue, "7.3.2") ;
     	if(nvSize < 0) then 
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
-			sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+			if(!SYSINFO.bIsWow64) then    
+				sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+			else  
+				sentPath = SRCDIR ^ "Common\\SolimarLicensing64\\SPNComboInstaller.exe"; 
+			endif;
    			sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    			if(Is(FILE_EXISTS, sentPath)) then
    				if(LaunchAppAndWait(sentPath, sentOpts, WAIT) < 0) then
@@ -244,7 +242,11 @@ begin
 		endif;  
 	else
 		MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);	
-		sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
+		if(!SYSINFO.bIsWow64) then                                              
+		    sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe";
+		else
+			sentPath = SRCDIR ^ "Common\\SolimarLicensing64\\SPNComboInstaller.exe"; 
+		endif;
    		sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    		if(Is(FILE_EXISTS, sentPath)) then
    			if(LaunchAppAndWait(sentPath, sentOpts, WAIT) < 0) then
@@ -259,6 +261,7 @@ end;
 // Function: 	IsOldSolimarLicense()
 // Purpose:  	Compare the version of the license component installed on the 
 //			 	current system with the installer package.
+//				*** Expects REGDB_OPTIONS to be set ***
 // Parameters:	aLicenseComponent - name of the license component
 // Returns:     TRUE if installed version is older, FALSE otherwise.
 //              
@@ -273,10 +276,6 @@ begin
 	bRetVal = FALSE;
 	// case 1: installed and older
 	// case 2: installed and newer or equal
-	if(SYSINFO.bIsWow64) then
-		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
-	endif;  	
- 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);  
  	nvResult = RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ aLicenseComponent,"CurrentVersion", nvType, svValue, nvSize) ;
     // svValue is the installed version   
     nvSize = 256; 
@@ -290,18 +289,21 @@ begin
 		ListGetFirstString(installVerList, svInstallVerToken);
 		StrToNum(nvVerToken, svVerToken);
 		StrToNum(nvInstallVerToken, svInstallVerToken);
-		//Major
-		if(nvVerToken > nvInstallVerToken) then		
+		//Major        
+		//outdated if currMajor > installMajor
+		//						= keep searching
+		//						< skip installed version is newer
+		if(nvVerToken > nvInstallVerToken) then				
 			bRetVal = TRUE;
-		else   
+		elseif(nvVerToken = nvInstallVerToken) then
 			//Minor           
 			ListGetNextString(currVerList,svVerToken);
 			ListGetNextString(installVerList,svInstallVerToken);
 			StrToNum(nvVerToken, svVerToken);
 			StrToNum(nvInstallVerToken, svInstallVerToken);			
 			if(nvVerToken > nvInstallVerToken) then		
-			    bRetVal = TRUE;
-			else   
+				bRetVal = TRUE;
+			elseif(nvVerToken = nvInstallVerToken) then
 				//Build          
 				ListGetNextString(currVerList, svVerToken);  
 				ListGetNextString(installVerList,svInstallVerToken);
@@ -309,13 +311,10 @@ begin
 				StrToNum(nvInstallVerToken, svInstallVerToken);				
 				if(nvVerToken > nvInstallVerToken) then		
 					  bRetVal = TRUE;
-				endif;
-			endif;
+				endif;         
+			endif;          			
 		endif;       
-    endif;	  
- 	if(SYSINFO.bIsWow64) then
- 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
- 	endif;	      
+    endif;	        
     return bRetVal;
 end;     
 
@@ -327,22 +326,18 @@ end;
 //                component and sees if there are more then 3( one for the
 //                license component,one for the current product, & a version). Anymore
 //				  then 3 would indicate there is another product using it.
+//				  *** Expects REGDB_OPTIONS to be set ***
 //  Returns     : TRUE if there are more then 2 product codes, FALSE otherwise
 //***********************************************************************
 function BOOL IsSharedLicenseRegKey(aLicenseComponent)
 	NUMBER nResult;
 	LIST   listNames;
 begin
-	
 	listNames = ListCreate(STRINGLIST);                        
 	if (listNames  = LIST_NULL) then
         MessageBox ("Unable to create necessary lists.", SEVERE);
         abort;
     endif;  
-	if(SYSINFO.bIsWow64) then
-		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY;	
-	endif;      
-    RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
     // Get the list of subkeys.
     nResult = RegDBQueryKey(SOLIMAR_LICENSE_KEY ^ aLicenseComponent, REGDB_NAMES, listNames );
     
@@ -354,10 +349,7 @@ begin
 		if(ListCount(listNames) > 2) then //
 			return TRUE;     			
 		endif;
-    endif;    
- 	if(SYSINFO.bIsWow64) then
- 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
- 	endif;	     
+    endif;         
     return FALSE;	//only default,license GUID, version keys left so not shared.
                     //or default, license GUID, one product, and version key
 end;
