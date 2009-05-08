@@ -74,7 +74,7 @@ bool KeyInfoListViewManager::PopulateView()
 		int MinorVersion = (TheKeyInfoStructure.ProductVersion.lVal & 0x0fff) >> 4;
 
 		//%x hexadecimal integer format
-		sprintf_s(ProductVersion, sizeof(ProductVersion)/sizeof(char), "%x.%x", MajorVersion, MinorVersion);
+		sprintf_s(ProductVersion, sizeof(ProductVersion)/sizeof(char), "%x.%02x", MajorVersion, MinorVersion);
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
@@ -175,6 +175,8 @@ char* KeyInfoListViewManager::MapKeyTypeID(int* pKeyTypeID)
 				return retval = "Rental";
 			case KEYDevelopment :
 				return retval = "Development";
+			case KEYVerification :
+				return retval = "Verification";
 			default :
 				return retval = "Reserved";
 		}
@@ -225,11 +227,17 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 			case SOLfusionProductID :
 				return retval = "SOLfusion";
 
+			case SPProductID :
+				return retval = "SSE SP";
+
 			case RubikaProductID :
 				return retval = "Rubika";
 
 			case SPDEProductID : 
 				return retval = "SPDE";
+
+			case VerificationKeyID:
+				return retval = "Software Verification Key";
 
 			default :
 				return retval = "Unknown License";
@@ -356,7 +364,24 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		else	
 			listViewItem1->SubItems->Add(utc_t.ToString());
 	}
-	
+
+	//HACK JWL - 08-06-17 : yy-mm-dd
+	//For verification keys, don't show other info, not important
+	//if(String::Equals(TheKeyInfoStructure.ProductID.bstrVal, S"Software Verification Key"))
+	if(String::Equals(TheKeyInfoStructure.KeyType.bstrVal, S"Verification"))
+	{
+		//delete listViewItem1;
+		//listViewItem1 = new ListViewItem();
+		listViewItem1->SubItems->Clear();
+		//Key Type Column
+		listViewItem1->Text = TheKeyInfoStructure.KeyType.bstrVal;
+		
+		//KeyNumber Column
+		listViewItem1->SubItems->Add(TheKeyInfoStructure.KeyNumber.bstrVal);	
+
+		//Product ID Column
+		listViewItem1->SubItems->Add(TheKeyInfoStructure.ProductID.bstrVal);
+	}
 	ListViewItem* __mcTemp__2[] = new ListViewItem*[1];
     __mcTemp__2[0] = listViewItem1;
 	this->TheKeyListView->Items->AddRange(__mcTemp__2);
