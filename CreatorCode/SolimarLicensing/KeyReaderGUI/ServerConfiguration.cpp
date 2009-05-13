@@ -9,6 +9,7 @@ System::Void ServerConfiguration::ServerConfiguration_Load(System::Object*  send
  	TheConnectionSetting = new ConnectionSettings();
 	//Read Registry for installed products
 	RegistryKey* rkey = Registry::LocalMachine->OpenSubKey(SOLIMAR_KEY);
+	System::Collections::Generic::LinkedList<String*>* pProdMap = new System::Collections::Generic::LinkedList<String*>();
 	if(rkey)
 	{
 		// Retrieve all the subkeys for the specified key.
@@ -20,8 +21,11 @@ System::Void ServerConfiguration::ServerConfiguration_Load(System::Object*  send
 			String* s = __try_cast<String*>(enum0->Current);
 			if(!s->Equals(LICENSE_PRODUCT)) 
 			{
-				if(MapProductName(s) >= 0)
+				if((MapProductName(s) >= 0) && !pProdMap->Contains(s))
+				{
 					ProductComboBox->Items->Add(s);
+					pProdMap->Add(s);
+				}
 			}
 		}
 		rkey->Close();
@@ -39,12 +43,21 @@ System::Void ServerConfiguration::ServerConfiguration_Load(System::Object*  send
 			String* s = __try_cast<String*>(enum0->Current);
 			if(!s->Equals(LICENSE_PRODUCT)) 
 			{
-				if(MapProductName(s) >= 0)
+				if((MapProductName(s) >= 0) && !pProdMap->Contains(s))
+				{
 					ProductComboBox->Items->Add(s);
+					pProdMap->Add(s);
+				}
 			}
 		}
 		rkey->Close();			
 	}
+	if(pProdMap)
+	{
+		pProdMap->Clear();
+		pProdMap = NULL;
+	}
+	ConvertSettingsToXml_1_0();	// If XML version of LOCAL_CONNECTION_FILE is not 1.0, then convert to 1.0
 	if(ProductComboBox->Items->Count > 1)	//Solimar Licensing is one key
 			ProductComboBox->SelectedIndex = 0;
 	ServerPropertyGrid->SelectedObject = TheConnectionSetting;
@@ -64,7 +77,12 @@ System::Void ServerConfiguration::CancelBtn_Click(System::Object*  sender, Syste
 System::Void ServerConfiguration::ProductComboBox_SelectedIndexChanged(System::Object*  sender, System::EventArgs*  e)
 {
 	if(m_ValueChanged)
-		SaveSettings(MapProductName(m_LastSelectedProduct));	
+	{
+		// CR.11199 - JWL - Promp user to see if they want to save settings
+#undef MessageBox
+		if(MessageBox::Show("Do you want to save the changes you've made in the Local Connection Setting?", "Local Connection Settings", MessageBoxButtons::YesNo, MessageBoxIcon::Question) == DialogResult::Yes)
+			SaveSettings(MapProductName(m_LastSelectedProduct));	
+	}
 	m_LastSelectedProduct = static_cast<String*>(ProductComboBox->SelectedItem);
 	LoadSettings(MapProductName(static_cast<String*>(ProductComboBox->SelectedItem)));
 }
@@ -216,15 +234,157 @@ bool ServerConfiguration::SaveSettings(int ProductID)
 	fsWrite->Close();
 	File::Delete(filePath);
 	File::Move(tempFilePath, filePath);
-	//give everyone rights to new file. Should surround with try/catch incase of failure.
-    AddFileSecurity(filePath, 
-				    "Everyone", 
-	             	FileSystemRights::FullControl, 
-					AccessControlType::Allow);
+			
+	try
+	{
+		//CR.FIX.11396 - For other than english OS, there is no everyone group, this will find the correct everyone group based on os language
+		System::Security::Principal::SecurityIdentifier* pSID = new System::Security::Principal::SecurityIdentifier(System::Security::Principal::WellKnownSidType::WorldSid, NULL);
+		System::Security::Principal::NTAccount* acct = (System::Security::Principal::NTAccount*)(pSID->Translate(Type::GetType("System.Security.Principal.NTAccount")));
+		String* strEveryoneAccount = acct->ToString();
+
+		AddFileSecurity(
+			filePath, 
+			strEveryoneAccount,
+			FileSystemRights::FullControl, 
+			AccessControlType::Allow);
+	}
+	catch(Exception* e)
+	{
+	// handle permissions problem
+	}
 	m_ValueChanged = false;
 	return bRetVal;
 }
 
+void ServerConfiguration::ConvertSettingsToXml_1_0()
+{
+	String* filePath = String::Concat(Environment::GetFolderPath(Environment::SpecialFolder::CommonApplicationData),
+									  LOCAL_CONNECTION_FILE_PATH,
+									  LOCAL_CONNECTION_FILE);
+	if(!File::Exists(filePath))
+	{
+		if(!CreateDefaultXML())
+			return ;
+	}
+	if(File::Exists(filePath))
+	{
+		FileStream* fs = new FileStream(filePath, FileMode::OpenOrCreate, FileAccess::Read, FileShare::Read);
+		// Create the XmlReader object.
+		XmlReader* reader = XmlReader::Create(fs);
+		reader->ReadToFollowing(VERSION_ELEMENT);
+		if( String::Equals(reader->GetAttribute(VALUE_ATTRIB), "1.0") == false)
+		{
+			reader->Close();
+			fs->Close();
+
+			//
+			//convert to 1.0.
+			String* tempFilePath = String::Concat(Environment::GetFolderPath(Environment::SpecialFolder::CommonApplicationData),
+										  LOCAL_CONNECTION_FILE_PATH,
+										  "temp.xml");
+			FileStream* fsRead = new FileStream(filePath, FileMode::OpenOrCreate, FileAccess::ReadWrite, FileShare::ReadWrite);	
+			FileStream* fsWrite = new FileStream(tempFilePath, FileMode::OpenOrCreate, FileSystemRights::Modify, FileShare::ReadWrite, 8, FileOptions::None);	
+			reader = XmlReader::Create(fsRead);
+			XmlWriterSettings* settings = new XmlWriterSettings;
+			settings->Indent = true;
+			XmlWriter* writer = XmlWriter::Create(fsWrite, settings);
+			String* lastProductID;
+			String* tmpAttribute;
+			while (reader->Read())
+			{
+				if ( reader->NodeType == XmlNodeType::Element )
+				{
+					//copy from read stream
+					writer->WriteStartElement(reader->Name);
+					if(String::Equals(reader->Name, VERSION_ELEMENT))
+					{
+						writer->WriteAttributeString(VALUE_ATTRIB, "1.0");	//Value Attribute
+						writer->WriteEndElement();
+					}
+					else if(String::Equals(reader->Name, SERVER_STRUCTURE_ELEMENT))
+					{
+						writer->WriteAttributes( reader, false);
+					}
+					else if(String::Equals(reader->Name, PRODUCT_ELEMENT))
+					{
+						lastProductID = reader->GetAttribute(ID_ATTRIB);
+						writer->WriteAttributes( reader, false);
+					}
+					else if(String::Equals(reader->Name, SERVER_ELEMENT))
+					{
+						tmpAttribute = reader->GetAttribute(NAME_ATTRIB);
+						writer->WriteAttributeString(NAME_ATTRIB, tmpAttribute);
+						writer->WriteAttributeString(BACKUP_ATTRIB, "0");
+						writer->WriteAttributeString(SHARED_ATTRIB, "0");
+						writer->WriteEndElement();
+
+						writer->WriteStartElement(SERVER_ELEMENT);
+						writer->WriteAttributeString(NAME_ATTRIB, tmpAttribute);
+						writer->WriteAttributeString(BACKUP_ATTRIB, "0");
+						writer->WriteAttributeString(SHARED_ATTRIB, "1");
+						writer->WriteEndElement();
+
+						tmpAttribute = reader->GetAttribute(BACKUP_ATTRIB);
+
+						writer->WriteStartElement(SERVER_ELEMENT);
+						writer->WriteAttributeString(NAME_ATTRIB, tmpAttribute);
+						writer->WriteAttributeString(BACKUP_ATTRIB, "1");
+						writer->WriteAttributeString(SHARED_ATTRIB, "0");
+						writer->WriteEndElement();
+
+						writer->WriteStartElement(SERVER_ELEMENT);
+						writer->WriteAttributeString(NAME_ATTRIB, tmpAttribute);
+						writer->WriteAttributeString(BACKUP_ATTRIB, "1");
+						writer->WriteAttributeString(SHARED_ATTRIB, "1");
+						writer->WriteEndElement();
+					}
+					else if (reader->IsEmptyElement )
+					{
+						writer->WriteAttributes( reader, false);
+						writer->WriteEndElement();	
+					}
+					else
+					{
+						writer->WriteAttributes( reader, false);
+					}
+				}
+				if ( reader->NodeType == XmlNodeType::EndElement )
+				{
+					writer->WriteEndElement();
+				}
+			}
+			writer->Flush();
+			writer->Close();
+			reader->Close();
+			fsRead->Close();
+			fsWrite->Close();
+			File::Delete(filePath);
+			File::Move(tempFilePath, filePath);
+
+			try
+			{
+				//CR.FIX.11396 - For other than english OS, there is no everyone group, this will find the correct everyone group based on os language
+				System::Security::Principal::SecurityIdentifier* pSID = new System::Security::Principal::SecurityIdentifier(System::Security::Principal::WellKnownSidType::WorldSid, NULL);
+				System::Security::Principal::NTAccount* acct = (System::Security::Principal::NTAccount*)(pSID->Translate(Type::GetType("System.Security.Principal.NTAccount")));
+				String* strEveryoneAccount = acct->ToString();
+
+				AddFileSecurity(
+					filePath, 
+					strEveryoneAccount,
+					FileSystemRights::FullControl, 
+					AccessControlType::Allow);
+			}
+			catch(Exception* e)
+			{
+			// handle permissions problem
+			}
+			return;
+		}
+		reader->Close();
+		fs->Close();
+	}
+	return ;
+}
 int ServerConfiguration::MapProductName(String* ProductName)
 {
 	if(ProductName != NULL)
@@ -245,6 +405,7 @@ int ServerConfiguration::MapProductName(String* ProductName)
 	}
 	return -1;
 }
+
 //<LicensingStructure>
 //	<Version value=""/>
 //		<ServerStructure>
