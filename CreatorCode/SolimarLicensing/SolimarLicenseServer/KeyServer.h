@@ -73,6 +73,7 @@ public:
 	HRESULT KeyModuleQuery(BSTR key_ident, long module_ident, VARIANT *vtValue);
 	HRESULT KeyModuleLicenseTotal(BSTR license_id, BSTR key_ident, long module_ident, long* license_count);
 	HRESULT KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long module_ident, long* license_count);
+	HRESULT KeyModuleLicenseInUse_ByApp(BSTR license_id, BSTR key_ident, long module_ident, long* license_count);
 	HRESULT KeyModuleLicenseObtain(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT KeyModuleLicenseRelease(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
 	HRESULT KeyModuleLicenseCounterDecrement(BSTR license_id, BSTR key_ident, long module_ident, long license_count);
@@ -180,4 +181,5 @@ private:
 	static BYTE crypto_key_password_packet_private[];
 	static BYTE crypto_key_password_packet_public[];
 	static BYTE crypto_key_password_packet_password[];
+	static unsigned int packet_magic_number_int[];	//a static BYTE [] still adds string to image, and can be seen in process explorer, this value is a GUID that is easily read
 };

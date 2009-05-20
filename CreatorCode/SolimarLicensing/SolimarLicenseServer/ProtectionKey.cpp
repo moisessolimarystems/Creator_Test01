@@ -210,6 +210,7 @@ ProtectionKey::~ProtectionKey()
 
 HRESULT ProtectionKey::TrialExpires(VARIANT *expire_date)
 {
+	SafeMutex mutex(license_use_lock);
 	*expire_date = _variant_t(0.0,VT_DATE);
 	try
 	{
@@ -225,6 +226,7 @@ HRESULT ProtectionKey::TrialExpires(VARIANT *expire_date)
 
 HRESULT ProtectionKey::TrialHours(long *trial_hours)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	*trial_hours = 0;
@@ -249,6 +251,7 @@ HRESULT ProtectionKey::TrialHours(long *trial_hours)
 
 HRESULT ProtectionKey::IsActive(VARIANT_BOOL *key_active)
 {
+	SafeMutex mutex(license_use_lock);
 	try
 	{
 		// key has a customer number, key number, and is not an expired key
@@ -265,6 +268,7 @@ HRESULT ProtectionKey::IsActive(VARIANT_BOOL *key_active)
 
 HRESULT ProtectionKey::IsProgrammed(VARIANT_BOOL *key_programmed)
 {
+	SafeMutex mutex(license_use_lock);
 	*key_programmed = VARIANT_FALSE;
 	try
 	{
@@ -294,12 +298,14 @@ HRESULT ProtectionKey::HeaderQuery(long header_ident, VARIANT *value)
 
 HRESULT ProtectionKey::ApplicationInstanceCount(long* application_instance_count)
 {
+	SafeMutex mutex(license_use_lock);
 	*application_instance_count = ReadHeaderCache(L"Application Instances").uiVal;
 	return S_OK;
 }
 
 HRESULT ProtectionKey::IsPresent(VARIANT_BOOL *key_present)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 
 	*key_present = VARIANT_FALSE;
@@ -387,6 +393,7 @@ HRESULT ProtectionKey::Release(BSTR license_id)
 //Calls IsPresent(), IsProgrammed() & IsActive()
 HRESULT ProtectionKey::ValidateLicense(BSTR license_id, VARIANT_BOOL *license_valid)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	// is still present, activated, and programmed
@@ -437,6 +444,7 @@ HRESULT ProtectionKey::ValidateLicense(BSTR license_id, VARIANT_BOOL *license_va
 
 HRESULT ProtectionKey::ModuleEnumerate(VARIANT *pvtModuleList)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	VariantInit(pvtModuleList);
@@ -510,6 +518,7 @@ HRESULT ProtectionKey::ModuleEnumerate(VARIANT *pvtModuleList)
 
 HRESULT ProtectionKey::ModuleQuery(long module_ident, VARIANT *vtValue)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	VariantInit(vtValue);
@@ -529,6 +538,7 @@ HRESULT ProtectionKey::ModuleQuery(long module_ident, VARIANT *vtValue)
 HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, long* license_count)
 {
 	// lock a license
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	*license_count=0;
@@ -562,15 +572,49 @@ HRESULT ProtectionKey::ModuleLicenseTotal(BSTR license_id, long module_ident, lo
 //Counts the ModuleInUse based on the license_id
 HRESULT ProtectionKey::ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count)
 {
-	// lock a license
 	HRESULT hr = S_OK;
 	try
 	{
 		_variant_t module_value = ReadModuleCache(module_ident);
 		KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][module_ident]);
+
+		// lock a license
 		SafeMutex mutex(license_use_lock);
 		ModuleLicenseUseList &module_license_use = license_use[license_id];
 		*license_count = module_license_use[module.id];
+	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
+//Counts the ModuleInUse based on the Application Instance that license_id uses
+HRESULT ProtectionKey::ModuleLicenseInUse_ByApp(BSTR license_id, long module_ident, long* license_count)
+{
+	SafeMutex mutex(license_use_lock);
+	HRESULT hr = S_OK;
+	*license_count = 0;
+	try
+	{
+		// Find the Application Instance for the given license_id.
+		LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
+		_bstr_t appID = licAppIt!=license_to_app.end() ? _bstr_t(licAppIt->second,true) : _bstr_t(L"",true);
+
+		// For the given Application Instance, cycle through all the license_id's and sum up the inUse
+		long tmpLicCount = 0;
+		for(  LicenseToApplicationInstanceList::iterator tmpLicAppIt = license_to_app.begin();
+				tmpLicAppIt != license_to_app.end();
+				tmpLicAppIt++)
+		{
+			if(wcscmp(appID, _bstr_t(tmpLicAppIt->second,true)) == 0)
+			{
+				hr = ModuleLicenseInUse(_bstr_t(tmpLicAppIt->first,true), module_ident, &tmpLicCount);
+				if(SUCCEEDED(hr))
+					*license_count += tmpLicCount;
+			}
+		}
 	}
 	catch (_com_error &e)
 	{
@@ -665,6 +709,7 @@ HRESULT ProtectionKey::ModuleLicenseUnlimited(BSTR license_id, long module_ident
 //if(module_ident == 131)
 //	OutputFormattedDebugString(L"ProtectionKey::ModuleLicenseUnlimited(license_id=%s, module_ident=%d, b_module_is_unlimited=%s", (wchar_t*)license_id, module_ident, b_module_is_unlimited==VARIANT_TRUE ? L"true" : L"false");
 //module_use(%d) > (long)LicenseEffectiveValue[%d](license_id(%s), module->id(%d))", module_use, effectiveValue, (wchar_t*)license_id, module->id);
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr(S_OK);
 	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	module_unlimited_list[module_ident] = b_module_is_unlimited == VARIANT_TRUE ? true : false;
@@ -672,7 +717,7 @@ HRESULT ProtectionKey::ModuleLicenseUnlimited(BSTR license_id, long module_ident
 	return hr;
 }
 
-//Returns S_OK on success, else S_FALSE
+//Returns S_OK on success
 HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_id, VARIANT_BOOL b_app_instance_lock_key)
 {
 //wchar_t tmpbuf[1024];
@@ -727,7 +772,7 @@ HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_
 				if(appIt->second == ProtectionKey::LCT_LOCK_APPLICATION_INSTANCE && b_app_instance_lock_key == VARIANT_FALSE)
 				{
 					//Don't allow locked app instance to be 
-					hr = S_FALSE;
+					hr = E_FAIL;
 				}
 				else
 				{
@@ -738,16 +783,18 @@ HRESULT ProtectionKey::AddApplicationInstance(BSTR license_id, BSTR application_
 		}
 		else
 		{
-			hr = S_FALSE;
+			hr = E_FAIL;
 		}
 	}
 	else //if(wcscmp(application_id, L"") == 0)
 	{
 		license_to_app[_bstr_t(license_id,true)] = _bstr_t(application_id,true);
 	}
+
+//swprintf_s(tmpbuf, 1024, L"ProtectionKey::AddApplicationInstance(%s, %s, %s) - hr: 0x%x", (wchar_t*)m_virtualKeyIdent, (wchar_t*)license_id, (wchar_t*)application_id, hr);
+//OutputDebugString(tmpbuf);
 	return hr;
 }
-//Returns S_OK on success, else S_FALSE
 HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR application_id)
 {
 //wchar_t tmpbuf[1024];
@@ -782,10 +829,10 @@ HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR applicati
 }
 
 ////Might not need this function...
-//Returns S_OK on success, else S_FALSE
 //Vector returned with BSTR name, VARIANT_BOOL bLock
 HRESULT ProtectionKey::GetApplicationInstanceList(VARIANT *pvtAppInstanceList)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr(S_OK);
 	VariantInit(pvtAppInstanceList);
 	try
@@ -906,6 +953,7 @@ HRESULT ProtectionKey::AddLicenseApplicationInstance(BSTR license_id, long modul
 
 HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = S_OK;
 	
 	try
@@ -935,6 +983,7 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 //returns E_FAIL if there is TrialKey
 HRESULT ProtectionKey::ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count)
 {
+	SafeMutex mutex(license_use_lock);
 	HRESULT hr = E_FAIL;
 	try
 	{
@@ -1069,8 +1118,10 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	HRESULT hr = S_OK;
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program(%d, %d, %d, %d, %d, %d, %d, module_list size: %d, ?)", customer_number, key_number, product_ident, ver_major, ver_minor, key_type, days, (module_value_list.vt & VT_ARRAY) ? module_value_list.parray->rgsabound[0].cElements : 0);
-	
+#endif
+
 	unsigned short product_version = (unsigned short)(Version::TinyVersion(Version::ModuleVersion(ver_major, ver_minor, 0, 0)).program);
 	
 	// lock the driver's key list so that these operations will not affect the key_ident we reference here until finished
@@ -1080,7 +1131,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program(%d, %d, %d, %d, %d, %d, %d, 
 	if (FAILED(hr)) return hr;
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Product: %d, Version: %08x, Key Type: %d, Status: INITIAL_TRIAL", product_ident, product_version, key_type);
+#endif
 
 	// write the header data
 	WriteHeader(L"Product ID",(unsigned int)(unsigned short)product_ident);
@@ -1090,19 +1143,25 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Produc
 	WriteHeader(L"Application Instances",(unsigned int)(unsigned short)application_instances);
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteCounterDays(%d)", days);
+#endif
 	
 	// write the initial/extended counter
 	hr = WriteCounterDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteExpirationDays(%d)", days);
+#endif
 	
 	// write the expiration date
 	hr = WriteExpirationDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Customer: %x, Key Number %x)", customer_number, key_number);
+#endif
 	
 	WriteHeader(L"Customer Number",(unsigned int)(unsigned short)customer_number);
 	WriteHeader(L"Key Number",(unsigned int)(unsigned short)key_number);
@@ -1111,7 +1170,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Custom
 	if (new_key_ident)
 	{
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentKeyIdent()");
+#endif
 		
 	    hr = m_driver->ComputeCurrentKeyIdent(m_physicalKeyIdent, new_key_ident);
 		if (FAILED(hr)) throw _com_error(hr);
@@ -1121,7 +1182,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentK
 	InitializePasswordNumber();	// Set the module password number to 0
 	
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primary descriptor, primary password, secondary descriptor)");
+#endif
 	
 	KeySpec::Header &header_primary_descriptor = m_keyspec->headers[L"Primary Descriptor"];
 	KeySpec::Header &header_secondary_descriptor = m_keyspec->headers[L"Secondary Descriptor"];
@@ -1134,7 +1197,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primar
 	
 
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data");
+#endif
 	
 	// write the default module data if provided
 	//xxx I don't know if this is supposed to happen
@@ -1144,12 +1209,16 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module 
 	for (KeySpec::Product::data_list_t::iterator module = product.data.begin(); module != product.data.end(); ++module)
 	{
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data (<%04x><%02d>  %08x)", module->offset, module->bits, (unsigned int)module->default_license);
+#endif
 		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
 	}
 	
 //xxx debug
-	OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides");
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides");
+#endif
 	
 	// write the values specified in the module value list if appropriate
 	if (module_value_list.vt==(VT_ARRAY | VT_VARIANT))
@@ -1183,20 +1252,26 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module 
 					if (module.isLicense)
 					{
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteLicense(%d, %08x)", module_id, module_value);
+#endif
 						WriteLicense(module_id, module_value);
 					}
 					else
 					{
 //xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteModule(%d, %08x)", module_id, module_value);
+#endif
 						WriteModule(module_id, module_value);
 					}
 				}
 				catch (_com_error &e)
 				{
 					//xxx debug
+					#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 					OutputFormattedDebugString(L"ProtectionKey::Program() -- Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
+					#endif
 					return e.Error();
 				}
 			}
@@ -1205,7 +1280,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provide
 	else if (module_value_list.vt != VT_EMPTY)
 	{
 		//xxx debug
+		#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
+		#endif
 		return E_INVALIDARG;
 	}
 
@@ -1215,7 +1292,9 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provide
 	if(headersInitialized != HEADER_INITIALIZED)
 		return E_FAIL;
 
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Leave");	
+#endif
 	return S_OK;
 }
 
@@ -2765,6 +2844,7 @@ HRESULT ProtectionKey::WriteLicenseDecrementCounter(BSTR license_id, unsigned in
 // License information helpers
 bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, wchar_t* id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	if (!LicenseIsPooled(id))
@@ -2780,6 +2860,7 @@ bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, wchar_t* id)
 
 bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, unsigned int id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	ModuleLicenseUnlimitedList &module_unlimited_list = license_unlimited_list[license_id];
 	if (!LicenseIsPooled(id))
@@ -2795,18 +2876,21 @@ bool ProtectionKey::LicenseIsUnlimited(BSTR license_id, unsigned int id)
 
 bool ProtectionKey::LicenseIsPooled(wchar_t* id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	return (module.pool!=0);
 }
 
 bool ProtectionKey::LicenseIsPooled(unsigned int id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	return (module.pool!=0);
 }
 
 unsigned int ProtectionKey::LicenseEffectiveValue(BSTR license_id, wchar_t* id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	
 	// assumes that 2 billion is much greater than valid license values
@@ -2848,6 +2932,7 @@ unsigned int ProtectionKey::LicenseEffectiveValue(BSTR license_id, wchar_t* id)
 
 unsigned int ProtectionKey::LicenseEffectiveValue(BSTR license_id, unsigned int id)
 {
+	SafeMutex mutex(license_use_lock);
 	KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][id]);
 	
 	// assumes that 2 billion is much greater than valid license values
