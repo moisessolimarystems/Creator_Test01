@@ -59,6 +59,7 @@
       <HintPath>..\SolimarLicensing\Image\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -87,6 +88,7 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
+    <Compile Include="AppConstants.cs" />
     <Compile Include="DestinationNameEditor.cs">
       <SubType>Form</SubType>
     </Compile>
