@@ -37,6 +37,19 @@ BYTE KeyServer::crypto_key_password_packet_password[] = {
 #include "..\common\keys\SolimarLicensingPacket.password.txt"
 };
 
+//A static BYTE [] still adds string to image, and can be seen in process explorer, this value is a GUID that is easily read
+//ECDBE6C6054746378D93B400527C21EE
+unsigned int KeyServer::packet_magic_number_int[] = {
+	0x45, 0x00, 0x43, 0x00, 0x44, 0x00, 0x42, 0x00,	// ECDB
+	0x45, 0x00, 0x36, 0x00, 0x43, 0x00, 0x36, 0x00,	// E6C6
+	0x30, 0x00, 0x35, 0x00, 0x34, 0x00, 0x37, 0x00,	// 0547
+	0x34, 0x00, 0x36, 0x00, 0x33, 0x00, 0x37, 0x00,	// 4637 
+	0x38, 0x00, 0x44, 0x00, 0x39, 0x00, 0x33, 0x00,	// 8D93
+	0x42, 0x00, 0x34, 0x00, 0x30, 0x00, 0x30, 0x00,	// B400
+	0x35, 0x00, 0x32, 0x00, 0x37, 0x00, 0x43, 0x00,	// 527C
+	0x32, 0x00, 0x31, 0x00, 0x45, 0x00, 0x45, 0x00,	// 21EE
+	0x00, 0x00
+};
 
 #pragma warning(disable:4355)
 
@@ -363,7 +376,14 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		PasswordPacket packet;
 		wchar_t *pNextToken;
 		wchar_t* pToken(0);
-		if (!(pToken = wcstok_s(pPacketString1, L"\r\n",&pNextToken)) || wcscmp(pToken,L"ECDBE6C6054746378D93B400527C21EE")!=0) throw(E_FAIL);	//xxx
+
+		// verify magic number
+		_bstr_t magic_number;
+		magic_number = (wchar_t*)(&packet_magic_number_int[0]);
+		for(int idx=1; idx<32; idx++)
+			magic_number += (wchar_t*)(&packet_magic_number_int[2*idx]);
+		if (!(pToken = wcstok_s(pPacketString1, L"\r\n",&pNextToken)) || wcscmp(pToken,magic_number)!=0) throw(E_FAIL);	//xxx
+		
 		unsigned int expected_headers(0), expected_passwords(0);
 		if (!(pToken = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
 		expected_headers = _wtoi(pToken);
@@ -710,7 +730,10 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	_bstr_t packet_string;
 	
 	// write the magic number
-	packet_string += L"ECDBE6C6054746378D93B400527C21EE\r\n";
+	packet_string = (wchar_t*)(&packet_magic_number_int[0]);
+	for(int idx=1; idx<32; idx++)
+		packet_string += (wchar_t*)(&packet_magic_number_int[2*idx]);
+	packet_string += L"\r\n";
 
 	// write the header information
 	packet_string += _bstr_t(_variant_t((long)password_packets[lid].headers.size()));
@@ -1064,6 +1087,23 @@ HRESULT KeyServer::KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long m
 	if (key!=keys.end())
 	{
 		return key->second->ModuleLicenseInUse(license_id, module_ident, license_count);
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+}
+
+HRESULT KeyServer::KeyModuleLicenseInUse_ByApp(BSTR license_id, BSTR key_ident, long module_ident, long* license_count)
+{
+	SafeMutex mutex(KeyListLock);
+
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	
+	if (key!=keys.end())
+	{
+		return key->second->ModuleLicenseInUse_ByApp(license_id, module_ident, license_count);
 	}
 	else
 	{
