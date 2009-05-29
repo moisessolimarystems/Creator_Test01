@@ -285,11 +285,21 @@ namespace SolimarLicenseViewer
 
             File.Delete(filePath);
             File.Move(tempFilePath, filePath);
-            //give everyone rights to new file. Should surround with try/catch incase of failure.
-            AddFileSecurity(filePath,
-                            "Everyone",
-                            FileSystemRights.FullControl,
-                            AccessControlType.Allow);
+            try
+            {
+                //give everyone rights to new file.
+                //CR.FIX.11396 - For other than english OS, there is no everyone group, this will find the correct everyone group based on os language
+                System.Security.Principal.SecurityIdentifier secId = new System.Security.Principal.SecurityIdentifier(System.Security.Principal.WellKnownSidType.WorldSid, null);
+                System.Security.Principal.NTAccount acct = (System.Security.Principal.NTAccount)(secId.Translate(typeof(System.Security.Principal.NTAccount)));
+                String strEveryoneAccount = acct.ToString();
+                AddFileSecurity(filePath,
+                                strEveryoneAccount,
+                                FileSystemRights.FullControl,
+                                AccessControlType.Allow);
+            }
+            catch(Exception)
+            {
+            }
             bRetVal = true;
             return bRetVal;
         }
@@ -305,26 +315,58 @@ namespace SolimarLicenseViewer
             #region Read Registry for installed products
             using (RegistryKey rkey = Registry.LocalMachine.OpenSubKey(AppConstants.SolimarRegKey))
             {
-                foreach (String productName in rkey.GetSubKeyNames())
+                if (rkey != null)
                 {
-                    if (!productName.Equals(AppConstants.LicenseProduct))
+                    foreach (String productName in rkey.GetSubKeyNames())
                     {
-                        int productID = m_CommLink.GetProductID(productName);
-                        if (productID >= 0)
+                        if (!productName.Equals(AppConstants.LicenseProduct))
                         {
-                            installedProductsList.Add(productID);
+                            int productID = m_CommLink.GetProductID(productName);
+                            if (productID >= 0)
+                            {
+                                installedProductsList.Add(productID);
 
-                            //Also add secondary product too...
-                            if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
-                                installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
-                            else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
-                                installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
-                            else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
-                                installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                                //Also add secondary product too...
+                                if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
+                                else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
+                                else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                            }
                         }
                     }
+                    rkey.Close();
                 }
-                rkey.Close();
+            }
+            #endregion
+
+            #region Read Registry for installed products for 32 bit products on a 64 bit machine
+            using (RegistryKey rkey = Registry.LocalMachine.OpenSubKey(AppConstants.SolimarRegKey32On64))
+            {
+                if (rkey != null)
+                {
+                    foreach (String productName in rkey.GetSubKeyNames())
+                    {
+                        if (!productName.Equals(AppConstants.LicenseProduct))
+                        {
+                            int productID = m_CommLink.GetProductID(productName);
+                            if (productID >= 0)
+                            {
+                                installedProductsList.Add(productID);
+
+                                //Also add secondary product too...
+                                if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
+                                else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
+                                else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
+                                    installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                            }
+                        }
+                    }
+                    rkey.Close();
+                }
             }
             #endregion
 
