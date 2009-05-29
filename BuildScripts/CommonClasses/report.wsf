@@ -1,0 +1,153 @@
+<package>
+<job id="vbs">
+<script language="VBScript" src="..\CommonClasses\ProductReport.vbs" />
+<script language="VBScript" src="..\CommonClasses\ReportAccess.vbs" />
+<script language="VBScript" src="..\CommonClasses\MoveFiles.vbs" />
+<script language="VBScript" src="..\CommonClasses\MKS.vbs" />
+<script language="VBScript" src="..\CommonClasses\Formatting.vbs" />
+<script language="VBScript">
+
+  Dim g_Report
+  Set g_Report = New CProductReport
+  g_Report.SetMembers 
+  Dim MKS, MoveFiles
+  Set MKS = New CMKS
+  Set MKS.Build = g_Report
+  Set MoveFiles = New CMovefiles
+  Set MoveFiles.Build = g_Report    
+  g_Report.GetParams MKS
+  
+      'Delete Successful Build indicator file    
+  If g_Report.FSO.FileExists(g_Report.Shell.CurrentDirectory & "\SUCCESS.txt") Then
+  	 MoveFiles.DeleteFileOrFolder "File", g_Report.Shell.CurrentDirectory & "\SUCCESS.txt",  False
+  End If
+      
+  Dim g_Access
+  Set g_Access = New CReportAccess
+  Set g_Access.Build = g_Report
+  g_Report.SetConnection g_Access
+  
+  SetProjPaths
+  g_Report.SetLabels
+  If g_Report.PopDataBase <> "N" Then
+    g_Report.PopulateDataBase g_Access
+  End If
+  If g_Report.GenTextFile <> "N" Then
+    g_Report.GenerateTextFile g_Access
+  End If
+  g_Report.CopyToNetworkAndSendEmail g_Access
+  MKS.Disconnect
+  
+  'Create Successful Build indicator file     
+  If g_Report.FSO.FileExists(g_Report.Shell.CurrentDirectory & "\SUCCESS.txt") <> True Then
+		MoveFiles.CreateFileOrFolder "File", g_Report.Shell.CurrentDirectory & "\SUCCESS.txt", True
+  End If   
+      
+  Set MKS = Nothing	
+  Set g_Access = Nothing
+  Set g_Report = Nothing         
+        
+'****************************************End of Main Program**************************************************
+          
+'0 means main dev path, 1 means var project
+'************************************
+' ProductName
+' ProjectName
+' InstallSrc Archive File
+' archiveFile
+' mPjNameArray(0),(1),(2)
+' filePathArray(0),(1),2)
+' releaseFilename
+' fileNamePrefix
+' VersionPrefix
+'**************************************
+' need to add "F:\code\MKSCODE folder path into init values
+' store each of these values into xml files for each product.
+ Sub SetProjPaths()
+        If g_Report.Productchoice = "SpdNT" Then
+                g_Report.SetProjPathsVar "SpdMain", "SpdMain", "F:\code\MKSCODE\SpdMain", _
+										 "S:\MKSCODE\SpdMain\spdInstallSource\setupcd.pj", _
+                                         "S:\Mkscode\SpdMain\Rcs\spdMain.pj", _
+                                         "spdMain", "", "setupcd", _
+                                         g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\spdInstallSource", _
+                                         "\SpdNT\Configuration\release.txt", "SpdNT", "SpdNT"
+        End If
+        If g_Report.Productchoice = "iConvert" Then
+            Dim VersionPrefix
+            g_Report.SetProjPathsVar "iconvert", "iConvert", "F:\code\MKSCODE\iconvert", _
+									 "S:\MKSCODE\iConvert\iConvertInstallSource\InstallSource.pj", _
+                                         "S:\MKSCODE\iConvert\rcs\iConvert.pj", _
+                                         "iConvert", "", "InstallSource", _
+                                         g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\iConvertInstallSource", _
+                                         "\iConvert\Configuration\iConvertRelease.txt", "iConvert", "iConvert"
+        End If
+        If g_Report.Productchoice = "SOLsearcher" Then
+             g_Report.SetProjPathsVar "SOLsearcher", "SOLsearcher", "F:\code\MKSCODE\SOLsearcher", _
+									  "S:\MKSCODE\SOLsearcher\SOLsearcherInstallSource\InstallSource.pj", _
+                                       "S:\MKSCODE\SOLsearcher\rcs\SOLsearcher.pj", _
+                                       "SOLsearcher", "", "InstallSource", _
+                                       g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SOLsearcherInstallSource", _
+                                       "\SOLsearcher\Configuration\SOLsearcherRelease.txt", "SOLsearcher", "SOLsearcher"
+        End If
+        If g_Report.Productchoice = "SOLscript" Then
+             g_Report.SetProjPathsVar "SOLscript", "SOLscript", "F:\code\MKSCODE\SOLscript", _
+									  "S:\MKSCODE\SOLscript\SOLscriptInstallSource\SOLscriptInstallSource.pj", _
+                                      "S:\MKSCODE\SOLscript\rcs\SOLscript.pj", _
+                                      "SOLscript", "", "SOLscriptInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SOLscriptInstallSource", _
+                                      "\SOLscript\Configuration\SOLscriptRelease.txt", "SOLscript", "SOLscript"
+        End If
+        If g_Report.Productchoice = "TestHarness" Then
+             g_Report.SetProjPathsVar "Jaws2.4", "JawsTestHarness", "F:\code\MKSCODE\Jaws2.4" ,"", _
+                                      "S:\MKSCODE\Jaws2.4\rcs\JawsTestHarness.pj", _
+                                      "JawsTestHarness", "", "buildvc", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\buildvc", _
+                                      "\JawsTestHarness\Configuration\JawsTestHarnessRelease.txt", "JawsTestHarness", "TestHarness"
+        End If
+		If g_Report.Productchoice = "Creator" Then
+             g_Report.SetProjPathsVar "Creator", "CreatorMain", "F:\code\MKSCODE\CREATOR", _
+									  "S:\MKSCODE\CREATOR\CreatorInstallSource\CreatorInstallSource.pj", _
+                                      "S:\MKSCODE\CREATOR\rcs\CreatorMain.pj", _
+                                      "CreatorMain", "", "CreatorInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\CreatorInstallSource", _
+                                      "\Creator\Configuration\CreatorRelease.txt", "Creator", "Creator"
+        End If
+		If g_Report.Productchoice = "SolimarLicensing" Then
+             g_Report.SetProjPathsVar "SolimarLicensing", "SolimarLicensing", "F:\code\MKSCODE\Shared\Code\Key_2.0", _
+									  "S:\MKSCODE\Shared\Code\Key_2.0\SolimarLicensingInstallSource\SolimarLicensingInstallSource.pj", _
+                                      "S:\MKSCODE\Shared\Code\Key_2.0\rcs\SolimarLicensing.pj", _
+                                      "SolimarLicensing", "", "SolimarLicensingInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SolimarLicensingInstallSource", _
+                                      "\SolimarLicensing\Configuration\SolimarLicensingRelease.txt", "SolimarLicensing", "SolimarLicensing"
+        End If
+	If g_Report.Productchoice = "SOLfusion" Then
+             g_Report.SetProjPathsVar "SOLfusion", "project", "F:\code\MKSCODE\SOLfusion", _
+									  "S:\MKSCODE\SOLfusion\SOLfusionInstallSource\project.pj", _
+                                      "S:\MKSCODE\SOLfusion\rcs\project.pj", _
+                                      "project", "", "project", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\SOLfusionInstallSource", _
+                                      "\SOLfusion\Configuration\SOLfusionRelease.txt", "SOLfusion", "SOLfusion"
+	End If
+        If g_Report.Productchoice = "SPDE" Then
+             g_Report.SetProjPathsVar "SPDE", "Spd52xx", "F:\code\MKSCODE\Spd52xx", _
+									  "S:\MKSCODE\Spd52xx\Spd52xxInstallSource\Spd52xxInstallSource.pj", _
+                                      "S:\MKSCODE\Spd52xx\rcs\Spd52xx.pj", _
+                                      "Spd52xx", "", "Spd52xxInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\Spd52xxInstallSource", _
+                                      "\SPDE\Configuration\SPDERelease.txt", "Spd52xx", "SPDE"
+        End If
+        If g_Report.Productchoice = "Rubika" Then
+             g_Report.SetProjPathsVar "Rubika", "Rubika", "F:\code\MKSCODE\Rubika", _
+									  "S:\MKSCODE\Rubika\RubikaInstallSource\RubikaInstallSource.pj", _
+                                      "S:\MKSCODE\Rubika\rcs\Rubika.pj", _
+                                      "Rubika", "", "RubikaInstallSource", _
+                                      g_Report.RootProjectDir, "", g_Report.RootProjectDir & "\RubikaInstallSource", _
+                                      "\Rubika\Configuration\RubikaRelease.txt", "Rubika", "Rubika"
+        End If
+End Sub
+     
+                        
+
+</script>
+</job>
+</package>
