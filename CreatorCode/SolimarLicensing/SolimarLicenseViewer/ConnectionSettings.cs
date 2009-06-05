@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SolimarLicenseViewer
 {
-    class ConnectionSettings
+    public class ConnectionSettings
     {
         public ConnectionSettings()
         {
@@ -84,7 +84,7 @@ namespace SolimarLicenseViewer
         private String sharedBackupName;
     }
 
-    class ConnectionSettings2
+    public class ConnectionSettings2
     {
         public ConnectionSettings2()
         {
