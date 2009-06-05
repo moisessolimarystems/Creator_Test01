@@ -54,6 +54,8 @@ namespace CreatorData
             }
         }
 
+
+
         public static LicenseTable GetLicenseByID(int licID, bool enableLoadOptions)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -180,31 +182,6 @@ namespace CreatorData
             return destinationID;
         }
 
-        //public static uint GetNextDestinationID(uint custID)
-        //{
-        //    int destinationID = 0;
-        //    using (CreatorDataContext db = new CreatorDataContext())
-        //    {
-        //        db.ObjectTrackingEnabled = false;
-        //        var licenses = from l in db.Licenses
-        //                       where l.SCRnumber.Equals(custID)
-        //                       orderby l.DestinationID
-        //                       select l.;
-        //        foreach (var id in licenses.Distinct())
-        //        {
-        //            if (id - destinationID > 1)
-        //            {
-        //                destinationID = destinationID + 1;
-        //                break;
-        //            }
-        //            destinationID = id;
-        //        }
-        //        if (destinationID == 0)
-        //            destinationID = destinationID + 1;
-        //    }
-        //    return (uint)destinationID;
-        //}
-
         public static int GetLicCountByType(uint custID, uint destID, uint groupID, Byte licType)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -216,6 +193,35 @@ namespace CreatorData
                                      l.DestinationID.Equals(destID)  &&
                                      l.SCRnumber.Equals(custID) &&
                                      l.LicenseType.Equals(licType)
+                               select l;
+                return licenses.Count();
+            }
+        }
+
+        public static int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Byte licType)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+
+                var licenses = from l in db.LicenseTables
+                               where l.GroupID.Equals(groupID) &&
+                                     l.DestinationID.Equals(destID) &&
+                                     l.SCRnumber.Equals(custID) &&
+                                     l.LicenseType != licType
+                               select l;
+                return licenses.Count();
+            }
+        }
+
+        public static int GetLicenseCountByDestName(uint custID, uint destID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var licenses = from l in db.LicenseTables
+                               where l.DestinationID.Equals(destID) &&
+                                     l.SCRnumber.Equals(custID) 
                                select l;
                 return licenses.Count();
             }

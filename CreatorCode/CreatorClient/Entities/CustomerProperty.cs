@@ -7,30 +7,21 @@ using Client.Creator.CreatorService;
 
 namespace Client.Creator
 {
-    //can I make an abstract base class?
     public class CustomerProperty
     {
-        //string _name;
-        //uint _id;
-        //string _operatorName;
         CustomerTable _customer;
 
         public CustomerProperty() 
         {
-            //_name = "";
-            //_id = 0;
-            //_operatorName = "";
             _customer = new CustomerTable();
         }
 
         public CustomerProperty(CustomerTable cust)
         {
             _customer = cust;
-            //_name = cust.SCRname;
-            //_id = (uint)cust.SCRnumber;
-            //_operatorName = cust.SCRoperator;
         }
 
+        #region Properties
         [Browsable(false)]
         public int Id
         {
@@ -56,5 +47,6 @@ namespace Client.Creator
             get { return _customer.SCRoperator; }
             set { _customer.SCRoperator = value; }
         }
+        #endregion
     }
 }

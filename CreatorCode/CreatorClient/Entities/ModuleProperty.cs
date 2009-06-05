@@ -41,33 +41,43 @@ namespace Client.Creator
             return _module.Equals(obj as Lic_PackageAttribs.Lic_ModuleInfoAttribs);
         }
 
-        //[Browsable(false)]
+        public bool IsAllowedRemoveModule
+        {
+            get
+            {
+                if (_module.moduleValue.TVal > 0)
+                {
+                    if (_module.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm)
+                    {
+                        if (!CreatorForm.s_CommLink.IsDefaultModule(_productID, _module.moduleID.TVal))
+                            return true;
+                    }
+                    else
+                    {
+                        if (_module.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                            return true;
+                    }
+                }
+                return false;
+            }
+        }
+
         public uint ProductID
         {
             get { return _productID; }
             set { _productID = value; }
         }
 
-        //[Browsable(false)]
         public uint ID
         {
             get { return _module.moduleID.TVal; }
             set { _module.moduleID.TVal = value; }
-            //get { return _id; }
-            //set { _id = value; }
         }
-
-        //need to turn this into a type of product
-        //that way when it is converted into a string it con infer from the 
-        //[Category("Module"), PropertyOrder(1)]
-        //[DisplayName("Module Name")]
-        //[Description("Module Name")]
-        //[Browsable(true)]
-        //[TypeConverter(typeof(ModuleNameConverter))]        
+     
         public virtual string Name
         {
             //need to translate the id to name;
-            get { return _name; }
+            get { return CreatorForm.s_CommLink.GetModuleName(_productID, ID); }
             set 
             {
                 if ((value as string).Equals("{New Module}"))
@@ -80,96 +90,39 @@ namespace Client.Creator
             }
         }
 
-        //[Category("Module"), PropertyOrder(3)]
-        //[DisplayName("Units")]
-        //[Description("Units")]
-        //[Browsable(true)]
         public uint Units
         {
-            get { return _module.moduleValue.TVal; } //_units; }
+            get { return _module.moduleValue.TVal; }
             set { _module.moduleValue.TVal = value; }
-            //set { _units = value; }
         }
 
-        //[Category("Module"), PropertyOrder(4)]
-        //[DisplayName("AppInstance")]
-        //[Description("AppInstance")]
-        //[Browsable(true)]
         public uint AppInstance
         {
             get{ return _module.moduleAppInstance.TVal;}
             set { _module.moduleAppInstance.TVal = value; }
-            //get { return _appInst; }
-            //set { _appInst = value; }
         }
 
-        //[Category("Module"), PropertyOrder(5)]
-        //[DisplayName("Expiration Date")]
-        //[Description("Expiration Date")]
-        //[Browsable(true)]
         public DateTime ExpirationDate
         {
             get { return _module.moduleExpirationDate.TVal; }
             set { _module.moduleExpirationDate.TVal = value; }
-            //get{return _expirationDate.Date;}
-            //set{_expirationDate = value;}
         }
 
         public Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState ModuleState
         {
             get { return _module.moduleState.TVal; }
             set { _module.moduleState.TVal = value; }
-            //get { return _moduleState; }
-            //set { _moduleState = value; }
         }
 
         public string OrderNumber
         {
             get { return _module.contractNumber.TVal; }
             set { _module.contractNumber.TVal = value; }
-            //get { return _orderNumber; }
-            //set { _orderNumber = value; }
         }
 
         public override string ToString()
         {
             return _name;
         }
-
-        ////hooks up to name property of ModuleProperty
-        //internal class ModuleNameConverter : StringConverter
-        //{
-        //    public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
-        //    {
-        //        //true means show a combobox
-        //        return true;
-        //    }
-
-        //    public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
-        //    {
-        //        //true will limit to list. false will show the list, but allow free-form entry
-        //        return true;
-        //    }
-        //    //needs to know the product the modules belong to
-        //    //where can I get that information
-        //    //modulenameconverter placed on the collection
-        //    public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        //    {
-        //        //return all values from software spec
-        //        List<string> moduleList = new List<string>();
-        //        GlobalSoftwareSpec globalSwSpec = new GlobalSoftwareSpec();
-        //        foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in globalSwSpec.softwareSpec.productSpecMap.TVal.Values)
-        //        {
-        //            if (productSpec.productID == _productID)
-        //            {
-        //                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-        //                {
-        //                    moduleList.Add(moduleSpec.moduleName);
-        //                }
-        //            }
-        //        }
-        //        return new StandardValuesCollection(moduleList.ToArray());
-        //    }
-        //}
     }
 }

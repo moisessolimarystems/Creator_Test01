@@ -15,6 +15,131 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PermissionsTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class PermissionsTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string pt_loginField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<bool> pt_create_modify_keyField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<bool> pt_extension_pwdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<bool> pt_version_pwdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<bool> pt_module_pwdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<bool> pt_permanent_pwdField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string pt_login {
+            get {
+                return this.pt_loginField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.pt_loginField, value) != true)) {
+                    this.pt_loginField = value;
+                    this.RaisePropertyChanged("pt_login");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public System.Nullable<bool> pt_create_modify_key {
+            get {
+                return this.pt_create_modify_keyField;
+            }
+            set {
+                if ((this.pt_create_modify_keyField.Equals(value) != true)) {
+                    this.pt_create_modify_keyField = value;
+                    this.RaisePropertyChanged("pt_create_modify_key");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public System.Nullable<bool> pt_extension_pwd {
+            get {
+                return this.pt_extension_pwdField;
+            }
+            set {
+                if ((this.pt_extension_pwdField.Equals(value) != true)) {
+                    this.pt_extension_pwdField = value;
+                    this.RaisePropertyChanged("pt_extension_pwd");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public System.Nullable<bool> pt_version_pwd {
+            get {
+                return this.pt_version_pwdField;
+            }
+            set {
+                if ((this.pt_version_pwdField.Equals(value) != true)) {
+                    this.pt_version_pwdField = value;
+                    this.RaisePropertyChanged("pt_version_pwd");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public System.Nullable<bool> pt_module_pwd {
+            get {
+                return this.pt_module_pwdField;
+            }
+            set {
+                if ((this.pt_module_pwdField.Equals(value) != true)) {
+                    this.pt_module_pwdField = value;
+                    this.RaisePropertyChanged("pt_module_pwd");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public System.Nullable<bool> pt_permanent_pwd {
+            get {
+                return this.pt_permanent_pwdField;
+            }
+            set {
+                if ((this.pt_permanent_pwdField.Equals(value) != true)) {
+                    this.pt_permanent_pwdField = value;
+                    this.RaisePropertyChanged("pt_permanent_pwd");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="TransactionTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class TransactionTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -563,131 +688,6 @@ namespace Client.Creator.CreatorService {
                 if ((object.ReferenceEquals(this.DestNameField, value) != true)) {
                     this.DestNameField = value;
                     this.RaisePropertyChanged("DestName");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="PermissionsTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
-    [System.SerializableAttribute()]
-    public partial class PermissionsTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string pt_loginField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<bool> pt_create_modify_keyField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<bool> pt_extension_pwdField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<bool> pt_version_pwdField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<bool> pt_module_pwdField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Nullable<bool> pt_permanent_pwdField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string pt_login {
-            get {
-                return this.pt_loginField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.pt_loginField, value) != true)) {
-                    this.pt_loginField = value;
-                    this.RaisePropertyChanged("pt_login");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
-        public System.Nullable<bool> pt_create_modify_key {
-            get {
-                return this.pt_create_modify_keyField;
-            }
-            set {
-                if ((this.pt_create_modify_keyField.Equals(value) != true)) {
-                    this.pt_create_modify_keyField = value;
-                    this.RaisePropertyChanged("pt_create_modify_key");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public System.Nullable<bool> pt_extension_pwd {
-            get {
-                return this.pt_extension_pwdField;
-            }
-            set {
-                if ((this.pt_extension_pwdField.Equals(value) != true)) {
-                    this.pt_extension_pwdField = value;
-                    this.RaisePropertyChanged("pt_extension_pwd");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public System.Nullable<bool> pt_version_pwd {
-            get {
-                return this.pt_version_pwdField;
-            }
-            set {
-                if ((this.pt_version_pwdField.Equals(value) != true)) {
-                    this.pt_version_pwdField = value;
-                    this.RaisePropertyChanged("pt_version_pwd");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public System.Nullable<bool> pt_module_pwd {
-            get {
-                return this.pt_module_pwdField;
-            }
-            set {
-                if ((this.pt_module_pwdField.Equals(value) != true)) {
-                    this.pt_module_pwdField = value;
-                    this.RaisePropertyChanged("pt_module_pwd");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public System.Nullable<bool> pt_permanent_pwd {
-            get {
-                return this.pt_permanent_pwdField;
-            }
-            set {
-                if ((this.pt_permanent_pwdField.Equals(value) != true)) {
-                    this.pt_permanent_pwdField = value;
-                    this.RaisePropertyChanged("pt_permanent_pwd");
                 }
             }
         }
@@ -1301,6 +1301,15 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPermissionsByUser", ReplyAction="http://tempuri.org/ICreator/GetPermissionsByUserResponse")]
+        Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByPacketID", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByPacketIDResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int packetID);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetNewTransactionsByLicenseNameResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licenseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrder", ReplyAction="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrderResponse")]
         void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID);
         
@@ -1391,9 +1400,6 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteDestinationName", ReplyAction="http://tempuri.org/ICreator/DeleteDestinationNameResponse")]
         void DeleteDestinationName(Client.Creator.CreatorService.DestinationNameTable destName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPermissionsByUser", ReplyAction="http://tempuri.org/ICreator/GetPermissionsByUserResponse")]
-        Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
         
@@ -1436,6 +1442,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLastGroupID", ReplyAction="http://tempuri.org/ICreator/GetLastGroupIDResponse")]
         uint GetLastGroupID(uint custID, uint destID);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseCountByDestName", ReplyAction="http://tempuri.org/ICreator/GetLicenseCountByDestNameResponse")]
+        int GetLicenseCountByDestName(uint custID, uint destID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLastDestinationID", ReplyAction="http://tempuri.org/ICreator/GetLastDestinationIDResponse")]
         uint GetLastDestinationID(uint custID);
         
@@ -1449,10 +1458,13 @@ namespace Client.Creator.CreatorService {
         bool IsLicenseUpdated(string licenseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseCountByType", ReplyAction="http://tempuri.org/ICreator/GetLicenseCountByTypeResponse")]
-        int GetLicenseCountByType(uint custID, uint destID, uint groupId, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
+        int GetLicenseCountByType(uint custID, uint destID, uint groupID, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDerivedLicenseCount", ReplyAction="http://tempuri.org/ICreator/GetDerivedLicenseCountResponse")]
+        int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GenerateLicensePacket", ReplyAction="http://tempuri.org/ICreator/GenerateLicensePacketResponse")]
-        void GenerateLicensePacket(string packetName, string licenseName, string comments, ref string verificationCode, ref byte[] newByteArrayLicensePacket, string user);
+        void GenerateLicensePacket(string packetName, string licenseName, System.DateTime expDate, string comments, ref string verificationCode, ref byte[] newByteArrayLicensePacket, string user);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/KeyEnumerate", ReplyAction="http://tempuri.org/ICreator/KeyEnumerateResponse")]
         System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> KeyEnumerate();
@@ -1483,12 +1495,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeletePacket", ReplyAction="http://tempuri.org/ICreator/DeletePacketResponse")]
         void DeletePacket(Client.Creator.CreatorService.PacketTable packet);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByPacketID", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByPacketIDResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int packetID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetNewTransactionsByLicenseNameResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licenseName);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
@@ -1516,6 +1522,18 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user) {
+            return base.Channel.GetPermissionsByUser(user);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int packetID) {
+            return base.Channel.GetTransactionsByPacketID(packetID);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licenseName) {
+            return base.Channel.GetNewTransactionsByLicenseName(licenseName);
         }
         
         public void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID) {
@@ -1638,10 +1656,6 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteDestinationName(destName);
         }
         
-        public Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user) {
-            return base.Channel.GetPermissionsByUser(user);
-        }
-        
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {
             return base.Channel.GetAllCustomers(searchString, enableLoadOptions);
         }
@@ -1698,6 +1712,10 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetLastGroupID(custID, destID);
         }
         
+        public int GetLicenseCountByDestName(uint custID, uint destID) {
+            return base.Channel.GetLicenseCountByDestName(custID, destID);
+        }
+        
         public uint GetLastDestinationID(uint custID) {
             return base.Channel.GetLastDestinationID(custID);
         }
@@ -1714,12 +1732,16 @@ namespace Client.Creator.CreatorService {
             return base.Channel.IsLicenseUpdated(licenseName);
         }
         
-        public int GetLicenseCountByType(uint custID, uint destID, uint groupId, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType) {
-            return base.Channel.GetLicenseCountByType(custID, destID, groupId, licType);
+        public int GetLicenseCountByType(uint custID, uint destID, uint groupID, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType) {
+            return base.Channel.GetLicenseCountByType(custID, destID, groupID, licType);
         }
         
-        public void GenerateLicensePacket(string packetName, string licenseName, string comments, ref string verificationCode, ref byte[] newByteArrayLicensePacket, string user) {
-            base.Channel.GenerateLicensePacket(packetName, licenseName, comments, ref verificationCode, ref newByteArrayLicensePacket, user);
+        public int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType) {
+            return base.Channel.GetDerivedLicenseCount(custID, destID, groupID, licType);
+        }
+        
+        public void GenerateLicensePacket(string packetName, string licenseName, System.DateTime expDate, string comments, ref string verificationCode, ref byte[] newByteArrayLicensePacket, string user) {
+            base.Channel.GenerateLicensePacket(packetName, licenseName, expDate, comments, ref verificationCode, ref newByteArrayLicensePacket, user);
         }
         
         public System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> KeyEnumerate() {
@@ -1760,14 +1782,6 @@ namespace Client.Creator.CreatorService {
         
         public void DeletePacket(Client.Creator.CreatorService.PacketTable packet) {
             base.Channel.DeletePacket(packet);
-        }
-        
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int packetID) {
-            return base.Channel.GetTransactionsByPacketID(packetID);
-        }
-        
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licenseName) {
-            return base.Channel.GetNewTransactionsByLicenseName(licenseName);
         }
     }
 }

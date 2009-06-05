@@ -13,7 +13,7 @@ namespace CreatorData
             PermissionsTable userPermissions = null;
             using (CreatorDataContext db = new CreatorDataContext())
             {
-                db.ObjectTrackingEnabled = false;                
+                db.ObjectTrackingEnabled = false;
                 userPermissions = db.PermissionsTables.Where(c => c.pt_login.Equals(user)).SingleOrDefault();
                 if (userPermissions == null)
                 {

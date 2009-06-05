@@ -29,8 +29,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Image\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -79,6 +79,12 @@
     </Compile>
     <Compile Include="NoFlickerListView.designer.cs">
       <DependentUpon>NoFlickerListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SoftwareSpecViewerControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SoftwareSpecViewerControl.Designer.cs">
+      <DependentUpon>SoftwareSpecViewerControl.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

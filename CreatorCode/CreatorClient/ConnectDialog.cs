@@ -7,14 +7,17 @@ using System.Text;
 using System.Windows.Forms;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.ServiceModel;
+using Client.Creator.CreatorService;
+using System.Configuration;
+using System.ServiceModel.Configuration;
 
 namespace Client.Creator
 {
     public partial class ConnectDialog : Shared.VisualComponents.DialogBaseForm
     {
-        public ConnectDialog(CommunicationLink commLink)
+        public ConnectDialog()
         {
-            m_CommLink = commLink;
             m_ValidServer = false;
             InitializeComponent();
         }
@@ -29,6 +32,7 @@ namespace Client.Creator
                 ServerNameComboBox.Items.AddRange(serverList);
                 if (ServerNameComboBox.Items.Count > 0)
                     ServerNameComboBox.SelectedIndex = 0;
+                this.btnOk.Focus();
             }            
         }
 
@@ -41,52 +45,83 @@ namespace Client.Creator
             if (d == null)
                 e.Data = d = new ConnectDialogData();
 
-            if(!d.ServerList.Contains(ServerNameComboBox.Text))
-                d.ServerList.Add(ServerNameComboBox.Text);
+            if (!d.ServerList.Contains(ServerNameComboBox.Text))
+                d.ServerList.Insert(0, ServerNameComboBox.Text);
+            else
+            {
+                d.ServerList.Remove(ServerNameComboBox.Text);
+                d.ServerList.Insert(0, ServerNameComboBox.Text);
+            }
         }
 
         private void ServerNameComboBox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
             {   
-                this.btnOk.Focus(); //set focus to force validation
-                if(m_ValidServer)
+                ValidateServerNameComboBox();
+                if (m_ValidServer)
                     DialogResult = DialogResult.OK;
             }
             else if (e.KeyCode == Keys.Escape)
             {
-                this.ServerNameComboBox.CausesValidation = false;
                 DialogResult = DialogResult.Cancel;
             }
         }
 
-        private void ServerNameComboBox_Validated(object sender, EventArgs e)
+        public static string GetEndPointName()
         {
-            errorProvider1.SetError(this.ServerNameComboBox, ""); 
+            string endpointName = "Unknown";
+
+            Configuration appConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            ServiceModelSectionGroup serviceModel = ServiceModelSectionGroup.GetSectionGroup(appConfig);
+            BindingsSection bindings = serviceModel.Bindings;
+
+            ChannelEndpointElementCollection endpoints = serviceModel.Client.Endpoints;
+
+            for(int i=0; i<endpoints.Count; i++)
+            {
+                ChannelEndpointElement endpointElement = endpoints[i];
+                if (endpointElement.Binding == "netTcpBinding")
+                {
+                    endpointName = endpointElement.Name;
+                }
+            }
+
+            return endpointName;
         }
 
-        private void ServerNameComboBox_Validating(object sender, CancelEventArgs e)
+        private void ValidateServerNameComboBox()
         {
             Cursor.Current = Cursors.WaitCursor;
             try
             {
-                m_CommLink.Connect(ServerNameComboBox.Text);
+                Client.Creator.ServiceProxy.Service<ICreator>.IsValidHost(this.ServerNameComboBox.Text);
                 m_ValidServer = true;
             }
-            catch (COMException ex)
+            catch (Exception ex)
             {
-                e.Cancel = true;
                 ServerNameComboBox.Select(0, this.ServerNameComboBox.Text.Length);
 
                 // Set the ErrorProvider error with the text to display.
-                errorProvider1.SetError(this.ServerNameComboBox, "Failed to Connect to Specified Server");
+                errorProvider1.SetError(this.ServerNameComboBox, ex.Message);
             }
-            Cursor.Current = Cursors.Default;
+            Cursor.Current = Cursors.Default;    
+        }
+
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            ValidateServerNameComboBox();
+        }
+
+        private void ConnectDialog_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (DialogResult == DialogResult.OK)
+                if (!m_ValidServer)
+                    e.Cancel = true;
         }
 
         #region private members
 
-        private CommunicationLink m_CommLink;
         private Boolean m_ValidServer;
 
         #endregion

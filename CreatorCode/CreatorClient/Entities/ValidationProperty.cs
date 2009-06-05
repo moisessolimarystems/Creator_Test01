@@ -21,18 +21,22 @@ namespace Client.Creator
             _token = token;
         }
 
-        public void SetValidationProperty(ValidationProperty token)
-        {            
-            //_tokenType = token.TokenType;
-            //_tokenValue = token.TokenValue;                
-        }
-
         public override string Name
         {
             //need to translate the id to name;
             get { return System.Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), TokenType); }
         }
 
+        [Browsable(false)]
+        public bool IsAllowedRemoveToken
+        {
+            get
+            {
+                if (!_token.tokenType.TVal.Equals(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode))
+                    return true;
+                return false;
+            }
+        }
 
         [Browsable(false)]
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs ValidationToken

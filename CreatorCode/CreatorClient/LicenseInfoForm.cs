@@ -21,9 +21,12 @@ namespace Client.Creator
     {
         private Object selectedObject;
         private CommunicationLink m_CommLink;
+        private bool m_Validated;
 
+        #region Form Events
         public LicenseInfoForm(string title, ref CommunicationLink commLink)
         {
+            m_Validated = true;
             InitializeComponent();
             this.Text = title;
             licInfoTabControl.TabPages.Clear();
@@ -43,8 +46,7 @@ namespace Client.Creator
             else if (e.Data is OrderDialogData)
                 LoadOrderTabPage(e.Data as OrderDialogData);
             else
-                LoadHardwareKeyTabPage();
-            
+                LoadHardwareKeyTabPage();            
         }
 
         private void LicenseInfoForm_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
@@ -63,8 +65,9 @@ namespace Client.Creator
             else if (e.Data is OrderDialogData)
                 SaveOrderTabPage(e.Data as OrderDialogData);
             else
-                SaveHardwareKeyTabPage();                           
+                SaveHardwareKeyTabPage();
         }
+        #endregion
 
         #region Order Methods
 
@@ -79,7 +82,9 @@ namespace Client.Creator
         void LoadOrderTabPage(OrderDialogData orderData)
         {
             selectedObject = orderData as Object;
-            licInfoTabControl.TabPages.Add(orderTabPage);
+            //licInfoTabControl.TabPages.Add(orderTabPage);
+            topPanel.Controls.Clear();
+            orderGroupBox.Parent = topPanel;
             orderNumberTextBox.Text = orderData.OrderInfo.OrderNumber;
             //EnableOrderTabPage(true);
             List<OrderTable> orders;
@@ -164,39 +169,34 @@ namespace Client.Creator
         #endregion
 
         #region License Methods
-        //Create Std Lic
-        //Create Derived Lic
+
         private void LoadLicenseTabPage(LicenseDialogData licData)
         {
             string selectedDestName;
-            licInfoTabControl.TabPages.Add(LicenseTabPage);
+            //licInfoTabControl.TabPages.Add(LicenseTabPage);
+            topPanel.Controls.Clear();
+            licenseGroupBox.Parent = topPanel;
             //need to get next available value from DB for destination ID and group ID.
             selectedObject = licData.LicInfo as Object;
-            if (licData.LicInfo.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard ||
-               licData.LicInfo.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandardSubscription)
-            {
-                //1) When creating destnames, need to find out appropriate group IDs also.
+            if (licData.LicInfo.IsStandardLicenseType)
+            {               
                 Service<ICreator>.Use((client) =>
-                {                    
-                    IList<DestinationNameTable> destNames = client.GetDestNamesByCustID((int)licData.LicInfo.CustID);
+                {                
+                    IList<DestinationNameTable> destNames = client.GetDestNamesByCustID((int)licData.LicInfo.CustID).OrderBy(c => c.DestID).ToList();
                     foreach (DestinationNameTable dn in destNames)
                     {
-                        destNameComboBox.Items.Insert(destNameComboBox.Items.Count - 1, dn.DestName);
-                        if (dn.DestID == (uint)licData.LicInfo.DestID)
-                            selectedDestName = dn.DestName;
+                        destNameComboBox.Items.Add(dn.DestName);
                     }
-                    if (destNameComboBox.Items.Count == 1)
+                    if (destNameComboBox.Items.Count == 0) //add base customer
                     {
-                        //add base customer
                         selectedDestName = client.GetCustomer(licData.LicInfo.CustID.ToString(), false).SCRname;
                         DestinationNameTable baseDestination = new DestinationNameTable();
                         baseDestination.CustID = (int)licData.LicInfo.CustID;
                         baseDestination.DestID = (int)licData.LicInfo.DestID;
                         baseDestination.DestName = selectedDestName;
                         client.CreateDestinationName(baseDestination);
-                        destNameComboBox.Items.Insert(destNameComboBox.Items.Count - 1, selectedDestName);
+                        destNameComboBox.Items.Add(selectedDestName);
                     }
-                    destNameComboBox.SelectedIndex = 0;
                 });
                 licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard);
                 licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandardSubscription);                
@@ -207,7 +207,7 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {   
                     selectedDestName = client.GetCustomer(licData.LicInfo.CustID.ToString(), false).SCRname;
-                    destNameComboBox.Items.Insert(destNameComboBox.Items.Count - 1, selectedDestName);
+                    destNameComboBox.Items.Add(selectedDestName);
                     destNameComboBox.DropDownStyle = ComboBoxStyle.Simple;
                     destNameComboBox.Enabled = false;
                     //increment index for test/dev and disaster recovery
@@ -218,6 +218,9 @@ namespace Client.Creator
                 licTypeComboBox.DropDownStyle = ComboBoxStyle.Simple;
                 licTypeComboBox.Enabled = false;
             }
+            //User Options for destination names
+            destNameComboBox.Items.Add("<New...>");
+            destNameComboBox.Items.Add("<Edit...>");
             //license name
             licNameTextBox.Text = licData.LicInfo.Name;
             //select destination name
@@ -240,7 +243,9 @@ namespace Client.Creator
             selectedObject = tokenData.LicInfo as Object;
             //hardware token get value from database
             btnOk.Enabled = true;
-            licInfoTabControl.TabPages.Add(TokenTabPage);
+            //licInfoTabControl.TabPages.Add(TokenTabPage);
+            topPanel.Controls.Clear();
+            tokenGroupBox.Parent = topPanel;
             //enabled when new token, ttNone passed in
             tokenTypeComboBox.Enabled = (tokenData.Token.TokenType != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone) ? false : true;
             //load token
@@ -300,15 +305,18 @@ namespace Client.Creator
         #region Packet Methods
         private void LoadPacketTabPage(PacketDialogData packetData)
         {
-            licInfoTabControl.TabPages.Add(PacketTabPage);
+            topPanel.Controls.Clear();
+            packetGroupBox.Parent = topPanel;
             selectedObject = packetData.PacketInfo as Object;
             packetNameTextBox.Text = packetData.PacketInfo.Name;
-            packetDateTextBox.Text = packetData.PacketInfo.Date.ToShortDateString();
-            packetOutputPathTextBox.Text = Directory.GetCurrentDirectory();
+            packetDateTimePicker.Value = DateTime.Today.AddDays(7);
+            packetDateTimePicker.MinDate = packetDateTimePicker.Value;
+            packetOutputPathTextBox.Text = packetData.PacketInfo.OutputPath;
             packetDescriptTextBox.Text = packetData.PacketInfo.Description;
         }
         private void SavePacketTabPage(PacketDialogData packetData)
         {
+            packetData.ExpDate = packetDateTimePicker.Value;
             packetData.PacketInfo.OutputPath = packetOutputPathTextBox.Text;
             packetData.PacketInfo.Description = packetDescriptTextBox.Text;
         }
@@ -319,7 +327,9 @@ namespace Client.Creator
         {
             //Test/Dev modules should not exceed standard license modules
             //Need to grab license from database to find last 
-            licInfoTabControl.TabPages.Add(ModuleTabPage);
+            //licInfoTabControl.TabPages.Add(ModuleTabPage);
+            topPanel.Controls.Clear();
+            moduleGroupBox.Parent = topPanel;
             modNameComboBox.Enabled = false;
             //edit module
             if (moduleData.ModuleNames.Count != 0)
@@ -447,7 +457,9 @@ namespace Client.Creator
         private void LoadHardwareKeyTabPage()        
         {
             List<CustomerTable> custList = null;
-            licInfoTabControl.TabPages.Add(HardwareKeyTabPage);            
+            //licInfoTabControl.TabPages.Add(HardwareKeyTabPage);            
+            topPanel.Controls.Clear();
+            hardwareKeyGroupBox.Parent = topPanel;
             Service<ICreator>.Use((client) =>
             {
                 custList = client.GetAllCustomers("", false);
@@ -485,17 +497,8 @@ namespace Client.Creator
             licInfo.LicType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)licTypeComboBox.SelectedItem;
             Service<ICreator>.Use((client) => 
             {
-                if (licInfo.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard || 
-                    licInfo.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandardSubscription)
-                {   //reset maximum values for DestID, GroupID and set groupID to next available for standard license.
-                    licInfo.GroupID = client.GetNextGroupID(licInfo.CustID, licInfo.DestID);
-                }
-                //else
-                //{   //reset maximum values for DestID, GroupID to standard license greatest values.
-                //    //licGroupIDNumericUpDown.Enabled = true;
-                //    //licDestIDNumericUpDown.Maximum = client.GetLastDestinationID(licInfo.CustID);
-                //    //licGroupIDNumericUpDown.Maximum = client.GetLastGroupID(licInfo.CustID, licInfo.DestID);
-                //}                
+                if (licInfo.IsStandardLicenseType)                   
+                    licInfo.GroupID = client.GetNextGroupID(licInfo.CustID, licInfo.DestID);                               
                 licInfo.LicInfo.softwareLicTypeIndex.TVal = (uint)(client.GetLicenseCountByType(licInfo.CustID, licInfo.DestID, licInfo.GroupID, licInfo.LicType) + 1);
             });
             licNameTextBox.Text = licInfo.Name;
@@ -507,24 +510,47 @@ namespace Client.Creator
             LicenseProperty licInfo = selectedObject as LicenseProperty;
             Service<ICreator>.Use((client) => 
             {
-                if (destNameComboBox.Text == "Add Destination Name...")
+                if (destNameComboBox.Text == "<New...>")
                 {
-                    //launch Destination Name Editor
-                    using (DestinationNameEditor dlg = new DestinationNameEditor())
+                    using (NewDestinationName dlg = new NewDestinationName())
                     {
                         if (dlg.ShowDialog(this) == DialogResult.OK)
-                        {
-                            destNameComboBox.Items.Insert(destNameComboBox.Items.Count - 1, dlg.DestinationName);
-                            //create the new destination name for this customer
+                        {   //create the new destination name for this customer                                                    
                             DestinationNameTable newDestName = new DestinationNameTable();
                             newDestName.CustID = (int)licInfo.CustID;
                             newDestName.DestID = (int)client.GetNextDestinationID(licInfo.CustID);
                             newDestName.DestName = dlg.DestinationName;
                             client.CreateDestinationName(newDestName);
                             licInfo.DestID = (uint)newDestName.DestID;
-                            licInfo.DestName = newDestName.DestName;                                       
+                            licInfo.DestName = newDestName.DestName;
+                            destNameComboBox.Items.Insert(newDestName.DestID, dlg.DestinationName);
                             destNameComboBox.SelectedItem = dlg.DestinationName;
                         }
+                        else
+                        {
+                            destNameComboBox.SelectedIndex = 0;
+                        }
+                    }
+                }
+                else if (destNameComboBox.Text == "<Edit...>")
+                {
+                    using (EditDestinationName dlg = new EditDestinationName(licInfo, destNameComboBox.Items))
+                    {
+                        dlg.ShowDialog(this);
+                        if (dlg.Modified)
+                        {
+                            destNameComboBox.Items.Clear();
+                            IList<DestinationNameTable> destTables = client.GetDestNamesByCustID((int)licInfo.CustID).OrderBy(c => c.DestID).ToList();
+                            foreach(DestinationNameTable table in destTables)
+                            {
+                                destNameComboBox.Items.Add(table.DestName);                                
+                            }
+                            destNameComboBox.Items.Add("<New...>");
+                            destNameComboBox.Items.Add("<Edit...>");
+                        }
+                        licInfo.DestID = (uint)dlg.SelectedDestinationID;
+                        licInfo.DestName = dlg.SelectedDestinationName; 
+                        destNameComboBox.SelectedItem = dlg.SelectedDestinationName;
                     }
                 }
                 else
@@ -576,6 +602,31 @@ namespace Client.Creator
 
         #region TokenTabPage Events
 
+        private void keyNameListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tokenValueTextBox.Text = keyNameListBox.SelectedItem.ToString();
+        }
+
+        private void ValidateTokenForm()
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            m_Validated = true;
+            Service<ICreator>.Use((client) =>
+            {
+                LicenseProperty selectedLicense = selectedObject as LicenseProperty;
+                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
+                if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
+                {
+                    m_Validated = false;
+                    this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
+
+                    // Set the ErrorProvider error with the text to display.
+                    errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+                }
+            });
+            Cursor.Current = Cursors.Default; 
+        }
+
         private void CustomerComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Service<ICreator>.Use((client) => 
@@ -590,7 +641,9 @@ namespace Client.Creator
         private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {   
             LicenseProperty selectedOrder = selectedObject as LicenseProperty;      
-            keyNameGroupBox.Visible = false;
+            //keyNameGroupBox.Visible = false;
+            keyNameListBox.Visible = false;
+            availableHWKeyLabel.Visible = false;
             tokenValueTextBox.Enabled = false;
             btnOk.Enabled = false;
             if (tokenTypeComboBox.Enabled)
@@ -611,8 +664,9 @@ namespace Client.Creator
                     });
                 }
                 if(keyNameListBox.Items.Count > 0)
-                    keyNameListBox.SelectedIndex = 0;
-                keyNameGroupBox.Visible = true;
+                    keyNameListBox.SelectedIndex = 0;                
+                keyNameListBox.Visible = true;
+                availableHWKeyLabel.Visible = true;
             }
             else
             {                
@@ -685,8 +739,6 @@ namespace Client.Creator
             btnOk.Enabled = false;
             loadingCircle1.Visible = true;
             loadingCircle1.Active = true;
-            //rogramBtn.Enabled = false;
-            //refreshBtn.Enabled = false;
         }
 
         private void OnRefreshedKey(IList<SolimarLicenseProtectionKeyInfo> keys)
@@ -721,19 +773,6 @@ namespace Client.Creator
             }
             loadingCircle1.Active = false;
             loadingCircle1.Visible = false;
-            //refreshBtn.Enabled = true;                         
-            //if (keyNameListBox.Items.Count < 1)
-            //{
-            //    programBtn.Enabled = false;
-            //}
-            //else
-            //{
-            //    keyNameListBox.SelectedIndex = 0;
-            //    programBtn.Enabled = true;
-            //}
-            //loadingCircle1.Active = false;
-            //loadingCircle1.Visible = false;
-            //refreshBtn.Enabled = true;
         }
 
         private IList<SolimarLicenseProtectionKeyInfo> LoadKeyNameListBox()
@@ -745,6 +784,29 @@ namespace Client.Creator
             });
             return pkeyList;
         }
+
+        private void tokenValueTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
+            {
+                ValidateTokenForm();
+                if (m_Validated)                
+                    DialogResult = DialogResult.OK;
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                DialogResult = DialogResult.Cancel;
+            }
+        }
+
+        private void tokenTypeComboBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                DialogResult = DialogResult.Cancel;
+            }
+        }
+
         #endregion
 
         #region OrderTabPage Events
@@ -796,34 +858,6 @@ namespace Client.Creator
             //else
             //    orderDateTimePicker.Enabled = true;            
         }
-        #endregion
-
-        private void tokenValueTextBox_Validated(object sender, EventArgs e)
-        {
-            errorProvider1.SetError(this.tokenValueTextBox, "");
-        }
-
-        private void tokenValueTextBox_Validating(object sender, CancelEventArgs e)
-        {
-            Service<ICreator>.Use((client) =>
-            {
-                LicenseProperty selectedLicense = selectedObject as LicenseProperty;
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
-                if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
-                {
-                    e.Cancel = true;
-                    this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
-
-                    // Set the ErrorProvider error with the text to display.
-                    errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-                }
-            });
-        }
-
-        private void keyNameListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            tokenValueTextBox.Text = keyNameListBox.SelectedItem.ToString();
-        }
 
         private void expDateTextBox_TextChanged(object sender, EventArgs e)
         {
@@ -831,14 +865,27 @@ namespace Client.Creator
             {
                 Int32.Parse(expDateTextBox.Text);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Windows.Forms.MessageBox.Show("Please input a valid number");
                 expDateTextBox.SelectionStart = 0;
                 expDateTextBox.SelectionLength = expDateTextBox.Text.Length;
             }
         }
+        #endregion
 
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            if (licInfoTabControl.SelectedTab == TokenTabPage)
+                ValidateTokenForm();            
+        }
+
+        private void LicenseInfoForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (DialogResult == DialogResult.OK)
+                if (!m_Validated)
+                    e.Cancel = true;
+        }
     }
 
     #region LicenseDialogData class
@@ -869,6 +916,7 @@ namespace Client.Creator
     public class PacketDialogData : Shared.VisualComponents.DialogData
     {
         private PacketProperty m_PacketInfo;
+        private DateTime m_ExpDate;
 
         #region Constructors
 
@@ -884,6 +932,12 @@ namespace Client.Creator
         {
             get { return this.m_PacketInfo; }
             set { this.m_PacketInfo = value; }
+        }
+
+        public DateTime ExpDate
+        {
+            get { return m_ExpDate; }
+            set { m_ExpDate = value; }
         }
         #endregion
     }

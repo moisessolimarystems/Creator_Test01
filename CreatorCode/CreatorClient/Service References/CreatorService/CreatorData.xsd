@@ -1,5 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/CreatorData" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CreatorData" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="PermissionsTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="pt_login" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="pt_create_modify_key" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_extension_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_version_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_module_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_permanent_pwd" nillable="true" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PermissionsTable" nillable="true" type="tns:PermissionsTable" />
+  <xs:complexType name="ArrayOfTransactionTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TransactionTable" nillable="true" type="tns:TransactionTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTransactionTable" nillable="true" type="tns:ArrayOfTransactionTable" />
   <xs:complexType name="TransactionTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -66,17 +83,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DestinationNameTable" nillable="true" type="tns:DestinationNameTable" />
-  <xs:complexType name="PermissionsTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="pt_login" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="pt_create_modify_key" nillable="true" type="xs:boolean" />
-      <xs:element minOccurs="0" name="pt_extension_pwd" nillable="true" type="xs:boolean" />
-      <xs:element minOccurs="0" name="pt_version_pwd" nillable="true" type="xs:boolean" />
-      <xs:element minOccurs="0" name="pt_module_pwd" nillable="true" type="xs:boolean" />
-      <xs:element minOccurs="0" name="pt_permanent_pwd" nillable="true" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="PermissionsTable" nillable="true" type="tns:PermissionsTable" />
   <xs:complexType name="ArrayOfCustomerTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="CustomerTable" nillable="true" type="tns:CustomerTable" />
@@ -151,12 +157,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LicenseTable" nillable="true" type="tns:LicenseTable" />
-  <xs:complexType name="ArrayOfTransactionTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="TransactionTable" nillable="true" type="tns:TransactionTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfTransactionTable" nillable="true" type="tns:ArrayOfTransactionTable" />
   <xs:complexType name="ArrayOfPacketTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />

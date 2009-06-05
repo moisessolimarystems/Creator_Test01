@@ -139,33 +139,20 @@ namespace Client.Creator
         //2) clean up add-on order node and listview after saving license.
         public void SetAddOnToPerm(string orderNumber, string parentOrderNumber)
         {            
-            //find permanent order number
-            //string permOrder = "";
-            //foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
-            //{
-            //    if (module.moduleState.TVal.Equals(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm))
-            //    {
-            //        permOrder = module.contractNumber.TVal;
-            //        break;
-            //    }
-            //}
-            //if (permOrder.Length > 0)
-            //{
-                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
+            {
+                //remove any non default module
+                if (module.contractNumber.TVal.Equals(orderNumber))
                 {
-                    //remove any non default module
-                    if (module.contractNumber.TVal.Equals(orderNumber))
-                    {
-                        //module value, module app instance
-                        if (module.moduleState.TVal.Equals(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn))
-                        {                            
-                            module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm;
-                            module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
-                            module.contractNumber.TVal = parentOrderNumber;
-                        }
+                    //module value, module app instance
+                    if (module.moduleState.TVal.Equals(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn))
+                    {                            
+                        module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm;
+                        module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
+                        module.contractNumber.TVal = parentOrderNumber;
                     }
                 }
-            //}
+            }
         }
 
         public void SetPermToTrial(string orderNumber)
@@ -271,36 +258,4 @@ namespace Client.Creator
             return base.ConvertFrom(context, info, value);
         }
     }
-
-    //public class VersionConverter : ExpandableObjectConverter
-    //{
-    //    public override bool CanConvertFrom(ITypeDescriptorContext context, Type t)
-    //    {
-    //        if (t == typeof(string))
-    //            return true;
-    //        return base.CanConvertFrom(context, t);
-    //    }
-
-    //    public override Object ConvertFrom(ITypeDescriptorContext context, CultureInfo info, Object value)
-    //    {
-    //        //Debug.WriteLine("ConvertFrom: ");
-    //        if (value is String)
-    //        {
-    //            return new CSOptions((String)value, true);
-    //        }
-    //        return base.ConvertFrom(context, info, value);
-    //    }
-
-    //    public override Object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destType)
-    //    {
-    //        Debug.WriteLine(String.Format("ConvertTo: {0}", destType.AssemblyQualifiedName));
-    //        if (destType == typeof(string))
-    //        {
-    //            if (value != null)
-    //                return ((CSOptions)value).StrValue;
-    //            return String.Empty;
-    //        }
-    //        return base.ConvertTo(context, culture, value, destType);
-    //    }
-    //}
 }

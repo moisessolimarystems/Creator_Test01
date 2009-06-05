@@ -80,6 +80,9 @@ namespace Client.Creator
             isBrowsable.SetValue(attrib, value);
         }
 
+        #region Properties
+
+        #region NonBrowsable Properties
         [Browsable(false)]
         [RefreshProperties(RefreshProperties.All)]
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType ProductLicenseType
@@ -120,6 +123,15 @@ namespace Client.Creator
             set { _orderRec.OrderIndex = value; }
         }
 
+        [Browsable(false)]
+        public ProductProperty Product
+        {
+            get { return _product; }
+            set { _product = value; }
+        }
+        #endregion
+
+        #region Browsable Properties
         [Category("Order"), PropertyOrder(1)]
         [DisplayName("Order Number")]
         [ReadOnly(true)]
@@ -239,13 +251,6 @@ namespace Client.Creator
             set { _orderRec.Description = value; }
         }
 
-        [Browsable(false)]
-        public ProductProperty Product
-        {
-            get { return _product; }
-            set { _product = value; }
-        }
-
         [Category("Product"), PropertyOrder(1)]
         [DisplayName("Name")]
         public String ProductName
@@ -271,26 +276,29 @@ namespace Client.Creator
             }
         }
 
+        [Browsable(false)]
         [Category("Product"), PropertyOrder(3)]
-        [DisplayName("AppInstance")]
-        [Description("AppInstance")]
-        [Browsable(false)]        
+        [DisplayName("Application Instance")]
         public uint AppInstance
         {
-            get 
+            get
             {
-                return _product.Product.productAppInstance.TVal; 
+                return _product.Product.productAppInstance.TVal;
             }
-            set 
+            set
             {
                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.Product.moduleList.TVal)
                 {
                     module.moduleAppInstance.TVal = value;
                 }
-               _product.Product.productAppInstance.TVal = value; 
+                _product.Product.productAppInstance.TVal = value;
             }
         }
+        #endregion
+
+        #endregion
     }
+
 
     class DateTimeConverter : TypeConverter
     {
@@ -298,18 +306,20 @@ namespace Client.Creator
         public override object ConvertFrom(ITypeDescriptorContext context,
             System.Globalization.CultureInfo culture, object value)
         {
-            if (value.ToString() == "")
-            {
-                //isNull = true;
-                return null;
-            }
+            if (value.ToString() == "")            
+                return null;            
             else
             {
-                //isNull = false;
+                int nvResult;
                 if (!(context.Instance as OrderProperty).ExpirationDate.HasValue)
                     throw new Exception("Unable to set expiration date for permanent type");
-                return (context.Instance as OrderProperty).ExpirationDate.Value.AddDays(Int32.Parse((string)value));
-                //return Convert.ToDateTime(value);
+                if (Int32.TryParse((string)value, out nvResult))  //user enter number of days 
+                    return (context.Instance as OrderProperty).ExpirationDate.Value.AddDays(Int32.Parse((string)value));
+                else 
+                {   //user entered a new date value
+                    try { return DateTime.Parse((string)value); }
+                    catch (FormatException ex) { throw new Exception("Invalid Date Format"); }
+                }        
             }
         }
 

@@ -21,7 +21,7 @@ namespace Service.Creator
         #region Customer OperationContracts
         // TODO: Add your service operations here
         [OperationContract]
-        IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions); //int pageNumber, int pageSize, bool enableLoadOptions);
+        IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
 
         [OperationContract]
         int GetCustomerCount(string searchString, bool enableLoadOptions);
@@ -66,10 +66,10 @@ namespace Service.Creator
         uint GetLastGroupID(uint custID, uint destID);
 
         [OperationContract]
-        uint GetLastDestinationID(uint custID);
+        int GetLicenseCountByDestName(uint custID, uint destID);
 
-        //[OperationContract]
-        //uint GetNextDestinationID(uint custID);
+        [OperationContract]
+        uint GetLastDestinationID(uint custID);
 
         [OperationContract]
         IList<LicenseTable> GetLicencesByConditions(IList<Condition> conditionList);
@@ -81,10 +81,13 @@ namespace Service.Creator
         bool IsLicenseUpdated(string licenseName); 
 
         [OperationContract]
-        int GetLicenseCountByType(uint custID, uint destID, uint groupId, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
+        int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
 
         [OperationContract]
-        void GenerateLicensePacket(string packetName, string licenseName, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
+        int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
+
+        [OperationContract]
+        void GenerateLicensePacket(string packetName, string licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
 
         [OperationContract]
         IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate();

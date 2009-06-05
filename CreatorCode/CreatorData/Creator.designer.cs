@@ -1789,7 +1789,7 @@ namespace CreatorData
 			this.Initialize();
 		}
 		
-		[Column(Storage="_pId", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		[Column(Storage="_pId", DbType="Int NOT NULL", IsPrimaryKey=true, UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=1)]
 		public int pId
 		{
@@ -1810,7 +1810,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_pVersion", DbType="Int NOT NULL")]
+		[Column(Storage="_pVersion", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=2)]
 		public int pVersion
 		{
@@ -1831,7 +1831,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_pName", DbType="VarChar(50)")]
+		[Column(Storage="_pName", DbType="VarChar(50)", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=3)]
 		public string pName
 		{
@@ -2120,7 +2120,7 @@ namespace CreatorData
 			this.Initialize();
 		}
 		
-		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=1)]
 		public int ID
 		{
@@ -2141,7 +2141,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_CustID", DbType="Int NOT NULL")]
+		[Column(Storage="_CustID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=2)]
 		public int CustID
 		{
@@ -2162,7 +2162,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_DestID", DbType="Int NOT NULL")]
+		[Column(Storage="_DestID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=3)]
 		public int DestID
 		{
@@ -2183,7 +2183,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_DestName", DbType="VarChar(50) NOT NULL", CanBeNull=false)]
+		[Column(Storage="_DestName", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=4)]
 		public string DestName
 		{

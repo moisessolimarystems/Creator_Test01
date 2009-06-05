@@ -8,17 +8,11 @@ namespace Client.Creator.ServiceProxy
     /// </summary>
     public delegate void UseServiceDelegate<T>(T proxy); 
 
-    /// <summary>
-    /// A helper class to run code using a WCF client proxy
-    /// 
-    /// This weird class came from 
-    /// http://www.iserviceoriented.com/blog/post/Indisposable+-+WCF+Gotcha+1.aspx
-    /// </summary>
     public static class Service<T>
     {
-        #region Static Fields
-        public static EndpointAddress address; // = new EndpointAddress(new Uri(string.Format("net.tcp://{0}:{1}/Service1", "achou2", "9090")), EndpointIdentity.CreateSpnIdentity("Service1"));               
+        #region Static Fields             
         public static ChannelFactory<T> _channelFactory = new ChannelFactory<T>("CreatorServiceTcp");        
+        //public static 
         #endregion
 
         #region Methods
@@ -29,16 +23,17 @@ namespace Client.Creator.ServiceProxy
         /// <param name="codeBlock">The code to run using the WCF Proxy</param>
         public static void Use(UseServiceDelegate<T> codeBlock)
         {
-            //ChannelFactory<T> _channelFactory = new ChannelFactory<T>("NetTcpBinding_IService1", address);              
-            //_channelFactory.Endpoint.Address = new EndpointAddress(new Uri(string.Format("net.tcp://{0}:{1}/Creator", "achou2", "9091")), EndpointIdentity.CreateSpnIdentity("Creator")); ;
-            IClientChannel proxy = (IClientChannel)_channelFactory.CreateChannel();
-            proxy.Open();
-            bool success = false; 
-            try 
-            { 
-                codeBlock((T)proxy); 
-                proxy.Close(); 
-                success = true; 
+            IClientChannel proxy = (IClientChannel)_channelFactory.CreateChannel();            
+            bool success = false;
+            try
+            {
+                codeBlock((T)proxy);
+                proxy.Close();
+                success = true;
+            }
+            catch (FaultException<EndpointNotFoundException> eex)
+            {
+                Console.WriteLine("Client FaulException<EndpointNotFoundException>");
             }
             catch (FaultException<ApplicationException> dex)
             {
@@ -63,6 +58,32 @@ namespace Client.Creator.ServiceProxy
                     proxy.Abort();
                 }
             }
+        }
+
+        public static bool IsValidHost(string hostName)
+        {
+            bool bValidHost = false;
+            ChannelFactory<T> _channelFactory = new ChannelFactory<T>("CreatorServiceTcp",
+                                                                       new EndpointAddress(new Uri("net.tcp://" + hostName + ":9091/Creator/tcp")));
+            IClientChannel proxy = (IClientChannel)_channelFactory.CreateChannel();
+            try
+            {
+                proxy.Open();
+                proxy.Close();
+                bValidHost = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (!bValidHost)
+                {
+                    proxy.Abort();
+                }
+            }
+            return bValidHost;
         }
         #endregion
     }

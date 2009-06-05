@@ -10,12 +10,7 @@ namespace Client.Creator
     [TypeConverter(typeof(PropertySorterTypeConverter))]
     public class PacketProperty
     {
-        //private string _name;
-        //private string _description;
-        //private DateTime _date;
-        private string _outputPath;
-        ////private string _user;
-        
+        private string _outputPath;        
         private PacketTable _packetData;
 
         enum Status
@@ -31,11 +26,8 @@ namespace Client.Creator
             _packetData.PacketComments = newDescription;
             _packetData.DateCreated = newDate;
             _packetData.UserName = newUser;
-            //_name = newName;
-            //_description = newDescription;
-            //_date = newDate;
+
             _outputPath = newOutputPath;
-            //_user = newUser;
         }
 
         [Category("Packet"), PropertyOrder(1)]

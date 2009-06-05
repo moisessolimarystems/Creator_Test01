@@ -184,6 +184,7 @@ namespace Client.Creator
         #endregion
 
     }
+
     class ListViewColumnSorter : IComparer
     {
         #region Private Variables
@@ -199,6 +200,16 @@ namespace Client.Creator
         /// Case insensitive comparer object
         /// </summary>
         private CaseInsensitiveComparer ObjectCompare;
+        /// <summary>
+        /// Specifies whether or not to group sort
+        /// </summary>
+        private bool GroupToSort;
+        /// <summary>
+        /// Declare a Hashtable array in which to store the groups.
+        /// </summary>
+        private Hashtable[] groupTables;
+
+
         #endregion
 
         #region Constructor
@@ -229,14 +240,19 @@ namespace Client.Creator
         {
             int compareResult;
             ListViewItem listviewX, listviewY;
-
+          
             // Cast the objects to be compared to ListViewItem objects
-            listviewX = (ListViewItem)x;
-            listviewY = (ListViewItem)y;
-
-            // Compare the two items           
-            compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
-
+            //if (GroupToSort)
+            //{
+            //    compareResult = String.Compare(((ListViewGroup)x).Header, ((ListViewGroup)y).Header);               
+            //}
+            //else
+            //{
+                listviewX = (ListViewItem)x;
+                listviewY = (ListViewItem)y;
+                // Compare the two items           
+                compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+            //}
             // Calculate correct return value based on object comparison
             if (OrderOfSort == SortOrder.Ascending)
             {
@@ -254,6 +270,8 @@ namespace Client.Creator
                 return 0;
             }
         }
+
+
 
         public void ResetProperties()
         {
@@ -280,6 +298,12 @@ namespace Client.Creator
         {
             get { return OrderOfSort; }
             set { OrderOfSort = value; }
+        }
+
+        public bool GroupSort
+        {
+            get { return GroupToSort; }
+            set { GroupToSort = value; }
         }
         #endregion
     }

@@ -37,7 +37,8 @@ namespace CreatorData
                                                                              d.SCRnumber.Equals(destname.CustID)).Count() > 0).ToList();
                         foreach (CustomerTable custRec in destList)
                         {
-                            list.Add(custRec);
+                            if(list.Where(cr => cr.SCRnumber == custRec.SCRnumber).Count() < 1)
+                                list.Add(custRec);                            
                         }
                     }                                                                                                        
                 }

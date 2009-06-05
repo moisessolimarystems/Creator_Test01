@@ -57,6 +57,7 @@ namespace Shared.VisualComponents
         private Color[] m_Colors;
         private double[] m_Angles;
         private StylePresets m_StylePreset;
+        private String m_DisplayText;
 
         // Properties ========================================================
         /// <summary>
@@ -81,6 +82,24 @@ namespace Shared.VisualComponents
             }
         }
 
+        /// <summary>
+        /// Gets or sets the display text.
+        /// </summary>
+        /// <value>The spoke thickness.</value>
+        [System.ComponentModel.Description("Gets or sets the display text."),
+        System.ComponentModel.Category("LoadingCircle")]
+        public String DisplayText
+        {
+            get
+            {
+                return m_DisplayText;
+            }
+            set
+            {
+                m_DisplayText = value;
+                Invalidate();
+            }
+        }
         /// <summary>
         /// Gets or sets the outer circle radius.
         /// </summary>
@@ -309,6 +328,11 @@ namespace Shared.VisualComponents
             if (m_NumberOfSpoke > 0)
             {
                 e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+                using (Font font1 = new Font("Times New Roman", 14, FontStyle.Bold, GraphicsUnit.Pixel))
+                {
+                    PointF pointF1 = new PointF(m_CenterPoint.X + m_OuterCircleRadius + font1.Size/2, m_CenterPoint.Y - font1.Size/2);
+                    e.Graphics.DrawString(m_DisplayText, font1, Brushes.DarkGray, pointF1);
+                }
 
                 int intPosition = m_ProgressValue;
                 for (int intCounter = 0; intCounter < m_NumberOfSpoke; intCounter++)
@@ -321,7 +345,8 @@ namespace Shared.VisualComponents
                     intPosition++;
                 }
             }
-
+            
+             
             base.OnPaint(e);
         }
 

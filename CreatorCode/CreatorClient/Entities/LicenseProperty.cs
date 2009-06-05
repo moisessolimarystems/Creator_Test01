@@ -53,6 +53,7 @@ namespace Client.Creator
             });
         }
 
+        #region Properties
         [Browsable(false)]
         [System.ComponentModel.RefreshProperties(RefreshProperties.All)]
         public PermissionsTable Permissions
@@ -76,12 +77,102 @@ namespace Client.Creator
             }
         }   
 
-
         [Browsable(false)]
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs LicInfo
         {
             get { return _licInfo; }
             set { _licInfo = value; }
+        }
+        [Browsable(false)]
+        public bool HasUpdates
+        {
+            get
+            {
+                bool bValue = false;
+                Service<ICreator>.Use((client) =>
+                {
+                    bValue = client.IsLicenseUpdated(Name);
+                });
+                return !bValue;
+            }
+        }
+        [Browsable(false)]
+        public bool IsModified
+        {
+            get
+            {
+                bool bValue = false;
+                Service<ICreator>.Use((client) =>
+                {
+                    bValue = client.IsLicenseModified(Name);
+                });
+                return bValue;
+            }
+        }
+        [Browsable(false)]
+        public bool IsStandardLicenseType
+        {
+            get
+            {
+                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard ||
+                    LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandardSubscription)
+                    return true;
+                return false;
+            }
+        }
+        [Browsable(false)]
+        public bool IsBackupLicenseType
+        {
+            get
+            {
+                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery ||
+                    LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
+                    return true;
+                return false;
+            }
+        }
+        [Browsable(false)]
+        public bool IsFailoverLicenseType
+        {
+            get
+            {
+                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
+                    return true;
+                return false;
+            }
+        }
+        [Browsable(false)]
+        public bool IsTestDevelopmentLicenseType
+        {
+            get
+            {
+                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
+                    return true;
+                return false;
+            }
+        }
+        [Browsable(false)]
+        public bool IsEnabled
+        {
+            get
+            {
+                if (_licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Count > 1)
+                    return true;
+                return false;
+            }
+        }
+        [Browsable(false)]
+        public int FailoverLicenseCount
+        {
+            get
+            {
+                int count = 0;
+                Service<ICreator>.Use((client) =>
+                {
+                    count = client.GetLicenseCountByType(CustID, DestID, GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover);
+                });
+                return count;
+            }
         }
 
         [Category("License"), PropertyOrder(1)]
@@ -177,5 +268,7 @@ namespace Client.Creator
             get { return _licInfo.activationAmountInDays.TVal; }
             set { _licInfo.activationAmountInDays.TVal = value; }
         }
+        #endregion
+
     }
 }
