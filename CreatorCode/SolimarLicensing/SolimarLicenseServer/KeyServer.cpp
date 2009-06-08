@@ -36,6 +36,19 @@ BYTE KeyServer::crypto_key_password_packet_password[] = {
 #include "..\common\keys\SolimarLicensingPacket.password.txt"
 };
 
+//A static BYTE [] still adds string to image, and can be seen in process explorer, this value is a GUID that is easily read
+//ECDBE6C6054746378D93B400527C21EE
+unsigned int KeyServer::packet_magic_number_int[] = {
+	0x45, 0x00, 0x43, 0x00, 0x44, 0x00, 0x42, 0x00,	// ECDB
+	0x45, 0x00, 0x36, 0x00, 0x43, 0x00, 0x36, 0x00,	// E6C6
+	0x30, 0x00, 0x35, 0x00, 0x34, 0x00, 0x37, 0x00,	// 0547
+	0x34, 0x00, 0x36, 0x00, 0x33, 0x00, 0x37, 0x00,	// 4637 
+	0x38, 0x00, 0x44, 0x00, 0x39, 0x00, 0x33, 0x00,	// 8D93
+	0x42, 0x00, 0x34, 0x00, 0x30, 0x00, 0x30, 0x00,	// B400
+	0x35, 0x00, 0x32, 0x00, 0x37, 0x00, 0x43, 0x00,	// 527C
+	0x32, 0x00, 0x31, 0x00, 0x45, 0x00, 0x45, 0x00,	// 21EE
+	0x00, 0x00
+};
 
 #pragma warning(disable:4355)
 //APCTimer::APCTimer(APCFunc pfunc, void* arg, long interval, initfunc, void* initarg);
@@ -48,6 +61,7 @@ void KeyServer::UpdateKeysThreadFunction(void* pvThis)
 	hr = pThis->ResynchronizeKeys();
 //OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Leave");
 }
+
 
 void KeyServer::HeartbeatCheckThreadFunction(void* pvThis)
 {
@@ -154,85 +168,124 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 //OutputDebugString(tmpbuf);
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
-		SafeMutex mutex2(KeyListLock);
-		SafeMutex mutex1(driver.keys_lock);
-		driver.RefreshKeyList();
-		if(driver.AtLeastOneParallelKey())
-			UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 
-		// first pass, add newly found keys
-		ProtectionKey* tmpProKey;
-		for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
-		{
-			if (keys.find(dkey->first)==keys.end())
+		KeyList tmpKeyList;
+		std::list<ProtectionKey*> deleteProtectionKeyList;
+		KeyServer::KeyList::iterator skeyIt = keys.begin();
+
+		{	//Scope for SafeMutex mutex2(KeyListLock);
+			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
+			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
+			SafeMutex mutex2(KeyListLock);
+			for(	skeyIt = keys.begin();
+					skeyIt != keys.end();
+					skeyIt++)
 			{
-				_bstr_t keyName = dkey->first;
-				//ProtectionKey tmpProKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
-				tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
-				long application_instances = 0;
-				tmpProKey->ApplicationInstanceCount(&application_instances);
-				if(application_instances > 1)	
-				{
-					//application_instances == virtual keys this single key will represent
-					for(int idx=1; idx<=application_instances; idx++)
-					{
-						wchar_t key_id[128];
-						_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
-						key_id[127]=0;
-
-						if (keys.find(key_id)==keys.end())	//Only add new keys
-						{
-							//Use Share Licensing - only the first key can use the shared licensing.
-							ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
-							tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
-							keys.insert(KeyList::value_type(key_id, tmpVirtProKey));
-							virtual_key_to_physical_key_list[key_id] = keyName;
-						}
-					}
-					delete tmpProKey;
-				}
-				else	//Only 1 Key
-				{
-					keys.insert(KeyList::value_type(dkey->first,tmpProKey));
-					virtual_key_to_physical_key_list[dkey->first] = dkey->first;
-				}
+				tmpKeyList.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
 			}
 		}
-		// second pass, remove keys that are no longer reported by the driver
-		KeyServer::KeyList::iterator skey=keys.begin();
-		while (skey!=keys.end())
-		{
-			if (driver.keys.find(virtual_key_to_physical_key_list[skey->first])==driver.keys.end())
+
+		{	//Scope for SafeMutex mutex1(driver.keys_lock);
+			SafeMutex mutex1(driver.keys_lock);
+			driver.RefreshKeyList();
+			if(driver.AtLeastOneParallelKey())
+				UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
+
+			// first pass, add newly found keys
+			ProtectionKey* tmpProKey;
+			for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
 			{
-				delete skey->second;
-				skey = keys.erase(skey);
+				if (tmpKeyList.find(dkey->first)==tmpKeyList.end())
+				{
+					_bstr_t keyName = dkey->first;
+					tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
+					long application_instances = 0;
+					tmpProKey->ApplicationInstanceCount(&application_instances);
+					if(application_instances > 1)	
+					{
+						//application_instances == virtual keys this single key will represent
+						for(int idx=1; idx<=application_instances; idx++)
+						{
+							wchar_t key_id[128];
+							_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
+							key_id[127]=0;
+
+							if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
+							{
+								//Use Share Licensing - only the first key can use the shared licensing.
+								ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
+								tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
+								tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
+								virtual_key_to_physical_key_list[key_id] = keyName;
+							}
+						}
+						delete tmpProKey;
+					}
+					else	//Only 1 Key
+					{
+						tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
+						virtual_key_to_physical_key_list[dkey->first] = dkey->first;
+					}
+				}
 			}
-			else
-				++skey;
+			// second pass, remove keys that are no longer reported by the driver
+			skeyIt=tmpKeyList.begin();
+			while (skeyIt!=tmpKeyList.end())
+			{
+				if (driver.keys.find(virtual_key_to_physical_key_list[skeyIt->first])==driver.keys.end())
+				{
+					deleteProtectionKeyList.insert(deleteProtectionKeyList.end(), skeyIt->second);
+					skeyIt = tmpKeyList.erase(skeyIt);
+				}
+				else
+					++skeyIt;
+			}
 		}
 
 		std::map<_bstr_t, ProtectionKey*> physicalKeyMap;// Performance optimization, used by virtual keys to look at instead of querying physical key.
 		// last pass, refresh all of the read-caches
-		for (skey = keys.begin(); skey!=keys.end(); ++skey)
+		for (skeyIt = tmpKeyList.begin(); skeyIt!=tmpKeyList.end(); ++skeyIt)
 		{
 			try
 			{
-				if(physicalKeyMap.find(skey->second->GetPhysicalKeyIdent()) != physicalKeyMap.end())
+				if(physicalKeyMap.find(skeyIt->second->GetPhysicalKeyIdent()) != physicalKeyMap.end())
 				{
 					//Physical key in cache, copy cells of physical key to this virtual key
-					skey->second->CopyCellCache(*(physicalKeyMap[skey->second->GetPhysicalKeyIdent()]));
+					skeyIt->second->CopyCellCache(*(physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()]));
 				}
 				else	
 				{
 					//Physical key not in cache, query the physical key
-					skey->second->UpdateAllCellsCache(bForceRefresh);
-					physicalKeyMap[skey->second->GetPhysicalKeyIdent()] = skey->second;
+					skeyIt->second->UpdateAllCellsCache(bForceRefresh);
+					physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()] = skeyIt->second;
 				}
 			}
 			catch (_com_error &e)
 			{
 				hr = e.Error();
 				break;
+			}
+		}
+
+
+		{	//Scope for SafeMutex mutex2(KeyListLock);
+			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
+			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
+			SafeMutex mutex2(KeyListLock);	
+			for(	skeyIt = tmpKeyList.begin();
+					skeyIt != tmpKeyList.end();
+					skeyIt++)
+			{
+				keys.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
+			}
+			tmpKeyList.clear();
+			while(!deleteProtectionKeyList.empty())
+			{
+				skeyIt = keys.find((*deleteProtectionKeyList.begin())->GetPhysicalKeyIdent());
+				if(skeyIt != keys.end())
+					keys.erase(skeyIt);
+				delete *deleteProtectionKeyList.begin();
+				deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
 			}
 		}
 	} // release the lock on the driver's key list
@@ -246,6 +299,11 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 // Top level functions
 HRESULT KeyServer::AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance, VARIANT_BOOL b_app_instance_lock_key)
 {
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"KeyServer::AddApplicationInstance (%s) application_instance: %s)", (BSTR)license_id, application_instance);
+//debug_buf[1023] = 0;
+//OutputDebugStringW(debug_buf);
+
 	SafeMutex mutex(KeyListLock);
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
@@ -460,7 +518,14 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		PasswordPacket packet;
 		wchar_t *pNextToken;
 		wchar_t* pToken(0);
-		if (!(pToken = wcstok_s(pPacketString1, L"\r\n",&pNextToken)) || wcscmp(pToken,L"ECDBE6C6054746378D93B400527C21EE")!=0) throw(E_FAIL);	//xxx
+
+		// verify magic number
+		_bstr_t magic_number;
+		magic_number = (wchar_t*)(&packet_magic_number_int[0]);
+		for(int idx=1; idx<32; idx++)
+			magic_number += (wchar_t*)(&packet_magic_number_int[2*idx]);
+		if (!(pToken = wcstok_s(pPacketString1, L"\r\n",&pNextToken)) || wcscmp(pToken,magic_number)!=0) throw(E_FAIL);	//xxx
+		
 		unsigned int expected_headers(0), expected_passwords(0);
 		if (!(pToken = wcstok_s(NULL, L"\r\n",&pNextToken))) throw(E_FAIL);
 		expected_headers = _wtoi(pToken);
@@ -836,7 +901,10 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	_bstr_t packet_string;
 	
 	// write the magic number
-	packet_string += L"ECDBE6C6054746378D93B400527C21EE\r\n";
+	packet_string = (wchar_t*)(&packet_magic_number_int[0]);
+	for(int idx=1; idx<32; idx++)
+		packet_string += (wchar_t*)(&packet_magic_number_int[2*idx]);
+	packet_string += L"\r\n";
 
 	// write the header information
 	packet_string += _bstr_t(_variant_t((long)password_packets[lid].headers.size()));
@@ -1197,6 +1265,23 @@ HRESULT KeyServer::KeyModuleLicenseInUse(BSTR license_id, BSTR key_ident, long m
 	}
 }
 
+HRESULT KeyServer::KeyModuleLicenseInUse_ByApp(BSTR license_id, BSTR key_ident, long module_ident, long* license_count)
+{
+	SafeMutex mutex(KeyListLock);
+
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	
+	if (key!=keys.end())
+	{
+		return key->second->ModuleLicenseInUse_ByApp(license_id, module_ident, license_count);
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+}
+
 HRESULT KeyServer::KeyModuleLicenseObtain(BSTR license_id, BSTR key_ident, long module_ident, long license_count)
 {
 	SafeMutex mutex(KeyListLock);
@@ -1488,12 +1573,47 @@ void KeyServer::HeartbeatCheck()
 
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
+			VARIANT vtAppInstanceList;
+			bool bFoundAppInstance = false;
+
+			////Trying to calculate the Application Instance that timed out
+			//for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
+			//{
+			//	hr = GetApplicationInstanceList(heartbeat->first, keyIt->first, &vtAppInstanceList);
+			//	if(SUCCEEDED(hr) && (vtAppInstanceList.vt & (VT_ARRAY | VT_VARIANT)))
+			//	{
+			//		VARIANT *pElement = 0;	//Vector returned with BSTR name, VARIANT_BOOL bLock
+			//		if (SUCCEEDED(SafeArrayAccessData(vtAppInstanceList.parray, (void**)&pElement)))
+			//		{
+			//			for(unsigned int idx=0; idx<(vtAppInstanceList.parray->rgsabound[0].cElements/2); idx++)
+			//			{
+			//				//if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE && wcscmp(m_applicationInstance, pElement[idx].bstrVal) == 0)
+			//				if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE)
+			//				{
+			//					bFoundAppInstance = true;
+			//					wchar_t debug_buf[1024];
+			//					_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - Application: %s - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", pElement[2*idx].bstrVal, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			//					debug_buf[1023] = 0;
+			//					OutputDebugStringW(debug_buf);
+			//					//app_instance_key_ident = pElement[2*idx].bstrVal;
+			//					//Comment out for testing
+			//					//break;	//There should only be one locked
+			//				}
+			//			}
+			//			SafeArrayUnaccessData(vtAppInstanceList.parray);
+			//		}
+			//	}
+			//	if(bFoundAppInstance == true)
+			//		break;
+			//}
+
 			//xxx debug
-			wchar_t debug_buf[1024];
-			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			debug_buf[1023] = 0;
-			OutputDebugStringW(debug_buf);
+			//wchar_t debug_buf[1024];
+			////_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			//_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			//debug_buf[1023] = 0;
+			//OutputDebugStringW(debug_buf);
+			
 
 			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
 			
