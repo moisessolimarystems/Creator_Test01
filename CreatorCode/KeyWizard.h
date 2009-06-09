@@ -202,6 +202,7 @@ __published:	// IDE-managed Components
         void __fastcall keyClassComboBoxChange(TObject *Sender);
         void __fastcall passwordComboBoxChange(TObject *Sender);
    void __fastcall ui_versionChange(TObject *Sender);
+        void __fastcall ui_versionExit(TObject *Sender);
 private:
         //
         // User declarations
@@ -291,6 +292,8 @@ private:
         //--------------------------------------------------//-
 public:		// User declarations
          __fastcall TKeyWizardFrm(SKeyRecord* key_record, TComponent* Owner);
+         bool IsValidVersionFormat(AnsiString strValue);
+         AnsiString DBFormatVersion(AnsiString strValue);
 
 
 };

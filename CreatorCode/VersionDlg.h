@@ -39,9 +39,10 @@ private:
 public:
 	//virtual __fastcall TDlgVersion(TComponent* AOwner):TForm(AOwner){}
    virtual __fastcall TDlgVersion(TComponent* AOwner);
-
    unsigned short getVersion(){return version;}
    void setDialog(unsigned short, unsigned short, bool);
+   bool IsValidVersionFormat(AnsiString strValue);
+   AnsiString DBFormatVersion(AnsiString strValue);
 
 BEGIN_MESSAGE_MAP
 END_MESSAGE_MAP( TForm )

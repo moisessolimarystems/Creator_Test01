@@ -32,17 +32,21 @@ __fastcall TDlgVersion::TDlgVersion(TComponent* AOwner)
 //==============================================================================
 void TDlgVersion::setDialog(unsigned short product_id, unsigned short current_version, bool DOStoNT)
 {
+   int majorVersion, minorVersion;
+
    //set initial_version
    init_version = current_version;
    //enable or disable users ability to convert a dos key to and nt key
    DOS_to_NT = DOStoNT;
    //initialize product and version display members
    ProductComboBox->ItemIndex = convertProductToIndex[product_id];
-
    //initialize version editbox with release version for current product
    version = lookup->getCurrentVersion(product_id, false);
-   VersionEdit->Text = Format("%4X", OPENARRAY(TVarRec,(version)));
-
+   majorVersion = ((int)version) >> 12;
+   //extract the last three bytes
+   minorVersion = (int)((((version & 0x0F00) >> 8) * 10) + (((version & 0x00F0) >> 4) * 1));
+   VersionEdit->Text = AnsiString::Format("%d.%d", OPENARRAY(TVarRec,(majorVersion,minorVersion)));
+   //VersionEdit->Text = Format("%4X", OPENARRAY(TVarRec,(version)));
    //if no product or version information is passed in, dialog is being used to
    //update a product version
    if(product_id==0 &&current_version==0)
@@ -69,6 +73,7 @@ void TDlgVersion::setDialog(unsigned short product_id, unsigned short current_ve
 //==============================================================================
 void __fastcall TDlgVersion::OKBtnClick(TObject *Sender)
 {
+   AnsiString dbVersion;
    //update version for product selected and exit dialog
    if(ALL_PRODUCTS)
    {
@@ -78,7 +83,17 @@ void __fastcall TDlgVersion::OKBtnClick(TObject *Sender)
    else
    {
       char *endptr;
-      version = static_cast<unsigned short>(strtol(VersionEdit->Text.c_str(), &endptr, 16));
+      if(!IsValidVersionFormat(VersionEdit->Text))
+      {
+          ModalResult = mrNone;
+          VersionEdit->SelectAll();
+          VersionEdit->SetFocus();
+          Application->MessageBox("Please enter a valid version.", "Invalid Entry", MB_OK );
+          return;
+      }
+      //convert input into hex format
+      dbVersion = DBFormatVersion(VersionEdit->Text);
+      version = static_cast<unsigned short>(strtol(dbVersion.c_str(), &endptr, 16));
 
       //if user does not have permission to convert a dos key to an nt key, verify version
       if( DOS_to_NT == false )
@@ -93,7 +108,9 @@ void __fastcall TDlgVersion::OKBtnClick(TObject *Sender)
 
       if( init_version >= version )
       {
-   	   ModalResult = mrNone;
+   	 ModalResult = mrNone;
+         VersionEdit->SelectAll();
+         VersionEdit->SetFocus();
          Application->MessageBox("New version must be greater than the current version.", "Invalid Entry", MB_OK );
       }
 
@@ -104,8 +121,12 @@ void __fastcall TDlgVersion::OKBtnClick(TObject *Sender)
 //==============================================================================
 void __fastcall TDlgVersion::ProductComboBoxChange(TObject *Sender)
 {
+   int majorVersion, minorVersion;
    version = lookup->getCurrentVersion(convertIndexToProduct[ProductComboBox->ItemIndex], false);
-   VersionEdit->Text = Format("%4X", OPENARRAY(TVarRec,(version)));
+   majorVersion = ((int)version) >> 12;
+   //extract the last three bytes
+   minorVersion = (int)((((version & 0x0F00) >> 8) * 10) + (((version & 0x00F0) >> 4) * 1));
+   VersionEdit->Text = AnsiString::Format("%d.%d", OPENARRAY(TVarRec,(majorVersion,minorVersion)));
 }
 
 //==============================================================================
@@ -115,8 +136,63 @@ void __fastcall TDlgVersion::ProductComboBoxChange(TObject *Sender)
 void __fastcall TDlgVersion::ApplyBtnClick(TObject *Sender)
 {
    char *endptr;
+   AnsiString dbVersion;
+   if(!IsValidVersionFormat(VersionEdit->Text))
+   {
+       ModalResult = mrNone;
+       VersionEdit->SelectAll();
+       VersionEdit->SetFocus();
+       Application->MessageBox("Please enter a valid version.", "Invalid Entry", MB_OK );
+       return;
+   }
+   dbVersion = DBFormatVersion(VersionEdit->Text);
+   //need to format user input to DB format x.x to x.xxx
    unsigned short tmp_version(static_cast<unsigned short>(strtol(VersionEdit->Text.c_str(), &endptr, 16)));
    lookup->updateVersion(convertIndexToProduct[ProductComboBox->ItemIndex], tmp_version);
+}
+
+//Expect strVersion to be valid X.X+ , minorVersion max of 2
+AnsiString TDlgVersion::DBFormatVersion(AnsiString strVersion)
+{
+    AnsiString majorVersion, minorVersion;
+    int pos;
+    pos = strVersion.AnsiPos(".");
+    majorVersion = AnsiString(strVersion.SubString(0,pos-1).ToInt());
+    minorVersion = AnsiString(strVersion.SubString(pos+1, strVersion.Length()-(majorVersion.Length())).ToInt());
+
+    if(minorVersion.Length() == 1)
+        minorVersion = "0" + minorVersion;
+    minorVersion= minorVersion + "0";
+    return majorVersion + minorVersion;
+}
+
+bool TDlgVersion::IsValidVersionFormat(AnsiString versionString)
+{
+    AnsiString majorVersion, minorVersion, tempString;
+    int count = 0, pos = 0, number = 0;
+    //find position of period
+    tempString = versionString;
+    do
+    {
+        pos = tempString.AnsiPos(".");
+        tempString = tempString.SubString(pos+1, tempString.Length()-pos);
+        if(pos != 0)
+            count++;
+    }
+    while(pos != 0);
+    if(count != 1)
+        return false;
+    else
+    {   //only one period ...split into major, minor
+        pos = versionString.AnsiPos(".");
+        majorVersion = versionString.SubString(0,pos-1);
+        if((StrToIntDef(majorVersion, -1) < 0) || (majorVersion.ToInt() < 1))
+            return false;
+        minorVersion = versionString.SubString(pos+1, versionString.Length()-(majorVersion.Length()));
+        if((minorVersion.Length() > 2) || (StrToIntDef(minorVersion, -1) < 0))
+            return false;
+    }
+    return true;
 }
 
 

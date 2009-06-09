@@ -14,210 +14,6 @@ object KeyWizardFrm: TKeyWizardFrm
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object StartPanel: TPanel
-    Left = 161
-    Top = 0
-    Width = 617
-    Height = 453
-    Align = alClient
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    TabOrder = 0
-    object Label5: TLabel
-      Left = 8
-      Top = 64
-      Width = 64
-      Height = 13
-      Caption = 'Product Type'
-    end
-    object Label6: TLabel
-      Left = 8
-      Top = 104
-      Width = 45
-      Height = 13
-      Caption = 'Key Type'
-    end
-    object Label1: TLabel
-      Left = 158
-      Top = 64
-      Width = 35
-      Height = 13
-      Caption = 'Version'
-    end
-    object DaysLabel: TLabel
-      Left = 158
-      Top = 104
-      Width = 24
-      Height = 13
-      Caption = 'Days'
-    end
-    object SystemEditLabel: TLabel
-      Left = 8
-      Top = 220
-      Width = 46
-      Height = 13
-      Caption = 'System Id'
-    end
-    object Label7: TLabel
-      Left = 8
-      Top = 263
-      Width = 43
-      Height = 13
-      Caption = 'Summary'
-    end
-    object eBONumberLabel: TLabel
-      Left = 158
-      Top = 216
-      Width = 61
-      Height = 13
-      Caption = 'eBO Number'
-    end
-    object keyClassLabel: TLabel
-      Left = 8
-      Top = 16
-      Width = 46
-      Height = 13
-      Caption = 'Key Class'
-    end
-    object passwordComboBoxLabel: TLabel
-      Left = 158
-      Top = 104
-      Width = 106
-      Height = 13
-      Caption = 'Exp Days/Counter Hrs'
-    end
-    object ProductComboBox: TComboBox
-      Left = 7
-      Top = 78
-      Width = 146
-      Height = 21
-      ItemHeight = 13
-      TabOrder = 0
-      OnChange = ProductComboBoxChange
-      Items.Strings = (
-        'Platinum'
-        'XImage NT'
-        'XImage 3.1/95'
-        'SOLsearcher'
-        'Connectivity'
-        'Legacy'
-        'iConvert'
-        'SOLsearcher Enterprise'
-        'SOLscript'
-        'SDX Designer'
-        'Quantum Server'
-        'Rubika'
-        'SOLfusion'
-        'SP/D Enterprise')
-    end
-    object keyTypeComboBox: TComboBox
-      Left = 7
-      Top = 119
-      Width = 146
-      Height = 21
-      ItemHeight = 13
-      TabOrder = 1
-      OnChange = keyTypeComboBoxChange
-    end
-    object ui_version: TMaskEdit
-      Left = 166
-      Top = 78
-      Width = 42
-      Height = 21
-      EditMask = 'A.AAA;0;_'
-      MaxLength = 5
-      TabOrder = 2
-      Text = '510B'
-      OnChange = ui_versionChange
-    end
-    object ui_days: TMaskEdit
-      Left = 166
-      Top = 119
-      Width = 43
-      Height = 21
-      TabOrder = 3
-      Text = '30'
-      OnChange = ui_daysChange
-    end
-    object DayUpDown: TUpDown
-      Left = 209
-      Top = 119
-      Width = 16
-      Height = 21
-      Associate = ui_days
-      Min = -10
-      Max = 90
-      Position = 30
-      TabOrder = 4
-      Wrap = False
-    end
-    object SelectModules: TCheckBox
-      Left = 272
-      Top = 32
-      Width = 289
-      Height = 17
-      Caption = 'Specify modules to be programed.'
-      TabOrder = 5
-      Visible = False
-      OnClick = SelectModulesClick
-    end
-    object SystemEdit: TEdit
-      Left = 7
-      Top = 234
-      Width = 117
-      Height = 21
-      TabOrder = 6
-      Text = 'SystemEdit'
-      OnChange = SystemEditChange
-    end
-    object KeySummary: TMemo
-      Left = 7
-      Top = 284
-      Width = 446
-      Height = 61
-      MaxLength = 254
-      TabOrder = 7
-    end
-    object eBONumberEditBox: TEdit
-      Left = 158
-      Top = 232
-      Width = 75
-      Height = 21
-      TabOrder = 8
-      Text = '0'
-      OnChange = eBONumberEditBoxChange
-    end
-    object keyClassComboBox: TComboBox
-      Left = 8
-      Top = 32
-      Width = 145
-      Height = 21
-      ItemHeight = 13
-      TabOrder = 9
-      OnChange = keyClassComboBoxChange
-      Items.Strings = (
-        'Parallel'
-        'USB')
-    end
-    object passwordComboBox: TComboBox
-      Left = 166
-      Top = 119
-      Width = 169
-      Height = 21
-      DropDownCount = 25
-      ItemHeight = 13
-      TabOrder = 10
-      OnChange = passwordComboBoxChange
-    end
-    object RemoteKey_CHB: TCheckBox
-      Left = 272
-      Top = 48
-      Width = 249
-      Height = 17
-      Caption = 'Remote Key'
-      TabOrder = 11
-    end
-  end
   object FinalPanel: TPanel
     Left = 161
     Top = 0
@@ -240,9 +36,9 @@ object KeyWizardFrm: TKeyWizardFrm
     TabOrder = 5
     inline TSolSearcherDetails1: TSolSearcherDetails
       Left = 0
-      Top = 24
+      Top = 8
       Width = 617
-      Height = 434
+      Height = 458
       Color = clBackground
       ParentColor = False
       TabOrder = 0
@@ -414,6 +210,208 @@ object KeyWizardFrm: TKeyWizardFrm
       Height = 21
       TabOrder = 8
       Text = '0'
+    end
+  end
+  object StartPanel: TPanel
+    Left = 161
+    Top = 0
+    Width = 617
+    Height = 453
+    Align = alClient
+    BevelOuter = bvNone
+    BorderStyle = bsSingle
+    TabOrder = 0
+    object Label5: TLabel
+      Left = 8
+      Top = 64
+      Width = 64
+      Height = 13
+      Caption = 'Product Type'
+    end
+    object Label6: TLabel
+      Left = 8
+      Top = 104
+      Width = 45
+      Height = 13
+      Caption = 'Key Type'
+    end
+    object Label1: TLabel
+      Left = 158
+      Top = 64
+      Width = 35
+      Height = 13
+      Caption = 'Version'
+    end
+    object DaysLabel: TLabel
+      Left = 158
+      Top = 104
+      Width = 24
+      Height = 13
+      Caption = 'Days'
+    end
+    object SystemEditLabel: TLabel
+      Left = 8
+      Top = 220
+      Width = 46
+      Height = 13
+      Caption = 'System Id'
+    end
+    object Label7: TLabel
+      Left = 8
+      Top = 263
+      Width = 43
+      Height = 13
+      Caption = 'Summary'
+    end
+    object eBONumberLabel: TLabel
+      Left = 158
+      Top = 216
+      Width = 61
+      Height = 13
+      Caption = 'eBO Number'
+    end
+    object keyClassLabel: TLabel
+      Left = 8
+      Top = 16
+      Width = 46
+      Height = 13
+      Caption = 'Key Class'
+    end
+    object passwordComboBoxLabel: TLabel
+      Left = 158
+      Top = 104
+      Width = 106
+      Height = 13
+      Caption = 'Exp Days/Counter Hrs'
+    end
+    object ProductComboBox: TComboBox
+      Left = 7
+      Top = 78
+      Width = 146
+      Height = 21
+      ItemHeight = 13
+      TabOrder = 0
+      OnChange = ProductComboBoxChange
+      Items.Strings = (
+        'Platinum'
+        'XImage NT'
+        'XImage 3.1/95'
+        'SOLsearcher'
+        'Connectivity'
+        'Legacy'
+        'iConvert'
+        'SOLsearcher Enterprise'
+        'SOLscript'
+        'SDX Designer'
+        'Quantum Server'
+        'Rubika'
+        'SOLfusion'
+        'SP/D Enterprise')
+    end
+    object keyTypeComboBox: TComboBox
+      Left = 7
+      Top = 119
+      Width = 146
+      Height = 21
+      ItemHeight = 13
+      TabOrder = 1
+      OnChange = keyTypeComboBoxChange
+    end
+    object ui_version: TMaskEdit
+      Left = 166
+      Top = 78
+      Width = 42
+      Height = 21
+      TabOrder = 2
+      OnChange = ui_versionChange
+      OnExit = ui_versionExit
+    end
+    object ui_days: TMaskEdit
+      Left = 166
+      Top = 119
+      Width = 43
+      Height = 21
+      TabOrder = 3
+      Text = '30'
+      OnChange = ui_daysChange
+    end
+    object DayUpDown: TUpDown
+      Left = 209
+      Top = 119
+      Width = 16
+      Height = 21
+      Associate = ui_days
+      Min = -10
+      Max = 90
+      Position = 30
+      TabOrder = 4
+      Wrap = False
+    end
+    object SelectModules: TCheckBox
+      Left = 272
+      Top = 32
+      Width = 289
+      Height = 17
+      Caption = 'Specify modules to be programed.'
+      TabOrder = 5
+      Visible = False
+      OnClick = SelectModulesClick
+    end
+    object SystemEdit: TEdit
+      Left = 7
+      Top = 234
+      Width = 117
+      Height = 21
+      TabOrder = 6
+      Text = 'SystemEdit'
+      OnChange = SystemEditChange
+    end
+    object KeySummary: TMemo
+      Left = 7
+      Top = 284
+      Width = 446
+      Height = 61
+      MaxLength = 254
+      TabOrder = 7
+    end
+    object eBONumberEditBox: TEdit
+      Left = 158
+      Top = 232
+      Width = 75
+      Height = 21
+      TabOrder = 8
+      Text = '0'
+      OnChange = eBONumberEditBoxChange
+    end
+    object keyClassComboBox: TComboBox
+      Left = 8
+      Top = 32
+      Width = 145
+      Height = 21
+      ItemHeight = 13
+      TabOrder = 9
+      OnChange = keyClassComboBoxChange
+      Items.Strings = (
+        'Parallel'
+        'USB')
+    end
+    object passwordComboBox: TComboBox
+      Left = 166
+      Top = 119
+      Width = 169
+      Height = 21
+      DropDownCount = 25
+      ItemHeight = 13
+      TabOrder = 10
+      OnChange = passwordComboBoxChange
+    end
+    object RemoteKey_CHB: TCheckBox
+      Left = 272
+      Top = 48
+      Width = 249
+      Height = 17
+      Caption = 'Remote Key'
+      TabOrder = 11
     end
   end
   object ButtonPanel: TPanel

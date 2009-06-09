@@ -74,7 +74,7 @@ bool KeyInfoListViewManager::PopulateView()
 		int MinorVersion = (TheKeyInfoStructure.ProductVersion.lVal & 0x0fff) >> 4;
 
 		//%x hexadecimal integer format
-		sprintf_s(ProductVersion, sizeof(ProductVersion)/sizeof(char), "%x.%02x", MajorVersion, MinorVersion);
+		sprintf_s(ProductVersion, sizeof(ProductVersion)/sizeof(char), "%x.%x", MajorVersion, MinorVersion);
 		TheKeyInfoStructure.ProductVersion.SetString(ProductVersion);
 		
 		int LicenseID = ((int)(TheKeyInfoStructure.License));
@@ -211,13 +211,13 @@ char* KeyInfoListViewManager::MapProductID(int* pProductID)
 				return retval = "IndexPlugInProductID";
 								
 			case IConvertProductID :
-				return retval = "IConvert";
+				return retval = "iCONVERT";
 				
 			case SolSearcherEnterpriseProductID :
-				return retval = "SolSearcher Enterprise";
+				return retval = "SOLsearcher Enterprise";
 				
 			case SolScriptProductID : 
-				return retval = "SolScript";
+				return retval = "SOLscript";
 				
 			case SDXDesignerProductID :
 				return retval = "SDX Designer";
@@ -295,6 +295,13 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 {
 	ListViewItem*  listViewItem1 = new ListViewItem();
 	listViewItem1->UseItemStyleForSubItems = true;
+
+	//Connection Type - Remote(Blue) or Local(Black)
+	if(TheKeyInfoStructure.ApplicationInstance.intVal > 0) 
+	{
+		listViewItem1->ForeColor = System::Drawing::Color::SteelBlue;
+	}
+
 	//Active Status - Red,Italic or Black
 	if(TheKeyInfoStructure.Active.intVal == 0) 
 	{
@@ -302,11 +309,7 @@ bool KeyInfoListViewManager::FillRow(KeyInfoStructure TheKeyInfoStructure)
 		listViewItem1->ForeColor = System::Drawing::Color::Red;
 	}
 
-	//Connection Type - Remote(Blue) or Local(Black)
-	if(TheKeyInfoStructure.ApplicationInstance.intVal > 0) 
-	{
-		listViewItem1->ForeColor = System::Drawing::Color::SteelBlue;
-	}
+
 	//Key Type Column
 	listViewItem1->Text = TheKeyInfoStructure.KeyType.bstrVal;
 	//KeyNumber Column

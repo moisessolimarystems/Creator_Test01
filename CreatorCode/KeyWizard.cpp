@@ -431,7 +431,8 @@ void __fastcall TKeyWizardFrm::ui_daysChange(TObject *Sender)
 //==============================================================================
 unsigned short TKeyWizardFrm::getSelectedVersion()
 {
-   return static_cast<unsigned short>(strtol(ui_version->Text.c_str(), &endptr, 16));
+   AnsiString dbVersion = DBFormatVersion(ui_version->Text);
+   return static_cast<unsigned short>(strtol(dbVersion.c_str(), &endptr, 16));
 }
 
 //==============================================================================
@@ -954,7 +955,8 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
 {
    //global setting based on product should be set in ProductComboBoxChange
    int moduleState(msNone);
-
+   unsigned short version;
+   int majorVersion, minorVersion;
    KeyType keyType(getKeyType());
    ProgramBtn->Enabled = false;
    //reset wizard components that are change on key_type
@@ -963,7 +965,12 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
 
    //set controls based on product - product version
    ui_version->Enabled = !SPD_LEGACY;
-   ui_version->Text = Format("%4X", OPENARRAY(TVarRec,(lookup->getCurrentVersion(m_selectedProduct, SPD_LEGACY))));
+   version = lookup->getCurrentVersion(m_selectedProduct, SPD_LEGACY);
+   majorVersion = ((int)version) >> 12;
+   //extract the last three bytes
+   minorVersion = (int)((((version & 0x0F00) >> 8) * 10) + (((version & 0x00F0) >> 4) * 1));
+   ui_version->Text = AnsiString::Format("%d.%d", OPENARRAY(TVarRec,(majorVersion,minorVersion)));
+   //Format("%4X", OPENARRAY(TVarRec,(lookup->getCurrentVersion(m_selectedProduct, SPD_LEGACY))));
 
    /* Addon Key- purpose is to extend the functionality of an existing key.  Note:
     * If existing key is non-permanent (can not be made permanent) then and Add-on
@@ -1007,7 +1014,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       //override default product version
       if (!SPD_LEGACY) {
          ui_version->Enabled = false;
-         ui_version->Text = "FFFF";
+         ui_version->Text = "9999";
       }
 
       if (m_bModules) {
@@ -1316,11 +1323,75 @@ void __fastcall TKeyWizardFrm::passwordComboBoxChange(TObject *Sender)
  *----------------------------------------------------------------------------*/
 void __fastcall TKeyWizardFrm::ui_versionChange(TObject *Sender)
 {
-   if (ui_version->Text.Length()==4){
+   /*if (ui_version->Text.Length()==4){
       key_record->pkey->productVersion = getSelectedVersion();
       if(m_bModules)
          SelectModulesClick(NULL);
    }
+   */
 }
 
 
+void __fastcall TKeyWizardFrm::ui_versionExit(TObject *Sender)
+{
+   if(!IsValidVersionFormat(ui_version->Text))
+   {
+       Application->MessageBox("Please enter a valid version.", "Invalid Entry", MB_OK );
+       ui_version->SelectAll();
+       ui_version->SetFocus();
+   }
+   else
+   {
+       key_record->pkey->productVersion = getSelectedVersion();
+       if(m_bModules)
+         SelectModulesClick(NULL);
+   }
+}
+//---------------------------------------------------------------------------
+
+
+//Expect strVersion to be valid X.X+ , minorVersion max of 2
+AnsiString TKeyWizardFrm::DBFormatVersion(AnsiString strVersion)
+{
+    AnsiString majorVersion, minorVersion;
+    int pos;
+    pos = strVersion.AnsiPos(".");
+    majorVersion = AnsiString(strVersion.SubString(0,pos-1).ToInt());
+    minorVersion = AnsiString(strVersion.SubString(pos+1, strVersion.Length()-(majorVersion.Length())).ToInt());
+
+    if(minorVersion.Length() == 1)
+        minorVersion = "0" + minorVersion;
+    minorVersion= minorVersion + "0";
+    return majorVersion + minorVersion;
+}
+
+bool TKeyWizardFrm::IsValidVersionFormat(AnsiString versionString)
+{
+    AnsiString majorVersion, minorVersion, tempString;
+    int count = 0, pos = 0, number = 0;
+    //find position of period
+    tempString = versionString;
+    do
+    {
+        pos = tempString.AnsiPos(".");
+        tempString = tempString.SubString(pos+1, tempString.Length()-pos);
+        if(pos != 0)
+            count++;
+    }
+    while(pos != 0);
+    if(count != 1)
+        return false;
+    else
+    {   //only one period ...split into major, minor
+        pos = versionString.AnsiPos(".");
+        majorVersion = versionString.SubString(0,pos-1);
+        if((majorVersion.Length() > 1) ||
+           (StrToIntDef(majorVersion, -1) < 0) ||
+           (majorVersion.ToInt() < 1))
+            return false;
+        minorVersion = versionString.SubString(pos+1, versionString.Length()-(majorVersion.Length()));
+        if((minorVersion.Length() > 2) || (StrToIntDef(minorVersion, -1) < 0))
+            return false;
+    }
+    return true;
+}
