@@ -30,7 +30,7 @@ class LicenseCacheByProduct
 		HRESULT ModuleLicenseInUseForAll(long moduleIdent, long* pLicenseCount);
 
 		//Results based on the licenseID.
-		HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+		//HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseObtainByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseReleaseByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseDecrementCounterByApp(BSTR licenseID, long moduleIdent, long licenseCount);
@@ -103,7 +103,7 @@ class LicenseCache
 		HRESULT ModuleLicenseInUseForAll(long productID, long moduleIdent, long* pLicenseCount);
 
 		//Results based on the licenseID.
-		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseInUseByApp(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseByLicenseID(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseObtainByApp(long productID, BSTR licenseID, long moduleIdent, long licenseCount);

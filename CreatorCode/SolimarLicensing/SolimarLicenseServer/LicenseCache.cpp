@@ -211,6 +211,16 @@ HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR appli
 	if(SUCCEEDED(hr))	//Verfiy that all existing licenses are still good.
 		hr = ((unsigned)productMaxAppInstance >= numberOfUniqueAppInstMap.size()) ? S_OK : LicenseServerError::EHR_LIC_PROD_NO_FREE_APP_INSTANCE;
 
+	if(FAILED(hr))
+	{
+		wchar_t errorBuf[1024];
+		swprintf_s(errorBuf, _countof(errorBuf), L"Application Instances - Licensed: %d, In Use: %d",
+			productMaxAppInstance,
+			numberOfUniqueAppInstMap.size()
+			);
+		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(0), __uuidof(0));
+	}
+
 	// cleanup
 	numberOfUniqueAppInstMap.clear();
 
@@ -305,12 +315,12 @@ HRESULT LicenseCacheByProduct::ModuleLicenseInUseForAll(long moduleIdent, long* 
 }
 
 //Results based on the licenseID.
-HRESULT LicenseCacheByProduct::ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
-{
-	HRESULT hr(S_OK);
-	SafeMutex mutex(licenseUseCacheByProductLock);
-	return hr;
-}
+//HRESULT LicenseCacheByProduct::ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
+//{
+//	HRESULT hr(S_OK);
+//	SafeMutex mutex(licenseUseCacheByProductLock);
+//	return hr;
+//}
 
 //Returns the number of module licenses inuse by the ApplicationInstance the licenseID is associate with
 HRESULT LicenseCacheByProduct::ModuleLicenseInUseByApp(BSTR licenseID, long moduleIdent, long* pLicenseCount)
@@ -442,6 +452,18 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 			}
 		}
 
+				int licObtainAmount = licenseCount;
+
+		//if module has an unlimited amount
+		int modSpecUnlimitedValue = 0;
+		std::wstring wstrModuleName = std::wstring(L"Unknown Module");
+		Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::iterator modSpecIt = pProductSpec->moduleSpecMap->find(moduleIdent);
+		if(modSpecIt != pProductSpec->moduleSpecMap->end())
+		{
+			modSpecUnlimitedValue = modSpecIt->second.modUnlimitedValue;
+			wstrModuleName = modSpecIt->second.moduleName;
+		}
+
 		// need to add appInstance to the module, see if there are enough appInstance license for the module.
 		if(bAddToModAppInUseList)
 		{
@@ -453,17 +475,17 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 				//Not enough app instances for the module
 				hr = LicenseServerError::EHR_LIC_MOD_NO_FREE_APP_INSTANCE;
 				//hr = E_FAIL;	//Change to custom error...
+				wchar_t errorBuf[1024];
+				swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Application Instances - Licensed: %d, In Use: %d",
+					wstrModuleName.c_str(),
+					moduleIdent,
+					licensesAppInstanceTotalMap[moduleIdent],
+					moduleAppInstUseList[moduleIdent].size()
+					);
+				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(0), __uuidof(0));
 				break;
 			}
 		}
-
-		int licObtainAmount = licenseCount;
-
-		//if module has an unlimited amount
-		int modSpecUnlimitedValue = 0;
-		Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::iterator modSpecIt = pProductSpec->moduleSpecMap->find(moduleIdent);
-		if(modSpecIt != pProductSpec->moduleSpecMap->end())
-			modSpecUnlimitedValue = modSpecIt->second.modUnlimitedValue;
 
 		if(modSpecUnlimitedValue != 0)
 		{
@@ -495,6 +517,15 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 		{
 			//Not enough licenses for the module
 			hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
+			wchar_t errorBuf[1024];
+			swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Amount to Obtain: %d ",
+					wstrModuleName.c_str(),
+					moduleIdent,
+					licensesTotalMap[moduleIdent],
+					licensesInuseMap[moduleIdent],
+					licObtainAmount
+					);
+			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(0), __uuidof(0));
 			break;
 		}
 
@@ -912,17 +943,17 @@ HRESULT LicenseCache::ModuleLicenseInUseForAll(long productID, long moduleIdent,
 }
 
 //Results based on the licenseID.
-HRESULT LicenseCache::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
-{
-	SafeMutex mutex(licenseUseCacheLock);
-	HRESULT hr(S_OK);
-	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
-	if(prodCacheMapIt != productCacheMap.end())
-		hr = prodCacheMapIt->second->ValidateLicense(licenseID, pBLicenseValid);
-	else
-		hr = E_INVALIDARG;
-	return hr;
-}
+//HRESULT LicenseCache::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
+//{
+//	SafeMutex mutex(licenseUseCacheLock);
+//	HRESULT hr(S_OK);
+//	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
+//	if(prodCacheMapIt != productCacheMap.end())
+//		hr = prodCacheMapIt->second->ValidateLicense(licenseID, pBLicenseValid);
+//	else
+//		hr = E_INVALIDARG;
+//	return hr;
+//}
 HRESULT LicenseCache::ModuleLicenseInUseByApp(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount)
 {
 	SafeMutex mutex(licenseUseCacheLock);
