@@ -13,7 +13,8 @@
 
 #include <sys/stat.h>	//For _S_IWRITE that _wchmod uses
 
-#define LICENSE_FILE_CODE	L"C9379DA6077646588738518B3EBD67AF"
+
+
 BYTE SoftwareLicenseFile::crypto_license_file_password[] = {
 #include "..\common\keys\SolimarLicenseFile.password.txt"
 };
@@ -22,6 +23,19 @@ BYTE SoftwareLicenseFile::crypto_license_file_public[] = {
 };
 BYTE SoftwareLicenseFile::crypto_license_file_private[] = {
 #include "..\common\keys\SolimarLicenseFile.private.key.txt"
+};
+
+//C9379DA6077646588738518B3EBD67AF
+unsigned int SoftwareLicenseFile::license_file_code_int[] = {
+	0x43, 0x00, 0x39, 0x00, 0x33, 0x00, 0x37, 0x00,	//C937
+	0x39, 0x00, 0x44, 0x00, 0x41, 0x00, 0x36, 0x00, //9DA6
+	0x30, 0x00, 0x37, 0x00, 0x37, 0x00, 0x36, 0x00,	//0776
+	0x34, 0x00, 0x36, 0x00, 0x35, 0x00, 0x38, 0x00,	//4658
+	0x38, 0x00, 0x37, 0x00, 0x33, 0x00, 0x38, 0x00,	//8738
+	0x35, 0x00, 0x31, 0x00, 0x38, 0x00, 0x42, 0x00,	//518B
+	0x33, 0x00, 0x45, 0x00, 0x42, 0x00, 0x44, 0x00,	//3EBD
+	0x36, 0x00, 0x37, 0x00, 0x41, 0x00, 0x46, 0x00,	//67AF
+	0x00, 0x00
 };
 //static BYTE crypto_license_file_public[];
 //static BYTE crypto_license_file_private[];
@@ -273,7 +287,13 @@ HRESULT SoftwareServerDataMgr::LoadFromFile()
 			throw hr;
 
 		//Append solimar licensing location.
-		if(!PathAppend(szPathAndFile, L"Solimar\\Licensing\\SolimarLicenseServer.dat")) 
+		// Hide the string so it doesn't appear in the strings of the image - "Solimar\\Licensing\\SolimarLicenseServer.dat"
+		BYTE fileLocByte[] = {
+			0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x73, 0x00, 0x69, 0x00,
+			0x6e, 0x00, 0x67, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6e, 0x00,
+			0x73, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 0x65, 0x00, 0x72, 0x00, 0x2e, 0x00, 0x64, 0x00, 0x61, 0x00, 0x74, 0x00, 0x00, 0x00
+		};
+		if(!PathAppend(szPathAndFile, (wchar_t*)fileLocByte)) 
 			throw E_FAIL;
 
 		BSTR bstrSoftwareStream = NULL;
@@ -353,7 +373,13 @@ HRESULT SoftwareServerDataMgr::SaveToFile()
 			throw hr;
 
 		//Append solimar licensing location.
-		if(!PathAppend(szPathAndFile, L"Solimar\\Licensing\\SolimarLicenseServer.dat")) 
+		// Hide the string so it doesn't appear in the strings of the image - "Solimar\\Licensing\\SolimarLicenseServer.dat"
+		BYTE fileLocByte[] = {
+			0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6e, 0x00, 0x73, 0x00, 0x69, 0x00,
+			0x6e, 0x00, 0x67, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x6e, 0x00,
+			0x73, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 0x65, 0x00, 0x72, 0x00, 0x2e, 0x00, 0x64, 0x00, 0x61, 0x00, 0x74, 0x00, 0x00, 0x00
+		};
+		if(!PathAppend(szPathAndFile, (wchar_t*)fileLocByte)) 
 			throw E_FAIL;
 
 		BSTR bstrLicPacketStream = SysAllocString(pServerDataAttribs->ToString().c_str());
@@ -410,7 +436,11 @@ HRESULT SoftwareLicenseFile::SaveToLicenseFile(_bstr_t licenseFileName, BSTR bst
 		//New Code
 		VARIANT vtByteArray;
 		VariantInit(&vtByteArray);
-		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(LICENSE_FILE_CODE, crypto_license_file_private, sizeof(crypto_license_file_private)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), bstrSoftwareStream, &vtByteArray);
+		_bstr_t bstr_license_data_code;
+		bstr_license_data_code = (wchar_t*)(&license_file_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_data_code += (wchar_t*)(&license_file_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(bstr_license_data_code, crypto_license_file_private, sizeof(crypto_license_file_private)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), bstrSoftwareStream, &vtByteArray);
 		if(FAILED(hr))
 			throw hr;
 
@@ -537,7 +567,11 @@ HRESULT SoftwareLicenseFile::LoadFromLicenseFile(_bstr_t licenseFileName, BSTR* 
 		SafeArrayUnaccessData(vtByteArray.parray);
 
 
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(LICENSE_FILE_CODE, crypto_license_file_public, sizeof(crypto_license_file_public)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), vtByteArray, pBstrSoftwareStream);
+		_bstr_t bstr_license_data_code;
+		bstr_license_data_code = (wchar_t*)(&license_file_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_data_code += (wchar_t*)(&license_file_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_data_code, crypto_license_file_public, sizeof(crypto_license_file_public)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), vtByteArray, pBstrSoftwareStream);
 		if(FAILED(hr))
 		{
 			VariantClear(&vtByteArray);
