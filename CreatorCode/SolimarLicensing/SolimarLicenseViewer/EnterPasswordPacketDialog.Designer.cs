@@ -42,16 +42,17 @@
             // 
             this.passwordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.passwordTextBox.Location = new System.Drawing.Point(82, 12);
-            this.passwordTextBox.Multiline = true;
+            this.passwordTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.passwordTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystem;
+            this.passwordTextBox.Location = new System.Drawing.Point(82, 13);
             this.passwordTextBox.Name = "passwordTextBox";
-            this.passwordTextBox.Size = new System.Drawing.Size(414, 40);
+            this.passwordTextBox.Size = new System.Drawing.Size(414, 20);
             this.passwordTextBox.TabIndex = 4;
             // 
             // passwordLabel
             // 
             this.passwordLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.passwordLabel.Location = new System.Drawing.Point(9, 16);
+            this.passwordLabel.Location = new System.Drawing.Point(9, 12);
             this.passwordLabel.Name = "passwordLabel";
             this.passwordLabel.Size = new System.Drawing.Size(67, 29);
             this.passwordLabel.TabIndex = 5;
@@ -60,7 +61,7 @@
             // directoryFindButton
             // 
             this.directoryFindButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.directoryFindButton.Location = new System.Drawing.Point(501, 10);
+            this.directoryFindButton.Location = new System.Drawing.Point(502, 11);
             this.directoryFindButton.Name = "directoryFindButton";
             this.directoryFindButton.Size = new System.Drawing.Size(24, 23);
             this.directoryFindButton.TabIndex = 6;

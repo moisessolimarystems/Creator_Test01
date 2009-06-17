@@ -81,6 +81,8 @@
             // 
             // licenseServerComboBox
             // 
+            this.licenseServerComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.licenseServerComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.licenseServerComboBox.FormattingEnabled = true;
             this.licenseServerComboBox.Location = new System.Drawing.Point(99, 25);
             this.licenseServerComboBox.Name = "licenseServerComboBox";

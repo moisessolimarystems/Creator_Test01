@@ -15,7 +15,6 @@ namespace SolimarLicenseViewer
         public ConnectDialog(CommunicationLink commLink)
         {
             m_CommLink = commLink;
-            m_ValidServer = false;
             InitializeComponent();
         }
 
@@ -24,9 +23,7 @@ namespace SolimarLicenseViewer
             ConnectDialogData d = e.Data as ConnectDialogData;
             if (d != null)
             {
-                String[] serverList = new String[d.ServerList.Count];
-                d.ServerList.CopyTo(serverList,0);
-                ServerNameComboBox.Items.AddRange(serverList);
+                ServerNameComboBox.Items.AddRange(d.ServerList.ToArray());
                 if (ServerNameComboBox.Items.Count > 0)
                     ServerNameComboBox.SelectedIndex = 0;
             }            
@@ -46,54 +43,44 @@ namespace SolimarLicenseViewer
             d.ServerList.Insert(0, ServerNameComboBox.Text);
         }
 
-        private void ServerNameComboBox_KeyUp(object sender, KeyEventArgs e)
+        private void ServerNameComboBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-            {   
-                this.btnOk.Focus(); //set focus to force validation
-                if(m_ValidServer)
-                    DialogResult = DialogResult.OK;
+            {
+                btnOk_Click(sender, new EventArgs());
             }
             else if (e.KeyCode == Keys.Escape)
             {
-                this.ServerNameComboBox.CausesValidation = false;
-                DialogResult = DialogResult.Cancel;
+                btnCancel_Click(sender, new EventArgs());
             }
         }
 
-        private void ServerNameComboBox_Validated(object sender, EventArgs e)
-        {
-            errorProvider1.SetError(this.ServerNameComboBox, ""); 
-        }
-
-        private void ServerNameComboBox_Validating(object sender, CancelEventArgs e)
+        private void btnOk_Click(object sender, EventArgs e)
         {
             Cursor.Current = Cursors.WaitCursor;
             try
             {
                 m_CommLink.Connect(ServerNameComboBox.Text);
-                m_ValidServer = true;
+                errorProvider1.SetError(this.ServerNameComboBox, "");
+                this.DialogResult = DialogResult.OK;
             }
             catch (COMException ex)
             {
-                e.Cancel = true;
+                this.DialogResult = DialogResult.None;
                 ServerNameComboBox.Select(0, this.ServerNameComboBox.Text.Length);
-                
-                // Set the ErrorProvider error with the text to display.
                 errorProvider1.SetError(this.ServerNameComboBox, "Failed to Connect to Specified Server - " + ex.Message);
-
-                //Displaying the messagebox below causes an endless loop if the user hits the enter key to close the window.
-                //This is because "this.btnOk.Focus(); //set focus to force validation" in the key down event will cause 
-                //the ServerNameComboBox_Validating() to be called again, therefore causing the same error.
-                //HandleExceptions.DisplayException(this, ex, "Failed to Connect to Specified Server", "Connection Failed");
+                HandleExceptions.DisplayException(this, ex, "Failed to Connect to Specified Server", "Connection Failed");
             }
             Cursor.Current = Cursors.Default;
+        }
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.Cancel;
         }
 
         #region private members
 
         private CommunicationLink m_CommLink;
-        private Boolean m_ValidServer;
 
         #endregion
     }

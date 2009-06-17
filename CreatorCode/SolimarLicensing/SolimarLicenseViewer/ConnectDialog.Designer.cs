@@ -35,20 +35,25 @@ namespace SolimarLicenseViewer
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // btnOk
             // 
             this.btnOk.CausesValidation = true;
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
             // ServerNameComboBox
             // 
+            this.ServerNameComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.ServerNameComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.ServerNameComboBox.FormattingEnabled = true;
             this.ServerNameComboBox.Location = new System.Drawing.Point(73, 32);
             this.ServerNameComboBox.Name = "ServerNameComboBox";
             this.ServerNameComboBox.Size = new System.Drawing.Size(202, 21);
             this.ServerNameComboBox.TabIndex = 2;
-            this.ServerNameComboBox.Validating += new System.ComponentModel.CancelEventHandler(this.ServerNameComboBox_Validating);
-            this.ServerNameComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ServerNameComboBox_KeyUp);
-            this.ServerNameComboBox.Validated += new System.EventHandler(this.ServerNameComboBox_Validated);
+            this.ServerNameComboBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ServerNameComboBox_KeyDown);
             // 
             // label1
             // 

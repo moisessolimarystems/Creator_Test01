@@ -22,8 +22,7 @@ namespace SolimarLicenseDiagnosticDataViewer
             licenseServerComboBox.Items.Clear();
             if (_stringList != null)
             {
-                foreach (string licServer in _stringList)
-                    licenseServerComboBox.Items.Add(licServer);
+                licenseServerComboBox.Items.AddRange(_stringList.ToArray());
                 if(licenseServerComboBox.Items.Count > 0)
                     licenseServerComboBox.SelectedIndex = 0;
             }

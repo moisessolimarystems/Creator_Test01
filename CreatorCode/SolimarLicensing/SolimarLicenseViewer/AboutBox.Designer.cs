@@ -75,9 +75,10 @@ namespace SolimarLicenseViewer
             this.linkLabel1.Location = new System.Drawing.Point(418, 360);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(208, 16);
-            this.linkLabel1.TabIndex = 40;
+            this.linkLabel1.TabIndex = 1;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "ftp://downloads.solimarsystems.com";
+            this.linkLabel1.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.AboutBox_PreviewKeyDown);
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.HTTPLabel_LinkClicked);
             // 
             // linkWebsite
@@ -88,9 +89,10 @@ namespace SolimarLicenseViewer
             this.linkWebsite.Location = new System.Drawing.Point(418, 344);
             this.linkWebsite.Name = "linkWebsite";
             this.linkWebsite.Size = new System.Drawing.Size(208, 16);
-            this.linkWebsite.TabIndex = 37;
+            this.linkWebsite.TabIndex = 0;
             this.linkWebsite.TabStop = true;
             this.linkWebsite.Text = "http://www.solimarsystems.com";
+            this.linkWebsite.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.AboutBox_PreviewKeyDown);
             this.linkWebsite.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.HTTPLabel_LinkClicked);
             // 
             // labelCopyright
@@ -151,9 +153,10 @@ namespace SolimarLicenseViewer
             this.linkTechSupport.Location = new System.Drawing.Point(418, 376);
             this.linkTechSupport.Name = "linkTechSupport";
             this.linkTechSupport.Size = new System.Drawing.Size(208, 16);
-            this.linkTechSupport.TabIndex = 38;
+            this.linkTechSupport.TabIndex = 2;
             this.linkTechSupport.TabStop = true;
             this.linkTechSupport.Text = "tech.support@solimarsystems.com";
+            this.linkTechSupport.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.AboutBox_PreviewKeyDown);
             this.linkTechSupport.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.EmailLabel_LinkClicked);
             // 
             // linkSales
@@ -164,9 +167,10 @@ namespace SolimarLicenseViewer
             this.linkSales.Location = new System.Drawing.Point(418, 392);
             this.linkSales.Name = "linkSales";
             this.linkSales.Size = new System.Drawing.Size(208, 16);
-            this.linkSales.TabIndex = 39;
+            this.linkSales.TabIndex = 3;
             this.linkSales.TabStop = true;
             this.linkSales.Text = "sales@solimarsystems.com";
+            this.linkSales.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.AboutBox_PreviewKeyDown);
             this.linkSales.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.EmailLabel_LinkClicked);
             // 
             // labelFtp
@@ -274,6 +278,7 @@ namespace SolimarLicenseViewer
             this.Text = "AboutBox";
             this.Load += new System.EventHandler(this.AboutBox_Load);
             this.Click += new System.EventHandler(this.AboutBox_Click);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.AboutBox_PreviewKeyDown);
             this.ResumeLayout(false);
 
         }

@@ -158,6 +158,12 @@ namespace SolimarLicenseViewer
             versionLicensing.Text = String.Format("{0:0}.{1:00}.{2:000000}", VersionInfo.MAJOR_REVISION_NUMBER, VersionInfo.MINOR_REVISION_NUMBER, VersionInfo.BUILD_NUMBER);
         }
 
+        private void AboutBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                AboutBox_Click(sender, new EventArgs());
+        }
+
 
     }
 }
