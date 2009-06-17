@@ -43,8 +43,13 @@
             this.topHeaderPanel.SuspendLayout();
             this.SuspendLayout();
             // 
+            // btnCancel
+            // 
+            this.btnCancel.TabIndex = 1;
+            // 
             // btnOk
             // 
+            this.btnOk.TabIndex = 0;
             this.btnOk.Text = "Apply";
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
@@ -56,7 +61,7 @@
             this.MainPanel.Location = new System.Drawing.Point(0, 0);
             this.MainPanel.Name = "MainPanel";
             this.MainPanel.Size = new System.Drawing.Size(754, 401);
-            this.MainPanel.TabIndex = 3;
+            this.MainPanel.TabIndex = 0;
             // 
             // licSelectionListView
             // 
@@ -110,7 +115,7 @@
             this.refreshButton.Location = new System.Drawing.Point(6, 30);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(75, 23);
-            this.refreshButton.TabIndex = 7;
+            this.refreshButton.TabIndex = 2;
             this.refreshButton.Text = "Refresh";
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.refreshButton_Click);
@@ -130,7 +135,7 @@
             this.directoryFindButton.Location = new System.Drawing.Point(727, 4);
             this.directoryFindButton.Name = "directoryFindButton";
             this.directoryFindButton.Size = new System.Drawing.Size(24, 23);
-            this.directoryFindButton.TabIndex = 5;
+            this.directoryFindButton.TabIndex = 1;
             this.directoryFindButton.Text = "...";
             this.directoryFindButton.UseVisualStyleBackColor = true;
             this.directoryFindButton.Click += new System.EventHandler(this.directoryFindButton_Click);
@@ -139,14 +144,17 @@
             // 
             this.directoryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.directoryTextBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.directoryTextBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.FileSystemDirectories;
             this.directoryTextBox.Location = new System.Drawing.Point(156, 6);
             this.directoryTextBox.Name = "directoryTextBox";
-            this.directoryTextBox.ReadOnly = true;
             this.directoryTextBox.Size = new System.Drawing.Size(565, 20);
-            this.directoryTextBox.TabIndex = 4;
+            this.directoryTextBox.TabIndex = 0;
+            this.directoryTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.directoryTextBox_KeyDown);
             // 
             // LicenseUpdateHelper
             // 
+            this.AcceptButton = null;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(754, 432);
