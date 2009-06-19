@@ -58,6 +58,17 @@ namespace LicensingTest_SoftwareLicense
 			LogMessage("g_softwareSpec = globalSwSpec.softwareSpec; - End");
 			//LogMessage(computerI);
 			//Win32_ComputerSystemProduct.UUID
+
+			//ts_connectTextBox.
+			if (LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList == null)
+			{
+				LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList = new System.Collections.Specialized.StringCollection();
+				LicensingTest_SoftwareLicense.Properties.Settings.Default.Save();
+			}
+
+			foreach (string licSvr in LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList)
+				ts_connectTextBox.AutoCompleteCustomSource.Add(licSvr);
+
 		}
 
 		private void InitializeControl()
@@ -527,6 +538,29 @@ namespace LicensingTest_SoftwareLicense
 				//LogMessage("globalPerAverageCall: " + globalPerAverageCall.RawValue.ToString());
 				//LogMessage("globalPerAverageCallBase: " + globalPerAverageCallBase.RawValue.ToString());
 				//LogMessage("Called g_licServer.Initialize() - Server: " + ts_connectTextBox.Text);
+
+
+				List<string> licSvrList = new List<string>();
+				//licSvrList = LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList;
+				//List<string> licSvrList = (List<string>)LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList;
+				foreach (string licSvr in LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList)
+					licSvrList.Add(licSvr);
+
+				if (licSvrList.Contains(ts_connectTextBox.Text))
+					licSvrList.Remove(ts_connectTextBox.Text);
+				licSvrList.Insert(0, ts_connectTextBox.Text);
+
+
+				if (licSvrList.Count > 0)
+				{
+					ts_connectTextBox.AutoCompleteCustomSource.Clear();
+					ts_connectTextBox.AutoCompleteCustomSource.AddRange(licSvrList.ToArray());
+
+					LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList.Clear();
+					LicensingTest_SoftwareLicense.Properties.Settings.Default.ServerList.AddRange(licSvrList.ToArray());
+					LicensingTest_SoftwareLicense.Properties.Settings.Default.Save();
+				}
+
 
 				SetKeySpec(g_softwareSpec);
 
@@ -1564,7 +1598,7 @@ namespace LicensingTest_SoftwareLicense
 
 		private void tsgen_createSplitButton_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
 		{
-			if (sender is ToolStripSplitButton)
+			if (sender is ToolStripSplitButton && (sender != versionToolStripMenuItem))
 			{
 				(sender as ToolStripSplitButton).Text = e.ClickedItem.Text;
 				(sender as ToolStripSplitButton).ToolTipText = e.ClickedItem.ToolTipText;
@@ -1656,7 +1690,20 @@ namespace LicensingTest_SoftwareLicense
 					LogMessage("Successfully called tmpLicWrapper.ConnectEx(" + _licServer + ", " + _bUseSharedLicensing.ToString() + ", false)");
 				}
 
-				bool bInitialized = tmpLicWrapper.InitializeEx(tsgen_appInstTextBox.Text, System.Convert.ToInt32(tsgen_prodIdTextBox.Text), 1, 1, false, "", false, Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL, 0, false, false);
+				int prodMajor = System.Convert.ToInt32(productMajorToolStripTextBox.Text);
+				int prodMinor = System.Convert.ToInt32(productMinorToolStripTextBox.Text);
+
+				bool bInitialized = tmpLicWrapper.InitializeEx(tsgen_appInstTextBox.Text,
+					System.Convert.ToInt32(tsgen_prodIdTextBox.Text),
+					prodMajor,
+					prodMinor,
+					false,
+					"",
+					false,
+					Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG,
+					0,
+					false,
+					false);
 				LogMessage("Successfully called tmpLicWrapper.InitializeEx(" + System.Convert.ToInt32(tsgen_prodIdTextBox.Text) + ", " + ts_lmgrAppInstanceTextBox.Text + "), bInitialized: " + bInitialized.ToString());
 
 
@@ -1668,6 +1715,7 @@ namespace LicensingTest_SoftwareLicense
 			}
 			catch (COMException ex)
 			{
+				MessageBox.Show(ex.Message);
 				LogMessage(ex.Message);
 			}
 			finally
@@ -1727,6 +1775,36 @@ namespace LicensingTest_SoftwareLicense
 				recursiveGenerateTreeNodeToString(childNode, _depth + 1, ref _strBuilder);
 			}
 
+		}
+
+		private void SelectAll_ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (sender is ToolStripTextBox)
+			{
+				(sender as ToolStripTextBox).SelectAll();
+			}
+		}
+
+		private void messageListViewContextMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+		{
+			if (sender is ContextMenuStrip)
+			{
+				if (sender == messageListViewContextMenuStrip)
+				{
+					messageListView.BeginUpdate();
+					messageListView.Items.Clear();
+					messageListView.EndUpdate();
+				}
+			}
+			//messageListViewContextMenuStrip
+		}
+
+		private void tsgen_createSplitButton_DropDownOpening(object sender, EventArgs e)
+		{
+			connectToMachineToolStripMenuItem.AutoCompleteCustomSource.Clear();
+			connectToMachineToolStripMenuItem.AutoCompleteCustomSource.Add(connectToMachineToolStripMenuItem.Text);
+			foreach (string item in ts_connectTextBox.AutoCompleteCustomSource)
+				connectToMachineToolStripMenuItem.AutoCompleteCustomSource.Add(item);
 		}
 
 	}

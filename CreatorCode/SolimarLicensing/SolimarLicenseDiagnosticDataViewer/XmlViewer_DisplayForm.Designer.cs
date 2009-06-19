@@ -40,11 +40,13 @@
             // 
             this.textBox1.AcceptsReturn = true;
             this.textBox1.AcceptsTab = true;
+            this.textBox1.BackColor = System.Drawing.Color.White;
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Location = new System.Drawing.Point(0, 25);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox1.Size = new System.Drawing.Size(284, 239);
             this.textBox1.TabIndex = 0;
@@ -76,6 +78,7 @@
             // 
             this.findTSTextBox.Name = "findTSTextBox";
             this.findTSTextBox.Size = new System.Drawing.Size(200, 25);
+            this.findTSTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.findTSTextBox_KeyDown);
             // 
             // XmlViewer_DisplayForm
             // 
