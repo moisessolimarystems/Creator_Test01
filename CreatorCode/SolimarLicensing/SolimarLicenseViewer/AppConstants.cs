@@ -8,6 +8,7 @@ namespace SolimarLicenseViewer
     {
         //initial key created when installed
         public static readonly String SolimarRegKey     = "SOFTWARE\\Solimar";
+        public static readonly String SolimarRegKey32On64 = "SOFTWARE\\Wow6432Node\\Solimar";
         public static readonly String LicenseProduct    = "Solimar Licensing";        
         
         //XML File/Folder Path
@@ -17,17 +18,29 @@ namespace SolimarLicenseViewer
         //Form Constants
         public static readonly String LicenseView = "License";
         public static readonly String UsageView = "Usage";
-        public static readonly String FormTitle = "License Viewer";
+        public static readonly String FormTitle = "Solimar License Viewer";
         public static readonly String UnlimitedValue = "Unlimited";
 
 
         //TreeView Constants
         public static readonly String LicenseRootNode = "Licenses";
-        public static readonly String UsageRootNode = "No Connected Products";
+        public static readonly String UsageRootNode = "Usage";
+        public static readonly String NoConnectedProductsRootNode = "No Connected Products";
         public static readonly String ProtectionKeyRootNode = "Protection Keys";
+        public static readonly String ProductConnectionSettingsRootNode = "Product Connection Settings";
 
         //ListViewItem Constants
         public static readonly String DisasterRecoveryLicType = "sltDisasterRecovery";
+        public static readonly String ProductConnectionSettingsUnknownStatus = "Status Unknown";
+
+        #region ToolStripToolBar Constant
+        public static readonly String ProdSettingsEditConnTSB = "Edit Connection Settings";
+        public static readonly String ProdSettingsEditConnToolTipTSB = "Edit Connection Settings for the given Product";
+        public static readonly String ProdSettingsTestConnSelectedTSB = "Test Connection Settings";
+        public static readonly String ProdSettingsTestConnSelectedToolTipTSB = "Test Connection to License Server for the given Product";
+        public static readonly String ProdSettingsTestConnAllTSB = "Test All Connection Settings";
+        public static readonly String ProdSettingsTestConnAllToolTipTSB = "Test Connection to All License Server";
+        #endregion
 
         #region ListView Constants
 
@@ -52,18 +65,32 @@ namespace SolimarLicenseViewer
         public static readonly String KeyLicenseTypeHeader = "License Type";
         public static readonly String KeyDaysLeftHeader = "Days Left";
         public static readonly String KeyExpirationDateHeader = "Expiration Date";
+        public static readonly String ConnProductHeader = "Product";
+        public static readonly String ConnPrimaryServerHeader = "Primary License Server";
+        public static readonly String ConnBackupServerHeader = "Fail Over Server";
+        public static readonly String ConnTestDevHeader = "Use Development Licensing";
+        public static readonly String ConnStatusHeader = "Status";
+
+        public static readonly String FilterHeader = "Filter";
+        public static readonly String AllItem = "All Modules";
+        public static readonly String ExpiredItem = "Expired Modules";
+        public static readonly String NonExpiredItem = "Non-Expired Modules";
 
 
         //Product Node Column Headers
         public static readonly String VersionHeader = "Version";
-        public static readonly String AppInstanceHeader = "AppInstance";
+        public static readonly String AppInstanceHeader = "Application Instance";
         //History Node Column Headers
         public static readonly String VerificationCodeHeader = "Verification Code";
         public static readonly String DateAppliedHeader = "Date Applied";
         //Module Node Column Headers
         public static readonly String LicensesHeader = "Licenses";
-        public static readonly String UnitsHeader = "Units";
+        public static readonly String UnitsHeader = "Module";
+
         //Usage Node Column Headers
+        public static readonly String UsageProductHeader = "Product";
+        public static readonly String UsageAppInstanceHeader = "Application Instance";
+        public static readonly String UsageModuleHeader = "Module";
         public static readonly String ObtainedHeader = "Obtained";
         public static readonly String TotalHeader = "Total";
         //Protection Key Module Column Hearers
