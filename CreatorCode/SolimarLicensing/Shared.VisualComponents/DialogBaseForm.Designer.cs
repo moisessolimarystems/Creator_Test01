@@ -30,8 +30,8 @@ namespace Shared.VisualComponents
         {
             this.BottomPanel = new System.Windows.Forms.Panel();
             this.BottomButtonPanel = new System.Windows.Forms.Panel();
-            this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.btnOk = new System.Windows.Forms.Button();
             this.BottomPanel.SuspendLayout();
             this.BottomButtonPanel.SuspendLayout();
             this.SuspendLayout();
@@ -56,16 +56,6 @@ namespace Shared.VisualComponents
             this.BottomButtonPanel.Size = new System.Drawing.Size(173, 31);
             this.BottomButtonPanel.TabIndex = 4;
             // 
-            // btnOk
-            // 
-            this.btnOk.CausesValidation = false;
-            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(12, 4);
-            this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
-            this.btnOk.TabIndex = 3;
-            this.btnOk.Text = "OK";
-            // 
             // btnCancel
             // 
             this.btnCancel.CausesValidation = false;
@@ -76,10 +66,22 @@ namespace Shared.VisualComponents
             this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             // 
+            // btnOk
+            // 
+            this.btnOk.CausesValidation = false;
+            this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnOk.Location = new System.Drawing.Point(12, 4);
+            this.btnOk.Name = "btnOk";
+            this.btnOk.Size = new System.Drawing.Size(75, 23);
+            this.btnOk.TabIndex = 3;
+            this.btnOk.Text = "OK";
+            // 
             // DialogBaseForm
             // 
+            this.AcceptButton = this.btnOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btnCancel;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(343, 103);
             this.Controls.Add(this.BottomPanel);
