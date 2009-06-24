@@ -26,7 +26,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT EnterLicensePacket(VARIANT vtPasswordPacket, BSTR *pBstrVerificationCode);
 
 		//Licensing functions
-		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
+		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
 		
 		
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
@@ -85,6 +85,9 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec;		//Contains information to find out details of all modules.
 		LicenseCache licCache;	//Contains the license cache of all the products
 		SoftwareServerDataMgr licServerDataMgr;
+
+		//Use a cache of the streamed version of the License Info because large License Infos take a long time to convert from an object to a stream
+		std::map<std::wstring/*SW Lic Name*/, std::pair<std::wstring/*Last Touched Date*/, std::wstring/*SW Lic Streamed*/>> swLicStreamedCacheMap;
 
 		RainbowDriver* pRainbowDriver;
 		bool bFirstTime;
@@ -145,4 +148,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		static BYTE crypto_key_license_archive_private[];
 		static BYTE crypto_key_license_archive_public[];
 		static BYTE crypto_key_license_archive_password[];
+
+		static unsigned int license_packet_code_int[];
+		static unsigned int license_archive_code_int[];
+		static unsigned int license_verify_data_code_int[];
 };
