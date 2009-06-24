@@ -13,6 +13,40 @@ namespace Shared.VisualComponents
         public LicenseInfoViewerControl()
         {
             InitializeComponent();
+            this.KeyDown += new KeyEventHandler(LicenseInfoViewerControl_KeyDown);
+            this.MouseClick += new MouseEventHandler(LicenseInfoViewerControl_MouseClick);
+
+            this.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            this.ContextMenuStrip.Items.Add("Copy");
+            this.ContextMenuStrip.Click += new EventHandler(ContextMenuStrip_Click);
+        }
+
+        void ContextMenuStrip_Click(object sender, EventArgs e)
+        {
+            if (sender != null)
+            {
+                if (this.SelectedNode != null)
+                    Clipboard.SetData(DataFormats.UnicodeText, this.SelectedNode.Text);
+            }
+        }
+
+        void LicenseInfoViewerControl_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                TreeNode tNode = this.GetNodeAt(e.Location);
+                if (tNode != null)
+                    tNode.TreeView.SelectedNode = tNode;
+            }
+        }
+
+        void LicenseInfoViewerControl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.C && e.Control)
+            {
+                if (this.SelectedNode != null)
+                    Clipboard.SetData(DataFormats.UnicodeText, this.SelectedNode.Text);
+            }
         }
 
         private Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs g_softwareSpec;
@@ -25,7 +59,7 @@ namespace Shared.VisualComponents
             try
             {
                 this.BeginUpdate();
-                if(param_bClearAll)
+                if (param_bClearAll)
                     this.Nodes.Clear();
 
                 TreeNode rootNode = new TreeNode(Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(param_licenseInfoAttribs));
@@ -148,6 +182,7 @@ namespace Shared.VisualComponents
             }
 
             modNode.Text = nodeText;
+            modNode.Tag = new System.Collections.Generic.KeyValuePair<uint, DateTime>(param_modInfoAttribs.moduleID.TVal, param_modInfoAttribs.moduleExpirationDate.TVal);
 
             toolTipBuilder.Append("\r\nModuleName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleName(g_softwareSpec, param_prodID, param_modInfoAttribs.moduleID.TVal));
 
@@ -178,8 +213,37 @@ namespace Shared.VisualComponents
                 modNode.Nodes.Add(childNode);
             }
             modNode.ToolTipText = toolTipBuilder.ToString();
-            param_refRootNode.Nodes.Add(modNode);
+            AlphaAdd_ModuleInfoTreeNode(ref param_refRootNode, modNode);
 
+        }
+        private void AlphaAdd_ModuleInfoTreeNode(ref TreeNode param_refRootNode, TreeNode param_childNode)
+        {
+            int insertLocationIdx = param_refRootNode.Nodes.Count;  //Defaultly add to the end
+            if (param_childNode.Tag is System.Collections.Generic.KeyValuePair<uint, DateTime>)
+            {
+                System.Collections.Generic.KeyValuePair<uint, DateTime> childKvPair = (System.Collections.Generic.KeyValuePair<uint, DateTime>)param_childNode.Tag;
+                for (int idx = 0; idx < param_refRootNode.Nodes.Count; idx++)
+                {
+                    if (param_refRootNode.Nodes[idx].Tag is System.Collections.Generic.KeyValuePair<uint, DateTime>)
+                    {
+                        System.Collections.Generic.KeyValuePair<uint, DateTime> tmpKvPair = (System.Collections.Generic.KeyValuePair<uint, DateTime>)param_refRootNode.Nodes[idx].Tag;
+                        if (childKvPair.Key < tmpKvPair.Key)    // passed the module
+                        {
+                            insertLocationIdx = idx;
+                            break;
+                        }
+                        else if (childKvPair.Key == tmpKvPair.Key)  // same module, see if expiration date is after
+                        {
+                            if (childKvPair.Value.CompareTo(tmpKvPair.Value) < 1) // found expiration date to place after
+                            {
+                                insertLocationIdx = idx;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            param_refRootNode.Nodes.Insert(insertLocationIdx, param_childNode);
         }
 
         private void Tree_Add_Lic_VerificationAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationAttribs param_verificationAttribs, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licInfoAttribs)

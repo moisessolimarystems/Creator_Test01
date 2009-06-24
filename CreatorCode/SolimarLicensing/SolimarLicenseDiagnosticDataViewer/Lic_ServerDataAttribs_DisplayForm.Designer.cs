@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.headerPanel = new System.Windows.Forms.Panel();
 			this.lastTouchLabel = new System.Windows.Forms.Label();
 			this.versionLabel = new System.Windows.Forms.Label();
@@ -39,11 +40,15 @@
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.headerPanel.SuspendLayout();
+			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// headerPanel
 			// 
+			this.headerPanel.ContextMenuStrip = this.contextMenuStrip1;
 			this.headerPanel.Controls.Add(this.lastTouchLabel);
 			this.headerPanel.Controls.Add(this.versionLabel);
 			this.headerPanel.Controls.Add(this.lastTouchTitleLabel);
@@ -98,6 +103,7 @@
             this.columnHeader3,
             this.columnHeader4,
             this.columnHeader5});
+			this.noFlickerListView1.ContextMenuStrip = this.contextMenuStrip1;
 			this.noFlickerListView1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.noFlickerListView1.FullRowSelect = true;
 			this.noFlickerListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -109,6 +115,7 @@
 			this.noFlickerListView1.UseCompatibleStateImageBehavior = false;
 			this.noFlickerListView1.View = System.Windows.Forms.View.Details;
 			this.noFlickerListView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.noFlickerListView1_ColumnClick);
+			this.noFlickerListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
 			// 
 			// columnHeader1
 			// 
@@ -136,6 +143,20 @@
 			this.columnHeader5.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			this.columnHeader5.Width = 120;
 			// 
+			// contextMenuStrip1
+			// 
+			this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem});
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size(153, 48);
+			this.contextMenuStrip1.Click += new System.EventHandler(this.contextMenuStrip1_Click);
+			// 
+			// copyToolStripMenuItem
+			// 
+			this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+			this.copyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.copyToolStripMenuItem.Text = "Copy";
+			// 
 			// Lic_ServerDataAttribs_DisplayForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -149,6 +170,7 @@
 			this.Text = "Lic_ServerDataAttribs";
 			this.headerPanel.ResumeLayout(false);
 			this.headerPanel.PerformLayout();
+			this.contextMenuStrip1.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -166,5 +188,7 @@
 		private System.Windows.Forms.ColumnHeader columnHeader3;
 		private System.Windows.Forms.ColumnHeader columnHeader4;
 		private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
 	}
 }

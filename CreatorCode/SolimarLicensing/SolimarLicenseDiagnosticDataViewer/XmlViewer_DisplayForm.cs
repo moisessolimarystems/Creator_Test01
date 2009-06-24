@@ -43,6 +43,22 @@ namespace SolimarLicenseDiagnosticDataViewer
             {
                 textBox1.SelectAll();
             }
+            else if (e.KeyCode == Keys.F3)
+            {
+                findTSButton_Click(findTSButton, new EventArgs());
+            }
+        }
+        private void findTSTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.A && e.Control)
+            {
+                findTSTextBox.SelectAll();
+            }
+            else if (e.KeyCode == Keys.Return)
+            {
+                textBox1.Focus();
+                findTSButton_Click(findTSButton, new EventArgs());
+            }
         }
 
         private void findTSButton_Click(object sender, EventArgs e)
@@ -52,8 +68,7 @@ namespace SolimarLicenseDiagnosticDataViewer
             int startIdx = textBox1.SelectionStart;
             while (bRetry)
             {
-
-                location = textBox1.Text.IndexOf(findTSTextBox.TextBox.Text, startIdx + 1);
+                location = textBox1.Text.IndexOf(findTSTextBox.TextBox.Text, (startIdx + 1 < textBox1.Text.Length) ? (startIdx + 1) : 0);
                 if (location == -1)
                 {
                     if (startIdx == -1)
@@ -78,5 +93,7 @@ namespace SolimarLicenseDiagnosticDataViewer
                 }
             }
         }
+
+
     }
 }

@@ -28,9 +28,12 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this.components = new System.ComponentModel.Container();
             this.headerPanel = new System.Windows.Forms.Panel();
             this.displayButton = new System.Windows.Forms.Button();
             this.currentActivationsLabel = new System.Windows.Forms.Label();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modifiedDateLabel = new System.Windows.Forms.Label();
             this.verificationCodeLabel = new System.Windows.Forms.Label();
             this.keyNameLabel = new System.Windows.Forms.Label();
@@ -48,10 +51,12 @@
             this.columnHeader7 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader8 = new System.Windows.Forms.ColumnHeader();
             this.headerPanel.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // headerPanel
             // 
+            this.headerPanel.ContextMenuStrip = this.contextMenuStrip1;
             this.headerPanel.Controls.Add(this.displayButton);
             this.headerPanel.Controls.Add(this.currentActivationsLabel);
             this.headerPanel.Controls.Add(this.modifiedDateLabel);
@@ -87,6 +92,20 @@
             this.currentActivationsLabel.Size = new System.Drawing.Size(99, 13);
             this.currentActivationsLabel.TabIndex = 7;
             this.currentActivationsLabel.Text = "[CurrentActivations]";
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(103, 26);
+            this.contextMenuStrip1.Click += new System.EventHandler(this.contextMenuStrip1_Click);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
             // 
             // modifiedDateLabel
             // 
@@ -162,17 +181,18 @@
             this.columnHeader6,
             this.columnHeader7,
             this.columnHeader8});
+            this.keyListView.ContextMenuStrip = this.contextMenuStrip1;
             this.keyListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.keyListView.FullRowSelect = true;
             this.keyListView.GridLines = true;
             this.keyListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.keyListView.Location = new System.Drawing.Point(0, 73);
-            this.keyListView.MultiSelect = false;
             this.keyListView.Name = "keyListView";
             this.keyListView.Size = new System.Drawing.Size(487, 182);
             this.keyListView.TabIndex = 1;
             this.keyListView.UseCompatibleStateImageBehavior = false;
             this.keyListView.View = System.Windows.Forms.View.Details;
+            this.keyListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
             // 
             // Lic_KeyAttribs_DisplayForm
             // 
@@ -187,6 +207,7 @@
             this.Text = "Lic_KeyAttribs";
             this.headerPanel.ResumeLayout(false);
             this.headerPanel.PerformLayout();
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
 		}
@@ -212,5 +233,7 @@
 		private System.Windows.Forms.ColumnHeader columnHeader7;
         private System.Windows.Forms.ColumnHeader columnHeader8;
         private System.Windows.Forms.Button displayButton;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
 	}
 }

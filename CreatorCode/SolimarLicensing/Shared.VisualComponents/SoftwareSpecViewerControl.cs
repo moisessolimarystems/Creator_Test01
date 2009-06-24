@@ -13,6 +13,39 @@ namespace Shared.VisualComponents
         public SoftwareSpecViewerControl()
         {
             InitializeComponent();
+            this.KeyDown += new KeyEventHandler(General_KeyDown);
+            this.MouseClick += new MouseEventHandler(General_MouseClick);
+
+            this.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            this.ContextMenuStrip.Items.Add("Copy");
+            this.ContextMenuStrip.Click += new EventHandler(ContextMenuStrip_Click);
+        }
+        private void ContextMenuStrip_Click(object sender, EventArgs e)
+        {
+            if (sender != null)
+            {
+                if (this.SelectedNode != null)
+                    Clipboard.SetData(DataFormats.UnicodeText, this.SelectedNode.Text);
+            }
+        }
+
+        private void General_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                TreeNode tNode = this.GetNodeAt(e.Location);
+                if (tNode != null)
+                    tNode.TreeView.SelectedNode = tNode;
+            }
+        }
+
+        private void General_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.C && e.Control)
+            {
+                if (this.SelectedNode != null)
+                    Clipboard.SetData(DataFormats.UnicodeText, this.SelectedNode.Text);
+            }
         }
 
         public void SetData(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs param_SoftwareSpec)
