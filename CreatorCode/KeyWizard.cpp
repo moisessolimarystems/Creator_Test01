@@ -1014,7 +1014,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
       //override default product version
       if (!SPD_LEGACY) {
          ui_version->Enabled = false;
-         ui_version->Text = "9999";
+         ui_version->Text = "9.999";
       }
 
       if (m_bModules) {
