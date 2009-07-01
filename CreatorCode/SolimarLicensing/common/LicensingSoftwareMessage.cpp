@@ -9,8 +9,8 @@ LicensingSoftwareMessage::LicensingSoftwareMessage()
 LicensingSoftwareMessage::LicensingSoftwareMessage(std::wstring &_licenseServer,
 																	std::wstring &_softwareLicense,
 																	DWORD _productId,
-																	DWORD _messageId,
 																	DWORD _messageType,
+																	DWORD _messageId,
 																	VARIANT _messageTimestamp,
 																	std::wstring &_message,
 																	HRESULT _messageErrorHr

@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Configuration;
 using System.Drawing;
+using System.Net;
 
 namespace SolimarLicenseViewer
 {
@@ -54,13 +55,21 @@ namespace SolimarLicenseViewer
         /// <param name="lv">ListView from the MainForm</param>
         /// <param name="commlink">Link to Solimar License Server/Wrapper</param>        
         /// </summary>
-        public ListViewMgr(SplitContainer splitCntl, Shared.VisualComponents.NoFlickerListView lv, Shared.VisualComponents.NoFlickerListView bottomLv, CommunicationLink commlink)
+        public ListViewMgr(SplitContainer splitCntl, 
+            Shared.VisualComponents.NoFlickerListView lv, 
+            ToolStrip lvTs,
+            Shared.VisualComponents.NoFlickerListView bottomLv, 
+            CommunicationLink commlink)
         {
             TheSplitControl = splitCntl;
             TheListView = lv;
+            TheListViewToolStrip = lvTs;
             TheBottomListView = bottomLv;
             m_CommLink = commlink;
             m_TreeNode = null;
+            m_connSettingsHelper = new ConnectionSettingsHelper(m_CommLink);
+            m_toolStripList = new Dictionary<string, List<ToolStripItem>>();
+
             // Create an instance of a ListView column sorter and assign it 
             // to the ListView control.
             ListViewColumnSorter lvSorter = new ListViewColumnSorter();
@@ -72,20 +81,349 @@ namespace SolimarLicenseViewer
             lvSorter.Order = SortOrder.Ascending;
             lvSorter.SortColumn = 0;
             TheBottomListView.ListViewItemSorter = lvSorter;
+
+            InitializeToolStripItems();
+        }
+        public void InitializeToolStripItems()
+        {
+            List<ToolStripItem> tmpTSItemList = null;
+            ToolStripButton tmpTSB = null;
+            ToolStripSeparator tmpTSS = null;
+            ToolStripLabel tmpTSL = null;
+
+            #region Items for AppConstants.LicenseRootNode
+            tmpTSItemList = new List<ToolStripItem>();
+            tmpTSItemList.Add(new ToolStripLabel());
+            m_toolStripList.Add(AppConstants.LicenseRootNode, tmpTSItemList);
+            #endregion
+
+            #region Items for AppConstants.UnitsHeader
+            tmpTSItemList = new List<ToolStripItem>();
+            tmpTSItemList.Add(new ToolStripLabel());
+
+            m_moduleFilterComboBox = new ToolStripComboBox();
+            m_moduleFilterComboBox.Items.Add(AppConstants.AllItem);
+            m_moduleFilterComboBox.Items.Add(AppConstants.ExpiredItem);
+            m_moduleFilterComboBox.Items.Add(AppConstants.NonExpiredItem);
+            m_moduleFilterComboBox.Alignment = ToolStripItemAlignment.Right;
+            m_moduleFilterComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            m_moduleFilterComboBox.SelectedIndex = 0;
+            m_moduleFilterComboBox.SelectedIndexChanged += new EventHandler(m_moduleFilterComboBox_SelectedIndexChanged);
+            tmpTSItemList.Add(m_moduleFilterComboBox);
+
+            tmpTSL = new ToolStripLabel(AppConstants.FilterHeader + ": ");
+            tmpTSL.Alignment = ToolStripItemAlignment.Right;
+            tmpTSItemList.Add(tmpTSL);
+
+            m_toolStripList.Add(AppConstants.UnitsHeader, tmpTSItemList);
+
+
+            #endregion
+
+            #region Items for AppConstants.ProtectionKeyRootNode
+            tmpTSItemList = new List<ToolStripItem>();
+            tmpTSItemList.Add(new ToolStripLabel());
+            m_toolStripList.Add(AppConstants.ProtectionKeyRootNode, tmpTSItemList);
+            #endregion
+
+            #region Items for AppConstants.UsageRootNode
+            tmpTSItemList = new List<ToolStripItem>();
+            tmpTSItemList.Add(new ToolStripLabel());
+            m_toolStripList.Add(AppConstants.UsageRootNode, tmpTSItemList);
+            #endregion
+
+            #region Items for AppConstants.ProductConnectionSettingsRootNode
+            tmpTSItemList = new List<ToolStripItem>();
+            tmpTSItemList.Add(new ToolStripLabel());
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Alignment = ToolStripItemAlignment.Right;
+            tmpTSB.Text = AppConstants.ProdSettingsTestConnAllTSB;
+            tmpTSB.ToolTipText = AppConstants.ProdSettingsTestConnAllToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.Click += new EventHandler(prodConnTestConnAllTSButton_Click);
+            tmpTSItemList.Add(tmpTSB);
+            m_toolStripList.Add(AppConstants.ProductConnectionSettingsRootNode, tmpTSItemList);
+
+            tmpTSS = new ToolStripSeparator();
+            tmpTSS.Alignment = ToolStripItemAlignment.Right;
+            tmpTSItemList.Add(tmpTSS);
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Alignment = ToolStripItemAlignment.Right;
+            tmpTSB.Text = AppConstants.ProdSettingsTestConnSelectedTSB;
+            tmpTSB.ToolTipText = AppConstants.ProdSettingsTestConnSelectedToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.Click += new EventHandler(prodConnTestConnSelTSButton_Click);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSS = new ToolStripSeparator();
+            tmpTSS.Alignment = ToolStripItemAlignment.Right;
+            tmpTSItemList.Add(tmpTSS);
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Alignment = ToolStripItemAlignment.Right;
+            tmpTSB.Text = AppConstants.ProdSettingsEditConnTSB;
+            tmpTSB.ToolTipText = AppConstants.ProdSettingsEditConnToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.Click += new EventHandler(prodConn_EditConnSettings);
+            tmpTSItemList.Add(tmpTSB);
+
+            #endregion
+        }
+
+        void m_moduleFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PopulateView();
         }
         #endregion
 
-        #region License View
+        /// <summary>
+        /// Populates the ListView with license information based upon the selected TreeNode.
+        /// </summary>
+        public void PopulateView()
+        {
+            //Clear items in listview
+            this.TheListView.BeginUpdate();
+            this.TheListView.Items.Clear();
+            this.TheListView.Reset_NoItemsMessage();
+            this.TheListView.SelectedIndexChanged -= new EventHandler(prodConn_SelectedIndexChanged);
+            this.TheListView.KeyDown -= new KeyEventHandler(prodConn_KeyDown);
+            this.TheListView.DoubleClick -= new EventHandler(prodConn_EditConnSettings);
+
+            this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
+            TheSplitControl.Panel2Collapsed = true;
+            switch (SelectedNode.Level)
+            {
+                case 0:
+                    if (SelectedNode.Text == AppConstants.LicenseRootNode)
+                        LoadPackageData();
+                    else if (SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
+                        LoadProtectionKeysData();
+                    else if (SelectedNode.Text == AppConstants.UsageRootNode)
+                        LoadUsageData();
+                    else if (SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
+                        LoadProductConnectionData();
+                    break;
+                case 1:
+                    if (SelectedNode.Text == AppConstants.HistoryNode)
+                        LoadHistoryData();
+                    else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
+                        LoadProductData();
+                    else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
+                        LoadAppInstData();
+                    break;
+                case 2:
+                    if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)  //load modules
+                        LoadModuleData();
+                    else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)    //used app instance
+                        LoadUsedModuleData(SelectedNode.Parent.Name);
+                    break;
+                default:
+                    break;
+            }
+            if (TheListView.Items.Count > 0)
+                TheListView.GridLines = true;
+            else
+                TheListView.GridLines = false;
+            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.ColumnContent);
+            PopulateViewColumns();
+            this.TheListView.EndUpdate();
+        }
+
+        /// <summary>
+        /// Populates the ListView column headers based upon the selected TreeNode of the License view.
+        /// </summary>
+        private void PopulateViewColumns()
+        {
+            TheListView.BeginUpdate();
+            TheListView.Columns.Clear();
+            ColumnHeader colHeader = null;
+            switch (SelectedNode.Level)
+            {
+                case 0:
+                    #region if (SelectedNode.Text == AppConstants.LicenseRootNode)
+                    if (SelectedNode.Text == AppConstants.LicenseRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.NameHeader);
+                        TheListView.Columns.Add(AppConstants.LicenceTypeHeader);
+                        TheListView.Columns.Add(AppConstants.VerificationStatusHeader);
+                        {
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.ExpirationHeader;
+                            colHeader.Tag = typeof(DateTime);
+                            TheListView.Columns.Add(colHeader);
+
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.CurrentActivationHeader;
+                            colHeader.Tag = typeof(int);
+                            TheListView.Columns.Add(colHeader);
+
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.TotalActivationHeader;
+                            colHeader.Tag = typeof(int);
+                            TheListView.Columns.Add(colHeader);
+
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.DaysPerActivationHeader;
+                            colHeader.Tag = typeof(int);
+                            TheListView.Columns.Add(colHeader);
+                        }
+                    }
+                    #endregion
+                    #region else if(SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
+                    else if (SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.KeyTypeHeader);
+                        TheListView.Columns.Add(AppConstants.KeyNameHeader);
+                        TheListView.Columns.Add(AppConstants.KeyProductIdHeader);
+                        TheListView.Columns.Add(AppConstants.KeyProductVersionHeader);
+                        TheListView.Columns.Add(AppConstants.KeyLicenseTypeHeader);
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.KeyDaysLeftHeader;
+                        colHeader.Tag = typeof(int);
+                        TheListView.Columns.Add(colHeader);
+
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.KeyExpirationDateHeader;
+                        colHeader.Tag = typeof(DateTime);
+                        TheListView.Columns.Add(colHeader);
+
+                        TheBottomListView.Columns.Clear();
+                        TheBottomListView.Columns.Add(AppConstants.PkModuleHeader);
+                        TheBottomListView.Columns.Add(AppConstants.PkModuleTotalHeader);
+                        TheBottomListView.Columns.Add(AppConstants.PkModuleInUseHeader);
+                        
+                    }
+                    #endregion
+                    #region else if(SelectedNode.Text == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Text == AppConstants.UsageRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.UsageProductHeader);
+                    }
+                    #endregion
+                    #region else if(SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
+                    else if (SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
+                    {
+                        if (IsLocalMachine(m_CommLink.ServerName))
+                        {
+                            TheListView.Columns.Add(AppConstants.ConnProductHeader);
+                            TheListView.Columns.Add(AppConstants.ConnPrimaryServerHeader);
+                            TheListView.Columns.Add(AppConstants.ConnBackupServerHeader);
+                            TheListView.Columns.Add(AppConstants.ConnTestDevHeader);
+                            TheListView.Columns.Add(AppConstants.ConnStatusHeader);
+                        }
+                        else
+                        {
+                            TheListView.Columns.Add("");
+                        }
+                    }
+                    #endregion
+                    break;
+                case 1:
+                    #region if (SelectedNode.Text == AppConstants.HistoryNode)
+                    if (SelectedNode.Text == AppConstants.HistoryNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.NameHeader);
+                        TheListView.Columns.Add(AppConstants.VerificationCodeHeader);
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.DateAppliedHeader;
+                        colHeader.Tag = typeof(DateTime);
+                        TheListView.Columns.Add(colHeader);
+                    }
+                    #endregion
+                    #region else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
+                    else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.NameHeader);
+                        TheListView.Columns.Add(AppConstants.VersionHeader);
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.AppInstanceHeader;
+                        colHeader.Tag = typeof(DateTime);
+                        TheListView.Columns.Add(colHeader);
+                    }
+                    #endregion
+                    #region else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.UsageAppInstanceHeader);
+                    }
+                    #endregion
+                    break;
+                case 2:
+                    #region if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)
+                    if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)
+                    {
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.UnitsHeader;
+                        colHeader.Tag = typeof(string);
+                        TheListView.Columns.Add(colHeader);
+
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.LicensesHeader;
+                        colHeader.Tag = typeof(int);
+                        TheListView.Columns.Add(colHeader);
+
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.AppInstanceHeader;
+                        colHeader.Tag = typeof(int);
+                        TheListView.Columns.Add(colHeader);
+
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.ExpirationHeader;
+                        colHeader.Tag = typeof(DateTime);
+                        TheListView.Columns.Add(colHeader);
+                    }
+                    #endregion
+                    #region else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)
+                    {
+                        TheListView.Columns.Add(AppConstants.UsageModuleHeader);
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.ObtainedHeader;
+                        colHeader.Tag = typeof(int);
+                        TheListView.Columns.Add(colHeader);
+
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.TotalHeader;
+                        colHeader.Tag = typeof(int);
+                        TheListView.Columns.Add(colHeader);
+                    }
+                    #endregion
+                    break;
+                default:
+                    break;
+            }
+            ResetListViewColumnSorter(TheListView);
+            ResetListViewColumnSorter(TheBottomListView);
+            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.HeaderSize);
+            AutoResizeColumns(TheBottomListView, ColumnHeaderAutoResizeStyle.HeaderSize);
+            TheListView.EndUpdate();
+        }
+
+        #region License Section
         /// <summary>
         /// Loads package information into the ListView. Populates name, license type, and verification status columns. 
         /// </summary>
         public void LoadPackageData()
         {
+            if (m_toolStripList.ContainsKey(AppConstants.LicenseRootNode))
+            {
+                this.TheListViewToolStrip.Visible = true;
+                this.TheListViewToolStrip.Items.Clear();
+                this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.LicenseRootNode].ToArray());
+                this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+            }
+            else
+            {
+                this.TheListViewToolStrip.Visible = false;
+            }
             String generalStream = "";
             String verificationStatus = AppConstants.UnVerifiedStatus;
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             try
             {
+
                 m_CommLink.GetAllSoftwareLicenses(ref generalStream);
                 Solimar.Licensing.Attribs.AttribsMemberStringList strList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                 strList.SVal = generalStream;
@@ -131,7 +469,7 @@ namespace SolimarLicenseViewer
                             lvItem.ForeColor = System.Drawing.Color.Black;
                         }
                     }
-                    catch (COMException ex)
+                    catch (COMException)
                     {
                     }
                     lvItem.SubItems.Add(verificationStatus);
@@ -185,6 +523,7 @@ namespace SolimarLicenseViewer
             }
             catch (COMException)
             {
+                this.TheListView.NoItemsMessage = m_CommLink.Exception.Message;
             }
         }
 
@@ -193,6 +532,25 @@ namespace SolimarLicenseViewer
         /// </summary>
         public void LoadProductData()
         {
+            if (m_toolStripList.ContainsKey(AppConstants.LicenseRootNode))
+            {
+                this.TheListViewToolStrip.Visible = true;
+                this.TheListViewToolStrip.Items.Clear();
+                this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.LicenseRootNode].ToArray());
+                //this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Name + ": ";
+                StringBuilder sBuilder = new StringBuilder();
+                foreach (string tmpStr in m_TreeNode.ToolTipText.Split('\n'))
+                {
+                    if (sBuilder.Length != 0)
+                        sBuilder.Append(", ");
+                    sBuilder.Append(tmpStr);
+                }
+                this.TheListViewToolStrip.Items[0].Text = sBuilder.ToString();
+            }
+            else
+            {
+                this.TheListViewToolStrip.Visible = false;
+            }
             String generalStream = "";
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             try
@@ -205,15 +563,18 @@ namespace SolimarLicenseViewer
                     ListViewItem lvItem = new ListViewItem();
                     lvItem.Text = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
                     System.Text.StringBuilder strBuilder = new StringBuilder();
-                    strBuilder.Append(prodInfo.product_Major.ToString());
+                    strBuilder.Append(prodInfo.product_Major.TVal.ToString());
                     strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_Minor.ToString());
-                    strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_SubMajor.ToString());
-                    strBuilder.Append(".");
-                    strBuilder.Append(prodInfo.product_SubMinor.ToString());
+                    strBuilder.Append(prodInfo.product_Minor.TVal.ToString());
+                    if (prodInfo.product_SubMajor != 0 && prodInfo.product_SubMinor != 0)
+                    {
+                        strBuilder.Append(".");
+                        strBuilder.Append(prodInfo.product_SubMajor.TVal.ToString());
+                        strBuilder.Append(".");
+                        strBuilder.Append(prodInfo.product_SubMinor.TVal.ToString());
+                    }
                     lvItem.SubItems.Add(strBuilder.ToString());
-                    lvItem.SubItems.Add(prodInfo.productAppInstance);
+                    lvItem.SubItems.Add(prodInfo.productAppInstance.TVal.ToString());
                     lvItem.ForeColor = m_TreeNode.ForeColor;
                     //lvItem.SubItems.Add(prodInfo.productExpirationDate.TVal.ToLocalTime().ToString());
                     lviList.Add(lvItem);
@@ -236,6 +597,27 @@ namespace SolimarLicenseViewer
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             try
             {
+                //LicenseRootNode
+                if (m_toolStripList.ContainsKey(AppConstants.UnitsHeader))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.UnitsHeader].ToArray());
+                    StringBuilder sBuilder = new StringBuilder();
+                    foreach (string tmpStr in m_TreeNode.ToolTipText.Split('\n'))
+                    {
+                        if(sBuilder.Length != 0)
+                            sBuilder.Append(", ");
+                        sBuilder.Append(tmpStr);
+                    }
+                    this.TheListViewToolStrip.Items[0].Text = sBuilder.ToString();
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+
+
                 m_CommLink.GetSoftwareLicenseInfoByLicense(m_TreeNode.Parent.Name, ref generalStream);
                 licInfoAttrib.AssignMembersFromStream(generalStream);
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
@@ -244,6 +626,8 @@ namespace SolimarLicenseViewer
                     if (string.Equals(m_CommLink.GetProductName(productID), m_TreeNode.Text))
                     {
                         System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
+                        bool bDisplayExpired = m_moduleFilterComboBox.SelectedIndex == 0/*All*/ || m_moduleFilterComboBox.SelectedIndex == 1/*Expired*/;
+                        bool bDisplayNonExpired = m_moduleFilterComboBox.SelectedIndex == 0/*All*/ || m_moduleFilterComboBox.SelectedIndex == 2/*NonExpired*/;
                         foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                         {
                             //Get Module Info using product id and module id
@@ -251,9 +635,17 @@ namespace SolimarLicenseViewer
                             moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
                             lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
                             if ((DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0) && (DateTime.Now.ToUniversalTime().CompareTo(modInfo.moduleExpirationDate.TVal) > 0))
+                            {
                                 lvItem.ForeColor = System.Drawing.Color.Red;
+                                if (!bDisplayExpired)
+                                    continue;
+                            }
                             else
+                            {
                                 lvItem.ForeColor = m_TreeNode.ForeColor;
+                                if (!bDisplayNonExpired)
+                                    continue;
+                            }
 
                             lvItem.SubItems.Add(System.Convert.ToInt32(modInfo.moduleValue.ToString(), 16).ToString());
                             m_CommLink.SoftwareModuleLicenseInUseForAllByProduct(productID, moduleID, ref useCount);
@@ -282,6 +674,18 @@ namespace SolimarLicenseViewer
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             try
             {
+                if (m_toolStripList.ContainsKey(AppConstants.LicenseRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.LicenseRootNode].ToArray());
+                    this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+
                 m_CommLink.GetAllSoftwareLicenses(ref generalStream);
                 Solimar.Licensing.Attribs.AttribsMemberStringList strList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                 strList.SVal = generalStream;
@@ -290,14 +694,16 @@ namespace SolimarLicenseViewer
                 {
                     m_CommLink.GetSoftwareLicenseInfoByLicense(softwareLicense, ref generalStream);
                     licInfoAttrib.AssignMembersFromStream(generalStream);
-                    ListViewItem lvItem = new ListViewItem();
-                    lvItem.Text = softwareLicense;
-                    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verToken in licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal)
+                    // Only display the last item.
+                    if (licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0)
                     {
+                        ListViewItem lvItem = new ListViewItem();
+                        lvItem.Text = softwareLicense;
+                        Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verToken = (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1];
                         lvItem.SubItems.Add(verToken.verificationValue);
                         lvItem.SubItems.Add(verToken.verificationDate.TVal.ToLocalTime().ToString());
+                        this.TheListView.Items.Add(lvItem);
                     }
-                    this.TheListView.Items.Add(lvItem);
                 }
             }
             catch (COMException)
@@ -305,6 +711,9 @@ namespace SolimarLicenseViewer
             }
         }
 
+        #endregion
+
+        #region Protection Key Section
         /// <summary>
         /// Loads protection key information into the ListView. Populates the name, ...
         /// </summary>
@@ -312,8 +721,19 @@ namespace SolimarLicenseViewer
         {
             try
             {
-                this.TheListView.BeginUpdate();
-                this.TheListView.Items.Clear();
+                if (m_toolStripList.ContainsKey(AppConstants.ProtectionKeyRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.ProtectionKeyRootNode].ToArray());
+                    this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+                //this.TheListView.BeginUpdate();
+                //this.TheListView.Items.Clear();
                 this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
                 this.TheListView.SelectedIndexChanged += new EventHandler(TheListView_SelectedIndexChanged);
 
@@ -321,7 +741,7 @@ namespace SolimarLicenseViewer
                 {
                     ListViewItem lvItem = new ListViewItem();
                     lvItem.Text = "Unknown Key Type";
-                    
+
                     if (keyInfo != null)
                     {
                         System.Diagnostics.Trace.WriteLine("LoadProtectionKeysData() keyName: " + keyInfo.keyName + ", productName: " + keyInfo.productName);
@@ -363,7 +783,7 @@ namespace SolimarLicenseViewer
                         }
                     }
                     this.TheListView.Items.Add(lvItem);
-                
+
                 }
             }
             catch (COMException)
@@ -374,7 +794,7 @@ namespace SolimarLicenseViewer
                 if (this.TheListView.Items.Count > 0)
                     this.TheListView.Items[0].Selected = true;
                 TheListView_SelectedIndexChanged(this.TheListView, new EventArgs());
-                this.TheListView.EndUpdate();
+                //this.TheListView.EndUpdate();
             }
         }
 
@@ -426,11 +846,11 @@ namespace SolimarLicenseViewer
                                 {
                                     ListViewItem lvItem = new ListViewItem();
                                     lvItem.Text = modInfo.moduleName;
-                                    lvItem.SubItems.Add(modInfo.moduleInUse.ToString());
                                     if (modInfo.moduleTotal >= modInfo.moduleUnlimited && modInfo.moduleUnlimited > 0)
                                         lvItem.SubItems.Add(SolimarLicenseViewer.AppConstants.UnlimitedValue);
                                     else
                                         lvItem.SubItems.Add(modInfo.moduleTotal.ToString());
+                                    lvItem.SubItems.Add(modInfo.moduleInUse.ToString());
 
                                     this.TheBottomListView.Items.Add(lvItem);
                                 }
@@ -455,161 +875,52 @@ namespace SolimarLicenseViewer
                 this.TheBottomListView.EndUpdate();
             }
         }
-
-        /// <summary>
-        /// Copies a packet history entry into clipboard.
-        /// </summary>
-        public void CopyHistoryData(int itemIndex)
-        {
-            Clipboard.SetDataObject(this.TheListView.Items[itemIndex].Text + " " + this.TheListView.Items[itemIndex].SubItems[1].Text);
-        }
-        /// <summary>
-        /// Populates the ListView with license information based upon the selected TreeNode.
-        /// </summary>
-        public void PopulateLicenseView()
-        {
-            //Clear items in listview
-            this.TheListView.Items.Clear();
-            this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
-            TheSplitControl.Panel2Collapsed = true;
-            switch (SelectedNode.Level)
-            {
-                case 0: //load packages or History
-                    if (SelectedNode.Text == AppConstants.LicenseRootNode)
-                        LoadPackageData();
-                    else //if(SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
-                    {
-                        LoadProtectionKeysData();
-                    }
-                    break;
-                case 1: //load products
-                    if (SelectedNode.Text == AppConstants.HistoryNode)
-                        LoadHistoryData();
-                    else //if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
-                        LoadProductData();
-                    break;
-                default: //load modules
-                    LoadModuleData();
-                    break;
-            }
-            if (TheListView.Items.Count > 0)
-                TheListView.GridLines = true;
-            else
-                TheListView.GridLines = false;
-            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.ColumnContent);
-            PopulateLicenseColumns();
-        }
-        /// <summary>
-        /// Populates the ListView column headers based upon the selected TreeNode of the License view.
-        /// </summary>
-        public void PopulateLicenseColumns()
-        {
-            TheListView.Columns.Clear();
-            ColumnHeader colHeader = null;
-            switch (SelectedNode.Level)
-            {
-                case 0:
-                    if (SelectedNode.Text == AppConstants.LicenseRootNode)
-                    {
-                        TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.LicenceTypeHeader);
-                        TheListView.Columns.Add(AppConstants.VerificationStatusHeader);
-                        {
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.ExpirationHeader;
-                            colHeader.Tag = typeof(DateTime);
-                            TheListView.Columns.Add(colHeader);
-
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.CurrentActivationHeader;
-                            colHeader.Tag = typeof(int);
-                            TheListView.Columns.Add(colHeader);
-
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.TotalActivationHeader;
-                            colHeader.Tag = typeof(int);
-                            TheListView.Columns.Add(colHeader);
-
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.DaysPerActivationHeader;
-                            colHeader.Tag = typeof(int);
-                            TheListView.Columns.Add(colHeader);
-                        }
-                    }
-                    else //if(SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
-                    {
-                        TheListView.Columns.Add(AppConstants.KeyTypeHeader);
-                        TheListView.Columns.Add(AppConstants.KeyNameHeader);
-                        TheListView.Columns.Add(AppConstants.KeyProductIdHeader);
-                        TheListView.Columns.Add(AppConstants.KeyProductVersionHeader);
-                        TheListView.Columns.Add(AppConstants.KeyLicenseTypeHeader);
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.KeyDaysLeftHeader;
-                        colHeader.Tag = typeof(int);
-                        TheListView.Columns.Add(colHeader);
-
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.KeyExpirationDateHeader;
-                        colHeader.Tag = typeof(DateTime);
-                        TheListView.Columns.Add(colHeader);
-
-                        TheBottomListView.Columns.Clear();
-                        TheBottomListView.Columns.Add(AppConstants.PkModuleHeader);
-                        TheBottomListView.Columns.Add(AppConstants.PkModuleInUseHeader);
-                        TheBottomListView.Columns.Add(AppConstants.PkModuleTotalHeader);
-                    }
-                    break;
-                case 1:
-                    if (SelectedNode.Text == AppConstants.HistoryNode)
-                    {
-                        TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.VerificationCodeHeader);
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.DateAppliedHeader;
-                        colHeader.Tag = typeof(DateTime);
-                        TheListView.Columns.Add(colHeader);
-                    }
-                    else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
-                    {
-                        TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.VersionHeader);
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.AppInstanceHeader;
-                        colHeader.Tag = typeof(DateTime);
-                        TheListView.Columns.Add(colHeader);
-                    }
-                    break;
-                default:
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.UnitsHeader;
-                    colHeader.Tag = typeof(string);
-                    TheListView.Columns.Add(colHeader);
-
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.LicensesHeader;
-                    colHeader.Tag = typeof(int);
-                    TheListView.Columns.Add(colHeader);
-
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.AppInstanceHeader;
-                    colHeader.Tag = typeof(int);
-                    TheListView.Columns.Add(colHeader);
-
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.ExpirationHeader;
-                    colHeader.Tag = typeof(DateTime);
-                    TheListView.Columns.Add(colHeader);
-                    break;
-            }
-            ResetListViewColumnSorter(TheListView);
-            ResetListViewColumnSorter(TheBottomListView);
-            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.HeaderSize);
-            AutoResizeColumns(TheBottomListView, ColumnHeaderAutoResizeStyle.HeaderSize);
-        }
         #endregion
 
-        #region Usage View
+        #region Usage Section
 
+        public void LoadUsageData()
+        {
+            try
+            {
+                if (m_toolStripList.ContainsKey(AppConstants.UsageRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.UsageRootNode].ToArray());
+                    this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+
+                String productName;
+                String generalStream = "";
+                m_CommLink.GetSoftwareLicenseInfoForAll(ref generalStream);
+                Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
+                licInfoAttrib.AssignMembersFromStream(generalStream);
+
+                foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
+                {
+                    //add a product node if there are app instances
+                    if (prodInfo.productID.ToString() != "0")
+                    {
+                        m_CommLink.SoftwareGetApplicationInstanceListByProduct(System.Convert.ToInt32(prodInfo.productID.ToString(), 16), ref generalStream);
+                        Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                        appList.SVal = generalStream;
+                        if (appList.TVal.Count > 0)
+                        {
+                            productName = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
+                            this.TheListView.Items.Add(productName);
+                        }
+                    }
+                }
+            }
+            catch (COMException)
+            {
+            }
+        }
         /// <summary>
         /// Loads application instance information into the ListView. Populates the name column.
         /// Displays only application instances connected to the license server.
@@ -618,8 +929,26 @@ namespace SolimarLicenseViewer
         {
             String generalStream = "";
             Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
-            try 
+            try
             {
+                if (m_toolStripList.ContainsKey(AppConstants.UsageRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.UsageRootNode].ToArray());
+                    StringBuilder sBuilder = new StringBuilder();
+                    foreach (string tmpStr in m_TreeNode.ToolTipText.Split('\n'))
+                    {
+                        if (sBuilder.Length != 0)
+                            sBuilder.Append(", ");
+                        sBuilder.Append(tmpStr);
+                    }
+                    this.TheListViewToolStrip.Items[0].Text = AppConstants.UsageRootNode + " - " + sBuilder.ToString();
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
                 m_CommLink.SoftwareGetApplicationInstanceListByProduct(m_CommLink.GetProductID(m_TreeNode.Text), ref generalStream);
                 appList.SVal = generalStream;
                 if (appList.TVal.Count > 0)
@@ -631,35 +960,57 @@ namespace SolimarLicenseViewer
                         //add another informative item
                         this.TheListView.Items.Add(lvItem);
                     }
-                }  
+                }
             }
-            catch (COMException ex) { }
+            catch (COMException ex)
+            {
+                HandleExceptions.DisplayException(ex);
+            }
         }
         /// <summary>
         /// Loads Used Module information into the ListView. Populates the name column, obtained, total columns.
         /// Displays only modules that have been obtained by the application instance.
         /// </summary>
-        public void LoadUsedModuleData()
+        public void LoadUsedModuleData(string _productName)
         {
             int productID, moduleID;
             int licenseCount = 0;
             String generalStream = "";
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
-            try 
+            try
             {
+                if (m_toolStripList.ContainsKey(AppConstants.UsageRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.UsageRootNode].ToArray());
+                    //this.TheListViewToolStrip.Items[0].Text = m_TreeNode.ToolTipText + ": ";
+                    StringBuilder sBuilder = new StringBuilder();
+                    foreach (string tmpStr in m_TreeNode.ToolTipText.Split('\n'))
+                    {
+                        if (sBuilder.Length != 0)
+                            sBuilder.Append(", ");
+                        sBuilder.Append(tmpStr);
+                    }
+                    this.TheListViewToolStrip.Items[0].Text = AppConstants.UsageRootNode + " - " + sBuilder.ToString();
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
                 m_CommLink.GetSoftwareLicenseInfoForAll(ref generalStream);
                 licInfoAttrib.AssignMembersFromStream(generalStream);
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                 {   //found matching prodinfo attriblist
                     productID = System.Convert.ToInt32(prodInfo.productID.ToString(), 16);
-                    if (string.Equals(m_CommLink.GetProductName(productID), m_TreeNode.Parent.Name))
+                    if (string.Equals(m_CommLink.GetProductName(productID), _productName))
                     {
                         m_CommLink.InitializeWrapper(m_TreeNode.Text, productID, System.Convert.ToInt32(prodInfo.product_Major.ToString(), 16), System.Convert.ToInt32(prodInfo.product_Minor.ToString(), 16));
                         foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                         {
                             moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
 
-                            m_CommLink.ModuleLicenseInUse(moduleID, ref licenseCount);
+                            m_CommLink.ModuleLicenseInUse_ByApp(moduleID, ref licenseCount);
                             if (licenseCount > 0)
                             {
                                 ListViewItem lvItem = new ListViewItem();
@@ -675,60 +1026,263 @@ namespace SolimarLicenseViewer
                     }
                 }
             }
-            catch (COMException ex) { }
+            catch (COMException) { }
         }
-        /// <summary>
-        /// Populates the ListView with Usage information based upon the selected TreeNode.
-        /// </summary>
-        public void PopulateUsageView()
-        {
-            //Clear items in listview
-            this.TheListView.Items.Clear();
-            this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
-            switch (SelectedNode.Level)
-            {
-                case 0: 
-                    LoadAppInstData();
-                    break;
-                default:    
-                    LoadUsedModuleData();
-                    break;
-            }
-            if (TheListView.Items.Count > 0)
-                TheListView.GridLines = true;
-            else
-                TheListView.GridLines = false;
-            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.ColumnContent);
-            PopulateUsageColumns();
-        }
-        /// <summary>
-        /// Populates the ListView column headers based upon the selected TreeNode of the Usage view.
-        /// </summary>
-        public void PopulateUsageColumns()
-        {
-            TheListView.Columns.Clear();
-            TheListView.Columns.Add(AppConstants.NameHeader);
-            ColumnHeader colHeader = null;
-            switch (SelectedNode.Level)
-            {
-                case 0:
-                    break;
-                default:
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.ObtainedHeader;
-                    colHeader.Tag = typeof(int);
-                    TheListView.Columns.Add(colHeader);
+        #endregion
 
-                    colHeader = new ColumnHeader();
-                    colHeader.Text = AppConstants.TotalHeader;
-                    colHeader.Tag = typeof(int);
-                    TheListView.Columns.Add(colHeader);
-                    break;
+        #region ProductionConnectionData Section
+        public void LoadProductConnectionData()
+        {
+            if (IsLocalMachine(m_CommLink.ServerName))
+            {
+                if (m_toolStripList.ContainsKey(AppConstants.ProductConnectionSettingsRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.ProductConnectionSettingsRootNode].ToArray());
+                    this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+
+                this.TheListView.SelectedIndexChanged += new EventHandler(prodConn_SelectedIndexChanged);
+                this.TheListView.KeyDown += new KeyEventHandler(prodConn_KeyDown);
+                this.TheListView.DoubleClick += new EventHandler(prodConn_EditConnSettings);
+
+                foreach (ConnectionSettings2 connSettings in m_connSettingsHelper.GetConnectionSettings().Values)
+                    UpdateProdConnListView(connSettings);
             }
-            ResetListViewColumnSorter(TheListView);
-            ResetListViewColumnSorter(TheBottomListView);
-            AutoResizeColumns(TheListView, ColumnHeaderAutoResizeStyle.HeaderSize);
-            AutoResizeColumns(TheBottomListView, ColumnHeaderAutoResizeStyle.HeaderSize);
+            else
+            {
+                if (m_toolStripList.ContainsKey(AppConstants.LicenseRootNode))
+                {
+                    this.TheListViewToolStrip.Visible = true;
+                    this.TheListViewToolStrip.Items.Clear();
+                    this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.LicenseRootNode].ToArray());
+                    this.TheListViewToolStrip.Items[0].Text = m_TreeNode.Text + ": ";
+                }
+                else
+                {
+                    this.TheListViewToolStrip.Visible = false;
+                }
+                this.TheListView.NoItemsMessage = "This can only be set when connected to the localhost";
+            }
+        }
+
+
+
+        ///key into ListView where _productID is unique, display_connectionSettings.  If _productID is new then add
+        ///_connectionSettings.  If _productID is already there, update existing item.
+        private void UpdateProdConnListView(ConnectionSettings2 _connectionSettings)
+        {
+            this.TheListView.BeginUpdate();
+
+            ListViewItem matchingLvi = null;
+            foreach (ListViewItem lvi in this.TheListView.Items)
+            {
+                if ((lvi.Tag != null) && ((int)lvi.Tag) == _connectionSettings.ProductID)
+                {
+                    matchingLvi = lvi;
+                    break;
+                }
+
+            }
+            if (matchingLvi == null)    //New item
+            {
+                matchingLvi = new ListViewItem();
+                matchingLvi.ForeColor = System.Drawing.Color.Black;
+                matchingLvi.Text = m_CommLink.GetProductName(_connectionSettings.ProductID);
+                matchingLvi.Tag = _connectionSettings.ProductID;
+                matchingLvi.SubItems.Add(_connectionSettings.ServerName);
+                matchingLvi.SubItems.Add(_connectionSettings.BackupName);
+                matchingLvi.SubItems.Add(_connectionSettings.UseDevelopmentLic.ToString());
+                matchingLvi.SubItems.Add(AppConstants.ProductConnectionSettingsUnknownStatus);
+                this.TheListView.Items.Add(matchingLvi);
+            }
+            else //Update Existing item
+            {
+                matchingLvi.ForeColor = System.Drawing.Color.Black;
+                matchingLvi.Text = m_CommLink.GetProductName(_connectionSettings.ProductID);
+                matchingLvi.SubItems[1].Text = _connectionSettings.ServerName;
+                matchingLvi.SubItems[2].Text = _connectionSettings.BackupName;
+                matchingLvi.SubItems[3].Text = _connectionSettings.UseDevelopmentLic.ToString();
+                matchingLvi.SubItems[4].Text = AppConstants.ProductConnectionSettingsUnknownStatus;
+            }
+            prodConn_SelectedIndexChanged(TheListView, new EventArgs());
+            this.TheListView.EndUpdate();
+        }
+
+        public void prodConn_EditConnSettings(object sender, EventArgs e)
+        {
+            if (this.TheListView.SelectedItems.Count > 0)
+            {
+                Dictionary<int, ConnectionSettings2> prodConnSettingsMap = m_connSettingsHelper.GetConnectionSettings();
+                EditConnectionSettingsDialog dialog = new EditConnectionSettingsDialog();
+                System.Collections.Generic.List<ConnectionSettings2> objList = new List<ConnectionSettings2>();
+                foreach (ListViewItem lvi in this.TheListView.SelectedItems)
+                {
+                    if ((int)lvi.Tag != -1)
+                        objList.Add(prodConnSettingsMap[(int)lvi.Tag]);
+                }
+
+                string caption = (objList.Count > 1) ?
+                    "Edit Connection Settings for multiple products" :
+                    "Edit Connection Settings Product: " + m_CommLink.GetProductName(objList[0].ProductID);
+
+                dialog.SetData(objList.ToArray(), caption);
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (ConnectionSettings2 connSettings in dialog.GetData())
+                    {
+                        if (connSettings.IsDirty)
+                        {
+                            UpdateProdConnListView(connSettings);
+                            m_connSettingsHelper.SetConnectionSetting(connSettings.ProductID, connSettings);
+                        }
+                    }
+                }
+
+            }
+        }
+        private void prodConn_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                prodConn_EditConnSettings(this.TheListView, new EventArgs());
+            }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+        private void prodConn_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bool bSelected = this.TheListView.SelectedItems.Count > 0;
+            foreach (ToolStripItem tsItem in this.TheListViewToolStrip.Items)
+            {
+                if (tsItem is ToolStripButton)
+                {
+                    if (((string.Compare(tsItem.Text, AppConstants.ProdSettingsEditConnTSB, true) == 0) ||
+                    (string.Compare(tsItem.Text, AppConstants.ProdSettingsTestConnSelectedTSB, true) == 0))
+                    )
+                    {
+                        tsItem.Enabled = bSelected;
+                    }
+                }
+            }
+        }
+        public void prodConnTestConnSelTSButton_Click(object sender, EventArgs e)
+        {
+            System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
+            foreach (ListViewItem lvi in this.TheListView.SelectedItems)
+                lvItemList.Add(lvi);
+            testConnectionToLicenseServer(lvItemList);
+        }
+        public void prodConnTestConnAllTSButton_Click(object sender, EventArgs e)
+        {
+            System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
+            foreach (ListViewItem lvi in this.TheListView.Items)
+                lvItemList.Add(lvi);
+            testConnectionToLicenseServer(lvItemList);
+        }
+
+        private void testConnectionToLicenseServer(System.Collections.Generic.List<ListViewItem> _listViewItemList)
+        {
+            ConnectionSettings2 connSettings = new ConnectionSettings2();
+            foreach (ListViewItem lvItem in _listViewItemList)
+            {
+                connSettings.ProductID = (int)lvItem.Tag;
+                connSettings.ServerName = lvItem.SubItems[1].Text;
+                connSettings.BackupName = lvItem.SubItems[2].Text;
+                connSettings.UseDevelopmentLic = System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0;
+                try
+                {
+                    testConnectionToLicenseServer(connSettings);
+                    lvItem.ForeColor = System.Drawing.Color.Green;
+                    lvItem.SubItems[4].Text = "Successfully connected to the License Server";
+                }
+                catch (Exception ex)
+                {
+                    lvItem.ForeColor = System.Drawing.Color.Red;
+                    lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
+                }
+                //setToolTip(lvItem);
+            }
+        }
+        // throws an exception if fails to connect...
+        private void testConnectionToLicenseServer(ConnectionSettings2 _connectionSettings)
+        {
+            if (_connectionSettings != null)
+            {
+                try
+                {
+
+                    this.TheListView.FindForm().Cursor = Cursors.WaitCursor;
+                    //this.TheListView.FindForm().Enabled = false;
+
+                    using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
+                    {
+                        licWrapper.ConnectEx(_connectionSettings.ServerName);
+                        if (_connectionSettings.BackupName.Length != 0)
+                            licWrapper.ConnectEx(_connectionSettings.BackupName, false, true);
+                        Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
+                        if (_connectionSettings.UseDevelopmentLic == true)
+                        {
+                            //Successfully connected, use a different product ID for the Test/Dev licensing
+                            if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Iconvert)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevIconvert;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubika;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubikaProcessBuilder;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSdxDesigner;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolIndexer;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolFusion)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolfusionSp;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolScript)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolScript;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherEnt)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolsearcherEp;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpde;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpdeQueueManager;
+                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherSp)
+                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSseSp;
+                        }
+
+                        licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
+                                                (int)productID, //product
+                                                0,              //prod_ver_major
+                                                0,              //prod_ver_minor
+                                                false,          //single_key
+                                                "",             //specific_single_key_ident
+                                                false,          //lock_keys
+                                                0,              //ui_level
+                                                0,              //grace_period_minutes
+                                                false,          //application_instance_lock_keys
+                                                false);         //bypass_remote_key_restriction
+                        licWrapper.DisconnectEx();
+                        //licWrapper = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(this.TheListView.FindForm(), ex, "Failed to connect to License Server", "Test Connection to License Server");
+                    throw;
+                }
+                finally
+                {
+
+                    //this.TheListView.FindForm().Enabled = true;
+                    this.TheListView.FindForm().Cursor = Cursors.Default;
+                }
+            }
         }
         #endregion
 
@@ -847,6 +1401,41 @@ namespace SolimarLicenseViewer
         }
         #endregion
 
+        #region Helper Methods
+        public bool IsLocalMachine(string _serverName)
+        {
+            bool bIsLocalMachine = false;
+            bIsLocalMachine = (string.Compare(_serverName, "localhost", true) == 0);
+
+            if (!bIsLocalMachine)
+                bIsLocalMachine = (string.Compare(_serverName, System.Environment.MachineName, true) == 0);
+            if (!bIsLocalMachine)
+            {
+                //see if IP address was past in
+                try
+                {
+                    //find host by name
+                    IPHostEntry iphostentry = Dns.GetHostEntry(Dns.GetHostName());
+
+                    //enumerate IP addresses
+                    foreach (IPAddress ipaddress in iphostentry.AddressList)
+                    {
+                        if (string.Compare(_serverName, ipaddress.ToString(), true) == 0)
+                        {
+                            bIsLocalMachine = true;
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+            return bIsLocalMachine;
+        }
+        #endregion
+
         #region Properties
         /// <summary>
         /// Gets the currently selected TreeNode.
@@ -868,8 +1457,9 @@ namespace SolimarLicenseViewer
         /// <summary>
         /// Specifies the ListView from the MainForm
         /// </summary>
-        private SplitContainer TheSplitControl;
         private Shared.VisualComponents.NoFlickerListView TheListView;
+        private SplitContainer TheSplitControl;
+        private ToolStrip TheListViewToolStrip;
         private Shared.VisualComponents.NoFlickerListView TheBottomListView;
         /// <summary>
         /// Stores user selected TreeNode
@@ -879,6 +1469,7 @@ namespace SolimarLicenseViewer
         /// object to the license server/wrapper functions
         /// </summary>
         private CommunicationLink m_CommLink;
+        private ConnectionSettingsHelper m_connSettingsHelper;
         /// <summary>
         /// Boolean object to determine disaster recovery mode
         /// </summary>
@@ -887,6 +1478,9 @@ namespace SolimarLicenseViewer
         /// Boolean object to determine disaster recovery extensions enabled
         /// </summary>
         private Boolean m_EnableDisasterRecoverExt;
+
+        private Dictionary<string, List<ToolStripItem>> m_toolStripList;
+        private ToolStripComboBox m_moduleFilterComboBox;
         #endregion
     }
     // Implements the manual sorting of items by columns.
