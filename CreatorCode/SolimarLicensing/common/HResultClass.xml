@@ -108,6 +108,8 @@
 		<HResult name="EHR_LIC_SOFTWARE_KEY_ID_REQUIRED"	ecode="EC_LIC_SOFTWARE_KEY_ID_REQUIRED"	value="42" alias="Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED"	ecode="EC_LIC_SOFTWARE_LIC_FILE_EXPIRED"	value="43" alias="Software License Expired (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_NO_PRODUCT"	ecode="EC_LIC_SOFTWARE_NO_PRODUCT"	value="44" alias="Software Licensing does not contain licensing for the given product (License Server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION"	ecode="EC_LIC_SOFTWARE_PRODUCT_NO_VERSION"	value="45" alias="Software Licensing contains licensing for the given product, but not at the desired version (License Server)"/>
+		<HResult name="EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER"	ecode="EC_LIC_MOD_NO_OBTAIN_USING_FAILOVER"	value="46" alias="Unable to obtain module when using Backup Server (License Server)"/>
 		
 	</HResultType>
 	<!--	-->

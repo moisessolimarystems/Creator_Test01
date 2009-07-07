@@ -107,6 +107,8 @@ namespace Solimar
 			private const uint EHR_LIC_SOFTWARE_KEY_ID_REQUIRED = ITF_LIC_SVR_OFFSET+42;
 			private const uint EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED = ITF_LIC_SVR_OFFSET+43;
 			private const uint EHR_LIC_SOFTWARE_NO_PRODUCT = ITF_LIC_SVR_OFFSET+44;
+			private const uint EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION = ITF_LIC_SVR_OFFSET+45;
+			private const uint EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER = ITF_LIC_SVR_OFFSET+46;
 		
 			// Rainbow driver errors
 			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -206,6 +208,8 @@ namespace Solimar
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,"Software License Expired (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_NO_PRODUCT,"Software Licensing does not contain licensing for the given product (License Server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION,"Software Licensing contains licensing for the given product, but not at the desired version (License Server)");
+				SolLicErrors.Add(EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER,"Unable to obtain module when using Backup Server (License Server)");
 				SolLicErrors.Add(EHR_SP_INVALID_FUNCTION_CODE,"Invalid function code (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_PACKET,"Invalid packet (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_UNIT_NOT_FOUND,"Unit not found (Rainbow driver)");
