@@ -151,6 +151,11 @@
 
 #define SS_GENERATE_AND_DISPATCH_MESSAGE(MessageValue, MessageType, MessageErrorCode) \
 { /* begin scope */ \
+	SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(L"", MessageValue, MessageType, MessageErrorCode) \
+} /* end scope */ \
+
+#define SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(LicenseServer, MessageValue, MessageType, MessageErrorCode) \
+{ /* begin scope */ \
 	static const int MAX_MESSAGE_SIZE = 0x2000; \
 	wchar_t message[MAX_MESSAGE_SIZE]; \
 	_snwprintf_s(message, sizeof(message)/sizeof(wchar_t), MessageValue); \
@@ -159,7 +164,7 @@
 	time_t timestamp = time(0); \
 	_variant_t vtTimestamp; \
 	vtTimestamp = TimeHelper::TimeTToVariant(timestamp, false); \
-	DispatchLicenseMessage(L"", MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
+	DispatchLicenseMessage(_bstr_t(LicenseServer), _bstr_t(L""), MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
 } /* end scope */ \
 
 #define SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp) \
@@ -216,7 +221,7 @@
 [
 	coclass,
 	threading(free),
-	support_error_info("ISolimarLicenseMgr5"),
+	support_error_info("ISolimarLicenseMgr7"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -224,7 +229,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr6,
+	public ISolimarLicenseMgr7,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -280,9 +285,13 @@ public:
 	STDMETHOD(KeyProductExists)(long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL *p_bool_key_product_exists);
 
 	// ISolimarLicenseMgr6
+	STDMETHOD(ModuleLicenseInUse_ByApp)(long module_id, long *count);
+
+	// ISolimarLicenseMgr7
 	STDMETHOD(Connect3)(BSTR server, long connectionFlags);
 	STDMETHOD(SoftwareLicense_Initialize)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, long auto_ui_level, unsigned long grace_period_minutes);
 	STDMETHOD(SoftwareLicense_InitializeViewOnly)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor);
+	STDMETHOD(GetInfoByProduct)(long product, VARIANT_BOOL use_shared_licenses_servers, BSTR* p_server, BSTR* p_backup_server, VARIANT_BOOL* p_bool_use_test_dev_licensing);
 
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
@@ -318,6 +327,7 @@ private:
 		ModuleLicenseMap licenses_total;
 		ModuleLicenseMap licenses_allocated;
 		ModuleLicenseMap licenses_inuse;
+		ModuleLicenseMap licenses_inuse_byapp;
 		
 		bool KeyPresent;
 		bool KeyActive;
@@ -353,7 +363,7 @@ private:
 		ServerInfo(_bstr_t servername, 
 			bool useOnlySharedLicenses, 
 			bool useSoftwareLicensing,
-			GITPtr<ISolimarLicenseSvr3> pILicenseServer);
+			GITPtr<ISolimarLicenseSvr4> pILicenseServer);
 
 		~ServerInfo();
 
@@ -364,7 +374,7 @@ private:
 		SoftwareLicenseInfo software_license;
 		KeyList keys;
 
-		GITPtr<ISolimarLicenseSvr3> LicenseServer;
+		GITPtr<ISolimarLicenseSvr4> LicenseServer;
 
 		HRESULT Reconnect();
 
@@ -435,11 +445,13 @@ private:
 	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.
 	HRESULT SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
+	// refresh ApplicationInstance InUse list
+	HRESULT RefreshApplicationInstanceInUseCache(ServerInfo* pServerInfo, bool bLogError);
 
 	// checks that all licenses checked out are accounted for by some key
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
 
-	// checks if there is valid licensing, 2nd Param tells whether to use backup servers or enter Grace Period if FAILS
+	// checks if there is valid licensing, 2nd Param tells whether to use backup servers or enter Grace/Violation Period if FAILS
 	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error);
 
 	// re-allocates any unallocated or invalidated licenses (if possible)
@@ -453,11 +465,13 @@ private:
 
 	HRESULT ModuleLicenseTotalInternal(long module_id, long *count);
 
-	// Calculates the modules in use by the given Application Instance.
-	// For Software License, goes to the License Server for all the process that are connected
-	// with the same Application Instance.  For Protection Key Licensing, only retrieves the
-	// in use for this given instance.
+	// Calculates the modules in use by the given Connection to the License Servers, not by the 
+	// Application Instance.
 	HRESULT ModuleLicenseInUseInternal(long module_id, long *count);
+
+	// Calculates the modules in use by the given Application Instance.
+	// For Software License & Protection Key Licensing, goes to the License Server for all the process that are connected
+	HRESULT ModuleLicenseInUse_ByAppInternal(long module_id, long *count);
 
 	// attempts to allocate licenses on the known-good keys in the cache
 	//HRESULT ObtainLicensesInternal(ModuleLicenseMap &licenses);
@@ -503,11 +517,13 @@ private:
 	
 	Lic_PackageAttribs::Lic_SoftwareSpecAttribs m_softwareSpec;
 	KeySpec m_keyspec;
-	ServerList m_servers;
-	ServerList m_backupServers;
-	bool m_bUsingBackupServers;
+	ServerList m_servers;			// List of Primary License Servers, the current software Licensing Scheme only supports a single item in the list
+	ServerList m_backupServers;	// List of Backup License Servers, the current software Licensing Scheme only supports a single item in the list
 	bool m_bBypassRemoteKeyRestrictions;
-
+	bool m_bUsingBackupServers;	// Licensing is using Backup License Servers for its licensing needs
+	bool m_bInViolationPeriod;		// Licensing is in violation
+	bool m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized;	// Primary License Server has been successfully initialized
+	std::list<std::wstring> m_licenseMsgEventLogCache;				// Cache of license messages written to the event log, so event log will not get flooded with the same message
 	KeyIdentList m_productkeys;
 
 	bool m_single_key, m_lock_keys, m_initialized;	
@@ -520,16 +536,18 @@ private:
 	unsigned long m_dtGracePeriod;	//in minutes
 	bool m_bLockKeyByAppInstance;
 	_bstr_t m_applicationInstance;
+	_bstr_t m_headerInformation;	//contains header information important for event log messages.
 
 	//bool m_bConfiguredForSoftwareLicense; //either configured for ProtectionKeys or Software Licenses.
 
 
 	time_t m_dtRefreshLicenses;
 
-	bool InViolationPeriod();
+	bool GracePeriodHadEnded();
 	bool GracePeriodHasStarted();
 	void StartGracePeriod();
 	void StopGracePeriod();
+	std::map<unsigned int, int> appInstanceInUseModuleCacheMap;
 
 	
 		
@@ -538,6 +556,7 @@ private:
 	static bool isAutoUiStyleDialog(DWORD ui_level);
 	static bool isAutoUiStyleEventLog(DWORD ui_level);
 	void DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message);
+	void DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message);
 	void KeyMessageShowDialog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);
 	void KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);
 	
