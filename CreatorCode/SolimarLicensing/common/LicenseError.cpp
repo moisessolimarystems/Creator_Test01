@@ -34,7 +34,7 @@ const SL_ERROR SLErrors[] =
 	{EC_PACKET_EXPIRED,						EHR_PACKET_EXPIRED,						L"Packet expired (License server)"},
 	{EC_KEY_BASE_NOT_MATCHING,						EHR_KEY_BASE_NOT_MATCHING,						L"Base Keys do not match module for module (License server)"},
 	{EC_KEY_NOT_MATCHING_INSTANCES,						EHR_KEY_NOT_MATCHING_INSTANCES,						L"Keys do not match by Application Instances for all the Key on the server (License server)"},
-	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instance on the server (License server)"},
+	{EC_KEY_NO_FREE_APP_INSTANCE,						EHR_KEY_NO_FREE_APP_INSTANCE,						L"Insufficient licensing, unable to obtain an Application Instances on the server (License server)"},
 	{EC_KEY_NO_BASE_KEY,						EHR_KEY_NO_BASE_KEY,						L"Insufficient licensing, unable to locate a Base Key on the server (License server)"},
 	{EC_KEY_RESTORED_KEY_SERVER,						EHR_KEY_RESTORED_KEY_SERVER,						L"Licensing on the License server has been restored (License server)"},
 	{EC_KEY_USE_FAILOVER_KEY_SERVER,						EHR_KEY_USE_FAILOVER_KEY_SERVER,						L"Unable to validate Licensing on the License server, switching to Failover License server (License server)"},
@@ -57,6 +57,8 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_SOFTWARE_KEY_ID_REQUIRED,						EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,						L"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)"},
 	{EC_LIC_SOFTWARE_LIC_FILE_EXPIRED,						EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,						L"Software License Expired (License server)"},
 	{EC_LIC_SOFTWARE_NO_PRODUCT,						EHR_LIC_SOFTWARE_NO_PRODUCT,						L"Software Licensing does not contain licensing for the given product (License Server)"},
+	{EC_LIC_SOFTWARE_PRODUCT_NO_VERSION,						EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION,						L"Software Licensing contains licensing for the given product, but not at the desired version (License Server)"},
+	{EC_LIC_MOD_NO_OBTAIN_USING_FAILOVER,						EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER,						L"Unable to obtain module when using Backup Server (License Server)"},
 
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
@@ -129,6 +131,8 @@ HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type)
 
 	return hr;
 }
+
+// Tries to look up error by looking up IErrorInfo first...
 std::wstring GetErrorMessage(HRESULT hr)
 {
 	wchar_t hrErrMsg[256];
@@ -139,7 +143,19 @@ std::wstring GetErrorMessage(HRESULT hr)
 	#endif
 	std::wstring retVal(L"Unknown Error");
 
-	if(SL_IS_LIC_HR(hr))
+	IErrorInfo* pIErrorInfo = NULL;
+	if (GetErrorInfo(0, &pIErrorInfo) == S_OK)
+	{
+		BSTR des;
+		if (SUCCEEDED(pIErrorInfo->GetDescription(&des)))
+		{
+			retVal = std::wstring(des);
+			SetErrorInfo(0, pIErrorInfo);
+			SysFreeString(des);
+		}
+		pIErrorInfo->Release();
+	}
+	else if(SL_IS_LIC_HR(hr))
 	{
 		//Detect a Solimar License error
 		retVal = GetECMessage(SL_EC_FROM_EHR(hr));
@@ -167,7 +183,63 @@ std::wstring GetErrorMessage(HRESULT hr)
 		// Free the buffer.
 		LocalFree(lpMsgBuf);
 	}
-	if(!_wcsicmp(retVal.c_str(), L"Unknown Error"))
+
+	//TRACE(AnsiString(retVal + AnsiString(hrErrMsg)).c_str());
+	return retVal + ((retVal.find_last_of(L"]") == std::wstring::npos) ? std::wstring(hrErrMsg) : std::wstring(L""));
+}
+
+// Tries to look up error by looking up hr in map...
+std::wstring GenerateErrorMessage(HRESULT hr, std::wstring wstrHeaderMsg, bool bAppendExistingErrorInfo)
+{
+	wchar_t hrErrMsg[256];
+	#if _MSC_VER >= 1400
+		swprintf_s(hrErrMsg, sizeof(hrErrMsg)/sizeof(wchar_t), L" [0x%08X]", hr);
+	#else
+		swprintf(hrErrMsg, L" [0x%08X]", hr);
+	#endif
+	std::wstring wstrRetVal(L"Unknown Error");
+	std::wstring wstrAppendErrorMsg(L"");
+	std::wstring wstrHeaderErrorMsg(wstrHeaderMsg);
+
+	if(hr == -1)
+	{
+		wstrHeaderErrorMsg = L"";
+		wstrRetVal = wstrHeaderMsg;
+	}
+	else
+	{
+		if(SL_IS_LIC_HR(hr))
+		{
+			//Detect a Solimar License error
+			wstrRetVal = GetECMessage(SL_EC_FROM_EHR(hr));
+		}
+		else
+		{
+			HRESULT tempHr = ((hr & 0x80070000) == 0x80070000) ? (hr & 0x0000FFFF) : hr;
+			LPVOID lpMsgBuf;
+			FormatMessageW(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+				NULL,
+				tempHr,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+				(wchar_t*)&lpMsgBuf,
+				0,
+				NULL);
+			std::wstring tempMsg = (wchar_t*)lpMsgBuf;
+			size_t index(tempMsg.length());
+			while(tempMsg[index-1]==L'\n' || tempMsg[index-1]==L'\r')
+			{
+				tempMsg[index] = L'\0';
+				index--;
+			}
+			wstrRetVal = std::wstring(tempMsg.substr(0, index));
+			// Free the buffer.
+			LocalFree(lpMsgBuf);
+		}
+	}
+
+	bool bUseForMainMessage = (_wcsicmp(wstrRetVal.c_str(), L"Unknown Error")==0);
+	if(bUseForMainMessage || bAppendExistingErrorInfo)
 	{
 		IErrorInfo* pIErrorInfo = NULL;
 		if (GetErrorInfo(0, &pIErrorInfo) == S_OK)
@@ -175,16 +247,32 @@ std::wstring GetErrorMessage(HRESULT hr)
 			BSTR des;
 			if (SUCCEEDED(pIErrorInfo->GetDescription(&des)))
 			{
-				retVal = std::wstring(des);
+				if(bUseForMainMessage)
+					wstrRetVal = std::wstring(des);
+				else if(bAppendExistingErrorInfo)
+				{
+					if(wcsstr(std::wstring(des).c_str(), wstrRetVal.c_str())== NULL)
+						wstrAppendErrorMsg = std::wstring(des); // Only append if message is different.
+					else
+						wstrRetVal = std::wstring(des); // Use the longer message
+				}
+				else if(bAppendExistingErrorInfo && (_wcsicmp(wstrRetVal.c_str(), std::wstring(des).c_str()) != 0))
+					wstrAppendErrorMsg = std::wstring(des); // Only append if message is different.
 				SetErrorInfo(0, pIErrorInfo);
 				SysFreeString(des);
 			}
 			pIErrorInfo->Release();
 		}
 	}
-	//TRACE(AnsiString(retVal + AnsiString(hrErrMsg)).c_str());
-	return retVal + std::wstring(hrErrMsg);
+
+	std::wstring tmpStr = ((wstrHeaderErrorMsg.length() == 0) ? L"" : wstrHeaderErrorMsg + L"\r\n - ") + 
+		std::wstring(wstrRetVal) + 
+		((wstrAppendErrorMsg.length() == 0) ? L"" : L"\r\n - " + wstrAppendErrorMsg)
+		;
+	//OutputDebugString(std::wstring(std::wstring(L"GenerateErrorMessage(): ") + tmpStr).c_str());
+	return tmpStr;
 }
+
 /*
  *
  * GetECMessage()
