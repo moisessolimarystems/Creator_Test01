@@ -163,6 +163,16 @@ HRESULT RainbowDriver::GetKeyVersion(_bstr_t key, unsigned short *key_version)
 	return ReadCell(key, CELL_KEY_VERSION, key_version);
 }
 
+HRESULT RainbowDriver::VerifyNoDongleEmulator(int* pCheckEmulatorStatusCode, bool* pbCheckEmulatorFound, char* pEmulatorName, char* pExceptionServiceName)
+{
+	HRESULT hr = S_OK;
+	BOOL bEmulator = FALSE;
+
+	*pCheckEmulatorStatusCode = RNBOsproCheckEmulator(&bEmulator, pEmulatorName, pExceptionServiceName);
+	*pbCheckEmulatorFound = (bEmulator==TRUE);
+	return ((*pCheckEmulatorStatusCode==API_SUCCESS) && (bEmulator==FALSE)) ? S_OK : LicenseServerError::EHR_DONGLE_EMULATOR;
+}
+
 HRESULT RainbowDriver::RefreshKeyList()
 {
 //OutputDebugStringW(L"RainbowDriver::RefreshKeyList() - Enter");
@@ -193,7 +203,6 @@ HRESULT RainbowDriver::RefreshKeyList()
 	bool bLocalAtLeastOneParallelKey = false;
 	if (!packet)
 		hr = E_FAIL;
-	
 	if (SUCCEEDED(hr))
 		hr = TranslateRainbowError(RNBOsproFormatPacket(packet, sizeof(RB_SPRO_APIPACKET)));
 	if (SUCCEEDED(hr))

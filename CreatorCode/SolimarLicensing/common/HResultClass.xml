@@ -59,6 +59,33 @@
 	<RNBO name="SP_BUFFER_TOO_SMALL"			 value="73"/>
 	<RNBO name="SP_INTERNAL_ERROR"				 value="74"/>
 	<RNBO name="SP_PACKET_ALREADY_INITIALIZED"	 value="75"/>
+	<RNBO name="SP_PROTOCOL_NOT_INSTALLED"		 value="76"/>
+	<RNBO name="SP_NO_LEASE_FEATURE"			 value="101"/>
+	<RNBO name="SP_LEASE_EXPIRED"				 value="102"/>
+	<RNBO name="SP_COUNTER_LIMIT_REACHED"		 value="103"/>
+	<RNBO name="SP_NO_DIGITAL_SIGNATURE"		 value="104"/>
+	<RNBO name="SP_SYS_FILE_CORRUPTED"			 value="105"/>
+	<RNBO name="SP_INVALID_DEV_CODE"			 value="107"/>
+	<RNBO name="SP_DEVID_DOES_NOT_MATCH"		 value="108"/>
+	<RNBO name="SP_DEVICE_SHARING_DETECTED"		 value="109"/>
+	<RNBO name="SP_SERVER_VERSION_NOT_SUPPORTED" value="110"/>
+	<RNBO name="SP_FILE_NOT_FOUND"				 value="111"/>
+	<RNBO name="SP_PATH_TOO_LONG"				 value="112"/>
+	<RNBO name="SP_SOFT_DB_CORRUPT"				 value="113"/>
+	<RNBO name="SP_SOFT_DB_RESTORE_DETECTED"	 value="114"/>
+	<RNBO name="SP_PRST_DATA_CORRUPT"			 value="115"/>
+	<RNBO name="SP_SECURITY_RUNTIME_NOT_DETECTED" value="116"/>
+	<RNBO name="SP_TIME_TAMPER_DETECTED"		 value="117"/>
+	<RNBO name="SP_END_DATE_REACHED"			 value="118"/>
+	<RNBO name="SP_START_DATE_NOT_REACHED"		 value="119"/>
+	<RNBO name="SP_HOST_ID_ERROR"				 value="120"/>
+	<RNBO name="SP_LIC_INVALID"					 value="121"/>
+	<RNBO name="SP_LIC_RUN_TIME_ERROR"			 value="122"/>
+	<RNBO name="SP_LIC_MEMORY_CORRUPTED"		 value="123"/>
+	<RNBO name="SP_NOT_ENOUGH_MEMORY"			 value="124"/>
+	<RNBO name="SP_IP_ADDRESS_BLOCKED"			 value="125"/>
+	<RNBO name="SP_SERVER_OUT_OF_WORKING_TIME"	 value="126"/>
+	<RNBO name="SP_SECURITY_RUNTIME_VERSION_MISMATCH" value="127"/>
 	<RNBO name="SP_INVALID_STATUS"				 value="255"/>											
 	<!--	-->
 	<!-- HResults with offset ITF_MIN -->
@@ -115,6 +142,8 @@
 		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC" value="49" alias="Failed to validate software license with a Validation Token (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE"	ecode="EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE" value="50" alias="Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED"	ecode="EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED"	value="51" alias="Product License Expired (License server)"/>
+		<HResult name="EHR_LIC_MAIL_SERVER"	ecode="EC_LIC_MAIL_SERVER"	value="52" alias="Dynamic Mail Server Error (License server)"/>
+		<HResult name="EHR_DONGLE_EMULATOR"	ecode="EC_DONGLE_EMULATOR"	value="53" alias="Second 1515 error verifying License Server, please contact Solimar Systems, Inc. (License server)"/>
 	</HResultType>
 	<!--	-->
 	<!-- HResults with offset ITF_LIC_CR_APP_MIN -->
@@ -156,6 +185,39 @@
 		<HResult name="EHR_SP_BUFFER_TOO_SMALL"			  ecode="EC_SP_BUFFER_TOO_SMALL"			value="SP_BUFFER_TOO_SMALL"			alias="The size of the buffer is not sufficient to hold the expected data (Rainbow driver)"/>
 		<HResult name="EHR_SP_INTERNAL_ERROR"			  ecode="EC_SP_INTERNAL_ERROR"				value="SP_INTERNAL_ERROR"				alias="An internal error (Rainbow driver)"/>
 		<HResult name="EHR_SP_PACKET_ALREADY_INITIALIZED" ecode="EC_SP_PACKET_ALREADY_INITIALIZED"	value="SP_PACKET_ALREADY_INITIALIZED" alias="The packet being initialized was already initialized (Rainbow driver)"/>
+		<HResult name="EHR_SP_PROTOCOL_NOT_INSTALLED"	  ecode="EC_SP_PROTOCOL_NOT_INSTALLED"		value="SP_PROTOCOL_NOT_INSTALLED"	alias="The specified protocol is not installed (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_LEASE_FEATURE"			  ecode="EC_SP_NO_LEASE_FEATURE"			value="SP_NO_LEASE_FEATURE"			alias="The element does not contain any lease period. Probably, this is not a full licenseelement (Rainbow driver)"/>
+		<HResult name="EHR_SP_LEASE_EXPIRED"			  ecode="EC_SP_LEASE_EXPIRED"				value="SP_LEASE_EXPIRED"			alias="The trial version expiration date has reached before the application was first executed (Rainbow driver)"/>
+		<HResult name="EHR_SP_COUNTER_LIMIT_REACHED"	  ecode="EC_SP_COUNTER_LIMIT_REACHED"		value="SP_COUNTER_LIMIT_REACHED"	alias="The value requested for the decrement operation exceeds the current counter value (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_DIGITAL_SIGNATURE"		  ecode="EC_SP_NO_DIGITAL_SIGNATURE"		value="SP_NO_DIGITAL_SIGNATURE"		alias="The Sentinel driver binary is not signed by a valid authority (Rainbow driver)"/>
+		<HResult name="EHR_SP_SYS_FILE_CORRUPTED"		  ecode="EC_SP_SYS_FILE_CORRUPTED"			value="SP_SYS_FILE_CORRUPTED"		alias="The digital certificate of the Sentinel driver is not valid (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_DEV_CODE"			  ecode="EC_SP_INVALID_DEV_CODE"			value="SP_INVALID_DEV_CODE"			alias="You specified an invalid Developer Code (Rainbow driver)"/>
+		<HResult name="EHR_SP_DEVID_DOES_NOT_MATCH"		  ecode="EC_SP_DEVID_DOES_NOT_MATCH"		value="SP_DEVID_DOES_NOT_MATCH"		alias="The specified developer ID doesn't match the one in Developer Code (Rainbow driver)"/>
+		<HResult name="EHR_SP_DEVICE_SHARING_DETECTED"	  ecode="EC_SP_DEVICE_SHARING_DETECTED"		value="SP_DEVICE_SHARING_DETECTED"	alias="Device is shared by more than one system or shared in virtual machine environment (Rainbow driver)"/>
+		<HResult name="EHR_SP_SERVER_VERSION_NOT_SUPPORTED"	  ecode="EC_SP_SERVER_VERSION_NOT_SUPPORTED"	value="SP_SERVER_VERSION_NOT_SUPPORTED"	alias="The Sentinel Protection Server from which you are trying to obtain a license is
+outdated (Rainbow driver)"/>
+		<HResult name="EHR_SP_FILE_NOT_FOUND"			  ecode="EC_SP_FILE_NOT_FOUND"				value="SP_FILE_NOT_FOUND"			alias="Specified file is not found (Rainbow driver)"/>
+		<HResult name="EHR_SP_PATH_TOO_LONG"			  ecode="EC_SP_PATH_TOO_LONG"				value="SP_PATH_TOO_LONG"			alias="Specified path is too long (Rainbow driver)"/>
+		<HResult name="EHR_SP_SOFT_DB_CORRUPT"			  ecode="EC_SP_SOFT_DB_CORRUPT"				value="SP_SOFT_DB_CORRUPT"			alias="The software key database is in corrupt state (Rainbow driver)"/>
+		<HResult name="EHR_SP_SOFT_DB_RESTORE_DETECTED"	  ecode="EC_SP_SOFT_DB_RESTORE_DETECTED"	value="SP_SOFT_DB_RESTORE_DETECTED"	alias="The software key database has been illegally restored to an earlier version (Rainbow driver)"/>
+		<HResult name="EHR_SP_PRST_DATA_CORRUPT"		  ecode="EC_SP_PRST_DATA_CORRUPT"			value="SP_PRST_DATA_CORRUPT"		alias="The SuperPro persistence data is in corrupt state (Rainbow driver)"/>
+		<HResult name="EHR_SP_SECURITY_RUNTIME_NOT_DETECTED"  ecode="EC_SP_SECURITY_RUNTIME_NOT_DETECTED"	value="SP_SECURITY_RUNTIME_NOT_DETECTED"	alias="The Sentinel Security Runtime was not installed or detected (Rainbow driver)"/>
+		<HResult name="EHR_SP_TIME_TAMPER_DETECTED"		  ecode="EC_SP_TIME_TAMPER_DETECTED"		value="SP_TIME_TAMPER_DETECTED"		alias="A time tampering condition is detected because the LKD (Last Known good Date)
+stored in the key is ahead of the system's current date (Rainbow driver)"/>
+		<HResult name="EHR_SP_END_DATE_REACHED"			  ecode="EC_SP_END_DATE_REACHED"			value="SP_END_DATE_REACHED"			alias="The software key is invalid because the key end date has reached (Rainbow driver)"/>
+		<HResult name="EHR_SP_START_DATE_NOT_REACHED"	  ecode="EC_SP_START_DATE_NOT_REACHED"		value="SP_START_DATE_NOT_REACHED"	alias="The software key is invalid because the system's current date is ahead of the key start
+date (Rainbow driver)"/>
+		<HResult name="EHR_SP_HOST_ID_ERROR"			  ecode="EC_SP_HOST_ID_ERROR"				value="SP_HOST_ID_ERROR"			alias="The fingerprint of the machine has been changed or the license is enforced with the
+user name and you are using a different user name (Rainbow driver)"/>
+		<HResult name="EHR_SP_LIC_INVALID"				  ecode="EC_SP_LIC_INVALID"					value="SP_LIC_INVALID"				alias="SuperPro Software Key is invalid (Rainbow driver)"/>
+		<HResult name="EHR_SP_LIC_RUN_TIME_ERROR"		  ecode="EC_SP_LIC_RUN_TIME_ERROR"			value="SP_LIC_RUN_TIME_ERROR"		alias="License runtime failed to work due to some error (Rainbow driver)"/>
+		<HResult name="EHR_SP_LIC_MEMORY_CORRUPTED"		  ecode="EC_SP_LIC_MEMORY_CORRUPTED"		value="SP_LIC_MEMORY_CORRUPTED"		alias="License is corrupted (like invalid cell format) (Rainbow driver)"/>
+		<HResult name="EHR_SP_NOT_ENOUGH_MEMORY"		  ecode="EC_SP_NOT_ENOUGH_MEMORY"			value="SP_NOT_ENOUGH_MEMORY"		alias="Not enough storage is available to process this command (Rainbow driver)"/>
+		<HResult name="EHR_SP_IP_ADDRESS_BLOCKED"		  ecode="EC_SP_IP_ADDRESS_BLOCKED"			value="SP_IP_ADDRESS_BLOCKED"		alias="Cannot communicate with the Sentinel Protection Server because the IP address of the
+client is blocked by the server (Rainbow driver)"/>
+		<HResult name="EHR_SP_SERVER_OUT_OF_WORKING_TIME" ecode="EC_SP_SERVER_OUT_OF_WORKING_TIME"	value="SP_SERVER_OUT_OF_WORKING_TIME"	alias="Cannot communicate with the Sentinel Protection Server because the server is out of
+the working time (Rainbow driver)"/>
+		<HResult name="EHR_SP_SECURITY_RUNTIME_VERSION_MISMATCH"  ecode="EC_SP_SECURITY_RUNTIME_VERSION_MISMATCH"	value="SP_SECURITY_RUNTIME_VERSION_MISMATCH"	alias="SuperPro persistence component versions mismatch (Rainbow driver)"/>
 		<HResult name="EHR_SP_INVALID_STATUS"			  ecode="EC_SP_INVALID_STATUS"				value="SP_INVALID_STATUS"			    alias="An invalid status code was returned (Rainbow driver)"/>
 	</HResultType>
 	<!--	-->
@@ -174,6 +236,8 @@
 		<HResult name="EHR_LIC_MGR_NO_LIC_SERVER"		ecode="EC_LIC_MGR_NO_LIC_SERVER"		value="2"  alias="Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)" /> 
 		<HResult name="EHR_LIC_MGR_VIEW_ONLY"	ecode="EC_LIC_MGR_VIEW_ONLY"	value="3" alias="Unable to perform the given action, initialized for view only (License Manager)"/>
 	</HResultType>
+	
+	
 	<!--	-->	
 </HResultClass>
 </HResultClasses>

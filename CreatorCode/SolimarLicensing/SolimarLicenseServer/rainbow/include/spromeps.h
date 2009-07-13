@@ -1,7 +1,7 @@
 /***************************************************************************
 * SPROMEPS.H
 *
-* (C) Copyright 2007 SafeNet, Inc. All rights reserved.
+* (C) Copyright 2009 SafeNet, Inc. All rights reserved.
 *
 * Description - SuperPro Multiple Entry Points Header file.
 *
@@ -13,6 +13,9 @@
 * Revision 1.2 - Added new API's and typedef's for 6.2.0
 * Revision 1.3 - Added new API's and constants for 6.4.0
 * Revision 1.4 - Added new API, constants and updated Shell error codes for 6.5.0
+* Revision 1.5 - Added new API's, constants and error codes for 6.6.0
+* Revision 1.6 - Added new API, constants and error codes for 7.0.0
+* Revision 1.7 - Added new constants and error codes for 7.1.0
 *
 ****************************************************************************/
 #ifndef _SPROMEPS_H
@@ -93,8 +96,29 @@
 #define SP_NO_DIGITAL_SIGNATURE         104
 #define SP_SYS_FILE_CORRUPTED           105
 #define SP_STRING_BUFFER_TOO_LONG       106 
+#define SP_INVALID_DEV_CODE             107 
+#define SP_DEVID_DOES_NOT_MATCH         108 
+#define SP_DEVICE_SHARING_DETECTED      109 
+#define SP_SERVER_VERSION_NOT_SUPPORTED 110
+#define SP_FILE_NOT_FOUND               111
+#define SP_PATH_TOO_LONG                112
+#define SP_SOFT_DB_CORRUPT              113
+#define SP_SOFT_DB_RESTORE_DETECTED     114
+#define SP_PRST_DATA_CORRUPT            115
+#define SP_SECURITY_RUNTIME_NOT_DETECTED      116
+#define SP_TIME_TAMPER_DETECTED         117
+#define SP_END_DATE_REACHED             118
+#define SP_START_DATE_NOT_REACHED       119
+#define SP_HOST_ID_ERROR                120
+#define SP_LIC_INVALID                  121
+#define SP_LIC_RUN_TIME_ERROR           122
+#define SP_LIC_MEMORY_CORRUPTED         123
+#define SP_NOT_ENOUGH_MEMORY            124
+#define SP_IP_ADDRESS_BLOCKED           125
+#define SP_SERVER_OUT_OF_WORKING_TIME   126
+#define SP_SECURITY_RUNTIME_VERSION_MISMATCH   127
 
-/* Shell Error Codes */
+/* CodeCover Error Codes */
 
 #define SH_SP_BAD_ALGO                     401
 #define SH_SP_LONG_MSG                     402
@@ -130,6 +154,8 @@
 #define SH_SP_APP_NOT_SUPPORTED            433
 #define SH_SP_FILE_COPY                    434
 #define SH_SP_HEADER_SIZE_EXCEED           435
+#define SH_SP_SGEN                         436
+#define SH_SP_CODE_MORPHING                437
 
 
 /***************************************************************************
@@ -139,10 +165,10 @@
 /* Dword Alignment Roll-up */
 
 #define SPRO_APIPACKET_ALIGNMENT_VALUE (sizeof(unsigned long))
-#define SPRO_APIPACKET_SIZE            (1024+SPRO_APIPACKET_ALIGNMENT_VALUE)
-#define SPRO_MAX_QUERY_SIZE            56              /* in bytes         */
+#define SPRO_APIPACKET_SIZE            (1024 + SPRO_APIPACKET_ALIGNMENT_VALUE)
+#define SPRO_MAX_QUERY_SIZE            112              /* in bytes */
 
-/* Create SP types */
+/* Create SP Types */
 
 #ifdef __cplusplus
 #define SP_EXPORT extern "C"
@@ -441,7 +467,7 @@ typedef RBP_VOID RBP_SPRO_APIPACKET;
 #define RB_OS_LINUX               12         // Linux operating system     
 #define RB_MAX_OS_TYPE            12
 
-/* Driver types */
+/* Driver Types */
 
 #define RB_DOSRM_LOCAL_DRVR       1          // DOS Real Mode local driver 
 #define RB_WIN3x_LOCAL_DRVR       2          // Windows 3.x local driver   
@@ -500,35 +526,56 @@ typedef RB_WORD PROTOCOL_FLAG;
 #define SP_DISABLE_MAINLIC_SHARING  0    
 #define SP_ENABLE_MAINLIC_SHARING   1
 
+#define SP_DISABLE_DEVICE_SHARING   2
 
-#define SP_DISABLE_SUBLIC_SHARING  0    
-#define SP_ENABLE_SUBLIC_SHARING   1
-
-
+#define SP_DISABLE_SUBLIC_SHARING   0    
+#define SP_ENABLE_SUBLIC_SHARING    1
 
 /* Key Type Constants */
 
 #define SP_KEY_FORM_FACTOR_PARALLEL 0
 #define SP_KEY_FORM_FACTOR_USB      1
+#define SP_KEY_FORM_FACTOR_SOFT     2
 
 #define SP_SUPERPRO_FAMILY_KEY      0
 #define SP_ULTRAPRO_FAMILY_KEY      1
-#define SP_UNKNOWN_FAMILY_KEY      16
+#define SP_UNKNOWN_FAMILY_KEY       16
 
-/* Maximum values */
+/* Software Key Type Constants */
+#define SP_SIMPLE_SOFT              1
+#define SP_SECURE_SOFT              2
+#define SP_EVALUATION_SOFT          3
 
-#define MAX_NUM_DEV   10     // Maximum number of devices
-#define MAX_NAME_LEN  64     // Maximum host name length
-#define MAX_ADDR_LEN  32     // Maximum host address length
+/* Maximum Values */
 
-/* Terminal Service flags */
+#define MAX_NUM_DEV     10     // Maximum number of devices
+#define MAX_NAME_LEN    64     // Maximum host name length
+#define MAX_ADDR_LEN    32     // Maximum host address length
+#define MAX_IPADDR_LEN  64     // Maximum IP address length
+#define SP_MAX_PATH_LEN 256    // Maximun path length
 
-#define SP_TERM_SERV_CHECK_OFF        0
-#define SP_TERM_SERV_CHECK_ON	        1
+/* Terminal Service Flags */
 
-/* Key Monitoring Information */
+#define SP_TERM_SERV_CHECK_OFF      0
+#define SP_TERM_SERV_CHECK_ON       1
 
-typedef struct tag_nsproKeyMonitorInfo {
+/* Device Capabilities */
+#define SP_CAPS_AES_ALGO                 1
+#define SP_CAPS_PASSWORD_COUNTER         2
+#define SP_CAPS_SECURE_TUNNEL            4
+#define SP_CAPS_DISABLE_DEVICE_SHARING   8
+
+/* Date Structure Used by NSPRO_KEY_MONITOR_INFO_EX */
+
+typedef struct tag_sproDate {
+   RB_WORD      year;           // the year
+   RB_BYTE      month;          // the month (1-12)
+   RB_BYTE      day;            // the day of the month (1-31)
+} RB_SPRO_DATE, *RBP_SPRO_DATE;
+
+/* Key Monitoring Information Used by NSPRO_MONITOR_INFO */
+
+typedef struct tag_nsproKeyMonitorInfo { 
    RB_WORD      devId;          // developer id of the key 
    RB_WORD      hardLimit;      // hardlimit of the key 
    RB_WORD      inUse;          // Number of licenses in use for the key 
@@ -537,17 +584,49 @@ typedef struct tag_nsproKeyMonitorInfo {
                                 // the key throughout the life of server
 } NSPRO_KEY_MONITOR_INFO;
 
+/* Key Monitoring Information Used by NSPRO_MONITOR_INFO_EX */
 
-/* Monitoring Information */
+typedef struct tag_nsproKeyMonitorInfoEx {
+   RB_DWORD   devId;          // developer id of the key
+   RB_DWORD   serialNum;      // serial number of the key
+   RB_DWORD   capabilities;   // capabilities of the key
+   RB_DWORD   hardLimit;      // hard limit of the key
+   RB_DWORD   inUse;          // number of licenses in use for the key
+   RB_DWORD   numTimeOut;     // number of timeouts recorded for the key
+   RB_DWORD   highestUse;     // highest number of licenses issued from
+                              // the key throughout the life of server
+   RB_DWORD   subLicLimit;    // the sub-license limit of certain cell
+   RB_DWORD   subLicInUse;    // the number of sub-licenses in use for certain cell
+   RB_BYTE    writePasswordCounter;       // write password counter
+   RB_BYTE    overwritePasswordCounter;   // overwrite password counter
+   RB_BYTE    formFactor;     // form factor of the key
+   RB_BYTE    softKeyType;    // software key type
+   RB_SPRO_DATE startDate;    // software key start date
+   RB_SPRO_DATE endDate;      // software key end date
+} NSPRO_KEY_MONITOR_INFO_EX;
+
+/* Monitoring Information Returned by RNBOsproGetKeyInfo */
 
 typedef struct tag_nsproMonitorInfo {
-   char                    serverName[MAX_NAME_LEN];
-   char                    serverIPAddress[MAX_ADDR_LEN];  // Server's IP address 
-   char                    serverIPXAddress[MAX_ADDR_LEN]; // Server's IPX address
-   char                    version[MAX_NAME_LEN];          // version of the server
-   RB_WORD                 protocol;                       // Protocols supported by the server
-   NSPRO_KEY_MONITOR_INFO  sproKeyMonitorInfo;     
+   char                       serverName[MAX_NAME_LEN];
+   char                       serverIPAddress[MAX_ADDR_LEN];  // Server's IP address 
+   char                       serverIPXAddress[MAX_ADDR_LEN]; // Server's IPX address
+   char                       version[MAX_NAME_LEN];          // version of the server
+   RB_WORD                    protocol;                       // Protocols supported by the server
+   NSPRO_KEY_MONITOR_INFO     sproKeyMonitorInfo;     
 } NSPRO_MONITOR_INFO; 
+
+/* Monitoring Information Returned by RNBOsproGetKeyInfoEx */
+
+typedef struct tag_nsproMonitorInfoEx {
+   char                       serverName[MAX_NAME_LEN];
+   char                       serverIPAddress[MAX_IPADDR_LEN];// Server's IP address
+   char                       serverIPXAddress[MAX_ADDR_LEN]; // Server's IPX address
+   char                       version[MAX_NAME_LEN];          // version of the server
+   RB_DWORD                   protocol;                       // Protocols supported by the server
+   RB_DWORD                   reserved;                       // reserved for future use
+   NSPRO_KEY_MONITOR_INFO_EX  sproKeyMonitorInfo;
+} NSPRO_MONITOR_INFO_EX;
 
 /* Server Information Returned by RNBOsproEnumServer */
 
@@ -556,14 +635,9 @@ typedef struct tag_nsproServerInfo {
    RB_WORD    numLicAvail;
 }  NSPRO_SERVER_INFO;
 
-
 /***************************************************************************
 *                       Function Prototypes
 ****************************************************************************/
-
-SP_EXPORT SP_STATUS SP_API
-RNBOsproCheckTerminalService(SP_OUT RBP_SPRO_APIPACKET thepacket ,
-							   SP_IN RB_WORD	 termserv);
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproFormatPacket( SP_OUT RBP_SPRO_APIPACKET thePacket,
@@ -574,7 +648,7 @@ RNBOsproInitialize( SP_OUT RBP_SPRO_APIPACKET thePacket );
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproFindFirstUnit( SP_IN RBP_SPRO_APIPACKET thePacket,
-                       SP_IN RB_WORD            devleoperID );
+                       SP_IN RB_WORD            developerID );
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproFindNextUnit( SP_IN RBP_SPRO_APIPACKET packet );
@@ -663,12 +737,20 @@ RNBOsproEnumServer ( SP_IN  ENUM_SERVER_FLAG  enumFlag,
                      SP_IN  RB_WORD           developerId,
                      SP_OUT NSPRO_SERVER_INFO *serverInfo,
                      SP_IO  RBP_WORD          numServerInfo );
-
+                     
 SP_EXPORT SP_STATUS SP_API
 RNBOsproGetKeyInfo ( SP_IN  RBP_SPRO_APIPACKET thePacket,
                      SP_IN  RB_WORD            devId,
                      SP_IN  RB_WORD            keyIndex,
                      SP_OUT NSPRO_MONITOR_INFO *nsproMonitorInfo );
+
+SP_EXPORT SP_STATUS SP_API 
+RNBOsproGetKeyInfoEx ( SP_IN  RBP_SPRO_APIPACKET     thePacket,
+                       SP_IN  RB_DWORD               devId,
+                       SP_IN  RB_DWORD               keyIndex,
+                       SP_IN  RB_DWORD               subLicAddress,
+                       SP_OUT NSPRO_MONITOR_INFO_EX  *nsproMonitorInfoEx,
+                       SP_IN  RB_DWORD               size );
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproSetProtocol ( SP_IN RBP_SPRO_APIPACKET thePacket,
@@ -681,13 +763,27 @@ RNBOsproSetHeartBeat( SP_IN RBP_SPRO_APIPACKET thePacket,
 SP_EXPORT SP_STATUS SP_API
 RNBOsproSetSharedLicense( SP_IN RBP_SPRO_APIPACKET thePacket,
                           SP_IN RB_WORD            shareMainLic,
-                          SP_IN RB_WORD            shareSubLic);
+                          SP_IN RB_WORD            shareSubLic );
+
+SP_EXPORT SP_STATUS SP_API
+RNBOsproCheckTerminalService( SP_IN RBP_SPRO_APIPACKET thePacket,
+                              SP_IN RB_WORD            termserv );
+
+SP_EXPORT SP_STATUS SP_API 
+RNBOsproSetDeveloperCode( SP_IN RBP_SPRO_APIPACKET thePacket,
+                          SP_IN RBP_VOID           devCode,
+                          SP_IN RB_DWORD           size );
 
 SP_EXPORT SP_STATUS SP_API
 RNBOsproGetKeyType( SP_IN  RBP_SPRO_APIPACKET  thePacket,
                     SP_OUT RBP_WORD            keyFamily,
                     SP_OUT RBP_WORD            keyFormFactor,
                     SP_OUT RBP_WORD            keyMemorySize );
+                    
+SP_EXPORT SP_STATUS SP_API
+RNBOsproSetConfigFile( SP_IN RBP_SPRO_APIPACKET thePacket,
+                       SP_IN RBP_CHAR           cfgFileName );
+                    
 
 SP_EXPORT RB_VOID SP_API RNBOsproCleanup();
                               

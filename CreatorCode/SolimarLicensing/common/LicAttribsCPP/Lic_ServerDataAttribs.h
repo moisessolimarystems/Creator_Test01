@@ -324,6 +324,316 @@ public:
 	typedef std::vector< Lic_ClockViolationInfoAttribs > TVector_Lic_ClockViolationInfoAttribsList;
 	typedef SpdAttribs::CStreamableVectors< TVector_Lic_ClockViolationInfoAttribsList  > Vector_Lic_ClockViolationInfoAttribsList_Obj;
 	typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ClockViolationInfoAttribsList_Obj, TVector_Lic_ClockViolationInfoAttribsList > Lic_ClockViolationInfoAttribsList;
+	class Lic_AlertInfoAttribs : public SpdAttribs::CAttribsBase
+	{
+	public:
+		static wchar_t* GetAttribsClassName()
+		{
+			 return L"aia";
+		}
+		
+	
+		static const wchar_t* DescriptiveName()
+		{
+			return L"License Server Alert Info Attributes";
+		}
+	
+		virtual const wchar_t* GetDescriptiveName() const
+		{
+			return DescriptiveName();
+		}
+	
+		Lic_AlertInfoAttribs& operator =(const CWStringStream &wsData)
+		{
+			InitFromString(wsData);
+			return *this ;
+		}
+		class Lic_EmailAlertMailAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"eA";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"Email Alert Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_EmailAlertMailAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+				
+			SpdAttribs::WStringAttrib id;
+			SpdAttribs::WStringAttrib name;
+			SpdAttribs::BoolAttrib bActive;
+			SpdAttribs::VectorStringAttrib recipentsList;
+			SpdAttribs::VectorDwordAttrib eventIdList;
+		
+			
+		
+			Lic_EmailAlertMailAttribs& operator =(const Lic_EmailAlertMailAttribs &c)
+			{
+				id = c.id;
+				name = c.name;
+				bActive = c.bActive;
+				recipentsList = c.recipentsList;
+				eventIdList = c.eventIdList;
+				return *this ;
+			}
+		
+			Lic_EmailAlertMailAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				id(m_mapAttribObjs, L"eID", SpdAttribs::WStringObj(L"")),
+				name(m_mapAttribObjs, L"eN", SpdAttribs::WStringObj(L"")),
+				bActive(m_mapAttribObjs, L"bA", true),
+				recipentsList(m_mapAttribObjs, L"rL", SpdAttribs::VectorStringObj()),
+				eventIdList(m_mapAttribObjs, L"eL", SpdAttribs::VectorDwordObj()){;}
+			
+			Lic_EmailAlertMailAttribs(const Lic_EmailAlertMailAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				id(m_mapAttribObjs, L"eID", c.id),
+				name(m_mapAttribObjs, L"eN", c.name),
+				bActive(m_mapAttribObjs, L"bA", c.bActive),
+				recipentsList(m_mapAttribObjs, L"rL", c.recipentsList),
+				eventIdList(m_mapAttribObjs, L"eL", c.eventIdList){;}
+			
+			Lic_EmailAlertMailAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				id(m_mapAttribObjs, L"eID", SpdAttribs::WStringObj(L"")),
+				name(m_mapAttribObjs, L"eN", SpdAttribs::WStringObj(L"")),
+				bActive(m_mapAttribObjs, L"bA", true),
+				recipentsList(m_mapAttribObjs, L"rL", SpdAttribs::VectorStringObj()),
+				eventIdList(m_mapAttribObjs, L"eL", SpdAttribs::VectorDwordObj()){;}
+			
+			Lic_EmailAlertMailAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_EmailAlertMailAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				id(m_mapAttribObjs, L"eID", c.id),
+				name(m_mapAttribObjs, L"eN", c.name),
+				bActive(m_mapAttribObjs, L"bA", c.bActive),
+				recipentsList(m_mapAttribObjs, L"rL", c.recipentsList),
+				eventIdList(m_mapAttribObjs, L"eL", c.eventIdList){;}
+			
+			Lic_EmailAlertMailAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WStringAttrib &param_id,
+				const SpdAttribs::WStringAttrib &param_name,
+				const SpdAttribs::BoolAttrib &param_bActive,
+				const SpdAttribs::VectorStringAttrib &param_recipentsList,
+				const SpdAttribs::VectorDwordAttrib &param_eventIdList) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					id(m_mapAttribObjs, L"eID", param_id),
+					name(m_mapAttribObjs, L"eN", param_name),
+					bActive(m_mapAttribObjs, L"bA", param_bActive),
+					recipentsList(m_mapAttribObjs, L"rL", param_recipentsList),
+					eventIdList(m_mapAttribObjs, L"eL", param_eventIdList){;}
+			
+			Lic_EmailAlertMailAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WStringAttrib &param_id,
+				const SpdAttribs::WStringAttrib &param_name,
+				const SpdAttribs::BoolAttrib &param_bActive,
+				const SpdAttribs::VectorStringAttrib &param_recipentsList,
+				const SpdAttribs::VectorDwordAttrib &param_eventIdList) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					id(m_mapAttribObjs, L"eID", param_id),
+					name(m_mapAttribObjs, L"eN", param_name),
+					bActive(m_mapAttribObjs, L"bA", param_bActive),
+					recipentsList(m_mapAttribObjs, L"rL", param_recipentsList),
+					eventIdList(m_mapAttribObjs, L"eL", param_eventIdList){;}
+			
+		
+		};
+		
+		typedef std::vector< Lic_EmailAlertMailAttribs > TVector_Lic_EmailAlertMailAttribsList;
+		typedef SpdAttribs::CStreamableVectors< TVector_Lic_EmailAlertMailAttribsList  > Vector_Lic_EmailAlertMailAttribsList_Obj;
+		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_EmailAlertMailAttribsList_Obj, TVector_Lic_EmailAlertMailAttribsList > Lic_EmailAlertMailAttribsList;
+		class Lic_AlertMailServerAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"aMS";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"License Server Alert Mail Server Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_AlertMailServerAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+			typedef enum {
+				ttAnonymous = 0,
+				ttBasic = 1,
+			} TAuthenticationType;
+			
+				
+			SpdAttribs::WStringAttrib mailServerName;
+			SpdAttribs::WStringAttrib fromEmail;
+			SpdAttribs::WStringAttrib fromDisplayName;
+			SpdAttribs::DwordAttrib portNumber;
+			SpdAttribs::AttribEnumTypeMember<TAuthenticationType> authenticationType;
+			SpdAttribs::WStringAttrib authBasicUserName;
+			SpdAttribs::WStringAttrib authBasicUserPassword;
+		
+			
+		
+			Lic_AlertMailServerAttribs& operator =(const Lic_AlertMailServerAttribs &c)
+			{
+				mailServerName = c.mailServerName;
+				fromEmail = c.fromEmail;
+				fromDisplayName = c.fromDisplayName;
+				portNumber = c.portNumber;
+				authenticationType = c.authenticationType;
+				authBasicUserName = c.authBasicUserName;
+				authBasicUserPassword = c.authBasicUserPassword;
+				return *this ;
+			}
+		
+			Lic_AlertMailServerAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				mailServerName(m_mapAttribObjs, L"msn", SpdAttribs::WStringObj(L"")),
+				fromEmail(m_mapAttribObjs, L"fe", SpdAttribs::WStringObj(L"")),
+				fromDisplayName(m_mapAttribObjs, L"fD", SpdAttribs::WStringObj(L"")),
+				portNumber(m_mapAttribObjs, L"pn", 25),
+				authenticationType(m_mapAttribObjs, L"aT", ttAnonymous),
+				authBasicUserName(m_mapAttribObjs, L"uN", SpdAttribs::WStringObj(L"")),
+				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")){;}
+			
+			Lic_AlertMailServerAttribs(const Lic_AlertMailServerAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				mailServerName(m_mapAttribObjs, L"msn", c.mailServerName),
+				fromEmail(m_mapAttribObjs, L"fe", c.fromEmail),
+				fromDisplayName(m_mapAttribObjs, L"fD", c.fromDisplayName),
+				portNumber(m_mapAttribObjs, L"pn", c.portNumber),
+				authenticationType(m_mapAttribObjs, L"aT", c.authenticationType),
+				authBasicUserName(m_mapAttribObjs, L"uN", c.authBasicUserName),
+				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword){;}
+			
+			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				mailServerName(m_mapAttribObjs, L"msn", SpdAttribs::WStringObj(L"")),
+				fromEmail(m_mapAttribObjs, L"fe", SpdAttribs::WStringObj(L"")),
+				fromDisplayName(m_mapAttribObjs, L"fD", SpdAttribs::WStringObj(L"")),
+				portNumber(m_mapAttribObjs, L"pn", 25),
+				authenticationType(m_mapAttribObjs, L"aT", ttAnonymous),
+				authBasicUserName(m_mapAttribObjs, L"uN", SpdAttribs::WStringObj(L"")),
+				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")){;}
+			
+			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_AlertMailServerAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				mailServerName(m_mapAttribObjs, L"msn", c.mailServerName),
+				fromEmail(m_mapAttribObjs, L"fe", c.fromEmail),
+				fromDisplayName(m_mapAttribObjs, L"fD", c.fromDisplayName),
+				portNumber(m_mapAttribObjs, L"pn", c.portNumber),
+				authenticationType(m_mapAttribObjs, L"aT", c.authenticationType),
+				authBasicUserName(m_mapAttribObjs, L"uN", c.authBasicUserName),
+				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword){;}
+			
+			Lic_AlertMailServerAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WStringAttrib &param_mailServerName,
+				const SpdAttribs::WStringAttrib &param_fromEmail,
+				const SpdAttribs::WStringAttrib &param_fromDisplayName,
+				const SpdAttribs::DwordAttrib &param_portNumber,
+				const TAuthenticationType &param_authenticationType,
+				const SpdAttribs::WStringAttrib &param_authBasicUserName,
+				const SpdAttribs::WStringAttrib &param_authBasicUserPassword) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					mailServerName(m_mapAttribObjs, L"msn", param_mailServerName),
+					fromEmail(m_mapAttribObjs, L"fe", param_fromEmail),
+					fromDisplayName(m_mapAttribObjs, L"fD", param_fromDisplayName),
+					portNumber(m_mapAttribObjs, L"pn", param_portNumber),
+					authenticationType(m_mapAttribObjs, L"aT", param_authenticationType),
+					authBasicUserName(m_mapAttribObjs, L"uN", param_authBasicUserName),
+					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword){;}
+			
+			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WStringAttrib &param_mailServerName,
+				const SpdAttribs::WStringAttrib &param_fromEmail,
+				const SpdAttribs::WStringAttrib &param_fromDisplayName,
+				const SpdAttribs::DwordAttrib &param_portNumber,
+				const TAuthenticationType &param_authenticationType,
+				const SpdAttribs::WStringAttrib &param_authBasicUserName,
+				const SpdAttribs::WStringAttrib &param_authBasicUserPassword) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					mailServerName(m_mapAttribObjs, L"msn", param_mailServerName),
+					fromEmail(m_mapAttribObjs, L"fe", param_fromEmail),
+					fromDisplayName(m_mapAttribObjs, L"fD", param_fromDisplayName),
+					portNumber(m_mapAttribObjs, L"pn", param_portNumber),
+					authenticationType(m_mapAttribObjs, L"aT", param_authenticationType),
+					authBasicUserName(m_mapAttribObjs, L"uN", param_authBasicUserName),
+					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword){;}
+			
+		
+		};
+		
+			
+		Lic_EmailAlertMailAttribsList emailAlertsList;
+		Lic_AlertMailServerAttribs mailServer;
+	
+		
+	
+		Lic_AlertInfoAttribs& operator =(const Lic_AlertInfoAttribs &c)
+		{
+			emailAlertsList = c.emailAlertsList;
+			mailServer = c.mailServer;
+			return *this ;
+		}
+	
+		Lic_AlertInfoAttribs() : 
+			SpdAttribs::CAttribsBase(GetAttribsClassName()),
+			emailAlertsList(m_mapAttribObjs, L"emLt", Vector_Lic_EmailAlertMailAttribsList_Obj()),
+			mailServer(m_mapAttribObjs, L"aMS", L"mS", Lic_AlertMailServerAttribs()){;}
+		
+		Lic_AlertInfoAttribs(const Lic_AlertInfoAttribs &c) : 
+			SpdAttribs::CAttribsBase(GetAttribsClassName()),
+			emailAlertsList(m_mapAttribObjs, L"emLt", c.emailAlertsList),
+			mailServer(m_mapAttribObjs, L"aMS", L"mS", c.mailServer){;}
+		
+		Lic_AlertInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+			emailAlertsList(m_mapAttribObjs, L"emLt", Vector_Lic_EmailAlertMailAttribsList_Obj()),
+			mailServer(m_mapAttribObjs, L"aMS", L"mS", Lic_AlertMailServerAttribs()){;}
+		
+		Lic_AlertInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_AlertInfoAttribs &c) : 
+			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+			emailAlertsList(m_mapAttribObjs, L"emLt", c.emailAlertsList),
+			mailServer(m_mapAttribObjs, L"aMS", L"mS", c.mailServer){;}
+		
+		Lic_AlertInfoAttribs(const CWStringStream &wsAttribsClassName,
+			const Lic_EmailAlertMailAttribsList &param_emailAlertsList,
+			const Lic_AlertMailServerAttribs &param_mailServer) : 
+				SpdAttribs::CAttribsBase(wsAttribsClassName),
+				emailAlertsList(m_mapAttribObjs, L"emLt", param_emailAlertsList),
+				mailServer(m_mapAttribObjs, L"aMS", L"mS", param_mailServer){;}
+		
+		Lic_AlertInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+			const Lic_EmailAlertMailAttribsList &param_emailAlertsList,
+			const Lic_AlertMailServerAttribs &param_mailServer) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				emailAlertsList(m_mapAttribObjs, L"emLt", param_emailAlertsList),
+				mailServer(m_mapAttribObjs, L"aMS", L"mS", param_mailServer){;}
+		
+	
+	};
+	
 		
 	Lic_ServerDataFileInfoAttribsList fileInfoList;
 	Lic_ClockViolationInfoAttribsList clockViolHistoryList;
@@ -335,6 +645,8 @@ public:
 	SpdAttribs::DwordAttrib clockViolCount;
 	SpdAttribs::WStringAttrib clockViolLastDate;
 	SpdAttribs::BoolAttrib bInClockViol;
+	Lic_AlertInfoAttribs alertInfo;
+	SpdAttribs::WStringAttrib streamed_EmulationInfoAttribs;
 
 	
 
@@ -350,6 +662,8 @@ public:
 		clockViolCount = c.clockViolCount;
 		clockViolLastDate = c.clockViolLastDate;
 		bInClockViol = c.bInClockViol;
+		alertInfo = c.alertInfo;
+		streamed_EmulationInfoAttribs = c.streamed_EmulationInfoAttribs;
 		return *this ;
 	}
 
@@ -364,7 +678,9 @@ public:
 		lastTouchDate(m_mapAttribObjs, L"lDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 		clockViolCount(m_mapAttribObjs, L"cVC", 0),
 		clockViolLastDate(m_mapAttribObjs, L"cVD", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-		bInClockViol(m_mapAttribObjs, L"iCV", false){;}
+		bInClockViol(m_mapAttribObjs, L"iCV", false),
+		alertInfo(m_mapAttribObjs, L"aia", L"aI", Lic_AlertInfoAttribs()),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", SpdAttribs::WStringObj(L"")){;}
 	
 	Lic_ServerDataAttribs(const Lic_ServerDataAttribs &c) : 
 		SpdAttribs::CAttribsBase(GetAttribsClassName()),
@@ -377,7 +693,9 @@ public:
 		lastTouchDate(m_mapAttribObjs, L"lDt", c.lastTouchDate),
 		clockViolCount(m_mapAttribObjs, L"cVC", c.clockViolCount),
 		clockViolLastDate(m_mapAttribObjs, L"cVD", c.clockViolLastDate),
-		bInClockViol(m_mapAttribObjs, L"iCV", c.bInClockViol){;}
+		bInClockViol(m_mapAttribObjs, L"iCV", c.bInClockViol),
+		alertInfo(m_mapAttribObjs, L"aia", L"aI", c.alertInfo),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", c.streamed_EmulationInfoAttribs){;}
 	
 	Lic_ServerDataAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -390,7 +708,9 @@ public:
 		lastTouchDate(m_mapAttribObjs, L"lDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 		clockViolCount(m_mapAttribObjs, L"cVC", 0),
 		clockViolLastDate(m_mapAttribObjs, L"cVD", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-		bInClockViol(m_mapAttribObjs, L"iCV", false){;}
+		bInClockViol(m_mapAttribObjs, L"iCV", false),
+		alertInfo(m_mapAttribObjs, L"aia", L"aI", Lic_AlertInfoAttribs()),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", SpdAttribs::WStringObj(L"")){;}
 	
 	Lic_ServerDataAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ServerDataAttribs &c) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -403,7 +723,9 @@ public:
 		lastTouchDate(m_mapAttribObjs, L"lDt", c.lastTouchDate),
 		clockViolCount(m_mapAttribObjs, L"cVC", c.clockViolCount),
 		clockViolLastDate(m_mapAttribObjs, L"cVD", c.clockViolLastDate),
-		bInClockViol(m_mapAttribObjs, L"iCV", c.bInClockViol){;}
+		bInClockViol(m_mapAttribObjs, L"iCV", c.bInClockViol),
+		alertInfo(m_mapAttribObjs, L"aia", L"aI", c.alertInfo),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", c.streamed_EmulationInfoAttribs){;}
 	
 	Lic_ServerDataAttribs(const CWStringStream &wsAttribsClassName,
 		const Lic_ServerDataFileInfoAttribsList &param_fileInfoList,
@@ -415,7 +737,9 @@ public:
 		const SpdAttribs::WStringAttrib &param_lastTouchDate,
 		const SpdAttribs::DwordAttrib &param_clockViolCount,
 		const SpdAttribs::WStringAttrib &param_clockViolLastDate,
-		const SpdAttribs::BoolAttrib &param_bInClockViol) : 
+		const SpdAttribs::BoolAttrib &param_bInClockViol,
+		const Lic_AlertInfoAttribs &param_alertInfo,
+		const SpdAttribs::WStringAttrib &param_streamed_EmulationInfoAttribs) : 
 			SpdAttribs::CAttribsBase(wsAttribsClassName),
 			fileInfoList(m_mapAttribObjs, L"fiLt", param_fileInfoList),
 			clockViolHistoryList(m_mapAttribObjs, L"cVLt", param_clockViolHistoryList),
@@ -426,7 +750,9 @@ public:
 			lastTouchDate(m_mapAttribObjs, L"lDt", param_lastTouchDate),
 			clockViolCount(m_mapAttribObjs, L"cVC", param_clockViolCount),
 			clockViolLastDate(m_mapAttribObjs, L"cVD", param_clockViolLastDate),
-			bInClockViol(m_mapAttribObjs, L"iCV", param_bInClockViol){;}
+			bInClockViol(m_mapAttribObjs, L"iCV", param_bInClockViol),
+			alertInfo(m_mapAttribObjs, L"aia", L"aI", param_alertInfo),
+			streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", param_streamed_EmulationInfoAttribs){;}
 	
 	Lic_ServerDataAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 		const Lic_ServerDataFileInfoAttribsList &param_fileInfoList,
@@ -438,7 +764,9 @@ public:
 		const SpdAttribs::WStringAttrib &param_lastTouchDate,
 		const SpdAttribs::DwordAttrib &param_clockViolCount,
 		const SpdAttribs::WStringAttrib &param_clockViolLastDate,
-		const SpdAttribs::BoolAttrib &param_bInClockViol) : 
+		const SpdAttribs::BoolAttrib &param_bInClockViol,
+		const Lic_AlertInfoAttribs &param_alertInfo,
+		const SpdAttribs::WStringAttrib &param_streamed_EmulationInfoAttribs) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			fileInfoList(m_mapAttribObjs, L"fiLt", param_fileInfoList),
 			clockViolHistoryList(m_mapAttribObjs, L"cVLt", param_clockViolHistoryList),
@@ -449,7 +777,9 @@ public:
 			lastTouchDate(m_mapAttribObjs, L"lDt", param_lastTouchDate),
 			clockViolCount(m_mapAttribObjs, L"cVC", param_clockViolCount),
 			clockViolLastDate(m_mapAttribObjs, L"cVD", param_clockViolLastDate),
-			bInClockViol(m_mapAttribObjs, L"iCV", param_bInClockViol){;}
+			bInClockViol(m_mapAttribObjs, L"iCV", param_bInClockViol),
+			alertInfo(m_mapAttribObjs, L"aia", L"aI", param_alertInfo),
+			streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", param_streamed_EmulationInfoAttribs){;}
 	
 
 };

@@ -2,6 +2,8 @@
 #define _WIN32_WINNT 0x0500
 #endif
 
+#define WIN32_LEAN_AND_MEAN
+
 //#include "stdafx.h"
 #include "SoftwareServer.h"
 #include "KeySpec.h"	//For keySpec
@@ -10,7 +12,9 @@
 #include "..\common\LicAttribsCPP\Lic_GenericAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_KeyAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_LicenseSystemAttribs.h"
+#include "..\common\LicAttribsCPP\Lic_RunningProcessesInfoAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_SystemInfoAttribs.h"
+#include "..\common\LicAttribsCPP\Lic_TestMailServerAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
 #include "..\common\LicAttribsCPP\Sys_EventLogInfoAttribs.h"
 #include "..\common\EventLogLicenseHelper.h"
@@ -26,6 +30,8 @@
 #include "..\Common\StringUtils.h"
 #include "..\common\CryptoAndFlateHelper.h"
 #include "..\common\VersionInfo.h"	//For Version Information
+
+#include "..\common\CSmtp.h"//For CSmtp
 
 // only include the password packet signing PRIVATE key on debug and solimar internal builds
 BYTE SoftwareServer::crypto_key_password_packet_private[] = {
@@ -106,7 +112,9 @@ unsigned int SoftwareServer::license_verify_data_code_int[] = {
 SoftwareServer::SoftwareServer():
 	pSoftwareSpec(NULL),
 	SoftwareLicenseLock(CreateMutex(0,0,0)),
-	bFirstTime(true)
+	SendMailLock(CreateMutex(0,0,0)),
+	bFirstTime(true),
+	lastTimeEmailToSolimar(0)
 {
 //BYTE serialByte[] = {
 //						0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x4e, 0x00, 0x75, 0x00, 0x6d, 0x00, 0x62, 0x00, 0x65, 0x00, 0x72, 0x00, 0x00, 0x00
@@ -128,6 +136,22 @@ SoftwareServer::SoftwareServer():
 		g_pSoftwareSpec = new GlobalSoftwareSpec();
 	//Use Global SoftwareSpec - Only need to do once
 	licCache.RefreshSoftwareSpec(&(g_pSoftwareSpec->GetSoftwareSpec()));
+
+	Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+	if (SUCCEEDED(licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs)))
+		UpdateAlertEventLogIdCache(alertInfoAttribs.emailAlertsList);
+
+	// Reset dongle emulation on startup
+	Lic_EmulationInfoAttribs emulatorInfoAttribs;
+	if (SUCCEEDED(licServerDataMgr.GetEmulatorInfoAttribs(&emulatorInfoAttribs)))
+	{
+//OutputDebugString(L"SoftwareServer::SoftwareServer() - emulatorInfoAttribs.bDongleEmulatorDetected = false");
+		emulatorInfoAttribs.checkEmulatorCall_StatusCode = 0;
+		emulatorInfoAttribs.bCheckEmulatorCall_FoundEmulator = false;
+		emulatorInfoAttribs.bDongleEmulatorDetected = false;
+		//emulatorInfoAttribs.bBypassDongleEmulatorCheck = false;
+		licServerDataMgr.SetEmulatorInfoAttribs(&emulatorInfoAttribs);
+	}
 }
 
 SoftwareServer::~SoftwareServer()
@@ -136,6 +160,11 @@ SoftwareServer::~SoftwareServer()
 	{
 		CloseHandle(SoftwareLicenseLock);
 		SoftwareLicenseLock = NULL;
+	}
+	if (SendMailLock!=NULL)
+	{
+		CloseHandle(SendMailLock);
+		SendMailLock = NULL;
 	}
 	if(pSoftwareSpec != NULL)
 	{
@@ -1112,7 +1141,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get KeyInfo - 
 			// Add Server Data
 			BSTR bstrServerDataAttrbsStream = NULL;
 			SafeMutex mutex(SoftwareLicenseLock);
-			hr = licServerDataMgr.GetLicServerDataAttrbsStream(&bstrServerDataAttrbsStream);
+			hr = licServerDataMgr.GetLicServerDataAttrbsStream(&bstrServerDataAttrbsStream, true);
 			if(SUCCEEDED(hr))
 			{
 				licSystemAttribs.Streamed_ServerDataAttribs = std::wstring(bstrServerDataAttrbsStream);
@@ -1149,6 +1178,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 		//
 		// Get System Info
 		Lic_SystemInfoAttribs sysInfoAttribs;
+		Lic_RunningProcessesInfoAttribs processInfoAttribs;
 
 		wchar_t wLicSvrVersion[256];
 		wsprintf(wLicSvrVersion, L"%d.%d.%d", MAJOR_REVISION_NUMBER, MINOR_REVISION_NUMBER, BUILD_NUMBER);
@@ -1440,6 +1470,177 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 					rList.clear();
 				}
 			}
+
+			//CR.FIX.18131 - Detect Dongle Emulator - retrieve all service on the box
+			// Hide the string so it doesn't appear in the strings of the image - "Name"
+			BYTE tmpNameByte[] = { 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x00, 0x00 };
+
+			// Hide the string so it doesn't appear in the strings of the image - "PathName"
+			BYTE tmpPathNameByte[] = { 0x50, 0x00, 0x61, 0x00, 0x74, 0x00, 0x68, 0x00, 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x00, 0x00 };
+
+			// Hide the string so it doesn't appear in the strings of the image - "Started"
+			BYTE tmpStartedByte[] = { 0x53, 0x00, 0x74, 0x00, 0x61, 0x00, 0x72, 0x00, 0x74, 0x00, 0x65, 0x00, 0x64, 0x00, 0x00, 0x00 };
+
+			// Hide the string so it doesn't appear in the strings of the image - "DisplayName"
+			BYTE tmpDiaplayNameByte[] = { 0x44, 0x00, 0x69, 0x00, 0x73, 0x00, 0x70, 0x00, 0x6c, 0x00, 0x61, 0x00, 0x79, 0x00, 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x00, 0x00 };
+
+			// Hide the string so it doesn't appear in the strings of the image - "Description"
+			BYTE tmpDescriptionByte[] = { 0x44, 0x00, 0x65, 0x00, 0x73, 0x00, 0x63, 0x00, 0x72, 0x00, 0x69, 0x00, 0x70, 0x00, 0x74, 0x00, 0x69, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x00, 0x00 };
+
+			// Hide the string so it doesn't appear in the strings of the image - "ServiceType"
+			BYTE tmpServiceTypeByte[] = { 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x54, 0x00, 0x79, 0x00, 0x70, 0x00, 0x65, 0x00, 0x00, 0x00 };
+			if(SUCCEEDED(hr))
+			{
+				// gather system uuid information
+				WMIHelper::ResultsType rList;
+
+				// Hide the string so it doesn't appear in the strings of the image - "SELECT Name,PathName,Started,DisplayName,Description,ServiceType FROM Win32_Service"
+				BYTE wmiQuery_Byte[] = { 
+					0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x4e, 0x00, 
+					0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x2c, 0x00, 0x50, 0x00, 0x61, 0x00, 0x74, 0x00, 0x68, 0x00, 
+					0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x2c, 0x00, 0x53, 0x00, 0x74, 0x00, 0x61, 0x00, 
+					0x72, 0x00, 0x74, 0x00, 0x65, 0x00, 0x64, 0x00, 0x2c, 0x00, 0x44, 0x00, 0x69, 0x00, 0x73, 0x00, 
+					0x70, 0x00, 0x6c, 0x00, 0x61, 0x00, 0x79, 0x00, 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 
+					0x2c, 0x00, 0x44, 0x00, 0x65, 0x00, 0x73, 0x00, 0x63, 0x00, 0x72, 0x00, 0x69, 0x00, 0x70, 0x00, 
+					0x74, 0x00, 0x69, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x2c, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 
+					0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x54, 0x00, 0x79, 0x00, 0x70, 0x00, 0x65, 0x00, 
+					0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 
+					0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 
+					0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x00, 0x00
+				};
+
+				hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_Byte, rList);
+				//std::wstring wmiQuery = L"SELECT Name,PathName,Started,DisplayName,Description,ServiceType FROM Win32_Service";
+				//hr = wmi.ExecuteQuery(wmiQuery.c_str(), rList);
+				if(SUCCEEDED(hr) && rList.size()>0)
+				{
+					for (unsigned int idx=0; idx<rList.size(); ++idx)
+					{
+						Lic_RunningProcessesInfoAttribs::Lic_ServicesInfoAttribs serviceInfo;
+
+						VARIANT* pvtTmp = &rList[idx][(wchar_t*)tmpNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.name = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpPathNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.path = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpStartedByte];
+						if (pvtTmp->vt == VT_BOOL)
+							serviceInfo.bStarted = pvtTmp->boolVal == VARIANT_TRUE;
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpDiaplayNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.display = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
+						if (pvtTmp->vt == VT_BSTR)
+						{
+							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
+							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
+							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
+							serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
+						}
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpServiceTypeByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.serviceType = std::wstring(pvtTmp->bstrVal);
+
+						/*
+						wchar_t buf[1024];
+						_snwprintf(buf, 
+						  sizeof(buf)/sizeof(wchar_t), 
+						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s', Description: '%s'", 
+						  std::wstring(serviceInfo.name).c_str(),
+						  std::wstring(serviceInfo.path).c_str(),
+						  serviceInfo.bStarted == true ? L"TRUE" : L"FALSE",
+						  std::wstring(serviceInfo.display).c_str(),
+						  std::wstring(serviceInfo.description).c_str()
+						  );
+						OutputDebugStringW(buf);
+						*/
+						//std::string data = StringUtils::WstringToString(std::wstring(serviceInfo.description));
+						//OutputDebugStringW(std::wstring(serviceInfo.description).c_str());
+						
+						processInfoAttribs.servicesList->push_back(serviceInfo);
+					}
+					WMIHelper::Clear(rList);
+					rList.clear();
+				}
+
+			}
+			//CR.FIX.18131 - Detect Dongle Emulator - retrieve all system drivers on the box
+			if(SUCCEEDED(hr))
+			{
+				// gather system uuid information
+				WMIHelper::ResultsType rList;
+				// Hide the string so it doesn't appear in the strings of the image - "SELECT Name,PathName,Started,DisplayName,Description,ServiceType FROM Win32_SystemDriver"
+				BYTE wmiQuery_Byte[] = {
+					0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x4e, 0x00, 
+					0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x2c, 0x00, 0x50, 0x00, 0x61, 0x00, 0x74, 0x00, 0x68, 0x00, 
+					0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x2c, 0x00, 0x53, 0x00, 0x74, 0x00, 0x61, 0x00, 
+					0x72, 0x00, 0x74, 0x00, 0x65, 0x00, 0x64, 0x00, 0x2c, 0x00, 0x44, 0x00, 0x69, 0x00, 0x73, 0x00, 
+					0x70, 0x00, 0x6c, 0x00, 0x61, 0x00, 0x79, 0x00, 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 
+					0x2c, 0x00, 0x44, 0x00, 0x65, 0x00, 0x73, 0x00, 0x63, 0x00, 0x72, 0x00, 0x69, 0x00, 0x70, 0x00, 
+					0x74, 0x00, 0x69, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x2c, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 
+					0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x54, 0x00, 0x79, 0x00, 0x70, 0x00, 0x65, 0x00, 
+					0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 
+					0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 
+					0x65, 0x00, 0x6d, 0x00, 0x44, 0x00, 0x72, 0x00, 0x69, 0x00, 0x76, 0x00, 0x65, 0x00, 0x72, 0x00, 
+					0x00, 0x00
+				};
+				hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_Byte, rList);
+				//std::wstring wmiQuery = L"SELECT Name,PathName,Started,DisplayName,Description,ServiceType FROM Win32_SystemDriver";
+				//hr = wmi.ExecuteQuery(wmiQuery.c_str(), rList);
+				if(SUCCEEDED(hr) && rList.size()>0)
+				{
+					for (unsigned int idx=0; idx<rList.size(); ++idx)
+					{
+						Lic_RunningProcessesInfoAttribs::Lic_ServicesInfoAttribs serviceInfo;
+						VARIANT* pvtTmp = &rList[idx][(wchar_t*)tmpNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.name = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpPathNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.path = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpStartedByte];
+						if (pvtTmp->vt == VT_BOOL)
+							serviceInfo.bStarted = pvtTmp->boolVal == VARIANT_TRUE;
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpDiaplayNameByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.display = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.description = std::wstring(pvtTmp->bstrVal);
+
+						pvtTmp = &rList[idx][(wchar_t*)tmpServiceTypeByte];
+						if (pvtTmp->vt == VT_BSTR)
+							serviceInfo.serviceType = std::wstring(pvtTmp->bstrVal);
+
+						//wchar_t buf[1024];
+						//_snwprintf(buf, 
+						//  sizeof(buf)/sizeof(wchar_t), 
+						//  L"SoftwareServer::GenerateLicenseSystemData() - SystemDriver - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s'", 
+						//  std::wstring(systemDriverInfo.name).c_str(),
+						//  std::wstring(systemDriverInfo.path).c_str(),
+						//  systemDriverInfo.bStarted == true ? L"TRUE" : L"FALSE",
+						//  std::wstring(systemDriverInfo.display).c_str()
+						//  );
+						//OutputDebugStringW(buf);
+
+						processInfoAttribs.servicesList->push_back(serviceInfo);
+					}
+					WMIHelper::Clear(rList);
+					rList.clear();
+				}
+			}
+
+
 		}	// End of scope of WMIHelper wmi
 
 
@@ -1460,6 +1661,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpe
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString() - end");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
 
+		licSystemAttribs.Streamed_RunningProcessesInfoAttribs = std::wstring(processInfoAttribs.ToString());
 
 		BSTR tmpStreamedEventLog;
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - EventLogLicenseHelper::ReadEventLog() - start");
@@ -1501,6 +1703,165 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Leave");
 	return hr;
 }
 
+HRESULT SoftwareServer::GenerateLicenseSystemDataForSolimar()
+{
+	OutputDebugString(L"SoftwareServer::GenerateLicenseSystemDataForSolimar() - Enter");
+	HRESULT hr(E_FAIL);
+
+	SafeMutex mutex(SoftwareLicenseLock);
+	HANDLE hTempFile =  INVALID_HANDLE_VALUE;
+	wchar_t msgBuf[1024];
+	wchar_t tempFilename[MAX_PATH];
+	try
+	{
+		// Check to see if there has been a call to email in the last 5 minutes, throw a custom error if so
+		time_t cur_time = time(NULL);
+		static const time_t UPDATE_TIME_PERIOD_SECONDS = (time_t)(5*60);//5 minutes - Don't check more than once every 5 minutes.
+		if(lastTimeEmailToSolimar != 0 && abs(difftime(cur_time, lastTimeEmailToSolimar)) < UPDATE_TIME_PERIOD_SECONDS)
+		{
+			_snwprintf_s(
+				msgBuf, 
+				_TRUNCATE, 
+				L"Mail Error: Failed to e-mail Solimar Systems, Inc. You have already e-mailed the diagnostic data in the given time period.  Wait and try again."
+				);
+
+			hr = LicenseServerError::EHR_LIC_MAIL_SERVER;
+			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(msgBuf), __uuidof(0), __uuidof(0));
+			g_licenseController.GenerateMessage(L"License Server", MT_ERROR, hr, time(0), MessageGenericError, msgBuf);
+			throw hr;
+		}
+
+		// Based on mail server settings, send an email
+
+		// Write pVtLicSysDataPacket to a temp file to a temp location
+		wchar_t tempPath[MAX_PATH];
+		if (!GetTempPath(sizeof(tempPath) / sizeof(wchar_t), tempPath))
+			throw HRESULT_FROM_WIN32(::GetLastError());
+		
+		wchar_t localComputerName[MAX_COMPUTERNAME_LENGTH + 1];
+		DWORD localComputerNameSize = MAX_COMPUTERNAME_LENGTH + 1;
+		if (!GetComputerNameW(localComputerName, &localComputerNameSize))
+			throw HRESULT_FROM_WIN32(::GetLastError());
+
+		_snwprintf_s(
+			tempFilename, 
+			_TRUNCATE,
+			L"%s\\%s.lsData", 
+			tempPath,
+			localComputerName
+			);
+
+		// Create temp file with delete on close flag...
+		hTempFile = CreateFileW(
+			tempFilename,
+			GENERIC_WRITE,
+			FILE_SHARE_READ,
+			NULL, 
+			OPEN_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+		if (hTempFile == INVALID_HANDLE_VALUE)
+			throw HRESULT_FROM_WIN32(::GetLastError());
+
+		// Open the file
+		
+		VARIANT vtLicSysDataPacket;
+		VariantInit(&vtLicSysDataPacket);
+		hr = GenerateLicenseSystemData(&vtLicSysDataPacket);
+		if (FAILED(hr))
+			throw hr;
+
+		// Cycle through vtLicSysDataPacket and write its contents to hTempFile
+		BYTE *pSAData=0;
+		if (vtLicSysDataPacket.vt!=(VT_ARRAY | VT_UI1) || vtLicSysDataPacket.parray==0)
+			throw E_INVALIDARG;
+
+		hr = SafeArrayAccessData(vtLicSysDataPacket.parray, (void**)&pSAData);
+		if(FAILED(hr))
+			throw hr;
+
+		DWORD bytesWritten;
+		if( !WriteFile(
+			hTempFile,
+			pSAData,
+			vtLicSysDataPacket.parray->rgsabound[0].cElements,
+			&bytesWritten,
+			NULL) )
+		{
+			hr = HRESULT_FROM_WIN32(GetLastError());
+			SafeArrayUnaccessData(vtLicSysDataPacket.parray);
+			VariantClear(&vtLicSysDataPacket);
+			throw hr;
+		}
+		SafeArrayUnaccessData(vtLicSysDataPacket.parray);
+		VariantClear(&vtLicSysDataPacket);
+
+		//truncate whatever data was aready in the file.
+		if( !SetEndOfFile(hTempFile))
+		{
+			hr = HRESULT_FROM_WIN32(GetLastError());
+			throw hr;
+		}
+		CloseHandle(hTempFile);
+		hTempFile = INVALID_HANDLE_VALUE;
+
+		wchar_t subject[256];
+		wchar_t body[1024];
+		_snwprintf_s(
+			subject, 
+			_TRUNCATE,
+			L"Solimar Licensing Diagnostic Data from Computer: '%s'",
+			localComputerName
+			);
+
+		_snwprintf_s(
+			body,
+			_TRUNCATE,
+			L"This Solimar Licensing Diagnostic Data file was created on Computer: '%s' and e-mailed to Solimar Systems, Inc. from the License Viewer.",
+			localComputerName
+			);
+
+		// Send the email with the attachment being the temp file.
+		SpdAttribs::VectorStringAttrib recipentsList;
+		recipentsList->push_back(L"tech.support@solimarsystems.com");	// For release
+		recipentsList->push_back(L"production@solimarsystems.com");		// For release
+		hr = SendAlertEMail(
+			recipentsList, 
+			subject, 
+			body, 
+			tempFilename);
+		if (FAILED(hr))
+			throw hr;
+
+		// Successfully sent diagnostic data to Solimar, log the time.
+		lastTimeEmailToSolimar = time(NULL);
+
+		if (PathFileExistsW(tempFilename))
+			DeleteFile(tempFilename);
+	}
+	catch (HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	
+	// Cleanup
+	try
+	{
+		if (hTempFile != INVALID_HANDLE_VALUE)
+			CloseHandle(hTempFile);
+		if (PathFileExistsW(tempFilename))
+			DeleteFile(tempFilename);
+	}
+	catch(...)
+	{
+	}
+	return hr;
+}
+
 
 HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 	VARIANT vtLicSysDataPacket, 
@@ -1525,6 +1886,7 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 			tmpLicSysAttribs.InitFromString(bstrTmpStream);
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = tmpLicSysAttribs.createdDate - pre");
 			*pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());
+
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = tmpLicSysAttribs.createdDate - post");
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - remove excess KeyAttribs - pre");
 			//strip out the key byte array before sending...
@@ -1587,9 +1949,91 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 //			tmpLicSysAttribs.ListOfStreamed_InfoAttribs->erase(tmpLicSysAttribs.ListOfStreamed_InfoAttribs->begin());
 //			tmpLicSysAttribs.ListOfStreamed_InfoAttribs->push_back(SysAllocString(tmpLicInfoAttribs.ToString().c_str()));
 			//yyy - testing end
+			
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - pre");
 			*pBstrLicInfoDataAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_InfoAttribs.ToString().c_str());
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - post");
+			SysFreeString(bstrTmpStream);
+		}
+
+	}
+	catch (HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Leave");
+	return hr;
+}
+HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData2(
+	VARIANT vtLicSysDataPacket, 
+	BSTR *pBstrCreatedDateStreamed, 
+	BSTR *pBstrKeyAttribsListStream,
+	BSTR *pBstrLicUsageDataAttribsStream,
+	BSTR *pBstrConnectionAttribsListStream,
+	BSTR *pBstrEventLogAttribsListStream,
+	BSTR *pBstrLicInfoDataAttribsListStream,
+	BSTR *pBstrLicAlertInfoAttribs)
+{
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData2() - Enter");
+	HRESULT hr(E_INVALIDARG);
+	try
+	{
+		SafeMutex mutex(SoftwareLicenseLock);
+		BSTR bstrTmpStream;
+		hr = GenerateStream_ByLicenseSystemData(vtLicSysDataPacket, &bstrTmpStream);
+		if(SUCCEEDED(hr))
+		{
+			Lic_LicenseSystemAttribs tmpLicSysAttribs;
+			tmpLicSysAttribs.InitFromString(bstrTmpStream);
+			*pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());
+
+			//strip out the key byte array before sending...
+			int idx = 0;
+			SpdAttribs::CStreamableString tmpStreamableString;
+			PBYTE pbBuf(NULL) ;
+			pbBuf = new BYTE[16] ;
+			memset(pbBuf, 0, 16);
+			while(idx < tmpLicSysAttribs.ListOfStreamed_KeyAttribs->size())
+			{
+				std::wstring streamedVal = L"";
+				tmpStreamableString.StringToValue(tmpLicSysAttribs.ListOfStreamed_KeyAttribs->at(idx), streamedVal);
+				Lic_KeyAttribs licKeyAttribs;
+				licKeyAttribs.InitFromString(streamedVal);
+				licKeyAttribs.layout->at(0) = SpdAttribs::CBuffer(pbBuf, 16);	//clear out these items
+				licKeyAttribs.layout->at(6) = SpdAttribs::CBuffer(pbBuf, 16);	//clear out these items
+				licKeyAttribs.licenseCode = std::wstring(L"");	//Remove License Code
+				tmpLicSysAttribs.ListOfStreamed_KeyAttribs->at(idx) = licKeyAttribs.ToString();
+				idx++;
+			}
+			// Now delete the temporary buffer.
+			delete[] (pbBuf);
+
+			*pBstrKeyAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_KeyAttribs.ToString().c_str());
+
+			*pBstrLicUsageDataAttribsStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_UsageInfoAttribs.ToString()).c_str());
+
+			//Do not implement returning connection settings
+			*pBstrConnectionAttribsListStream = SysAllocString(L"");
+
+			//Returning event log list for License Server Entries
+			*pBstrEventLogAttribsListStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_SystemEventLogInfoAttribs.ToString()).c_str());
+
+			*pBstrLicInfoDataAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_InfoAttribs.ToString().c_str());
+
+			Lic_ServerDataAttribs serverDataAttribs;
+			// Cast tmpLicSysAttribs.Streamed_ServerDataAttribs to (std::wstring) to removed escaped characters.
+			serverDataAttribs.InitFromString(((std::wstring)tmpLicSysAttribs.Streamed_ServerDataAttribs).c_str());
+
+			// serverDataAttribs.alertInfo.ToString() will give varaible information for the alertInfo member in serverDataAttribs.
+			// To do properly, create a Lic_AlertInfoAttribs tempAlertInfo, then tempAlertInfo=serverDataAttribs.alertInfo then tempAlertInfo.ToString()
+			Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfo;
+			alertInfo = serverDataAttribs.alertInfo;
+			*pBstrLicAlertInfoAttribs = SysAllocString(alertInfo.ToString().c_str());
+
 			SysFreeString(bstrTmpStream);
 		}
 
@@ -1927,6 +2371,7 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 		SafeMutex mutex(SoftwareLicenseLock);
 		Lic_PackageAttribs licensePackageAttribs;
 		hr = GetSoftwareLicenseInfo_ByLicenseInternal(softwareLicense, &licensePackageAttribs.licLicenseInfoAttribs);
+		//licensePackageAttribs.licLicenseInfoAttribs.bLicClockViolation
 		if(FAILED(hr))
 			throw hr;
 
@@ -2074,8 +2519,6 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 			newLicenseFile = _bstr_t(tmp_code).Detach();
 			pSoftwareLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, pKeyServer, &licServerDataMgr);
 		}
-
-
 
 		//The Protection Key in the License Archive must be present on the License Server to apply the License Archive
 		std::wstring tmpKeyID = Lic_PackageAttribsHelper::GetValidationValue(&(licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID);
@@ -2273,56 +2716,74 @@ HRESULT SoftwareServer::ValidateToken_ByLicense(BSTR softwareLicense, long valid
 	SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
 	if(pSwLicMgr)
 	{
-		switch(validationTokenType)
+		// CR.18131 - Detect DongleEmulator
+		bool bBypassDongleEmulationCheck = false;
+		if ((validationTokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID) ||
+				(validationTokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode))
 		{
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID:
-				hr = pSwLicMgr->ValidateHardwareKeyID(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode:
-				hr = pSwLicMgr->ValidateLicenseCode(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttBiosSerialNumber:
-				hr = pSwLicMgr->ValidateHardwareBiosSerialNumber(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttMacAddress:
-				hr = pSwLicMgr->ValidateHardwareMacAddress(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
-				hr = pSwLicMgr->ValidateHardwareCompuerName(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypeCopyFromCustomerOnly:
-				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY;
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypeArchiveOnly:
-				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE;
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypePackageOnly:
-				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_PACKET;
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttDomainName:
-				hr = pSwLicMgr->ValidateHardwareDomainName(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttOperatingSystem:
-				hr = pSwLicMgr->ValidateHardwareOperatingSystem(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemManufacturer:
-				hr = pSwLicMgr->ValidateHardwareSystemManufacturer(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemModel:
-				hr = pSwLicMgr->ValidateHardwareSystemModel(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemType:
-				hr = pSwLicMgr->ValidateHardwareSystemType(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemUuid:
-				hr = pSwLicMgr->ValidateHardwareSystemUUID(validationValue);
-				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttPartOfDomain:
-				hr = pSwLicMgr->ValidateHardwarePartOfDomain(_wcsicmp(validationValue, L"true") == 0);
-				break;
-			default:
-				break;
-		};
+			Lic_EmulationInfoAttribs emulatorInfoAttribs;
+			hr = licServerDataMgr.GetEmulatorInfoAttribs(&emulatorInfoAttribs);
+			if (SUCCEEDED(hr))
+			{
+				if (emulatorInfoAttribs.bDongleEmulatorDetected && !emulatorInfoAttribs.bBypassDongleEmulatorCheck)
+					hr = LicenseServerError::EHR_DONGLE_EMULATOR;
+			}
+			bBypassDongleEmulationCheck = emulatorInfoAttribs.bBypassDongleEmulatorCheck;
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			switch(validationTokenType)
+			{
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID:
+					hr = pSwLicMgr->ValidateHardwareKeyID(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode:
+					hr = pSwLicMgr->ValidateLicenseCode(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttBiosSerialNumber:
+					hr = pSwLicMgr->ValidateHardwareBiosSerialNumber(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttMacAddress:
+					hr = pSwLicMgr->ValidateHardwareMacAddress(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
+					hr = pSwLicMgr->ValidateHardwareCompuerName(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypeCopyFromCustomerOnly:
+					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY;
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypeArchiveOnly:
+					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE;
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypePackageOnly:
+					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_PACKET;
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttDomainName:
+					hr = pSwLicMgr->ValidateHardwareDomainName(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttOperatingSystem:
+					hr = pSwLicMgr->ValidateHardwareOperatingSystem(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemManufacturer:
+					hr = pSwLicMgr->ValidateHardwareSystemManufacturer(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemModel:
+					hr = pSwLicMgr->ValidateHardwareSystemModel(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemType:
+					hr = pSwLicMgr->ValidateHardwareSystemType(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemUuid:
+					hr = pSwLicMgr->ValidateHardwareSystemUUID(validationValue);
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttPartOfDomain:
+					hr = pSwLicMgr->ValidateHardwarePartOfDomain(_wcsicmp(validationValue, L"true") == 0);
+					break;
+				default:
+					break;
+			};
+		}
 	}
 	else	//Not Found
 	{
@@ -2604,6 +3065,472 @@ HRESULT SoftwareServer::ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicen
 	return hr;
 }
 
+HRESULT SoftwareServer::GetMailServerInfo(BSTR *pBstrAlertMailServerAttribsStream)
+{
+	HRESULT hr(E_FAIL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs tmpMailServerAttribs = alertInfoAttribs.mailServer;
+		*pBstrAlertMailServerAttribsStream = SysAllocString(tmpMailServerAttribs.ToString().c_str());
+
+		hr = S_OK;
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::SetMailServerInfo(BSTR bstrAlertMailServerAttribsStream)
+{
+	HRESULT hr(E_INVALIDARG);
+	if (bstrAlertMailServerAttribsStream != NULL)
+	{
+		SafeMutex mutex(SoftwareLicenseLock);
+		try
+		{
+			Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+			hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+			if (FAILED(hr))
+				throw hr;
+
+			Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs tmpMailAttribs;
+			tmpMailAttribs = bstrAlertMailServerAttribsStream;
+			alertInfoAttribs.mailServer = tmpMailAttribs;
+
+			hr = licServerDataMgr.SetAlertInfoAttribs(&alertInfoAttribs);
+			if (FAILED(hr))
+				throw hr;
+		}
+		catch(HRESULT eHr)
+		{
+			hr = eHr;
+		}
+		catch(_com_error &e)
+		{
+			hr = e.Error();
+		}
+	}
+	return hr;
+}
+HRESULT SoftwareServer::TestMailServerInfo(BSTR bstrTestMailServerAttribsStream)
+{
+	HRESULT hr(E_FAIL);
+	try
+	{
+		Lic_TestMailServer testMailServerAttribs;
+		testMailServerAttribs = bstrTestMailServerAttribsStream;
+
+		hr = SendAlertEMail(testMailServerAttribs.recipentsList, testMailServerAttribs.subject, testMailServerAttribs.body);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::GetAllEmailAlerts(BSTR *pBstrEmailAlertMailAttribsListStream)
+{
+	HRESULT hr(E_NOTIMPL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		*pBstrEmailAlertMailAttribsListStream = SysAllocString(alertInfoAttribs.emailAlertsList.ToString().c_str());
+
+		hr = S_OK;
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::GetEmailAlert(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream)
+{
+	HRESULT hr(E_FAIL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		_bstr_t emailAlertId(bstrEmailAlertId,true);
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		bool bFoundItem = false;
+		for (	Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator emailAlertsListIt = alertInfoAttribs.emailAlertsList->begin();
+				emailAlertsListIt != alertInfoAttribs.emailAlertsList->end();
+				emailAlertsListIt++)
+		{
+			if (_wcsicmp(std::wstring(emailAlertsListIt->id).c_str(), emailAlertId) == 0)
+			{
+				bFoundItem = true;
+				*pBstrEmailAlertMailAttribsStream = SysAllocString(emailAlertsListIt->ToString().c_str());
+				break;
+			}
+		}
+
+		// Return custom error for can't find bstrEmailAlertId
+		if (bFoundItem == false)
+			hr = E_INVALIDARG;
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::SetEmailAlert(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream)
+{
+	HRESULT hr(E_FAIL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		_bstr_t emailAlertId(bstrEmailAlertId,true);
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		bool bFoundItem = false;
+		for (	Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator emailAlertsListIt = alertInfoAttribs.emailAlertsList->begin();
+				emailAlertsListIt != alertInfoAttribs.emailAlertsList->end();
+				emailAlertsListIt++)
+		{
+			if (_wcsicmp(std::wstring(emailAlertsListIt->id).c_str(), emailAlertId) == 0)
+			{
+				*emailAlertsListIt = bstrEmailAlertMailAttribsStream;
+
+				bFoundItem = true;
+				//*pBstrEmailAlertMailAttribsStream = SysAllocString(emailAlertsListIt->ToString().c_str());
+
+				hr = licServerDataMgr.SetAlertInfoAttribs(&alertInfoAttribs);
+				if (FAILED(hr))
+					throw hr;
+
+				hr = S_OK;
+				break;
+			}
+		}
+
+		// Return custom error for can't find bstrEmailAlertId
+		if (bFoundItem == false)
+			hr = E_INVALIDARG;
+
+		UpdateAlertEventLogIdCache(alertInfoAttribs.emailAlertsList);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId)
+{
+	HRESULT hr(E_FAIL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_EmailAlertMailAttribs emailAlertMailAttribs;
+		emailAlertMailAttribs = bstrEmailAlertMailAttribsStream;
+
+		GUID key_guid;
+		hr = CoCreateGuid(&key_guid);
+		if (FAILED(hr))
+			throw hr;
+		
+		wchar_t tmp_code[128];
+		StringFromGUID2(key_guid, tmp_code, 128);
+		tmp_code[127]=0;
+		emailAlertMailAttribs.id = std::wstring(tmp_code);
+
+		alertInfoAttribs.emailAlertsList->push_back(emailAlertMailAttribs);
+
+		*pBstrEmailAlertId = SysAllocString(emailAlertMailAttribs.id.ToString().c_str());
+
+		hr = licServerDataMgr.SetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		hr = S_OK;
+
+		UpdateAlertEventLogIdCache(alertInfoAttribs.emailAlertsList);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::DeleteEmailAlert(BSTR bstrEmailAlertId)
+{
+	HRESULT hr(E_FAIL);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		_bstr_t emailAlertId(bstrEmailAlertId,true);
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator deleteEmailAlertsListIt = alertInfoAttribs.emailAlertsList->end();
+
+		for (	Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator emailAlertsListIt = alertInfoAttribs.emailAlertsList->begin();
+				emailAlertsListIt != alertInfoAttribs.emailAlertsList->end();
+				emailAlertsListIt++)
+		{
+			if (_wcsicmp(std::wstring(emailAlertsListIt->id).c_str(), emailAlertId) == 0)
+			{
+				deleteEmailAlertsListIt = emailAlertsListIt;
+				break;
+			}
+		}
+
+		if (deleteEmailAlertsListIt != alertInfoAttribs.emailAlertsList->end())
+		{
+			alertInfoAttribs.emailAlertsList->erase(deleteEmailAlertsListIt);
+			hr = licServerDataMgr.SetAlertInfoAttribs(&alertInfoAttribs);
+			if (FAILED(hr))
+				throw hr;
+			UpdateAlertEventLogIdCache(alertInfoAttribs.emailAlertsList);
+		}
+		else
+			hr = E_INVALIDARG;
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
+HRESULT SoftwareServer::UpdateAlertEventLogIdCache(Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_EmailAlertMailAttribsList emailAlertMailAttribsList)
+{
+	SafeMutex mutex(SoftwareLicenseLock);
+	HRESULT hr(E_FAIL);
+	try
+	{
+		eventLogIdToListofAlertIdsMap.clear();
+		for (	Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator emailAlertsListIt = emailAlertMailAttribsList->begin();
+				emailAlertsListIt != emailAlertMailAttribsList->end();
+				emailAlertsListIt++)
+		{
+			if (emailAlertsListIt->bActive == true)
+			{
+				for (	SpdAttribs::TVectorDword::const_iterator eventIdListId = emailAlertsListIt->eventIdList->begin();
+						eventIdListId != emailAlertsListIt->eventIdList->end();
+						eventIdListId++)
+				{
+					eventLogIdToListofAlertIdsMap[*eventIdListId].push_back(emailAlertsListIt->id->c_str());
+				}
+			}
+		}
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+
+}
+
+HRESULT SoftwareServer::SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsList, std::wstring subject, std::wstring body, std::wstring attachmentFile)
+{
+	HRESULT hr (S_OK);
+	wchar_t msgBuf[1024];
+	try
+	{
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+		{
+		SafeMutex mutex(SoftwareLicenseLock);
+		hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+		}
+
+		CSmtp mail;
+
+		mail.SetSMTPServer(
+			StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.mailServerName)).c_str(), 
+			alertInfoAttribs.mailServer.portNumber
+			);
+		if (alertInfoAttribs.mailServer.authenticationType == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttAnonymous)
+		{
+		}
+		else if (alertInfoAttribs.mailServer.authenticationType == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttBasic)
+		{
+			mail.SetLogin(StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.authBasicUserName)).c_str());
+			mail.SetPassword(StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.authBasicUserPassword)).c_str());
+		}
+		
+		mail.SetSenderMail(StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.fromEmail)).c_str());
+		if (alertInfoAttribs.mailServer.fromDisplayName->length() > 0)
+			mail.SetSenderName(StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.fromDisplayName)).c_str());
+		mail.SetReplyTo(StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.fromEmail)).c_str());
+
+		for (int idx = 0; idx<recipentsList->size(); idx++)
+			mail.AddRecipient(StringUtils::WstringToString(std::wstring(recipentsList->at(idx))).c_str());
+
+		mail.SetSubject(StringUtils::WstringToString(std::wstring(subject)).c_str());
+		mail.AddMsgLine(StringUtils::WstringToString(std::wstring(body)).c_str());
+
+		if (attachmentFile.length() > 0)
+			mail.AddAttachment(StringUtils::WstringToString(std::wstring(attachmentFile)).c_str());
+
+		{
+		SafeMutex mutex(SendMailLock);
+		mail.Send();
+		}
+	}
+	catch(ECSmtp e)
+	{
+		_snwprintf_s(msgBuf, _TRUNCATE, L"Mail Error(%d): %S", e.GetErrorNum(), e.GetErrorText().c_str());
+		// OutputDebugString(msgBuf);
+
+		// Create Dynamic Mail Errors in Licening
+		hr = LicenseServerError::EHR_LIC_MAIL_SERVER;
+
+		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(msgBuf), __uuidof(0), __uuidof(0));
+
+		g_licenseController.GenerateMessage(L"License Server", MT_ERROR, hr, time(0), MessageGenericError, msgBuf);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+HRESULT SoftwareServer::SendAlertEmailIfNeeded(long productId, unsigned int eventId, std::wstring message)
+{
+	HRESULT hr(E_FAIL);
+	try
+	{
+		unsigned int eventLogId = (productId!=-1) ? (productId*1000)+eventId : eventId;
+		std::map<unsigned int, std::list<std::wstring>>::iterator eventLogIdToNumberOfAlertsMapIt = eventLogIdToListofAlertIdsMap.find(eventLogId);
+		if (eventLogIdToNumberOfAlertsMapIt != eventLogIdToListofAlertIdsMap.end())
+		{
+			std::list<std::wstring> alertIdList = eventLogIdToNumberOfAlertsMapIt->second;
+
+			struct TempAttribs
+			{
+				SpdAttribs::VectorStringAttrib recipentsList;
+				std::wstring subject;
+				std::wstring body;
+			};
+			std::vector<TempAttribs> emailList;
+
+			// Cycle through alertInfoAttribs.emailAlertsList
+			Lic_ServerDataAttribs::Lic_AlertInfoAttribs alertInfoAttribs;
+			{
+			SafeMutex mutex(SoftwareLicenseLock);
+			hr = licServerDataMgr.GetAlertInfoAttribs(&alertInfoAttribs);
+			if (FAILED(hr))
+				throw hr;
+
+			for (	std::list<std::wstring>::iterator alertIdListIt = alertIdList.begin();
+					alertIdListIt != alertIdList.end();
+					alertIdListIt++)
+			{
+				for (	Lic_ServerDataAttribs::Lic_AlertInfoAttribs::TVector_Lic_EmailAlertMailAttribsList::iterator emailAlertsListIt = alertInfoAttribs.emailAlertsList->begin();
+					emailAlertsListIt != alertInfoAttribs.emailAlertsList->end();
+					emailAlertsListIt++)
+				{
+					if (_wcsicmp(alertIdListIt->c_str(), emailAlertsListIt->id->c_str()) == 0)
+					{
+						wchar_t msgBuf[1024];
+						_snwprintf_s(
+							msgBuf, 
+							_TRUNCATE, 
+							L"Licensing E-mail Alert - EventID: '%d'",
+							eventLogId
+							);
+
+						TempAttribs emailAttribs;
+						emailAttribs.recipentsList = emailAlertsListIt->recipentsList;
+						emailAttribs.subject = msgBuf;
+						emailAttribs.body = message;
+						emailList.push_back(emailAttribs);
+						break;
+					}
+				}
+			}
+			} // End scope of SafeMutex mutex(SoftwareLicenseLock);
+
+			for(std::vector<TempAttribs>::iterator emailListIt = emailList.begin();
+				emailListIt != emailList.end();
+				emailListIt++)
+			{
+				hr = SendAlertEMail(emailListIt->recipentsList, emailListIt->subject, emailListIt->body);
+				if (FAILED(hr))
+					throw hr;
+			}
+			emailList.clear();
+		}
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
 
 HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionKey* pKey, _bstr_t bstrValidationKey, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pLicenseInfoAttribs)
 {

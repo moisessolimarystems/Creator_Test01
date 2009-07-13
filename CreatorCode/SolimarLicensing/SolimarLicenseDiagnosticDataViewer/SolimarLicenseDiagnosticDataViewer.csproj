@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -13,6 +13,11 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>tools32.ico</ApplicationIcon>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,6 +83,12 @@
     <Compile Include="LicenseDiagnosticDataViewerForm.Designer.cs">
       <DependentUpon>LicenseDiagnosticDataViewerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lic_EmulationInfoAttribs_DisplayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Lic_EmulationInfoAttribs_DisplayForm.Designer.cs">
+      <DependentUpon>Lic_EmulationInfoAttribs_DisplayForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Lic_KeyAttribs_DisplayControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -101,6 +112,12 @@
     </Compile>
     <Compile Include="Lic_LicenseSystemAttribs_DisplayForm.Designer.cs">
       <DependentUpon>Lic_LicenseSystemAttribs_DisplayForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Lic_RunningProcessesInfoAttribs_DisplayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Lic_RunningProcessesInfoAttribs_DisplayForm.Designer.cs">
+      <DependentUpon>Lic_RunningProcessesInfoAttribs_DisplayForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Lic_ServerDataAttribs_DisplayForm.cs">
       <SubType>Form</SubType>
@@ -137,6 +154,9 @@
     <EmbeddedResource Include="LicenseDiagnosticDataViewerForm.resx">
       <DependentUpon>LicenseDiagnosticDataViewerForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Lic_EmulationInfoAttribs_DisplayForm.resx">
+      <DependentUpon>Lic_EmulationInfoAttribs_DisplayForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Lic_KeyAttribs_DisplayControl.resx">
       <DependentUpon>Lic_KeyAttribs_DisplayControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -148,6 +168,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Lic_LicenseSystemAttribs_DisplayForm.resx">
       <DependentUpon>Lic_LicenseSystemAttribs_DisplayForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lic_RunningProcessesInfoAttribs_DisplayForm.resx">
+      <DependentUpon>Lic_RunningProcessesInfoAttribs_DisplayForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Lic_ServerDataAttribs_DisplayForm.resx">
       <DependentUpon>Lic_ServerDataAttribs_DisplayForm.cs</DependentUpon>

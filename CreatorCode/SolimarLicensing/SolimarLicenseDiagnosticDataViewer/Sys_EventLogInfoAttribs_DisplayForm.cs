@@ -215,6 +215,15 @@ namespace SolimarLicenseDiagnosticDataViewer
             }
         }
 
+        private void general_KeyDown(object sender, KeyEventArgs e)
+        {
+           if (e.KeyCode == Keys.C && e.Control)
+           {
+              System.Windows.Forms.Clipboard.SetText(Shared.VisualComponents.ListViewHelper.GetCopyTextForListView(this.msgListView));
+              e.Handled = true;
+           }
+        }
+
         
     }
 }

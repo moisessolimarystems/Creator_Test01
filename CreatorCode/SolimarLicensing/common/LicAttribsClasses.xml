@@ -68,6 +68,17 @@
 	</AttribsClass>
 	-->
 	
+	<!-- It has been discovered that there is a Emulator for SafeNet Dongles.  This class is for parameters for SafeNet functions to detect such Emulators-->
+	<AttribsClass code_class_name="Lic_EmulationInfoAttribs" name="L_EmInA" descriptive_name="License Emulation Info Attributes" base="" filename="Lic_EmulationInfoAttribs">
+		<attrib type="bool" name="bDongleEmulatorDetected" tagname="dED" default="false" />
+		<attrib type="bool" name="bBypassDongleEmulatorCheck" tagname="bdEC" default="false" />
+		<attrib type="list(string)" name="knownEmulatorServicesList" tagname="kEL" default=""/>
+		<attrib type="string" name="excludeService" tagname="exS" default=""/>
+
+		<attrib type="bool" name="bCheckEmulatorCall_FoundEmulator" tagname="ceFE" default="false" />
+		<attrib type="unsigned __int32" name="checkEmulatorCall_StatusCode" tagname="ceSC" default="0"/>
+	</AttribsClass>
+	
 	<!--
 		Contents of a license package unencrypted.
 	-->
@@ -342,6 +353,8 @@
 		<attrib type="Lic_LicenseInfoAttribs" name="licLicenseInfoAttribs" tagname="lIA" default="Lic_LicenseInfoAttribs"/>
 		<attrib type="Lic_SoftwareSpecAttribs" name="licSoftwareSpecAttribs" tagname="lSA" default="Lic_SoftwareSpecAttribs"/>
 		<attrib type="Lic_SoftwareSpecAttribs" name="licReplaceSoftwareSpecAttribs" tagname="lRSA" default="Lic_SoftwareSpecAttribs"/>
+		
+		<attrib type="string" name="streamed_EmulationInfoAttribs" tagname="sEA" default="" />
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_ServerDataAttribs" name="L_SvrDtA" descriptive_name="License Server Data Attributes" base="" filename="Lic_ServerDataAttribs">
@@ -422,7 +435,7 @@
 			<attrib type="Lic_AlertMailServerAttribs" name="mailServer" tagname="mS" default="" />
 		</AttribsClass>
 		</typedef>
-	
+		
 		<attrib type="unsigned __int32" name="versionMajor" tagname="vMj" default="1"/>
 		<attrib type="unsigned __int32" name="versionMinor" tagname="vMn" default="0"/>
 		<attrib type="unsigned __int32" name="versionSubMajor" tagname="vSMj" default="0"/>
@@ -431,7 +444,9 @@
 		<attrib type="unsigned __int32" name="clockViolCount" tagname="cVC" default="0"/>
 		<attrib type="DateTime" name="clockViolLastDate" tagname="cVD" default="1900-01-01 00:00:00.0000"/>
 		<attrib type="bool" name="bInClockViol" tagname="iCV" default="false" />
+		
 		<attrib type="Lic_AlertInfoAttribs" name="alertInfo" tagname="aI" default="" />
+		<attrib type="string" name="streamed_EmulationInfoAttribs" tagname="sEA" default="" />
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_TestMailServer" name="L_TMS" descriptive_name="Test Mail Server Attributes" base="" filename="Lic_TestMailServerAttribs">
@@ -549,7 +564,25 @@
 		<attrib type="unsigned __int32" name="enumOverflowAction" tagname="oA" default="0"/>
 		<attrib type="string" name="source" tagname="s" default=""/>
 	</AttribsClass>
-	
+
+	<AttribsClass code_class_name="Lic_RunningProcessesInfoAttribs" name="L_RPInA" descriptive_name="Running Processes Info Attributes" base="" filename="Lic_RunningProcessesInfoAttribs">
+		<!-- Services and System Drivers are both included in this list-->
+		<typedef type="class" name="Lic_ServicesInfoAttribs">
+		<AttribsClass code_class_name="Lic_ServicesInfoAttribs" name="L_SIA" descriptive_name="Services Info Attributes" base="">
+			<attrib type="string" name="name" tagname="nm" default="" />
+			<attrib type="string" name="path" tagname="pt" default="" />
+			<attrib type="bool" name="bStarted" tagname="bS" default="false" />
+			<attrib type="string" name="display" tagname="dn" default="" />
+			<attrib type="string" name="description" tagname="dc" default="" />
+			<attrib type="string" name="serviceType" tagname="st" default="" />
+		</AttribsClass>
+		</typedef>
+		<typedef type="collection" name="Lic_ServicesInfoAttribsList">
+			<List value_type="Lic_ServicesInfoAttribs"/>
+		</typedef>
+		<attrib type="Lic_ServicesInfoAttribsList" name="servicesList" tagname="sLt" default="" />
+	</AttribsClass>
+
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
 		<attrib type="string" name="Streamed_ServerDataAttribs" tagname="sD" default="" />
@@ -557,6 +590,7 @@
 		<attrib type="string" name="Streamed_SoftwareSpecAttribs" tagname="sS" default="" />
 		<attrib type="string" name="Streamed_UsageInfoAttribs" tagname="sU" default="" />
 		<attrib type="string" name="Streamed_SystemEventLogInfoAttribs" tagname="sE" default="" />
+		<attrib type="string" name="Streamed_RunningProcessesInfoAttribs" tagname="rP" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>

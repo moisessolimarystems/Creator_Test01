@@ -311,6 +311,12 @@ HRESULT KeyServer::AddApplicationInstance(BSTR license_id, BSTR key_ident, BSTR 
 //OutputDebugStringW(debug_buf);
 
 	SafeMutex mutex(KeyListLock);
+	
+	// CR.18131 - Detect DongleEmulator, remove check here if don't want to check for dongle emulation for Creator 2 keys
+	//HRESULT hr = VerifyNoDongleEmulator();
+	//if (FAILED(hr))
+	//	return hr;
+
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));	// find the key in the key list
 	if (key!=keys.end())
 		return key->second->AddApplicationInstance(license_id, application_instance, b_app_instance_lock_key);
@@ -1386,6 +1392,7 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs)
 {
 	SafeMutex mutex(KeyListLock);
+
 	// find the key in the key list
 	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
 
@@ -1762,4 +1769,10 @@ HRESULT KeyServer::TimesUp()
 HRESULT KeyServer::CheckHealth(unsigned int timeout) 
 {
 	return S_OK;	//Do nothing, return success
+}
+
+// CR.18131 - Detect DongleEmulator
+HRESULT KeyServer::VerifyNoDongleEmulator(int* pCheckEmulatorStatusCode, bool* pbCheckEmulatorFound, char* pEmulatorName, char* pExceptionServiceName)
+{
+	return pRainbowDriver->VerifyNoDongleEmulator(pCheckEmulatorStatusCode, pbCheckEmulatorFound, pEmulatorName, pExceptionServiceName);
 }

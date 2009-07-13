@@ -205,7 +205,7 @@
             // 
             this.panel1.Controls.Add(this.textBox1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 503);
+            this.panel1.Location = new System.Drawing.Point(0, 501);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1149, 87);
             this.panel1.TabIndex = 3;
@@ -224,7 +224,7 @@
             // bottumSplitter
             // 
             this.bottumSplitter.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.bottumSplitter.Location = new System.Drawing.Point(0, 498);
+            this.bottumSplitter.Location = new System.Drawing.Point(0, 496);
             this.bottumSplitter.Name = "bottumSplitter";
             this.bottumSplitter.Size = new System.Drawing.Size(1149, 5);
             this.bottumSplitter.TabIndex = 5;
@@ -237,7 +237,7 @@
             this.leftPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.leftPanel.Location = new System.Drawing.Point(0, 24);
             this.leftPanel.Name = "leftPanel";
-            this.leftPanel.Size = new System.Drawing.Size(188, 474);
+            this.leftPanel.Size = new System.Drawing.Size(188, 472);
             this.leftPanel.TabIndex = 6;
             // 
             // leftTreeView
@@ -249,7 +249,7 @@
             this.leftTreeView.Name = "leftTreeView";
             this.leftTreeView.ShowLines = false;
             this.leftTreeView.ShowNodeToolTips = true;
-            this.leftTreeView.Size = new System.Drawing.Size(188, 474);
+            this.leftTreeView.Size = new System.Drawing.Size(188, 472);
             this.leftTreeView.TabIndex = 10;
             this.leftTreeView.DoubleClick += new System.EventHandler(this.leftTreeView_DoubleClick);
             // 
@@ -257,7 +257,7 @@
             // 
             this.leftSplitter.Location = new System.Drawing.Point(188, 24);
             this.leftSplitter.Name = "leftSplitter";
-            this.leftSplitter.Size = new System.Drawing.Size(5, 474);
+            this.leftSplitter.Size = new System.Drawing.Size(5, 472);
             this.leftSplitter.TabIndex = 7;
             this.leftSplitter.TabStop = false;
             // 
@@ -266,9 +266,9 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 590);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 588);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1149, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1149, 24);
             this.statusStrip1.TabIndex = 9;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -345,11 +345,11 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ToolStripMenuItem makeObjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem makeLicPackageToolStripMenuItem;
-		private System.Windows.Forms.Splitter bottumSplitter;
-		private System.Windows.Forms.Panel leftPanel;
-		private System.Windows.Forms.Splitter leftSplitter;
+        private System.Windows.Forms.Splitter bottumSplitter;
+        private System.Windows.Forms.Panel leftPanel;
+        private System.Windows.Forms.Splitter leftSplitter;
         private System.Windows.Forms.TreeView leftTreeView;
-		private System.Windows.Forms.ToolTip generalToolTip;
+        private System.Windows.Forms.ToolTip generalToolTip;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;

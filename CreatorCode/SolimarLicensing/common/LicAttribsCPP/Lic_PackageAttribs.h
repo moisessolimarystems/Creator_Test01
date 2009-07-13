@@ -48,6 +48,8 @@ public:
 		pid_SdxDesigner = 18,
 		pid_SpdeQueueManager = 19,
 		pid_LibraryServices = 20,
+		pid_XIMAGEpdf = 21,
+		pid_SolimarUtilities = 22,
 		pid_TestDevIconvert = 107,
 		pid_TestDevSolsearcherEp = 108,
 		pid_TestDevSolScript = 109,
@@ -61,6 +63,8 @@ public:
 		pid_TestDevSdxDesigner = 118,
 		pid_TestDevSpdeQueueManager = 119,
 		pid_TestDevLibraryServices = 120,
+		pid_TestDevXIMAGEpdf = 121,
+		pid_TestDevSolimarUtilities = 122,
 		pid_UnknownProduct = 0xFFFF,
 	} TLic_ProductID;
 	
@@ -1587,6 +1591,7 @@ public:
 	Lic_LicenseInfoAttribs licLicenseInfoAttribs;
 	Lic_SoftwareSpecAttribs licSoftwareSpecAttribs;
 	Lic_SoftwareSpecAttribs licReplaceSoftwareSpecAttribs;
+	SpdAttribs::WStringAttrib streamed_EmulationInfoAttribs;
 
 	
 
@@ -1595,6 +1600,7 @@ public:
 		licLicenseInfoAttribs = c.licLicenseInfoAttribs;
 		licSoftwareSpecAttribs = c.licSoftwareSpecAttribs;
 		licReplaceSoftwareSpecAttribs = c.licReplaceSoftwareSpecAttribs;
+		streamed_EmulationInfoAttribs = c.streamed_EmulationInfoAttribs;
 		return *this ;
 	}
 
@@ -1602,43 +1608,51 @@ public:
 		SpdAttribs::CAttribsBase(GetAttribsClassName()),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", Lic_LicenseInfoAttribs()),
 		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()),
-		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()){;}
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", SpdAttribs::WStringObj(L"")){;}
 	
 	Lic_PackageAttribs(const Lic_PackageAttribs &c) : 
 		SpdAttribs::CAttribsBase(GetAttribsClassName()),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", c.licLicenseInfoAttribs),
 		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs),
-		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs){;}
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", c.streamed_EmulationInfoAttribs){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", Lic_LicenseInfoAttribs()),
 		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()),
-		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()){;}
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", SpdAttribs::WStringObj(L"")){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_PackageAttribs &c) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", c.licLicenseInfoAttribs),
 		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs),
-		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs){;}
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs),
+		streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", c.streamed_EmulationInfoAttribs){;}
 	
 	Lic_PackageAttribs(const CWStringStream &wsAttribsClassName,
 		const Lic_LicenseInfoAttribs &param_licLicenseInfoAttribs,
 		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs,
-		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs) : 
+		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs,
+		const SpdAttribs::WStringAttrib &param_streamed_EmulationInfoAttribs) : 
 			SpdAttribs::CAttribsBase(wsAttribsClassName),
 			licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", param_licLicenseInfoAttribs),
 			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs),
-			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs){;}
+			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs),
+			streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", param_streamed_EmulationInfoAttribs){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 		const Lic_LicenseInfoAttribs &param_licLicenseInfoAttribs,
 		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs,
-		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs) : 
+		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs,
+		const SpdAttribs::WStringAttrib &param_streamed_EmulationInfoAttribs) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", param_licLicenseInfoAttribs),
 			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs),
-			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs){;}
+			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs),
+			streamed_EmulationInfoAttribs(m_mapAttribObjs, L"sEA", param_streamed_EmulationInfoAttribs){;}
 	
 
 };

@@ -134,6 +134,208 @@ namespace Solimar
 				public class Lic_ServerDataFileInfoAttribsList : AttribsMemberGenericList {public Lic_ServerDataFileInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ServerDataFileInfoAttribs), defaultVal){;} }
 					
 				public class Lic_ClockViolationInfoAttribsList : AttribsMemberGenericList {public Lic_ClockViolationInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ClockViolationInfoAttribs), defaultVal){;} }
+					public class Lic_AlertInfoAttribs : LicensingAttribsBase
+				{
+					public static string ClassName = "aia";
+					
+					public Lic_AlertInfoAttribs() : 
+						base(ClassName)
+					{
+						;
+					}
+					
+					public class Lic_EmailAlertMailAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "eA";
+						
+						public Lic_EmailAlertMailAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						
+						public AttribsMemberString id = new AttribsMemberString("eID", "");
+						public AttribsMemberString name = new AttribsMemberString("eN", "");
+						public AttribsMemberBOOL bActive = new AttribsMemberBOOL("bA", true);
+						public AttribsMemberStringList recipentsList = new AttribsMemberStringList("rL", new ArrayList());
+						public AttribsMemberDWORDList eventIdList = new AttribsMemberDWORDList("eL", new ArrayList());
+					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_EmailAlertMailAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_EmailAlertMailAttribs(string keyName, Lic_EmailAlertMailAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_EmailAlertMailAttribs(AttribsMemberAttribsClass_Lic_EmailAlertMailAttribs t)
+						{
+							return (Lic_EmailAlertMailAttribs)t.m_tVal;
+						}
+					
+						public Lic_EmailAlertMailAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						
+					public class Lic_EmailAlertMailAttribsList : AttribsMemberGenericList {public Lic_EmailAlertMailAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_EmailAlertMailAttribs), defaultVal){;} }
+						public class Lic_AlertMailServerAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "aMS";
+						
+						public Lic_AlertMailServerAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						[FlagsAttribute]
+						public enum TAuthenticationType : uint
+						{
+							ttAnonymous = 0,
+							ttBasic = 1,
+						};
+						
+						public class AttribsMemberEnum_TAuthenticationType : AttribsMemberEnum
+						{
+							public AttribsMemberEnum_TAuthenticationType(string keyName, TAuthenticationType defaultVal) :
+								base(keyName, defaultVal, typeof(TAuthenticationType))
+							{
+								;
+							}
+							
+							protected static SortedList m_MapAliasToEnum;
+							protected static SortedList m_MapEnumToAlias;
+							protected static SortedList m_MapOrderingIndexToAlias;
+							protected static SortedList m_MapAliasToIndex;
+							protected static SortedList m_MapEnumToIndex;
+							static AttribsMemberEnum_TAuthenticationType()
+							{
+								m_MapAliasToEnum = new SortedList();
+								m_MapEnumToAlias = new SortedList();
+								m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
+								m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapAliasToEnum.Add("Anonymous",TAuthenticationType.ttAnonymous);
+								m_MapEnumToAlias.Add(TAuthenticationType.ttAnonymous,"Anonymous");
+								m_MapOrderingIndexToAlias.Add(1,"Anonymous");
+								m_MapAliasToEnum.Add("Basic",TAuthenticationType.ttBasic);
+								m_MapEnumToAlias.Add(TAuthenticationType.ttBasic,"Basic");
+								m_MapOrderingIndexToAlias.Add(2,"Basic");
+								m_MapAliasToIndex.Add("Anonymous",0);
+								m_MapAliasToIndex.Add("Basic",1);
+								m_MapEnumToIndex.Add(TAuthenticationType.ttAnonymous,0);
+								m_MapEnumToIndex.Add(TAuthenticationType.ttBasic,1);
+							}
+							
+						
+							public static string GetAlias(System.Enum enum_value)
+							{
+								return (string)m_MapEnumToAlias[enum_value];
+							}
+							public static StringCollection GetAliases()
+							{
+								StringCollection alias_list = new StringCollection();
+								foreach (string alias in m_MapOrderingIndexToAlias.Values)
+								{
+									alias_list.Add(alias);
+								}
+								return alias_list;
+							}
+							public static System.Enum GetEnumValueFromAlias(string alias)
+							{
+								return (System.Enum)m_MapAliasToEnum[alias];
+							}
+							public static int GetIndexFromAlias(string alias)
+							{
+								return (int)m_MapAliasToIndex[alias];
+							}
+							public static int GetIndexFromEnum(System.Enum enum_value)
+							{
+								return (int)m_MapEnumToIndex[enum_value];
+							}
+							
+							public string GetAlias()
+							{
+								return GetAlias(EVal);
+							}
+							public void SetEnumValueFromAlias(string alias)
+							{
+								EVal = GetEnumValueFromAlias(alias);
+							}
+						
+							public static implicit operator TAuthenticationType(AttribsMemberEnum_TAuthenticationType t)
+							{
+								return (TAuthenticationType)t.m_tVal;
+							}
+							
+							public TAuthenticationType TVal
+							{
+								get {return this;}
+								set {m_tVal = (Object)value;}
+							}
+						}
+						
+							
+						public AttribsMemberString mailServerName = new AttribsMemberString("msn", "");
+						public AttribsMemberString fromEmail = new AttribsMemberString("fe", "");
+						public AttribsMemberString fromDisplayName = new AttribsMemberString("fD", "");
+						public AttribsMemberDWORD portNumber = new AttribsMemberDWORD("pn", 25);
+						public AttribsMemberEnum_TAuthenticationType authenticationType = new AttribsMemberEnum_TAuthenticationType("aT", TAuthenticationType.ttAnonymous);
+						public AttribsMemberString authBasicUserName = new AttribsMemberString("uN", "");
+						public AttribsMemberString authBasicUserPassword = new AttribsMemberString("uP", "");
+					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_AlertMailServerAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_AlertMailServerAttribs(string keyName, Lic_AlertMailServerAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_AlertMailServerAttribs(AttribsMemberAttribsClass_Lic_AlertMailServerAttribs t)
+						{
+							return (Lic_AlertMailServerAttribs)t.m_tVal;
+						}
+					
+						public Lic_AlertMailServerAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						
+					public Lic_EmailAlertMailAttribsList emailAlertsList = new Lic_EmailAlertMailAttribsList("emLt", new ArrayList());
+					public AttribsMemberAttribsClass_Lic_AlertMailServerAttribs mailServer = new AttribsMemberAttribsClass_Lic_AlertMailServerAttribs("mS", new Lic_AlertMailServerAttribs());
+				
+				};
+				
+				public class AttribsMemberAttribsClass_Lic_AlertInfoAttribs : AttribsMemberAttribsClass
+				{
+					public AttribsMemberAttribsClass_Lic_AlertInfoAttribs(string keyName, Lic_AlertInfoAttribs defaultVal) : 
+						base(keyName, defaultVal)
+					{
+						;
+					}
+					
+					public static implicit operator Lic_AlertInfoAttribs(AttribsMemberAttribsClass_Lic_AlertInfoAttribs t)
+					{
+						return (Lic_AlertInfoAttribs)t.m_tVal;
+					}
+				
+					public Lic_AlertInfoAttribs TVal
+					{
+						get {return this;}
+						set {m_tVal = (Object)value;}
+					}
+				}
 					
 				public Lic_ServerDataFileInfoAttribsList fileInfoList = new Lic_ServerDataFileInfoAttribsList("fiLt", new ArrayList());
 				public Lic_ClockViolationInfoAttribsList clockViolHistoryList = new Lic_ClockViolationInfoAttribsList("cVLt", new ArrayList());
@@ -145,6 +347,8 @@ namespace Solimar
 				public AttribsMemberDWORD clockViolCount = new AttribsMemberDWORD("cVC", 0);
 				public AttribsMemberDateTime clockViolLastDate = new AttribsMemberDateTime("cVD", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 				public AttribsMemberBOOL bInClockViol = new AttribsMemberBOOL("iCV", false);
+				public AttribsMemberAttribsClass_Lic_AlertInfoAttribs alertInfo = new AttribsMemberAttribsClass_Lic_AlertInfoAttribs("aI", new Lic_AlertInfoAttribs());
+				public AttribsMemberString streamed_EmulationInfoAttribs = new AttribsMemberString("sEA", "");
 			
 			};
 			

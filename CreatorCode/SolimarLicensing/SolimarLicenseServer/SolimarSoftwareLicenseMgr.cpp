@@ -9,7 +9,7 @@
 #include <math.h>			//For abs
 
 #include "..\common\TimeHelper.h"
-
+#include "..\common\StringUtils.h"
 
 #include "..\common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_PackageAttribsHelper.h"
@@ -169,20 +169,109 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 	return hr;
 }
 
-HRESULT SoftwareLicenseMgr::ValidateHardwareKeyID(_bstr_t bstrValidationValue)
+// CR.18131 - Detect DongleEmulator
+HRESULT SoftwareLicenseMgr::VerifyNoDongleEmulatorIfNeeded()
 {
+	wchar_t debug_buf[1024];
+	HRESULT hr(S_OK);
+	try
+	{
+		Lic_EmulationInfoAttribs emulatorInfoAttribs;
+		hr = m_pLicServerDataMgr->GetEmulatorInfoAttribs(&emulatorInfoAttribs);
+		if (FAILED(hr))
+			throw hr;
+
+		if (emulatorInfoAttribs.bBypassDongleEmulatorCheck)
+			throw S_OK; //Bypass all Dongle Checks...
+
+		if (emulatorInfoAttribs.bDongleEmulatorDetected)
+			throw LicenseServerError::EHR_DONGLE_EMULATOR;
+
+		bool bCallFoundEmulator = false;
+		int callStatusCode = 0;
+		try
+		{
+			std::string tmpExStr = StringUtils::WstringToString(std::wstring(emulatorInfoAttribs.excludeService));
+			std::vector<char> exServiceChrPtr(tmpExStr.begin(), tmpExStr.end());
+			if (exServiceChrPtr.size() > 0)
+				exServiceChrPtr.push_back('\0');
+
+			char* pExceptionServerName = (exServiceChrPtr.size() != 0) ? &exServiceChrPtr[0] : NULL;
+
+			// Always call for a NULL serverName
+			hr = m_pKeyServer->VerifyNoDongleEmulator(&callStatusCode, &bCallFoundEmulator, NULL, pExceptionServerName);
+//_snwprintf_s(
+//	debug_buf, 
+//	1024, 
+//	L"SoftwareLicenseMgr::VerifyNoDongleEmulatorIfNeeded() - VerifyNoDongleEmulator(NULL, %s)",
+//	pExceptionServerName == NULL ? L"NULL" : std::wstring(emulatorInfoAttribs.excludeService).c_str()
+//	);
+//OutputDebugStringW(debug_buf);
+			if (FAILED(hr))
+				throw hr;
+
+			for (int idx = 0; idx<emulatorInfoAttribs.knownEmulatorServicesList->size(); idx++)
+			{
+				std::string tmpStr = StringUtils::WstringToString(std::wstring(emulatorInfoAttribs.knownEmulatorServicesList->at(0)));
+				std::vector<char> serviceChrPtr(tmpStr.begin(), tmpStr.end());
+				serviceChrPtr.push_back('\0');
+
+				//get the char* using &serviceChrPtr[0] or &*serviceChrPtr.begin()
+				hr = m_pKeyServer->VerifyNoDongleEmulator(&callStatusCode, &bCallFoundEmulator, &serviceChrPtr[0], pExceptionServerName);
+
+//_snwprintf_s(
+//debug_buf, 
+//1024, 
+//L"SoftwareLicenseMgr::VerifyNoDongleEmulatorIfNeeded() - VerifyNoDongleEmulator(%s, %s)",
+//&serviceChrPtr[0] == NULL ? L"NULL" : std::wstring(emulatorInfoAttribs.knownEmulatorServicesList->at(0)).c_str(),
+//pExceptionServerName == NULL ? L"NULL" : std::wstring(emulatorInfoAttribs.excludeService).c_str()
+//);
+//OutputDebugStringW(debug_buf);
+
+				if (FAILED(hr))
+					throw hr;
+			}
+		}
+		catch (HRESULT eHr)
+		{
+			//Error case, set and update...
+			emulatorInfoAttribs.checkEmulatorCall_StatusCode = callStatusCode;
+			emulatorInfoAttribs.bCheckEmulatorCall_FoundEmulator = bCallFoundEmulator;
+			emulatorInfoAttribs.bDongleEmulatorDetected = true;
+			m_pLicServerDataMgr->SetEmulatorInfoAttribs(&emulatorInfoAttribs);
+			throw eHr;
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	return hr;
+}
+
+HRESULT SoftwareLicenseMgr::ValidateHardwareKeyID(_bstr_t bstrValidationValue, bool bBypassDongleEmulationCheck)
+{
+	//
+	// This call will query SoftwareServerDataMgr to see if to check for emulator, and do appropiate work, etc...
+	//
 	HRESULT hr(LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID);
 	SafeMutex mutex(softwareLicenseMgrLock);
 	if(m_pKeyServer != NULL)
 	{
-		Lic_KeyAttribs licKeyAttribs;
-		hr = m_pKeyServer->GetKeyInfoAttribs(bstrValidationValue, &licKeyAttribs);
-		if(hr == E_INVALIDARG)	//No Key attached
-			hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
+		// CR.18131 - Detect DongleEmulator
+		hr = bBypassDongleEmulationCheck ? S_OK : VerifyNoDongleEmulatorIfNeeded();
+
+		if (SUCCEEDED(hr))
+		{
+			Lic_KeyAttribs licKeyAttribs;
+			hr = m_pKeyServer->GetKeyInfoAttribs(bstrValidationValue, &licKeyAttribs);
+			if(hr == E_INVALIDARG)	//No Key attached
+				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
+		}
 	}
 	return hr;
 }
-HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID)
+HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID, bool bBypassDongleEmulationCheck)
 {
 	HRESULT hr(LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE);
 //wchar_t debug_buf[1024];
@@ -215,16 +304,22 @@ HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, _bs
 		}
 		else if(m_pKeyServer != NULL)
 		{
-			Lic_KeyAttribs licKeyAttribs;
-			hr = m_pKeyServer->GetKeyInfoAttribs(keyID, &licKeyAttribs);
-			if(hr == E_INVALIDARG)	//No Key attached
-				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
-			else
+			// CR.18131 - Detect DongleEmulator
+			hr = bBypassDongleEmulationCheck ? S_OK : VerifyNoDongleEmulatorIfNeeded();
+
+			if (SUCCEEDED(hr))
 			{
-				if(_wcsicmp(bstrValidationValue, std::wstring(licKeyAttribs.licenseCode).c_str()) == 0)
-					hr = S_OK;
+				Lic_KeyAttribs licKeyAttribs;
+				hr = m_pKeyServer->GetKeyInfoAttribs(keyID, &licKeyAttribs);
+				if(hr == E_INVALIDARG)	//No Key attached
+					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
 				else
-					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE;
+				{
+					if(_wcsicmp(bstrValidationValue, std::wstring(licKeyAttribs.licenseCode).c_str()) == 0)
+						hr = S_OK;
+					else
+						hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE;
+				}
 			}
 		}
 	}
@@ -1110,13 +1205,20 @@ HRESULT SoftwareLicenseMgr::VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* 
 		if(_pLicPackageAttribs == NULL)
 			throw E_INVALIDARG;
 
+		// CR.18131 - Detect DongleEmulator
+		// Don't check for dongle emulation, there could be a case where the license server is incorrectly in dongleEmulationViolation, and the incoming 
+		// packet will clear them from that state...
+
 		//if there is a hardware key in the verification attributes, makes sure that the key is plugged in the system 
 		// before applying the new license packet or else can't write new hardware key code.
 
 		std::wstring tmpKeyID = Lic_PackageAttribsHelper::GetValidationValue(&(_pLicPackageAttribs->licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID);
 		if(tmpKeyID.length() != 0)
 		{
-			hr = ValidateHardwareKeyID(tmpKeyID.c_str());
+			hr = ValidateHardwareKeyID(
+				tmpKeyID.c_str(), 
+				true  // bypass checking for dongle emulation
+				);
 			if(FAILED(hr))
 			{
 				if(hr == LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID)
@@ -1132,7 +1234,11 @@ HRESULT SoftwareLicenseMgr::VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* 
 			std::wstring tmpLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(_pLicPackageAttribs->licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
 			if(tmpLicenseCode.length() != 0)
 			{
-				hr = ValidateLicenseCode(tmpLicenseCode.c_str());
+				hr = ValidateLicenseCode(
+					tmpLicenseCode.c_str(),
+					L"",
+					true  // bypass checking for dongle emulation
+					);
 				if(FAILED(hr))
 					throw hr;
 			}
@@ -1880,6 +1986,20 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 				keyAttrib.keyName = std::wstring(m_bstrLicenseName);
 				tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttrib.ToString());
 				hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
+
+				// Update EmulationInfo Here, use the Lic_EmulationInfoAttribs from the package
+				// CR.18131 - Detect DongleEmulator
+				if (SUCCEEDED(hr))
+				{
+					Lic_EmulationInfoAttribs emulatorInfoAttribs;
+					emulatorInfoAttribs = tmpPacketNewLicenseFileAttribs.streamed_EmulationInfoAttribs;
+
+					// For testing, add a service
+					//emulatorInfoAttribs.knownEmulatorServicesList->push_back(L"Solimar Wcf Third Service");
+					//emulatorInfoAttribs.bBypassDongleEmulatorCheck = true;
+
+					hr = m_pLicServerDataMgr->SetEmulatorInfoAttribs(&emulatorInfoAttribs);
+				}
 			}
 		}
 

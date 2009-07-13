@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include "rainbow\include\spromeps.h"
+#include "rainbow\include\AntiEmulate.h"
 #include <comdef.h>
 #include <vector>
 #include <map>
@@ -30,6 +31,9 @@ public:
 
 	HRESULT GetSoftwareKeyCode(_bstr_t key, BSTR *key_code);
 	HRESULT SetSoftwareKeyCode(_bstr_t key, BSTR key_code);
+
+	// CR.18131 - Detect DongleEmulator
+	HRESULT VerifyNoDongleEmulator(int* pCheckEmulatorStatusCode, bool* pbCheckEmulatorFound, char* pEmulatorName, char* pExceptionServiceName);
 
 	typedef std::map<_bstr_t,RBP_SPRO_APIPACKET> KeyList;
 	HANDLE keys_lock;

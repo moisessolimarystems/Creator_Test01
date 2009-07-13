@@ -33,6 +33,7 @@ public:
 	SpdAttribs::WStringAttrib Streamed_SoftwareSpecAttribs;
 	SpdAttribs::WStringAttrib Streamed_UsageInfoAttribs;
 	SpdAttribs::WStringAttrib Streamed_SystemEventLogInfoAttribs;
+	SpdAttribs::WStringAttrib Streamed_RunningProcessesInfoAttribs;
 	SpdAttribs::VectorStringAttrib ListOfStreamed_InfoAttribs;
 	SpdAttribs::WStringAttrib createdDate;
 
@@ -46,6 +47,7 @@ public:
 		Streamed_SoftwareSpecAttribs = c.Streamed_SoftwareSpecAttribs;
 		Streamed_UsageInfoAttribs = c.Streamed_UsageInfoAttribs;
 		Streamed_SystemEventLogInfoAttribs = c.Streamed_SystemEventLogInfoAttribs;
+		Streamed_RunningProcessesInfoAttribs = c.Streamed_RunningProcessesInfoAttribs;
 		ListOfStreamed_InfoAttribs = c.ListOfStreamed_InfoAttribs;
 		createdDate = c.createdDate;
 		return *this ;
@@ -59,6 +61,7 @@ public:
 		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", SpdAttribs::WStringObj(L"")),
 		Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", SpdAttribs::WStringObj(L"")),
 		Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", SpdAttribs::WStringObj(L"")),
+		Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", SpdAttribs::WStringObj(L"")),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", SpdAttribs::VectorStringObj()),
 		createdDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")){;}
 	
@@ -70,6 +73,7 @@ public:
 		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", c.Streamed_SoftwareSpecAttribs),
 		Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", c.Streamed_UsageInfoAttribs),
 		Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", c.Streamed_SystemEventLogInfoAttribs),
+		Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", c.Streamed_RunningProcessesInfoAttribs),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", c.ListOfStreamed_InfoAttribs),
 		createdDate(m_mapAttribObjs, L"cDt", c.createdDate){;}
 	
@@ -81,6 +85,7 @@ public:
 		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", SpdAttribs::WStringObj(L"")),
 		Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", SpdAttribs::WStringObj(L"")),
 		Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", SpdAttribs::WStringObj(L"")),
+		Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", SpdAttribs::WStringObj(L"")),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", SpdAttribs::VectorStringObj()),
 		createdDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")){;}
 	
@@ -92,6 +97,7 @@ public:
 		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", c.Streamed_SoftwareSpecAttribs),
 		Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", c.Streamed_UsageInfoAttribs),
 		Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", c.Streamed_SystemEventLogInfoAttribs),
+		Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", c.Streamed_RunningProcessesInfoAttribs),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", c.ListOfStreamed_InfoAttribs),
 		createdDate(m_mapAttribObjs, L"cDt", c.createdDate){;}
 	
@@ -102,6 +108,7 @@ public:
 		const SpdAttribs::WStringAttrib &param_Streamed_SoftwareSpecAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_UsageInfoAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_SystemEventLogInfoAttribs,
+		const SpdAttribs::WStringAttrib &param_Streamed_RunningProcessesInfoAttribs,
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_InfoAttribs,
 		const SpdAttribs::WStringAttrib &param_createdDate) : 
 			SpdAttribs::CAttribsBase(wsAttribsClassName),
@@ -111,6 +118,7 @@ public:
 			Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", param_Streamed_SoftwareSpecAttribs),
 			Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", param_Streamed_UsageInfoAttribs),
 			Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", param_Streamed_SystemEventLogInfoAttribs),
+			Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", param_Streamed_RunningProcessesInfoAttribs),
 			ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", param_ListOfStreamed_InfoAttribs),
 			createdDate(m_mapAttribObjs, L"cDt", param_createdDate){;}
 	
@@ -121,6 +129,7 @@ public:
 		const SpdAttribs::WStringAttrib &param_Streamed_SoftwareSpecAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_UsageInfoAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_SystemEventLogInfoAttribs,
+		const SpdAttribs::WStringAttrib &param_Streamed_RunningProcessesInfoAttribs,
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_InfoAttribs,
 		const SpdAttribs::WStringAttrib &param_createdDate) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -130,6 +139,7 @@ public:
 			Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", param_Streamed_SoftwareSpecAttribs),
 			Streamed_UsageInfoAttribs(m_mapAttribObjs, L"sU", param_Streamed_UsageInfoAttribs),
 			Streamed_SystemEventLogInfoAttribs(m_mapAttribObjs, L"sE", param_Streamed_SystemEventLogInfoAttribs),
+			Streamed_RunningProcessesInfoAttribs(m_mapAttribObjs, L"rP", param_Streamed_RunningProcessesInfoAttribs),
 			ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", param_ListOfStreamed_InfoAttribs),
 			createdDate(m_mapAttribObjs, L"cDt", param_createdDate){;}
 	

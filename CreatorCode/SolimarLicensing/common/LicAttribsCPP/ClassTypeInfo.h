@@ -76,6 +76,9 @@ namespace Solimar
 				constructor_helper_4();
 				constructor_helper_5();
 				constructor_helper_6();
+				constructor_helper_7();
+				constructor_helper_8();
+				constructor_helper_9();
 			}
 
 			~ClassTypeInfo()
@@ -112,8 +115,26 @@ namespace Solimar
 					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_UsageInfoAttribs"] = AttribInfo(L"Streamed_UsageInfoAttribs",L"",L"");
 					map_class_base[L"L_LcSysA"]->attribs[L"createdDate"] = AttribInfo(L"createdDate",L"",L"");
 					map_class_base[L"L_LcSysA"]->attribs[L"ListOfStreamed_KeyAttribs"] = AttribInfo(L"ListOfStreamed_KeyAttribs",L"",L"");
+					map_class_base[L"L_LcSysA"]->attribs[L"Streamed_RunningProcessesInfoAttribs"] = AttribInfo(L"Streamed_RunningProcessesInfoAttribs",L"",L"");
 			}
 			void constructor_helper_2()
+			{
+					map_class_base[L"L_UsInA"] = new ClassInfoBase(L"L_UsInA",L"",L"License Usage Info Attributes");
+					map_base_classes.insert(std::make_pair(L"",L"L_UsInA"));
+					map_class_base[L"L_UsInA"]->attribs[L"productList"] = AttribInfo(L"productList",L"",L"");
+			}
+			void constructor_helper_3()
+			{
+					map_class_base[L"L_EmInA"] = new ClassInfoBase(L"L_EmInA",L"",L"License Emulation Info Attributes");
+					map_base_classes.insert(std::make_pair(L"",L"L_EmInA"));
+					map_class_base[L"L_EmInA"]->attribs[L"bDongleEmulatorDetected"] = AttribInfo(L"bDongleEmulatorDetected",L"",L"");
+					map_class_base[L"L_EmInA"]->attribs[L"bBypassDongleEmulatorCheck"] = AttribInfo(L"bBypassDongleEmulatorCheck",L"",L"");
+					map_class_base[L"L_EmInA"]->attribs[L"bCheckEmulatorCall_FoundEmulator"] = AttribInfo(L"bCheckEmulatorCall_FoundEmulator",L"",L"");
+					map_class_base[L"L_EmInA"]->attribs[L"excludeService"] = AttribInfo(L"excludeService",L"",L"");
+					map_class_base[L"L_EmInA"]->attribs[L"checkEmulatorCall_StatusCode"] = AttribInfo(L"checkEmulatorCall_StatusCode",L"",L"");
+					map_class_base[L"L_EmInA"]->attribs[L"knownEmulatorServicesList"] = AttribInfo(L"knownEmulatorServicesList",L"",L"");
+			}
+			void constructor_helper_4()
 			{
 					map_class_base[L"S_ElInA"] = new ClassInfoBase(L"S_ElInA",L"",L"System Event Log Info Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"S_ElInA"));
@@ -126,21 +147,24 @@ namespace Solimar
 					map_class_base[L"S_ElInA"]->attribs[L"enumOverflowAction"] = AttribInfo(L"enumOverflowAction",L"",L"");
 					map_class_base[L"S_ElInA"]->attribs[L"minimumRetentionDays"] = AttribInfo(L"minimumRetentionDays",L"",L"");
 			}
-			void constructor_helper_3()
+			void constructor_helper_5()
 			{
-					map_class_base[L"L_UsInA"] = new ClassInfoBase(L"L_UsInA",L"",L"License Usage Info Attributes");
-					map_base_classes.insert(std::make_pair(L"",L"L_UsInA"));
-					map_class_base[L"L_UsInA"]->attribs[L"productList"] = AttribInfo(L"productList",L"",L"");
+					map_class_base[L"L_TMS"] = new ClassInfoBase(L"L_TMS",L"",L"Test Mail Server Attributes");
+					map_base_classes.insert(std::make_pair(L"",L"L_TMS"));
+					map_class_base[L"L_TMS"]->attribs[L"body"] = AttribInfo(L"body",L"",L"");
+					map_class_base[L"L_TMS"]->attribs[L"recipentsList"] = AttribInfo(L"recipentsList",L"",L"");
+					map_class_base[L"L_TMS"]->attribs[L"subject"] = AttribInfo(L"subject",L"",L"");
 			}
-			void constructor_helper_4()
+			void constructor_helper_6()
 			{
 					map_class_base[L"L_PkgA"] = new ClassInfoBase(L"L_PkgA",L"",L"License Validation Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_PkgA"));
 					map_class_base[L"L_PkgA"]->attribs[L"licReplaceSoftwareSpecAttribs"] = AttribInfo(L"licReplaceSoftwareSpecAttribs",L"",L"");
 					map_class_base[L"L_PkgA"]->attribs[L"licLicenseInfoAttribs"] = AttribInfo(L"licLicenseInfoAttribs",L"",L"");
+					map_class_base[L"L_PkgA"]->attribs[L"streamed_EmulationInfoAttribs"] = AttribInfo(L"streamed_EmulationInfoAttribs",L"",L"");
 					map_class_base[L"L_PkgA"]->attribs[L"licSoftwareSpecAttribs"] = AttribInfo(L"licSoftwareSpecAttribs",L"",L"");
 			}
-			void constructor_helper_5()
+			void constructor_helper_7()
 			{
 					map_class_base[L"L_SysInA"] = new ClassInfoBase(L"L_SysInA",L"",L"System Info Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_SysInA"));
@@ -156,12 +180,19 @@ namespace Solimar
 					map_class_base[L"L_SysInA"]->attribs[L"biosSerialNumberList"] = AttribInfo(L"biosSerialNumberList",L"",L"");
 					map_class_base[L"L_SysInA"]->attribs[L"bPartOFDomain"] = AttribInfo(L"bPartOFDomain",L"",L"");
 			}
-			void constructor_helper_6()
+			void constructor_helper_8()
+			{
+					map_class_base[L"L_RPInA"] = new ClassInfoBase(L"L_RPInA",L"",L"Running Processes Info Attributes");
+					map_base_classes.insert(std::make_pair(L"",L"L_RPInA"));
+					map_class_base[L"L_RPInA"]->attribs[L"servicesList"] = AttribInfo(L"servicesList",L"",L"");
+			}
+			void constructor_helper_9()
 			{
 					map_class_base[L"L_SvrDtA"] = new ClassInfoBase(L"L_SvrDtA",L"",L"License Server Data Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_SvrDtA"));
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionSubMinor"] = AttribInfo(L"versionSubMinor",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionSubMajor"] = AttribInfo(L"versionSubMajor",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"alertInfo"] = AttribInfo(L"alertInfo",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"bInClockViol"] = AttribInfo(L"bInClockViol",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"fileInfoList"] = AttribInfo(L"fileInfoList",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"clockViolCount"] = AttribInfo(L"clockViolCount",L"",L"");
@@ -169,6 +200,7 @@ namespace Solimar
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionMajor"] = AttribInfo(L"versionMajor",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionMinor"] = AttribInfo(L"versionMinor",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"clockViolHistoryList"] = AttribInfo(L"clockViolHistoryList",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"streamed_EmulationInfoAttribs"] = AttribInfo(L"streamed_EmulationInfoAttribs",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"lastTouchDate"] = AttribInfo(L"lastTouchDate",L"",L"");
 			}
 			

@@ -57,5 +57,24 @@ namespace Shared.VisualComponents
                 }
             }
         }
+
+        static public string GetCopyTextForListView(ListView _listView)
+        {
+           StringBuilder copyStrBuilder = new StringBuilder();
+           foreach (ListViewItem lvi in _listView.SelectedItems)
+           {
+              StringBuilder lineStrBuilder = new StringBuilder();
+              foreach (ListViewItem.ListViewSubItem subItem in lvi.SubItems)
+              {
+                 if (lineStrBuilder.Length != 0)
+                    lineStrBuilder.Append(" ");
+                 lineStrBuilder.AppendFormat("\"{0}\"", subItem.Text);
+              }
+              if (copyStrBuilder.Length != 0)
+                 copyStrBuilder.Append("\r\n");
+              copyStrBuilder.Append(lineStrBuilder.ToString());
+           }
+           return copyStrBuilder.ToString();
+        }
     }
 }

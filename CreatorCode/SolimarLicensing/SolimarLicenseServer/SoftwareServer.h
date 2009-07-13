@@ -30,7 +30,6 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//Licensing functions - Ensure that the inuse to the total values are correct
 		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
 		
-		
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long productID, long moduleIdent, long* pLicenseCount);
 
@@ -42,7 +41,6 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT ModuleLicenseReleaseByApp(long productID, BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseDecrementCounterByApp(long productID, BSTR licenseID, long moduleIdent, long licenseCount);
 		//HRESULT ModuleLicenseUnlimited(long product_ident, BSTR license_id, long module_ident, VARIANT_BOOL b_module_is_unlimited);
-
 
 		HRESULT GetSoftwareLicenseInfoByProduct_ForAll(long productID, BSTR *pBstrProductInfoAttribsStream);
 		HRESULT GetSoftwareLicenseInfo_ForAll(BSTR *pBstrLicenseInfoAttribsStream);
@@ -69,7 +67,30 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT GenerateLicPackage_BySoftwareLicArchive(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
 		HRESULT GenerateLicPackage_BySoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
 		HRESULT GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket);
-		HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
+
+		// Will generate Diagnostic Data and Mail to Solimar, only allow once per 5 minutes.
+		HRESULT GenerateLicenseSystemDataForSolimar();
+
+		HRESULT GenerateStreamData_ByLicenseSystemData(
+			VARIANT vtLicSysDataPacket, 
+			BSTR *pBstrCreatedDateStreamed, 
+			BSTR *pBstrKeyAttribsListStream, 
+			BSTR *pBstrLicUsageDataAttribsStream, 
+			BSTR *pBstrConnectionAttribsListStream, 
+			BSTR *pBstrEventLogAttribsListStream, 
+			BSTR *pBstrLicInfoDataAttribsListStream
+			);
+
+		HRESULT GenerateStreamData_ByLicenseSystemData2(
+			VARIANT vtLicSysDataPacket, 
+			BSTR *pBstrCreatedDateStreamed, 
+			BSTR *pBstrKeyAttribsListStream, 
+			BSTR *pBstrLicUsageDataAttribsStream, 
+			BSTR *pBstrConnectionAttribsListStream, 
+			BSTR *pBstrEventLogAttribsListStream, 
+			BSTR *pBstrLicInfoDataAttribsListStream,
+			BSTR *pBstrLicAlertInfoAttribs
+			);
 		// Only for Interal License Servers
 		HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
 		HRESULT GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream);
@@ -81,12 +102,24 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one will create new license file.
 		HRESULT ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicense, BSTR keyIdent);
 
+		// CR.17907
+		HRESULT GetMailServerInfo(BSTR *pBstrAlertMailServerAttribsStream);
+		HRESULT SetMailServerInfo(BSTR bstrAlertMailServerAttribsStream);
+		HRESULT TestMailServerInfo(BSTR bstrTestMailServerAttribsStream);
+		HRESULT GetAllEmailAlerts(BSTR *pBstrEmailAlertMailAttribsListStream);
+		HRESULT GetEmailAlert(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream);
+		HRESULT SetEmailAlert(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream);
+		HRESULT AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId);
+		HRESULT DeleteEmailAlert(BSTR bstrEmailAlertId);
+		HRESULT SendAlertEmailIfNeeded(long productId, unsigned int eventId, std::wstring message);
+		
 		HRESULT GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance);
 
 		HRESULT TimesUp();
 		HRESULT CheckHealth(unsigned int timeout);
 	private:
 		HANDLE SoftwareLicenseLock;
+		HANDLE SendMailLock;
 
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec;		//Contains information to find out details of all modules.
 		LicenseCache licCache;	//Contains the license cache of all the products
@@ -98,9 +131,15 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//Use to determine if the cache sent a violation license info object or not
 		std::map<std::wstring/*SW Lic Name*/, bool/*bClockViolation*/> swLicClockViolationMap;
 
+		// CR.17907
+		std::map<unsigned int, std::list<std::wstring>> eventLogIdToListofAlertIdsMap;
+		HRESULT UpdateAlertEventLogIdCache(Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_EmailAlertMailAttribsList);
+		HRESULT SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsList, std::wstring subject, std::wstring body, std::wstring attachmentFile = L"");
+
 		RainbowDriver* pRainbowDriver;
 		KeyServer* pKeyServer;
 		bool bFirstTime;
+		time_t lastTimeEmailToSolimar;
 
 		//variables to help with sending out messages
 		//Pair used to store module ID and expiration date
@@ -134,6 +173,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//std::list<SoftwareLicenseMgr*> softwareLicMgrList;
 		typedef std::map<_bstr_t, SoftwareLicenseMgr*> SoftwareLicList; //map<_bstr_t(licenseFileName, SoftwareLicenseMgr*>
 
+		//std::map<_bstr_t, SoftwareLicenseMgr*>
 		SoftwareLicList softwareLicMgrMap; 
 
 		HRESULT ResynchronizeSoftwareLicensesInternal(bool bForceRefresh = false);

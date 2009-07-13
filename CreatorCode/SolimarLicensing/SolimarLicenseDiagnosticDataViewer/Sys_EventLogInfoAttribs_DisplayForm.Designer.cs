@@ -31,11 +31,11 @@
             this.mainBackPanel = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.msgListView = new Shared.VisualComponents.NoFlickerListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.eventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
             this.msgToolStrip = new System.Windows.Forms.ToolStrip();
             this.tsErrorButton = new System.Windows.Forms.ToolStripButton();
@@ -104,6 +104,7 @@
             this.msgListView.UseCompatibleStateImageBehavior = false;
             this.msgListView.View = System.Windows.Forms.View.Details;
             this.msgListView.SelectedIndexChanged += new System.EventHandler(this.msgListView_SelectedIndexChanged);
+            this.msgListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
             // 
             // columnHeader1
             // 

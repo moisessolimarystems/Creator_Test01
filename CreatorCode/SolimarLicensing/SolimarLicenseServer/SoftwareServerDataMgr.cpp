@@ -164,6 +164,110 @@ HRESULT SoftwareServerDataMgr::SetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_
 	}
 	return hr;
 }
+HRESULT SoftwareServerDataMgr::GetAlertInfoAttribs(Lic_ServerDataAttribs::Lic_AlertInfoAttribs* pAlertInfoAttribs)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		*pAlertInfoAttribs = pServerDataAttribs->alertInfo.ToString();
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+HRESULT SoftwareServerDataMgr::SetAlertInfoAttribs(Lic_ServerDataAttribs::Lic_AlertInfoAttribs* pAlertInfoAttribs)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		Lic_ServerDataAttribs::Lic_AlertInfoAttribs tmpAlertInfoAttribs;
+		tmpAlertInfoAttribs = pAlertInfoAttribs->ToString();
+		pServerDataAttribs->alertInfo = tmpAlertInfoAttribs;
+
+		SaveToFile();
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+// CR.18131 - Detect DongleEmulator
+HRESULT SoftwareServerDataMgr::GetEmulatorInfoAttribs(Lic_EmulationInfoAttribs* pEmulatorInfoAttribs)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		std::wstring streamedVal = pServerDataAttribs->streamed_EmulationInfoAttribs;
+		*pEmulatorInfoAttribs = streamedVal.c_str();
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+HRESULT SoftwareServerDataMgr::SetEmulatorInfoAttribs(Lic_EmulationInfoAttribs* pEmulatorInfoAttribs)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+		pServerDataAttribs->streamed_EmulationInfoAttribs = std::wstring(pEmulatorInfoAttribs->ToString());
+
+		SaveToFile();
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
 
 HRESULT SoftwareServerDataMgr::Touch(bool bForceCurrentDateUpdate)
 {
@@ -331,17 +435,28 @@ HRESULT SoftwareServerDataMgr::Touch(bool bForceCurrentDateUpdate)
 
 
 // Up to caller to free pBstrSoftwareStream
-HRESULT SoftwareServerDataMgr::GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream)
+HRESULT SoftwareServerDataMgr::GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream, bool bRemoveAlertMailServerPassword)
 {
 	HRESULT hr(S_OK);
 	try
 	{
 		SafeMutex mutex(softwareServerDataMgrLock);
+
+		std::wstring password = L"";
+		if (bRemoveAlertMailServerPassword)
+		{
+			password = pServerDataAttribs->alertInfo.mailServer.authBasicUserPassword;
+			pServerDataAttribs->alertInfo.mailServer.authBasicUserPassword = std::wstring(L"");
+		}
 		if(pServerDataAttribs != NULL)
 			*pBstrSoftwareStream = SysAllocString(pServerDataAttribs->ToString().c_str());
 		else
 			*pBstrSoftwareStream = SysAllocString(L"File not Found");
 
+		if (bRemoveAlertMailServerPassword)
+		{
+			pServerDataAttribs->alertInfo.mailServer.authBasicUserPassword = password;
+		}
 	}
 	catch(HRESULT &eHr)
 	{
@@ -388,7 +503,8 @@ HRESULT CreateNew_Lic_ServerDataFileInfoAttribs(Lic_ServerDataAttribs::Lic_Serve
 	return S_OK;
 }
 #endif
-//Private
+
+//Private - Populates Lic_ServerDataAttribs* pServerDataAttribs from the file
 HRESULT SoftwareServerDataMgr::LoadFromFile()
 {
 	HRESULT hr(S_OK);
@@ -457,8 +573,8 @@ HRESULT SoftwareServerDataMgr::LoadFromFile()
 
 		if(bstrSoftwareStream != NULL)
 		{
-			pServerDataAttribs->InitFromString(bstrSoftwareStream);
-			
+			(*pServerDataAttribs) = std::wstring(bstrSoftwareStream);
+
 			SYSTEMTIME lastTouchDateSystime;
 			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pServerDataAttribs->lastTouchDate)).c_str(), lastTouchDateSystime))
 				throw(E_FAIL);

@@ -104,6 +104,9 @@ public:
 	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceCurrentDateUpdate, bool bForceActivitySlotUpdate);
 
 	HRESULT CheckHealth(unsigned int timeout);
+
+	// CR.18131 - Detect DongleEmulator
+	HRESULT VerifyNoDongleEmulator(int* pCheckEmulatorStatusCode, bool* pbCheckEmulatorFound, char* pEmulatorName, char* pExceptionServiceName);
 private:
 	//static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	//static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)

@@ -54,8 +54,8 @@ class SoftwareLicenseMgr
 		HRESULT ApplyLicensePacket(LicensePacket* pLicPacket, BSTR *pBstrVerificationCode);
 		*/
 
-		HRESULT ValidateHardwareKeyID(_bstr_t bstrValidationValue);
-		HRESULT ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID = L"");
+		HRESULT ValidateHardwareKeyID(_bstr_t bstrValidationValue, bool bBypassDongleEmulationCheck = false);
+		HRESULT ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID = L"", bool bBypassDongleEmulationCheck = false);
 		HRESULT ValidateHardwareBiosSerialNumber(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareMacAddress(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareCompuerName(_bstr_t bstrValidationValue);
@@ -90,6 +90,8 @@ class SoftwareLicenseMgr
 		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, _bstr_t _bstrValue);
 		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, bool _boolValue);
 
+		// CR.18131 - Detect DongleEmulator
+		HRESULT VerifyNoDongleEmulatorIfNeeded();
 
 		Lic_PackageAttribs::Lic_ProductInfoAttribs TestingOnly_GenerateLicense_Rubika();
 		Lic_PackageAttribs::Lic_ProductInfoAttribs TestingOnly_GenerateLicense_SPDE();

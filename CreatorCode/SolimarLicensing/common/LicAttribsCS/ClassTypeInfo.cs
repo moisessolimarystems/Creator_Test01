@@ -76,6 +76,20 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_UsageInfoAttribs"] = new AttribInfo("Streamed_UsageInfoAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["createdDate"] = new AttribInfo("createdDate","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["ListOfStreamed_KeyAttribs"] = new AttribInfo("ListOfStreamed_KeyAttribs","","");
+				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_RunningProcessesInfoAttribs"] = new AttribInfo("Streamed_RunningProcessesInfoAttribs","","");
+				map_class_base["L_UsInA"] = new ClassInfoBase("L_UsInA","","License Usage Info Attributes");
+				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
+				((System.Collections.ArrayList)map_base_classes[""]).Add("L_UsInA");
+				((ClassInfoBase)map_class_base["L_UsInA"]).attribs["productList"] = new AttribInfo("productList","","");
+				map_class_base["L_EmInA"] = new ClassInfoBase("L_EmInA","","License Emulation Info Attributes");
+				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
+				((System.Collections.ArrayList)map_base_classes[""]).Add("L_EmInA");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["bDongleEmulatorDetected"] = new AttribInfo("bDongleEmulatorDetected","","");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["bBypassDongleEmulatorCheck"] = new AttribInfo("bBypassDongleEmulatorCheck","","");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["bCheckEmulatorCall_FoundEmulator"] = new AttribInfo("bCheckEmulatorCall_FoundEmulator","","");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["excludeService"] = new AttribInfo("excludeService","","");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["checkEmulatorCall_StatusCode"] = new AttribInfo("checkEmulatorCall_StatusCode","","");
+				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["knownEmulatorServicesList"] = new AttribInfo("knownEmulatorServicesList","","");
 				map_class_base["S_ElInA"] = new ClassInfoBase("S_ElInA","","System Event Log Info Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("S_ElInA");
@@ -87,15 +101,18 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["S_ElInA"]).attribs["logName"] = new AttribInfo("logName","","");
 				((ClassInfoBase)map_class_base["S_ElInA"]).attribs["enumOverflowAction"] = new AttribInfo("enumOverflowAction","","");
 				((ClassInfoBase)map_class_base["S_ElInA"]).attribs["minimumRetentionDays"] = new AttribInfo("minimumRetentionDays","","");
-				map_class_base["L_UsInA"] = new ClassInfoBase("L_UsInA","","License Usage Info Attributes");
+				map_class_base["L_TMS"] = new ClassInfoBase("L_TMS","","Test Mail Server Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
-				((System.Collections.ArrayList)map_base_classes[""]).Add("L_UsInA");
-				((ClassInfoBase)map_class_base["L_UsInA"]).attribs["productList"] = new AttribInfo("productList","","");
+				((System.Collections.ArrayList)map_base_classes[""]).Add("L_TMS");
+				((ClassInfoBase)map_class_base["L_TMS"]).attribs["body"] = new AttribInfo("body","","");
+				((ClassInfoBase)map_class_base["L_TMS"]).attribs["recipentsList"] = new AttribInfo("recipentsList","","");
+				((ClassInfoBase)map_class_base["L_TMS"]).attribs["subject"] = new AttribInfo("subject","","");
 				map_class_base["L_PkgA"] = new ClassInfoBase("L_PkgA","","License Validation Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_PkgA");
 				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licReplaceSoftwareSpecAttribs"] = new AttribInfo("licReplaceSoftwareSpecAttribs","","");
 				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licLicenseInfoAttribs"] = new AttribInfo("licLicenseInfoAttribs","","");
+				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["streamed_EmulationInfoAttribs"] = new AttribInfo("streamed_EmulationInfoAttribs","","");
 				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licSoftwareSpecAttribs"] = new AttribInfo("licSoftwareSpecAttribs","","");
 				map_class_base["L_SysInA"] = new ClassInfoBase("L_SysInA","","System Info Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
@@ -111,11 +128,16 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["domainNameList"] = new AttribInfo("domainNameList","","");
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["biosSerialNumberList"] = new AttribInfo("biosSerialNumberList","","");
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["bPartOFDomain"] = new AttribInfo("bPartOFDomain","","");
+				map_class_base["L_RPInA"] = new ClassInfoBase("L_RPInA","","Running Processes Info Attributes");
+				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
+				((System.Collections.ArrayList)map_base_classes[""]).Add("L_RPInA");
+				((ClassInfoBase)map_class_base["L_RPInA"]).attribs["servicesList"] = new AttribInfo("servicesList","","");
 				map_class_base["L_SvrDtA"] = new ClassInfoBase("L_SvrDtA","","License Server Data Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_SvrDtA");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionSubMinor"] = new AttribInfo("versionSubMinor","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionSubMajor"] = new AttribInfo("versionSubMajor","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["alertInfo"] = new AttribInfo("alertInfo","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["bInClockViol"] = new AttribInfo("bInClockViol","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["fileInfoList"] = new AttribInfo("fileInfoList","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["clockViolCount"] = new AttribInfo("clockViolCount","","");
@@ -123,6 +145,7 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionMajor"] = new AttribInfo("versionMajor","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionMinor"] = new AttribInfo("versionMinor","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["clockViolHistoryList"] = new AttribInfo("clockViolHistoryList","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["streamed_EmulationInfoAttribs"] = new AttribInfo("streamed_EmulationInfoAttribs","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["lastTouchDate"] = new AttribInfo("lastTouchDate","","");
 			}
 			

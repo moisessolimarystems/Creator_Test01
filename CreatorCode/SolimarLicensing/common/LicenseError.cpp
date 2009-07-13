@@ -65,6 +65,8 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						L"Failed to validate software license with a Validation Token (License server)"},
 	{EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						L"Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)"},
 	{EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED,						EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED,						L"Product License Expired (License server)"},
+	{EC_LIC_MAIL_SERVER,						EHR_LIC_MAIL_SERVER,						L"Dynamic Mail Server Error (License server)"},
+	{EC_DONGLE_EMULATOR,						EHR_DONGLE_EMULATOR,						L"Second 1515 error verifying License Server, please contact Solimar Systems, Inc. (License server)"},
 
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
@@ -102,6 +104,33 @@ const SL_ERROR SLErrors[] =
 	{EC_SP_BUFFER_TOO_SMALL,						EHR_SP_BUFFER_TOO_SMALL,						L"The size of the buffer is not sufficient to hold the expected data (Rainbow driver)"},
 	{EC_SP_INTERNAL_ERROR,						EHR_SP_INTERNAL_ERROR,						L"An internal error (Rainbow driver)"},
 	{EC_SP_PACKET_ALREADY_INITIALIZED,						EHR_SP_PACKET_ALREADY_INITIALIZED,						L"The packet being initialized was already initialized (Rainbow driver)"},
+	{EC_SP_PROTOCOL_NOT_INSTALLED,						EHR_SP_PROTOCOL_NOT_INSTALLED,						L"The specified protocol is not installed (Rainbow driver)"},
+	{EC_SP_NO_LEASE_FEATURE,						EHR_SP_NO_LEASE_FEATURE,						L"The element does not contain any lease period. Probably, this is not a full licenseelement (Rainbow driver)"},
+	{EC_SP_LEASE_EXPIRED,						EHR_SP_LEASE_EXPIRED,						L"The trial version expiration date has reached before the application was first executed (Rainbow driver)"},
+	{EC_SP_COUNTER_LIMIT_REACHED,						EHR_SP_COUNTER_LIMIT_REACHED,						L"The value requested for the decrement operation exceeds the current counter value (Rainbow driver)"},
+	{EC_SP_NO_DIGITAL_SIGNATURE,						EHR_SP_NO_DIGITAL_SIGNATURE,						L"The Sentinel driver binary is not signed by a valid authority (Rainbow driver)"},
+	{EC_SP_SYS_FILE_CORRUPTED,						EHR_SP_SYS_FILE_CORRUPTED,						L"The digital certificate of the Sentinel driver is not valid (Rainbow driver)"},
+	{EC_SP_INVALID_DEV_CODE,						EHR_SP_INVALID_DEV_CODE,						L"You specified an invalid Developer Code (Rainbow driver)"},
+	{EC_SP_DEVID_DOES_NOT_MATCH,						EHR_SP_DEVID_DOES_NOT_MATCH,						L"The specified developer ID doesn't match the one in Developer Code (Rainbow driver)"},
+	{EC_SP_DEVICE_SHARING_DETECTED,						EHR_SP_DEVICE_SHARING_DETECTED,						L"Device is shared by more than one system or shared in virtual machine environment (Rainbow driver)"},
+	{EC_SP_SERVER_VERSION_NOT_SUPPORTED,						EHR_SP_SERVER_VERSION_NOT_SUPPORTED,						L"The Sentinel Protection Server from which you are trying to obtain a license is outdated (Rainbow driver)"},
+	{EC_SP_FILE_NOT_FOUND,						EHR_SP_FILE_NOT_FOUND,						L"Specified file is not found (Rainbow driver)"},
+	{EC_SP_PATH_TOO_LONG,						EHR_SP_PATH_TOO_LONG,						L"Specified path is too long (Rainbow driver)"},
+	{EC_SP_SOFT_DB_CORRUPT,						EHR_SP_SOFT_DB_CORRUPT,						L"The software key database is in corrupt state (Rainbow driver)"},
+	{EC_SP_SOFT_DB_RESTORE_DETECTED,						EHR_SP_SOFT_DB_RESTORE_DETECTED,						L"The software key database has been illegally restored to an earlier version (Rainbow driver)"},
+	{EC_SP_PRST_DATA_CORRUPT,						EHR_SP_PRST_DATA_CORRUPT,						L"The SuperPro persistence data is in corrupt state (Rainbow driver)"},
+	{EC_SP_SECURITY_RUNTIME_NOT_DETECTED,						EHR_SP_SECURITY_RUNTIME_NOT_DETECTED,						L"The Sentinel Security Runtime was not installed or detected (Rainbow driver)"},
+	{EC_SP_TIME_TAMPER_DETECTED,						EHR_SP_TIME_TAMPER_DETECTED,						L"A time tampering condition is detected because the LKD (Last Known good Date) stored in the key is ahead of the system's current date (Rainbow driver)"},
+	{EC_SP_END_DATE_REACHED,						EHR_SP_END_DATE_REACHED,						L"The software key is invalid because the key end date has reached (Rainbow driver)"},
+	{EC_SP_START_DATE_NOT_REACHED,						EHR_SP_START_DATE_NOT_REACHED,						L"The software key is invalid because the system's current date is ahead of the key start date (Rainbow driver)"},
+	{EC_SP_HOST_ID_ERROR,						EHR_SP_HOST_ID_ERROR,						L"The fingerprint of the machine has been changed or the license is enforced with the user name and you are using a different user name (Rainbow driver)"},
+	{EC_SP_LIC_INVALID,						EHR_SP_LIC_INVALID,						L"SuperPro Software Key is invalid (Rainbow driver)"},
+	{EC_SP_LIC_RUN_TIME_ERROR,						EHR_SP_LIC_RUN_TIME_ERROR,						L"License runtime failed to work due to some error (Rainbow driver)"},
+	{EC_SP_LIC_MEMORY_CORRUPTED,						EHR_SP_LIC_MEMORY_CORRUPTED,						L"License is corrupted (like invalid cell format) (Rainbow driver)"},
+	{EC_SP_NOT_ENOUGH_MEMORY,						EHR_SP_NOT_ENOUGH_MEMORY,						L"Not enough storage is available to process this command (Rainbow driver)"},
+	{EC_SP_IP_ADDRESS_BLOCKED,						EHR_SP_IP_ADDRESS_BLOCKED,						L"Cannot communicate with the Sentinel Protection Server because the IP address of the client is blocked by the server (Rainbow driver)"},
+	{EC_SP_SERVER_OUT_OF_WORKING_TIME,						EHR_SP_SERVER_OUT_OF_WORKING_TIME,						L"Cannot communicate with the Sentinel Protection Server because the server is out of the working time (Rainbow driver)"},
+	{EC_SP_SECURITY_RUNTIME_VERSION_MISMATCH,						EHR_SP_SECURITY_RUNTIME_VERSION_MISMATCH,						L"SuperPro persistence component versions mismatch (Rainbow driver)"},
 	{EC_SP_INVALID_STATUS,						EHR_SP_INVALID_STATUS,						L"An invalid status code was returned (Rainbow driver)"},
 
 	{EC_WRPPR_SVR_NOT_CONNECTED,						EHR_WRPPR_SVR_NOT_CONNECTED,						L"Not Connected (License Server Wrapper)"},
@@ -116,11 +145,9 @@ const unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);
 
 HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id, long product_id)
 {
-//wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, _countof(tmpbuf), L"event_type: %d, product_id: %d, event_id: %d", event_type, product_id, event_id);
-//OutputDebugString(tmpbuf);
 	return WriteEventLog(event_log_msg, event_type, (product_id!=-1) ? (product_id * 1000) + event_id : event_id);
 }
+
 HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id)
 {
 	//TReadEventLog();

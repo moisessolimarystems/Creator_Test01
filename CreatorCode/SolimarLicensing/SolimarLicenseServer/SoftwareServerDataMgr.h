@@ -2,6 +2,7 @@
 #include <comdef.h>
 #include "..\Common\LicAttribsCPP\Lic_ServerDataAttribs.h"
 #include "..\Common\LicAttribsCPP\Lic_KeyAttribs.h"
+#include "..\Common\LicAttribsCPP\Lic_EmulationInfoAttribs.h"
 class SoftwareServerDataMgr
 {
 	public:
@@ -12,11 +13,18 @@ class SoftwareServerDataMgr
 		HRESULT GetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pFileInfo);
 		HRESULT SetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pFileInfo);
 
+		HRESULT GetAlertInfoAttribs(Lic_ServerDataAttribs::Lic_AlertInfoAttribs* pAlertInfoAttribs);
+		HRESULT SetAlertInfoAttribs(Lic_ServerDataAttribs::Lic_AlertInfoAttribs* pAlertInfoAttribs);
+
+		// CR.18131 - Detect DongleEmulator
+		HRESULT GetEmulatorInfoAttribs(Lic_EmulationInfoAttribs* pEmulatorInfoAttribs);
+		HRESULT SetEmulatorInfoAttribs(Lic_EmulationInfoAttribs* pEmulatorInfoAttribs);
+
 		HRESULT Touch(bool bForceCurrentDateUpdate = false);
 		bool InClockViolation() { return (pServerDataAttribs!=NULL) ? pServerDataAttribs->bInClockViol: true;}
 
 		// Up to caller to free pBstrSoftwareStream
-		HRESULT GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream);
+		HRESULT GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream, bool bRemoveAlertMailServerPassword);
 	private:
 		HRESULT LoadFromFile();
 		HRESULT SaveToFile();

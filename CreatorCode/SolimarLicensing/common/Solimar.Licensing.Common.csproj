@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -20,6 +20,7 @@
     <ApplicationRevision>0</ApplicationRevision>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,9 +52,14 @@
     <Compile Include="CsvHelper.cs" />
     <Compile Include="LicAttribsCS\ClassTypeInfo.cs" />
     <Compile Include="LicAttribsCS\CSpdAttribsBase.cs" />
+    <Compile Include="LicAttribsCS\KeyMessages.cs" />
+    <Compile Include="LicAttribsCS\Lic_EmulationInfoAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_KeyAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribsHelper.cs" />
+    <Compile Include="LicAttribsCS\Lic_RunningProcessesInfoAttribs.cs" />
+    <Compile Include="LicAttribsCS\Lic_ServerDataAttribs.cs" />
+    <Compile Include="LicAttribsCS\Lic_TestMailServerAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_UsageInfoAttribs.cs" />
     <Compile Include="LicAttribsCS\Sys_EventLogInfoAttribs.cs" />
     <Compile Include="LicenseError.cs" />

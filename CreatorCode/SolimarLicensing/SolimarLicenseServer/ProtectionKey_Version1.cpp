@@ -39,6 +39,7 @@ ProtectionKey_Version1* ProtectionKey_Version1::Copy(_bstr_t virtualKeyIdent)
 //Maybe remove...
 bool ProtectionKey_Version1::TimesUp()
 {
+   /*
 //OutputDebugStringW(L"ProtectionKey_Version1::TimesUp()");
 
 	//Check to see if an hour has been passed since the current time/date on the key (check cache)
@@ -59,6 +60,8 @@ bool ProtectionKey_Version1::TimesUp()
 	bTemp = true;
 	bTemp = false;
 	return bTemp;
+   */
+   return false;
 }
 
 //Called to reduce hours until expire.
