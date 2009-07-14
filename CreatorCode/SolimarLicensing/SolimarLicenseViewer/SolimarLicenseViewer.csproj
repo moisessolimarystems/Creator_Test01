@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EC94C25C-1C53-4A77-A5F0-3047377944D4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -30,6 +30,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ApplicationIcon>keyLicenseManager16.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,11 +43,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>..\Image\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -74,6 +76,13 @@
       <DependentUpon>ConnectDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ConnectionSettings.cs" />
+    <Compile Include="ConnectionSettingsHelper.cs" />
+    <Compile Include="EditConnectionSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditConnectionSettingsDialog.Designer.cs">
+      <DependentUpon>EditConnectionSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="EnterPasswordDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,12 +107,6 @@
     <Compile Include="LicenseUpdateHelper.Designer.cs">
       <DependentUpon>LicenseUpdateHelper.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductSettingsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProductSettingsDialog.Designer.cs">
-      <DependentUpon>ProductSettingsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="ListViewMgr.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -114,6 +117,9 @@
     <EmbeddedResource Include="ConnectDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ConnectDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditConnectionSettingsDialog.resx">
+      <DependentUpon>EditConnectionSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EnterPasswordDialog.resx">
       <DependentUpon>EnterPasswordDialog.cs</DependentUpon>
@@ -130,10 +136,6 @@
     <EmbeddedResource Include="LicenseUpdateHelper.resx">
       <DependentUpon>LicenseUpdateHelper.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProductSettingsDialog.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ProductSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -178,6 +180,11 @@
     <None Include="Resources\AboutBox.png" />
   </ItemGroup>
   <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
       <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
@@ -193,6 +200,14 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="keyLicenseManager16.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

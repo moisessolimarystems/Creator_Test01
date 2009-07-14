@@ -51,21 +51,32 @@ namespace SolimarLicenseViewer
         #region LicenseServerWrapper Methods
         public void Connect(String serverName)
         {
+            Connect(serverName, true);
+        }
+        public void Connect(String serverName, bool bDisconnectOnError)
+        {
             try
             {
-                m_licServer.Disconnect();
-                m_licServer.Connect(serverName);
-                m_licenseWrapper.DisconnectEx();
+                Disconnect();
                 m_licenseWrapper.ConnectEx(serverName);
+                m_licServer.Connect(serverName);
                 m_ServerName = serverName;
             }
             catch (COMException ex)
             {
-                m_licServer.Disconnect();
-                m_licenseWrapper.DisconnectEx();
-                m_ServerName = "";
+                m_exception = ex;
+                if(bDisconnectOnError)
+                    Disconnect();
+                else
+                    m_ServerName = serverName;
                 throw;
             }
+        }
+        public void Disconnect()
+        {
+            m_licenseWrapper.DisconnectEx();
+            m_licServer.Disconnect();
+            m_ServerName = "";
         }
 
         //Cache for Software Licenses -
@@ -202,7 +213,7 @@ namespace SolimarLicenseViewer
             {
                 verificationCode = m_licServer.EnterSoftwareLicPacket(byteLicPacket);
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 throw;
             }
@@ -213,7 +224,7 @@ namespace SolimarLicenseViewer
             {
                 verificationCode = m_licServer.EnterProtectionKeyPasswordPacket(byteLicPacket);
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 throw;
             }
@@ -224,7 +235,7 @@ namespace SolimarLicenseViewer
             {
                 return m_licServer.EnterProtectionKeyPassword(password);
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 throw;
             }
@@ -312,13 +323,25 @@ namespace SolimarLicenseViewer
             }
         }
 
+        public void GenerateLicPackage_BySoftwareLicArchive(Byte[] byteArray, ref String slaStream)
+        {
+            try
+            {
+                slaStream = m_licServer.GenerateLicPackage_BySoftwareLicArchive(byteArray);
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+        }
+
         public void SoftwareLicenseDisasterRecoveryExtendTimeByLicense(String softwareLicense)
         {
             try
             {
                 m_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicense(softwareLicense);
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 throw;
             }
@@ -338,7 +361,7 @@ namespace SolimarLicenseViewer
                     m_protectionKeyCache = m_licServer.KeyEnumerate();
                 return m_protectionKeyCache;
             }
-            catch (COMException ex)
+            catch (COMException)
             {
                 throw;
             }
@@ -446,6 +469,18 @@ namespace SolimarLicenseViewer
             }
         }
 
+        public void ModuleLicenseInUse_ByApp(int modID, ref int licenseCount)
+        {
+            try
+            {
+                licenseCount = m_licenseWrapper.ModuleLicenseInUse_ByAppEx(modID);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("ModuleLicenseInUse_ByApp Failed", ex);
+            }
+        }
+
         public void ModuleLicenseObtain(int modID, int licenseCount)
         {
             try
@@ -487,7 +522,7 @@ namespace SolimarLicenseViewer
         {
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productName == productName)
+                if(string.Compare(productSpec.productName, productName, true) == 0)
                     return (int)productSpec.productID.TVal;
             }
             return -1;
@@ -497,7 +532,7 @@ namespace SolimarLicenseViewer
         {
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleList(m_softwareSpec, (uint)productID).TVal.Values)
             {
-                if (moduleSpec.moduleName == moduleName)
+                if (string.Compare(moduleSpec.moduleName, moduleName, true) == 0)
                     return (int)moduleSpec.moduleID.TVal;
             }
             return -1;
@@ -524,6 +559,11 @@ namespace SolimarLicenseViewer
             get { return m_ServerName; }
             set { m_ServerName = value; }
         }
+        public Exception Exception
+        {
+            get { return m_exception; }
+            set { m_exception = value; }
+        }
         #endregion
 
         #region Private Variables
@@ -531,6 +571,7 @@ namespace SolimarLicenseViewer
         private Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseServerWrapper m_licServer;
         private Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper m_licenseWrapper;
         private String m_ServerName;
+        private Exception m_exception = null;
         #endregion
     }
 }
