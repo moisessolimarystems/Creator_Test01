@@ -3,7 +3,10 @@
 
 #include <windows.h>
 #include <string>
-
+#include <atlbase.h>	// For AtlReportError
+#if _MSC_VER >= 1400
+#include <atlcom.h>	// For AtlReportError
+#endif
 namespace LicenseServerError
 {
 	/* Custom Error Base   HR Error Codes should all offset from this base. */
@@ -109,6 +112,8 @@ namespace LicenseServerError
 	const unsigned long EC_LIC_SOFTWARE_KEY_ID_REQUIRED = ITF_LIC_SVR_OFFSET+42;
 	const unsigned long EC_LIC_SOFTWARE_LIC_FILE_EXPIRED = ITF_LIC_SVR_OFFSET+43;
 	const unsigned long EC_LIC_SOFTWARE_NO_PRODUCT = ITF_LIC_SVR_OFFSET+44;
+	const unsigned long EC_LIC_SOFTWARE_PRODUCT_NO_VERSION = ITF_LIC_SVR_OFFSET+45;
+	const unsigned long EC_LIC_MOD_NO_OBTAIN_USING_FAILOVER = ITF_LIC_SVR_OFFSET+46;
 
 	// Rainbow driver errors
 	const unsigned long EC_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -202,6 +207,8 @@ namespace LicenseServerError
 	const HRESULT EHR_LIC_SOFTWARE_KEY_ID_REQUIRED = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_KEY_ID_REQUIRED);
 	const HRESULT EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_LIC_FILE_EXPIRED);
 	const HRESULT EHR_LIC_SOFTWARE_NO_PRODUCT = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_NO_PRODUCT);
+	const HRESULT EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_PRODUCT_NO_VERSION);
+	const HRESULT EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_MOD_NO_OBTAIN_USING_FAILOVER);
 
 	const HRESULT EHR_SP_INVALID_FUNCTION_CODE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_INVALID_FUNCTION_CODE);
 	const HRESULT EHR_SP_INVALID_PACKET = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_INVALID_PACKET);
@@ -256,9 +263,55 @@ namespace LicenseServerError
 		wchar_t*		message;
 	} SL_ERROR;
 
+	/*
+	 * GetErrorMessage should be used by programs to translate error HRESULTS
+	 */
 	std::wstring GetErrorMessage(HRESULT hr);
 	std::wstring GetECMessage(unsigned long echr);
+
+	/*
+	 * GenerateErrorMessage should be used by programs to translate error HRESULTS
+	 */
+	std::wstring GenerateErrorMessage(HRESULT hr, std::wstring wstrHeaderMsg=L"", bool bAppendExistingErrorInfo=true);
+
+	/*
+	 * SAVE_ERRORINFO, RESTORE_ERRORINFO
+	 * Helper macros to save and restore IErrorInfo objects in return blocks.
+	 * For instance, if a COM object is released between a COM error occurring, 
+	 * and returning an errored hr from a function, the IErrorInfo object may 
+	 * be cleared (similar to the lasterror for Win32 calls). Use these
+	 * macros to help store the IErrorInfo during COM cleanup, and then
+	 *restore IErrorInfo before returning.
+	 */
+#define SAVE_ERRORINFO \
+	IErrorInfo* save_error_info = NULL; \
+	GetErrorInfo(0, &save_error_info); \
+	if (save_error_info) \
+		SetErrorInfo(0, save_error_info);
+#define RESTORE_ERRORINFO \
+	if (save_error_info) \
+	{ \
+		SetErrorInfo(0, save_error_info); \
+		save_error_info->Release(); \
+	}
+
 	HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type);
+
+	/*
+	 * LIC_PROPAGATE_CUSTOM_ERROR()
+	 *
+	 * Pulls the error message from a given HR, and sets the
+	 * calling objects ISupportErrorInfo with the information.
+	 * This macro can be used to easily propagate error info
+	 * from object to object within Licensing.
+	 */
+#define LIC_PROPAGATE_CUSTOM_ERROR(hr, clsid, iid) \
+	if(FAILED(hr)) \
+		AtlReportError((clsid), (BSTR)(LicenseServerError::GetErrorMessage(hr).c_str()), (iid), (hr));
+
+#define LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, wstrMsg, clsid, iid) \
+	if(FAILED(hr)) \
+		AtlReportError((clsid), (BSTR)(wstrMsg.c_str()), (iid), (hr));
 
 
 	/*
