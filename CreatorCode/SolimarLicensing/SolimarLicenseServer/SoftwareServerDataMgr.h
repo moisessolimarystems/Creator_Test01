@@ -35,5 +35,7 @@ class SoftwareLicenseFile
 		static BYTE crypto_license_file_password[];
 		static BYTE crypto_license_file_public[];
 		static BYTE crypto_license_file_private[];
+
+		static unsigned int license_file_code_int[];
 		//static HANDLE softwareLicenseFileLock;
 };

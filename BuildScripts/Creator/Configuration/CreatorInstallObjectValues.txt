@@ -1,0 +1,11 @@
+'Creator: Depends on Nothing
+IpmLocation = \\CreatorInstallShield\\
+IpmFile = Creator.ipr
+ReleaseMedia = Creator
+CompileLoc = 
+CompileFile = 
+PostProcessSrcLoc = InstallShieldProjPath\Media\Creator\Disk Images\DISK1\
+PostProcessSrcFile = *.*
+PostProcessDestLoc = CD_IMAGE_CREATOR
+PostProcessDestFile = 
+Name = CREATOR

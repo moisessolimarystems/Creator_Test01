@@ -215,7 +215,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" />
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" />
-			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="Assembly" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Instances" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>

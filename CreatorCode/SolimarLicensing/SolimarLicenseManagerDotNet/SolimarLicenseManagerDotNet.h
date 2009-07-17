@@ -46,6 +46,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			bool KeyProductExists(long product, long prodVerMajor, long prodVerMinor, bool% bRefKeyExists);
 			bool ModuleLicenseTotal(long module, long% refLicenseCount);
 			bool ModuleLicenseInUse(long module, long% refLicenseCount);
+			bool ModuleLicenseInUse_ByApp(long module, long% refLicenseCount);
 			bool ModuleLicenseObtain(long module, long licenseCount);
 			bool ModuleLicenseRelease(long module, long licenseCount);
 			bool ModuleLicenseCounterDecrement(long module, long licenseCount);
@@ -56,6 +57,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			void ConnectEx(String^ server);
 			void ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
 			void ConnectByProductEx(long product, bool bUseSharedLicenseServers);
+			void GetInfoByProductEx(long product, bool bUseSharedLicenseServers, String^% refLicServer, String^% refBackupLicServer, bool% refBUseTestDev);
 			void DisconnectEx();
 			// Returns true if there is any licensing for the given products, else false.  If no licensing was present initially,
 			// but licensing is added afterwards, than the initialized connection will be able to have modules obtained against it
@@ -66,6 +68,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			bool KeyProductExistsEx(int product, int prodVerMajor, int prodVerMinor);
 			long ModuleLicenseTotalEx(long module);
 			long ModuleLicenseInUseEx(long module);
+			long ModuleLicenseInUse_ByAppEx(long module);
 			void ModuleLicenseObtainEx(long module, long licenseCount);
 			void ModuleLicenseReleaseEx(long module, long licenseCount);
 			void ModuleLicenseCounterDecrementEx(long module, long licenseCount);
@@ -95,11 +98,19 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 		private:
 			SolimarLicenseManagerWrapper::LicensingWrapper* m_pLicenseWrapper;
 
+			String^ GetLicenseServerVersion(String^ _server);
+			String^ GetLicenseManagerVersion();
+			System::Runtime::InteropServices::COMException^ GenerateException(HRESULT _hr);
+
 			delegate void DelegateMessageCallbackUnmanaged(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
 			DelegateMessageCallbackUnmanaged^ m_messageCallbackUnmanaged;
 			DelegateMessageCallbackManaged^ m_messageCallbackManaged;
 			bool m_bRegisteredMessageCallback;
 			bool m_bFinalized;
+
+			bool m_bUseSharedLicenseServers;
+			long m_productID;
+			String^ m_licServer;
 
 			delegate void DelegateInvalidLicenseCallbackUnmanaged(void* pContext, HRESULT hr, const wchar_t* message);
 			DelegateInvalidLicenseCallbackUnmanaged^ m_invalidLicenseCallbackUnmanaged;

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="..\Build Specs.xsl"?>
+<Requirements Product="SOLsearcher Build Specs">
+	<Development>
+		<Compiler>
+			<Name> Borland C++ Builder 6.0 </Name>
+			<Service_Pack>  </Service_Pack>
+			<Description> </Description>	
+			<Location> </Location>		
+		</Compiler>
+		<Compiler>
+			<Name> Borland C++ Builder 5.0 </Name>
+			<Service_Pack> Update Pack 1 </Service_Pack>
+			<Description> </Description>
+			<Location> </Location>
+		</Compiler>
+		<Compiler>
+			<Name> Microsoft Visual Studio 6.0 </Name>
+			<Service_Pack> Service Pack 5 </Service_Pack>
+			<Description> </Description>
+			<Location> </Location>
+		</Compiler>
+		<Compiler>
+			<Name> Microsoft Visual Studio .Net 2003 </Name>
+			<Service_Pack> </Service_Pack>
+			<Description> </Description>
+			<Location> </Location>
+		</Compiler>
+	</Development>
+	<Deployment>
+		<Install>
+			<Name> InstallShield Developer 7</Name>
+			<Service_Pack> Service Pack 4 </Service_Pack>
+			<Description> </Description>
+			<Location> </Location>
+		</Install>
+		<Install>
+			<Name> InstallShield PackageForTheWeb 3.0 </Name>
+			<Service_Pack> </Service_Pack>
+			<Description> </Description>
+			<Location> </Location>
+		</Install>
+	</Deployment>
+	<Support>
+		<Software>
+			<Name> Cab SDK </Name>
+			<Description>  CabArc.exe to be on the system to generate cab files </Description>
+			<Location></Location>
+		</Software>
+		<Software>
+			<Name> inetsdk </Name>
+			<Description> Used to sign cabs</Description>
+			<Location> c:\inetsdk\bin </Location>
+		</Software>
+		<Software>
+			<Name> Internet Information Services </Name>
+			<Description> </Description>
+			<Location> </Location>
+		</Software>
+		<Software>
+			<Name> Microsoft Messaging Queuing </Name>
+			<Description> </Description>
+			<Location> </Location>
+		</Software>
+		<Software>
+			<Name> Sunisoft 3.94 </Name>
+			<Description> for ss_search control, register and install into builder 5.0 </Description>
+			<Location> </Location>
+		</Software>
+		<Software>
+			<Name> Microsoft Platform SDK 2000</Name>
+			<Description> </Description>
+			<Location> </Location>
+		</Software>		
+		<Software>
+			<Name> Adobe SDK 5.0 </Name>
+			<Description> </Description>
+			<Location> </Location>
+		</Software>
+	</Support>
+</Requirements>

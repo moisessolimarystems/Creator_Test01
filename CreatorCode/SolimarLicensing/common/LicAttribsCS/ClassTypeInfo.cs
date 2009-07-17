@@ -77,11 +77,12 @@ namespace Solimar
 				map_class_base["L_LcSysA"] = new ClassInfoBase("L_LcSysA","","License System Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_LcSysA");
-				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_ServerDataAttribs"] = new AttribInfo("Streamed_ServerDataAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["ListOfStreamed_InfoAttribs"] = new AttribInfo("ListOfStreamed_InfoAttribs","","");
-				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["ListOfStreamed_KeyAttribs"] = new AttribInfo("ListOfStreamed_KeyAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_SystemInfoAttribs"] = new AttribInfo("Streamed_SystemInfoAttribs","","");
+				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_SoftwareSpecAttribs"] = new AttribInfo("Streamed_SoftwareSpecAttribs","","");
+				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_ServerDataAttribs"] = new AttribInfo("Streamed_ServerDataAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["createdDate"] = new AttribInfo("createdDate","","");
+				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["ListOfStreamed_KeyAttribs"] = new AttribInfo("ListOfStreamed_KeyAttribs","","");
 				map_class_base["L_SvrDtA"] = new ClassInfoBase("L_SvrDtA","","License Server Data Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_SvrDtA");

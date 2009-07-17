@@ -79,6 +79,7 @@ public:
 	//Results based on the license_id.
 	HRESULT ModuleLicenseTotal(BSTR license_id, long module_ident, long* license_count);
 	HRESULT ModuleLicenseInUse(BSTR license_id, long module_ident, long* license_count);
+	HRESULT ModuleLicenseInUse_ByApp(BSTR license_id, long module_ident, long* license_count);
 	HRESULT ModuleLicenseObtain(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseRelease(BSTR license_id, long module_ident, long license_count);
 	HRESULT ModuleLicenseDecrementCounter(BSTR license_id, long module_ident, long license_count);
