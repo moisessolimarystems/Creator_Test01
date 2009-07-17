@@ -52,13 +52,16 @@
             this.bottumSplitter = new System.Windows.Forms.Splitter();
             this.leftPanel = new System.Windows.Forms.Panel();
             this.leftTreeView = new System.Windows.Forms.TreeView();
-            this.lefhHeaderPanel = new System.Windows.Forms.Panel();
             this.leftSplitter = new System.Windows.Forms.Splitter();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.leftPanel.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -112,6 +115,7 @@
             this.closeLicenseSystemDataToolStripMenuItem.Name = "closeLicenseSystemDataToolStripMenuItem";
             this.closeLicenseSystemDataToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
             this.closeLicenseSystemDataToolStripMenuItem.Text = "&Close License System Data";
+            this.closeLicenseSystemDataToolStripMenuItem.Visible = false;
             this.closeLicenseSystemDataToolStripMenuItem.Click += new System.EventHandler(this.closeLicenseSystemDataToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
@@ -205,6 +209,7 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1149, 87);
             this.panel1.TabIndex = 3;
+            this.panel1.Visible = false;
             // 
             // textBox1
             // 
@@ -224,11 +229,11 @@
             this.bottumSplitter.Size = new System.Drawing.Size(1149, 5);
             this.bottumSplitter.TabIndex = 5;
             this.bottumSplitter.TabStop = false;
+            this.bottumSplitter.Visible = false;
             // 
             // leftPanel
             // 
             this.leftPanel.Controls.Add(this.leftTreeView);
-            this.leftPanel.Controls.Add(this.lefhHeaderPanel);
             this.leftPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.leftPanel.Location = new System.Drawing.Point(0, 24);
             this.leftPanel.Name = "leftPanel";
@@ -239,21 +244,12 @@
             // 
             this.leftTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.leftTreeView.FullRowSelect = true;
-            this.leftTreeView.Location = new System.Drawing.Point(0, 37);
+            this.leftTreeView.Location = new System.Drawing.Point(0, 0);
             this.leftTreeView.Name = "leftTreeView";
             this.leftTreeView.ShowNodeToolTips = true;
-            this.leftTreeView.Size = new System.Drawing.Size(188, 437);
+            this.leftTreeView.Size = new System.Drawing.Size(188, 474);
             this.leftTreeView.TabIndex = 10;
             this.leftTreeView.DoubleClick += new System.EventHandler(this.leftTreeView_DoubleClick);
-            // 
-            // lefhHeaderPanel
-            // 
-            this.lefhHeaderPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lefhHeaderPanel.Location = new System.Drawing.Point(0, 0);
-            this.lefhHeaderPanel.Name = "lefhHeaderPanel";
-            this.lefhHeaderPanel.Size = new System.Drawing.Size(188, 37);
-            this.lefhHeaderPanel.TabIndex = 9;
-            this.lefhHeaderPanel.Visible = false;
             // 
             // leftSplitter
             // 
@@ -265,11 +261,35 @@
             // 
             // statusStrip1
             // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1,
+            this.toolStripStatusLabel2});
             this.statusStrip1.Location = new System.Drawing.Point(0, 590);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1149, 22);
             this.statusStrip1.TabIndex = 9;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(33, 19);
+            this.toolStripStatusLabel1.Text = "[File]";
+            this.toolStripStatusLabel1.Visible = false;
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(66, 19);
+            this.toolStripStatusLabel2.Text = "[File Type]";
+            this.toolStripStatusLabel2.Visible = false;
+            // 
+            // imageList
+            // 
+            this.imageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // LicenseDiagnosticDataViewerForm
             // 
@@ -295,6 +315,8 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.leftPanel.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -324,10 +346,12 @@
 		private System.Windows.Forms.Splitter bottumSplitter;
 		private System.Windows.Forms.Panel leftPanel;
 		private System.Windows.Forms.Splitter leftSplitter;
-		private System.Windows.Forms.TreeView leftTreeView;
-		private System.Windows.Forms.Panel lefhHeaderPanel;
+        private System.Windows.Forms.TreeView leftTreeView;
 		private System.Windows.Forms.ToolTip generalToolTip;
         private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ImageList imageList;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
     }
 }
 

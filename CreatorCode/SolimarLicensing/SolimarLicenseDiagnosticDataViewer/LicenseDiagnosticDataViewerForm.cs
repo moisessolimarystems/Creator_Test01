@@ -34,7 +34,7 @@ namespace SolimarLicenseDiagnosticDataViewer
         private void openLicenseSystemDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.m_importPktDialog.DefaultExt = "lsData";
-            this.m_importPktDialog.Filter = "License System Data|*.lsData|License Verification Data|*.vData|License Packet|*.packet|License Archive|*.licArchive";
+            this.m_importPktDialog.Filter = "License System Data|*.lsData|License Verification Data|*.vData|License Packet|*.packet|License Archive|*.licArchive|Solimar Validation Tokens|*.svt.csv";
             this.m_importPktDialog.Title = "License System Data";
             this.m_importPktDialog.FileName = System.Environment.MachineName.ToLower();
             this.m_importPktDialog.InitialDirectory = m_selectedDirectory;
@@ -43,6 +43,8 @@ namespace SolimarLicenseDiagnosticDataViewer
                 try
                 {
                     m_selectedDirectory = System.IO.Path.GetDirectoryName(this.m_importPktDialog.FileName);
+                    SetStatusText_File(this.m_importPktDialog.FileName);
+                    //SetStatusText_FileType(this.m_importPktDialog.Filter);
 
                     #region if License Verification Data
                     if (string.Compare(System.IO.Path.GetExtension(this.m_importPktDialog.FileName), ".vData", true) == 0)
@@ -75,13 +77,21 @@ namespace SolimarLicenseDiagnosticDataViewer
                     }
                     #endregion
                     #region if License System Data
-                    else //if (string.Compare(System.IO.Path.GetExtension(this.m_importPktDialog.FileName), ".lsData", true) == 0)
+                    else if (string.Compare(System.IO.Path.GetExtension(this.m_importPktDialog.FileName), ".lsData", true) == 0)
                     {
                         Byte[] licPktBytes = System.IO.File.ReadAllBytes(this.m_importPktDialog.FileName);
                         string licStream = "";
                         licStream = m_solLicServerWrapper.GenerateStream_ByLicenseSystemData(licPktBytes);
                         textBox1.Text = licStream.ToString();
                         SetSystemData(this.m_importPktDialog.FileName, licStream);
+                    }
+                    #endregion
+                    #region if Validation Token Data
+                    else //if (string.Compare(System.IO.Path.GetExtension(this.m_importPktDialog.FileName), ".svt.csv", true) == 0)
+                    {
+                        string allText = System.IO.File.ReadAllText(this.m_importPktDialog.FileName);
+                        SetCsvData(this.m_importPktDialog.FileName, allText);
+                        textBox1.Text = allText;
                     }
                     #endregion
                 }
@@ -160,12 +170,42 @@ namespace SolimarLicenseDiagnosticDataViewer
             try
             {
                 m_solLicServerWrapper.Connect(_server);
+                // See if the license server is an Internal License Server
+                try
+                {
+                    // An exception will be thrown no matter what
+                    Byte[] licPktBytes = new Byte[500];
+                    m_solLicServerWrapper.GenerateStream_ByLicenseSystemData(licPktBytes);
+                }
+                catch (COMException innerEx)
+                {
+                    //access denied exception means that Solimar License Server is not an Internal one.
+                    //invalid parameter  means that Solimar License Server is an Internal one.
+                    if ((uint)innerEx.ErrorCode != 0x80070057/*Invalid Parameter Exception*/) 
+                    {
+                        if ((uint)innerEx.ErrorCode == 0x80070005/*Access Denied*/)
+                            throw new Exception(string.Format("License Server: {0} - Can only connect to an Internal Solimar License Server.", _server), innerEx);
+                        else
+                            throw;
+                    }
+                    else //if (innerEx.ErrorCode == 0x80070057/*Invalid Parameter Exception*/) 
+                    {
+                        // successfully connected to an internal solimar license server
+                    }
+                }
                 this.Text = string.Format("Solimar License Diagnostic Data Viewer [{0}]", _server);
                 m_connected = true;
+                connectToolStripMenuItem.Visible = false;
+                toolStripSeparator2.Visible = false;
             }
-            catch (COMException ex)
+            catch (COMException comEx)
             {
                 if(this.InvokeRequired == false)
+                    HandleExceptions.DisplayException(comEx);
+            }
+            catch (Exception ex)
+            {
+                if (this.InvokeRequired == false)
                     HandleExceptions.DisplayException(ex);
             }
             return m_connected;
@@ -222,6 +262,59 @@ namespace SolimarLicenseDiagnosticDataViewer
 
 
         #region Left Nav Tree
+        private void SetCsvData(string _fileName, string _csvData)
+        {
+            TreeNode childNode = null;
+            this.Cursor = Cursors.WaitCursor;
+            leftTreeView.BeginUpdate();
+            try
+            {
+                leftTreeView.Nodes.Clear();
+                foreach (Form mdiChild in this.MdiChildren)
+                {
+                    mdiChild.Close();
+                }
+
+                TreeNode rootNode = new TreeNode(System.IO.Path.GetFileName(_fileName));
+                leftTreeView.Nodes.Add(rootNode);
+
+                StringBuilder toolTipBuilder = new StringBuilder();
+
+                //SolimarValidationToken_DisplayForm
+                childNode = new TreeNode("Solimar Validation Token");
+                childNode.Tag = Guid.NewGuid().ToString();
+                childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                SolimarValidationToken_DisplayForm svTokenForm = new SolimarValidationToken_DisplayForm();
+                svTokenForm.SetData(_csvData);
+                svTokenForm.MdiParent = this;
+                svTokenForm.Show();
+                m_guidToFormMap.Add(childNode.Tag as string, svTokenForm);
+                rootNode.Nodes.Add(childNode);
+
+                childNode = new TreeNode("Raw XML");
+                childNode.Tag = Guid.NewGuid().ToString();
+                childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                XmlViewer_DisplayForm xmlForm = new XmlViewer_DisplayForm();
+                xmlForm.SetData(_csvData);
+                xmlForm.MdiParent = this;
+                xmlForm.Show();
+                xmlForm.WindowState = FormWindowState.Minimized;
+                m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
+                rootNode.Nodes.Add(childNode);
+
+                rootNode.ToolTipText = toolTipBuilder.ToString();
+                rootNode.ExpandAll();
+            }
+            catch (Exception ex)
+            {
+                textBox1.Text = ex.ToString();
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
+            }
+            leftTreeView.EndUpdate();
+        }
         private void SetSystemData(string _fileName, string _licSysAttribsStreamed)
         {
             this.Cursor = Cursors.WaitCursor;
@@ -366,6 +459,7 @@ namespace SolimarLicenseDiagnosticDataViewer
                     xmlForm.SetData(_licSysAttribsStreamed);
                     xmlForm.MdiParent = this;
                     xmlForm.Show();
+                    xmlForm.WindowState = FormWindowState.Minimized;
                     m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
                     rootNode.Nodes.Add(childNode);
 
@@ -440,6 +534,7 @@ namespace SolimarLicenseDiagnosticDataViewer
                     xmlForm.SetData(_licPackageAttribsStreamed);
                     xmlForm.MdiParent = this;
                     xmlForm.Show();
+                    xmlForm.WindowState = FormWindowState.Minimized;
                     m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
                     rootNode.Nodes.Add(childNode);
 
@@ -469,17 +564,20 @@ namespace SolimarLicenseDiagnosticDataViewer
 			{
 				if (leftTreeView.SelectedNode.Tag is string)
 				{
-					Form tmpForm = m_guidToFormMap[leftTreeView.SelectedNode.Tag as string];
-					if (tmpForm != null)
-					{
-						tmpForm.Focus();
-						if(this.ActiveMdiChild.WindowState == FormWindowState.Minimized)
-							tmpForm.WindowState = FormWindowState.Normal;
-						else
-							tmpForm.WindowState = this.ActiveMdiChild.WindowState;
-						//tmpForm.s/
-						//this.ActivateMdiChild(tmpForm);
-					}
+                    if (m_guidToFormMap.ContainsKey(leftTreeView.SelectedNode.Tag as string))
+                    {
+                        Form tmpForm = m_guidToFormMap[leftTreeView.SelectedNode.Tag as string];
+                        if (tmpForm != null)
+                        {
+                            tmpForm.Focus();
+                            if (this.ActiveMdiChild.WindowState == FormWindowState.Minimized)
+                                tmpForm.WindowState = FormWindowState.Normal;
+                            else
+                                tmpForm.WindowState = this.ActiveMdiChild.WindowState;
+                            //tmpForm.s/
+                            //this.ActivateMdiChild(tmpForm);
+                        }
+                    }
 				}
 			}
 		}
@@ -495,7 +593,31 @@ namespace SolimarLicenseDiagnosticDataViewer
             }
         }
 
+        private void SetStatusText_File(string _file)
+        {
+            toolStripStatusLabel1.Text = _file;
+            SetStatusText_FileType(toolStripStatusLabel1.Text);
+            toolStripStatusLabel1.Visible = toolStripStatusLabel1.Text.Length != 0;
+        }
+        private void SetStatusText_FileType(string _file)
+        {
+            string ext = System.IO.Path.GetExtension(_file);
+            string fullName = "";
+            //"|*.||*.||*.||*.";
+            if (string.Compare(ext, ".lsData") == 0)
+                fullName = "License System Data";
+            else if (string.Compare(ext, ".vData") == 0)
+                fullName = "License Verification Data";
+            else if (string.Compare(ext, ".packet") == 0)
+                fullName = "License Packet";
+            else if (string.Compare(ext, ".licArchive") == 0)
+                fullName = "License Archive";
+            else
+                fullName = "Unknown";
+            toolStripStatusLabel2.Text = "File Type: " + fullName;
+            toolStripStatusLabel2.Visible = _file.Length != 0;
 
+        }
 
 	}
 
