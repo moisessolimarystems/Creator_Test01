@@ -63,15 +63,25 @@ namespace SolimarLicenseDiagnosticDataViewer
 				if (productIdx == 0xff)	//Verification Key
 				{
 					this.verificationCodeLabel.Text = _data.verificationCode.TVal;
-					this.modifiedDateLabel.Text = _data.modifiedDate.TVal.ToString();
+					this.modifiedDateLabel.Text = _data.modifiedDate.TVal.ToLocalTime().ToString();
 					this.currentActivationsLabel.Text = _data.currentActivations.TVal.ToString();
 				}
 				else  //Product
 				{
-					this.verificationCodeTitleLabel.Text = "Product:";
-					this.verificationCodeLabel.Text = Lic_PackageAttribs.AttribsMemberEnum_TLic_ProductID.GetAlias((Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)productIdx);
-					this.modifiedDateTitlelabel.Text = "Version:";
-					this.modifiedDateLabel.Text = version;
+					if (_data.keyName.TVal.Contains('{') == true) // Uninitialized Key has a '{' in its name
+					{
+						this.verificationCodeTitleLabel.Text = "Type:";
+						this.verificationCodeLabel.Text = "Uninitialized Key";
+						this.modifiedDateTitlelabel.Visible = false;
+						this.modifiedDateLabel.Visible = false;
+					}
+					else
+					{
+						this.verificationCodeTitleLabel.Text = "Product:";
+						this.verificationCodeLabel.Text = Lic_PackageAttribs.AttribsMemberEnum_TLic_ProductID.GetAlias((Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)productIdx);
+						this.modifiedDateTitlelabel.Text = "Version:";
+						this.modifiedDateLabel.Text = version;
+					}
 					this.currentActivationsTitleLabel.Visible = false;
 					this.currentActivationsLabel.Visible = false;
 				}
@@ -129,6 +139,80 @@ namespace SolimarLicenseDiagnosticDataViewer
                 //    this.Height -= m_heightPanel;
                 //}
             }
-        } 
+        }
+
+		private void contextMenuStrip1_Click(object sender, EventArgs e)
+		{
+			string copyText = "";
+			if (sender is System.Windows.Forms.ContextMenuStrip)
+			{
+				if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is Panel)
+				{
+					StringBuilder copyStrBuilder = new StringBuilder();
+					copyStrBuilder.Append(keyNameTitleLabel.Text);
+					copyStrBuilder.Append(" ");
+					copyStrBuilder.Append(keyNameLabel.Text);
+
+					copyStrBuilder.Append("\r\n");
+					copyStrBuilder.Append(verificationCodeTitleLabel.Text);
+					copyStrBuilder.Append(" ");
+					copyStrBuilder.Append(verificationCodeLabel.Text);
+
+					copyStrBuilder.Append("\r\n");
+					copyStrBuilder.Append(modifiedDateTitlelabel.Text);
+					copyStrBuilder.Append(" ");
+					copyStrBuilder.Append(modifiedDateLabel.Text);
+
+					if (currentActivationsTitleLabel.Visible)
+					{
+						copyStrBuilder.Append("\r\n");
+						copyStrBuilder.Append(currentActivationsTitleLabel.Text);
+						copyStrBuilder.Append(" ");
+						copyStrBuilder.Append(currentActivationsLabel.Text);
+					}
+
+					copyText = copyStrBuilder.ToString();
+				}
+				else if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is ListView)
+					copyText = getCopyTextForListView(((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) as ListView);
+			}
+			if (copyText.Length != 0)
+				System.Windows.Forms.Clipboard.SetText(copyText);
+			else
+				System.Windows.Forms.Clipboard.Clear();
+		}
+
+		private void general_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.C && e.Control)
+			{
+				System.Windows.Forms.Clipboard.SetText(getCopyTextForListView(keyListView));
+			}
+			else if (e.KeyCode == Keys.A && e.Control)
+			{
+				keyListView.BeginUpdate();
+				foreach (ListViewItem li in keyListView.Items)
+					li.Selected = true;
+				keyListView.EndUpdate();
+			}
+		}
+		private string getCopyTextForListView(ListView _listView)
+		{
+			StringBuilder copyStrBuilder = new StringBuilder();
+			foreach (ListViewItem lvi in _listView.SelectedItems)
+			{
+				StringBuilder lineStrBuilder = new StringBuilder();
+				foreach (ListViewItem.ListViewSubItem subItem in lvi.SubItems)
+				{
+					if (lineStrBuilder.Length != 0)
+						lineStrBuilder.Append(" ");
+					lineStrBuilder.Append(subItem.Text);
+				}
+				if (copyStrBuilder.Length != 0)
+					copyStrBuilder.Append("\r\n");
+				copyStrBuilder.Append(lineStrBuilder.ToString());
+			}
+			return copyStrBuilder.ToString();
+		}
 	}
 }
