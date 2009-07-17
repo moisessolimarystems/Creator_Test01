@@ -60,10 +60,44 @@ BYTE SoftwareServer::crypto_key_license_archive_password[] = {
 #include "..\common\keys\SolimarLicensingPacket.password.txt"
 };
 
+//B83AB367E7194b808F05441273A7A64B
+unsigned int SoftwareServer::license_packet_code_int[] = {
+	0x42, 0x00, 0x38, 0x00, 0x33, 0x00, 0x41, 0x00,	// B83A
+	0x42, 0x00, 0x33, 0x00, 0x36, 0x00, 0x37, 0x00,	// B367
+	0x45, 0x00, 0x37, 0x00, 0x31, 0x00, 0x39, 0x00,	// E719
+	0x34, 0x00, 0x42, 0x00, 0x38, 0x00, 0x30, 0x00,	// 4B80 
+	0x38, 0x00, 0x46, 0x00, 0x30, 0x00, 0x35, 0x00,	// 8F05
+	0x34, 0x00, 0x34, 0x00, 0x31, 0x00, 0x32, 0x00,	// 4412
+	0x37, 0x00, 0x33, 0x00, 0x41, 0x00, 0x37, 0x00,	// 73A7
+	0x41, 0x00, 0x36, 0x00, 0x34, 0x00, 0x42, 0x00,	// A64B
+	0x00, 0x00
+};
 
-#define LICENSE_PACKET_CODE	L"B83AB367E7194b808F05441273A7A64B"
-#define LICENSE_ARCHIVE_CODE	L"8F93139804E94368B3D6C2F96F772A62"
-#define VERIFY_DATA_CODE		L"5C6A795104CF4364AE2E180E33DADB9A"
+//8F93139804E94368B3D6C2F96F772A62
+unsigned int SoftwareServer::license_archive_code_int[] = {
+	0x38, 0x00, 0x46, 0x00, 0x39, 0x00, 0x33, 0x00,	// 8F93
+	0x31, 0x00, 0x33, 0x00, 0x39, 0x00, 0x38, 0x00,	// 1398
+	0x30, 0x00, 0x34, 0x00, 0x45, 0x00, 0x39, 0x00,	// 04E9
+	0x34, 0x00, 0x33, 0x00, 0x36, 0x00, 0x38, 0x00,	// 4368 
+	0x42, 0x00, 0x33, 0x00, 0x44, 0x00, 0x36, 0x00,	// B3D6
+	0x43, 0x00, 0x32, 0x00, 0x46, 0x00, 0x39, 0x00,	// C2F9
+	0x36, 0x00, 0x46, 0x00, 0x37, 0x00, 0x37, 0x00,	// 6F77
+	0x32, 0x00, 0x41, 0x00, 0x36, 0x00, 0x32, 0x00,	// 2A62
+	0x00, 0x00
+};
+
+//5C6A795104CF4364AE2E180E33DADB9A
+unsigned int SoftwareServer::license_verify_data_code_int[] = {
+	0x35, 0x00, 0x43, 0x00, 0x36, 0x00, 0x41, 0x00,	// 5C6A
+	0x37, 0x00, 0x39, 0x00, 0x35, 0x00, 0x31, 0x00,	// 7951
+	0x30, 0x00, 0x34, 0x00, 0x43, 0x00, 0x46, 0x00,	// 04CF
+	0x34, 0x00, 0x33, 0x00, 0x36, 0x00, 0x34, 0x00,	// 4364 
+	0x41, 0x00, 0x45, 0x00, 0x32, 0x00, 0x45, 0x00,	// AE2E
+	0x31, 0x00, 0x38, 0x00, 0x30, 0x00, 0x45, 0x00,	// 180E
+	0x33, 0x00, 0x33, 0x00, 0x44, 0x00, 0x41, 0x00,	// 33DA
+	0x44, 0x00, 0x42, 0x00, 0x39, 0x00, 0x41, 0x00,	// DB9A
+	0x00, 0x00
+};
 
 
 SoftwareServer::SoftwareServer():
@@ -71,6 +105,22 @@ SoftwareServer::SoftwareServer():
 	SoftwareLicenseLock(CreateMutex(0,0,0)),
 	bFirstTime(true)
 {
+//BYTE serialByte[] = {
+//						0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x4e, 0x00, 0x75, 0x00, 0x6d, 0x00, 0x62, 0x00, 0x65, 0x00, 0x72, 0x00, 0x00, 0x00
+//					};
+//BYTE wmiQuery_SerialByte[] = {
+//0x43, 0x00, 0x39, 0x00, 0x33, 0x00, 0x37, 0x00,	//C937
+//0x39, 0x00, 0x44, 0x00, 0x41, 0x00, 0x36, 0x00, //9DA6
+//0x30, 0x00, 0x37, 0x00, 0x37, 0x00, 0x36, 0x00,	//0776
+//0x34, 0x00, 0x36, 0x00, 0x35, 0x00, 0x38, 0x00,	//4658
+//0x38, 0x00, 0x37, 0x00, 0x33, 0x00, 0x38, 0x00,	//8738
+//0x35, 0x00, 0x31, 0x00, 0x38, 0x00, 0x42, 0x00,	//518B
+//0x33, 0x00, 0x45, 0x00, 0x42, 0x00, 0x44, 0x00,	//3EBD
+//0x36, 0x00, 0x37, 0x00, 0x41, 0x00, 0x46, 0x00,	//67AF
+//0x00, 0x00
+//};
+//OutputDebugString((wchar_t*)wmiQuery_SerialByte);
+//OutputDebugString(L"C9379DA6077646588738518B3EBD67AF");
 	if(g_pSoftwareSpec == NULL)
 		g_pSoftwareSpec = new GlobalSoftwareSpec();
 	//Use Global SoftwareSpec - Only need to do once
@@ -110,7 +160,7 @@ HRESULT SoftwareServer::AddApplicationInstance(long productID, BSTR license_id, 
 HRESULT SoftwareServer::RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	return licCache.RemoveApplicationInstance(productID, license_id, application_instance);;
+	return licCache.RemoveApplicationInstance(productID, license_id, application_instance);
 }
 HRESULT SoftwareServer::GetApplicationInstanceList(long productID, BSTR license_id, BSTR *pBstrListAppInstStream)
 {
@@ -222,12 +272,12 @@ if(bFirstTime)
 }
 
 
-HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
-{
-//OutputDebugString(L"SoftwareServer::ValidateLicense()");
-	SafeMutex mutex(SoftwareLicenseLock);
-	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
-}
+//HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
+//{
+////OutputDebugString(L"SoftwareServer::ValidateLicense()");
+//	SafeMutex mutex(SoftwareLicenseLock);
+//	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
+//}
 HRESULT SoftwareServer::ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
@@ -338,12 +388,22 @@ HRESULT SoftwareServer::GetSoftwareLicenseInfoByProduct_ByLicense(BSTR softwareL
 HRESULT SoftwareServer::GetSoftwareLicenseInfo_ByLicense(BSTR softwareLicense, BSTR *pBstrLicenseInfoAttribsStream)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	HRESULT hr = E_FAIL;
+	HRESULT hr = S_OK;
 
 	Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
 	hr = GetSoftwareLicenseInfo_ByLicenseInternal(softwareLicense, &tmpLicInfoAttribs);
 	if(SUCCEEDED(hr))
-		*pBstrLicenseInfoAttribsStream = SysAllocString(tmpLicInfoAttribs.ToString().c_str());
+	{
+		//Update Cache if the Software License is not in cache, or the modified date is different
+		if(swLicStreamedCacheMap.find(softwareLicense) == swLicStreamedCacheMap.end() || 
+			_wcsicmp(swLicStreamedCacheMap[softwareLicense].first.c_str(), std::wstring(tmpLicInfoAttribs.modifiedDate).c_str()) != 0)
+		{
+			swLicStreamedCacheMap[softwareLicense].first = tmpLicInfoAttribs.modifiedDate;
+			swLicStreamedCacheMap[softwareLicense].second = tmpLicInfoAttribs.ToString().c_str();	//This call will take a long time when the License Info object is big.
+		}
+	}
+	*pBstrLicenseInfoAttribsStream = SysAllocString(swLicStreamedCacheMap.find(softwareLicense)->second.second.c_str());
+
 	return hr;
 }
 
@@ -491,7 +551,11 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 	wchar_t delimiter[] = L"\1";
 
 	// write the magic number
-	packet_string += LICENSE_PACKET_CODE;
+	_bstr_t bstr_license_packet_code;
+	bstr_license_packet_code = (wchar_t*)(&license_packet_code_int[0]);
+	for(int idx=1; idx<32; idx++)
+		bstr_license_packet_code += (wchar_t*)(&license_packet_code_int[2*idx]);
+	packet_string += bstr_license_packet_code;
 	packet_string += delimiter;
 
 	// write the expiration date
@@ -692,8 +756,11 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		//Can't use "\r\n" as a delimiter, c++ ToString() for license attribs adds "\n" for xml separation, the c# ToString uses " "
 		wchar_t delimiter[] = L"\1";
 
-//Think about changing this magic number, same as in key password packets
-		if (!(pToken = wcstok_s(pPacketString1, delimiter, &pNextToken)) || wcscmp(pToken,LICENSE_PACKET_CODE)!=0) 
+		_bstr_t bstr_license_packet_code;
+		bstr_license_packet_code = (wchar_t*)(&license_packet_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_packet_code += (wchar_t*)(&license_packet_code_int[2*idx]);
+		if (!(pToken = wcstok_s(pPacketString1, delimiter, &pNextToken)) || wcscmp(pToken,bstr_license_packet_code)!=0) 
 			throw E_INVALIDARG;
 
 
@@ -827,7 +894,11 @@ HRESULT SoftwareServer::GenerateVerifyDataWithVerCode_ByLicense(BSTR softwareLic
 		licensePackageAttribs.licLicenseInfoAttribs.modifiedDate = std::wstring(timestamp);
 	
 		BSTR bstrLicAttribsStream = SysAllocString(licensePackageAttribs.ToString().c_str());
-		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(VERIFY_DATA_CODE, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicensePacket);
+		_bstr_t bstr_license_verify_data_code;
+		bstr_license_verify_data_code = (wchar_t*)(&license_verify_data_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_verify_data_code += (wchar_t*)(&license_verify_data_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(bstr_license_verify_data_code, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicensePacket);
 		SysFreeString(bstrLicAttribsStream);
 		if(FAILED(hr))
 			throw hr;
@@ -868,7 +939,11 @@ HRESULT SoftwareServer::GenerateVerifyDataWithLicInfo_ByLicense(BSTR softwareLic
 		licensePackageAttribs.licLicenseInfoAttribs.modifiedDate = std::wstring(timestamp);
 
 		BSTR bstrLicAttribsStream = SysAllocString(licensePackageAttribs.ToString().c_str());
-		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(VERIFY_DATA_CODE, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicensePacket);
+		_bstr_t bstr_license_verify_data_code;
+		bstr_license_verify_data_code = (wchar_t*)(&license_verify_data_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_verify_data_code += (wchar_t*)(&license_verify_data_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(bstr_license_verify_data_code, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicensePacket);
 		SysFreeString(bstrLicAttribsStream);
 		if(FAILED(hr))
 			throw hr;
@@ -899,7 +974,7 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 			SafeMutex mutex1(pRainbowDriver->keys_lock);
 			pRainbowDriver->RefreshKeyList();
 			
-			wchar_t tmpbuf[1024];
+			//wchar_t tmpbuf[1024];
 			unsigned short shortValue;
 			byte valueByte[16];
 			int arrayIdx = 0;
@@ -1014,17 +1089,34 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 		}
 
 		WMIHelper::ResultsType NetworkAdaptersList;
-		WMIHelper wmi(L"\\\\localhost\\root\\cimv2");
+		// Hide the string so it doesn't appear in the strings of the image - "\\localhost\root\cimv2"
+		BYTE wmiLocation_Byte[] = {
+			0x5c, 0x00, 0x5c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x63, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x68, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x72, 0x00,
+			0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x63, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x76, 0x00, 0x32, 0x00, 0x00, 0x00
+		};
+		WMIHelper wmi((wchar_t*)wmiLocation_Byte);
 		hr = wmi.Connect();
 		if(SUCCEEDED(hr))
 		{
 			// gather processor information
-			hr = wmi.ExecuteQuery(L"SELECT MACAddress FROM Win32_NetworkAdapterConfiguration Where IPEnabled = True", NetworkAdaptersList);
+			// Hide the string so it doesn't appear in the strings of the image - "SELECT MACAddress FROM Win32_NetworkAdapterConfiguration Where IPEnabled = True
+			BYTE wmiQuery_MacAddressByte[] = {
+				0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x4d, 0x00, 0x41, 0x00, 0x43, 0x00, 0x41, 0x00, 0x64, 0x00, 0x64, 0x00, 0x72, 0x00, 0x65, 0x00, 0x73, 0x00,
+				0x73, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x4e, 0x00, 0x65, 0x00, 0x74, 0x00,
+				0x77, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6b, 0x00, 0x41, 0x00, 0x64, 0x00, 0x61, 0x00, 0x70, 0x00, 0x74, 0x00, 0x65, 0x00, 0x72, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x66, 0x00, 0x69, 0x00,
+				0x67, 0x00, 0x75, 0x00, 0x72, 0x00, 0x61, 0x00, 0x74, 0x00, 0x69, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x20, 0x00, 0x57, 0x00, 0x68, 0x00, 0x65, 0x00, 0x72, 0x00, 0x65, 0x00, 0x20, 0x00, 0x49, 0x00,
+				0x50, 0x00, 0x45, 0x00, 0x6e, 0x00, 0x61, 0x00, 0x62, 0x00, 0x6c, 0x00, 0x65, 0x00, 0x64, 0x00, 0x20, 0x00, 0x3d, 0x00, 0x20, 0x00, 0x54, 0x00, 0x72, 0x00, 0x75, 0x00, 0x65, 0x00, 0x00, 0x00
+			};
+			hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_MacAddressByte, NetworkAdaptersList);
 			if(SUCCEEDED(hr) && NetworkAdaptersList.size()>0)
 			{
 				for (unsigned int idx=0; idx<NetworkAdaptersList.size(); ++idx)
 				{
-					VARIANT* pvtMacAddress = &NetworkAdaptersList[idx][L"MACAddress"];
+					// Hide the string so it doesn't appear in the strings of the image - "MACAddress"
+					BYTE macAddressByte[] = {
+						0x4d, 0x00, 0x41, 0x00, 0x43, 0x00, 0x41, 0x00, 0x64, 0x00, 0x64, 0x00, 0x72, 0x00, 0x65, 0x00, 0x73, 0x00, 0x73, 0x00, 0x00, 0x00
+					};
+					VARIANT* pvtMacAddress = &NetworkAdaptersList[idx][(wchar_t*)macAddressByte];
 					if (pvtMacAddress->vt == VT_BSTR)
 						sysInfoAttribs.macAddressList->push_back(std::wstring(pvtMacAddress->bstrVal));
 				}
@@ -1038,12 +1130,22 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 		{
 			// gather processor information
 			WMIHelper::ResultsType BiosList;
-			hr = wmi.ExecuteQuery(L"SELECT SerialNumber FROM Win32_BIOS", BiosList);
+			// Hide the string so it doesn't appear in the strings of the image - "SELECT SerialNumber FROM Win32_BIOS"
+			BYTE wmiQuery_SerialByte[] = {
+				0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x4e, 0x00, 0x75, 0x00, 0x6d, 0x00,
+				0x62, 0x00, 0x65, 0x00, 0x72, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x42, 0x00,
+				0x49, 0x00, 0x4f, 0x00, 0x53, 0x00, 0x00
+			};
+			hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_SerialByte, BiosList);
 			if(SUCCEEDED(hr) && BiosList.size()>0)
 			{
 				for (unsigned int idx=0; idx<BiosList.size(); ++idx)
 				{
-					VARIANT* pvtBiosSerialNumber = &BiosList[idx][L"SerialNumber"];
+					// Hide the string so it doesn't appear in the strings of the image - "SerialNumber"
+					BYTE serialByte[] = {
+						0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x4e, 0x00, 0x75, 0x00, 0x6d, 0x00, 0x62, 0x00, 0x65, 0x00, 0x72, 0x00, 0x00, 0x00
+					};
+					VARIANT* pvtBiosSerialNumber = &BiosList[idx][(wchar_t*)serialByte];
 					if (pvtBiosSerialNumber->vt == VT_BSTR)
 					{
 						sysInfoAttribs.biosSerialNumberList->push_back(std::wstring(pvtBiosSerialNumber->bstrVal));
@@ -1053,16 +1155,17 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 				BiosList.clear();
 			}
 		}
-
-
-
-
+		licSystemAttribs.Streamed_SoftwareSpecAttribs = std::wstring(g_pSoftwareSpec->GetSoftwareSpec().ToString());
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
 
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
 //OutputDebugString(bstrLicAttribsStream);
 
-		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(VERIFY_DATA_CODE, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicSysDataPacket);
+		_bstr_t bstr_license_verify_data_code;
+		bstr_license_verify_data_code = (wchar_t*)(&license_verify_data_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_verify_data_code += (wchar_t*)(&license_verify_data_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(bstr_license_verify_data_code, crypto_key_verify_data_private, sizeof(crypto_key_verify_data_private)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicSysDataPacket);
 		SysFreeString(bstrLicAttribsStream);
 
 		if(FAILED(hr))
@@ -1084,7 +1187,11 @@ HRESULT SoftwareServer::GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataP
 	try
 	{
 		SafeMutex mutex(SoftwareLicenseLock);
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(VERIFY_DATA_CODE, crypto_key_verify_data_public, sizeof(crypto_key_verify_data_public)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), vtLicSysDataPacket, pBstrLicSysDataAttribsStream);
+		_bstr_t bstr_license_verify_data_code;
+		bstr_license_verify_data_code = (wchar_t*)(&license_verify_data_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_verify_data_code += (wchar_t*)(&license_verify_data_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_verify_data_code, crypto_key_verify_data_public, sizeof(crypto_key_verify_data_public)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), vtLicSysDataPacket, pBstrLicSysDataAttribsStream);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1102,7 +1209,11 @@ HRESULT SoftwareServer::GenerateLicPackage_ByVerifyData(VARIANT vtVerifyData, BS
 	try
 	{
 		SafeMutex mutex(SoftwareLicenseLock);
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(VERIFY_DATA_CODE, crypto_key_verify_data_public, sizeof(crypto_key_verify_data_public)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), vtVerifyData, pBstrLicensePackageAttribsStream);
+		_bstr_t bstr_license_verify_data_code;
+		bstr_license_verify_data_code = (wchar_t*)(&license_verify_data_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_verify_data_code += (wchar_t*)(&license_verify_data_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_verify_data_code, crypto_key_verify_data_public, sizeof(crypto_key_verify_data_public)/sizeof(BYTE), crypto_key_verify_data_password, sizeof(crypto_key_verify_data_password)/sizeof(BYTE), vtVerifyData, pBstrLicensePackageAttribsStream);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1121,7 +1232,11 @@ HRESULT SoftwareServer::GenerateLicPackage_BySoftwareLicArchive(VARIANT vtLicens
 	try
 	{
 		SafeMutex mutex(SoftwareLicenseLock);
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(LICENSE_ARCHIVE_CODE, crypto_key_license_archive_public, sizeof(crypto_key_license_archive_public)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), vtLicenseArchive, pBstrLicensePackageAttribsStream);
+		_bstr_t bstr_license_archive_code;
+		bstr_license_archive_code = (wchar_t*)(&license_archive_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_archive_code += (wchar_t*)(&license_archive_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_archive_code, crypto_key_license_archive_public, sizeof(crypto_key_license_archive_public)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), vtLicenseArchive, pBstrLicensePackageAttribsStream);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1139,7 +1254,11 @@ HRESULT SoftwareServer::GenerateLicPackage_BySoftwareLicPacket(VARIANT vtLicense
 	try
 	{
 		SafeMutex mutex(SoftwareLicenseLock);
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(LICENSE_PACKET_CODE, crypto_key_password_packet_public, sizeof(crypto_key_password_packet_public)/sizeof(BYTE), crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password)/sizeof(BYTE), vtLicensePacket, pBstrLicensePackageAttribsStream, true/*bExpectDateInByteArray*/);
+		_bstr_t bstr_license_packet_code;
+		bstr_license_packet_code = (wchar_t*)(&license_packet_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_packet_code += (wchar_t*)(&license_packet_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_packet_code, crypto_key_password_packet_public, sizeof(crypto_key_password_packet_public)/sizeof(BYTE), crypto_key_password_packet_password, sizeof(crypto_key_password_packet_password)/sizeof(BYTE), vtLicensePacket, pBstrLicensePackageAttribsStream, true/*bExpectDateInByteArray*/);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1418,7 +1537,11 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 		licensePackageAttribs.licLicenseInfoAttribs.modifiedDate = std::wstring(timestamp);
 
 		BSTR bstrLicAttribsStream = SysAllocString(licensePackageAttribs.ToString().c_str());
-		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(LICENSE_ARCHIVE_CODE, crypto_key_license_archive_private, sizeof(crypto_key_license_archive_private)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicArchive);
+		_bstr_t bstr_license_archive_code;
+		bstr_license_archive_code = (wchar_t*)(&license_archive_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_archive_code += (wchar_t*)(&license_archive_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(bstr_license_archive_code, crypto_key_license_archive_private, sizeof(crypto_key_license_archive_private)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), bstrLicAttribsStream, pVtLicArchive);
 		SysFreeString(bstrLicAttribsStream);
 		if(FAILED(hr))
 			throw hr;
@@ -1442,6 +1565,9 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 					delete swLicMgrIt->second;
 					swLicMgrIt->second = NULL;
 					softwareLicMgrMap.erase(swLicMgrIt);
+
+					g_licenseController.GenerateMessage(tmpBstrLicName, MT_INFO, S_OK, time(0), MessageGeneric, L"Successfully generated License Archive from Software License. The original Software License has been removed. This License Archive can be transferred to another system.");
+					SysFreeString(tmpBstrLicName);
 					break;
 				}
 				SysFreeString(tmpBstrLicName);
@@ -1470,7 +1596,11 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 		SafeMutex mutex(SoftwareLicenseLock);
 		
 		BSTR bstrLicensePackageAttribsStream = 0;
-		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(LICENSE_ARCHIVE_CODE, crypto_key_license_archive_public, sizeof(crypto_key_license_archive_public)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), vtLicArchive, &bstrLicensePackageAttribsStream);
+		_bstr_t bstr_license_archive_code;
+		bstr_license_archive_code = (wchar_t*)(&license_archive_code_int[0]);
+		for(int idx=1; idx<32; idx++)
+			bstr_license_archive_code += (wchar_t*)(&license_archive_code_int[2*idx]);
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(bstr_license_archive_code, crypto_key_license_archive_public, sizeof(crypto_key_license_archive_public)/sizeof(BYTE), crypto_key_license_archive_password, sizeof(crypto_key_license_archive_password)/sizeof(BYTE), vtLicArchive, &bstrLicensePackageAttribsStream);
 		if(FAILED(hr))
 			throw hr;
 
@@ -1542,6 +1672,11 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 		if(bCreatedPSoftwareLicMgr)
 		{
 			softwareLicMgrMap.insert(SoftwareLicList::value_type(_bstr_t(szPath) + newLicenseFile, pSoftwareLicMgr));
+			BSTR tmpBstrLicName;
+			hr = pSoftwareLicMgr->GetSoftwareLicenseName(&tmpBstrLicName);
+			g_licenseController.GenerateMessage(SUCCEEDED(hr) ? tmpBstrLicName : L"", MT_INFO, S_OK, time(0), MessageGeneric, L"Successfully generated Software License from License Archive.  License transfer complete.");
+			if(SUCCEEDED(hr))
+			SysFreeString(tmpBstrLicName);
 		}
 	}
 	catch (HRESULT &ehr)
@@ -2569,9 +2704,13 @@ HRESULT SoftwareServer::TimesUp()
 				if(bSendReminder)
 				{
 					//Generate Message to send
-					wchar_t wMsg[0x2000];
+					static const int MAX_MESSAGE_SIZE = 0x2000;
+					static const int MAX_MESSAGE_SIZE_TO_CUT = 0x1700;
+					wchar_t wMsg[MAX_MESSAGE_SIZE];
 					wMsg[0] = 0;
-
+					size_t stCurrentBufferSize(0);
+					size_t stAdditionBufferSize(0);
+					bool bShowMessage(true);
 					int tmpProductID = prodReminderMapIt->first;
 					for(	ModuleIdToExpirationDateList::iterator modIt = prodReminderMapIt->second.modIdToExpDateList.begin();
 							modIt != prodReminderMapIt->second.modIdToExpDateList.end();
@@ -2582,14 +2721,25 @@ HRESULT SoftwareServer::TimesUp()
 						SYSTEMTIME timeSystime;
 						VariantTimeToSystemTime(vtTimestamp.date, &timeSystime);
 						wchar_t wTimeStamp[256];
-						TimeHelper::SystemTimeToString(wTimeStamp, sizeof(wTimeStamp)/sizeof(wchar_t), timeSystime, false);
+						TimeHelper::SystemTimeToString(wTimeStamp, _countof(wTimeStamp), timeSystime, false);
 						time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-						wchar_t wTmpBuf[256];
-						if(currentTimeDateTimeT < modIt->second)	//Module will expire soon
-							_snwprintf_s(wTmpBuf, sizeof(wTmpBuf)/sizeof(wchar_t), L"  Module: %s (%0d) - Will Expire at: %s\n", Lic_PackageAttribsHelper::GetModuleName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first, modIt->first).c_str(), modIt->first, wTimeStamp);
-						else	//Module has expired already
-							_snwprintf_s(wTmpBuf, sizeof(wTmpBuf)/sizeof(wchar_t), L"  Module: %s (%0d) - Expired On: %s\n", Lic_PackageAttribsHelper::GetModuleName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first, modIt->first).c_str(), modIt->first, wTimeStamp);
-						wcscat_s(wMsg, sizeof(wMsg)/sizeof(wchar_t), wTmpBuf);
+						
+						if(bShowMessage)
+						{
+							wchar_t wTmpBuf[256];
+							wTmpBuf[0] = 0;
+							if(currentTimeDateTimeT < modIt->second)	//Module will expire soon
+								stAdditionBufferSize = _snwprintf_s(wTmpBuf, _countof(wTmpBuf), L"  Module: %s (%0d) - Will Expire at: %s\n", Lic_PackageAttribsHelper::GetModuleName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first, modIt->first).c_str(), modIt->first, wTimeStamp);
+							else	//Module has expired already
+								stAdditionBufferSize = _snwprintf_s(wTmpBuf, _countof(wTmpBuf), L"  Module: %s (%0d) - Expired On: %s\n", Lic_PackageAttribsHelper::GetModuleName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first, modIt->first).c_str(), modIt->first, wTimeStamp);
+							if(stCurrentBufferSize + stAdditionBufferSize > MAX_MESSAGE_SIZE_TO_CUT)
+							{
+								_snwprintf_s(wTmpBuf, _countof(wTmpBuf), L"  Use License Viewer for the rest of the modules that are Expired or close to Expiring");
+								bShowMessage = false;
+							}
+							stCurrentBufferSize += stAdditionBufferSize;
+							wcscat_s(wMsg, wTmpBuf);
+						}
 					}
 
 					//Set Message for exp date
@@ -2600,19 +2750,18 @@ HRESULT SoftwareServer::TimesUp()
 						SYSTEMTIME timeSystime;
 						VariantTimeToSystemTime(vtTimestamp.date, &timeSystime);
 						wchar_t wTimeStamp[256];
-						TimeHelper::SystemTimeToString(wTimeStamp, sizeof(wTimeStamp)/sizeof(wchar_t), timeSystime, false);
+						TimeHelper::SystemTimeToString(wTimeStamp, _countof(wTimeStamp), timeSystime, false);
 
 						time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
 						wchar_t wTmpBuf[256];
 						BSTR bstrTmpSoftwareLicense;
 						swLicMgrIt->second->GetSoftwareLicenseName(&bstrTmpSoftwareLicense);
 						if(currentTimeDateTimeT < prodReminderMapIt->second.swExpDate)	//Software License is valid
-							_snwprintf_s(wTmpBuf, sizeof(wTmpBuf)/sizeof(wchar_t), L"\nLicense: %s is valid until: %s\n", bstrTmpSoftwareLicense, wTimeStamp);
+							_snwprintf_s(wTmpBuf, _countof(wTmpBuf), L"\nLicense: %s is valid until: %s\n", bstrTmpSoftwareLicense, wTimeStamp);
 						else	//Software License is invalid
-							_snwprintf_s(wTmpBuf, sizeof(wTmpBuf)/sizeof(wchar_t), L"\nLicense: %s has been invalid since: %s\n", bstrTmpSoftwareLicense, wTimeStamp);
+							_snwprintf_s(wTmpBuf, _countof(wTmpBuf), L"\nLicense: %s has been invalid since: %s\n", bstrTmpSoftwareLicense, wTimeStamp);
 						SysFreeString(bstrTmpSoftwareLicense);
-						wcscat_s(wMsg, sizeof(wMsg)/sizeof(wchar_t), wTmpBuf);
-						
+						wcscat_s(wMsg, wTmpBuf);
 					}
 					if(prodReminderMapIt->second.modIdToExpDateList.size() > 0)
 					{

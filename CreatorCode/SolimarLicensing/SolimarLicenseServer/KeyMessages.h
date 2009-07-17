@@ -78,6 +78,8 @@ static const unsigned int MessagePasswordSPDPPM2 = 36;
 // softwareLicenseServer - module expiration
 static const unsigned int MessageSoftwareModuleExpiration = 37;
 
+// generic message
+static const unsigned int MessageGeneric = 38;
 
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
@@ -137,8 +139,8 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageKeysNoBaseKey*/ L"Unable to locate a Base Key on the Server, all keys on Server \"%s\" will be ignored.",
 	
 //backup key server messages
-	/*MessageKeysRestoreKeyServer*/	L"Licensing has been restored on Key Server \"%s\".",
-	/*MessageKeysUseBackupKeyServer*/	L"Unable to validate licensing on Key Server \"%s\", switching to Backup Key Server \"%s\".",
+	/*MessageKeysRestoreKeyServer*/	L"Licensing has been restored on License Server: %s.",
+	/*MessageKeysUseBackupKeyServer*/	L"Unable to validate licensing on License Server %s, switching to Backup License Server: %s.",
 
 // entering passwords2
 	/*MessagePasswordRemote*/	L"Password Correct. Key now licensed for remote access.",
@@ -148,6 +150,9 @@ static const wchar_t* LicensingMessageStringTable[256] =
 
 //softwareLicenseServer - module expiration
 	/*MessageSoftwareModuleExpiration*/ L"Warning, Product: %s (%d)\n%s\n",
+
+//MessageGeneric
+	/*MessageGeneric*/ L"%s",
 
 // general errors
 	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
