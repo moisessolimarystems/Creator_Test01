@@ -8,10 +8,7 @@
 //				  create a new project via. step-by step instructions use the
 //				  Project Assistant.
 //
-//===========================================================================
-
- 
-    
+//===========================================================================   
 // Included header files ----------------------------------------------------
 #include "ifx.h"  
 
@@ -28,7 +25,7 @@
 // The argument it accepts must be a handle to the Installer database.
     
 /* export prototype MyFunction(HWND); */      
-           
+prototype CheckRequirements();           
                          
 // Global Variables
 // Since we don't know the lengths of the directory paths or the length of the
@@ -38,7 +35,43 @@
 STRING      	gsvSetupType, gsvDir;    
 NUMBER			gUnInstallType; 
 STRING SETUPEXEDIR[MAX_PATH + 1];    
-                                                         
+  
+//=============================================================================
+//
+// Function:  	CheckRequirements
+// Purpose:  	This function checks all minimum requirements for the
+//            	application being installed.  If any fail, then the user
+//            	is informed and the setup is terminated. 
+// Parameters:	None
+// Returns:		None
+//
+//=============================================================================
+function CheckRequirements()
+begin                      
+    //Re-initialize INSTALLDIR since PROGRAMFILES doesn't automatically account for 64bit folders.
+    //don't allow install on systems that have solimar license server
+    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE); 
+    if(RegDBKeyExist("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall" ^ LICENSESERVER2_PRODUCTCODE) = 1) then
+    	MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+    	abort;
+    else
+	   	if(SYSINFO.bIsWow64) then
+			REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
+		endif;     
+	    if(RegDBKeyExist("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall" ^ LICENSESERVER2_PRODUCTCODE) = 1) then
+	        MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+	        abort;
+	    endif;	
+	 	if(SYSINFO.bIsWow64) then
+	 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
+	 	endif;    	
+    endif;
+	
+   	if(SYSINFO.bIsWow64) then            
+   		//Set INSTALLDIR to use the correct program files folder for x64
+   		INSTALLDIR = PROGRAMFILES64 ^ "Solimar Systems\\License Creator";   		
+   	endif;   	                           		   	                                                
+end;                                                          
                             
 //---------------------------------------------------------------------------
 // OnBegin
@@ -57,6 +90,7 @@ begin
 
     // Initialization Steps.  
     InitLicensing();
+   	CheckRequirements();
    	
     // Initialize global structure for Uninstall information.
     UNINSTALL_STRING = UNINSTALL_STRING + "UNINSTALL";     
@@ -160,7 +194,22 @@ Dlg_SdFeatureDialog2:
         	ListAddString(listStartCopy, "              Server feature selected.", AFTER);  
         	/** End Setup Type Information **/ 
 		endif;
-    endif; 
+    endif;         
+
+Dlg_SdUserLoginCustomDlg:   
+	if(FeatureIsItemSelected (MEDIA,  "Server")) then     
+		szTitle = "Specify Login Info for " + @PRODUCT_NAME + " Service";
+		nResult = SdUserLoginCustomDlg(szTitle, szSubTitle, szMsg); 
+		StrReplace (IFX_NETAPI_PASSWORD, "\"", "\\\"", 0 );
+		OnLogonUserSetMsiProperties();
+		if(nResult = BACK) then  
+		    if(nSetupType = CUSTOM) then
+			 	goto Dlg_SdFeatureDialog2;         
+			else    
+				goto Dlg_SetupType;  
+			endif;
+		endif;
+	endif;
     
 Dlg_SdStartCopy:
     szTitle = "";
@@ -170,7 +219,15 @@ Dlg_SdStartCopy:
     ListDestroy(listStartCopy);
 	
 	if (nResult = BACK) then  
-    	goto Dlg_SetupType;    	
+    	if(FeatureIsItemSelected (MEDIA,  "Server")) then   
+    		goto Dlg_SdUserLoginCustomDlg;    	
+    	else  
+    		if(nSetupType = CUSTOM) then
+    			goto Dlg_SdFeatureDialog2;
+    		else   
+    			goto Dlg_SetupType;
+    		endif; 
+    	endif;
     endif;
 
     // setup default status
@@ -268,8 +325,7 @@ function OnFirstUIAfter()
 begin
 	Disable(STATUSEX); 
 	      
-	//Start Creator Service.
-	_LaunchAppEx("net", " start Creator",WAIT, SW_HIDE, -1, nvExitCode);	                                                       	                                                        
+	//Start Creator Service.                                                     	                                                        
     if(FeatureIsItemSelected (MEDIA,  "Server")) then      
 	    SdShowMsg("Installing Licensing....", TRUE);                      
 	    InstallSentinelDriver();   
