@@ -185,7 +185,7 @@ namespace ValidationTokenRetriever
 
 		private void exportToFile()
 		{
-			globalSaveFileDialog.FileName = MakeFileNameSafe(companyTextBox.Text) + "-" + MakeFileNameSafe(compNameTextBox.Text) + "-" + MakeFileNameSafe("solimarValidationTokens") + ".csv";
+			globalSaveFileDialog.FileName = MakeFileNameSafe(companyTextBox.Text) + "-" + MakeFileNameSafe(compNameTextBox.Text) + ".svt.csv";
 			if (globalSaveFileDialog.ShowDialog() == DialogResult.OK)
 			{
 				using (System.IO.TextWriter txtWriter = new System.IO.StreamWriter(globalSaveFileDialog.OpenFile()))

@@ -149,6 +149,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="SolimarValidationToken_DisplayForm.resx">
+      <DependentUpon>SolimarValidationToken_DisplayForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestForm.resx">
       <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -170,6 +173,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="SolimarValidationToken_DisplayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SolimarValidationToken_DisplayForm.Designer.cs">
+      <DependentUpon>SolimarValidationToken_DisplayForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestForm.cs">
       <SubType>Form</SubType>
     </Compile>
