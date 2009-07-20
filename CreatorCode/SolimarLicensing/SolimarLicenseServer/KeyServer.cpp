@@ -121,7 +121,6 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 	{// obtain a lock on the driver's key list
 
 		KeyList tmpKeyList;
-		std::list<ProtectionKey*> deleteProtectionKeyList;
 		KeyServer::KeyList::iterator skeyIt;
 
 		{	//Scope for SafeMutex mutex2(KeyListLock);
@@ -132,7 +131,8 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 					skeyIt != keys.end();
 					skeyIt++)
 			{
-				tmpKeyList.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
+				// CR.11876 - Make a copy of the Protection Keys.
+				tmpKeyList.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
 			}
 		}
 
@@ -185,7 +185,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 			{
 				if (pRainbowDriver->keys.find(virtual_key_to_physical_key_list[skeyIt->first])==pRainbowDriver->keys.end())
 				{
-					deleteProtectionKeyList.insert(deleteProtectionKeyList.end(), skeyIt->second);
+					delete skeyIt->second;
 					skeyIt = tmpKeyList.erase(skeyIt);
 				}
 				else
@@ -223,6 +223,12 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
 			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
 			SafeMutex mutex2(KeyListLock);	
+			// CR.11876 - Replace the entire list of keys.  Delete old list
+			while(!keys.empty())
+			{
+				delete keys.begin()->second;
+				keys.erase(keys.begin());
+			}
 			for(	skeyIt = tmpKeyList.begin();
 					skeyIt != tmpKeyList.end();
 					skeyIt++)
@@ -230,14 +236,6 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 				keys.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
 			}
 			tmpKeyList.clear();
-			while(!deleteProtectionKeyList.empty())
-			{
-				skeyIt = keys.find((*deleteProtectionKeyList.begin())->GetPhysicalKeyIdent());
-				if(skeyIt != keys.end())
-					keys.erase(skeyIt);
-				delete *deleteProtectionKeyList.begin();
-				deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
-			}
 		}
 	} // release the lock on the driver's key list
 
