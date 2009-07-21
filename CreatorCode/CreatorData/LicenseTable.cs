@@ -271,9 +271,9 @@ namespace CreatorData
                         case 1:
                             //failover
                             var latestStdTransaction = db.TransactionTables.Where(t => t.taLicenseID.Equals(standardLicense.ID) &&
-                                                                              (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
+                                                                                 (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
                             var latestLicTransaction = db.TransactionTables.Where(t => t.taLicenseID.Equals(license.ID) &&
-                                                                              (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
+                                                                                 (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
                             if (latestLicTransaction == null && latestStdTransaction != null)
                                 return false;
                             if (latestLicTransaction != null && latestStdTransaction != null)
@@ -288,19 +288,22 @@ namespace CreatorData
                             //test dev
                             //find each order in TD/DR
                             //compare latest order transaction for TD/DR vs latest std order transaction
-                            //
+                            //licenseName
                             int standardOrder = 0;
+                            string stdOrderName;
                             var orders = db.OrderTables.Where(c => c.LicenseID.Equals(license.ID));
                             foreach (var order in orders)
                             {
                                 //issue -> corresponding order id for standard is necessary
+                                stdOrderName = (license.LicenseType.Equals(2)) ? order.OrderNumber.Replace("D", "S") : order.OrderNumber.Replace("T", "S");
                                 standardOrder = db.OrderTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
-                                                                          c.OrderNumber.Contains("S")).FirstOrDefault().ID;
+                                                                          c.OrderNumber.Equals(stdOrderName)).FirstOrDefault().ID;
                                 var stdTransaction = db.TransactionTables.Where(c => c.taLicenseID.Equals(standardLicense.ID) &&
                                                                                      c.taOrderID.Equals(standardOrder) &&
                                                                                      c.taType.Equals(2)).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
                                 var licTransaction = db.TransactionTables.Where(c => c.taLicenseID.Equals(license.ID) &&
                                                                                      c.taOrderID.Equals(order.ID) &&
+                                                                                     c.taPacketID.Equals(0) &&
                                                                                      c.taType.Equals(2)).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
 
                                 if (licTransaction == null && stdTransaction != null)

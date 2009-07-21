@@ -347,7 +347,7 @@ namespace Client.Creator
             deleteToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;
             if (DetailTreeView.SelectedNode.Tag is OrderProperty)
             {
-                if ((DetailTreeView.SelectedNode.Tag as OrderProperty).LicenseName.Contains("B"))
+                if ((DetailTreeView.SelectedNode.Tag as OrderProperty).LicenseName.Contains("F"))
                     deleteToolStripMenuItem.Enabled = false;
             }
         }
@@ -513,16 +513,19 @@ namespace Client.Creator
                     break;
                 case 2:            //level 2 - Product
                     LoadProductNode(e.Node);
+                    m_CurrentLicenseName = (e.Node.Parent.Tag as LicenseProperty).Name;
                     DetailPropertyGrid.Enabled = false;
                     break;
                 case 3:            //level 3 - Order
                     LoadProductNode(e.Node.Parent);
+                    m_CurrentLicenseName = (e.Node.Parent.Parent.Tag as LicenseProperty).Name;
                     LicenseProperty licProperty = e.Node.Parent.Parent.Tag as LicenseProperty;
                     if (licProperty.IsBackupLicenseType)
                         DetailPropertyGrid.Enabled = false;
                     break;
                 case 4:            //level 4 - AddOn Order
                     LoadProductNode(e.Node.Parent.Parent);
+                    m_CurrentLicenseName = (e.Node.Parent.Parent.Parent.Tag as LicenseProperty).Name;
                     LicenseProperty addOnLicense = e.Node.Parent.Parent.Parent.Tag as LicenseProperty;
                     if (addOnLicense.IsBackupLicenseType)
                         DetailPropertyGrid.Enabled = false;
@@ -681,7 +684,7 @@ namespace Client.Creator
                                 //if(selectedOrder.)
                                 //{
                                     dlvEditToolStripMenuItem.Enabled = true;
-                                    dlvDeleteToolStripMenuItem.Enabled = true;
+                                    dlvDeleteToolStripMenuItem.Enabled = (item.Tag as ModuleProperty).IsAllowedRemoveModule; ;
                                 //}
                             }
                         }
@@ -915,12 +918,21 @@ namespace Client.Creator
                      MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
+                TreeNode parentNode = DetailTreeView.SelectedNode.Parent;
+                int selectedIndex = DetailTreeView.SelectedNode.Index;
                 if (DetailTreeView.SelectedNode.Tag is CustomerProperty)
                     DeleteCustomerNode(DetailTreeView.SelectedNode);
                 if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
                     DeleteLicenseNode(DetailTreeView.SelectedNode);
                 if (DetailTreeView.SelectedNode.Tag is OrderProperty)
-                    DeleteOrderNode(DetailTreeView.SelectedNode);
+                    DeleteOrderNode(DetailTreeView.SelectedNode);                
+                if(parentNode.Nodes.Count > 0)
+                {
+                    if (selectedIndex == 0)
+                        DetailTreeView.SelectedNode = parentNode.Nodes[selectedIndex];
+                    else
+                        DetailTreeView.SelectedNode = parentNode.Nodes[selectedIndex - 1];
+                }
             }
         }
 
@@ -938,6 +950,7 @@ namespace Client.Creator
             //resort tree
             custNode.Nodes.Clear();
             LoadCustomerNode(custNode);
+            SetCustomerLicenseState(custNode);
             custNode.Text = string.Format("{0} ({1})", custNode.Name, custNode.Nodes.Count);            
             DetailTreeView.SelectedNode = custNode.Nodes.Find(newNode.Name, false).FirstOrDefault();
             DetailTreeView.EndUpdate();
@@ -1082,9 +1095,9 @@ namespace Client.Creator
             using (LicenseInfoForm dlg = new LicenseInfoForm("Modify Validation Token", ref s_CommLink))
             {
                 //disable modifying type                
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs tokenInfo = DetailListView.Items[selectedIndexes[0]].Tag as Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs;
+                ValidationProperty tokenInfo = DetailListView.Items[selectedIndexes[0]].Tag as ValidationProperty;
                 LicenseProperty selectedLicense =  DetailTreeView.SelectedNode.Tag as LicenseProperty;
-                TokenDialogData data = new TokenDialogData(new ValidationProperty(tokenInfo),selectedLicense);
+                TokenDialogData data = new TokenDialogData(tokenInfo,selectedLicense);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     Service<ICreator>.Use((client) =>
@@ -1123,25 +1136,25 @@ namespace Client.Creator
             bool bModified = false;
             DialogResult dlgResult = DialogResult.None;
             TokenTable token = null;
-            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs selectedToken;
+            ValidationProperty selectedToken;
             //Get Confirmation of Delete from User
             foreach (ListViewItem selectedItem in DetailListView.SelectedItems)
             {
-                selectedToken = selectedItem.Tag as Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs;
+                selectedToken = selectedItem.Tag as ValidationProperty;
                 if (DetailListView.Items.Count > 2)
-                    dlgResult = MessageBox.Show(string.Format("Please confirm delete token : {0}.", selectedToken.tokenType.GetAlias()), "Delete Token Confirmation",
+                    dlgResult = MessageBox.Show(string.Format("Please confirm delete token : {0}.", selectedToken.Name), "Delete Token Confirmation",
                                 MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 else
-                    dlgResult = MessageBox.Show(string.Format("Deleting token : {0} will disable license : {1}.\nClick OK to continue with deletion of token.", selectedToken.tokenType.GetAlias(), selectedLicense.Name), "Delete Token Confirmation",
+                    dlgResult = MessageBox.Show(string.Format("Deleting token : {0} will disable license : {1}.\nClick OK to continue with deletion of token.", selectedToken.Name, selectedLicense.Name), "Delete Token Confirmation",
                                 MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (dlgResult == DialogResult.OK)
                 {
-                    selectedLicense.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Remove(selectedToken);
+                    selectedLicense.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Remove(selectedToken.ValidationToken);
                     DetailListView.Items.Remove(selectedItem);
                     PopulateDetailListView(selectedLicense);
                     Service<ICreator>.Use((client) =>
                     {
-                        token = client.GetTokenByLicenseName(selectedLicense.Name, (byte)selectedToken.tokenType);
+                        token = client.GetTokenByLicenseName(selectedLicense.Name, (byte)selectedToken.TokenType);
                         if (token != null)
                         {
                             if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
@@ -1153,7 +1166,7 @@ namespace Client.Creator
                                 client.DeleteToken(token);
                         }
                     });
-                    CreateTransaction(TransactionType.License, selectedLicense.Name, string.Format("Removed Token - {0}", selectedToken.tokenType.GetAlias()), selectedToken.tokenValue);
+                    CreateTransaction(TransactionType.License, selectedLicense.Name, string.Format("Removed Token - {0}", selectedToken.Name), selectedToken.TokenValue);
                     bModified = true;
                 }
             }
@@ -1167,20 +1180,20 @@ namespace Client.Creator
         private void dlvRemoveModule(OrderProperty selectedOrder)
         {
             //module remove
-            Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
+            ModuleProperty module;
             foreach (ListViewItem selectedItem in DetailListView.SelectedItems)
             {
-                module = selectedItem.Tag as Lic_PackageAttribs.Lic_ModuleInfoAttribs;
-                if (!s_CommLink.IsDefaultModule(selectedOrder.Product.ID, module.moduleID.TVal))
+                module = selectedItem.Tag as ModuleProperty;
+                if (!s_CommLink.IsDefaultModule(selectedOrder.Product.ID, module.ID))
                 {
                     //set module to nothing 
-                    module.moduleValue.TVal = 0;
-                    module.moduleAppInstance.TVal = 0;
+                    module.Units = 0;
+                    module.AppInstance = 0;
                     //0 = name
                     //1 = value                        
-                    selectedItem.SubItems[1].Text = module.moduleValue.TVal.ToString();
+                    selectedItem.SubItems[1].Text = module.Units.ToString();
                 }
-                CreateTransaction(TransactionType.Product, selectedOrder, "Removed Module : {0}", s_CommLink.GetModuleName(selectedOrder.Product.ID, module.moduleID.TVal));
+                CreateTransaction(TransactionType.Product, selectedOrder, string.Format("Removed Module - {0}", s_CommLink.GetModuleName(selectedOrder.Product.ID, module.ID)), module.Units.ToString());
             }
             SaveLicense();
         }
@@ -1557,7 +1570,7 @@ namespace Client.Creator
                         dbProduct.moduleList.TVal.AddRange(orderData.Product.ModuleList.TVal);
                         dbProduct.product_Major.TVal = orderData.Product.Product.product_Major.TVal;
                         dbProduct.product_Minor.TVal = orderData.Product.Product.product_Minor.TVal;
-                        dbProduct.productAppInstance.TVal += orderData.Product.AppInstance;
+                        dbProduct.productAppInstance.TVal++; //= orderData.Product.AppInstance;
                         product = dbProduct;
                         bFound = true;
                         break;
@@ -1684,7 +1697,7 @@ namespace Client.Creator
                 LicenseTable licRec = client.GetLicenseByName(licData.Name, false);
                 Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                 licPackage.Stream = licRec.LicenseInfo;
-                OrderTable orderRec;
+                OrderTable orderRec, storedRec;
                 string replaceString = "";
                 if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
                     replaceString = "D";
@@ -1712,12 +1725,20 @@ namespace Client.Creator
                                 orderRec.ProductName = s_CommLink.GetProductName(product.productID.TVal);
                             }
                             client.CreateOrder(orderRec);
+                            storedRec = client.GetOrderByOrderName(string.Format("{0}-{1}", licData.Name, orderRec.OrderIndex));
+                            CreateTransaction(TransactionType.Order,
+                                              licData.Name,
+                                              string.Format("Added {0} Order - {1}", orderRec.ProductName, Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState),orderRec.OrderState)),
+                                              orderRec.OrderNumber);
                             //convert product into test/dev product for test/dev key
-
+                            client.UpdateSubLicenseTransactionsByOrder(orderRec.ID, storedRec.ID);
                             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in product.moduleList.TVal)
                             {
                                 if (module.contractNumber.TVal.Equals(orderNum))
+                                {
                                     module.contractNumber.TVal = orderRec.OrderNumber;
+                                    module.moduleExpirationDate.TVal = orderRec.ExpirationDate.Value;
+                                }
                             }
                             licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(product);
                         }
@@ -1742,6 +1763,7 @@ namespace Client.Creator
                 Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                 licPackage.Stream = licRec.LicenseInfo;
                 OrderTable orderRec, storedRec;
+                uint productID;
                 string replaceString = "";
                 if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
                     replaceString = "D";
@@ -1764,7 +1786,7 @@ namespace Client.Creator
                             if (storedRec != null)
                             {   //stored order exists, update - only update state
                                 storedRec.OrderState = orderRec.OrderState;
-                                //client.UpdateSubLicenseTransactionsByOrder(orderRec.ID, storedRec.ID);
+                                client.UpdateSubLicenseTransactionsByOrder(orderRec.ID, storedRec.ID);
                                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs stdModule in stdProduct.moduleList.TVal)
                                 {
                                     //need to update module in licPackage with values from stdModule
@@ -1772,16 +1794,17 @@ namespace Client.Creator
                                     {
                                         foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
                                         {
-                                            if (product.productID.TVal.Equals(stdProduct.productID.TVal))
+                                            productID = (replaceString.Equals("T")) ? s_CommLink.GetTestDevProductSpec(stdProduct.productID.TVal).productID.TVal : stdProduct.productID.TVal;
+                                            if (product.productID.TVal.Equals(productID))
                                             {
                                                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in product.moduleList.TVal)
                                                 {
                                                     if (module.contractNumber.TVal.Equals(orderNum.Replace("S", replaceString)) &&
-                                                       module.moduleID.TVal.Equals(stdModule.moduleID.TVal))
+                                                        module.moduleID.TVal.Equals(stdModule.moduleID.TVal))
                                                     {
                                                         module.moduleState.TVal = stdModule.moduleState.TVal;
                                                         module.moduleValue.TVal = stdModule.moduleValue.TVal;
-                                                        module.moduleExpirationDate.TVal = stdModule.moduleExpirationDate.TVal;
+                                                        module.moduleExpirationDate.TVal = storedRec.ExpirationDate.Value; //use current orders expiration date. //stdModule.moduleExpirationDate.TVal;
                                                         module.moduleAppInstance.TVal = stdModule.moduleAppInstance.TVal;
                                                         break;
                                                     }
@@ -1886,7 +1909,7 @@ namespace Client.Creator
                             }
                             client.CreateOrder(orderRec);
                             storedRec = client.GetOrderByOrderName(string.Format("{0}-{1}", licData.Name, orderRec.OrderIndex));
-                            //client.UpdateSubLicenseTransactionsByOrder(orderRec.ID, storedRec.ID);
+                            client.UpdateSubLicenseTransactionsByOrder(orderRec.ID, storedRec.ID);
                         }
                     }
                 }
@@ -1957,6 +1980,8 @@ namespace Client.Creator
                 {
                     if (product.productID.TVal.Equals(orderData.Product.ID))
                     {
+                        //decrement appinstance for product when removing an order
+                        product.productAppInstance.TVal--;
                         Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList moduleList = Lic_LicenseInfoAttribsHelper.GetModuleList_ByContractNumber(product, orderData.OrderNumber);
                         foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs mod in moduleList.TVal)
                         {
@@ -2325,16 +2350,26 @@ namespace Client.Creator
                 {
                     selectedLicense = licNode.Tag as LicenseProperty;
                     licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("License");
+                    licNode.ToolTipText = "";
                     if (selectedLicense.IsModified)
-                        licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("LicenseUpdate");          
-                    if (selectedLicense.IsStandardLicenseType)
+                    {
+                        licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("LicenseUpdate");
+                        licNode.ToolTipText = "Changes have been made to license. Generate license packet.";
+                    }
+                    if (!selectedLicense.IsStandardLicenseType)
                     {
                         //check to see if there are pending changes
                         if (selectedLicense.HasUpdates)
+                        {
                             licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("LicenseResync");
-                    }                        
+                            licNode.ToolTipText = "Standard license updates are available. Resync to apply changes.";
+                        }
+                    }
                     if (!(selectedLicense).IsEnabled) //disable key, not enough tokens
+                    {
                         licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("LicenseDisabled");
+                        licNode.ToolTipText = "Not enough validation tokens are set. Add a new validation token to enable license.";
+                    }
                 }
             }
         }
@@ -2360,7 +2395,7 @@ namespace Client.Creator
                             licenseNode.Name = licenseNode.Text;
                             licenseNode.Tag = new LicenseProperty(license, m_Permissions);
                             licenseNode.ImageIndex = GetDetailTreeViewIconIndex("License");
-                            licenseNode.SelectedImageIndex = licenseNode.ImageIndex;                                        
+                            licenseNode.SelectedImageIndex = licenseNode.ImageIndex;         
                             licenseNode.Nodes.Add(new VirtualTreeNode());
                             node.Nodes.Add(licenseNode);
                             if (m_searchString.Length > 0)
@@ -3356,6 +3391,7 @@ namespace Client.Creator
             ResyncSelectedLicense(selectedLicense);
             LoadCustomerNode(DetailTreeView.SelectedNode.Parent);
             LoadLicenseNode(DetailTreeView.SelectedNode);
+            SetCustomerLicenseState(DetailTreeView.SelectedNode);
             this.Cursor = storedCursor;
         }
 
@@ -3588,19 +3624,19 @@ namespace Client.Creator
 
         private void DetailTreeView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (DetailTreeView.SelectedNode != null)
-            {
-                if (e.KeyCode == Keys.F5)
-                {
-                    Cursor storedCursor = this.Cursor;
-                    this.Cursor = Cursors.WaitCursor;
-                    LicenseProperty selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseProperty;
-                    ResyncSelectedLicense(selectedLicense);
-                    LoadCustomerNode(DetailTreeView.SelectedNode.Parent);
-                    LoadLicenseNode(DetailTreeView.SelectedNode);
-                    this.Cursor = storedCursor;
-                }
-            }
+            //if (DetailTreeView.SelectedNode != null)
+            //{
+            //    if (e.KeyCode == Keys.F5)
+            //    {
+            //        Cursor storedCursor = this.Cursor;
+            //        this.Cursor = Cursors.WaitCursor;
+            //        LicenseProperty selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+            //        ResyncSelectedLicense(selectedLicense);
+            //        LoadCustomerNode(DetailTreeView.SelectedNode.Parent);
+            //        LoadLicenseNode(DetailTreeView.SelectedNode);
+            //        this.Cursor = storedCursor;
+            //    }
+            //}
         }
 
         private void dlvAddToolStripButton_Click(object sender, EventArgs e)

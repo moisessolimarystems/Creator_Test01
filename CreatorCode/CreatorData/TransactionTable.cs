@@ -17,6 +17,8 @@ namespace CreatorData
         }
 
         //sublicense transactions should be <= standardlicense transactions
+        //copied transaction has packetid of 0
+        //new transaction has packetid of null
         public static void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -34,7 +36,7 @@ namespace CreatorData
                         newTransaction.taDescription = trans.taDescription;
                         newTransaction.taLicenseID = order.LicenseID;
                         newTransaction.taOrderID = subLicOrderID;
-                        newTransaction.taPacketID = null;
+                        newTransaction.taPacketID = 0;
                         newTransaction.taType = trans.taType;
                         newTransaction.taUnits = trans.taUnits;
                         newTransaction.taUser = trans.taUser;

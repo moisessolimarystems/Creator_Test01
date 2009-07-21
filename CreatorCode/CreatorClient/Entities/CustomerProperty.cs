@@ -29,7 +29,7 @@ namespace Client.Creator
             set { _customer.SCRnumber = value; }
         }
 
-        [Category("CustomerProperty")]
+        [Category("Customer Information")]
         [Description("Name")]
         [DisplayName("Name")]          
         public string Name
@@ -39,7 +39,7 @@ namespace Client.Creator
         }
 
 
-        [Category("CustomerProperty")]
+        [Category("Customer Information")]
         [Description("Operator")]
         [DisplayName("Operator")]        
         public string Operator

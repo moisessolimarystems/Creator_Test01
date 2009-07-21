@@ -388,6 +388,7 @@
             // 
             // tokenTypeComboBox
             // 
+            this.tokenTypeComboBox.BackColor = System.Drawing.SystemColors.Window;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
             this.tokenTypeComboBox.Location = new System.Drawing.Point(175, 5);
@@ -535,7 +536,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 22F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -571,33 +572,34 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(384, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(381, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
-            this.folderBrowseButton.Size = new System.Drawing.Size(21, 25);
+            this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
             this.folderBrowseButton.TabIndex = 8;
             this.folderBrowseButton.UseVisualStyleBackColor = true;
             this.folderBrowseButton.Click += new System.EventHandler(this.folderBrowseButton_Click);
             // 
             // packetNameTextBox
             // 
+            this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.packetNameTextBox.Enabled = false;
-            this.packetNameTextBox.Location = new System.Drawing.Point(119, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(118, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(260, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(258, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(119, 104);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(118, 104);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(260, 71);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(258, 71);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -625,11 +627,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(119, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(118, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(260, 29);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(258, 29);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -646,10 +648,10 @@
             // packetDateTimePicker
             // 
             this.packetDateTimePicker.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDateTimePicker.Location = new System.Drawing.Point(119, 35);
+            this.packetDateTimePicker.Location = new System.Drawing.Point(118, 35);
             this.packetDateTimePicker.Margin = new System.Windows.Forms.Padding(5);
             this.packetDateTimePicker.Name = "packetDateTimePicker";
-            this.packetDateTimePicker.Size = new System.Drawing.Size(260, 20);
+            this.packetDateTimePicker.Size = new System.Drawing.Size(258, 20);
             this.packetDateTimePicker.TabIndex = 9;
             // 
             // orderTabPage
@@ -749,6 +751,7 @@
             // 
             // orderNumberTextBox
             // 
+            this.orderNumberTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.orderNumberTextBox.Enabled = false;
             this.orderNumberTextBox.Location = new System.Drawing.Point(123, 5);
             this.orderNumberTextBox.Margin = new System.Windows.Forms.Padding(5);
@@ -930,6 +933,7 @@
             // 
             // KeyValueTextBox
             // 
+            this.KeyValueTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.KeyValueTextBox.Location = new System.Drawing.Point(168, 36);
             this.KeyValueTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.KeyValueTextBox.Name = "KeyValueTextBox";

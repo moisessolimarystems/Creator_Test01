@@ -30,14 +30,14 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2,
-            treeNode3});
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode6,
+            treeNode7,
+            treeNode8});
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -210,7 +210,7 @@
             this.helpToolStripMenuItem});
             this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MainMenuStrip.Name = "MainMenuStrip";
-            this.MainMenuStrip.Size = new System.Drawing.Size(993, 24);
+            this.MainMenuStrip.Size = new System.Drawing.Size(989, 24);
             this.MainMenuStrip.TabIndex = 0;
             // 
             // fileToolStripMenuItem
@@ -299,7 +299,7 @@
             this.MainToolStrip.Location = new System.Drawing.Point(0, 24);
             this.MainToolStrip.Name = "MainToolStrip";
             this.MainToolStrip.Padding = new System.Windows.Forms.Padding(0);
-            this.MainToolStrip.Size = new System.Drawing.Size(993, 27);
+            this.MainToolStrip.Size = new System.Drawing.Size(989, 27);
             this.MainToolStrip.TabIndex = 1;
             // 
             // newCustMainToolStripBtn
@@ -457,7 +457,7 @@
             this.LicenseViewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LicenseViewPanel.Location = new System.Drawing.Point(0, 51);
             this.LicenseViewPanel.Name = "LicenseViewPanel";
-            this.LicenseViewPanel.Size = new System.Drawing.Size(993, 478);
+            this.LicenseViewPanel.Size = new System.Drawing.Size(989, 474);
             this.LicenseViewPanel.TabIndex = 8;
             // 
             // splitContainer2
@@ -475,8 +475,8 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.statusStrip1);
             this.splitContainer2.Panel2MinSize = 10;
-            this.splitContainer2.Size = new System.Drawing.Size(993, 478);
-            this.splitContainer2.SplitterDistance = 457;
+            this.splitContainer2.Size = new System.Drawing.Size(989, 474);
+            this.splitContainer2.SplitterDistance = 453;
             this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 2;
             // 
@@ -497,8 +497,8 @@
             // 
             this.MainSplitContainer.Panel2.BackColor = System.Drawing.SystemColors.Window;
             this.MainSplitContainer.Panel2.Controls.Add(this.MainTabControl);
-            this.MainSplitContainer.Size = new System.Drawing.Size(993, 457);
-            this.MainSplitContainer.SplitterDistance = 145;
+            this.MainSplitContainer.Size = new System.Drawing.Size(989, 453);
+            this.MainSplitContainer.SplitterDistance = 144;
             this.MainSplitContainer.SplitterWidth = 1;
             this.MainSplitContainer.TabIndex = 1;
             // 
@@ -514,33 +514,33 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode1.ImageIndex = 1;
-            treeNode1.Name = "LicenseNode";
-            treeNode1.SelectedImageIndex = 1;
-            treeNode1.Text = "Licenses";
-            treeNode2.ImageIndex = 2;
-            treeNode2.Name = "PacketNode";
-            treeNode2.SelectedImageIndex = 2;
-            treeNode2.Text = "Packets";
-            treeNode3.Name = "KeyNode";
-            treeNode3.Text = "Hardware Keys";
-            treeNode4.ImageIndex = 3;
-            treeNode4.Name = "CreatorRootNode";
-            treeNode4.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode4.SelectedImageIndex = 3;
-            treeNode4.Text = "Creator";
-            treeNode5.ImageIndex = 0;
-            treeNode5.Name = "ReportRootNode";
-            treeNode5.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode5.SelectedImageIndex = 0;
-            treeNode5.Text = "Reports";
+            treeNode6.ImageIndex = 1;
+            treeNode6.Name = "LicenseNode";
+            treeNode6.SelectedImageIndex = 1;
+            treeNode6.Text = "Licenses";
+            treeNode7.ImageIndex = 2;
+            treeNode7.Name = "PacketNode";
+            treeNode7.SelectedImageIndex = 2;
+            treeNode7.Text = "Packets";
+            treeNode8.Name = "KeyNode";
+            treeNode8.Text = "Hardware Keys";
+            treeNode9.ImageIndex = 3;
+            treeNode9.Name = "CreatorRootNode";
+            treeNode9.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode9.SelectedImageIndex = 3;
+            treeNode9.Text = "Creator";
+            treeNode10.ImageIndex = 0;
+            treeNode10.Name = "ReportRootNode";
+            treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode10.SelectedImageIndex = 0;
+            treeNode10.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4,
-            treeNode5});
+            treeNode9,
+            treeNode10});
             this.MainTreeView.SelectedImageIndex = 0;
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
-            this.MainTreeView.Size = new System.Drawing.Size(141, 453);
+            this.MainTreeView.Size = new System.Drawing.Size(140, 449);
             this.MainTreeView.TabIndex = 0;
             this.MainTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainTreeView_MouseUp);
             this.MainTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.MainTreeView_AfterSelect);
@@ -568,7 +568,7 @@
             this.MainTabControl.Multiline = true;
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(843, 453);
+            this.MainTabControl.Size = new System.Drawing.Size(840, 449);
             this.MainTabControl.TabIndex = 2;
             this.MainTabControl.Visible = false;
             // 
@@ -578,7 +578,7 @@
             this.LicensesTabPage.Location = new System.Drawing.Point(4, 22);
             this.LicensesTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.LicensesTabPage.Name = "LicensesTabPage";
-            this.LicensesTabPage.Size = new System.Drawing.Size(835, 427);
+            this.LicensesTabPage.Size = new System.Drawing.Size(832, 423);
             this.LicensesTabPage.TabIndex = 1;
             this.LicensesTabPage.Text = "Licenses";
             this.LicensesTabPage.UseVisualStyleBackColor = true;
@@ -599,8 +599,8 @@
             // SubSplitContainer.Panel2
             // 
             this.SubSplitContainer.Panel2.Controls.Add(this.PropertyGridTabControl);
-            this.SubSplitContainer.Size = new System.Drawing.Size(835, 427);
-            this.SubSplitContainer.SplitterDistance = 249;
+            this.SubSplitContainer.Size = new System.Drawing.Size(832, 423);
+            this.SubSplitContainer.SplitterDistance = 248;
             this.SubSplitContainer.SplitterWidth = 1;
             this.SubSplitContainer.TabIndex = 1;
             // 
@@ -614,7 +614,8 @@
             this.DetailTreeView.Location = new System.Drawing.Point(0, 0);
             this.DetailTreeView.Name = "DetailTreeView";
             this.DetailTreeView.SelectedImageIndex = 0;
-            this.DetailTreeView.Size = new System.Drawing.Size(245, 423);
+            this.DetailTreeView.ShowNodeToolTips = true;
+            this.DetailTreeView.Size = new System.Drawing.Size(244, 419);
             this.DetailTreeView.StateImageList = this.DetailTreeViewImageList;
             this.DetailTreeView.TabIndex = 2;
             this.DetailTreeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeExpand);
@@ -662,7 +663,7 @@
             this.PropertyGridTabControl.Multiline = true;
             this.PropertyGridTabControl.Name = "PropertyGridTabControl";
             this.PropertyGridTabControl.SelectedIndex = 0;
-            this.PropertyGridTabControl.Size = new System.Drawing.Size(581, 423);
+            this.PropertyGridTabControl.Size = new System.Drawing.Size(579, 419);
             this.PropertyGridTabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.PropertyGridTabControl.TabIndex = 0;
             this.PropertyGridTabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.PropertyGridTabControl_Selecting);
@@ -840,7 +841,7 @@
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
-            this.TransactionsTabPage.Size = new System.Drawing.Size(483, 395);
+            this.TransactionsTabPage.Size = new System.Drawing.Size(573, 395);
             this.TransactionsTabPage.TabIndex = 1;
             this.TransactionsTabPage.Text = "Transactions";
             this.TransactionsTabPage.UseVisualStyleBackColor = true;
@@ -859,7 +860,7 @@
             this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionListView.Name = "TransactionListView";
             this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(483, 370);
+            this.TransactionListView.Size = new System.Drawing.Size(573, 370);
             this.TransactionListView.TabIndex = 0;
             this.TransactionListView.UseCompatibleStateImageBehavior = false;
             this.TransactionListView.View = System.Windows.Forms.View.Details;
@@ -892,7 +893,7 @@
             this.SingleToolStripButton});
             this.TransactionsToolStrip.Location = new System.Drawing.Point(0, 0);
             this.TransactionsToolStrip.Name = "TransactionsToolStrip";
-            this.TransactionsToolStrip.Size = new System.Drawing.Size(483, 25);
+            this.TransactionsToolStrip.Size = new System.Drawing.Size(573, 25);
             this.TransactionsToolStrip.TabIndex = 1;
             this.TransactionsToolStrip.Text = "toolStrip1";
             // 
@@ -925,7 +926,7 @@
             this.PacketTabPage.ImageIndex = 4;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(483, 395);
+            this.PacketTabPage.Size = new System.Drawing.Size(571, 391);
             this.PacketTabPage.TabIndex = 2;
             this.PacketTabPage.Text = "Packets";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -948,7 +949,7 @@
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel2_Paint);
             this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Size = new System.Drawing.Size(483, 370);
+            this.splitContainer1.Size = new System.Drawing.Size(571, 366);
             this.splitContainer1.SplitterDistance = 310;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
@@ -970,7 +971,7 @@
             this.LicensePacketListView.MultiSelect = false;
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(481, 368);
+            this.LicensePacketListView.Size = new System.Drawing.Size(569, 364);
             this.LicensePacketListView.StateImageList = this.ListViewImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
@@ -1027,7 +1028,7 @@
             this.showUnVerifiedToolStripButton});
             this.PacketListToolStrip.Location = new System.Drawing.Point(0, 0);
             this.PacketListToolStrip.Name = "PacketListToolStrip";
-            this.PacketListToolStrip.Size = new System.Drawing.Size(483, 25);
+            this.PacketListToolStrip.Size = new System.Drawing.Size(571, 25);
             this.PacketListToolStrip.TabIndex = 5;
             // 
             // toolStripLabel1
@@ -1088,7 +1089,7 @@
             this.PacketsTabPage.Location = new System.Drawing.Point(4, 22);
             this.PacketsTabPage.Name = "PacketsTabPage";
             this.PacketsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.PacketsTabPage.Size = new System.Drawing.Size(809, 427);
+            this.PacketsTabPage.Size = new System.Drawing.Size(835, 427);
             this.PacketsTabPage.TabIndex = 2;
             this.PacketsTabPage.Text = "Packets";
             this.PacketsTabPage.UseVisualStyleBackColor = true;
@@ -1107,7 +1108,7 @@
             this.PacketListView.FullRowSelect = true;
             this.PacketListView.Location = new System.Drawing.Point(3, 3);
             this.PacketListView.Name = "PacketListView";
-            this.PacketListView.Size = new System.Drawing.Size(803, 421);
+            this.PacketListView.Size = new System.Drawing.Size(829, 421);
             this.PacketListView.TabIndex = 0;
             this.PacketListView.UseCompatibleStateImageBehavior = false;
             this.PacketListView.View = System.Windows.Forms.View.Details;
@@ -1147,7 +1148,7 @@
             this.ReportTabPage.Location = new System.Drawing.Point(4, 22);
             this.ReportTabPage.Name = "ReportTabPage";
             this.ReportTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ReportTabPage.Size = new System.Drawing.Size(809, 427);
+            this.ReportTabPage.Size = new System.Drawing.Size(835, 427);
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Report";
             this.ReportTabPage.UseVisualStyleBackColor = true;
@@ -1161,7 +1162,7 @@
             this.ReportListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ReportListView.Location = new System.Drawing.Point(3, 3);
             this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(803, 421);
+            this.ReportListView.Size = new System.Drawing.Size(829, 421);
             this.ReportListView.TabIndex = 0;
             this.ReportListView.UseCompatibleStateImageBehavior = false;
             this.ReportListView.View = System.Windows.Forms.View.Details;
@@ -1181,7 +1182,7 @@
             this.HardwareKeyTabPage.Controls.Add(this.panel1);
             this.HardwareKeyTabPage.Location = new System.Drawing.Point(4, 22);
             this.HardwareKeyTabPage.Name = "HardwareKeyTabPage";
-            this.HardwareKeyTabPage.Size = new System.Drawing.Size(809, 427);
+            this.HardwareKeyTabPage.Size = new System.Drawing.Size(835, 427);
             this.HardwareKeyTabPage.TabIndex = 4;
             this.HardwareKeyTabPage.Text = "Hardware Keys";
             this.HardwareKeyTabPage.UseVisualStyleBackColor = true;
@@ -1193,7 +1194,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(809, 427);
+            this.panel1.Size = new System.Drawing.Size(835, 427);
             this.panel1.TabIndex = 0;
             // 
             // HardwareKeyListView
@@ -1208,7 +1209,7 @@
             this.HardwareKeyListView.GridLines = true;
             this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
             this.HardwareKeyListView.Name = "HardwareKeyListView";
-            this.HardwareKeyListView.Size = new System.Drawing.Size(809, 402);
+            this.HardwareKeyListView.Size = new System.Drawing.Size(835, 402);
             this.HardwareKeyListView.TabIndex = 1;
             this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
             this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
@@ -1234,7 +1235,7 @@
             this.addHardwareKeyToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(809, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(835, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -1252,7 +1253,7 @@
             // 
             this.statusStrip1.Location = new System.Drawing.Point(0, -3);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(993, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(989, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -1494,7 +1495,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(993, 529);
+            this.ClientSize = new System.Drawing.Size(989, 525);
             this.Controls.Add(this.LicenseViewPanel);
             this.Controls.Add(this.MainToolStrip);
             this.Controls.Add(this.toolStrip2);

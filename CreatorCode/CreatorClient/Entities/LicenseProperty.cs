@@ -66,9 +66,9 @@ namespace Client.Creator
                 ReadOnlyAttribute attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
                 FieldInfo isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
                 isReadOnly.SetValue(attrib, !_permissions.pt_create_modify_key.Value);
-                descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationTotal"];
-                attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
-                isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
+                 descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationTotal"];
+                 attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
+                 isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
                 isReadOnly.SetValue(attrib, !_permissions.pt_create_modify_key.Value);
                 descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationAmtInDays"];
                 attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
@@ -83,6 +83,7 @@ namespace Client.Creator
             get { return _licInfo; }
             set { _licInfo = value; }
         }
+        
         [Browsable(false)]
         public bool HasUpdates
         {
@@ -96,6 +97,7 @@ namespace Client.Creator
                 return !bValue;
             }
         }
+
         [Browsable(false)]
         public bool IsModified
         {
@@ -109,6 +111,7 @@ namespace Client.Creator
                 return bValue;
             }
         }
+
         [Browsable(false)]
         public bool IsStandardLicenseType
         {
@@ -120,6 +123,7 @@ namespace Client.Creator
                 return false;
             }
         }
+
         [Browsable(false)]
         public bool IsBackupLicenseType
         {
@@ -131,6 +135,7 @@ namespace Client.Creator
                 return false;
             }
         }
+
         [Browsable(false)]
         public bool IsFailoverLicenseType
         {
@@ -141,6 +146,7 @@ namespace Client.Creator
                 return false;
             }
         }
+
         [Browsable(false)]
         public bool IsTestDevelopmentLicenseType
         {
@@ -151,6 +157,7 @@ namespace Client.Creator
                 return false;
             }
         }
+
         [Browsable(false)]
         public bool IsEnabled
         {
@@ -161,6 +168,7 @@ namespace Client.Creator
                 return false;
             }
         }
+
         [Browsable(false)]
         public int FailoverLicenseCount
         {

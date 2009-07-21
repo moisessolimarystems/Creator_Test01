@@ -327,7 +327,6 @@ namespace Client.Creator
         {
             //Test/Dev modules should not exceed standard license modules
             //Need to grab license from database to find last 
-            //licInfoTabControl.TabPages.Add(ModuleTabPage);
             topPanel.Controls.Clear();
             moduleGroupBox.Parent = topPanel;
             modNameComboBox.Enabled = false;
@@ -392,38 +391,6 @@ namespace Client.Creator
                         }
                     }                        
                 }                
-            }
-            else
-            {   //new module
-                bool bFound = false;
-                modNameComboBox.Enabled = true;
-                Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = m_CommLink.GetModuleSpecList(moduleData.OrderData.Product.ID);
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
-                {
-                    if ((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm ||
-                        moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) &&
-                        moduleSpec.moduleDefaultLicense > 0)
-                        continue;
-                    bFound = false;
-                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in moduleData.OrderData.Product.ModuleList.TVal)
-                    {
-                        if (module.moduleID.TVal.Equals(moduleSpec.moduleID.TVal))
-                        {
-                            bFound = true;
-                            break;
-                        }
-                    }
-                    if (!bFound)
-                        modNameComboBox.Items.Add(moduleSpec.moduleName.TVal);
-                }
-                if (modNameComboBox.Items.Count > 0)
-                    modNameComboBox.SelectedIndex = 0;
-                else
-                {
-                    modNameComboBox.Items.Add("No Modules Available");
-                    modNameComboBox.SelectedIndex = 0;
-                    btnOk.Enabled = false;
-                }
             }
         }
 
