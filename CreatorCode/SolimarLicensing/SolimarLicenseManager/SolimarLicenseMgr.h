@@ -361,7 +361,7 @@ private:
 		ServerInfo();
 		ServerInfo(const ServerInfo &s);
 		ServerInfo(_bstr_t servername, 
-			bool useOnlySharedLicenses, 
+			bool useOnlySharedLicenses, //Use Shared Licensing when accessing Protection Keys
 			bool useSoftwareLicensing,
 			GITPtr<ISolimarLicenseSvr4> pILicenseServer);
 
@@ -531,15 +531,19 @@ private:
 	_bstr_t m_specific_single_key_ident;
 	_bstr_t m_current_single_key;
 	long m_product, m_prod_ver_major, m_prod_ver_minor;
+	long m_productKeyID;	//For backward compatibility of new products working with old protection keys
 	ModuleLicenseMap m_allocated_licenses;
 	time_t m_dtGracePeriodStart;
 	unsigned long m_dtGracePeriod;	//in minutes
 	bool m_bLockKeyByAppInstance;
 	_bstr_t m_applicationInstance;
+	_bstr_t m_applicationInstanceKey;	//For backward compatibility of new products working with old protection keys
 	_bstr_t m_headerInformation;	//contains header information important for event log messages.
 
 	//bool m_bConfiguredForSoftwareLicense; //either configured for ProtectionKeys or Software Licenses.
-
+	
+	//Side effect, sets m_productKeyID & m_applicationInstanceKey & bUseOnlySharedLicenses in ServerInfo objs
+	void InternalCalculateLegacyProtectionKeyInfo(long _productID);
 
 	time_t m_dtRefreshLicenses;
 
