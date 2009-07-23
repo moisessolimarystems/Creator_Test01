@@ -82,8 +82,10 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 				time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
 				time_t emptyExpiresDateTimeT = time_t(-1);
 
-				// ignore expiration date if it equals 1900/1/1
-				if(activationExpirationDateTimeT != emptyExpiresDateTimeT)
+				// ignore if expiration date == 1900/1/1 && total == 0 && activation in days == 0, this is standard licensing, non licensing activation
+				if(!(m_licenseFileAttribs.licLicenseInfoAttribs.activationTotal == 0 && 
+					m_licenseFileAttribs.licLicenseInfoAttribs.activationAmountInDays == 0 &&
+					activationExpirationDateTimeT == emptyExpiresDateTimeT))
 				{
 					// only add licensing to cache if the current date is below the expiration date
 					time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
@@ -125,8 +127,8 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 							//OutputDebugStringW(L"    Validate - ttMacAddress");
 							hr = ValidateHardwareMacAddress(_bstr_t(valTokenIT->tokenValue->c_str()));
 							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttCompuerName:
-							//OutputDebugStringW(L"    Validate - ttCompuerName");
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
+							//OutputDebugStringW(L"    Validate - ttComputerName");
 							hr = ValidateHardwareCompuerName(_bstr_t(valTokenIT->tokenValue->c_str()));
 							break;
 						default:
@@ -509,7 +511,7 @@ HRESULT SoftwareLicenseMgr::RefreshLicenseFileAttribs()
 	tmpLicAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->push_back(tmpVerTokenAttribs2);
 
 	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpVerTokenAttribs3;
-	tmpVerTokenAttribs3.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttCompuerName;
+	tmpVerTokenAttribs3.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName;
 	tmpVerTokenAttribs3.tokenValue = std::wstring(L"jlan5");
 	//tmpVerTokenAttribs3.tokenValue = std::wstring(L"vmec1");
 	tmpLicAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->push_back(tmpVerTokenAttribs3);

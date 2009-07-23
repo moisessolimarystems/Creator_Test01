@@ -831,7 +831,7 @@ public:
 				ttLicenseCode = 2,
 				ttBiosSerialNumber = 3,
 				ttMacAddress = 4,
-				ttCompuerName = 5,
+				ttComputerName = 5,
 				ttTypeCopyFromCustomerOnly = 6,
 				ttTypeArchiveOnly = 7,
 				ttTypePackageOnly = 8,

@@ -6,11 +6,11 @@ void InititalizeProduct24()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:24, ProdName: SOLsearcher Enterprise Single Plateform Test/Dev
+	// ProdID:24, ProdName: SOLsearcher Enterprise Single Platform Test/Dev
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(24))->second);
 	pTmpProdSpec->productID = 24;
-	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise Single Plateform Test/Dev");
+	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise Single Platform Test/Dev");
 	pTmpProdSpec->sameModSpecProductID = 8;
 }
 
@@ -19,11 +19,11 @@ void InititalizeProduct25()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:25, ProdName: SOLfusion Single Plateform Test/Dev
+	// ProdID:25, ProdName: SOLfusion Single Platform Test/Dev
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(25, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(25))->second);
 	pTmpProdSpec->productID = 25;
-	pTmpProdSpec->productName = std::wstring(L"SOLfusion Single Plateform Test/Dev");
+	pTmpProdSpec->productName = std::wstring(L"SOLfusion Single Platform Test/Dev");
 	pTmpProdSpec->sameModSpecProductID = 13;
 }
 
@@ -725,11 +725,11 @@ void InititalizeProduct15()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:15, ProdName: SOLsearcher Enterprise Single Plateform
+	// ProdID:15, ProdName: SOLsearcher Enterprise Single Platform
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(15, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(15))->second);
 	pTmpProdSpec->productID = 15;
-	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise Single Plateform");
+	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise Single Platform");
 	pTmpProdSpec->sameModSpecProductID = 8;
 }
 

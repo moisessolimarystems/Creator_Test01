@@ -826,7 +826,7 @@ namespace Solimar
 							ttLicenseCode = 2,
 							ttBiosSerialNumber = 3,
 							ttMacAddress = 4,
-							ttCompuerName = 5,
+							ttComputerName = 5,
 							ttTypeCopyFromCustomerOnly = 6,
 							ttTypeArchiveOnly = 7,
 							ttTypePackageOnly = 8,
@@ -867,8 +867,8 @@ namespace Solimar
 								m_MapAliasToEnum.Add("MacAddress",TTokenType.ttMacAddress);
 								m_MapEnumToAlias.Add(TTokenType.ttMacAddress,"MacAddress");
 								m_MapOrderingIndexToAlias.Add(5,"MacAddress");
-								m_MapAliasToEnum.Add("ComputerName",TTokenType.ttCompuerName);
-								m_MapEnumToAlias.Add(TTokenType.ttCompuerName,"ComputerName");
+								m_MapAliasToEnum.Add("ComputerName",TTokenType.ttComputerName);
+								m_MapEnumToAlias.Add(TTokenType.ttComputerName,"ComputerName");
 								m_MapOrderingIndexToAlias.Add(6,"ComputerName");
 								m_MapAliasToEnum.Add("TypeCopyCustOnly",TTokenType.ttTypeCopyFromCustomerOnly);
 								m_MapEnumToAlias.Add(TTokenType.ttTypeCopyFromCustomerOnly,"TypeCopyCustOnly");
@@ -893,7 +893,7 @@ namespace Solimar
 								m_MapEnumToIndex.Add(TTokenType.ttLicenseCode,2);
 								m_MapEnumToIndex.Add(TTokenType.ttBiosSerialNumber,3);
 								m_MapEnumToIndex.Add(TTokenType.ttMacAddress,4);
-								m_MapEnumToIndex.Add(TTokenType.ttCompuerName,5);
+								m_MapEnumToIndex.Add(TTokenType.ttComputerName,5);
 								m_MapEnumToIndex.Add(TTokenType.ttTypeCopyFromCustomerOnly,6);
 								m_MapEnumToIndex.Add(TTokenType.ttTypeArchiveOnly,7);
 								m_MapEnumToIndex.Add(TTokenType.ttTypePackageOnly,8);

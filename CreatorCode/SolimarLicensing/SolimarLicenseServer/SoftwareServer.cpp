@@ -184,11 +184,10 @@ wchar_t tmpbuf[BUF_SIZE];
 	HRESULT hr(E_FAIL);
 	DWORD dwNtErr(ERROR_SUCCESS);
 
-	for(;;)
+	try
 	{
 		hr = licServerDataMgr.Touch();
 
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
 		std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*> tmpLicInfoList;
 		{
 		SafeMutex mutex(SoftwareLicenseLock);
@@ -196,7 +195,7 @@ wchar_t tmpbuf[BUF_SIZE];
 		Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribsList tmpFileInfoList;
 		hr = licServerDataMgr.GetAllFileInfoList(&tmpFileInfoList);
 		if(FAILED(hr))
-			break;
+			throw hr;
 
 		SoftwareLicenseMgr* pNewSwLicMgr;
 //		if(bFirstTime)
@@ -242,6 +241,7 @@ if(bFirstTime)
 				continue;	
 			}
 
+			Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
 			hr = (*swLicIt).second->GetLicenseInfo(&tmpLicInfoAttribs);
 			if(SUCCEEDED(hr))
 				tmpLicInfoList.insert(tmpLicInfoList.end(), new Lic_PackageAttribs::Lic_LicenseInfoAttribs(tmpLicInfoAttribs));
@@ -261,10 +261,14 @@ if(bFirstTime)
 
 			tmpLicInfoList.erase(tmpLicInfoList.begin());
 		}
-
-
-
-		break;	//Unconditional Break
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	catch(...)
+	{
+OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Caught unexpected Exception");
 	}
 
 //OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Leave");
@@ -1815,7 +1819,7 @@ HRESULT SoftwareServer::ValidateToken_ByLicense(BSTR softwareLicense, long valid
 			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttMacAddress:
 				hr = pSwLicMgr->ValidateHardwareMacAddress(validationValue);
 				break;
-			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttCompuerName:
+			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
 				hr = pSwLicMgr->ValidateHardwareCompuerName(validationValue);
 				break;
 			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypeCopyFromCustomerOnly:
@@ -1890,6 +1894,22 @@ HRESULT SoftwareServer::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR 
 				}
 			}
 		}
+
+		//Log message about activation
+		wchar_t tmpbuf[1024];
+		Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
+		hr = pSwLicMgr->GetLicenseInfo(&tmpLicInfoAttribs);
+		if(FAILED(hr))
+			throw hr;
+		
+		swprintf_s(tmpbuf, 
+			L"Successfully applied License Activation. Expiration Date: %s, Current Activation: %d, Total Activations: %d, Activation Amount in Days: %d", 
+			std::wstring(SpdAttribs::WStringObj(tmpLicInfoAttribs.activationExpirationDate)).c_str(),
+			(int)tmpLicInfoAttribs.activationCurrent, 
+			(int)tmpLicInfoAttribs.activationTotal, 
+			(int)tmpLicInfoAttribs.activationAmountInDays);
+
+		g_licenseController.GenerateMessage((wchar_t*)softwareLicense, MT_INFO, S_OK, time(0), MessageGeneric, tmpbuf);
 	}
 	catch(HRESULT &eHr)
 	{

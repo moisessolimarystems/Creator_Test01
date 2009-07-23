@@ -324,7 +324,7 @@
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	
-	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Plateform" sameModSpecProductID="8">
+	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="16" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
@@ -351,9 +351,9 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="23" productName="SPDE Test/Dev" sameModSpecProductID="14">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="24" productName="SOLsearcher Enterprise Single Plateform Test/Dev" sameModSpecProductID="8">
+	<Lic_ProductSoftwareSpecAttribs productID="24" productName="SOLsearcher Enterprise Single Platform Test/Dev" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="25" productName="SOLfusion Single Plateform Test/Dev" sameModSpecProductID="13">
+	<Lic_ProductSoftwareSpecAttribs productID="25" productName="SOLfusion Single Platform Test/Dev" sameModSpecProductID="13">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="26" productName="SDX Designer Test/Dev" sameModSpecProductID="17" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>

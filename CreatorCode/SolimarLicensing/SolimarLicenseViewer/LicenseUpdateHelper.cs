@@ -294,7 +294,7 @@ namespace SolimarLicenseViewer
                             {
                                 //if validation token is computer, only add if computer name is correct.
                                 //if validation token is hardware id, add, but show in red and don't allow selection if key is not on system.
-                                if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttCompuerName)
+                                if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName)
                                 {
                                     bAddToDisplay = string.Compare(m_CommLink.ServerName, verToken.tokenValue.TVal, true) == 0;
                                 }

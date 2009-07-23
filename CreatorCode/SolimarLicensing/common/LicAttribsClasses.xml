@@ -240,7 +240,7 @@
 					<enum name="ttLicenseCode" value="2" alias="LicenseCode"/>
 					<enum name="ttBiosSerialNumber" value="3" alias="BiosSerialNumber"/>
 					<enum name="ttMacAddress" value="4" alias="MacAddress"/>
-					<enum name="ttCompuerName" value="5" alias="ComputerName"/>
+					<enum name="ttComputerName" value="5" alias="ComputerName"/>
 					<enum name="ttTypeCopyFromCustomerOnly" value="6" alias="TypeCopyCustOnly"/>
 					<enum name="ttTypeArchiveOnly" value="7" alias="TypeArchiveOnly"/>
 					<enum name="ttTypePackageOnly" value="8" alias="TypePackageOnly"/>

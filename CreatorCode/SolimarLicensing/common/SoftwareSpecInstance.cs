@@ -19,18 +19,18 @@ namespace Solimar.Licensing
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs tmpModSpec;
 			
-			#region ProdID:24, ProdName: SOLsearcher Enterprise Single Plateform Test/Dev
+			#region ProdID:24, ProdName: SOLsearcher Enterprise Single Platform Test/Dev
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 24;
-			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Single Plateform Test/Dev";
+			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Single Platform Test/Dev";
 			tmpProdSpec.sameModSpecProductID.TVal = 8;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:25, ProdName: SOLfusion Single Plateform Test/Dev
+			#region ProdID:25, ProdName: SOLfusion Single Platform Test/Dev
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 25;
-			tmpProdSpec.productName.TVal = "SOLfusion Single Plateform Test/Dev";
+			tmpProdSpec.productName.TVal = "SOLfusion Single Platform Test/Dev";
 			tmpProdSpec.sameModSpecProductID.TVal = 13;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
@@ -1588,10 +1588,10 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:15, ProdName: SOLsearcher Enterprise Single Plateform
+			#region ProdID:15, ProdName: SOLsearcher Enterprise Single Platform
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 15;
-			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Single Plateform";
+			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Single Platform";
 			tmpProdSpec.sameModSpecProductID.TVal = 8;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
