@@ -156,7 +156,7 @@ ProtectionKey::ProtectionKey(_bstr_t virtualKeyIdent, const ProtectionKey &k) :
 	m_keyspec(k.m_keyspec), 
 	m_driver(k.m_driver),
 	b_use_shared_licensing(k.b_use_shared_licensing),
-	m_lastTimeCheck(0),
+	m_lastTimeCheck(k.m_lastTimeCheck),
 	m_application_instance(k.m_application_instance),
 	m_license_connection_type(k.m_license_connection_type)
 {
@@ -965,12 +965,14 @@ HRESULT ProtectionKey::ModuleLicenseRelease(BSTR license_id, long module_ident, 
 		
 		LicenseUseList::iterator i = license_use.find(_bstr_t(license_id,true));
 		if (i!=license_use.end())
+		{
 			i->second[module.id] = max(i->second[module.id]-license_count,0);
 
-		if(i->second[module.id] == 0)
-		{
-			// Only do this for certain module types, not sure what type yet...
-			RemoveLicenseApplicationInstance(license_id, module_ident);
+			if(i->second[module.id] == 0)
+			{
+				// Only do this for certain module types, not sure what type yet...
+				RemoveLicenseApplicationInstance(license_id, module_ident);
+			}
 		}
 	}
 	catch (_com_error &e)
