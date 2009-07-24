@@ -147,7 +147,7 @@ void __fastcall TDlgVersion::ApplyBtnClick(TObject *Sender)
    }
    dbVersion = DBFormatVersion(VersionEdit->Text);
    //need to format user input to DB format x.x to x.xxx
-   unsigned short tmp_version(static_cast<unsigned short>(strtol(VersionEdit->Text.c_str(), &endptr, 16)));
+   unsigned short tmp_version(static_cast<unsigned short>(strtol(dbVersion.c_str(), &endptr, 16)));
    lookup->updateVersion(convertIndexToProduct[ProductComboBox->ItemIndex], tmp_version);
 }
 
