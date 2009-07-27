@@ -15,7 +15,7 @@ namespace Solimar.Licensing.Attribs
 				switch (_licInfoAttribs.softwareLicType.TVal)
 				{
 					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
-						licType = "B";
+						licType = "F";
 						break;
 					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
 						licType = "D";
