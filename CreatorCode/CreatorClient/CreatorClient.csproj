@@ -139,6 +139,12 @@
     <Compile Include="OrderSelectionForm.Designer.cs">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="PacketVerification.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PacketVerification.Designer.cs">
+      <DependentUpon>PacketVerification.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ConnectDialog.resx">
@@ -161,6 +167,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="OrderSelectionForm.resx">
       <DependentUpon>OrderSelectionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PacketVerification.resx">
+      <DependentUpon>PacketVerification.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -258,6 +267,7 @@
     <None Include="Service References\CreatorService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Service References\CreatorService\Arrays.xsd" />
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.CustomerTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

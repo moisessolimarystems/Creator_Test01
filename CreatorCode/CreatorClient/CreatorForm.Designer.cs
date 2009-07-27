@@ -100,19 +100,15 @@
             this.PacketTabPage = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.LicensePacketListView = new Shared.VisualComponents.NoFlickerListView();
-            this.PktNameColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.PktCodeColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.PktDateColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.PktDescriptionColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.PktUserColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.PacketContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.verifyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.PacketNameColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.CreateDateColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.ExpDateColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.CreatedByColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.VerifiedByColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.packetDescriptionRichTextBox = new System.Windows.Forms.RichTextBox();
             this.PacketListToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
-            this.showAllToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.showVerifiedToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.showUnVerifiedToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.PacketsTabPage = new System.Windows.Forms.TabPage();
             this.PacketListView = new Shared.VisualComponents.NoFlickerListView();
             this.statusColumnHeader = new System.Windows.Forms.ColumnHeader();
@@ -134,6 +130,9 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.addHardwareKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.PacketContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.verifyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.DetailListViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.dlvNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dlvEditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -187,14 +186,15 @@
             this.TransactionsToolStrip.SuspendLayout();
             this.PacketTabPage.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.PacketContextMenuStrip.SuspendLayout();
             this.PacketListToolStrip.SuspendLayout();
             this.PacketsTabPage.SuspendLayout();
             this.ReportTabPage.SuspendLayout();
             this.HardwareKeyTabPage.SuspendLayout();
             this.panel1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.PacketContextMenuStrip.SuspendLayout();
             this.DetailListViewContextMenuStrip.SuspendLayout();
             this.MainTreeViewContextMenuStrip.SuspendLayout();
             this.LicenseContextMenuStrip.SuspendLayout();
@@ -676,7 +676,7 @@
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
-            this.PropertyGridTabPage.Size = new System.Drawing.Size(573, 395);
+            this.PropertyGridTabPage.Size = new System.Drawing.Size(571, 391);
             this.PropertyGridTabPage.TabIndex = 0;
             this.PropertyGridTabPage.Text = "Properties";
             this.PropertyGridTabPage.UseVisualStyleBackColor = true;
@@ -698,8 +698,8 @@
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListView);
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListViewToolStrip);
             this.DetailSplitContainer.Panel2.Controls.Add(this.loadingCircle1);
-            this.DetailSplitContainer.Size = new System.Drawing.Size(573, 395);
-            this.DetailSplitContainer.SplitterDistance = 178;
+            this.DetailSplitContainer.Size = new System.Drawing.Size(571, 391);
+            this.DetailSplitContainer.SplitterDistance = 176;
             this.DetailSplitContainer.SplitterWidth = 2;
             this.DetailSplitContainer.TabIndex = 0;
             // 
@@ -712,7 +712,7 @@
             this.DetailPropertyGrid.Location = new System.Drawing.Point(0, 0);
             this.DetailPropertyGrid.Margin = new System.Windows.Forms.Padding(0);
             this.DetailPropertyGrid.Name = "DetailPropertyGrid";
-            this.DetailPropertyGrid.Size = new System.Drawing.Size(573, 178);
+            this.DetailPropertyGrid.Size = new System.Drawing.Size(571, 176);
             this.DetailPropertyGrid.TabIndex = 2;
             this.DetailPropertyGrid.ToolbarVisible = false;
             this.DetailPropertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.DetailPropertyGrid_PropertyValueChanged);
@@ -728,7 +728,7 @@
             this.DetailListView.MultiSelect = false;
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
-            this.DetailListView.Size = new System.Drawing.Size(573, 190);
+            this.DetailListView.Size = new System.Drawing.Size(571, 188);
             this.DetailListView.SmallImageList = this.ListViewImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
@@ -767,7 +767,7 @@
             this.dlvEditToolStripButton});
             this.DetailListViewToolStrip.Location = new System.Drawing.Point(0, 0);
             this.DetailListViewToolStrip.Name = "DetailListViewToolStrip";
-            this.DetailListViewToolStrip.Size = new System.Drawing.Size(573, 25);
+            this.DetailListViewToolStrip.Size = new System.Drawing.Size(571, 25);
             this.DetailListViewToolStrip.TabIndex = 5;
             // 
             // ImageToolStripLabel
@@ -827,7 +827,7 @@
             this.loadingCircle1.NumberSpoke = 9;
             this.loadingCircle1.OuterCircleRadius = 7;
             this.loadingCircle1.RotationSpeed = 100;
-            this.loadingCircle1.Size = new System.Drawing.Size(573, 215);
+            this.loadingCircle1.Size = new System.Drawing.Size(571, 213);
             this.loadingCircle1.SpokeThickness = 4;
             this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.Firefox;
             this.loadingCircle1.TabIndex = 6;
@@ -841,7 +841,7 @@
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
-            this.TransactionsTabPage.Size = new System.Drawing.Size(573, 395);
+            this.TransactionsTabPage.Size = new System.Drawing.Size(571, 391);
             this.TransactionsTabPage.TabIndex = 1;
             this.TransactionsTabPage.Text = "Transactions";
             this.TransactionsTabPage.UseVisualStyleBackColor = true;
@@ -860,7 +860,7 @@
             this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionListView.Name = "TransactionListView";
             this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(573, 370);
+            this.TransactionListView.Size = new System.Drawing.Size(571, 366);
             this.TransactionListView.TabIndex = 0;
             this.TransactionListView.UseCompatibleStateImageBehavior = false;
             this.TransactionListView.View = System.Windows.Forms.View.Details;
@@ -893,7 +893,7 @@
             this.SingleToolStripButton});
             this.TransactionsToolStrip.Location = new System.Drawing.Point(0, 0);
             this.TransactionsToolStrip.Name = "TransactionsToolStrip";
-            this.TransactionsToolStrip.Size = new System.Drawing.Size(573, 25);
+            this.TransactionsToolStrip.Size = new System.Drawing.Size(571, 25);
             this.TransactionsToolStrip.TabIndex = 1;
             this.TransactionsToolStrip.Text = "toolStrip1";
             // 
@@ -947,85 +947,81 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
+            this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
             this.splitContainer1.Panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel2_Paint);
-            this.splitContainer1.Panel2Collapsed = true;
             this.splitContainer1.Size = new System.Drawing.Size(571, 366);
-            this.splitContainer1.SplitterDistance = 310;
+            this.splitContainer1.SplitterDistance = 308;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
             // 
             // LicensePacketListView
             // 
             this.LicensePacketListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.PktNameColumnHeader,
-            this.PktCodeColumnHeader,
-            this.PktDateColumnHeader,
-            this.PktDescriptionColumnHeader,
-            this.PktUserColumnHeader});
-            this.LicensePacketListView.ContextMenuStrip = this.PacketContextMenuStrip;
+            this.PacketNameColumnHeader,
+            this.CreateDateColumnHeader,
+            this.ExpDateColumnHeader,
+            this.CreatedByColumnHeader,
+            this.VerifiedByColumnHeader});
             this.LicensePacketListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LicensePacketListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LicensePacketListView.FullRowSelect = true;
+            this.LicensePacketListView.GridLines = true;
+            this.LicensePacketListView.HideSelection = false;
             this.LicensePacketListView.Location = new System.Drawing.Point(0, 0);
             this.LicensePacketListView.Margin = new System.Windows.Forms.Padding(0);
             this.LicensePacketListView.MultiSelect = false;
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(569, 364);
+            this.LicensePacketListView.Size = new System.Drawing.Size(569, 306);
             this.LicensePacketListView.StateImageList = this.ListViewImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
             this.LicensePacketListView.View = System.Windows.Forms.View.Details;
             this.LicensePacketListView.SelectedIndexChanged += new System.EventHandler(this.LicensePacketListView_SelectedIndexChanged);
+            this.LicensePacketListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LicensePacketListView_MouseUp);
+            this.LicensePacketListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.LicensePacketListView_ColumnClick);
             // 
-            // PktNameColumnHeader
+            // PacketNameColumnHeader
             // 
-            this.PktNameColumnHeader.Text = "Name";
-            this.PktNameColumnHeader.Width = 56;
+            this.PacketNameColumnHeader.Text = "Name";
+            this.PacketNameColumnHeader.Width = 56;
             // 
-            // PktCodeColumnHeader
+            // CreateDateColumnHeader
             // 
-            this.PktCodeColumnHeader.Text = "Verification Code";
-            this.PktCodeColumnHeader.Width = 102;
+            this.CreateDateColumnHeader.Text = "Date Created";
+            this.CreateDateColumnHeader.Width = 84;
             // 
-            // PktDateColumnHeader
+            // ExpDateColumnHeader
             // 
-            this.PktDateColumnHeader.Text = "Date Created";
-            this.PktDateColumnHeader.Width = 84;
+            this.ExpDateColumnHeader.Text = "Expired Date";
+            this.ExpDateColumnHeader.Width = 85;
             // 
-            // PktDescriptionColumnHeader
+            // CreatedByColumnHeader
             // 
-            this.PktDescriptionColumnHeader.Text = "Description";
-            this.PktDescriptionColumnHeader.Width = 77;
+            this.CreatedByColumnHeader.Text = "Created By";
+            this.CreatedByColumnHeader.Width = 77;
             // 
-            // PktUserColumnHeader
+            // VerifiedByColumnHeader
             // 
-            this.PktUserColumnHeader.Text = "User";
+            this.VerifiedByColumnHeader.Text = "Verified By";
+            this.VerifiedByColumnHeader.Width = 86;
             // 
-            // PacketContextMenuStrip
+            // packetDescriptionRichTextBox
             // 
-            this.PacketContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.verifyToolStripMenuItem});
-            this.PacketContextMenuStrip.Name = "PacketContextMenuStrip";
-            this.PacketContextMenuStrip.Size = new System.Drawing.Size(114, 26);
-            // 
-            // verifyToolStripMenuItem
-            // 
-            this.verifyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("verifyToolStripMenuItem.Image")));
-            this.verifyToolStripMenuItem.Name = "verifyToolStripMenuItem";
-            this.verifyToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.verifyToolStripMenuItem.Text = "Verify";
-            this.verifyToolStripMenuItem.Click += new System.EventHandler(this.verifyToolStripMenuItem_Click);
+            this.packetDescriptionRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.packetDescriptionRichTextBox.Location = new System.Drawing.Point(0, 0);
+            this.packetDescriptionRichTextBox.Name = "packetDescriptionRichTextBox";
+            this.packetDescriptionRichTextBox.Size = new System.Drawing.Size(569, 55);
+            this.packetDescriptionRichTextBox.TabIndex = 0;
+            this.packetDescriptionRichTextBox.Text = "";
+            this.packetDescriptionRichTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.packetDescriptionRichTextBox_MouseUp);
             // 
             // PacketListToolStrip
             // 
             this.PacketListToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.PacketListToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
-            this.toolStripComboBox1,
-            this.showAllToolStripButton,
-            this.showVerifiedToolStripButton,
-            this.showUnVerifiedToolStripButton});
+            this.toolStripComboBox1});
             this.PacketListToolStrip.Location = new System.Drawing.Point(0, 0);
             this.PacketListToolStrip.Name = "PacketListToolStrip";
             this.PacketListToolStrip.Size = new System.Drawing.Size(571, 25);
@@ -1050,46 +1046,13 @@
             this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
-            // showAllToolStripButton
-            // 
-            this.showAllToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.showAllToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("showAllToolStripButton.Image")));
-            this.showAllToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.showAllToolStripButton.Name = "showAllToolStripButton";
-            this.showAllToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.showAllToolStripButton.Text = "All";
-            this.showAllToolStripButton.Visible = false;
-            this.showAllToolStripButton.Click += new System.EventHandler(this.showAllToolStripButton_Click);
-            // 
-            // showVerifiedToolStripButton
-            // 
-            this.showVerifiedToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.showVerifiedToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("showVerifiedToolStripButton.Image")));
-            this.showVerifiedToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.showVerifiedToolStripButton.Name = "showVerifiedToolStripButton";
-            this.showVerifiedToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.showVerifiedToolStripButton.Text = "Verified";
-            this.showVerifiedToolStripButton.Visible = false;
-            this.showVerifiedToolStripButton.Click += new System.EventHandler(this.showVerifiedToolStripButton_Click);
-            // 
-            // showUnVerifiedToolStripButton
-            // 
-            this.showUnVerifiedToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.showUnVerifiedToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("showUnVerifiedToolStripButton.Image")));
-            this.showUnVerifiedToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.showUnVerifiedToolStripButton.Name = "showUnVerifiedToolStripButton";
-            this.showUnVerifiedToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.showUnVerifiedToolStripButton.Text = "UnVerified";
-            this.showUnVerifiedToolStripButton.Visible = false;
-            this.showUnVerifiedToolStripButton.Click += new System.EventHandler(this.showUnVerifiedToolStripButton_Click);
-            // 
             // PacketsTabPage
             // 
             this.PacketsTabPage.Controls.Add(this.PacketListView);
             this.PacketsTabPage.Location = new System.Drawing.Point(4, 22);
             this.PacketsTabPage.Name = "PacketsTabPage";
             this.PacketsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.PacketsTabPage.Size = new System.Drawing.Size(835, 427);
+            this.PacketsTabPage.Size = new System.Drawing.Size(832, 423);
             this.PacketsTabPage.TabIndex = 2;
             this.PacketsTabPage.Text = "Packets";
             this.PacketsTabPage.UseVisualStyleBackColor = true;
@@ -1108,7 +1071,7 @@
             this.PacketListView.FullRowSelect = true;
             this.PacketListView.Location = new System.Drawing.Point(3, 3);
             this.PacketListView.Name = "PacketListView";
-            this.PacketListView.Size = new System.Drawing.Size(829, 421);
+            this.PacketListView.Size = new System.Drawing.Size(826, 417);
             this.PacketListView.TabIndex = 0;
             this.PacketListView.UseCompatibleStateImageBehavior = false;
             this.PacketListView.View = System.Windows.Forms.View.Details;
@@ -1148,7 +1111,7 @@
             this.ReportTabPage.Location = new System.Drawing.Point(4, 22);
             this.ReportTabPage.Name = "ReportTabPage";
             this.ReportTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ReportTabPage.Size = new System.Drawing.Size(835, 427);
+            this.ReportTabPage.Size = new System.Drawing.Size(832, 423);
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Report";
             this.ReportTabPage.UseVisualStyleBackColor = true;
@@ -1162,7 +1125,7 @@
             this.ReportListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ReportListView.Location = new System.Drawing.Point(3, 3);
             this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(829, 421);
+            this.ReportListView.Size = new System.Drawing.Size(826, 417);
             this.ReportListView.TabIndex = 0;
             this.ReportListView.UseCompatibleStateImageBehavior = false;
             this.ReportListView.View = System.Windows.Forms.View.Details;
@@ -1182,7 +1145,7 @@
             this.HardwareKeyTabPage.Controls.Add(this.panel1);
             this.HardwareKeyTabPage.Location = new System.Drawing.Point(4, 22);
             this.HardwareKeyTabPage.Name = "HardwareKeyTabPage";
-            this.HardwareKeyTabPage.Size = new System.Drawing.Size(835, 427);
+            this.HardwareKeyTabPage.Size = new System.Drawing.Size(832, 423);
             this.HardwareKeyTabPage.TabIndex = 4;
             this.HardwareKeyTabPage.Text = "Hardware Keys";
             this.HardwareKeyTabPage.UseVisualStyleBackColor = true;
@@ -1194,7 +1157,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(835, 427);
+            this.panel1.Size = new System.Drawing.Size(832, 423);
             this.panel1.TabIndex = 0;
             // 
             // HardwareKeyListView
@@ -1209,7 +1172,7 @@
             this.HardwareKeyListView.GridLines = true;
             this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
             this.HardwareKeyListView.Name = "HardwareKeyListView";
-            this.HardwareKeyListView.Size = new System.Drawing.Size(835, 402);
+            this.HardwareKeyListView.Size = new System.Drawing.Size(832, 398);
             this.HardwareKeyListView.TabIndex = 1;
             this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
             this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
@@ -1235,7 +1198,7 @@
             this.addHardwareKeyToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(835, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(832, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -1256,6 +1219,30 @@
             this.statusStrip1.Size = new System.Drawing.Size(989, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // PacketContextMenuStrip
+            // 
+            this.PacketContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.verifyToolStripMenuItem,
+            this.updateToolStripMenuItem});
+            this.PacketContextMenuStrip.Name = "PacketContextMenuStrip";
+            this.PacketContextMenuStrip.Size = new System.Drawing.Size(121, 48);
+            // 
+            // verifyToolStripMenuItem
+            // 
+            this.verifyToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("verifyToolStripMenuItem.Image")));
+            this.verifyToolStripMenuItem.Name = "verifyToolStripMenuItem";
+            this.verifyToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.verifyToolStripMenuItem.Text = "Verify";
+            this.verifyToolStripMenuItem.Click += new System.EventHandler(this.verifyToolStripMenuItem_Click);
+            // 
+            // updateToolStripMenuItem
+            // 
+            this.updateToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("updateToolStripMenuItem.Image")));
+            this.updateToolStripMenuItem.Name = "updateToolStripMenuItem";
+            this.updateToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
+            this.updateToolStripMenuItem.Text = "Update";
+            this.updateToolStripMenuItem.Click += new System.EventHandler(this.updateToolStripMenuItem_Click);
             // 
             // DetailListViewContextMenuStrip
             // 
@@ -1465,9 +1452,9 @@
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel3,
             this.shortCutToolStripComboBox});
-            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip2.Location = new System.Drawing.Point(0, 24);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(993, 25);
+            this.toolStrip2.Size = new System.Drawing.Size(989, 25);
             this.toolStrip2.TabIndex = 9;
             this.toolStrip2.Text = "toolStrip2";
             this.toolStrip2.Visible = false;
@@ -1538,8 +1525,8 @@
             this.PacketTabPage.ResumeLayout(false);
             this.PacketTabPage.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
-            this.PacketContextMenuStrip.ResumeLayout(false);
             this.PacketListToolStrip.ResumeLayout(false);
             this.PacketListToolStrip.PerformLayout();
             this.PacketsTabPage.ResumeLayout(false);
@@ -1549,6 +1536,7 @@
             this.panel1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.PacketContextMenuStrip.ResumeLayout(false);
             this.DetailListViewContextMenuStrip.ResumeLayout(false);
             this.MainTreeViewContextMenuStrip.ResumeLayout(false);
             this.LicenseContextMenuStrip.ResumeLayout(false);
@@ -1609,9 +1597,6 @@
         private System.Windows.Forms.ToolStripMenuItem verifyToolStripMenuItem;
         private System.Windows.Forms.ImageList ListViewImageList;
         private System.Windows.Forms.ToolStrip PacketListToolStrip;
-        private System.Windows.Forms.ToolStripButton showAllToolStripButton;
-        private System.Windows.Forms.ToolStripButton showVerifiedToolStripButton;
-        private System.Windows.Forms.ToolStripButton showUnVerifiedToolStripButton;
         private System.Windows.Forms.TabPage ReportTabPage;
         private Shared.VisualComponents.NoFlickerListView ReportListView;
         private System.Windows.Forms.ContextMenuStrip MainTreeViewContextMenuStrip;
@@ -1628,11 +1613,9 @@
         private System.Windows.Forms.ToolStripButton SingleToolStripButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private Shared.VisualComponents.NoFlickerListView LicensePacketListView;
-        private System.Windows.Forms.ColumnHeader PktNameColumnHeader;
-        private System.Windows.Forms.ColumnHeader PktCodeColumnHeader;
-        private System.Windows.Forms.ColumnHeader PktDateColumnHeader;
-        private System.Windows.Forms.ColumnHeader PktDescriptionColumnHeader;
-        private System.Windows.Forms.ColumnHeader PktUserColumnHeader;
+        private System.Windows.Forms.ColumnHeader PacketNameColumnHeader;
+        private System.Windows.Forms.ColumnHeader CreateDateColumnHeader;
+        private System.Windows.Forms.ColumnHeader CreatedByColumnHeader;
         private System.Windows.Forms.ColumnHeader userNameColumnHeader;
         private Shared.VisualComponents.LoadingCircle loadingCircle1;
         private System.Windows.Forms.ToolStripButton newCustMainToolStripBtn;
@@ -1686,6 +1669,10 @@
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripLabel toolStripLabel3;
         private System.Windows.Forms.ToolStripComboBox shortCutToolStripComboBox;
+        private System.Windows.Forms.ColumnHeader ExpDateColumnHeader;
+        private System.Windows.Forms.ColumnHeader VerifiedByColumnHeader;
+        private System.Windows.Forms.RichTextBox packetDescriptionRichTextBox;
+        private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
 
     }
 }

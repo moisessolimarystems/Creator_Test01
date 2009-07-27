@@ -52,6 +52,7 @@
             this.tokenTypeComboBox = new System.Windows.Forms.ComboBox();
             this.tokenValueLabel = new System.Windows.Forms.Label();
             this.availableHWKeyLabel = new System.Windows.Forms.Label();
+            this.browseTokenFileButton = new System.Windows.Forms.Button();
             this.ModuleTabPage = new System.Windows.Forms.TabPage();
             this.moduleGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -70,7 +71,7 @@
             this.descriptionLabel = new System.Windows.Forms.Label();
             this.packetOutputPathTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.packetDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.packetExpDateTextBox = new System.Windows.Forms.TextBox();
             this.orderTabPage = new System.Windows.Forms.TabPage();
             this.orderGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
@@ -98,6 +99,7 @@
             this.loadingCircle1 = new Shared.VisualComponents.LoadingCircle();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
+            this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.topPanel.SuspendLayout();
             this.licInfoTabControl.SuspendLayout();
             this.LicenseTabPage.SuspendLayout();
@@ -331,15 +333,17 @@
             // 
             // tableLayoutPanel2
             // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 42.56927F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 57.43073F));
+            this.tableLayoutPanel2.ColumnCount = 3;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59F));
             this.tableLayoutPanel2.Controls.Add(this.keyNameListBox, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueLabel, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.availableHWKeyLabel, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this.browseTokenFileButton, 2, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -353,14 +357,15 @@
             // 
             // keyNameListBox
             // 
+            this.tableLayoutPanel2.SetColumnSpan(this.keyNameListBox, 2);
             this.keyNameListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.keyNameListBox.FormattingEnabled = true;
             this.keyNameListBox.Items.AddRange(new object[] {
             "No Keys Available"});
-            this.keyNameListBox.Location = new System.Drawing.Point(175, 66);
+            this.keyNameListBox.Location = new System.Drawing.Point(162, 66);
             this.keyNameListBox.Margin = new System.Windows.Forms.Padding(5);
             this.keyNameListBox.Name = "keyNameListBox";
-            this.keyNameListBox.Size = new System.Drawing.Size(221, 95);
+            this.keyNameListBox.Size = new System.Drawing.Size(234, 95);
             this.keyNameListBox.TabIndex = 7;
             this.keyNameListBox.SelectedIndexChanged += new System.EventHandler(this.keyNameListBox_SelectedIndexChanged);
             // 
@@ -378,10 +383,11 @@
             // tokenValueTextBox
             // 
             this.tokenValueTextBox.CausesValidation = false;
-            this.tokenValueTextBox.Location = new System.Drawing.Point(175, 36);
-            this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5);
+            this.tokenValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tokenValueTextBox.Location = new System.Drawing.Point(162, 36);
+            this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
-            this.tokenValueTextBox.Size = new System.Drawing.Size(170, 20);
+            this.tokenValueTextBox.Size = new System.Drawing.Size(179, 20);
             this.tokenValueTextBox.TabIndex = 0;
             this.tokenValueTextBox.TextChanged += new System.EventHandler(this.tokenValueTextBox_TextChanged);
             this.tokenValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenValueTextBox_KeyUp);
@@ -389,12 +395,13 @@
             // tokenTypeComboBox
             // 
             this.tokenTypeComboBox.BackColor = System.Drawing.SystemColors.Window;
+            this.tokenTypeComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
-            this.tokenTypeComboBox.Location = new System.Drawing.Point(175, 5);
-            this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5);
+            this.tokenTypeComboBox.Location = new System.Drawing.Point(162, 5);
+            this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
-            this.tokenTypeComboBox.Size = new System.Drawing.Size(170, 21);
+            this.tokenTypeComboBox.Size = new System.Drawing.Size(179, 21);
             this.tokenTypeComboBox.TabIndex = 1;
             this.tokenTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.tokenTypeComboBox_SelectedIndexChanged);
             this.tokenTypeComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenTypeComboBox_KeyUp);
@@ -418,9 +425,21 @@
             this.availableHWKeyLabel.Location = new System.Drawing.Point(3, 71);
             this.availableHWKeyLabel.Margin = new System.Windows.Forms.Padding(3, 10, 3, 0);
             this.availableHWKeyLabel.Name = "availableHWKeyLabel";
-            this.availableHWKeyLabel.Size = new System.Drawing.Size(152, 13);
+            this.availableHWKeyLabel.Size = new System.Drawing.Size(121, 26);
             this.availableHWKeyLabel.TabIndex = 8;
             this.availableHWKeyLabel.Text = "Available Hardware Keys:";
+            // 
+            // browseTokenFileButton
+            // 
+            this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.browseTokenFileButton.Location = new System.Drawing.Point(341, 35);
+            this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.browseTokenFileButton.Name = "browseTokenFileButton";
+            this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
+            this.browseTokenFileButton.TabIndex = 9;
+            this.browseTokenFileButton.Text = "...";
+            this.browseTokenFileButton.UseVisualStyleBackColor = true;
+            this.browseTokenFileButton.Click += new System.EventHandler(this.browseTokenFileButton_Click);
             // 
             // ModuleTabPage
             // 
@@ -536,7 +555,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -545,15 +564,15 @@
             this.tableLayoutPanel4.Controls.Add(this.descriptionLabel, 0, 3);
             this.tableLayoutPanel4.Controls.Add(this.packetOutputPathTextBox, 1, 2);
             this.tableLayoutPanel4.Controls.Add(this.label3, 0, 2);
-            this.tableLayoutPanel4.Controls.Add(this.packetDateTimePicker, 1, 1);
+            this.tableLayoutPanel4.Controls.Add(this.packetExpDateTextBox, 1, 1);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel4.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 5;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 39F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 81F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 78F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 8F));
             this.tableLayoutPanel4.Size = new System.Drawing.Size(407, 224);
             this.tableLayoutPanel4.TabIndex = 0;
@@ -572,7 +591,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(381, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(374, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -584,22 +603,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Enabled = false;
-            this.packetNameTextBox.Location = new System.Drawing.Point(118, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(116, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(258, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(253, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(118, 104);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(116, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(258, 71);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(253, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -617,7 +635,7 @@
             // 
             this.descriptionLabel.AutoSize = true;
             this.descriptionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.descriptionLabel.Location = new System.Drawing.Point(3, 109);
+            this.descriptionLabel.Location = new System.Drawing.Point(3, 112);
             this.descriptionLabel.Margin = new System.Windows.Forms.Padding(3, 10, 3, 0);
             this.descriptionLabel.Name = "descriptionLabel";
             this.descriptionLabel.Size = new System.Drawing.Size(75, 13);
@@ -627,11 +645,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(118, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(116, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(258, 29);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(253, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -645,14 +663,16 @@
             this.label3.TabIndex = 2;
             this.label3.Text = "Packet Location:";
             // 
-            // packetDateTimePicker
+            // packetExpDateTextBox
             // 
-            this.packetDateTimePicker.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDateTimePicker.Location = new System.Drawing.Point(118, 35);
-            this.packetDateTimePicker.Margin = new System.Windows.Forms.Padding(5);
-            this.packetDateTimePicker.Name = "packetDateTimePicker";
-            this.packetDateTimePicker.Size = new System.Drawing.Size(258, 20);
-            this.packetDateTimePicker.TabIndex = 9;
+            this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(116, 35);
+            this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
+            this.packetExpDateTextBox.Name = "packetExpDateTextBox";
+            this.packetExpDateTextBox.ReadOnly = true;
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(253, 20);
+            this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
             // 
@@ -962,6 +982,11 @@
             // 
             this.errorProvider1.ContainerControl = this;
             // 
+            // browseCSVOpenFileDialog
+            // 
+            this.browseCSVOpenFileDialog.DefaultExt = "csv";
+            this.browseCSVOpenFileDialog.Filter = "CSV Files|*.csv";
+            // 
             // LicenseInfoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1073,8 +1098,10 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.GroupBox orderGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.DateTimePicker packetDateTimePicker;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
+        private System.Windows.Forms.TextBox packetExpDateTextBox;
+        private System.Windows.Forms.Button browseTokenFileButton;
+        private System.Windows.Forms.OpenFileDialog browseCSVOpenFileDialog;
 
 
     }

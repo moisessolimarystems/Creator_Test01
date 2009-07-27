@@ -307,17 +307,18 @@ namespace Client.Creator
         {
             topPanel.Controls.Clear();
             packetGroupBox.Parent = topPanel;
-            selectedObject = packetData.PacketInfo as Object;
+            selectedObject = packetData as Object;
             packetNameTextBox.Text = packetData.PacketInfo.Name;
-            packetDateTimePicker.Value = DateTime.Today.AddDays(7);
-            packetDateTimePicker.MinDate = packetDateTimePicker.Value;
-            packetOutputPathTextBox.Text = packetData.PacketInfo.OutputPath;
+            packetExpDateTextBox.Text = DateTime.Now.AddDays(14).ToLongDateString();
+            packetOutputPathTextBox.Text = packetData.PacketInfo.OutputPath;           
             packetDescriptTextBox.Text = packetData.PacketInfo.Description;
         }
         private void SavePacketTabPage(PacketDialogData packetData)
         {
-            packetData.ExpDate = packetDateTimePicker.Value;
+            packetData.ExpDate = DateTime.Parse(packetExpDateTextBox.Text); 
             packetData.PacketInfo.OutputPath = packetOutputPathTextBox.Text;
+            if (!Directory.Exists(packetData.PacketInfo.OutputPath))            
+                Directory.CreateDirectory(packetData.PacketInfo.OutputPath);            
             packetData.PacketInfo.Description = packetDescriptTextBox.Text;
         }
         #endregion
@@ -351,7 +352,7 @@ namespace Client.Creator
                         {
                             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
                             {
-                                if (modRec.moduleID.TVal.Equals(modID))
+                                if (modRec.moduleID.TVal.Equals(modID) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
                                 {
                                     totalValue += modRec.moduleValue.TVal;
                                     break;
@@ -374,6 +375,7 @@ namespace Client.Creator
                         {
                             modValueNumericUpDown.Value = module.moduleValue.TVal;
                             modValueNumericUpDown.Maximum = 65536;
+                            break;
                         }
                         else
                         {
@@ -394,6 +396,11 @@ namespace Client.Creator
             }
         }
 
+        //DecrementAddOnOrderAppInstance(module, contractnumber)
+        
+        //if module is from a std order bump up app inst when > 0
+        //if module is from a std order w/app inst 0 and there exists an add-on order with app inst 1, decrement add-on
+        //if module is from add-on and std order & any add-on has appinst 0 then +1 appinst for add-on
         private void SaveModuleTabPage(ModuleDialogData moduleData)
         {
             int modID;
@@ -410,7 +417,37 @@ namespace Client.Creator
                             {
                                 storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
                                 if (storedMod.moduleValue.TVal > 0)
+                                {
                                     storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+                                    //if (GetTotalModuleAppInstance(moduleData, storedMod) == 0)
+                                    //    storedMod.moduleAppInstance.TVal = 1;
+                                    //else
+                                    //{
+                                    //    //std order
+                                    //    if(moduleData.OrderData.ParentOrderNumber.Length == 0)
+                                    //    {
+
+                                    //    }
+                                    //    //if add-on type
+                                    //    //total is already > 0, don't do anything
+                                    //    //if std type
+                                    //    //total is already > 0, set to 1
+                                    //    //decrement any modules with parent order number = to standard order
+                                    //    //decrement any add-ons
+                                    //    //increment std
+                                    //    if(moduleData.OrderData.ParentOrderNumber
+                                    //    storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+                                    //}
+
+                                    //get total value for a std and its add-ons
+                                    //if current order is a std and appinst = 1, decrement the add-on  
+                                    //if current order is add-on and app inst = 1, don't do anything
+                                    //                               app inst = 0, then increment add-on                                                                     
+                                }
+                                else
+                                {
+                                    //if decrement std then increment add-on
+                                }
                                 break;
                             }
                         }
@@ -418,6 +455,35 @@ namespace Client.Creator
                 }
             }
         }
+
+        //private uint GetTotalModuleAppInstance(ModuleDialogData moduleData,Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
+        //{
+        //    uint totalValue = 0;
+        //    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in  moduleData.OrderData.Product.ModuleList.TVal)
+        //    {
+        //        if (modRec.moduleID.TVal.Equals(storedMod) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
+        //        {
+        //            totalValue += modRec.moduleAppInstance.TVal;
+        //            break;
+        //        }
+        //    }
+        //    return totalValue;             
+        //}
+
+        //private uint GetTotalAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
+        //{
+        //    uint totalValue = 0;
+        //    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
+        //    {
+        //        if (modRec.moduleID.TVal.Equals(storedMod) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
+        //        {
+        //            totalValue += modRec.moduleAppInstance.TVal;
+        //            break;
+        //        }
+        //    }
+        //    return totalValue;  
+        //}
+
         #endregion
 
         #region Hardware Key Methods
@@ -561,7 +627,8 @@ namespace Client.Creator
         {
             if (folderBrowserDialog.ShowDialog(this) == DialogResult.OK)
             {
-                packetOutputPathTextBox.Text = folderBrowserDialog.SelectedPath;
+                PacketDialogData selectedPacketData = selectedObject as PacketDialogData;
+                packetOutputPathTextBox.Text = Path.Combine(folderBrowserDialog.SelectedPath, selectedPacketData.CustomerName);
             }
         }
 
@@ -612,6 +679,7 @@ namespace Client.Creator
             keyNameListBox.Visible = false;
             availableHWKeyLabel.Visible = false;
             tokenValueTextBox.Enabled = false;
+            browseTokenFileButton.Visible = false;
             btnOk.Enabled = false;
             if (tokenTypeComboBox.Enabled)
                 tokenValueTextBox.Text = "";
@@ -640,6 +708,7 @@ namespace Client.Creator
                 if (selectedType != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
                 {
                     tokenValueTextBox.Enabled = true;
+                    browseTokenFileButton.Visible = true;
                 }
             }                
         }
@@ -853,6 +922,55 @@ namespace Client.Creator
                 if (!m_Validated)
                     e.Cancel = true;
         }
+
+        private string GetCSVTokenAlias(string tokenType)
+        {
+            string retVal = "";
+            switch (tokenType)
+            {
+                case "ttComputerName"://computername
+                    retVal = "Computer Name";
+                    break;
+                case "ttBiosNumber"://bios
+                    retVal = "Bios Serial Number";
+                    break;
+                case "ttMacAddress"://macaddress
+                    retVal = "Mac Address";
+                    break;
+                default:
+                    break;
+            }
+            return retVal;
+        }
+        private void browseTokenFileButton_Click(object sender, EventArgs e)
+        {
+            if (this.browseCSVOpenFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (StreamReader sr = new StreamReader(browseCSVOpenFileDialog.FileName))
+                    {
+                        String line, importedValue, selectedToken;
+                        selectedToken = GetCSVTokenAlias(tokenTypeComboBox.SelectedItem.ToString());
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            if (line.Contains(selectedToken))
+                            {
+                                //strip the line for value and load it into textbox
+                                importedValue = line.Remove(0, line.IndexOf(",")+1);
+                                importedValue = importedValue.Trim(new Char[] { '"' });
+                                tokenValueTextBox.Text = importedValue;
+                                break;
+                            }
+                        }
+                        sr.Close();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
     }
 
     #region LicenseDialogData class
@@ -884,12 +1002,14 @@ namespace Client.Creator
     {
         private PacketProperty m_PacketInfo;
         private DateTime m_ExpDate;
+        private string m_Customer;
 
         #region Constructors
 
-        public PacketDialogData(PacketProperty packetInfo)
+        public PacketDialogData(PacketProperty packetInfo, string customerName)
         {
             m_PacketInfo = packetInfo;
+            m_Customer = customerName;
         }
         #endregion
 
@@ -906,6 +1026,12 @@ namespace Client.Creator
             get { return m_ExpDate; }
             set { m_ExpDate = value; }
         }
+
+        public string CustomerName
+        {
+            get { return m_Customer; }
+            set { m_Customer = value; }
+        }
         #endregion
     }
     #endregion
@@ -913,7 +1039,6 @@ namespace Client.Creator
     #region TokenDialogData class
     public class TokenDialogData : Shared.VisualComponents.DialogData
     {        
-        //private Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType m_TokenType;
         private ValidationProperty m_Token;
         private LicenseProperty m_LicInfo;
         private List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType> m_ValidTokenTypes;
@@ -926,7 +1051,7 @@ namespace Client.Creator
             m_LicInfo = licInfo;
             m_ValidTokenTypes = new List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType>();
             m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttCompuerName);
+            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName);
             m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttMacAddress);
             m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttBiosSerialNumber);
             m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
