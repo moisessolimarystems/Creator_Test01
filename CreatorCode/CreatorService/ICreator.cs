@@ -78,7 +78,13 @@ namespace Service.Creator
         bool IsLicenseModified(string licenseName);
 
         [OperationContract]
-        bool IsLicenseUpdated(string licenseName); 
+        bool IsLicenseUpdated(string licenseName);
+
+        [OperationContract]
+        IList<string> GetModifiedLicensesByCustomer(string custName);
+
+        [OperationContract]
+        IList<string> GetUpdatedLicensesByCustomer(string custName); 
 
         [OperationContract]
         int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
@@ -113,6 +119,12 @@ namespace Service.Creator
 
         [OperationContract]
         PacketTable GetPacketByVerificationCode(string verificationCode);
+
+        [OperationContract]
+        bool ValidateVerificationCode(string packetName, string verificationCode);
+
+        [OperationContract]
+        string GenerateLicInfoByVerifyData(ref Byte[] byteVerifyData);
 
         [OperationContract()]
         void CreatePacket(PacketTable packet);

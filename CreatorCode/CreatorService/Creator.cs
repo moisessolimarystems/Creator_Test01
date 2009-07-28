@@ -142,6 +142,16 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetModifiedLicensesByCustomer(string custName)
+        {
+            return LicenseTable.GetModifiedLicenseNamesByCustomer(custName);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetUpdatedLicensesByCustomer(string custName)
+        {
+            return LicenseTable.GetUpdatedLicensesByCustomer(custName);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType)
         {
             //TODO : try not to cast. Performance issues and might truncate and bad practice
@@ -205,6 +215,7 @@ namespace Service.Creator
                 LicenseID = licRecord.ID,
                 PacketVerificationCode = verificationCode,
                 DateCreated = DateTime.Today,
+                ExpiredDate = expDate,
                 IsVerified = false,
                 PacketComments = comments,
                 UserName = user
@@ -262,6 +273,17 @@ namespace Service.Creator
         public PacketTable GetPacketByVerificationCode(string verificationCode)
         {
             return PacketTable.GetPacketByVerificationCode(verificationCode);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public bool ValidateVerificationCode(string packetName, string verificationCode)
+        {
+            return PacketTable.ValidateVerificationCode(packetName, verificationCode);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public string GenerateLicInfoByVerifyData(ref Byte[] byteVerifyData)
+        {
+            m_licServer.Connect("localhost");
+            return m_licServer.GenerateLicInfo_ByVerifyData(byteVerifyData);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreatePacket(PacketTable packet)
