@@ -37,9 +37,6 @@ namespace CreatorData
     partial void InsertTransactionTable(TransactionTable instance);
     partial void UpdateTransactionTable(TransactionTable instance);
     partial void DeleteTransactionTable(TransactionTable instance);
-    partial void InsertPacketTable(PacketTable instance);
-    partial void UpdatePacketTable(PacketTable instance);
-    partial void DeletePacketTable(PacketTable instance);
     partial void InsertLicenseTable(LicenseTable instance);
     partial void UpdateLicenseTable(LicenseTable instance);
     partial void DeleteLicenseTable(LicenseTable instance);
@@ -58,6 +55,9 @@ namespace CreatorData
     partial void InsertTokenTable(TokenTable instance);
     partial void UpdateTokenTable(TokenTable instance);
     partial void DeleteTokenTable(TokenTable instance);
+    partial void InsertPacketTable(PacketTable instance);
+    partial void UpdatePacketTable(PacketTable instance);
+    partial void DeletePacketTable(PacketTable instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -106,14 +106,6 @@ namespace CreatorData
 			}
 		}
 		
-		public System.Data.Linq.Table<PacketTable> PacketTables
-		{
-			get
-			{
-				return this.GetTable<PacketTable>();
-			}
-		}
-		
 		public System.Data.Linq.Table<LicenseTable> LicenseTables
 		{
 			get
@@ -159,6 +151,14 @@ namespace CreatorData
 			get
 			{
 				return this.GetTable<TokenTable>();
+			}
+		}
+		
+		public System.Data.Linq.Table<PacketTable> PacketTables
+		{
+			get
+			{
+				return this.GetTable<PacketTable>();
 			}
 		}
 	}
@@ -656,298 +656,6 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].Packet")]
-	[DataContract()]
-	public partial class PacketTable : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _ID;
-		
-		private System.DateTime _DateCreated;
-		
-		private string _PacketVerificationCode;
-		
-		private bool _IsVerified;
-		
-		private string _PacketComments;
-		
-		private string _PacketName;
-		
-		private int _LicenseID;
-		
-		private string _UserName;
-		
-		private EntityRef<LicenseTable> _License;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIDChanging(int value);
-    partial void OnIDChanged();
-    partial void OnDateCreatedChanging(System.DateTime value);
-    partial void OnDateCreatedChanged();
-    partial void OnPacketVerificationCodeChanging(string value);
-    partial void OnPacketVerificationCodeChanged();
-    partial void OnIsVerifiedChanging(bool value);
-    partial void OnIsVerifiedChanged();
-    partial void OnPacketCommentsChanging(string value);
-    partial void OnPacketCommentsChanged();
-    partial void OnPacketNameChanging(string value);
-    partial void OnPacketNameChanged();
-    partial void OnLicenseIDChanging(int value);
-    partial void OnLicenseIDChanged();
-    partial void OnUserNameChanging(string value);
-    partial void OnUserNameChanged();
-    #endregion
-		
-		public PacketTable()
-		{
-			this.Initialize();
-		}
-		
-		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=1)]
-		public int ID
-		{
-			get
-			{
-				return this._ID;
-			}
-			set
-			{
-				if ((this._ID != value))
-				{
-					this.OnIDChanging(value);
-					this.SendPropertyChanging();
-					this._ID = value;
-					this.SendPropertyChanged("ID");
-					this.OnIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_DateCreated", DbType="DateTime NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=2)]
-		public System.DateTime DateCreated
-		{
-			get
-			{
-				return this._DateCreated;
-			}
-			set
-			{
-				if ((this._DateCreated != value))
-				{
-					this.OnDateCreatedChanging(value);
-					this.SendPropertyChanging();
-					this._DateCreated = value;
-					this.SendPropertyChanged("DateCreated");
-					this.OnDateCreatedChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_PacketVerificationCode", DbType="NVarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=3)]
-		public string PacketVerificationCode
-		{
-			get
-			{
-				return this._PacketVerificationCode;
-			}
-			set
-			{
-				if ((this._PacketVerificationCode != value))
-				{
-					this.OnPacketVerificationCodeChanging(value);
-					this.SendPropertyChanging();
-					this._PacketVerificationCode = value;
-					this.SendPropertyChanged("PacketVerificationCode");
-					this.OnPacketVerificationCodeChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_IsVerified", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=4)]
-		public bool IsVerified
-		{
-			get
-			{
-				return this._IsVerified;
-			}
-			set
-			{
-				if ((this._IsVerified != value))
-				{
-					this.OnIsVerifiedChanging(value);
-					this.SendPropertyChanging();
-					this._IsVerified = value;
-					this.SendPropertyChanged("IsVerified");
-					this.OnIsVerifiedChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_PacketComments", DbType="VarChar(255)", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=5)]
-		public string PacketComments
-		{
-			get
-			{
-				return this._PacketComments;
-			}
-			set
-			{
-				if ((this._PacketComments != value))
-				{
-					this.OnPacketCommentsChanging(value);
-					this.SendPropertyChanging();
-					this._PacketComments = value;
-					this.SendPropertyChanged("PacketComments");
-					this.OnPacketCommentsChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_PacketName", DbType="VarChar(128) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=6)]
-		public string PacketName
-		{
-			get
-			{
-				return this._PacketName;
-			}
-			set
-			{
-				if ((this._PacketName != value))
-				{
-					this.OnPacketNameChanging(value);
-					this.SendPropertyChanging();
-					this._PacketName = value;
-					this.SendPropertyChanged("PacketName");
-					this.OnPacketNameChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_LicenseID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=7)]
-		public int LicenseID
-		{
-			get
-			{
-				return this._LicenseID;
-			}
-			set
-			{
-				if ((this._LicenseID != value))
-				{
-					if (this._License.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnLicenseIDChanging(value);
-					this.SendPropertyChanging();
-					this._LicenseID = value;
-					this.SendPropertyChanged("LicenseID");
-					this.OnLicenseIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_UserName", DbType="VarChar(50)", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=8)]
-		public string UserName
-		{
-			get
-			{
-				return this._UserName;
-			}
-			set
-			{
-				if ((this._UserName != value))
-				{
-					this.OnUserNameChanging(value);
-					this.SendPropertyChanging();
-					this._UserName = value;
-					this.SendPropertyChanged("UserName");
-					this.OnUserNameChanged();
-				}
-			}
-		}
-		
-		[Association(Name="LicenseTable_PacketTable", Storage="_License", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
-		public LicenseTable LicenseTable
-		{
-			get
-			{
-				return this._License.Entity;
-			}
-			set
-			{
-				LicenseTable previousValue = this._License.Entity;
-				if (((previousValue != value) 
-							|| (this._License.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._License.Entity = null;
-						previousValue.PacketTables.Remove(this);
-					}
-					this._License.Entity = value;
-					if ((value != null))
-					{
-						value.PacketTables.Add(this);
-						this._LicenseID = value.ID;
-					}
-					else
-					{
-						this._LicenseID = default(int);
-					}
-					this.SendPropertyChanged("LicenseTable");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void Initialize()
-		{
-			this._License = default(EntityRef<LicenseTable>);
-			OnCreated();
-		}
-		
-		[OnDeserializing()]
-		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnDeserializing(StreamingContext context)
-		{
-			this.Initialize();
-		}
-	}
-	
 	[Table(Name="[CORP\\AChou].License")]
 	[DataContract()]
 	public partial class LicenseTable : INotifyPropertyChanging, INotifyPropertyChanged
@@ -975,11 +683,11 @@ namespace CreatorData
 		
 		private EntitySet<TransactionTable> _Transactions;
 		
-		private EntitySet<PacketTable> _Packets;
-		
 		private EntitySet<OrderTable> _Orders;
 		
 		private EntitySet<TokenTable> _TokenTables;
+		
+		private EntitySet<PacketTable> _PacketTables;
 		
 		private EntityRef<CustomerTable> _SCustomerRecord;
 		
@@ -1226,27 +934,8 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_PacketTable", Storage="_Packets", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=11, EmitDefaultValue=false)]
-		public EntitySet<PacketTable> PacketTables
-		{
-			get
-			{
-				if ((this.serializing 
-							&& (this._Packets.HasLoadedOrAssignedValues == false)))
-				{
-					return null;
-				}
-				return this._Packets;
-			}
-			set
-			{
-				this._Packets.Assign(value);
-			}
-		}
-		
 		[Association(Name="LicenseTable_OrderTable", Storage="_Orders", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=12, EmitDefaultValue=false)]
+		[DataMember(Order=11, EmitDefaultValue=false)]
 		public EntitySet<OrderTable> OrderTables
 		{
 			get
@@ -1265,7 +954,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=13, EmitDefaultValue=false)]
+		[DataMember(Order=12, EmitDefaultValue=false)]
 		public EntitySet<TokenTable> TokenTables
 		{
 			get
@@ -1280,6 +969,25 @@ namespace CreatorData
 			set
 			{
 				this._TokenTables.Assign(value);
+			}
+		}
+		
+		[Association(Name="LicenseTable_Packet", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
+		[DataMember(Order=13, EmitDefaultValue=false)]
+		public EntitySet<PacketTable> PacketTables
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._PacketTables.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._PacketTables;
+			}
+			set
+			{
+				this._PacketTables.Assign(value);
 			}
 		}
 		
@@ -1349,18 +1057,6 @@ namespace CreatorData
 			entity.LicenseTable = null;
 		}
 		
-		private void attach_Packets(PacketTable entity)
-		{
-			this.SendPropertyChanging();
-			entity.LicenseTable = this;
-		}
-		
-		private void detach_Packets(PacketTable entity)
-		{
-			this.SendPropertyChanging();
-			entity.LicenseTable = null;
-		}
-		
 		private void attach_Orders(OrderTable entity)
 		{
 			this.SendPropertyChanging();
@@ -1385,12 +1081,24 @@ namespace CreatorData
 			entity.LicenseTable = null;
 		}
 		
+		private void attach_PacketTables(PacketTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.LicenseTable = this;
+		}
+		
+		private void detach_PacketTables(PacketTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.LicenseTable = null;
+		}
+		
 		private void Initialize()
 		{
 			this._Transactions = new EntitySet<TransactionTable>(new Action<TransactionTable>(this.attach_Transactions), new Action<TransactionTable>(this.detach_Transactions));
-			this._Packets = new EntitySet<PacketTable>(new Action<PacketTable>(this.attach_Packets), new Action<PacketTable>(this.detach_Packets));
 			this._Orders = new EntitySet<OrderTable>(new Action<OrderTable>(this.attach_Orders), new Action<OrderTable>(this.detach_Orders));
 			this._TokenTables = new EntitySet<TokenTable>(new Action<TokenTable>(this.attach_TokenTables), new Action<TokenTable>(this.detach_TokenTables));
+			this._PacketTables = new EntitySet<PacketTable>(new Action<PacketTable>(this.attach_PacketTables), new Action<PacketTable>(this.detach_PacketTables));
 			this._SCustomerRecord = default(EntityRef<CustomerTable>);
 			OnCreated();
 		}
@@ -2409,6 +2117,348 @@ namespace CreatorData
 					if ((value != null))
 					{
 						value.TokenTables.Add(this);
+						this._LicenseID = value.ID;
+					}
+					else
+					{
+						this._LicenseID = default(int);
+					}
+					this.SendPropertyChanged("LicenseTable");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
+			this._LicenseTable = default(EntityRef<LicenseTable>);
+			OnCreated();
+		}
+		
+		[OnDeserializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[Table(Name="[CORP\\AChou].Packet")]
+	[DataContract()]
+	public partial class PacketTable : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private System.DateTime _DateCreated;
+		
+		private string _PacketVerificationCode;
+		
+		private bool _IsVerified;
+		
+		private string _PacketComments;
+		
+		private string _PacketName;
+		
+		private int _LicenseID;
+		
+		private string _UserName;
+		
+		private System.DateTime _ExpiredDate;
+		
+		private string _VerifiedBy;
+		
+		private EntityRef<LicenseTable> _LicenseTable;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnDateCreatedChanging(System.DateTime value);
+    partial void OnDateCreatedChanged();
+    partial void OnPacketVerificationCodeChanging(string value);
+    partial void OnPacketVerificationCodeChanged();
+    partial void OnIsVerifiedChanging(bool value);
+    partial void OnIsVerifiedChanged();
+    partial void OnPacketCommentsChanging(string value);
+    partial void OnPacketCommentsChanged();
+    partial void OnPacketNameChanging(string value);
+    partial void OnPacketNameChanged();
+    partial void OnLicenseIDChanging(int value);
+    partial void OnLicenseIDChanged();
+    partial void OnUserNameChanging(string value);
+    partial void OnUserNameChanged();
+    partial void OnExpiredDateChanging(System.DateTime value);
+    partial void OnExpiredDateChanged();
+    partial void OnVerifiedByChanging(string value);
+    partial void OnVerifiedByChanged();
+    #endregion
+		
+		public PacketTable()
+		{
+			this.Initialize();
+		}
+		
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=1)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_DateCreated", DbType="DateTime NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=2)]
+		public System.DateTime DateCreated
+		{
+			get
+			{
+				return this._DateCreated;
+			}
+			set
+			{
+				if ((this._DateCreated != value))
+				{
+					this.OnDateCreatedChanging(value);
+					this.SendPropertyChanging();
+					this._DateCreated = value;
+					this.SendPropertyChanged("DateCreated");
+					this.OnDateCreatedChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_PacketVerificationCode", DbType="NVarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=3)]
+		public string PacketVerificationCode
+		{
+			get
+			{
+				return this._PacketVerificationCode;
+			}
+			set
+			{
+				if ((this._PacketVerificationCode != value))
+				{
+					this.OnPacketVerificationCodeChanging(value);
+					this.SendPropertyChanging();
+					this._PacketVerificationCode = value;
+					this.SendPropertyChanged("PacketVerificationCode");
+					this.OnPacketVerificationCodeChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_IsVerified", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=4)]
+		public bool IsVerified
+		{
+			get
+			{
+				return this._IsVerified;
+			}
+			set
+			{
+				if ((this._IsVerified != value))
+				{
+					this.OnIsVerifiedChanging(value);
+					this.SendPropertyChanging();
+					this._IsVerified = value;
+					this.SendPropertyChanged("IsVerified");
+					this.OnIsVerifiedChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_PacketComments", DbType="VarChar(255)", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=5)]
+		public string PacketComments
+		{
+			get
+			{
+				return this._PacketComments;
+			}
+			set
+			{
+				if ((this._PacketComments != value))
+				{
+					this.OnPacketCommentsChanging(value);
+					this.SendPropertyChanging();
+					this._PacketComments = value;
+					this.SendPropertyChanged("PacketComments");
+					this.OnPacketCommentsChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_PacketName", DbType="VarChar(128) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=6)]
+		public string PacketName
+		{
+			get
+			{
+				return this._PacketName;
+			}
+			set
+			{
+				if ((this._PacketName != value))
+				{
+					this.OnPacketNameChanging(value);
+					this.SendPropertyChanging();
+					this._PacketName = value;
+					this.SendPropertyChanged("PacketName");
+					this.OnPacketNameChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_LicenseID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=7)]
+		public int LicenseID
+		{
+			get
+			{
+				return this._LicenseID;
+			}
+			set
+			{
+				if ((this._LicenseID != value))
+				{
+					if (this._LicenseTable.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnLicenseIDChanging(value);
+					this.SendPropertyChanging();
+					this._LicenseID = value;
+					this.SendPropertyChanged("LicenseID");
+					this.OnLicenseIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_UserName", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=8)]
+		public string UserName
+		{
+			get
+			{
+				return this._UserName;
+			}
+			set
+			{
+				if ((this._UserName != value))
+				{
+					this.OnUserNameChanging(value);
+					this.SendPropertyChanging();
+					this._UserName = value;
+					this.SendPropertyChanged("UserName");
+					this.OnUserNameChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_ExpiredDate", DbType="DateTime NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=9)]
+		public System.DateTime ExpiredDate
+		{
+			get
+			{
+				return this._ExpiredDate;
+			}
+			set
+			{
+				if ((this._ExpiredDate != value))
+				{
+					this.OnExpiredDateChanging(value);
+					this.SendPropertyChanging();
+					this._ExpiredDate = value;
+					this.SendPropertyChanged("ExpiredDate");
+					this.OnExpiredDateChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_VerifiedBy", DbType="VarChar(50)", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=10)]
+		public string VerifiedBy
+		{
+			get
+			{
+				return this._VerifiedBy;
+			}
+			set
+			{
+				if ((this._VerifiedBy != value))
+				{
+					this.OnVerifiedByChanging(value);
+					this.SendPropertyChanging();
+					this._VerifiedBy = value;
+					this.SendPropertyChanged("VerifiedBy");
+					this.OnVerifiedByChanged();
+				}
+			}
+		}
+		
+		[Association(Name="LicenseTable_Packet", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public LicenseTable LicenseTable
+		{
+			get
+			{
+				return this._LicenseTable.Entity;
+			}
+			set
+			{
+				LicenseTable previousValue = this._LicenseTable.Entity;
+				if (((previousValue != value) 
+							|| (this._LicenseTable.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._LicenseTable.Entity = null;
+						previousValue.PacketTables.Remove(this);
+					}
+					this._LicenseTable.Entity = value;
+					if ((value != null))
+					{
+						value.PacketTables.Add(this);
 						this._LicenseID = value.ID;
 					}
 					else

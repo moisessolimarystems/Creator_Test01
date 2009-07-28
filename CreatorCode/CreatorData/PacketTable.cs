@@ -15,9 +15,22 @@ namespace CreatorData
                 db.ObjectTrackingEnabled = false;
                 if (licenseName != "")
                 {
-                    return db.PacketTables.Where(c => c.LicenseTable.LicenseName.Equals(licenseName)).ToList();
+                    return db.PacketTables.Where(c => c.LicenseTable.LicenseName.Equals(licenseName)).OrderBy(d => d.ID).ToList();
                 }
                 return db.PacketTables.ToList();
+            }
+        }
+
+        public static bool ValidateVerificationCode(string packetName, string verificationCode)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var packetTables = db.PacketTables.Where(c => c.PacketVerificationCode.Equals(verificationCode) &&
+                                                              c.PacketName.Equals(packetName));
+                if (packetTables.Count() > 0)
+                    return true;
+                return false;
             }
         }
 

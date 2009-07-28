@@ -248,6 +248,21 @@ namespace CreatorData
             }
         }
 
+        public static IList<string> GetModifiedLicenseNamesByCustomer(string custName)
+        {
+            //return all license names for a customer where a license has transactions that have no packetid value
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+
+                var licenses = from c in db.LicenseTables
+                               where c.CustomerTable.SCRname.Equals(custName) &&
+                                     c.TransactionTables.Where(t => t.taPacketID.HasValue != true).Count() > 0
+                               select c.LicenseName;                
+                return licenses.ToList();
+            }
+        }
+
         
         public static bool IsLicenseUpdated(string licenseName)
         {
@@ -296,8 +311,12 @@ namespace CreatorData
                             {
                                 //issue -> corresponding order id for standard is necessary
                                 stdOrderName = (license.LicenseType.Equals(2)) ? order.OrderNumber.Replace("D", "S") : order.OrderNumber.Replace("T", "S");
-                                standardOrder = db.OrderTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
-                                                                          c.OrderNumber.Equals(stdOrderName)).FirstOrDefault().ID;
+                                var storedOrder = db.OrderTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
+                                                                          c.OrderNumber.Equals(stdOrderName)).FirstOrDefault();
+                                if (storedOrder != null)
+                                    standardOrder = storedOrder.ID;
+                                else
+                                    return false;
                                 var stdTransaction = db.TransactionTables.Where(c => c.taLicenseID.Equals(standardLicense.ID) &&
                                                                                      c.taOrderID.Equals(standardOrder) &&
                                                                                      c.taType.Equals(2)).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
@@ -324,6 +343,22 @@ namespace CreatorData
                 }                                      
             }
             return true;
+        }
+
+        public static IList<string> GetUpdatedLicensesByCustomer(string custName)
+        {
+            List<string> updatedLicenses = new List<string>();
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var licenses = db.LicenseTables.Where(c => c.CustomerTable.SCRname.Equals(custName));                
+                foreach (var license in licenses)
+                {
+                    if (IsLicenseUpdated(license.LicenseName))
+                        updatedLicenses.Add(license.LicenseName);
+                }
+            }
+            return updatedLicenses;
         }
 
         public static void CreateLicense(LicenseTable license)

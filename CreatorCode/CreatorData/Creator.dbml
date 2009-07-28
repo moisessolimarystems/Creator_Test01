@@ -23,19 +23,6 @@
       <Association Name="LicenseTable_TransactionTable" Member="LicenseTable" Storage="_License" ThisKey="taLicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
-  <Table Name="[CORP\AChou].Packet" Member="PacketTables">
-    <Type Name="PacketTable">
-      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="DateCreated" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="PacketVerificationCode" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="IsVerified" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="PacketComments" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="PacketName" Type="System.String" DbType="VarChar(128) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="UserName" Type="System.String" DbType="VarChar(50)" CanBeNull="false" UpdateCheck="Never" />
-      <Association Name="LicenseTable_PacketTable" Member="LicenseTable" Storage="_License" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="[CORP\AChou].License" Member="LicenseTables">
     <Type Name="LicenseTable">
       <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
@@ -48,9 +35,9 @@
       <Column Name="LicenseComments" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="OrderIndex" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Association Name="LicenseTable_TransactionTable" Member="TransactionTables" Storage="_Transactions" ThisKey="ID" OtherKey="taLicenseID" Type="TransactionTable" />
-      <Association Name="LicenseTable_PacketTable" Member="PacketTables" Storage="_Packets" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
       <Association Name="LicenseTable_OrderTable" Member="OrderTables" Storage="_Orders" ThisKey="ID" OtherKey="LicenseID" Type="OrderTable" />
       <Association Name="LicenseTable_TokenTable" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
+      <Association Name="LicenseTable_Packet" Member="PacketTables" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
       <Association Name="CustomerTable_LicenseTable" Member="CustomerTable" Storage="_SCustomerRecord" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
     </Type>
   </Table>
@@ -102,6 +89,21 @@
       <Column Name="TokenValue" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Association Name="LicenseTable_TokenTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].Packet" Member="PacketTables">
+    <Type Name="PacketTable">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="DateCreated" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="PacketVerificationCode" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="IsVerified" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="PacketComments" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="PacketName" Type="System.String" DbType="VarChar(128) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="UserName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ExpiredDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="VerifiedBy" Type="System.String" DbType="VarChar(50)" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="LicenseTable_Packet" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
 </Database>
