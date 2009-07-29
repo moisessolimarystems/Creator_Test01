@@ -113,13 +113,13 @@
     <Compile Include="CreatorForm.Designer.cs">
       <DependentUpon>CreatorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Entities\LicenseProperty.cs" />
+    <Compile Include="Entities\LicenseServerProperty.cs" />
     <Compile Include="Entities\PacketProperty.cs" />
     <Compile Include="Entities\PermissionProperty.cs" />
     <Compile Include="Entities\ProductProperty.cs" />
     <Compile Include="Collections\SortableCollection.cs" />
     <Compile Include="Entities\ReportProperty.cs" />
-    <Compile Include="Entities\OrderProperty.cs" />
+    <Compile Include="Entities\ProductLicenseProperty.cs" />
     <Compile Include="EditDestinationName.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,11 +133,11 @@
       <DependentUpon>LicenseInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ListViewMgr.cs" />
-    <Compile Include="OrderSelectionForm.cs">
+    <Compile Include="ProductLicenseSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrderSelectionForm.Designer.cs">
-      <DependentUpon>OrderSelectionForm.cs</DependentUpon>
+    <Compile Include="ProductLicenseSelectionForm.Designer.cs">
+      <DependentUpon>ProductLicenseSelectionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PacketVerification.cs">
       <SubType>Form</SubType>
@@ -165,8 +165,8 @@
       <DependentUpon>LicenseInfoForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="OrderSelectionForm.resx">
-      <DependentUpon>OrderSelectionForm.cs</DependentUpon>
+    <EmbeddedResource Include="ProductLicenseSelectionForm.resx">
+      <DependentUpon>ProductLicenseSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PacketVerification.resx">
       <DependentUpon>PacketVerification.cs</DependentUpon>

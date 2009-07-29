@@ -234,7 +234,7 @@ namespace Client.Creator
                 newStandardLicenseToolStripMenuItem.Enabled = true;
             else
             {
-                LicenseProperty licData = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+                LicenseServerProperty licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
                 //add license items
                 if (licData.IsStandardLicenseType)
                 {
@@ -248,7 +248,7 @@ namespace Client.Creator
 
         private void EnableOrderMainToolStripDropDownMenuItems()
         {
-            LicenseProperty licData = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+            LicenseServerProperty licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
 
             //also need to account for admin allowed extra new orders 
             if (m_Permissions.pt_create_modify_key.Value)
@@ -270,7 +270,7 @@ namespace Client.Creator
 
         private void EnableLicenseContextMenu(bool value)
         {
-            LicenseProperty licData = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+            LicenseServerProperty licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
             expandToolStripMenuItem.Visible = !DetailTreeView.SelectedNode.IsExpanded;
             expandToolStripMenuItem.Enabled = (DetailTreeView.SelectedNode.Nodes.Count == 0) ? false : true;
             collapseToolStripMenuItem.Visible = DetailTreeView.SelectedNode.IsExpanded;
@@ -339,9 +339,9 @@ namespace Client.Creator
             resyncToolStripMenuItem.Enabled = false;
             deleteToolStripMenuItem.Visible = value;
             deleteToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;
-            if (DetailTreeView.SelectedNode.Tag is OrderProperty)
+            if (DetailTreeView.SelectedNode.Tag is ProductLicenseProperty)
             {
-                if ((DetailTreeView.SelectedNode.Tag as OrderProperty).LicenseName.Contains("F"))
+                if ((DetailTreeView.SelectedNode.Tag as ProductLicenseProperty).LicenseName.Contains("F"))
                     deleteToolStripMenuItem.Enabled = false;
             }
         }
@@ -504,25 +504,25 @@ namespace Client.Creator
             {
                 case 1:            //level 1 - License
                     LoadLicenseNode(e.Node);
-                    m_CurrentLicenseName = (e.Node.Tag as LicenseProperty).Name;
+                    m_CurrentLicenseName = (e.Node.Tag as LicenseServerProperty).Name;
                     createPacketMainToolStripBtn.Enabled = true;
                     break;
                 case 2:            //level 2 - Product
                     LoadProductNode(e.Node);
-                    m_CurrentLicenseName = (e.Node.Parent.Tag as LicenseProperty).Name;
+                    m_CurrentLicenseName = (e.Node.Parent.Tag as LicenseServerProperty).Name;
                     DetailPropertyGrid.Enabled = false;
                     break;
                 case 3:            //level 3 - Order
                     LoadProductNode(e.Node.Parent);
-                    m_CurrentLicenseName = (e.Node.Parent.Parent.Tag as LicenseProperty).Name;
-                    LicenseProperty licProperty = e.Node.Parent.Parent.Tag as LicenseProperty;
+                    m_CurrentLicenseName = (e.Node.Parent.Parent.Tag as LicenseServerProperty).Name;
+                    LicenseServerProperty licProperty = e.Node.Parent.Parent.Tag as LicenseServerProperty;
                     if (licProperty.IsBackupLicenseType)
                         DetailPropertyGrid.Enabled = false;
                     break;
                 case 4:            //level 4 - AddOn Order
                     LoadProductNode(e.Node.Parent.Parent);
-                    m_CurrentLicenseName = (e.Node.Parent.Parent.Parent.Tag as LicenseProperty).Name;
-                    LicenseProperty addOnLicense = e.Node.Parent.Parent.Parent.Tag as LicenseProperty;
+                    m_CurrentLicenseName = (e.Node.Parent.Parent.Parent.Tag as LicenseServerProperty).Name;
+                    LicenseServerProperty addOnLicense = e.Node.Parent.Parent.Parent.Tag as LicenseServerProperty;
                     if (addOnLicense.IsBackupLicenseType)
                         DetailPropertyGrid.Enabled = false;
                     break;
@@ -600,9 +600,9 @@ namespace Client.Creator
 
         private void DetailTreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.Tag is LicenseProperty)
+            if (e.Node.Tag is LicenseServerProperty)
             {   //Disable expand if key is not enabled to stop license functions.
-                if (!(e.Node.Tag as LicenseProperty).IsEnabled)
+                if (!(e.Node.Tag as LicenseServerProperty).IsEnabled)
                 {
                     e.Cancel = true;
                     return;
@@ -645,7 +645,7 @@ namespace Client.Creator
                 dlvNewToolStripMenuItem.Visible = false;
                 dlvEditToolStripMenuItem.Enabled = false;
                 dlvDeleteToolStripMenuItem.Enabled = false;
-                if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
+                if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
                 {
                     bShow = true;
                     if (m_Permissions.pt_module_pwd.Value)
@@ -658,19 +658,19 @@ namespace Client.Creator
                         }
                     }
                 }
-                if (DetailTreeView.SelectedNode.Tag is OrderProperty)
+                if (DetailTreeView.SelectedNode.Tag is ProductLicenseProperty)
                 {
                     bShow = true;
                     if (m_Permissions.pt_module_pwd.Value)
                     {
-                        LicenseProperty license;
-                        if(DetailTreeView.SelectedNode.Parent.Parent.Tag is LicenseProperty)
-                            license = DetailTreeView.SelectedNode.Parent.Parent.Tag as LicenseProperty;
+                        LicenseServerProperty license;
+                        if(DetailTreeView.SelectedNode.Parent.Parent.Tag is LicenseServerProperty)
+                            license = DetailTreeView.SelectedNode.Parent.Parent.Tag as LicenseServerProperty;
                         else
-                            license = DetailTreeView.SelectedNode.Parent.Parent.Parent.Tag as LicenseProperty;
+                            license = DetailTreeView.SelectedNode.Parent.Parent.Parent.Tag as LicenseServerProperty;
                         if (license.IsStandardLicenseType)
                         {
-                            OrderProperty selectedOrder = DetailTreeView.SelectedNode.Tag as OrderProperty;
+                            ProductLicenseProperty selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                             //case 1: no item selected - no edit, delete
                             //case 2: trial - no new, delete, yes edit
                             //case 3: permanent - no new, delete default mod yes edit, non default ok new, edit, delete
@@ -685,7 +685,7 @@ namespace Client.Creator
                         }
                         else if (license.IsTestDevelopmentLicenseType)
                         {
-                            OrderProperty selectedOrder = DetailTreeView.SelectedNode.Tag as OrderProperty;
+                            ProductLicenseProperty selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                             if (item != null)
                             {
                                 //only if order is an admin order
@@ -725,17 +725,17 @@ namespace Client.Creator
             {
                 if(DetailListView.SelectedItems.Count > 0 && e.KeyCode.Equals(Keys.Delete))
                 {
-                    if (DetailTreeView.SelectedNode.Tag is LicenseProperty)   //token remove
+                    if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)   //token remove
                         if(dlvRemoveToolStripButton.Enabled)
-                            dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+                            dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
                     else                //module remove
-                        dlvRemoveModule(DetailTreeView.SelectedNode.Tag as OrderProperty);
+                        dlvRemoveModule(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
                 }
             }
             if(e.KeyCode.Equals(Keys.Insert))
             {
-                if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
-                    CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+                if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
+                    CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             }
         }
         #endregion
@@ -793,7 +793,7 @@ namespace Client.Creator
             LicenseTable licRec;
             bool bOrderChanged = false;
             ProductProperty orderProduct = null;
-            OrderProperty selectedOrder = null;
+            ProductLicenseProperty selectedOrder = null;
             OrderTable storedOrder = null;
             Service<ICreator>.Use((client) =>
             {
@@ -812,7 +812,7 @@ namespace Client.Creator
                     case 1:
                         //license level - only changes activations, validation tokens
                         licPackage = new Lic_PackageAttribs();
-                        LicenseProperty licItem = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+                        LicenseServerProperty licItem = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
                         licRec = client.GetLicenseByName(DetailTreeView.SelectedNode.Text, false);
                         licPackage.Stream = licRec.LicenseInfo;
                         LicenseItemTransactions(ref licPackage.licLicenseInfoAttribs, ref licItem);
@@ -827,7 +827,7 @@ namespace Client.Creator
                     case 3:
                         //orderdata level - no add-on orders
                         //alert failover, test dev, disaster recovery 
-                        selectedOrder = DetailTreeView.SelectedNode.Tag as OrderProperty;
+                        selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                         storedOrder = client.GetOrderByOrderName(selectedOrder.OrderNumber);
                         bOrderChanged = OrderTransactions(ref storedOrder, selectedOrder);
                         client.UpdateOrder(storedOrder);
@@ -851,7 +851,7 @@ namespace Client.Creator
                         //other orders may need to be updated with the latest license version
                         foreach (TreeNode node in DetailTreeView.SelectedNode.Parent.Nodes)
                         {
-                            OrderProperty orderNode = node.Tag as OrderProperty;
+                            ProductLicenseProperty orderNode = node.Tag as ProductLicenseProperty;
                             orderNode.ProductVersion = selectedOrder.ProductVersion;
                         }
                         //need to reload customer node to set modified and pending states for any licenses
@@ -860,14 +860,14 @@ namespace Client.Creator
                         SetCustomerLicenseState(DetailTreeView.SelectedNode);
                         LoadLicenseNode(DetailTreeView.SelectedNode.Parent.Parent);
                         LoadProductNode(DetailTreeView.SelectedNode.Parent);
-                        LoadDetailListView(DetailTreeView.SelectedNode.Tag as OrderProperty);
+                        LoadDetailListView(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
                         LoadTransactionItems(selectedOrder.LicenseName);
                         break;
                     case 4:
                         //Add-on orderdata level         
                         TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
                         orderProduct = DetailTreeView.SelectedNode.Parent.Parent.Tag as ProductProperty;
-                        selectedOrder = DetailTreeView.SelectedNode.Tag as OrderProperty;
+                        selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                         storedOrder = client.GetOrderByOrderName(selectedOrder.OrderNumber);
                         //need to delete order if converting from add-on to perm
                         //issue, add-on order merged into perm, how to show transaction      
@@ -883,7 +883,7 @@ namespace Client.Creator
                             client.DeleteOrder(storedOrder);
                             DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent;
                             //return updated perm order contract
-                            (DetailTreeView.SelectedNode.Tag as OrderProperty).Product.Product = AddOnProductTransactions(ref licPackage.licLicenseInfoAttribs, selectedOrder);
+                            (DetailTreeView.SelectedNode.Tag as ProductLicenseProperty).Product.Product = AddOnProductTransactions(ref licPackage.licLicenseInfoAttribs, selectedOrder);
                             //need to update parent order with values from add-on order
                             DetailTreeView.SelectedNode.Nodes.RemoveByKey(selectedOrder.OrderNumber);
                             productNode = DetailTreeView.SelectedNode.Parent;
@@ -911,7 +911,7 @@ namespace Client.Creator
                         }
                         SetCustomerLicenseState(DetailTreeView.SelectedNode);
                         LoadProductNode(productNode);
-                        LoadDetailListView(DetailTreeView.SelectedNode.Tag as OrderProperty);
+                        LoadDetailListView(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
                         LoadTransactionItems(selectedOrder.LicenseName);
                         break;
                     default:
@@ -927,9 +927,9 @@ namespace Client.Creator
             int selectedIndex = DetailTreeView.SelectedNode.Index;
             if (DetailTreeView.SelectedNode.Tag is CustomerProperty)
                 bDeleted = DeleteCustomerNode(DetailTreeView.SelectedNode);
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
                 bDeleted = DeleteLicenseNode(DetailTreeView.SelectedNode);
-            if (DetailTreeView.SelectedNode.Tag is OrderProperty)
+            if (DetailTreeView.SelectedNode.Tag is ProductLicenseProperty)
                 bDeleted = DeleteOrderNode(DetailTreeView.SelectedNode, true);
             if (bDeleted)
             {
@@ -952,7 +952,7 @@ namespace Client.Creator
             //failover, DR still need to populate modules,products, orders
             TreeNode newNode = CreateLicenseNode(data.LicInfo);
             DetailTreeView.BeginUpdate();
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
                 custNode = DetailTreeView.SelectedNode.Parent;
             //resort tree
             custNode.Nodes.Clear();
@@ -966,10 +966,10 @@ namespace Client.Creator
         
         private void CreateStandardLicense()
         {
-            LicenseProperty newLicense = new LicenseProperty();
+            LicenseServerProperty newLicense = new LicenseServerProperty();
             TreeNode selectedNode = DetailTreeView.SelectedNode;
             //set to customer node if selected is license node
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
                 selectedNode = DetailTreeView.SelectedNode.Parent;
             Service<ICreator>.Use((client) =>
             {
@@ -988,7 +988,7 @@ namespace Client.Creator
 
         private void CreateFailoverLicense()
         {
-            LicenseProperty selectedLicense = new LicenseProperty(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            LicenseServerProperty selectedLicense = new LicenseServerProperty(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             //pass to function to convert std to failover
             selectedLicense.LicType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover;
             //display settings form for product connections
@@ -1002,7 +1002,7 @@ namespace Client.Creator
 
         private void CreateDRLicense()
         {
-            LicenseProperty selectedLicense = new LicenseProperty(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            LicenseServerProperty selectedLicense = new LicenseServerProperty(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             //pass to function to convert std to failover
             selectedLicense.LicType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery;
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New License", ref s_CommLink))
@@ -1015,7 +1015,7 @@ namespace Client.Creator
 
         private void CreateTestDevLicense()
         {
-            LicenseProperty selectedLicense = new LicenseProperty(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            LicenseServerProperty selectedLicense = new LicenseServerProperty(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             selectedLicense.LicType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev;
             //pass to function to convert std to failover
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New License", ref s_CommLink))
@@ -1077,8 +1077,8 @@ namespace Client.Creator
 
         private void dlvNewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
-                CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
+                CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
         }
 
         private void dlvEditToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1090,7 +1090,7 @@ namespace Client.Creator
         {
             if (!(nodeObj is ProductProperty))
             {
-                if (nodeObj is LicenseProperty)
+                if (nodeObj is LicenseServerProperty)
                     EditValidationToken(selectedIndices);
                 else
                     EditModules(selectedIndices);
@@ -1103,7 +1103,7 @@ namespace Client.Creator
             {
                 //disable modifying type                
                 ValidationProperty tokenInfo = DetailListView.Items[selectedIndexes[0]].Tag as ValidationProperty;
-                LicenseProperty selectedLicense =  DetailTreeView.SelectedNode.Tag as LicenseProperty;
+                LicenseServerProperty selectedLicense =  DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
                 TokenDialogData data = new TokenDialogData(tokenInfo,selectedLicense);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
@@ -1129,7 +1129,7 @@ namespace Client.Creator
             }
             using (LicenseInfoForm dlg = new LicenseInfoForm("Modify Module", ref s_CommLink))
             {
-                ModuleDialogData data = new ModuleDialogData(moduleList, DetailTreeView.SelectedNode.Tag as OrderProperty);
+                ModuleDialogData data = new ModuleDialogData(moduleList, DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {                   
                     SaveLicense();                    
@@ -1138,7 +1138,7 @@ namespace Client.Creator
             }
         }
 
-        private void dlvRemoveToken(LicenseProperty selectedLicense)
+        private void dlvRemoveToken(LicenseServerProperty selectedLicense)
         {
             bool bModified = false;
             DialogResult dlgResult = DialogResult.None;
@@ -1184,7 +1184,7 @@ namespace Client.Creator
             }
         }
 
-        private void dlvRemoveModule(OrderProperty selectedOrder)
+        private void dlvRemoveModule(ProductLicenseProperty selectedOrder)
         {
             //module remove
             ModuleProperty module;
@@ -1196,6 +1196,11 @@ namespace Client.Creator
                     //set module to nothing 
                     module.Units = 0;
                     module.AppInstance = 0;
+                    if (module.ModuleState != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                    {
+                        if (GetTotalAddOnModuleAppInstance(selectedOrder, module) == 0)
+                            IncrementAddOnModuleAppInstance(selectedOrder, module);
+                    }                     
                     //0 = name
                     //1 = value                        
                     selectedItem.SubItems[1].Text = module.Units.ToString();
@@ -1205,12 +1210,56 @@ namespace Client.Creator
             SaveLicense();
         }
 
+        private uint GetTotalAddOnModuleAppInstance(ProductLicenseProperty moduleData, ModuleProperty storedMod)
+        {
+            uint totalValue = 0;
+            string stdProductLicense = "";
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                stdProductLicense = (storedMod.ModuleState != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.OrderNumber : moduleData.ParentOrderNumber;
+                addOnOrders = client.GetAddOnOrdersByStandardOrder(stdProductLicense);
+            });
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.Product.ModuleList.TVal)
+            {
+                if (modRec.moduleID.TVal.Equals(storedMod.ID) && (addOnOrders.Contains(modRec.contractNumber.TVal)))
+                    totalValue += modRec.moduleAppInstance.TVal;
+            }
+            return totalValue;
+        }
+
+        private void IncrementAddOnModuleAppInstance(ProductLicenseProperty moduleData, ModuleProperty module)
+        {
+            //increment first add-on found
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                addOnOrders = client.GetAddOnOrdersByStandardOrder(module.OrderNumber);
+            });
+            if (addOnOrders != null)
+            {
+                if (addOnOrders.Count > 0)
+                {
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.Product.ModuleList.TVal)
+                    {
+                        if (storedMod.moduleID.TVal == module.ID &&
+                            addOnOrders.Contains(storedMod.contractNumber.TVal))
+                        {
+                            if (storedMod.moduleValue.TVal > 0)                            
+                                storedMod.moduleAppInstance.TVal = 1;                            
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         private void dlvDeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(DetailTreeView.SelectedNode.Tag is LicenseProperty)   //token remove
-                dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            if(DetailTreeView.SelectedNode.Tag is LicenseServerProperty)   //token remove
+                dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             else                //module remove
-                dlvRemoveModule(DetailTreeView.SelectedNode.Tag as OrderProperty);
+                dlvRemoveModule(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
         }
 
         private void TransactionListView_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -1394,7 +1443,7 @@ namespace Client.Creator
 
         #region Form Methods
 
-        public void CreateNewValidationToken(LicenseProperty licInfo)
+        public void CreateNewValidationToken(LicenseServerProperty licInfo)
         {
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Validation Token", ref s_CommLink))
             {
@@ -1475,7 +1524,7 @@ namespace Client.Creator
             }
         }
          */
-        private TreeNode CreateOrderNode(OrderProperty orderData)
+        private TreeNode CreateOrderNode(ProductLicenseProperty orderData)
         {
             CreateOrderEntity(orderData);
             TreeNode orderNode = new TreeNode(orderData.OrderNumber);
@@ -1494,7 +1543,7 @@ namespace Client.Creator
             return orderNode;
         }
 
-        private void CreateOrderEntity(OrderProperty orderData)
+        private void CreateOrderEntity(ProductLicenseProperty orderData)
         {
             OrderTable orderRec = new OrderTable();
             Service<ICreator>.Use((client) =>
@@ -1512,7 +1561,7 @@ namespace Client.Creator
                 client.CreateOrder(orderRec);
                 CreateTransaction(TransactionType.Order, 
                                   orderData, 
-                                  string.Format("Added {0} Order - {1}", orderData.ProductName, orderData.OrderStatus.ToString()), 
+                                  string.Format("Added {0} Product License - {1}", orderData.ProductName, orderData.OrderStatus.ToString()), 
                                   orderData.OrderNumber);
                 //update order index to next available index
                 licRec.OrderIndex = orderRec.OrderIndex + 1;
@@ -1530,7 +1579,7 @@ namespace Client.Creator
         }
 
         //create only done on new contract with new product
-        private TreeNode CreateProductNode(OrderProperty orderData)
+        private TreeNode CreateProductNode(ProductLicenseProperty orderData)
         {
             Lic_PackageAttribs.Lic_ProductInfoAttribs product = CreateProductEntity(orderData);
             TreeNode node = new TreeNode(orderData.Product.Name);
@@ -1543,7 +1592,7 @@ namespace Client.Creator
 
         //returns the created product module list, issue comes when creating product node that already exists
         //need to add new product entity into existing product node not overwrite
-        private Lic_PackageAttribs.Lic_ProductInfoAttribs CreateProductEntity(OrderProperty orderData)
+        private Lic_PackageAttribs.Lic_ProductInfoAttribs CreateProductEntity(ProductLicenseProperty orderData)
         {
             Lic_PackageAttribs.Lic_ProductInfoAttribs product = null;
             SetProductEntity(orderData);
@@ -1581,7 +1630,7 @@ namespace Client.Creator
 
         //fill product entity with default modules
         //only trial/addon order types
-        private void SetProductEntity(OrderProperty orderData)
+        private void SetProductEntity(ProductLicenseProperty orderData)
         {
             Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList;
@@ -1612,7 +1661,7 @@ namespace Client.Creator
         //need to separate into two functions
         //1) create license node
         //2) update group db entity with new product
-        private TreeNode CreateLicenseNode(LicenseProperty licProperties)
+        private TreeNode CreateLicenseNode(LicenseServerProperty licProperties)
         {
             //any type that is not standard needs to be based off of standard
             CreateLicenseEntity(licProperties);
@@ -1626,7 +1675,7 @@ namespace Client.Creator
             return node;
         }
 
-        private void CreateLicenseEntity(LicenseProperty licProperties)
+        private void CreateLicenseEntity(LicenseServerProperty licProperties)
         {
             //Create new license file from CustomerProperty id and next available swID
             Service<ICreator>.Use((client) =>
@@ -1673,14 +1722,14 @@ namespace Client.Creator
         //TestDevAddOrder-
         //TestDevUpdateOrder-
         //TestDevDeleteOrder-
-        void AddExistingOrder(LicenseProperty licData, List<string> orders)
+        void AddExistingOrder(LicenseServerProperty licData, List<string> orders)
         {
             //get std license
             //get test dev license
             //for each order selected in orders
             Service<ICreator>.Use((client) => 
             {
-                string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-S01", licData.CustID, licData.DestID, licData.GroupID);
+                string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", licData.CustID, licData.DestID, licData.GroupID);
                 LicenseTable stdLicRec = client.GetLicenseByName(licenseBase, false);
                 Lic_PackageAttribs stdLicPackage = new Lic_PackageAttribs();
                 stdLicPackage.Stream = stdLicRec.LicenseInfo;
@@ -1701,7 +1750,7 @@ namespace Client.Creator
                     foreach (string orderNum in orderNumbers)
                     {
                         //sub-orders                         
-                        if (orders.Contains(orderNum.Replace(replaceString, "S")))
+                        if (orders.Contains(orderNum.Replace(replaceString, "P")))
                         {
                             //get standard order
                             orderRec = client.GetOrderByOrderName(orderNum);
@@ -1722,7 +1771,7 @@ namespace Client.Creator
                             storedRec = client.GetOrderByOrderName(string.Format("{0}-{1}", licData.Name, orderRec.OrderIndex));
                             CreateTransaction(TransactionType.Order,
                                               licData.Name,
-                                              string.Format("Added {0} Order - {1}", orderRec.ProductName, Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), orderRec.OrderState)),
+                                              string.Format("Added {0} Product License - {1}", orderRec.ProductName, Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), orderRec.OrderState)),
                                               orderRec.OrderNumber);
                             //convert product into test/dev product for test/dev key
                             //Don't include add-on orders
@@ -1765,10 +1814,10 @@ namespace Client.Creator
         }
 
         //if existing replace old order
-        void UpdateExistingOrder(LicenseProperty licData)
+        void UpdateExistingOrder(LicenseServerProperty licData)
         {
             //only needed for disaster recovery and test dev
-            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-S01", licData.CustID, licData.DestID, licData.GroupID);
+            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", licData.CustID, licData.DestID, licData.GroupID);
             Service<ICreator>.Use((client) => 
             {                
                 LicenseTable stdLicRec = client.GetLicenseByName(licenseBase, false);
@@ -1814,7 +1863,7 @@ namespace Client.Creator
                                             {
                                                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in product.moduleList.TVal)
                                                 {
-                                                    if (module.contractNumber.TVal.Equals(orderNum.Replace("S", replaceString)) &&
+                                                    if (module.contractNumber.TVal.Equals(orderNum.Replace("P", replaceString)) &&
                                                         module.moduleID.TVal.Equals(stdModule.moduleID.TVal))
                                                     {
                                                         module.moduleState.TVal = stdModule.moduleState.TVal;
@@ -1840,9 +1889,9 @@ namespace Client.Creator
             });
         }
 
-        void PopulateFailoverLicense(LicenseProperty licData)
+        void PopulateFailoverLicense(LicenseServerProperty licData)
         {
-            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-S01", licData.CustID, licData.DestID, licData.GroupID);
+            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", licData.CustID, licData.DestID, licData.GroupID);
             Service<ICreator>.Use((client) =>
             {
                 LicenseTable licRec = client.GetLicenseByName(licenseBase, false);
@@ -1864,7 +1913,7 @@ namespace Client.Creator
                         orderRec.OrderIndex = client.GetNextOrderIndex(licData.Name);
                         orderRec.OrderNumber = string.Format("{0}-{1}", licData.Name, orderRec.OrderIndex);
                         if (orderRec.ParentOrderNumber != null)
-                            orderRec.ParentOrderNumber = orderRec.ParentOrderNumber.Replace("S", "F");
+                            orderRec.ParentOrderNumber = orderRec.ParentOrderNumber.Replace("P", "F");
                         foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in product.moduleList.TVal)
                         {
                             if (module.contractNumber.TVal.Equals(orderNum))
@@ -1880,17 +1929,18 @@ namespace Client.Creator
         }
 
         //called on a save license for standard
-        private void FailoverUpdateOrder(LicenseProperty licData)
+        private void FailoverUpdateOrder(LicenseServerProperty licData)
         {
             Service<ICreator>.Use((client) => 
             {
-                string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-S01", licData.CustID, licData.DestID, licData.GroupID);
+                string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", licData.CustID, licData.DestID, licData.GroupID);
                 LicenseTable stdLicRec = client.GetLicenseByName(licenseBase, false);
                 Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                 licPackage.Stream = stdLicRec.LicenseInfo;
                 string[] orderNumbers;
                 LicenseTable failOverLicenseRec = client.GetLicenseByName(licData.Name, false);
                 OrderTable orderRec, storedRec;
+                //add or update any orders in std
                 foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
                 {
                     orderNumbers = Lic_LicenseInfoAttribsHelper.GetContractNumbers(product);
@@ -1917,7 +1967,7 @@ namespace Client.Creator
                             orderRec.LicenseID = failOverLicenseRec.ID;
                             orderRec.OrderNumber = string.Format("{0}-{1}", licData.Name, orderRec.OrderIndex);
                             if (orderRec.ParentOrderNumber != null)
-                                orderRec.ParentOrderNumber = orderRec.ParentOrderNumber.Replace("S", "F");
+                                orderRec.ParentOrderNumber = orderRec.ParentOrderNumber.Replace("P", "F");
                             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in product.moduleList.TVal)
                             {
                                 if (module.contractNumber.TVal.Equals(orderNum))
@@ -1929,6 +1979,13 @@ namespace Client.Creator
                         }
                     }
                 }
+                //Delete any orders that don't exist in std license
+                //foreach()
+                //{
+                //    DeleteOrderNode();
+                //}
+                //Delete any orders that don't exist in std license
+
                 //don't clear validation tokens from failover
                 Lic_PackageAttribs failoverLicPackage = new Lic_PackageAttribs();
                 failoverLicPackage.Stream = failOverLicenseRec.LicenseInfo;
@@ -1943,7 +2000,7 @@ namespace Client.Creator
         {
             bool bDeleteOrder = true;
             TreeNode productNode;
-            OrderProperty orderData = node.Tag as OrderProperty;
+            ProductLicenseProperty orderData = node.Tag as ProductLicenseProperty;
             if (bVerify)
             {
                 bDeleteOrder = false;
@@ -1959,7 +2016,7 @@ namespace Client.Creator
                 else
                     productNode = node.Parent;
 
-                Lic_PackageAttribs.Lic_ProductInfoAttribs storedProduct = DeleteOrderEntity(node.Tag as OrderProperty);
+                Lic_PackageAttribs.Lic_ProductInfoAttribs storedProduct = DeleteOrderEntity(node.Tag as ProductLicenseProperty);
                 productNode.Nodes.Remove(node);
                 if (productNode.Nodes.Count == 0)
                     DeleteProductNode(productNode);
@@ -1968,7 +2025,7 @@ namespace Client.Creator
                     productNode.Tag = new ProductProperty(storedProduct);
                     //now set to either product node or perm order node
                     if (orderData.ParentOrderNumber != null)
-                        LoadDetailListView(productNode.Nodes.Find(orderData.ParentOrderNumber, true).FirstOrDefault().Tag as OrderProperty);
+                        LoadDetailListView(productNode.Nodes.Find(orderData.ParentOrderNumber, true).FirstOrDefault().Tag as ProductLicenseProperty);
                     else
                         LoadDetailListView(productNode.Tag as ProductProperty);
                     //reload detaillistview
@@ -1979,18 +2036,18 @@ namespace Client.Creator
         }
 
         //remove order entity from DB, remove any modules with order number and update license
-        private Lic_PackageAttribs.Lic_ProductInfoAttribs DeleteOrderEntity(OrderProperty orderData)
+        private Lic_PackageAttribs.Lic_ProductInfoAttribs DeleteOrderEntity(ProductLicenseProperty orderData)
         {
             Lic_PackageAttribs.Lic_ProductInfoAttribs storedProduct = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
             CreateTransaction(TransactionType.Order,
                               orderData,
-                              string.Format("Removed {0} Order - {1}", orderData.ProductName, orderData.OrderStatus.ToString()),
+                              string.Format("Removed {0} Product License - {1}", orderData.ProductName, orderData.OrderStatus.ToString()),
                               orderData.OrderNumber);
             Service<ICreator>.Use((client) =>
             {
                 OrderTable storedOrder = client.GetOrderByOrderName(orderData.OrderNumber);
                 //if order is standard, reuse order
-                if (storedOrder.OrderNumber.Contains("S"))
+                if (storedOrder.OrderNumber.Contains("P"))
                 {
                     //deactivate order instead of deleting to continue order # sequence.
                     storedOrder.LicenseID = -1;
@@ -2058,7 +2115,7 @@ namespace Client.Creator
         //done by right clicking node 
         private bool DeleteLicenseNode(TreeNode selectedLicenseNode)
         {
-            LicenseProperty selectedLicense = selectedLicenseNode.Tag as LicenseProperty;
+            LicenseServerProperty selectedLicense = selectedLicenseNode.Tag as LicenseServerProperty;
             DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of license: {0}.", selectedLicense.Name), "Delete License Confirmation",
                                       MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
@@ -2097,7 +2154,7 @@ namespace Client.Creator
                         }
                     }
                 }
-                DeleteLicenseEntity((selectedLicenseNode.Tag as LicenseProperty).Name);
+                DeleteLicenseEntity((selectedLicenseNode.Tag as LicenseServerProperty).Name);
                 selectedLicenseNode.Parent.Text = string.Format("{0} ({1})", selectedLicenseNode.Parent.Name, selectedLicenseNode.Parent.Nodes.Count - 1);
                 selectedLicenseNode.Parent.Nodes.Remove(selectedLicenseNode);
                 return true;
@@ -2164,7 +2221,7 @@ namespace Client.Creator
         public void PopulateDetailListViewColumns(Object selectedObject)
         {
             DetailListView.Columns.Clear();
-            if (selectedObject is LicenseProperty)
+            if (selectedObject is LicenseServerProperty)
             {
                 DetailListView.Columns.Add("Type");
                 DetailListView.Columns.Add("Value");
@@ -2186,15 +2243,15 @@ namespace Client.Creator
 
         public void PopulateDetailListView(Object selectedObject)
         {
-            if (selectedObject is LicenseProperty)
-                PopulateDetailListView(selectedObject as LicenseProperty);
+            if (selectedObject is LicenseServerProperty)
+                PopulateDetailListView(selectedObject as LicenseServerProperty);
             else if (selectedObject is ProductProperty)
                 PopulateDetailListView(selectedObject as ProductProperty);
-            else if(selectedObject is OrderProperty)
-                PopulateDetailListView(selectedObject as OrderProperty);
+            else if(selectedObject is ProductLicenseProperty)
+                PopulateDetailListView(selectedObject as ProductLicenseProperty);
         }
 
-        public void PopulateDetailListView(LicenseProperty licenseData)
+        public void PopulateDetailListView(LicenseServerProperty licenseData)
         {
             DetailListView.Items.Clear();
             Image tokenImage = ListViewImageList.Images[GetListViewIconIndex("VALIDATIONTOKENS")];
@@ -2239,7 +2296,7 @@ namespace Client.Creator
             }
         }
 
-        private void PopulateDetailListView(OrderProperty orderData)
+        private void PopulateDetailListView(ProductLicenseProperty orderData)
         {
             DetailListView.Items.Clear();
             //test-dev image missing
@@ -2272,10 +2329,10 @@ namespace Client.Creator
                 lvItem.Name = lvItem.Text = s_CommLink.GetModuleName(productID, module.moduleID);
                 lvItem.ImageIndex = GetListViewIconIndex("MODULE");
                 lvItem.SubItems.Add(module.moduleValue.TVal.ToString());
-                if (DetailTreeView.SelectedNode.Tag is OrderProperty)
+                if (DetailTreeView.SelectedNode.Tag is ProductLicenseProperty)
                 {
                     TreeNode node;
-                    OrderProperty orderData = DetailTreeView.SelectedNode.Tag as OrderProperty;
+                    ProductLicenseProperty orderData = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                     //trial - available is always 0
                     //perm, addon - total value is shared between these
                     string availableUnits = "Unlimited";
@@ -2293,7 +2350,7 @@ namespace Client.Creator
                         node = DetailTreeView.SelectedNode;
                         if (orderData.ParentOrderNumber != null)
                             node = DetailTreeView.SelectedNode.Parent;
-                        orderData = node.Tag as OrderProperty;
+                        orderData = node.Tag as ProductLicenseProperty;
                         foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedModule in orderData.Product.Product.moduleList.TVal)
                         {
                             if (storedModule.moduleID.TVal.Equals(module.moduleID.TVal))
@@ -2306,7 +2363,7 @@ namespace Client.Creator
                         {
                             foreach (TreeNode addonNode in node.Nodes)
                             {
-                                orderData = addonNode.Tag as OrderProperty;
+                                orderData = addonNode.Tag as ProductLicenseProperty;
                                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedModule in orderData.Product.Product.moduleList.TVal)
                                 {
                                     if (storedModule.moduleID.TVal.Equals(module.moduleID.TVal))
@@ -2375,18 +2432,18 @@ namespace Client.Creator
             TreeNode customerNode = null;         
             if (node.Tag is CustomerProperty)            
                 customerNode = node;
-            else if(node.Tag is LicenseProperty)
+            else if(node.Tag is LicenseServerProperty)
                 customerNode = node.Parent;
             else if(node.Tag is ProductProperty)
                 customerNode = node.Parent.Parent;
-            else if(node.Tag is OrderProperty)
+            else if(node.Tag is ProductLicenseProperty)
             {
-                if((node.Tag as OrderProperty).ParentOrderNumber != null)
+                if((node.Tag as ProductLicenseProperty).ParentOrderNumber != null)
                     customerNode = node.Parent.Parent.Parent.Parent;
                 else
                     customerNode = node.Parent.Parent.Parent;                        
             }
-            LicenseProperty selectedLicense;
+            LicenseServerProperty selectedLicense;
 
             IList<string> updatedLicenses = null;
             IList<string> modifiedLicenses = null;
@@ -2399,7 +2456,7 @@ namespace Client.Creator
             {
                 if (licNode.Text != "")
                 {
-                    selectedLicense = licNode.Tag as LicenseProperty;
+                    selectedLicense = licNode.Tag as LicenseServerProperty;
                     licNode.ImageIndex = licNode.SelectedImageIndex = GetDetailTreeViewIconIndex("License");
                     licNode.ToolTipText = "";
                     if (modifiedLicenses != null)
@@ -2450,7 +2507,7 @@ namespace Client.Creator
                             //set text to modified mode if license has transactions with no packet id
                             licenseNode = new TreeNode(license.LicenseName);
                             licenseNode.Name = licenseNode.Text;
-                            licenseNode.Tag = new LicenseProperty(license, m_Permissions);                                  
+                            licenseNode.Tag = new LicenseServerProperty(license, m_Permissions);                                  
                             licenseNode.Nodes.Add(new VirtualTreeNode());
                             node.Nodes.Add(licenseNode);
                             if (m_searchString.Length > 0)
@@ -2459,7 +2516,7 @@ namespace Client.Creator
                         else
                         {
                             licenseNode = node.Nodes[node.Nodes.IndexOfKey(license.LicenseName)];
-                            licenseNode.Tag = new LicenseProperty(license, m_Permissions);
+                            licenseNode.Tag = new LicenseServerProperty(license, m_Permissions);
                         }
                     }
                 }
@@ -2482,7 +2539,7 @@ namespace Client.Creator
                 {
                     orderNode = new TreeNode(order.OrderNumber);
                     orderNode.Name = order.OrderNumber;
-                    orderNode.Tag = new OrderProperty(order, selectedProduct, m_Permissions);
+                    orderNode.Tag = new ProductLicenseProperty(order, selectedProduct, m_Permissions);
                     if (order.ParentOrderNumber != null)
                     {
                         orderNode.ImageIndex = GetDetailTreeViewIconIndex("ADDONORDER");
@@ -2504,7 +2561,7 @@ namespace Client.Creator
                 else
                 {
                     orderNode = node.Nodes.Find(order.OrderNumber, true).First();
-                    orderNode.Tag = new OrderProperty(order, selectedProduct, m_Permissions);
+                    orderNode.Tag = new ProductLicenseProperty(order, selectedProduct, m_Permissions);
                 }
             }
             if (node.Nodes.Count > 0)
@@ -2859,7 +2916,7 @@ namespace Client.Creator
         }
 
         //Transaction for Order
-        private void CreateTransaction(TransactionType type, OrderProperty orderData, string description, string value)
+        private void CreateTransaction(TransactionType type, ProductLicenseProperty orderData, string description, string value)
         {
             Service<ICreator>.Use((client) =>
             {
@@ -2880,7 +2937,7 @@ namespace Client.Creator
 
         //Compare between current licenseinfo vs stored db licenseinfo
         //Difference creates a transaction and value is updated for stored db licenseinfo
-        private void LicenseItemTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, ref LicenseProperty licItem)
+        private void LicenseItemTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, ref LicenseServerProperty licItem)
         {
             //License Attribs 
             //1) LicType 2) GroupID 3) DestID 4) CustID 5) ValidationToken list
@@ -2986,7 +3043,7 @@ namespace Client.Creator
             return found;
         }
 
-        private bool OrderTransactions(ref OrderTable storedOrder, OrderProperty selectedOrder)
+        private bool OrderTransactions(ref OrderTable storedOrder, ProductLicenseProperty selectedOrder)
         {
             //1) expdate, status, description
             bool bChanged = false;
@@ -2994,7 +3051,7 @@ namespace Client.Creator
             {
                 CreateTransaction(TransactionType.Order, 
                                   selectedOrder,
-                                  string.Format("{0}: Order Status from {1} to {2}", selectedOrder.OrderNumber, ((Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)storedOrder.OrderState).ToString(), selectedOrder.OrderStatus.ToString()), 
+                                  string.Format("{0}: Product License Status from {1} to {2}", selectedOrder.OrderNumber, ((Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)storedOrder.OrderState).ToString(), selectedOrder.OrderStatus.ToString()), 
                                   selectedOrder.OrderStatus.ToString());
                 storedOrder.OrderState = (byte)selectedOrder.OrderStatus;
                 bChanged = true;
@@ -3026,7 +3083,7 @@ namespace Client.Creator
                     storedValue = storedOrder.ExpirationDate.Value.ToShortDateString();
                 CreateTransaction(TransactionType.Order, 
                                   selectedOrder,
-                                  string.Format("{0}: Order Expiration Date {1} to {2}", selectedOrder.OrderNumber,storedValue, value), 
+                                  string.Format("{0}: Product License Expiration Date {1} to {2}", selectedOrder.OrderNumber,storedValue, value), 
                                   value);
                 bChanged = true;
                 storedOrder.ExpirationDate = selectedOrder.ExpirationDate;
@@ -3038,7 +3095,7 @@ namespace Client.Creator
             return bChanged;
         }
 
-        private Lic_PackageAttribs.Lic_ProductInfoAttribs AddOnProductTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, OrderProperty selectedOrder)
+        private Lic_PackageAttribs.Lic_ProductInfoAttribs AddOnProductTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, ProductLicenseProperty selectedOrder)
         {
             List<Lic_PackageAttribs.Lic_ModuleInfoAttribs> removeList = new List<Lic_PackageAttribs.Lic_ModuleInfoAttribs>();
             Lic_PackageAttribs.Lic_ProductInfoAttribs updatedProduct = null;
@@ -3082,7 +3139,7 @@ namespace Client.Creator
         }
 
         //Problem : remove/add conflicts with edit because module compare thinks edits are new/remove modules}
-        private void ProductItemTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, OrderProperty orderData, bool bOrderChanged)
+        private void ProductItemTransactions(ref Lic_PackageAttribs.AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licInfo, ProductLicenseProperty orderData, bool bOrderChanged)
         {
             //iterate over all products
             string moduleName;
@@ -3438,11 +3495,11 @@ namespace Client.Creator
 
         private void resyncToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LicenseProperty selectedLicense;
+            LicenseServerProperty selectedLicense;
             //only enable refresh for licenses that have pending changes available 
             Cursor storedCursor = this.Cursor;
             this.Cursor = Cursors.WaitCursor;
-            selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+            selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
             ResyncSelectedLicense(selectedLicense);
             LoadCustomerNode(DetailTreeView.SelectedNode.Parent);
             LoadLicenseNode(DetailTreeView.SelectedNode);
@@ -3450,12 +3507,12 @@ namespace Client.Creator
             this.Cursor = storedCursor;
         }
 
-        //DetailTreeView selected node contains a LicenseProperty object
+        //DetailTreeView selected node contains a LicenseServerProperty object
         private void existingOrderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (OrderSelectionForm dlg = new OrderSelectionForm())
+            using (ProductLicenseSelectionForm dlg = new ProductLicenseSelectionForm())
             {
-                OrderSelectionData data = new OrderSelectionData(DetailTreeView.SelectedNode.Tag as LicenseProperty);                               
+                OrderSelectionData data = new OrderSelectionData(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);                               
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     AddExistingOrder(data.SelectedLicense, data.OrderSelectionList);
@@ -3474,7 +3531,7 @@ namespace Client.Creator
             this.Close();
         }
 
-        private void ResyncSelectedLicense(LicenseProperty selectedLicense)
+        private void ResyncSelectedLicense(LicenseServerProperty selectedLicense)
         {
             switch (selectedLicense.LicType)
             {
@@ -3502,9 +3559,9 @@ namespace Client.Creator
 
         private void existingOrderMainToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (OrderSelectionForm dlg = new OrderSelectionForm())
+            using (ProductLicenseSelectionForm dlg = new ProductLicenseSelectionForm())
             {
-                OrderSelectionData data = new OrderSelectionData(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+                OrderSelectionData data = new OrderSelectionData(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     AddExistingOrder(data.SelectedLicense, data.OrderSelectionList);
@@ -3548,7 +3605,7 @@ namespace Client.Creator
             //show contract dialog
             int orderIndex = 0;
             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
-            OrderProperty newOrder = new OrderProperty();
+            ProductLicenseProperty newOrder = new ProductLicenseProperty();
             string licenseName = DetailTreeView.SelectedNode.Name;
             Service<ICreator>.Use((client) =>
             {
@@ -3561,7 +3618,7 @@ namespace Client.Creator
             //display settings form for product connections
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Order", ref s_CommLink))
             {
-                OrderDialogData data = new OrderDialogData(newOrder, DetailTreeView.SelectedNode.Tag as LicenseProperty);
+                OrderDialogData data = new OrderDialogData(newOrder, DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     //create orderNode
@@ -3685,7 +3742,7 @@ namespace Client.Creator
             //    {
             //        Cursor storedCursor = this.Cursor;
             //        this.Cursor = Cursors.WaitCursor;
-            //        LicenseProperty selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseProperty;
+            //        LicenseServerProperty selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
             //        ResyncSelectedLicense(selectedLicense);
             //        LoadCustomerNode(DetailTreeView.SelectedNode.Parent);
             //        LoadLicenseNode(DetailTreeView.SelectedNode);
@@ -3696,16 +3753,16 @@ namespace Client.Creator
 
         private void dlvAddToolStripButton_Click(object sender, EventArgs e)
         {
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
-                CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
+                CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
         }
 
         private void dlvRemoveToolStripButton_Click(object sender, EventArgs e)
         {
-            if (DetailTreeView.SelectedNode.Tag is LicenseProperty)   //token remove
-                dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)   //token remove
+                dlvRemoveToken(DetailTreeView.SelectedNode.Tag as LicenseServerProperty);
             else                //module remove
-                dlvRemoveModule(DetailTreeView.SelectedNode.Tag as OrderProperty);
+                dlvRemoveModule(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
         }
 
         private void dlvEditToolStripButton_Click(object sender, EventArgs e)
@@ -3716,8 +3773,8 @@ namespace Client.Creator
         private void expandToolStripMenuItem_Click(object sender, EventArgs e)
         {
             bool bAllow = true;
-            if(DetailTreeView.SelectedNode.Tag is LicenseProperty)  //disallow expand
-                bAllow = (DetailTreeView.SelectedNode.Tag as LicenseProperty).IsEnabled;
+            if(DetailTreeView.SelectedNode.Tag is LicenseServerProperty)  //disallow expand
+                bAllow = (DetailTreeView.SelectedNode.Tag as LicenseServerProperty).IsEnabled;
             if(bAllow)
                 DetailTreeView.SelectedNode.Expand();
         }

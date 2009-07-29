@@ -12,7 +12,7 @@ namespace Client.Creator
 {
     public partial class EditDestinationName : Shared.VisualComponents.DialogBaseForm
     {
-        private LicenseProperty _licInfo;
+        private LicenseServerProperty _licInfo;
         private bool _modified;
 
         public bool Modified
@@ -47,7 +47,7 @@ namespace Client.Creator
             }
         }
 
-        public EditDestinationName(LicenseProperty licInfo, ComboBox.ObjectCollection destNameCollection)
+        public EditDestinationName(LicenseServerProperty licInfo, ComboBox.ObjectCollection destNameCollection)
         {            
             InitializeComponent();
             _modified = false;

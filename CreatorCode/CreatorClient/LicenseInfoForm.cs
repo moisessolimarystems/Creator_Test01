@@ -120,7 +120,7 @@ namespace Client.Creator
                         {
                             //should only add products that exist in the standard license
                             //and haven't already been added.
-                            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-S01", orderData.LicenseInfo.CustID, orderData.LicenseInfo.DestID, orderData.LicenseInfo.GroupID);
+                            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", orderData.LicenseInfo.CustID, orderData.LicenseInfo.DestID, orderData.LicenseInfo.GroupID);
                             int pos = productSpec.productName.TVal.IndexOf("Test");
                             //1) call twice, once with product, then product test
                             //2) call once with product and add only when 1 order(standard) found
@@ -198,8 +198,8 @@ namespace Client.Creator
                         destNameComboBox.Items.Add(selectedDestName);
                     }
                 });
-                licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard);
-                licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandardSubscription);                
+                licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual);
+                licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription);                
                 licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
             }
             else
@@ -403,7 +403,7 @@ namespace Client.Creator
         //if module is from add-on and std order & any add-on has appinst 0 then +1 appinst for add-on
         private void SaveModuleTabPage(ModuleDialogData moduleData)
         {
-            int modID;
+            int modID, totalAppInstances;
             foreach (string modName in moduleData.ModuleNames)
             {
                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
@@ -417,36 +417,48 @@ namespace Client.Creator
                             {
                                 storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
                                 if (storedMod.moduleValue.TVal > 0)
-                                {
-                                    storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
-                                    //if (GetTotalModuleAppInstance(moduleData, storedMod) == 0)
+                                {                        
+                                    //if(storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.ad
+                                    //{
+                                    //    //std
                                     //    storedMod.moduleAppInstance.TVal = 1;
+                                    //    if(GetTotalAddOnModuleAppInstance(moduleData,storedMod) > 0)
+                                    //        DecrementAddOnModuleAppInstance(moduleData, storedMod);
+                                    //}
                                     //else
                                     //{
-                                    //    //std order
-                                    //    if(moduleData.OrderData.ParentOrderNumber.Length == 0)
-                                    //    {
-
-                                    //    }
-                                    //    //if add-on type
-                                    //    //total is already > 0, don't do anything
-                                    //    //if std type
-                                    //    //total is already > 0, set to 1
-                                    //    //decrement any modules with parent order number = to standard order
-                                    //    //decrement any add-ons
-                                    //    //increment std
-                                    //    if(moduleData.OrderData.ParentOrderNumber
-                                    //    storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+                                    //    //addon
+                                    //    if(GetTotalAddOnModuleAppInstance
                                     //}
 
-                                    //get total value for a std and its add-ons
-                                    //if current order is a std and appinst = 1, decrement the add-on  
-                                    //if current order is add-on and app inst = 1, don't do anything
-                                    //                               app inst = 0, then increment add-on                                                                     
+                                    if (GetTotalModuleAppInstance(moduleData, storedMod) == 0)
+                                        storedMod.moduleAppInstance.TVal = 1;
+                                    else //>1
+                                    {
+                                        if (GetTotalModuleAppInstance(moduleData, storedMod) > 1)
+                                            storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+                                        else
+                                        {
+                                            if (storedMod.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                                storedMod.moduleAppInstance.TVal = 0;
+                                            else
+                                            {
+                                                storedMod.moduleAppInstance.TVal = 1;
+                                                DecrementAddOnModuleAppInstance(moduleData, storedMod);
+                                            }
+                                        }
+                                    }                                                                    
                                 }
                                 else
-                                {
+                                {                                    
                                     //if decrement std then increment add-on
+                                    //if decrement add-on don't decrement appinstance unless it is 1
+                                    storedMod.moduleAppInstance.TVal = 0;
+                                    if(storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                    {
+                                        if(GetTotalAddOnModuleAppInstance(moduleData,storedMod) == 0)
+                                            IncrementAddOnModuleAppInstance(moduleData, storedMod);
+                                    }                                      
                                 }
                                 break;
                             }
@@ -456,34 +468,89 @@ namespace Client.Creator
             }
         }
 
-        //private uint GetTotalModuleAppInstance(ModuleDialogData moduleData,Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
-        //{
-        //    uint totalValue = 0;
-        //    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in  moduleData.OrderData.Product.ModuleList.TVal)
-        //    {
-        //        if (modRec.moduleID.TVal.Equals(storedMod) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
-        //        {
-        //            totalValue += modRec.moduleAppInstance.TVal;
-        //            break;
-        //        }
-        //    }
-        //    return totalValue;             
-        //}
+        private uint GetTotalAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
+        {
+            uint totalValue = 0;
+            string stdProductLicense = "";
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                    stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.OrderData.OrderNumber : moduleData.OrderData.ParentOrderNumber;
+                    addOnOrders = client.GetAddOnOrdersByStandardOrder(stdProductLicense);
+            });
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
+            {
+                if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal)))
+                    totalValue += modRec.moduleAppInstance.TVal;
+            }
+            return totalValue;
+        }
 
-        //private uint GetTotalAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
-        //{
-        //    uint totalValue = 0;
-        //    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
-        //    {
-        //        if (modRec.moduleID.TVal.Equals(storedMod) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
-        //        {
-        //            totalValue += modRec.moduleAppInstance.TVal;
-        //            break;
-        //        }
-        //    }
-        //    return totalValue;  
-        //}
+        private uint GetTotalModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
+        {
+            uint totalValue = 0;
+            string stdProductLicense = "";
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.OrderData.OrderNumber : moduleData.OrderData.ParentOrderNumber;
+                addOnOrders = client.GetAddOnOrdersByStandardOrder(stdProductLicense);
+            });
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
+            {
+                if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal) || modRec.contractNumber.TVal.Equals(stdProductLicense)))
+                    totalValue += modRec.moduleAppInstance.TVal;
+            }
+            return totalValue;
+        }
 
+        //standard order moduledata does not know add-on orders need to retrieve from database?
+        private void DecrementAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
+        {
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                addOnOrders = client.GetAddOnOrdersByStandardOrder(module.contractNumber);
+            });
+            if(addOnOrders != null)
+            {
+                if(addOnOrders.Count > 0)
+                {
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
+                    {
+                        if (storedMod.moduleID.TVal == module.moduleID.TVal &&
+                            addOnOrders.Contains(storedMod.contractNumber.TVal))
+                            storedMod.moduleAppInstance.TVal = 0;                                                                          
+                    }
+                }
+            }
+        }
+
+        private void IncrementAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
+        {
+            //increment first add-on found
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                addOnOrders = client.GetAddOnOrdersByStandardOrder(module.contractNumber);
+            });
+            if (addOnOrders != null)
+            {
+                if (addOnOrders.Count > 0)
+                {
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
+                    {
+                        if (storedMod.moduleID.TVal == module.moduleID.TVal &&
+                            addOnOrders.Contains(storedMod.contractNumber.TVal))
+                        {
+                            if(storedMod.moduleValue.TVal > 0)
+                                storedMod.moduleAppInstance.TVal = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Hardware Key Methods
@@ -526,7 +593,7 @@ namespace Client.Creator
 
         private void licTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {            
-            LicenseProperty licInfo = selectedObject as LicenseProperty;            
+            LicenseServerProperty licInfo = selectedObject as LicenseServerProperty;            
             licInfo.LicType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)licTypeComboBox.SelectedItem;
             Service<ICreator>.Use((client) => 
             {
@@ -540,7 +607,7 @@ namespace Client.Creator
         //valid, existing dest name chosen from list in box
         private void destNameComboBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            LicenseProperty licInfo = selectedObject as LicenseProperty;
+            LicenseServerProperty licInfo = selectedObject as LicenseServerProperty;
             Service<ICreator>.Use((client) => 
             {
                 if (destNameComboBox.Text == "<New...>")
@@ -608,7 +675,7 @@ namespace Client.Creator
                 }
                 else
                 {   //allow only standard license if license with licInfo doesn't exist
-                    licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard);
+                    licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual);
                 }
             });
             licTypeComboBox.SelectedIndex = 0;   
@@ -647,7 +714,7 @@ namespace Client.Creator
             m_Validated = true;
             Service<ICreator>.Use((client) =>
             {
-                LicenseProperty selectedLicense = selectedObject as LicenseProperty;
+                LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
                 Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
                 if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
                 {
@@ -674,7 +741,7 @@ namespace Client.Creator
 
         private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {   
-            LicenseProperty selectedOrder = selectedObject as LicenseProperty;      
+            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;      
             //keyNameGroupBox.Visible = false;
             keyNameListBox.Visible = false;
             availableHWKeyLabel.Visible = false;
@@ -976,11 +1043,11 @@ namespace Client.Creator
     #region LicenseDialogData class
     public class LicenseDialogData : Shared.VisualComponents.DialogData
     {
-        private LicenseProperty m_LicInfo;
+        private LicenseServerProperty m_LicInfo;
 
         #region Constructors
 
-        public LicenseDialogData(LicenseProperty licInfo)
+        public LicenseDialogData(LicenseServerProperty licInfo)
         {
             m_LicInfo = licInfo;
         }
@@ -988,7 +1055,7 @@ namespace Client.Creator
 
         #region Properties
 
-        public LicenseProperty LicInfo
+        public LicenseServerProperty LicInfo
         {
             get { return this.m_LicInfo; }
             set { this.m_LicInfo = value; }
@@ -1040,12 +1107,12 @@ namespace Client.Creator
     public class TokenDialogData : Shared.VisualComponents.DialogData
     {        
         private ValidationProperty m_Token;
-        private LicenseProperty m_LicInfo;
+        private LicenseServerProperty m_LicInfo;
         private List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType> m_ValidTokenTypes;
 
         #region Constructors
 
-        public TokenDialogData(ValidationProperty token, LicenseProperty licInfo)
+        public TokenDialogData(ValidationProperty token, LicenseServerProperty licInfo)
         {
             m_Token = token;
             m_LicInfo = licInfo;
@@ -1066,7 +1133,7 @@ namespace Client.Creator
             set { this.m_Token = value; }
         }
 
-        public LicenseProperty LicInfo
+        public LicenseServerProperty LicInfo
         {
             get { return this.m_LicInfo; }
             set { this.m_LicInfo = value; }
@@ -1086,10 +1153,10 @@ namespace Client.Creator
     public class ModuleDialogData : Shared.VisualComponents.DialogData
     {
         private List<string> m_ModuleNames;
-        private OrderProperty m_OrderData;
+        private ProductLicenseProperty m_OrderData;
         #region Constructors
 
-        public ModuleDialogData(List<string> moduleNames, OrderProperty orderData)
+        public ModuleDialogData(List<string> moduleNames, ProductLicenseProperty orderData)
         {
             m_ModuleNames = moduleNames;
             m_OrderData = orderData;
@@ -1103,7 +1170,7 @@ namespace Client.Creator
             get { return this.m_ModuleNames; }
             set { this.m_ModuleNames = value; }
         }
-        public OrderProperty OrderData
+        public ProductLicenseProperty OrderData
         {
             get { return this.m_OrderData; }
             set { this.m_OrderData = value; }
@@ -1115,12 +1182,12 @@ namespace Client.Creator
     #region OrderDialogData class
     public class OrderDialogData : Shared.VisualComponents.DialogData
     {
-        private OrderProperty m_OrderInfo;
-        private LicenseProperty m_LicenseInfo;
+        private ProductLicenseProperty m_OrderInfo;
+        private LicenseServerProperty m_LicenseInfo;
 
         #region Constructors
 
-        public OrderDialogData(OrderProperty orderInfo, LicenseProperty licInfo)
+        public OrderDialogData(ProductLicenseProperty orderInfo, LicenseServerProperty licInfo)
         {
             m_OrderInfo = orderInfo;
             m_LicenseInfo = licInfo;
@@ -1129,13 +1196,13 @@ namespace Client.Creator
 
         #region Properties
 
-        public OrderProperty OrderInfo
+        public ProductLicenseProperty OrderInfo
         {
             get { return this.m_OrderInfo; }
             set { this.m_OrderInfo = value; }
         }
 
-        public LicenseProperty LicenseInfo
+        public LicenseServerProperty LicenseInfo
         {
             get { return this.m_LicenseInfo; }
             set { this.m_LicenseInfo = value; }
