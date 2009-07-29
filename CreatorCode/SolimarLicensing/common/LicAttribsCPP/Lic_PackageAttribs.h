@@ -791,11 +791,11 @@ public:
 			return *this ;
 		}
 		typedef enum {
-			sltStandard = 0,
+			sltPerpetual = 0,
 			sltFailover = 1,
 			sltDisasterRecovery = 2,
 			sltTestDev = 3,
-			sltStandardSubscription = 4,
+			sltSubscription = 4,
 		} TSoftwareLicenseType;
 		
 		typedef std::vector< Lic_ProductInfoAttribs > TVector_Lic_ProductInfoAttribsList;
@@ -1079,7 +1079,7 @@ public:
 			customerID(m_mapAttribObjs, L"cI", 0),
 			destinationID(m_mapAttribObjs, L"dI", 0),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
-			softwareLicType(m_mapAttribObjs, L"lT", sltStandard),
+			softwareLicType(m_mapAttribObjs, L"lT", sltPerpetual),
 			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", 1),
 			activationExpirationDate(m_mapAttribObjs, L"aEDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			activationTotal(m_mapAttribObjs, L"aT", 0),
@@ -1109,7 +1109,7 @@ public:
 			customerID(m_mapAttribObjs, L"cI", 0),
 			destinationID(m_mapAttribObjs, L"dI", 0),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
-			softwareLicType(m_mapAttribObjs, L"lT", sltStandard),
+			softwareLicType(m_mapAttribObjs, L"lT", sltPerpetual),
 			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", 1),
 			activationExpirationDate(m_mapAttribObjs, L"aEDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			activationTotal(m_mapAttribObjs, L"aT", 0),

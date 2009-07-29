@@ -2187,7 +2187,7 @@ HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionK
 		if(key_type == 1)	//KEYAddon
 		{
 			bCalculateExpirationDate = true;
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltStandard;
+			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
 		}
 		else if(key_type == 2)	//KEYBase
 		{
@@ -2231,7 +2231,7 @@ HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionK
 			);
 
 
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltStandard;
+			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
 			//Determine if key is permanent or not
 //hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Status"].id, &vtKeyStatus);
 

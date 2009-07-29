@@ -704,11 +704,11 @@ namespace Solimar
 					[FlagsAttribute]
 					public enum TSoftwareLicenseType : uint
 					{
-						sltStandard = 0,
+						sltPerpetual = 0,
 						sltFailover = 1,
 						sltDisasterRecovery = 2,
 						sltTestDev = 3,
-						sltStandardSubscription = 4,
+						sltSubscription = 4,
 					};
 					
 					public class AttribsMemberEnum_TSoftwareLicenseType : AttribsMemberEnum
@@ -731,9 +731,9 @@ namespace Solimar
 							m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
 							m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
 							m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapAliasToEnum.Add("Standard",TSoftwareLicenseType.sltStandard);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltStandard,"Standard");
-							m_MapOrderingIndexToAlias.Add(1,"Standard");
+							m_MapAliasToEnum.Add("Perpetual",TSoftwareLicenseType.sltPerpetual);
+							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltPerpetual,"Perpetual");
+							m_MapOrderingIndexToAlias.Add(1,"Perpetual");
 							m_MapAliasToEnum.Add("Failover",TSoftwareLicenseType.sltFailover);
 							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltFailover,"Failover");
 							m_MapOrderingIndexToAlias.Add(2,"Failover");
@@ -743,19 +743,19 @@ namespace Solimar
 							m_MapAliasToEnum.Add("Test / Development",TSoftwareLicenseType.sltTestDev);
 							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltTestDev,"Test / Development");
 							m_MapOrderingIndexToAlias.Add(4,"Test / Development");
-							m_MapAliasToEnum.Add("Standard - Subscription",TSoftwareLicenseType.sltStandardSubscription);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltStandardSubscription,"Standard - Subscription");
-							m_MapOrderingIndexToAlias.Add(5,"Standard - Subscription");
-							m_MapAliasToIndex.Add("Standard",0);
+							m_MapAliasToEnum.Add("Subscription",TSoftwareLicenseType.sltSubscription);
+							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltSubscription,"Subscription");
+							m_MapOrderingIndexToAlias.Add(5,"Subscription");
+							m_MapAliasToIndex.Add("Perpetual",0);
 							m_MapAliasToIndex.Add("Failover",1);
 							m_MapAliasToIndex.Add("Disaster Recovery",2);
 							m_MapAliasToIndex.Add("Test / Development",3);
-							m_MapAliasToIndex.Add("Standard - Subscription",4);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltStandard,0);
+							m_MapAliasToIndex.Add("Subscription",4);
+							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltPerpetual,0);
 							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltFailover,1);
 							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltDisasterRecovery,2);
 							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltTestDev,3);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltStandardSubscription,4);
+							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltSubscription,4);
 						}
 						
 					
@@ -1050,7 +1050,7 @@ namespace Solimar
 					public AttribsMemberDWORD customerID = new AttribsMemberDWORD("cI", 0);
 					public AttribsMemberDWORD destinationID = new AttribsMemberDWORD("dI", 0);
 					public AttribsMemberDWORD softwareGroupLicenseID = new AttribsMemberDWORD("swI", 0);
-					public AttribsMemberEnum_TSoftwareLicenseType softwareLicType = new AttribsMemberEnum_TSoftwareLicenseType("lT", TSoftwareLicenseType.sltStandard);
+					public AttribsMemberEnum_TSoftwareLicenseType softwareLicType = new AttribsMemberEnum_TSoftwareLicenseType("lT", TSoftwareLicenseType.sltPerpetual);
 					public AttribsMemberDWORD softwareLicTypeIndex = new AttribsMemberDWORD("lTI", 1);
 					public AttribsMemberDateTime activationExpirationDate = new AttribsMemberDateTime("aEDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberDWORD activationTotal = new AttribsMemberDWORD("aT", 0);

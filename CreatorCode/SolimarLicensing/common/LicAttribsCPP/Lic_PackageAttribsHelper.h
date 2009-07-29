@@ -20,17 +20,17 @@ class Lic_PackageAttribsHelper
 				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery:
 					wLetter = L'D';
 					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltStandard:
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual:
+					wLetter = L'P';
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltSubscription:
 					wLetter = L'S';
 					break;
 				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev:
 					wLetter = L'T';
 					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltStandardSubscription:
-					wLetter = L'S';
-					break;
 				default:
-					 wLetter = L'U';
+					wLetter = L'U';
 					break;
 			}
 			_snwprintf_s(

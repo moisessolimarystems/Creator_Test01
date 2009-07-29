@@ -208,16 +208,16 @@
 		<typedef type="class" name="Lic_LicenseInfoAttribs">
 		<AttribsClass code_class_name="Lic_LicenseInfoAttribs" name="L_LIA" descriptive_name="License Information Attributes" base="">
 			<typedef type="enum" name="TSoftwareLicenseType">
-			<enum name="sltStandard" value="0" alias="Standard"/>
+			<enum name="sltPerpetual" value="0" alias="Perpetual"/>
 			<enum name="sltFailover" value="1" alias="Failover"/>
 			<enum name="sltDisasterRecovery" value="2" alias="Disaster Recovery"/>
 			<enum name="sltTestDev" value="3" alias="Test / Development"/>
-			<enum name="sltStandardSubscription" value="4" alias="Standard - Subscription"/>
+			<enum name="sltSubscription" value="4" alias="Subscription"/>
 			</typedef>
 			<attrib type="unsigned __int32" name="customerID" tagname="cI" default="0"/>
 			<attrib type="unsigned __int32" name="destinationID" tagname="dI" default="0"/>
 			<attrib type="unsigned __int32" name="softwareGroupLicenseID" tagname="swI" default="0"/>
-			<attrib type="TSoftwareLicenseType" name="softwareLicType" tagname="lT" default="sltStandard"/>
+			<attrib type="TSoftwareLicenseType" name="softwareLicType" tagname="lT" default="sltPerpetual"/>
 			<attrib type="unsigned __int32" name="softwareLicTypeIndex" tagname="lTI" default="1"/>
 			<attrib type="DateTime" name="activationExpirationDate" tagname="aEDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  
