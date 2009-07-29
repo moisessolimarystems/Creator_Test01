@@ -365,6 +365,12 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetAddOnOrdersByStandardOrder(string standardOrder)
+        {
+            return OrderTable.GetAddOnOrdersByStandardOrder(standardOrder);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetNextOrderIndex(string licenseName)
         {
             return OrderTable.GetNextOrderIndex(licenseName);

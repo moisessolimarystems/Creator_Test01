@@ -169,6 +169,9 @@ namespace Service.Creator
         IList<OrderTable> GetOrdersEqualsProduct(string licenseName, string productName);
 
         [OperationContract]
+        IList<string> GetAddOnOrdersByStandardOrder(string standardOrder);
+
+        [OperationContract]
         OrderTable GetOrderByOrderName(string orderName);
 
         [OperationContract]
