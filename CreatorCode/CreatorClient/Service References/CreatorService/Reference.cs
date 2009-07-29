@@ -1333,6 +1333,9 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationID", ReplyAction="http://tempuri.org/ICreator/GetDestinationIDResponse")]
+        Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextDestinationID", ReplyAction="http://tempuri.org/ICreator/GetNextDestinationIDResponse")]
         uint GetNextDestinationID(uint custID);
         
@@ -1387,6 +1390,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetOrdersEqualsProduct", ReplyAction="http://tempuri.org/ICreator/GetOrdersEqualsProductResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetOrdersEqualsProduct(string licenseName, string productName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrder", ReplyAction="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrderResponse")]
+        System.Collections.Generic.List<string> GetAddOnOrdersByStandardOrder(string standardOrder);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetOrderByOrderName", ReplyAction="http://tempuri.org/ICreator/GetOrderByOrderNameResponse")]
         Client.Creator.CreatorService.OrderTable GetOrderByOrderName(string orderName);
         
@@ -1440,9 +1446,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationName", ReplyAction="http://tempuri.org/ICreator/GetDestinationNameResponse")]
         Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationID", ReplyAction="http://tempuri.org/ICreator/GetDestinationIDResponse")]
-        Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
@@ -1568,6 +1571,10 @@ namespace Client.Creator.CreatorService {
                 base(binding, remoteAddress) {
         }
         
+        public Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName) {
+            return base.Channel.GetDestinationID(custID, destName);
+        }
+        
         public uint GetNextDestinationID(uint custID) {
             return base.Channel.GetNextDestinationID(custID);
         }
@@ -1640,6 +1647,10 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetOrdersEqualsProduct(licenseName, productName);
         }
         
+        public System.Collections.Generic.List<string> GetAddOnOrdersByStandardOrder(string standardOrder) {
+            return base.Channel.GetAddOnOrdersByStandardOrder(standardOrder);
+        }
+        
         public Client.Creator.CreatorService.OrderTable GetOrderByOrderName(string orderName) {
             return base.Channel.GetOrderByOrderName(orderName);
         }
@@ -1710,10 +1721,6 @@ namespace Client.Creator.CreatorService {
         
         public Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID) {
             return base.Channel.GetDestinationName(custID, destID);
-        }
-        
-        public Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName) {
-            return base.Channel.GetDestinationID(custID, destName);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {

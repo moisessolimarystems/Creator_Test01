@@ -15,12 +15,18 @@
       <xsd:import namespace="http://tempuri.org/" />
       <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/CreatorData" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.Attribs" />
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Service.Creator" />
-      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_GetDestinationID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationID" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetDestinationID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationIDResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetNextDestinationID_InputMessage">
     <wsdl:part name="parameters" element="tns:GetNextDestinationID" />
   </wsdl:message>
@@ -129,6 +135,12 @@
   <wsdl:message name="ICreator_GetOrdersEqualsProduct_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetOrdersEqualsProductResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetAddOnOrdersByStandardOrder_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAddOnOrdersByStandardOrder" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAddOnOrdersByStandardOrder_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAddOnOrdersByStandardOrderResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetOrderByOrderName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetOrderByOrderName" />
   </wsdl:message>
@@ -236,12 +248,6 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetDestinationName_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetDestinationNameResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestinationID_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestinationID" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestinationID_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestinationIDResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
@@ -436,6 +442,10 @@
     <wsdl:part name="parameters" element="tns:ValidateVerificationCodeResponse" />
   </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="GetDestinationID">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationID" message="tns:ICreator_GetDestinationID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationIDResponse" message="tns:ICreator_GetDestinationID_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetNextDestinationID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextDestinationID" message="tns:ICreator_GetNextDestinationID_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextDestinationIDResponse" message="tns:ICreator_GetNextDestinationID_OutputMessage" />
@@ -508,6 +518,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetOrdersEqualsProduct" message="tns:ICreator_GetOrdersEqualsProduct_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetOrdersEqualsProductResponse" message="tns:ICreator_GetOrdersEqualsProduct_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetAddOnOrdersByStandardOrder">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrder" message="tns:ICreator_GetAddOnOrdersByStandardOrder_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrderResponse" message="tns:ICreator_GetAddOnOrdersByStandardOrder_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetOrderByOrderName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetOrderByOrderName" message="tns:ICreator_GetOrderByOrderName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetOrderByOrderNameResponse" message="tns:ICreator_GetOrderByOrderName_OutputMessage" />
@@ -579,10 +593,6 @@
     <wsdl:operation name="GetDestinationName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationName" message="tns:ICreator_GetDestinationName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationNameResponse" message="tns:ICreator_GetDestinationName_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetDestinationID">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationID" message="tns:ICreator_GetDestinationID_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationIDResponse" message="tns:ICreator_GetDestinationID_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
@@ -717,6 +727,15 @@
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="GetDestinationID">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetNextDestinationID">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextDestinationID" style="document" />
       <wsdl:input>
@@ -879,6 +898,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetAddOnOrdersByStandardOrder">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetOrderByOrderName">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetOrderByOrderName" style="document" />
       <wsdl:input>
@@ -1034,15 +1062,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetDestinationName">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationName" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetDestinationID">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationID" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

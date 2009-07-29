@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="oBICaTy0XIquqbBWI2CN2C+7wgc=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="yPLm+rxlb8sGyfztTze0b0rmhn4=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="netTcpBinding" name="CreatorServiceTcp">
       <properties>
@@ -106,7 +106,7 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="CreatorServiceTcp1" contract="CreatorService.ICreator" bindingType="netTcpBinding" address="net.tcp://localhost:9091/Creator/tcp" bindingConfiguration="CreatorServiceTcp">
+    <endpoint name="CreatorServiceTcp" contract="CreatorService.ICreator" bindingType="netTcpBinding" address="net.tcp://localhost:9091/Creator/tcp" bindingConfiguration="CreatorServiceTcp">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue>net.tcp://localhost:9091/Creator/tcp</serializedValue>
@@ -181,7 +181,7 @@
           <serializedValue>False</serializedValue>
         </property>
         <property path="/name" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>CreatorServiceTcp1</serializedValue>
+          <serializedValue>CreatorServiceTcp</serializedValue>
         </property>
       </properties>
     </endpoint>

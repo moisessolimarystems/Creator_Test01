@@ -44,6 +44,19 @@ namespace CreatorData
             }
         }
 
+        public static IList<String> GetAddOnOrdersByStandardOrder(string orderName)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var addonOrderNames = from c in db.OrderTables
+                                      where c.LicenseID > 0
+                                      where c.ParentOrderNumber.Equals(orderName)
+                                      select c.OrderNumber;
+                return addonOrderNames.ToList();                
+            }
+        }
+
         //how to get unique order index
         //save last used index in license table
         //update everytime order gets added 
