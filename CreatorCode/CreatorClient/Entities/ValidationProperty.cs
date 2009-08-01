@@ -4,21 +4,28 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using Solimar.Licensing.Attribs;
+using Client.Creator.CreatorService;
+using Client.Creator.ServiceProxy;
 
 namespace Client.Creator
 {
     public class ValidationProperty : BaseGridItem
     {
+
+
+        string _status;
         Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs _token;
 
         public ValidationProperty()
         {
-            _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();            
+            _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+            _status = "Active";
         }
 
         public ValidationProperty(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token)
         {
             _token = token;
+            _status = "Active";
         }
 
         public override string Name
@@ -61,6 +68,12 @@ namespace Client.Creator
         {
             get { return _token.tokenValue.TVal; }
             set { _token.tokenValue.TVal = value; }
+        }
+
+        public string Status
+        {
+            get{ return _status;  }
+            set { _status = value; }         
         }
 
         public override string ToString()
