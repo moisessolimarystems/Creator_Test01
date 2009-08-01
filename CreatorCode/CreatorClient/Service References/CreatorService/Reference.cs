@@ -806,6 +806,9 @@ namespace Client.Creator.CreatorService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int CustIDField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte TokenStatusField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -877,6 +880,19 @@ namespace Client.Creator.CreatorService {
                 if ((this.CustIDField.Equals(value) != true)) {
                     this.CustIDField = value;
                     this.RaisePropertyChanged("CustID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public byte TokenStatus {
+            get {
+                return this.TokenStatusField;
+            }
+            set {
+                if ((this.TokenStatusField.Equals(value) != true)) {
+                    this.TokenStatusField = value;
+                    this.RaisePropertyChanged("TokenStatus");
                 }
             }
         }
@@ -1333,6 +1349,9 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationName", ReplyAction="http://tempuri.org/ICreator/GetDestinationNameResponse")]
+        Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationID", ReplyAction="http://tempuri.org/ICreator/GetDestinationIDResponse")]
         Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName);
         
@@ -1429,6 +1448,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/TokenExists", ReplyAction="http://tempuri.org/ICreator/TokenExistsResponse")]
         bool TokenExists(uint custID, byte tokenType, string tokenValue);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
+        bool IsHardwareTokenActive(uint custID, string tokenValue);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
         uint GetNextHardwareTokenValue(uint custID);
         
@@ -1443,9 +1465,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestNamesByCustID", ReplyAction="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationName", ReplyAction="http://tempuri.org/ICreator/GetDestinationNameResponse")]
-        Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
@@ -1569,6 +1588,10 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID) {
+            return base.Channel.GetDestinationName(custID, destID);
         }
         
         public Client.Creator.CreatorService.DestinationNameTable GetDestinationID(int custID, string destName) {
@@ -1699,6 +1722,10 @@ namespace Client.Creator.CreatorService {
             return base.Channel.TokenExists(custID, tokenType, tokenValue);
         }
         
+        public bool IsHardwareTokenActive(uint custID, string tokenValue) {
+            return base.Channel.IsHardwareTokenActive(custID, tokenValue);
+        }
+        
         public uint GetNextHardwareTokenValue(uint custID) {
             return base.Channel.GetNextHardwareTokenValue(custID);
         }
@@ -1717,10 +1744,6 @@ namespace Client.Creator.CreatorService {
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID) {
             return base.Channel.GetDestNamesByCustID(custID);
-        }
-        
-        public Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID) {
-            return base.Channel.GetDestinationName(custID, destID);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {

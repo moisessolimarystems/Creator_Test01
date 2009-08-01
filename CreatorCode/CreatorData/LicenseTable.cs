@@ -273,11 +273,12 @@ namespace CreatorData
                 //order or product transaction
                 var license = db.LicenseTables.Where(c => c.LicenseName.Equals(licenseName)).FirstOrDefault();
                 if (license != null)
-                {
+                {   //0 = perpetual, 4=subscription
                     var standardLicense = db.LicenseTables.Where(c => c.SCRnumber.Equals(license.SCRnumber) &&
                                           c.DestinationID.Equals(license.DestinationID) &&
                                           c.GroupID.Equals(license.GroupID) &&
-                                          c.LicenseType.Equals(0)).FirstOrDefault();
+                                          (c.LicenseType.Equals(0) ||
+                                           c.LicenseType.Equals(4))).FirstOrDefault();
                     switch (license.LicenseType)
                     {
                         case 0:
@@ -297,28 +298,26 @@ namespace CreatorData
                                     return false;
                             }
                             break;
-                        case 2:
-                        //disaster                        
-                        case 3:
-                            //test dev
-                            //find each order in TD/DR
+                        case 2:                         //disaster                        
+                        case 3:                            //test dev
                             //compare latest order transaction for TD/DR vs latest std order transaction
                             //licenseName
-                            int standardOrder = 0;
-                            string stdOrderName;
-                            var orders = db.OrderTables.Where(c => c.LicenseID.Equals(license.ID));
-                            foreach (var order in orders)
+                            string baseProductLicense;
+                            int baseProductLicenseID = 0;
+                            string licenseBase = (standardLicense.LicenseType == 0) ? "P" : "S";
+                            var productLicenses = db.OrderTables.Where(c => c.LicenseID.Equals(license.ID));
+                            foreach (var order in productLicenses)
                             {
                                 //issue -> corresponding order id for standard is necessary
-                                stdOrderName = (license.LicenseType.Equals(2)) ? order.OrderNumber.Replace("D", "S") : order.OrderNumber.Replace("T", "S");
+                                baseProductLicense = (license.LicenseType.Equals(2)) ? order.OrderNumber.Replace("D", licenseBase) : order.OrderNumber.Replace("T", licenseBase);
                                 var storedOrder = db.OrderTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
-                                                                          c.OrderNumber.Equals(stdOrderName)).FirstOrDefault();
+                                                                          c.OrderNumber.Equals(baseProductLicense)).FirstOrDefault();
                                 if (storedOrder != null)
-                                    standardOrder = storedOrder.ID;
+                                    baseProductLicenseID = storedOrder.ID;
                                 else
                                     return false;
                                 var stdTransaction = db.TransactionTables.Where(c => c.taLicenseID.Equals(standardLicense.ID) &&
-                                                                                     c.taOrderID.Equals(standardOrder) &&
+                                                                                     c.taOrderID.Equals(baseProductLicenseID) &&
                                                                                      c.taType.Equals(2)).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
                                 var licTransaction = db.TransactionTables.Where(c => c.taLicenseID.Equals(license.ID) &&
                                                                                      c.taOrderID.Equals(order.ID) &&

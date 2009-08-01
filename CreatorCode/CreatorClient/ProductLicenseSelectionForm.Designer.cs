@@ -64,7 +64,7 @@
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "Order Number";
+            this.columnHeader1.Text = "Product License Number";
             // 
             // columnHeader2
             // 
@@ -86,15 +86,15 @@
             this.columnHeader5.Text = "Description";
             this.columnHeader5.Width = 103;
             // 
-            // OrderSelectionForm
+            // ProductLicenseSelectionForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.ClientSize = new System.Drawing.Size(486, 287);
             this.Controls.Add(this.listView1);
-            this.Name = "OrderSelectionForm";
-            this.Text = "Order Selection";
-            this.FinishDialog += new Shared.VisualComponents.FinishDialogEventHandler(this.OrderSelectionForm_FinishDialog);
-            this.InitDialog += new Shared.VisualComponents.InitDialogEventHandler(this.OrderSelectionForm_InitDialog);
+            this.Name = "ProductLicenseSelectionForm";
+            this.Text = "Product License Selection";
+            this.FinishDialog += new Shared.VisualComponents.FinishDialogEventHandler(this.ProductLicenseSelectionForm_FinishDialog);
+            this.InitDialog += new Shared.VisualComponents.InitDialogEventHandler(this.ProductLicenseSelectionForm_InitDialog);
             this.Controls.SetChildIndex(this.listView1, 0);
             this.ResumeLayout(false);
 

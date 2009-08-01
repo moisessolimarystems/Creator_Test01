@@ -22,12 +22,18 @@ namespace Client.Creator
             _lvManager.SetListViewColumnSorter(listView1);
         }
 
-        private void OrderSelectionForm_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
-        {            
-            LicenseServerProperty licData = (e.Data as OrderSelectionData).SelectedLicense;
+        private void ProductLicenseSelectionForm_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
+        {
+            LicenseServerProperty licData = (e.Data as ProductLicenseSelectionData).SelectedLicense;
             Service<ICreator>.Use((client) =>
             {
-                List<OrderTable> standardOrders = client.GetOrdersByLicenseName(string.Format("{0:x4}-{1:x3}-{2:x4}-P01", licData.CustID, licData.DestID, licData.GroupID));
+                string licenseBase = "P";
+                List<OrderTable> standardOrders = client.GetOrdersByLicenseName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                if (standardOrders.Count == 0) //subscription type
+                {
+                    licenseBase = "S";
+                    standardOrders = client.GetOrdersByLicenseName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                }
                 List<OrderTable> subOrders = client.GetOrdersByLicenseName(licData.Name);
                 foreach (OrderTable order in standardOrders)
                 {
@@ -37,17 +43,13 @@ namespace Client.Creator
                         ListViewItem lvItem = new ListViewItem();
                         if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
                         {
-                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace("P", "D"))))
+                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace(licenseBase, "D"))))
                                 continue;
-                            //lvItem.Checked = true;
                         }
                         else if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
                         {
-                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace("P", "T"))))
-                            {
-                                continue;
-                                //lvItem.Checked = true;
-                            }
+                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace(licenseBase, "T"))))
+                                continue;                            
                         }
                         lvItem.Text = order.OrderNumber;
                         lvItem.SubItems.Add(Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), order.OrderState));
@@ -64,12 +66,12 @@ namespace Client.Creator
             });
         }
 
-        private void OrderSelectionForm_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
+        private void ProductLicenseSelectionForm_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
         {
             foreach (ListViewItem lvItem in listView1.Items)
             {
                 if (lvItem.Checked)
-                    (e.Data as OrderSelectionData).OrderSelectionList.Add(lvItem.Text);
+                    (e.Data as ProductLicenseSelectionData).ProductLicenseSelectionList.Add(lvItem.Text);
             }
         }
 
@@ -81,17 +83,17 @@ namespace Client.Creator
         }
 
     }
-    #region OrderSelectionData class
-    public class OrderSelectionData : Shared.VisualComponents.DialogData
+    #region ProductLicenseSelectionData class
+    public class ProductLicenseSelectionData : Shared.VisualComponents.DialogData
     {
         private LicenseServerProperty _selectedLicense;
-        private List<string> _orderSelectionList;
+        private List<string> _productLicenseSelectionList;
         #region Constructors
 
-        public OrderSelectionData(LicenseServerProperty selectedLicense)
+        public ProductLicenseSelectionData(LicenseServerProperty selectedLicense)
         {
             _selectedLicense = selectedLicense;
-            _orderSelectionList = new List<string>();
+            _productLicenseSelectionList = new List<string>();
         }
         #endregion
 
@@ -103,10 +105,10 @@ namespace Client.Creator
             set { _selectedLicense = value; }
         }
 
-        public List<string> OrderSelectionList
+        public List<string> ProductLicenseSelectionList
         {
-            get { return _orderSelectionList; }
-            set { _orderSelectionList = value; }
+            get { return _productLicenseSelectionList; }
+            set { _productLicenseSelectionList = value; }
         }        
         #endregion
     }

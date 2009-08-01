@@ -71,8 +71,8 @@ namespace Client.Creator
         }
 
         [Category("Product"),PropertyOrder(3)]
-        [DisplayName("AppInstance")]
-        [Description("AppInstance")]
+        [DisplayName("Product Connections")]
+        [Description("Number of connections allowed per product.")]
         public uint AppInstance
         {
             get { return _product.productAppInstance.TVal; }

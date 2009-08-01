@@ -238,11 +238,7 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public string KeyProgramVerification(string key, int customerNumber, int keyNumber)
         {
-            //if (m_licServer == null)
-            //{
-            //    m_licServer = new SolimarLicenseServerWrapper();
-                m_licServer.Connect("localhost");
-            //}
+            m_licServer.Connect("localhost");
             return m_licServer.KeyProgramVerification(key, customerNumber, keyNumber);
         }
 
@@ -436,6 +432,12 @@ namespace Service.Creator
         public bool TokenExists(uint custID, byte tokenType, string tokenValue)
         {
             return TokenTable.TokenExists(custID, tokenType, tokenValue);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public bool IsHardwareTokenActive(uint custID, string tokenValue)
+        {
+            return TokenTable.IsHardwareTokenActive(custID, tokenValue);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

@@ -211,17 +211,17 @@ namespace Service.Creator
         bool TokenExists(uint custID, byte tokenType, string tokenValue);
 
         [OperationContract]
+        bool IsHardwareTokenActive(uint custID, string tokenValue);
+
+        [OperationContract]
         uint GetNextHardwareTokenValue(uint custID);
 
-        //[OperationContract()]
         [OperationContract]
         void CreateToken(TokenTable ta);
 
-        //[OperationContract()]
         [OperationContract]
         void UpdateToken(TokenTable ta);
 
-        //[OperationContract()]
         [OperationContract]
         void DeleteToken(TokenTable ta);
 

@@ -46,7 +46,7 @@ namespace Client.Creator
             else if (e.Data is OrderDialogData)
                 LoadOrderTabPage(e.Data as OrderDialogData);
             else
-                LoadHardwareKeyTabPage();            
+                LoadHardwareKeyTabPage(e.Data as HardwareKeyDialogData);            
         }
 
         private void LicenseInfoForm_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
@@ -67,46 +67,65 @@ namespace Client.Creator
             else
                 SaveHardwareKeyTabPage();
         }
+
+        private void btnOk_Click(object sender, EventArgs e)
+        {
+            if (licInfoTabControl.SelectedTab == TokenTabPage)
+                ValidateTokenForm();
+        }
+
+        private void LicenseInfoForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (DialogResult == DialogResult.OK)
+                if (!m_Validated)
+                    e.Cancel = true;
+        }
         #endregion
 
         #region Order Methods
 
         void EnableOrderTabPage(bool bEnable)
         {
-            orderProductComboBox.Enabled = bEnable;
-            orderVersionMaskedTextBox.Enabled = bEnable;
-            orderTypeComboBox.Enabled = bEnable;
-            orderDescriptionTextBox.Enabled = bEnable;
+            ProductLicenseProductComboBox.Enabled = bEnable;
+            productLicenseVersionMaskedTextBox.Enabled = bEnable;
+            ProductLicenseTypeComboBox.Enabled = bEnable;
+            productLicenseDescriptionTextBox.Enabled = bEnable;
             btnOk.Enabled = bEnable;
         }
+
         void LoadOrderTabPage(OrderDialogData orderData)
         {
             selectedObject = orderData as Object;
-            //licInfoTabControl.TabPages.Add(orderTabPage);
             topPanel.Controls.Clear();
             orderGroupBox.Parent = topPanel;
-            orderNumberTextBox.Text = orderData.OrderInfo.OrderNumber;
-            //EnableOrderTabPage(true);
-            List<OrderTable> orders;
+            productLicenseNumberTextBox.Text = orderData.OrderInfo.OrderNumber;
+            List<OrderTable> productLicenses;
             Service<ICreator>.Use((client) => 
             {
                 //trial -> zero options : 1 order
                 //perm -> add-on available : 1 order
                 //perm, add-on -> zero available : 2 order                
                 if (orderData.LicenseInfo.LicType != (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev))
-                {
-                    //standard,failover,disaster             
+                {   //standard,failover,disaster             
                     foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                     {
                         if (!productSpec.productName.TVal.Contains("Test"))
                         {
-                            //don't include modules that already exist?
-                            orders = client.GetOrdersEqualsProduct(orderData.OrderInfo.LicenseName, productSpec.productName.TVal);
+                            productLicenses = client.GetOrdersEqualsProduct(orderData.OrderInfo.LicenseName, productSpec.productName.TVal);
                             //0 order => product hasnt been added
                             if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
-                                orders.Count > 0)
-                                continue;                                
-                            orderProductComboBox.Items.Add(productSpec.productName);
+                                productLicenses.Count > 0)
+                            {
+                                //bool bFound = false;
+                                //foreach (OrderTable productLicense in productLicenses)
+                                //{
+                                //    if (productLicense.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm)
+                                //        bFound = true;
+                                //}
+                                //if (!bFound)
+                                    continue;
+                            }
+                            ProductLicenseProductComboBox.Items.Add(productSpec.productName);
                         }
                     }
                 }
@@ -124,31 +143,26 @@ namespace Client.Creator
                             int pos = productSpec.productName.TVal.IndexOf("Test");
                             //1) call twice, once with product, then product test
                             //2) call once with product and add only when 1 order(standard) found
-                            orders = client.GetOrdersEqualsProduct(licenseBase, productSpec.productName.TVal.Remove(pos - 1));
-                            if (orders.Count == 1)
-                            {
-                                //0 order => product hasnt been added                     
-                                orders = client.GetOrdersEqualsProduct(orderData.OrderInfo.LicenseName, productSpec.productName);
-                                if (orders.Count == 0)
-                                    orderProductComboBox.Items.Add(productSpec.productName);
+                            productLicenses = client.GetOrdersEqualsProduct(licenseBase, productSpec.productName.TVal.Remove(pos - 1));
+                            if (productLicenses.Count == 1)
+                            {   //0 order => product hasnt been added                     
+                                productLicenses = client.GetOrdersEqualsProduct(orderData.OrderInfo.LicenseName, productSpec.productName);
+                                if (productLicenses.Count == 0)
+                                    ProductLicenseProductComboBox.Items.Add(productSpec.productName);
                             }
                         }
                     }
                 }
             });
-            if (orderProductComboBox.Items.Count == 0)
-            {
-                orderProductComboBox.Items.Add("No Products Available");
-                //EnableOrderTabPage(false);
-            }
-            orderProductComboBox.SelectedIndex = 0;
+            if (ProductLicenseProductComboBox.Items.Count == 0)
+                ProductLicenseProductComboBox.Items.Add("No Products Available");
+            ProductLicenseProductComboBox.SelectedIndex = 0;
             expDateTextBox.Text = "30";
-            //load product combobox based on type of license
         }
         
         void SaveOrderTabPage(OrderDialogData orderData)
         {
-            string[] splitOrderStatus = orderTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
+            string[] splitOrderStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
             //can only be one or two
             if (splitOrderStatus.Count() > 1)
             {
@@ -158,13 +172,13 @@ namespace Client.Creator
             else
                 orderData.OrderInfo.OrderStatus = (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)Enum.Parse(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), splitOrderStatus[0]);
             
-            orderData.OrderInfo.Product.ID = (uint)m_CommLink.GetProductID(orderProductComboBox.SelectedItem.ToString());
+            orderData.OrderInfo.Product.ID = (uint)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
             orderData.OrderInfo.ProductLicenseType = m_CommLink.GetProductSpec(orderData.OrderInfo.Product.ID).productLicType.TVal;
             orderData.OrderInfo.Product.AppInstance = (uint)((orderData.OrderInfo.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
-            string[] versionNum = orderVersionMaskedTextBox.Text.Split(".".ToCharArray());
+            string[] versionNum = productLicenseVersionMaskedTextBox.Text.Split(".".ToCharArray());
             orderData.OrderInfo.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]),UInt32.Parse(versionNum[1]));
             orderData.OrderInfo.ExpirationDate = DateTime.Today.AddDays(Int32.Parse(expDateTextBox.Text));
-            orderData.OrderInfo.Description = orderDescriptionTextBox.Text;            
+            orderData.OrderInfo.Description = productLicenseDescriptionTextBox.Text;            
         }
         #endregion
 
@@ -173,7 +187,6 @@ namespace Client.Creator
         private void LoadLicenseTabPage(LicenseDialogData licData)
         {
             string selectedDestName;
-            //licInfoTabControl.TabPages.Add(LicenseTabPage);
             topPanel.Controls.Clear();
             licenseGroupBox.Parent = topPanel;
             //need to get next available value from DB for destination ID and group ID.
@@ -554,19 +567,37 @@ namespace Client.Creator
         #endregion
 
         #region Hardware Key Methods
-        private void LoadHardwareKeyTabPage()        
+        private void LoadHardwareKeyTabPage(HardwareKeyDialogData hardwareKeyData)        
         {
-            List<CustomerTable> custList = null;
-            //licInfoTabControl.TabPages.Add(HardwareKeyTabPage);            
             topPanel.Controls.Clear();
             hardwareKeyGroupBox.Parent = topPanel;
-            Service<ICreator>.Use((client) =>
+            CustomerComboBox.Enabled = false;
+            KeyValueTextBox.Enabled = false;
+            activateCheckBox.Enabled = false;
+            if(hardwareKeyData.CustomerName.Length > 0)
             {
-                custList = client.GetAllCustomers("", false);
-            });
-            foreach (CustomerTable cust in custList)
+                CustomerComboBox.Items.Add(hardwareKeyData.CustomerName);
+                KeyValueTextBox.Text = hardwareKeyData.KeyValue;
+                activateCheckBox.Checked = true;
+                label10.Visible = true;
+                keyNameListBox.Visible = true;
+                btnOk.Text = "Activate";
+            }
+            else
             {
-                CustomerComboBox.Items.Add(cust.SCRname);
+                CustomerComboBox.Enabled = true;
+                KeyValueTextBox.Enabled = true;
+                activateCheckBox.Enabled = true;
+                List<CustomerTable> custList = null;          
+                Service<ICreator>.Use((client) =>
+                {
+                    custList = client.GetAllCustomers("", false);
+                });
+                foreach (CustomerTable cust in custList)
+                {
+                    CustomerComboBox.Items.Add(cust.SCRname);
+                }
+                activateCheckBox.Checked = false;
             }
             CustomerComboBox.SelectedIndex = 0;
             RefreshKeyList();
@@ -574,18 +605,46 @@ namespace Client.Creator
         private void SaveHardwareKeyTabPage()
         {            
             string[] value = KeyValueTextBox.Text.Split(new Char[] { '-' });
-            KeyProgramVerification(AvailableKeysListBox.SelectedItem.ToString(),
-                                   Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
-                                   Int32.Parse(value[1], System.Globalization.NumberStyles.HexNumber));
             TokenTable newHardwareKey = new TokenTable();
             newHardwareKey.TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
             newHardwareKey.TokenValue = KeyValueTextBox.Text;
             newHardwareKey.LicenseID = -1;
             newHardwareKey.CustID = Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber);
-            Service<ICreator>.Use((client) =>
-            {    
-                client.CreateToken(newHardwareKey);
-            });
+            if (activateCheckBox.Checked)
+            {
+                KeyProgramVerification(AvailableKeysListBox.SelectedItem.ToString(),
+                                       Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
+                                       Int32.Parse(value[1], System.Globalization.NumberStyles.HexNumber));
+                newHardwareKey.TokenStatus = 1;
+                if (activateCheckBox.Enabled)
+                {
+                    Service<ICreator>.Use((client) =>
+                    {
+                        client.CreateToken(newHardwareKey);
+                    });
+                }
+                else
+                {
+                    //update
+                    TokenTable selectedToken = null;
+                    Service<ICreator>.Use((client) =>
+                    {
+                        selectedToken = client.GetHardwareTokenByKeyValue((uint)Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
+                                                                          KeyValueTextBox.Text);
+                        selectedToken.TokenStatus = 1;
+                        client.UpdateToken(selectedToken);
+                    });
+                }
+            }
+            else
+            {
+                newHardwareKey.TokenStatus = 0;
+                Service<ICreator>.Use((client) =>
+                {
+                    client.CreateToken(newHardwareKey);
+                });
+            }
+
         }
         #endregion
 
@@ -728,15 +787,22 @@ namespace Client.Creator
             Cursor.Current = Cursors.Default; 
         }
 
+        private string GetNextAvailableHardwareKey(string customerName)
+        {
+            CustomerTable custRec = null;
+            uint tokenValue = 0;
+            Service<ICreator>.Use((client) =>
+            {
+                custRec = client.GetCustomer(customerName, false);
+                tokenValue = client.GetNextHardwareTokenValue((uint)custRec.SCRnumber);
+            });
+            return string.Format("{0:x4}-{1:x4}", custRec.SCRnumber, tokenValue);
+        }
+
         private void CustomerComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Service<ICreator>.Use((client) => 
-            {
-                CustomerTable custRec = client.GetCustomer(CustomerComboBox.SelectedItem.ToString(), false);
-                uint tokenValue = client.GetNextHardwareTokenValue((uint)custRec.SCRnumber);
-                KeyValueTextBox.Text = string.Format("{0:x4}-{1:x4}", custRec.SCRnumber, tokenValue);
-            });
-
+           if(activateCheckBox.Enabled)
+                KeyValueTextBox.Text = GetNextAvailableHardwareKey(CustomerComboBox.SelectedItem.ToString());
         }
 
         private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -912,23 +978,32 @@ namespace Client.Creator
 
         #endregion
 
-        #region OrderTabPage Events
+        #region ProductLicenseTabPage Events
 
-        private void orderProductComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void productLicenseProductComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             //filter out available types - for status
             OrderDialogData storedObject = selectedObject as OrderDialogData;            
             //get current product version for product;
-            string selectedProduct = orderProductComboBox.SelectedItem.ToString();
-            //if (selectedProduct == "No Products Available")
-            //    btnOk.Enabled = false;
-            orderTypeComboBox.Items.Clear();
-            orderVersionMaskedTextBox.Text = "0.00";
+            string selectedProduct = ProductLicenseProductComboBox.SelectedItem.ToString();
+            ProductLicenseTypeComboBox.Items.Clear();
+            productLicenseVersionMaskedTextBox.Text = "0.00";
             Service<ICreator>.Use((client) => 
             {
                 //get all orders for a given product
-                IList<OrderTable> productOrders = client.GetOrdersEqualsProduct(storedObject.OrderInfo.LicenseName, selectedProduct);                
-                orderTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial);
+                IList<OrderTable> productOrders = client.GetOrdersEqualsProduct(storedObject.OrderInfo.LicenseName, selectedProduct);
+                List<OrderTable> orders;
+                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                {
+                    if (productSpec.productName.TVal.Equals(selectedProduct) && !productSpec.productName.TVal.Contains("Test"))
+                    {
+                        orders = client.GetOrdersEqualsProduct(storedObject.OrderInfo.LicenseName, productSpec.productName.TVal);
+                        if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
+                            orders.Count > 0))
+                            ProductLicenseTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial);
+                        break;
+                    }
+                }
                 if (productOrders.Count > 0)
                 {
                     Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState state = (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)productOrders[0].OrderState;
@@ -936,22 +1011,22 @@ namespace Client.Creator
                     {
                         if (orderRec.OrderState.Equals((byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm))
                         {
-                            orderTypeComboBox.Items.Add(string.Format("{0} : {1}", Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn, orderRec.OrderNumber));  
+                            ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn, orderRec.OrderNumber));  
                         }
                     }               
                 }
-                orderTypeComboBox.SelectedIndex = 0;
+                ProductLicenseTypeComboBox.SelectedIndex = 0;
                 int productID = CreatorForm.s_CommLink.GetProductID(selectedProduct);
                 if (productID > 0)
                 {
                     int productVersion = client.GetProductVersionFromTable(productID);
-                    orderVersionMaskedTextBox.Text = string.Format("{0:x}", productVersion);
+                    productLicenseVersionMaskedTextBox.Text = string.Format("{0:x}", productVersion);
                 }
             });
 
         }
 
-        private void orderTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void productLicenseTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             //on trial don't need to do anything
             //on addon display list of possible orders to add onto 
@@ -977,18 +1052,7 @@ namespace Client.Creator
         }
         #endregion
 
-        private void btnOk_Click(object sender, EventArgs e)
-        {
-            if (licInfoTabControl.SelectedTab == TokenTabPage)
-                ValidateTokenForm();            
-        }
 
-        private void LicenseInfoForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (DialogResult == DialogResult.OK)
-                if (!m_Validated)
-                    e.Cancel = true;
-        }
 
         private string GetCSVTokenAlias(string tokenType)
         {
@@ -1036,6 +1100,35 @@ namespace Client.Creator
                 catch (Exception)
                 {
                 }
+            }
+        }
+
+        private void CustomerComboBox_TextChanged(object sender, EventArgs e)
+        {            
+            //autocomplete
+            if (CustomerComboBox.Items.IndexOf(CustomerComboBox.Text) >= 0)
+            {
+                if(activateCheckBox.Enabled)
+                    KeyValueTextBox.Text = GetNextAvailableHardwareKey(CustomerComboBox.Text);
+                btnOk.Enabled = true;
+            }
+            else
+                btnOk.Enabled = false;
+        }
+
+        private void activateCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (activateCheckBox.Checked)
+            {
+                btnOk.Text = "Activate";
+                label10.Visible = true;
+                AvailableKeysListBox.Visible = true;
+            }
+            else
+            {
+                btnOk.Text = "Reserve";
+                label10.Visible = false;
+                AvailableKeysListBox.Visible = false;
             }
         }
     }
@@ -1213,6 +1306,44 @@ namespace Client.Creator
         //    get { return this.m_LicenseType; }
         //    set { this.m_LicenseType = value; }
         //}
+        #endregion
+    }
+    #endregion
+
+    #region HardwareKeyDialogData class
+    public class HardwareKeyDialogData : Shared.VisualComponents.DialogData
+    {
+        private string _customerName;
+        private string _keyValue;
+
+        #region Constructors
+
+        public HardwareKeyDialogData()
+        {
+            _customerName = "";
+            _keyValue = "";
+        }
+
+        public HardwareKeyDialogData(string custName, string keyValue)
+        {
+            _customerName = custName;
+            _keyValue = keyValue;
+        }
+        #endregion
+
+        #region Properties
+
+        public string CustomerName
+        {
+            get { return _customerName; }
+            set { _customerName = value; }
+        }
+
+        public string KeyValue
+        {
+            get { return _keyValue; }
+            set { _keyValue = value; }
+        }
         #endregion
     }
     #endregion

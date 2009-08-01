@@ -26,17 +26,14 @@ namespace CreatorData
                 {
                     if (token != 0)
                     {
-                        //get all customer names where translate to cunst id
-                        //get all licenses with cust id
-                        //get all tokens with license id
                         list = db.TokenTables.Where(c => c.TokenType.Equals(token) &&
-                                                   (c.TokenValue.Contains(searchString) ||
-                                                    c.LicenseTable.CustomerTable.SCRname.ToString().Contains(searchString) ||
-                                                    c.LicenseTable.LicenseName.Contains(searchString))).ToList(); 
+                                                        (c.TokenValue.Contains(searchString) ||
+                                                         c.LicenseTable.CustomerTable.SCRname.Contains(searchString) ||
+                                                         c.LicenseTable.LicenseName.Contains(searchString))).ToList(); 
                     }
                     else
                         list = db.TokenTables.Where(c => c.TokenValue.Contains(searchString) ||
-                                                    c.LicenseTable.SCRnumber.ToString().Contains(searchString)).ToList();
+                                                         c.LicenseTable.SCRnumber.ToString().Contains(searchString)).ToList();
                 }
                 return list;
             }
@@ -79,6 +76,22 @@ namespace CreatorData
                 return db.TokenTables.Where(c => c.LicenseTable.LicenseName.Equals(licenseName) &&
                                                        c.TokenType.Equals(tokenType)).SingleOrDefault();
             }
+        }
+
+        public static bool IsHardwareTokenActive(uint custID, string keyValue)
+        {
+            bool bActive = false;
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                IList<TokenTable> activeHardwareKey = db.TokenTables.Where(c => c.CustID.Equals(custID) &&
+                                                                                c.TokenType.Equals(1) &&
+                                                                                c.TokenStatus.Equals(1) &&
+                                                                                c.TokenValue.Equals(keyValue)).ToList();
+                if (activeHardwareKey.Count > 0)
+                    bActive = true;
+            }
+            return bActive;
         }
 
         public static TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue)

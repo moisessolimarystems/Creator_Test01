@@ -972,7 +972,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_Packet", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
+		[Association(Name="LicenseTable_PacketTable", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
 		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<PacketTable> PacketTables
 		{
@@ -1962,6 +1962,8 @@ namespace CreatorData
 		
 		private int _CustID;
 		
+		private byte _TokenStatus;
+		
 		private EntityRef<LicenseTable> _LicenseTable;
 		
     #region Extensibility Method Definitions
@@ -1978,6 +1980,8 @@ namespace CreatorData
     partial void OnTokenValueChanged();
     partial void OnCustIDChanging(int value);
     partial void OnCustIDChanged();
+    partial void OnTokenStatusChanging(byte value);
+    partial void OnTokenStatusChanged();
     #endregion
 		
 		public TokenTable()
@@ -2090,6 +2094,27 @@ namespace CreatorData
 					this._CustID = value;
 					this.SendPropertyChanged("CustID");
 					this.OnCustIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_TokenStatus", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=6)]
+		public byte TokenStatus
+		{
+			get
+			{
+				return this._TokenStatus;
+			}
+			set
+			{
+				if ((this._TokenStatus != value))
+				{
+					this.OnTokenStatusChanging(value);
+					this.SendPropertyChanging();
+					this._TokenStatus = value;
+					this.SendPropertyChanged("TokenStatus");
+					this.OnTokenStatusChanged();
 				}
 			}
 		}
@@ -2436,7 +2461,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_Packet", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		[Association(Name="LicenseTable_PacketTable", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
 		public LicenseTable LicenseTable
 		{
 			get

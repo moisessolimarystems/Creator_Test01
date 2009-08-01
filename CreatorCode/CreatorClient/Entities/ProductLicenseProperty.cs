@@ -278,7 +278,7 @@ namespace Client.Creator
 
         [Browsable(false)]
         [Category("Product"), PropertyOrder(3)]
-        [DisplayName("Application Instance")]
+        [DisplayName("Product Connections")]
         public uint AppInstance
         {
             get

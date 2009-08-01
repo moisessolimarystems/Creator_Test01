@@ -89,6 +89,7 @@
       <xs:element minOccurs="0" name="TokenType" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="TokenValue" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="CustID" type="xs:int" />
+      <xs:element minOccurs="0" name="TokenStatus" type="xs:unsignedByte" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TokenTable" nillable="true" type="tns:TokenTable" />

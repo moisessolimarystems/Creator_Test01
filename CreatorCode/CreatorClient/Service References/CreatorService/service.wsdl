@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_GetDestinationName_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationName" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetDestinationName_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestinationNameResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetDestinationID_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDestinationID" />
   </wsdl:message>
@@ -213,6 +219,12 @@
   <wsdl:message name="ICreator_TokenExists_OutputMessage">
     <wsdl:part name="parameters" element="tns:TokenExistsResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_IsHardwareTokenActive_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsHardwareTokenActive" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_IsHardwareTokenActive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsHardwareTokenActiveResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetNextHardwareTokenValue_InputMessage">
     <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValue" />
   </wsdl:message>
@@ -242,12 +254,6 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetDestNamesByCustID_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetDestNamesByCustIDResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestinationName_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestinationName" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestinationName_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestinationNameResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
@@ -442,6 +448,10 @@
     <wsdl:part name="parameters" element="tns:ValidateVerificationCodeResponse" />
   </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="GetDestinationName">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationName" message="tns:ICreator_GetDestinationName_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationNameResponse" message="tns:ICreator_GetDestinationName_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetDestinationID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationID" message="tns:ICreator_GetDestinationID_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationIDResponse" message="tns:ICreator_GetDestinationID_OutputMessage" />
@@ -570,6 +580,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/TokenExists" message="tns:ICreator_TokenExists_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/TokenExistsResponse" message="tns:ICreator_TokenExists_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="IsHardwareTokenActive">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/IsHardwareTokenActive" message="tns:ICreator_IsHardwareTokenActive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse" message="tns:ICreator_IsHardwareTokenActive_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetNextHardwareTokenValue">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue" message="tns:ICreator_GetNextHardwareTokenValue_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse" message="tns:ICreator_GetNextHardwareTokenValue_OutputMessage" />
@@ -589,10 +603,6 @@
     <wsdl:operation name="GetDestNamesByCustID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustID" message="tns:ICreator_GetDestNamesByCustID_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse" message="tns:ICreator_GetDestNamesByCustID_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetDestinationName">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationName" message="tns:ICreator_GetDestinationName_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationNameResponse" message="tns:ICreator_GetDestinationName_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
@@ -727,6 +737,15 @@
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="GetDestinationName">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetDestinationID">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationID" style="document" />
       <wsdl:input>
@@ -1015,6 +1034,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="IsHardwareTokenActive">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/IsHardwareTokenActive" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetNextHardwareTokenValue">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextHardwareTokenValue" style="document" />
       <wsdl:input>
@@ -1053,15 +1081,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetDestNamesByCustID">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestNamesByCustID" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetDestinationName">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationName" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
