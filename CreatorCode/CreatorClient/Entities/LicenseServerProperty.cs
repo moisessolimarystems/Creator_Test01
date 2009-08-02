@@ -163,9 +163,26 @@ namespace Client.Creator
         {
             get
             {
+                bool bEnabled = true;
                 if (_licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Count > 1)
-                    return true;
-                return false;
+                {
+                    foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
+                    {
+                        if (token.tokenType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                        {
+                            Service<ICreator>.Use((client) =>
+                            {
+                                TokenTable hwToken = client.GetTokenByLicenseName(Name, (byte)token.tokenType.TVal);
+                                if (hwToken.TokenStatus != 1)
+                                    bEnabled = false;
+                            });
+                            break;
+                        }
+                    }
+                }
+                else
+                    bEnabled = false;
+                return bEnabled;
             }
         }
 
