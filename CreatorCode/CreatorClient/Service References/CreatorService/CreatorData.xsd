@@ -1,5 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/CreatorData" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CreatorData" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="TokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
+      <xs:element minOccurs="0" name="TokenType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="TokenValue" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CustID" type="xs:int" />
+      <xs:element minOccurs="0" name="TokenStatus" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TokenTable" nillable="true" type="tns:TokenTable" />
+  <xs:complexType name="ArrayOfDestinationNameTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DestinationNameTable" nillable="true" type="tns:DestinationNameTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDestinationNameTable" nillable="true" type="tns:ArrayOfDestinationNameTable" />
   <xs:complexType name="DestinationNameTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -82,23 +99,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfTokenTable" nillable="true" type="tns:ArrayOfTokenTable" />
-  <xs:complexType name="TokenTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
-      <xs:element minOccurs="0" name="TokenType" type="xs:unsignedByte" />
-      <xs:element minOccurs="0" name="TokenValue" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="CustID" type="xs:int" />
-      <xs:element minOccurs="0" name="TokenStatus" type="xs:unsignedByte" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="TokenTable" nillable="true" type="tns:TokenTable" />
-  <xs:complexType name="ArrayOfDestinationNameTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DestinationNameTable" nillable="true" type="tns:DestinationNameTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfDestinationNameTable" nillable="true" type="tns:ArrayOfDestinationNameTable" />
   <xs:complexType name="ArrayOfCustomerTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="CustomerTable" nillable="true" type="tns:CustomerTable" />

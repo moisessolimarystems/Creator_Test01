@@ -9,7 +9,7 @@ namespace CreatorData
 {
     public partial class CustomerTable
     {
-        public static IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions)//int pageNumber, int pageSize, bool enableLoadOptions)
+        public static IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions)
         {
             IList<CustomerTable> list, destList;
             using (CreatorDataContext db = new CreatorDataContext())
@@ -43,6 +43,26 @@ namespace CreatorData
                     }                                                                                                        
                 }
 
+                return list;
+            }
+        }
+
+        public static IList<string> GetAllCustomerNames(string searchString)
+        {
+            IList<string> list;
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                if (searchString.Length == 0)
+                {
+                    list = db.CustomerTables.OrderBy(c => c.SCRnumber).Select(n => n.SCRname).ToList();
+                }
+                else
+                {
+                    IList<DestinationNameTable> destNames = db.DestinationNameTables.Where(d => d.DestName.Contains(searchString)).ToList();
+                    list = db.CustomerTables.Where(c => c.LicenseTables.Where(d => d.LicenseName.Contains(searchString)).Count() > 0 ||
+                                                          c.SCRname.Contains(searchString)).Select(n => n.SCRname).ToList();
+                }
                 return list;
             }
         }

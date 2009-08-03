@@ -26,10 +26,72 @@ namespace CreatorData
                 {
                     if (token != 0)
                     {
-                        list = db.TokenTables.Where(c => c.TokenType.Equals(token) &&
-                                                        (c.TokenValue.Contains(searchString) ||
-                                                         c.LicenseTable.CustomerTable.SCRname.Contains(searchString) ||
-                                                         c.LicenseTable.LicenseName.Contains(searchString))).ToList(); 
+                        //list = (from t in db.TokenTables //115
+                        //        from c in db.CustomerTables
+                        //        from l in db.LicenseTables
+                        //        where t.TokenType.Equals(token) &&
+                        //             (t.TokenValue.Contains(searchString) ||
+                        //              (l.LicenseName.Contains(searchString) && t.LicenseID.Equals(l.ID)) 
+                        //             )
+                        //        select t).ToList();
+                        //list = (from t in db.TokenTables //0
+                        //        from l in db.LicenseTables
+                        //        where t.TokenType.Equals(token) &&
+                        //             (t.TokenValue.Contains(searchString) ||
+                        //              (l.LicenseName.Contains(searchString) && t.LicenseID.Equals(l.ID))
+                        //             )
+                        //        select t).ToList();
+                        list = (from t in db.TokenTables //5
+                                from c in db.CustomerTables
+                                where t.TokenType.Equals(token) &&
+                                     (c.SCRname.Contains(searchString) && t.CustID.Equals(c.SCRnumber))
+                                select t).ToList();                                   
+                    }
+                    else
+                        list = db.TokenTables.Where(c => c.TokenValue.Contains(searchString) ||
+                                                         c.LicenseTable.SCRnumber.ToString().Contains(searchString)).ToList();
+                }
+                return list;
+            }
+        }
+
+        public static IList<TokenTable> GetAllTokensByCustomer(string searchString, string custName, Byte token)
+        {
+            IList<TokenTable> list;
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+
+                if (searchString.Length == 0)
+                {
+                    if (token != 0)
+                    {
+                        list = (from t in db.TokenTables //5
+                                from c in db.CustomerTables
+                                where t.TokenType.Equals(token) &&
+                                     (c.SCRname.Contains(custName) && t.CustID.Equals(c.SCRnumber))
+                                select t).OrderBy(l => l.LicenseID).ToList();                        
+                    }
+                    else
+                    {
+                        list = (from t in db.TokenTables //5
+                                from c in db.CustomerTables
+                                where (c.SCRname.Contains(custName) && t.CustID.Equals(c.SCRnumber))
+                                select t).OrderBy(l => l.LicenseID).ToList();
+                    }
+                }
+                else
+                {
+                    if (token != 0)
+                    {
+                        list = (from t in db.TokenTables //5
+                                from c in db.CustomerTables
+                                from l in db.LicenseTables
+                                where t.TokenType.Equals(token)                                         &&
+                                     (t.TokenValue.Contains(searchString)                               ||
+                                     (l.LicenseName.Contains(searchString) && t.LicenseID.Equals(l.ID)) ||
+                                     (c.SCRname.Contains(custName) && t.CustID.Equals(c.SCRnumber)))
+                                select t).ToList();
                     }
                     else
                         list = db.TokenTables.Where(c => c.TokenValue.Contains(searchString) ||
@@ -94,14 +156,13 @@ namespace CreatorData
             return bActive;
         }
 
-        public static TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue)
+        public static TokenTable GetHardwareTokenByKeyValue(string keyValue)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.TokenTables.Where(c => c.CustID.Equals(custID) &&
-                                            c.TokenType.Equals(1) &&
-                                            c.TokenValue.Equals(keyValue)).SingleOrDefault();
+                return db.TokenTables.Where(c => c.TokenType.Equals(1) &&
+                                                 c.TokenValue.Equals(keyValue)).SingleOrDefault();
             }
         }
 

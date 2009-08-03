@@ -15,6 +15,131 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="TokenTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class TokenTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int IDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int LicenseIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte TokenTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenValueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CustIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte TokenStatusField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int LicenseID {
+            get {
+                return this.LicenseIDField;
+            }
+            set {
+                if ((this.LicenseIDField.Equals(value) != true)) {
+                    this.LicenseIDField = value;
+                    this.RaisePropertyChanged("LicenseID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte TokenType {
+            get {
+                return this.TokenTypeField;
+            }
+            set {
+                if ((this.TokenTypeField.Equals(value) != true)) {
+                    this.TokenTypeField = value;
+                    this.RaisePropertyChanged("TokenType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string TokenValue {
+            get {
+                return this.TokenValueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenValueField, value) != true)) {
+                    this.TokenValueField = value;
+                    this.RaisePropertyChanged("TokenValue");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public int CustID {
+            get {
+                return this.CustIDField;
+            }
+            set {
+                if ((this.CustIDField.Equals(value) != true)) {
+                    this.CustIDField = value;
+                    this.RaisePropertyChanged("CustID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public byte TokenStatus {
+            get {
+                return this.TokenStatusField;
+            }
+            set {
+                if ((this.TokenStatusField.Equals(value) != true)) {
+                    this.TokenStatusField = value;
+                    this.RaisePropertyChanged("TokenStatus");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="DestinationNameTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class DestinationNameTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -784,131 +909,6 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="TokenTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
-    [System.SerializableAttribute()]
-    public partial class TokenTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int LicenseIDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte TokenTypeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string TokenValueField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int CustIDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte TokenStatusField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
-            get {
-                return this.IDField;
-            }
-            set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int LicenseID {
-            get {
-                return this.LicenseIDField;
-            }
-            set {
-                if ((this.LicenseIDField.Equals(value) != true)) {
-                    this.LicenseIDField = value;
-                    this.RaisePropertyChanged("LicenseID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public byte TokenType {
-            get {
-                return this.TokenTypeField;
-            }
-            set {
-                if ((this.TokenTypeField.Equals(value) != true)) {
-                    this.TokenTypeField = value;
-                    this.RaisePropertyChanged("TokenType");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string TokenValue {
-            get {
-                return this.TokenValueField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.TokenValueField, value) != true)) {
-                    this.TokenValueField = value;
-                    this.RaisePropertyChanged("TokenValue");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public int CustID {
-            get {
-                return this.CustIDField;
-            }
-            set {
-                if ((this.CustIDField.Equals(value) != true)) {
-                    this.CustIDField = value;
-                    this.RaisePropertyChanged("CustID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public byte TokenStatus {
-            get {
-                return this.TokenStatusField;
-            }
-            set {
-                if ((this.TokenStatusField.Equals(value) != true)) {
-                    this.TokenStatusField = value;
-                    this.RaisePropertyChanged("TokenStatus");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="CustomerTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class CustomerTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1349,6 +1349,15 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateToken", ReplyAction="http://tempuri.org/ICreator/UpdateTokenResponse")]
+        void UpdateToken(Client.Creator.CreatorService.TokenTable ta);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteToken", ReplyAction="http://tempuri.org/ICreator/DeleteTokenResponse")]
+        void DeleteToken(Client.Creator.CreatorService.TokenTable ta);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestNamesByCustID", ReplyAction="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestinationName", ReplyAction="http://tempuri.org/ICreator/GetDestinationNameResponse")]
         Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID);
         
@@ -1369,6 +1378,12 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPermissionsByUser", ReplyAction="http://tempuri.org/ICreator/GetPermissionsByUserResponse")]
         Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPacketByVerificationCode", ReplyAction="http://tempuri.org/ICreator/GetPacketByVerificationCodeResponse")]
+        Client.Creator.CreatorService.PacketTable GetPacketByVerificationCode(string verificationCode);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/ValidateVerificationCode", ReplyAction="http://tempuri.org/ICreator/ValidateVerificationCodeResponse")]
+        bool ValidateVerificationCode(string packetName, string verificationCode);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GenerateLicInfoByVerifyData", ReplyAction="http://tempuri.org/ICreator/GenerateLicInfoByVerifyDataResponse")]
         string GenerateLicInfoByVerifyData(ref byte[] byteVerifyData);
@@ -1433,11 +1448,14 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllTokens", ReplyAction="http://tempuri.org/ICreator/GetAllTokensResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllTokensByCustomer", ReplyAction="http://tempuri.org/ICreator/GetAllTokensByCustomerResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokensByCustomer(string searchString, string custName, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTokensByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTokensByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetTokensByLicenseName(string licenseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetHardwareTokenByKeyValue", ReplyAction="http://tempuri.org/ICreator/GetHardwareTokenByKeyValueResponse")]
-        Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue);
+        Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(string keyValue);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID", ReplyAction="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustIDResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID);
@@ -1457,17 +1475,11 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
         void CreateToken(Client.Creator.CreatorService.TokenTable ta);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateToken", ReplyAction="http://tempuri.org/ICreator/UpdateTokenResponse")]
-        void UpdateToken(Client.Creator.CreatorService.TokenTable ta);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteToken", ReplyAction="http://tempuri.org/ICreator/DeleteTokenResponse")]
-        void DeleteToken(Client.Creator.CreatorService.TokenTable ta);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetDestNamesByCustID", ReplyAction="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomerNames", ReplyAction="http://tempuri.org/ICreator/GetAllCustomerNamesResponse")]
+        System.Collections.Generic.List<string> GetAllCustomerNames(string searchString);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCustomerCount", ReplyAction="http://tempuri.org/ICreator/GetCustomerCountResponse")]
         int GetCustomerCount(string searchString, bool enableLoadOptions);
@@ -1541,6 +1553,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/KeyEnumerate", ReplyAction="http://tempuri.org/ICreator/KeyEnumerateResponse")]
         System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> KeyEnumerate();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/KeyFormat", ReplyAction="http://tempuri.org/ICreator/KeyFormatResponse")]
+        string KeyFormat(string key);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/KeyProgramVerification", ReplyAction="http://tempuri.org/ICreator/KeyProgramVerificationResponse")]
         string KeyProgramVerification(string key, int customerNumber, int keyNumber);
         
@@ -1555,12 +1570,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPacketsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetPacketsByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByLicenseName(string licenseName);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPacketByVerificationCode", ReplyAction="http://tempuri.org/ICreator/GetPacketByVerificationCodeResponse")]
-        Client.Creator.CreatorService.PacketTable GetPacketByVerificationCode(string verificationCode);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/ValidateVerificationCode", ReplyAction="http://tempuri.org/ICreator/ValidateVerificationCodeResponse")]
-        bool ValidateVerificationCode(string packetName, string verificationCode);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
@@ -1590,6 +1599,18 @@ namespace Client.Creator.CreatorService {
                 base(binding, remoteAddress) {
         }
         
+        public void UpdateToken(Client.Creator.CreatorService.TokenTable ta) {
+            base.Channel.UpdateToken(ta);
+        }
+        
+        public void DeleteToken(Client.Creator.CreatorService.TokenTable ta) {
+            base.Channel.DeleteToken(ta);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID) {
+            return base.Channel.GetDestNamesByCustID(custID);
+        }
+        
         public Client.Creator.CreatorService.DestinationNameTable GetDestinationName(int custID, int destID) {
             return base.Channel.GetDestinationName(custID, destID);
         }
@@ -1616,6 +1637,14 @@ namespace Client.Creator.CreatorService {
         
         public Client.Creator.CreatorService.PermissionsTable GetPermissionsByUser(string user) {
             return base.Channel.GetPermissionsByUser(user);
+        }
+        
+        public Client.Creator.CreatorService.PacketTable GetPacketByVerificationCode(string verificationCode) {
+            return base.Channel.GetPacketByVerificationCode(verificationCode);
+        }
+        
+        public bool ValidateVerificationCode(string packetName, string verificationCode) {
+            return base.Channel.ValidateVerificationCode(packetName, verificationCode);
         }
         
         public string GenerateLicInfoByVerifyData(ref byte[] byteVerifyData) {
@@ -1702,12 +1731,16 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetAllTokens(searchString, token);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokensByCustomer(string searchString, string custName, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token) {
+            return base.Channel.GetAllTokensByCustomer(searchString, custName, token);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetTokensByLicenseName(string licenseName) {
             return base.Channel.GetTokensByLicenseName(licenseName);
         }
         
-        public Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue) {
-            return base.Channel.GetHardwareTokenByKeyValue(custID, keyValue);
+        public Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(string keyValue) {
+            return base.Channel.GetHardwareTokenByKeyValue(keyValue);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID) {
@@ -1734,20 +1767,12 @@ namespace Client.Creator.CreatorService {
             base.Channel.CreateToken(ta);
         }
         
-        public void UpdateToken(Client.Creator.CreatorService.TokenTable ta) {
-            base.Channel.UpdateToken(ta);
-        }
-        
-        public void DeleteToken(Client.Creator.CreatorService.TokenTable ta) {
-            base.Channel.DeleteToken(ta);
-        }
-        
-        public System.Collections.Generic.List<Client.Creator.CreatorService.DestinationNameTable> GetDestNamesByCustID(int custID) {
-            return base.Channel.GetDestNamesByCustID(custID);
-        }
-        
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {
             return base.Channel.GetAllCustomers(searchString, enableLoadOptions);
+        }
+        
+        public System.Collections.Generic.List<string> GetAllCustomerNames(string searchString) {
+            return base.Channel.GetAllCustomerNames(searchString);
         }
         
         public int GetCustomerCount(string searchString, bool enableLoadOptions) {
@@ -1846,6 +1871,10 @@ namespace Client.Creator.CreatorService {
             return base.Channel.KeyEnumerate();
         }
         
+        public string KeyFormat(string key) {
+            return base.Channel.KeyFormat(key);
+        }
+        
         public string KeyProgramVerification(string key, int customerNumber, int keyNumber) {
             return base.Channel.KeyProgramVerification(key, customerNumber, keyNumber);
         }
@@ -1864,14 +1893,6 @@ namespace Client.Creator.CreatorService {
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByLicenseName(string licenseName) {
             return base.Channel.GetPacketsByLicenseName(licenseName);
-        }
-        
-        public Client.Creator.CreatorService.PacketTable GetPacketByVerificationCode(string verificationCode) {
-            return base.Channel.GetPacketByVerificationCode(verificationCode);
-        }
-        
-        public bool ValidateVerificationCode(string packetName, string verificationCode) {
-            return base.Channel.ValidateVerificationCode(packetName, verificationCode);
         }
     }
 }

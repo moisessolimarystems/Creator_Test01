@@ -21,6 +21,24 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_UpdateToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTokenResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteTokenResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetDestNamesByCustID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestNamesByCustID" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetDestNamesByCustID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDestNamesByCustIDResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetDestinationName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDestinationName" />
   </wsdl:message>
@@ -62,6 +80,18 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetPermissionsByUser_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetPermissionsByUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetPacketByVerificationCode_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPacketByVerificationCode" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetPacketByVerificationCode_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPacketByVerificationCodeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_ValidateVerificationCode_InputMessage">
+    <wsdl:part name="parameters" element="tns:ValidateVerificationCode" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_ValidateVerificationCode_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ValidateVerificationCodeResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GenerateLicInfoByVerifyData_InputMessage">
     <wsdl:part name="parameters" element="tns:GenerateLicInfoByVerifyData" />
@@ -189,6 +219,12 @@
   <wsdl:message name="ICreator_GetAllTokens_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllTokensResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetAllTokensByCustomer_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllTokensByCustomer" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllTokensByCustomer_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllTokensByCustomerResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetTokensByLicenseName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTokensByLicenseName" />
   </wsdl:message>
@@ -237,29 +273,17 @@
   <wsdl:message name="ICreator_CreateToken_OutputMessage">
     <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_UpdateToken_InputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateToken" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_UpdateToken_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateTokenResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_DeleteToken_InputMessage">
-    <wsdl:part name="parameters" element="tns:DeleteToken" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_DeleteToken_OutputMessage">
-    <wsdl:part name="parameters" element="tns:DeleteTokenResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestNamesByCustID_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestNamesByCustID" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetDestNamesByCustID_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetDestNamesByCustIDResponse" />
-  </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomersResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllCustomerNames_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllCustomerNames" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllCustomerNames_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllCustomerNamesResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetCustomerCount_InputMessage">
     <wsdl:part name="parameters" element="tns:GetCustomerCount" />
@@ -405,6 +429,12 @@
   <wsdl:message name="ICreator_KeyEnumerate_OutputMessage">
     <wsdl:part name="parameters" element="tns:KeyEnumerateResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_KeyFormat_InputMessage">
+    <wsdl:part name="parameters" element="tns:KeyFormat" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_KeyFormat_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KeyFormatResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_KeyProgramVerification_InputMessage">
     <wsdl:part name="parameters" element="tns:KeyProgramVerification" />
   </wsdl:message>
@@ -435,19 +465,19 @@
   <wsdl:message name="ICreator_GetPacketsByLicenseName_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetPacketsByLicenseNameResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GetPacketByVerificationCode_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetPacketByVerificationCode" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetPacketByVerificationCode_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetPacketByVerificationCodeResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_ValidateVerificationCode_InputMessage">
-    <wsdl:part name="parameters" element="tns:ValidateVerificationCode" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_ValidateVerificationCode_OutputMessage">
-    <wsdl:part name="parameters" element="tns:ValidateVerificationCodeResponse" />
-  </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="UpdateToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteToken" message="tns:ICreator_DeleteToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteTokenResponse" message="tns:ICreator_DeleteToken_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDestNamesByCustID">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustID" message="tns:ICreator_GetDestNamesByCustID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse" message="tns:ICreator_GetDestNamesByCustID_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetDestinationName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestinationName" message="tns:ICreator_GetDestinationName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestinationNameResponse" message="tns:ICreator_GetDestinationName_OutputMessage" />
@@ -475,6 +505,14 @@
     <wsdl:operation name="GetPermissionsByUser">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetPermissionsByUser" message="tns:ICreator_GetPermissionsByUser_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetPermissionsByUserResponse" message="tns:ICreator_GetPermissionsByUser_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPacketByVerificationCode">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetPacketByVerificationCode" message="tns:ICreator_GetPacketByVerificationCode_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetPacketByVerificationCodeResponse" message="tns:ICreator_GetPacketByVerificationCode_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ValidateVerificationCode">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCode" message="tns:ICreator_ValidateVerificationCode_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCodeResponse" message="tns:ICreator_ValidateVerificationCode_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GenerateLicInfoByVerifyData">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GenerateLicInfoByVerifyData" message="tns:ICreator_GenerateLicInfoByVerifyData_InputMessage" />
@@ -560,6 +598,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllTokens" message="tns:ICreator_GetAllTokens_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllTokensResponse" message="tns:ICreator_GetAllTokens_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetAllTokensByCustomer">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllTokensByCustomer" message="tns:ICreator_GetAllTokensByCustomer_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllTokensByCustomerResponse" message="tns:ICreator_GetAllTokensByCustomer_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetTokensByLicenseName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTokensByLicenseName" message="tns:ICreator_GetTokensByLicenseName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetTokensByLicenseNameResponse" message="tns:ICreator_GetTokensByLicenseName_OutputMessage" />
@@ -592,21 +634,13 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="UpdateToken">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="DeleteToken">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteToken" message="tns:ICreator_DeleteToken_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteTokenResponse" message="tns:ICreator_DeleteToken_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetDestNamesByCustID">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustID" message="tns:ICreator_GetDestNamesByCustID_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetDestNamesByCustIDResponse" message="tns:ICreator_GetDestNamesByCustID_OutputMessage" />
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllCustomersResponse" message="tns:ICreator_GetAllCustomers_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllCustomerNames">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomerNames" message="tns:ICreator_GetAllCustomerNames_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllCustomerNamesResponse" message="tns:ICreator_GetAllCustomerNames_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetCustomerCount">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetCustomerCount" message="tns:ICreator_GetCustomerCount_InputMessage" />
@@ -704,6 +738,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/KeyEnumerate" message="tns:ICreator_KeyEnumerate_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/KeyEnumerateResponse" message="tns:ICreator_KeyEnumerate_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="KeyFormat">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/KeyFormat" message="tns:ICreator_KeyFormat_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/KeyFormatResponse" message="tns:ICreator_KeyFormat_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="KeyProgramVerification">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/KeyProgramVerification" message="tns:ICreator_KeyProgramVerification_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/KeyProgramVerificationResponse" message="tns:ICreator_KeyProgramVerification_OutputMessage" />
@@ -724,19 +762,38 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetPacketsByLicenseName" message="tns:ICreator_GetPacketsByLicenseName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetPacketsByLicenseNameResponse" message="tns:ICreator_GetPacketsByLicenseName_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetPacketByVerificationCode">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetPacketByVerificationCode" message="tns:ICreator_GetPacketByVerificationCode_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetPacketByVerificationCodeResponse" message="tns:ICreator_GetPacketByVerificationCode_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="ValidateVerificationCode">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCode" message="tns:ICreator_ValidateVerificationCode_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCodeResponse" message="tns:ICreator_ValidateVerificationCode_OutputMessage" />
-    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="CreatorServiceTcp" type="tns:ICreator">
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="UpdateToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDestNamesByCustID">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestNamesByCustID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetDestinationName">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestinationName" style="document" />
       <wsdl:input>
@@ -793,6 +850,24 @@
     </wsdl:operation>
     <wsdl:operation name="GetPermissionsByUser">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetPermissionsByUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPacketByVerificationCode">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetPacketByVerificationCode" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateVerificationCode">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/ValidateVerificationCode" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -989,6 +1064,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetAllTokensByCustomer">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllTokensByCustomer" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetTokensByLicenseName">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetTokensByLicenseName" style="document" />
       <wsdl:input>
@@ -1061,35 +1145,17 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="UpdateToken">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="DeleteToken">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteToken" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetDestNamesByCustID">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetDestNamesByCustID" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllCustomers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllCustomerNames">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllCustomerNames" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1313,6 +1379,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="KeyFormat">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/KeyFormat" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="KeyProgramVerification">
       <soap12:operation soapAction="http://tempuri.org/ICreator/KeyProgramVerification" style="document" />
       <wsdl:input>
@@ -1351,24 +1426,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetPacketsByLicenseName">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetPacketsByLicenseName" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetPacketByVerificationCode">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetPacketByVerificationCode" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="ValidateVerificationCode">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/ValidateVerificationCode" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
