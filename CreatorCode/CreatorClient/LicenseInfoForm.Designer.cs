@@ -46,13 +46,15 @@
             this.TokenTabPage = new System.Windows.Forms.TabPage();
             this.tokenGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.keyNameListBox = new System.Windows.Forms.ListBox();
             this.tokenTypeLabel = new System.Windows.Forms.Label();
             this.tokenValueTextBox = new System.Windows.Forms.TextBox();
             this.tokenTypeComboBox = new System.Windows.Forms.ComboBox();
             this.tokenValueLabel = new System.Windows.Forms.Label();
             this.availableHWKeyLabel = new System.Windows.Forms.Label();
             this.browseTokenFileButton = new System.Windows.Forms.Button();
+            this.keyNameListView = new System.Windows.Forms.ListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.ModuleTabPage = new System.Windows.Forms.TabPage();
             this.moduleGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -337,14 +339,14 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 72F));
-            this.tableLayoutPanel2.Controls.Add(this.keyNameListBox, 1, 2);
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueLabel, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.availableHWKeyLabel, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.browseTokenFileButton, 2, 1);
+            this.tableLayoutPanel2.Controls.Add(this.keyNameListView, 1, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -356,28 +358,14 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(401, 218);
             this.tableLayoutPanel2.TabIndex = 8;
             // 
-            // keyNameListBox
-            // 
-            this.tableLayoutPanel2.SetColumnSpan(this.keyNameListBox, 2);
-            this.keyNameListBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.keyNameListBox.FormattingEnabled = true;
-            this.keyNameListBox.Items.AddRange(new object[] {
-            "No Keys Available"});
-            this.keyNameListBox.Location = new System.Drawing.Point(156, 66);
-            this.keyNameListBox.Margin = new System.Windows.Forms.Padding(5);
-            this.keyNameListBox.Name = "keyNameListBox";
-            this.keyNameListBox.Size = new System.Drawing.Size(240, 95);
-            this.keyNameListBox.TabIndex = 7;
-            this.keyNameListBox.SelectedIndexChanged += new System.EventHandler(this.keyNameListBox_SelectedIndexChanged);
-            // 
             // tokenTypeLabel
             // 
             this.tokenTypeLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.tokenTypeLabel.AutoSize = true;
             this.tokenTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tokenTypeLabel.Location = new System.Drawing.Point(3, 9);
+            this.tokenTypeLabel.Location = new System.Drawing.Point(3, 2);
             this.tokenTypeLabel.Name = "tokenTypeLabel";
-            this.tokenTypeLabel.Size = new System.Drawing.Size(145, 13);
+            this.tokenTypeLabel.Size = new System.Drawing.Size(113, 26);
             this.tokenTypeLabel.TabIndex = 3;
             this.tokenTypeLabel.Text = "Choose Validation Type:";
             // 
@@ -385,10 +373,10 @@
             // 
             this.tokenValueTextBox.CausesValidation = false;
             this.tokenValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tokenValueTextBox.Location = new System.Drawing.Point(156, 36);
+            this.tokenValueTextBox.Location = new System.Drawing.Point(155, 36);
             this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
-            this.tokenValueTextBox.Size = new System.Drawing.Size(172, 20);
+            this.tokenValueTextBox.Size = new System.Drawing.Size(170, 20);
             this.tokenValueTextBox.TabIndex = 0;
             this.tokenValueTextBox.TextChanged += new System.EventHandler(this.tokenValueTextBox_TextChanged);
             this.tokenValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenValueTextBox_KeyUp);
@@ -399,10 +387,10 @@
             this.tokenTypeComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
-            this.tokenTypeComboBox.Location = new System.Drawing.Point(156, 5);
+            this.tokenTypeComboBox.Location = new System.Drawing.Point(155, 5);
             this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
-            this.tokenTypeComboBox.Size = new System.Drawing.Size(172, 21);
+            this.tokenTypeComboBox.Size = new System.Drawing.Size(170, 21);
             this.tokenTypeComboBox.TabIndex = 1;
             this.tokenTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.tokenTypeComboBox_SelectedIndexChanged);
             this.tokenTypeComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenTypeComboBox_KeyUp);
@@ -433,7 +421,7 @@
             // browseTokenFileButton
             // 
             this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.browseTokenFileButton.Location = new System.Drawing.Point(328, 35);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(325, 35);
             this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
             this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
@@ -441,6 +429,35 @@
             this.browseTokenFileButton.Text = "...";
             this.browseTokenFileButton.UseVisualStyleBackColor = true;
             this.browseTokenFileButton.Click += new System.EventHandler(this.browseTokenFileButton_Click);
+            // 
+            // keyNameListView
+            // 
+            this.keyNameListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.tableLayoutPanel2.SetColumnSpan(this.keyNameListView, 2);
+            this.keyNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.keyNameListView.FullRowSelect = true;
+            this.keyNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.keyNameListView.Location = new System.Drawing.Point(155, 66);
+            this.keyNameListView.Margin = new System.Windows.Forms.Padding(5);
+            this.keyNameListView.MultiSelect = false;
+            this.keyNameListView.Name = "keyNameListView";
+            this.keyNameListView.Size = new System.Drawing.Size(241, 97);
+            this.keyNameListView.TabIndex = 10;
+            this.keyNameListView.UseCompatibleStateImageBehavior = false;
+            this.keyNameListView.View = System.Windows.Forms.View.Details;
+            this.keyNameListView.SelectedIndexChanged += new System.EventHandler(this.keyNameListView_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Name";
+            this.columnHeader1.Width = 162;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Status";
+            this.columnHeader2.Width = 75;
             // 
             // ModuleTabPage
             // 
@@ -556,7 +573,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 45F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 48F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -592,7 +609,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(361, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(358, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -604,21 +621,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(112, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(111, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(244, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(242, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(112, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(111, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(244, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(242, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -646,11 +663,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(112, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(111, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(244, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(242, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -668,11 +685,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(112, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(111, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(244, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(242, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -883,7 +900,7 @@
             this.tableLayoutPanel6.ColumnCount = 3;
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 57.77778F));
             this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 42.22222F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 139F));
+            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
             this.tableLayoutPanel6.Controls.Add(this.label8, 0, 0);
             this.tableLayoutPanel6.Controls.Add(this.CustomerComboBox, 1, 0);
             this.tableLayoutPanel6.Controls.Add(this.AvailableKeysListBox, 1, 2);
@@ -917,7 +934,7 @@
             // 
             this.tableLayoutPanel6.SetColumnSpan(this.CustomerComboBox, 2);
             this.CustomerComboBox.FormattingEnabled = true;
-            this.CustomerComboBox.Location = new System.Drawing.Point(159, 5);
+            this.CustomerComboBox.Location = new System.Drawing.Point(158, 5);
             this.CustomerComboBox.Margin = new System.Windows.Forms.Padding(5);
             this.CustomerComboBox.Name = "CustomerComboBox";
             this.CustomerComboBox.Size = new System.Drawing.Size(207, 21);
@@ -930,10 +947,10 @@
             this.tableLayoutPanel6.SetColumnSpan(this.AvailableKeysListBox, 2);
             this.AvailableKeysListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AvailableKeysListBox.FormattingEnabled = true;
-            this.AvailableKeysListBox.Location = new System.Drawing.Point(159, 66);
+            this.AvailableKeysListBox.Location = new System.Drawing.Point(158, 66);
             this.AvailableKeysListBox.Margin = new System.Windows.Forms.Padding(5);
             this.AvailableKeysListBox.Name = "AvailableKeysListBox";
-            this.AvailableKeysListBox.Size = new System.Drawing.Size(243, 69);
+            this.AvailableKeysListBox.Size = new System.Drawing.Size(244, 69);
             this.AvailableKeysListBox.TabIndex = 1;
             // 
             // label10
@@ -961,11 +978,11 @@
             // KeyValueTextBox
             // 
             this.KeyValueTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.KeyValueTextBox.Location = new System.Drawing.Point(159, 36);
+            this.KeyValueTextBox.Location = new System.Drawing.Point(158, 36);
             this.KeyValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 1, 5);
             this.KeyValueTextBox.Name = "KeyValueTextBox";
             this.KeyValueTextBox.ReadOnly = true;
-            this.KeyValueTextBox.Size = new System.Drawing.Size(107, 20);
+            this.KeyValueTextBox.Size = new System.Drawing.Size(105, 20);
             this.KeyValueTextBox.TabIndex = 1;
             // 
             // activateCheckBox
@@ -974,7 +991,7 @@
             this.activateCheckBox.AutoSize = true;
             this.activateCheckBox.Checked = true;
             this.activateCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.activateCheckBox.Location = new System.Drawing.Point(270, 39);
+            this.activateCheckBox.Location = new System.Drawing.Point(267, 39);
             this.activateCheckBox.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
             this.activateCheckBox.Name = "activateCheckBox";
             this.activateCheckBox.Size = new System.Drawing.Size(65, 17);
@@ -1112,7 +1129,6 @@
         private System.Windows.Forms.TextBox licNameTextBox;
         private System.Windows.Forms.Label licNameLabel;
         private System.Windows.Forms.GroupBox licenseGroupBox;
-        private System.Windows.Forms.ListBox keyNameListBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label availableHWKeyLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
@@ -1125,6 +1141,9 @@
         private System.Windows.Forms.Button browseTokenFileButton;
         private System.Windows.Forms.OpenFileDialog browseCSVOpenFileDialog;
         private System.Windows.Forms.CheckBox activateCheckBox;
+        private System.Windows.Forms.ListView keyNameListView;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
 
 
     }
