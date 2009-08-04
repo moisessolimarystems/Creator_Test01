@@ -24,6 +24,9 @@ namespace Service.Creator
         IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
 
         [OperationContract]
+        IList<string> GetAllCustomerNames(string searchString);
+
+        [OperationContract]
         int GetCustomerCount(string searchString, bool enableLoadOptions);
 
         [OperationContract]
@@ -97,6 +100,9 @@ namespace Service.Creator
 
         [OperationContract]
         IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate();
+
+        [OperationContract]
+        string KeyFormat(string key);
 
         [OperationContract]
         string KeyProgramVerification(string key, int customerNumber, int keyNumber);
@@ -194,12 +200,15 @@ namespace Service.Creator
         #region Token TokenContracts
         [OperationContract]
         IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
+        
+        [OperationContract]
+        IList<TokenTable> GetAllTokensByCustomer(string searchString, string custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
 
         [OperationContract]
         IList<TokenTable> GetTokensByLicenseName(string licenseName);
 
         [OperationContract]
-        TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue);
+        TokenTable GetHardwareTokenByKeyValue(string keyValue);
 
         [OperationContract]
         IList<TokenTable> GetAvailableHardwareTokensByCustID(uint custID);

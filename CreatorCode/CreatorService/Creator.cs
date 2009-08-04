@@ -42,9 +42,15 @@ namespace Service.Creator
 
         #region Customer Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions)// int pageNumber, int pageSize, bool enableLoadOptions)
+        public IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions)
         {
-            return CustomerTable.GetAllCustomers(searchString, enableLoadOptions);//pageNumber, pageSize, enableLoadOptions);
+            return CustomerTable.GetAllCustomers(searchString, enableLoadOptions);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetAllCustomerNames(string searchString)
+        {
+            return CustomerTable.GetAllCustomerNames(searchString);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -227,12 +233,15 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate()
         {
-            //if (m_licServer. == null)
-            //{
-            //    m_licServer = new SolimarLicenseServerWrapper();
-                m_licServer.Connect("localhost");
-            //}
+            m_licServer.Connect("localhost");
             return m_licServer.KeyEnumerate();
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public string KeyFormat(string key)
+        {
+            m_licServer.Connect("localhost");
+            return m_licServer.KeyFormat(key);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -403,6 +412,11 @@ namespace Service.Creator
         {
             return TokenTable.GetAllTokens(searchString, (byte)token);
         }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<TokenTable> GetAllTokensByCustomer(string searchString, string custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token)
+        {
+            return TokenTable.GetAllTokensByCustomer(searchString, custName,(byte)token);
+        }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetAvailableHardwareTokensByCustID(uint custID)
@@ -411,9 +425,9 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public TokenTable GetHardwareTokenByKeyValue(uint custID, string keyValue)
+        public TokenTable GetHardwareTokenByKeyValue(string keyValue)
         {
-            return TokenTable.GetHardwareTokenByKeyValue(custID, keyValue);
+            return TokenTable.GetHardwareTokenByKeyValue(keyValue);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
