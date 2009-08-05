@@ -170,7 +170,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 	{// obtain a lock on the driver's key list
 
 		KeyList tmpKeyList;
-		std::list<ProtectionKey*> deleteProtectionKeyList;
+		std::list<_bstr_t> deleteProtectionKeyList;
 		KeyServer::KeyList::iterator skeyIt = keys.begin();
 
 		{	//Scope for SafeMutex mutex2(KeyListLock);
@@ -181,7 +181,8 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 					skeyIt != keys.end();
 					skeyIt++)
 			{
-				tmpKeyList.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
+				// CR.11876 - Make a copy of the Protection Keys.
+				tmpKeyList.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
 			}
 		}
 
@@ -234,7 +235,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 			{
 				if (driver.keys.find(virtual_key_to_physical_key_list[skeyIt->first])==driver.keys.end())
 				{
-					deleteProtectionKeyList.insert(deleteProtectionKeyList.end(), skeyIt->second);
+					deleteProtectionKeyList.push_back(_bstr_t(skeyIt->first,true));
 					skeyIt = tmpKeyList.erase(skeyIt);
 				}
 				else
@@ -272,20 +273,33 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
 			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
 			SafeMutex mutex2(KeyListLock);	
+			// CR.FIX.11909 - Remove keys no longer attached
+			while(!deleteProtectionKeyList.empty())
+			{
+				skeyIt = keys.find(*deleteProtectionKeyList.begin());
+				if(skeyIt != keys.end())
+					keys.erase(skeyIt);
+				deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
+			}
+
+			// CR.FIX.11909 - Cycle through keys, adding/updating key cache from temp key cache
+			KeyServer::KeyList::iterator keyIt;
 			for(	skeyIt = tmpKeyList.begin();
 					skeyIt != tmpKeyList.end();
 					skeyIt++)
 			{
-				keys.insert(KeyList::value_type(skeyIt->first, skeyIt->second));
+				keyIt = keys.find(_bstr_t(skeyIt->first,true));
+				if(keyIt != keys.end())	// Update existing Key Cells
+					keyIt->second->CopyCellCache(*(skeyIt->second));
+				else	// Add new Key
+					keys.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
 			}
-			tmpKeyList.clear();
-			while(!deleteProtectionKeyList.empty())
+
+			// CR.FIX.11909 - Delete temp cache of keys
+			while(!tmpKeyList.empty())
 			{
-				skeyIt = keys.find((*deleteProtectionKeyList.begin())->GetPhysicalKeyIdent());
-				if(skeyIt != keys.end())
-					keys.erase(skeyIt);
-				delete *deleteProtectionKeyList.begin();
-				deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
+				delete tmpKeyList.begin()->second;
+				tmpKeyList.erase(tmpKeyList.begin());
 			}
 		}
 	} // release the lock on the driver's key list
