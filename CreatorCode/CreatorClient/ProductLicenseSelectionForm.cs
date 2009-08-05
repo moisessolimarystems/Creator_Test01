@@ -55,7 +55,7 @@ namespace Client.Creator
                         lvItem.SubItems.Add(Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), order.OrderState));
                         lvItem.SubItems.Add(order.ProductName);
                         if (order.ExpirationDate.HasValue)
-                            lvItem.SubItems.Add(order.ExpirationDate.Value.ToShortDateString());
+                            lvItem.SubItems.Add(order.ExpirationDate.Value.ToLocalTime().ToShortDateString());
                         else
                             lvItem.SubItems.Add("");
                         lvItem.SubItems.Add(order.Description);

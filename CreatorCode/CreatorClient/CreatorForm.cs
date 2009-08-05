@@ -16,6 +16,7 @@ using System.Windows.Forms.VisualStyles;
 using System.ServiceModel;
 using Client.Creator.ServiceProxy;
 using Client.Creator.Properties;
+using Solimar.Licensing.LicenseManagerWrapper;
 
 /*
  * TODO : - Apply rules to license types - std,bkup,dr,testdev
@@ -46,6 +47,9 @@ namespace Client.Creator
         private List<String> m_ServerList;
         private string m_searchString = "";
         private string m_CurrentLicenseName = "";
+        //used by hardware key view
+        private string _selectedCustomer = "";
+        private DateTime _currentExpirationDate;
 
         #region Enums
 
@@ -147,6 +151,14 @@ namespace Client.Creator
             get { return m_ServerList.First(); }           
         }
 
+        public DateTime CurrentExpirationDate
+        {
+            get 
+            {
+                return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0);
+            }
+        }
+
         #endregion
 
         public CreatorForm()
@@ -160,6 +172,7 @@ namespace Client.Creator
             _lvManager.SetListViewColumnSorter(TransactionListView);
             _lvManager.SetListViewColumnSorter(PacketListView);
             _lvManager.SetListViewColumnSorter(LicensePacketListView);
+            _lvManager.SetListViewColumnSorter(HardwareKeyListView);
             ResetMainToolStripMenu();
             //set to make read-only items not greyed-out            
             DetailPropertyGrid.ViewForeColor = Color.FromArgb(254, 0, 0, 0);
@@ -433,10 +446,11 @@ namespace Client.Creator
             if (e.Node.Level > 0)
             {
                 //countToolStripStatusLabel.Text = "";
+                _selectedCustomer = "";
                 if (MainTreeView.SelectedNode.Text == "Licenses")
                 {
                     ResetMainToolStripMenu();
-                    SearchCurrentView();
+                    SearchCurrentView("");
                     EnableDetailListView(true);
                     MainSplitContainer.Panel2.Controls.Clear();
                     //RestoreTreeState(DetailTreeView, m_TreeState);                    
@@ -448,7 +462,7 @@ namespace Client.Creator
                     ResetMainToolStripMenu();
                     toolStripSearchBox.Enabled = true;
                     SearchToolStripLabel.Enabled = true;
-                    SearchCurrentView();
+                    SearchCurrentView("");
                     MainSplitContainer.Panel2.Controls.Clear();
                     //panel1.Parent = MainSplitContainer.Panel2;
                     loadingCircle1.Parent = MainSplitContainer.Panel2;
@@ -458,9 +472,8 @@ namespace Client.Creator
                 else if (MainTreeView.SelectedNode.Text == "Hardware Keys")
                 {
                     ResetMainToolStripMenu();
-                    toolStripSearchBox.Enabled = true;
-                    SearchToolStripLabel.Enabled = true;
-                    SearchCurrentView();
+                    EnableHardwareCustomerView();
+                    SearchCurrentView("");                    
                     MainSplitContainer.Panel2.Controls.Clear();
                     loadingCircle1.Parent = MainSplitContainer.Panel2;
                     panel1.Parent = MainSplitContainer.Panel2;
@@ -554,7 +567,6 @@ namespace Client.Creator
                 PropertyGridTabControl.TabPages.Add(PropertyGridTabPage);
             if (!(node.Tag is CustomerProperty))
             {
-                //LoadDetailListView(node.Tag);
                 if (!PropertyGridTabControl.TabPages.Contains(TransactionsTabPage))
                     PropertyGridTabControl.TabPages.Add(TransactionsTabPage);
                 if (!PropertyGridTabControl.TabPages.Contains(PacketTabPage))
@@ -1060,7 +1072,7 @@ namespace Client.Creator
         }
 
         private void GenerateLicensePacket()
-        {
+        {            
             if (!(m_selectedDirectory.Length > 0))
                 m_selectedDirectory = Directory.GetCurrentDirectory();
             PacketProperty newPacket = new PacketProperty(string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
@@ -1285,7 +1297,7 @@ namespace Client.Creator
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
             {
-                SearchCurrentView();
+                SearchCurrentView(toolStripSearchBox.Text);
             }
         }
 
@@ -1468,7 +1480,7 @@ namespace Client.Creator
                         LicenseTable dbLicense = client.GetLicenseByName(licInfo.Name, false);
                         if (data.Token.TokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                         {
-                            dbToken = client.GetHardwareTokenByKeyValue(data.LicInfo.CustID, data.Token.TokenValue);
+                            dbToken = client.GetHardwareTokenByKeyValue(data.Token.TokenValue);
                             dbToken.LicenseID = dbLicense.ID;
                             client.UpdateToken(dbToken);
                         }
@@ -1563,7 +1575,10 @@ namespace Client.Creator
                 orderRec.OrderIndex = (int)orderData.OrderIndex;
                 orderRec.OrderState = (byte)orderData.OrderStatus;
                 orderRec.LicenseID = licRec.ID;
-                orderRec.ExpirationDate = orderData.ExpirationDate;
+                if(orderData.ExpirationDate.HasValue)
+                    orderRec.ExpirationDate = orderData.ExpirationDate.Value.ToUniversalTime();
+                else
+                    orderRec.ExpirationDate = orderData.ExpirationDate;
                 orderRec.Description = orderData.Description;
                 orderRec.ProductName = orderData.Product.Name;
                 orderRec.ProductVersion = orderData.Product.Version.ToString();
@@ -1660,7 +1675,7 @@ namespace Client.Creator
                             module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
                             module.moduleAppInstance.TVal = 1;
                         }       
-                        module.moduleExpirationDate.TVal = orderData.ExpirationDate.Value;                
+                        module.moduleExpirationDate.TVal = orderData.ExpirationDate.Value.ToUniversalTime();                
                         module.contractNumber.TVal = orderData.OrderNumber;
                         module.moduleState.TVal = orderData.OrderStatus;
                         orderData.Product.ModuleList.TVal.Add(module);
@@ -1798,7 +1813,7 @@ namespace Client.Creator
                                 {
                                     module.contractNumber.TVal = orderRec.OrderNumber;
                                     //Disaster Recovery has no expiration dates.                                  
-                                    module.moduleExpirationDate.TVal = (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery) ? new DateTime(1900, 1, 1) : orderRec.ExpirationDate.Value;
+                                    module.moduleExpirationDate.TVal = (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery) ? new DateTime(1900, 1, 1) : orderRec.ExpirationDate.Value.ToLocalTime() ;
                                 }
                             }
                             licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(product);
@@ -2253,6 +2268,64 @@ namespace Client.Creator
             });
         }
 
+        private void PopulateHardwareKeyView(string searchString, string custName)
+        {
+            IList<TokenTable> tokens = null;
+            string licenseName;
+            LicenseTable license = null;
+            bool b = false;
+            HardwareKeyListView.Items.Clear();
+            Service<ICreator>.Use((client) =>
+            {
+                tokens = client.GetAllTokensByCustomer(searchString, custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                foreach (var token in tokens.OrderBy(c => c.TokenValue).ToList())
+                {
+                    ListViewItem item = new ListViewItem();
+                    //key value
+                    item.Name = item.Text = token.TokenValue;
+                    //license name
+                    license = client.GetLicenseByID(token.LicenseID, false);
+                    licenseName = "";
+                    if (license != null)
+                        licenseName = license.LicenseName;
+                    item.SubItems.Add(licenseName);
+                    item.SubItems.Add(((TokenStatus)token.TokenStatus).ToString());
+                    //if (!b)
+                    //{
+                    //    item.BackColor = Color.AliceBlue;
+                    //    b = true;
+                    //}
+                    //else
+                    //    b = false;
+                    this.HardwareKeyListView.Items.Add(item);
+                }
+            });
+        }
+
+        //initial view should be customers, key counts
+        //double click on customer should be list of keys license server status
+        private void PopulateHardwareKeyCustomerView(string searchString)
+        {
+            IList<TokenTable> tokens = null;
+            IList<CustomerTable> customers = null;
+            int reservedKeys, activeKeys, deactivatedKeys;
+            Service<ICreator>.Use((client) =>
+            {
+                customers = client.GetAllCustomers(searchString,false);
+                tokens = client.GetAllTokens(searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+            });
+            ListViewItem[] lvItems = new ListViewItem[customers.Count];
+            for (int index = 0; index < customers.Count; index++)
+            {
+                reservedKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(0)).Count();
+                activeKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(1)).Count();
+                deactivatedKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(2)).Count();
+                ListViewItem item = new ListViewItem(new string[]{customers[index].SCRname, reservedKeys.ToString(), activeKeys.ToString(), deactivatedKeys.ToString()});
+                lvItems[index] = item;
+            }
+            HardwareKeyListView.Items.AddRange(lvItems);
+        }
+
         private void LoadDetailListView(Object item)
         {
             DetailListView.BeginUpdate();
@@ -2260,6 +2333,16 @@ namespace Client.Creator
             PopulateDetailListView(item);
             _lvManager.AutoResizeColumns(DetailListView);
             DetailListView.EndUpdate();
+        }
+
+        private void LoadHardwareKeyListView(string searchString, string custName)
+        {
+            HardwareKeyListView.BeginUpdate();
+            HardwareKeyListView.Items.Clear();
+            PopulateHardwareKeyListViewColumns(custName);
+            PopulateHardwareKeyListView(searchString, custName);
+            _lvManager.AutoResizeColumns(HardwareKeyListView);
+            HardwareKeyListView.EndUpdate();
         }
         /// <summary>
         /// Populates the ListView column headers based upon the selected TreeNode of the License view.
@@ -2291,21 +2374,28 @@ namespace Client.Creator
         /// <summary>
         /// Populates the ListView column headers based upon the selected TreeNode of the License view.
         /// </summary>
-        public void PopulateHardwareKeyListViewColumns(Object selectedObject)
+        public void PopulateHardwareKeyListViewColumns(string custName)
         {
-            HardwareKeyListView.Columns.Clear();
-            if (selectedObject is LicenseServerProperty)
+            if (custName.Length > 0)
             {
-                DetailListView.Columns.Add("Customer");
-                DetailListView.Columns.Add("Reserved");
-                DetailListView.Columns.Add("Active");
-                DetailListView.Columns.Add("Deactivated");
+                if (!(HardwareKeyListView.Columns.Count == 3))
+                {
+                    HardwareKeyListView.Columns.Clear();
+                    HardwareKeyListView.Columns.Add("Key Value");                    
+                    HardwareKeyListView.Columns.Add("License Server");
+                    HardwareKeyListView.Columns.Add("Status");
+                }
             }
             else
             {
-                DetailListView.Columns.Add("Key Value");
-                DetailListView.Columns.Add("License Server");
-                DetailListView.Columns.Add("Status");
+                if (!(HardwareKeyListView.Columns.Count == 4))
+                {
+                    HardwareKeyListView.Columns.Clear();
+                    HardwareKeyListView.Columns.Add("Customer");
+                    HardwareKeyListView.Columns.Add("Reserved");
+                    HardwareKeyListView.Columns.Add("Active");
+                    HardwareKeyListView.Columns.Add("Deactivated");
+                }
             }
             _lvManager.ResetListViewColumnSorter(HardwareKeyListView);
         }
@@ -2318,6 +2408,14 @@ namespace Client.Creator
                 PopulateDetailListView(selectedObject as ProductProperty);
             else if(selectedObject is ProductLicenseProperty)
                 PopulateDetailListView(selectedObject as ProductLicenseProperty);
+        }
+
+        public void PopulateHardwareKeyListView(string searchString, string custName)
+        {
+            if (custName.Length > 0)
+                PopulateHardwareKeyView(searchString, custName);
+            else
+                PopulateHardwareKeyCustomerView(searchString);
         }
 
         public void PopulateDetailListView(LicenseServerProperty licenseData)
@@ -2476,7 +2574,7 @@ namespace Client.Creator
                 {                
                     if (module.moduleExpirationDate.TVal.CompareTo(new DateTime(1900, 1, 1)) != 0)
                     {
-                        if (module.moduleExpirationDate.TVal.CompareTo(DateTime.Now) < 0)
+                        if (module.moduleExpirationDate.TVal.ToLocalTime().CompareTo(CurrentExpirationDate) < 0)
                             lvItem.ForeColor = System.Drawing.Color.Red;
                     }
                     else
@@ -2719,7 +2817,9 @@ namespace Client.Creator
             {
                 if (customers.Count() > 0)
                 {
-                    foreach (var cust in customers)
+                    TreeNode[] nodes = new TreeNode[customers.Count()];
+                    int index = 0;
+                    foreach(CustomerTable cust in customers)
                     {
                         TreeNode custNode = new TreeNode(string.Format("{0} ({1})", cust.SCRname, cust.LicenseTables.Count()));
                         custNode.Name = cust.SCRname;
@@ -2728,8 +2828,10 @@ namespace Client.Creator
                         if (!custNode.IsExpanded)
                             custNode.Nodes.Add(new VirtualTreeNode());
                         custNode.Tag = new CustomerProperty(cust);
-                        DetailTreeView.Nodes.Add(custNode);
+                        nodes[index] = custNode;
+                        index++;
                     }
+                    DetailTreeView.Nodes.AddRange(nodes);
                     SubSplitContainer.Panel2Collapsed = false;
                     DetailTreeView.Enabled = true;
                 }
@@ -2831,52 +2933,6 @@ namespace Client.Creator
             }
             _lvManager.AutoResizeColumns(ReportListView);
             ReportListView.EndUpdate();
-        }
-
-        private void LoadHardwareKeyListView()
-        {
-            IList<TokenTable> tokens = null;
-            Service<ICreator>.Use((client) => 
-            {
-                tokens = client.GetAllTokens(m_searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
-                //Need list view manager
-                bool b = false;
-                HardwareKeyListView.BeginUpdate();
-                HardwareKeyListView.Items.Clear();
-                LicenseTable license;
-                CustomerTable cust;
-                string licenseName;
-                foreach (var token in tokens)
-                {                
-                    ListViewItem item = new ListViewItem();
-                    cust = client.GetCustomer(token.CustID.ToString(),false);                                        
-                    //customer name
-                    if (cust != null)
-                    {
-                        item.Text = cust.SCRname;
-                        //key value
-                        item.SubItems.Add(token.TokenValue);
-                        //license name
-                        license = client.GetLicenseByID(token.LicenseID, false);
-                        licenseName = "";
-                        if (license != null)
-                            licenseName = license.LicenseName;
-                        item.SubItems.Add(licenseName);
-                        item.SubItems.Add(((TokenStatus)token.TokenStatus).ToString());
-                        this.HardwareKeyListView.Items.Add(item);
-                        if (!b)
-                        {
-                            item.BackColor = Color.AliceBlue;
-                            b = true;
-                        }
-                        else
-                            b = false;
-                    }
-                }
-            });
-
-            _lvManager.AutoResizeColumns(HardwareKeyListView);
-            HardwareKeyListView.EndUpdate();
         }
 
         private void LoadTransactionItems(string licenseName)
@@ -3300,21 +3356,24 @@ namespace Client.Creator
             }
         }
 
-        private void SearchCurrentView()
+        private void SearchCurrentView(string searchString)
         {
             if (toolStripSearchBox.ForeColor == SystemColors.InactiveCaptionText)
                 toolStripSearchBox.Text = "";
-            m_searchString = toolStripSearchBox.Text;
             switch (MainTreeView.SelectedNode.Text)//shortCutToolStripComboBox.Text)
             {
                 case "Licenses":
-                    LoadDBCustomers(m_searchString, true);
+                    LoadDBCustomers(searchString, true);
                     break;
                 case "Packets":
                     LoadPacketListView();
                     break;
                 case "Hardware Keys":
-                    LoadHardwareKeyListView();
+                    //how to differentiate between customer view and key view
+                    //customer view 
+                    //
+                    //key view
+                    LoadHardwareKeyListView(searchString, _selectedCustomer);
                     break;
                 default:
                     break;
@@ -3341,8 +3400,6 @@ namespace Client.Creator
                 worker.RunWorkerCompleted += ((sender, e) => OnDBCustomersRetrieved(data));
                 worker.RunWorkerAsync();
             }
-            //panel1.BackColor = Color.FromArgb(0, System.Drawing.Color.Transparent);
-            //panel1.Visible = true;
             loadingCircle1.Visible = true;
             loadingCircle1.SpokeThickness = 6;
             loadingCircle1.InnerCircleRadius = 12;
@@ -3528,7 +3585,7 @@ namespace Client.Creator
                 HardwareKeyDialogData data = new HardwareKeyDialogData();
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    LoadHardwareKeyListView();
+                    //LoadHardwareKeyListView(null);
                 }
             }
         }
@@ -3557,7 +3614,7 @@ namespace Client.Creator
                             if (module.moduleExpirationDate.TVal.Equals(new DateTime(1900, 1, 1)))
                                 expirationDate = "None";
                             else
-                                expirationDate = module.moduleExpirationDate.TVal.ToShortDateString();
+                                expirationDate = module.moduleExpirationDate.TVal.ToLocalTime().ToShortDateString();
                             information += string.Format("Order Number - {0}, Expiration Date - {1}\n", module.contractNumber.TVal, expirationDate);
                         }
                     }
@@ -3872,7 +3929,7 @@ namespace Client.Creator
 
         private void SearchToolStripLabel_Click(object sender, EventArgs e)
         {
-            SearchCurrentView();
+            SearchCurrentView(toolStripSearchBox.Text);
         }
 
         private void toolStripSearchBox_Enter(object sender, EventArgs e)
@@ -3924,7 +3981,7 @@ namespace Client.Creator
             {
                 ResetMainToolStripMenu();
                 MainToolStrip.Visible = true;
-                SearchCurrentView();
+                SearchCurrentView("");
                 EnableDetailListView(true);
                 MainSplitContainer.Panel2.Controls.Clear();
                 //RestoreTreeState(DetailTreeView, m_TreeState);                    
@@ -3935,7 +3992,7 @@ namespace Client.Creator
             {
                 //ResetMainToolStripMenu();
                 MainToolStrip.Visible = false;
-                SearchCurrentView();
+                SearchCurrentView("");
                 MainSplitContainer.Panel2.Controls.Clear();
                 //panel1.Parent = MainSplitContainer.Panel2;
                 loadingCircle1.Parent = MainSplitContainer.Panel2;
@@ -3946,7 +4003,7 @@ namespace Client.Creator
             {
                 //ResetMainToolStripMenu();
                 MainToolStrip.Visible = false;
-                SearchCurrentView();
+                SearchCurrentView("");
                 MainSplitContainer.Panel2.Controls.Clear();
                 loadingCircle1.Parent = MainSplitContainer.Panel2;
                 panel1.Parent = MainSplitContainer.Panel2;
@@ -4089,26 +4146,39 @@ namespace Client.Creator
 
         private void HardwareKeyListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            activateToolStripButton.Enabled = false;
-            deactivateTokenToolStripButton.Enabled = false;
-            if (HardwareKeyListView.SelectedItems.Count > 0)
-            {
-                string status = HardwareKeyListView.SelectedItems[0].SubItems[3].Text;
-                if (status == "Reserved")
-                {
-                    activateToolStripButton.Enabled = true;
-                }
-                //TokenTable hardwareToken = null;
-                //Service<ICreator>.Use((client) =>
-                //{
-                //    hardwareToken = client.GetTokenByLicenseName(licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
-                //});
-            }
+            if(_selectedCustomer.Length > 0)            
+                EnableHardwareKeyView();
+            //if (navigateBackToolStripButton.Enabled)
+            //{
+            //    activateHardwareKeyToolStripButton.Enabled = false;
+            //    deactivateHardwareKeyToolStripButton.Enabled = false;
+            //    if(e.Item.SubItems[2].Text == "Active")
+            //        deactivateHardwareKeyToolStripButton.Enabled = true;
+            //    else if (e.Item.SubItems[2].Text == "Reserved")
+            //        activateHardwareKeyToolStripButton.Enabled = true;             
+            //}
+            //activateToolStripButton.Enabled = false;
+            //deactivateTokenToolStripButton.Enabled = false;
+            //if (HardwareKeyListView.SelectedItems.Count > 0)
+            //{
+            //    string status = HardwareKeyListView.SelectedItems[0].SubItems[2].Text;
+            //    if (status == "Reserved")
+            //    {
+            //        activateToolStripButton.Enabled = true;
+            //    }
+            //    //TokenTable hardwareToken = null;
+            //    //Service<ICreator>.Use((client) =>
+            //    //{
+            //    //    hardwareToken = client.GetTokenByLicenseName(licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+            //    //});
+            //}
         }
 
         private void HardwareKeyListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-
+            _lvManager.SetSortIndexColumn(HardwareKeyListView.Handle, e.Column);
+            // Perform the sort with these new sort options.
+            HardwareKeyListView.Sort();
         }
 
         //item has been selected in order for btn to be clicked
@@ -4122,10 +4192,226 @@ namespace Client.Creator
                                                                        HardwareKeyListView.SelectedItems[0].SubItems[1].Text);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    LoadHardwareKeyListView();
+                    //LoadHardwareKeyListView((HardwareKeyListView.SelectedItems[0].Tag as string));
                 }
             }
 
+        }
+
+        private void navigateBackToolStripButton_Click(object sender, EventArgs e)
+        {
+            //load customer view
+            _selectedCustomer = "";
+            SearchCurrentView(toolStripSearchBox.Text);
+            EnableHardwareCustomerView();
+        }
+
+        private void HardwareKeyListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (!(_selectedCustomer.Length > 0))
+            //if(navigateBackToolStripButton.Enabled)
+            {
+                // Do a hit test for the current mouse position
+                ListViewHitTestInfo hitInfo = HardwareKeyListView.HitTest(e.Location);
+                // Test to see if the selected item and the hit test item are the same.
+                if (HardwareKeyListView.SelectedItems.Count > 0)
+                {
+                    ListViewItem item = HardwareKeyListView.SelectedItems[0];
+                    if (item.Equals(hitInfo.Item))
+                    {
+                        _selectedCustomer = item.Text;                        
+                        //launch edit dialog
+                        LoadHardwareKeyListView("", _selectedCustomer);
+                        EnableHardwareKeyView();
+                    }
+                }
+            }
+        }
+
+        private void seekKeyToolStripButton_Click(object sender, EventArgs e)
+        {
+            bool bKeyFound = false;
+            string[] keyName;
+            CustomerTable custRec = null;
+            IList<SolimarLicenseProtectionKeyInfo> pkeyList = null;
+            int index = 0;
+            Service<ICreator>.Use((client) => 
+            {
+                pkeyList = client.KeyEnumerate();
+                if (pkeyList.Count > 0)
+                {
+                    foreach(SolimarLicenseProtectionKeyInfo attachedKey in pkeyList)
+                    {
+                        if(attachedKey.IsKeyTypeVerification())
+                        {
+                            bKeyFound = true;
+                            keyName = attachedKey.keyName.Split("-".ToCharArray());
+                            //hex to decimal value
+                            custRec = client.GetCustomer(Int32.Parse(keyName[0], System.Globalization.NumberStyles.HexNumber).ToString(), false);
+                            LoadHardwareKeyListView("", custRec.SCRname);
+                            index = HardwareKeyListView.Items.IndexOfKey(attachedKey.keyName);
+                            _selectedCustomer = custRec.SCRname;
+                            break;
+                        }
+                    }
+                }             
+            });
+            if (!bKeyFound)
+                MessageBox.Show("No hardware keys attached", "Seek Error", MessageBoxButtons.OK);
+            else
+            {
+                HardwareKeyListView.Focus();
+                HardwareKeyListView.Items[index].Selected = true;
+            }
+        }
+
+        private void EnableHardwareKeyView()
+        {
+            navigateBackToolStripButton.Enabled = true;
+            reserveHardwareKeyToolStripButton.Enabled = true;
+            toolStripSearchBox.Enabled = false;
+            SearchToolStripLabel.Enabled = false;
+            deactivateHardwareKeyToolStripButton.Enabled = false;
+            activateHardwareKeyToolStripButton.Enabled = false;
+            if (HardwareKeyListView.SelectedItems.Count > 0)
+            { 
+                deactivateHardwareKeyToolStripButton.Enabled = true;
+                if (HardwareKeyListView.SelectedItems[0].SubItems[2].Text == "Reserved")
+                    activateHardwareKeyToolStripButton.Enabled = true;
+            }
+        }
+
+        private void EnableHardwareCustomerView()
+        {
+            toolStripSearchBox.Enabled = true;
+            SearchToolStripLabel.Enabled = true;
+            navigateBackToolStripButton.Enabled = false;
+            seekKeyToolStripButton.Enabled = true;
+            reserveHardwareKeyToolStripButton.Enabled = false;
+            deactivateHardwareKeyToolStripButton.Enabled = false;
+            activateHardwareKeyToolStripButton.Enabled = false;
+        }
+
+        private void reserveHardwareKeyToolStripButton_Click(object sender, EventArgs e)
+        {
+            string keyName = "";
+            uint nextKeyValue;
+            CustomerTable custRec = null;
+            Service<ICreator>.Use((client) =>
+            {
+                custRec = client.GetCustomer(_selectedCustomer,false);
+                nextKeyValue = client.GetNextHardwareTokenValue((uint)custRec.SCRnumber);
+                keyName = string.Format("{0:x4}-{1:x4}",custRec.SCRnumber,nextKeyValue);
+                TokenTable newToken = new TokenTable();
+                newToken.CustID = custRec.SCRnumber;
+                newToken.TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;                
+                newToken.TokenValue = keyName;
+                newToken.TokenStatus = (byte)TokenStatus.Reserved;
+                newToken.LicenseID = -1;
+                client.CreateToken(newToken);
+            });
+            PopulateHardwareKeyListView("", _selectedCustomer);
+            HardwareKeyListView.Focus();
+            HardwareKeyListView.Items[HardwareKeyListView.Items.IndexOfKey(keyName)].Selected = true;
+            //select it
+        }
+
+        private void deactivateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
+        {
+            //item selected
+            //deactivate or delete
+            if (HardwareKeyListView.SelectedItems.Count > 0)
+            {
+                //deactivated or reserved
+                int selectedIndex = HardwareKeyListView.SelectedItems[0].Index;
+                string keyValue = HardwareKeyListView.SelectedItems[0].Text;
+                string keyStatus = HardwareKeyListView.SelectedItems[0].SubItems[2].Text;
+                Service<ICreator>.Use((client) =>
+                {
+                    TokenTable selectedToken = client.GetHardwareTokenByKeyValue(keyValue);
+                    if (keyStatus == TokenStatus.Deactivated.ToString() ||
+                        keyStatus == TokenStatus.Reserved.ToString())
+                    {
+                        client.DeleteToken(selectedToken);
+                        HardwareKeyListView.Items.RemoveByKey(keyValue);
+                        if (HardwareKeyListView.Items.Count > 0)
+                        {
+                            if (selectedIndex == 0)
+                                HardwareKeyListView.Items[selectedIndex].Selected = true;
+                            else
+                                HardwareKeyListView.Items[selectedIndex - 1].Selected = true;
+                        }
+                    }
+                    else //active
+                    {                        
+                        IList<SolimarLicenseProtectionKeyInfo> pKeyList = client.KeyEnumerate();
+                        bool bFound = false;
+                        foreach(SolimarLicenseProtectionKeyInfo attachedKey in pKeyList)
+                        {
+                            if (attachedKey.keyName.Equals(keyValue))
+                            {
+                                bFound = true;
+                                break;
+                            }
+                        }
+                        bFound = true;
+                        if (bFound)
+                        {
+                            client.KeyFormat("0100-0100");//keyValue);
+                            selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
+                            client.UpdateToken(selectedToken);
+                            HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
+                        }
+                        else
+                        {
+                            MessageBox.Show(string.Format("Hardware Key : {0} is not attached to {1}", keyValue, m_ServerList[0]),
+                                            "Deactivation Error",
+                                            MessageBoxButtons.OK, 
+                                            MessageBoxIcon.Error);
+                        }
+                    }
+                });
+            }
+        }
+
+        private void activateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
+        {
+            int selectedIndex = HardwareKeyListView.SelectedItems[0].Index;
+            string keyValue = HardwareKeyListView.SelectedItems[0].Text;
+            string unintializedKeyValue = "";
+            string[] keyName = keyValue.Split("-".ToCharArray());
+            Service<ICreator>.Use((client) =>
+            {
+                IList<SolimarLicenseProtectionKeyInfo> pKeyList = client.KeyEnumerate();
+                bool bFound = false;
+                foreach (SolimarLicenseProtectionKeyInfo attachedKey in pKeyList)
+                {
+                    if (attachedKey.IsKeyTypeUninitialized())
+                    {
+                        bFound = true;
+                        unintializedKeyValue = attachedKey.keyName;
+                        break;
+                    }
+                }
+                if (bFound)
+                {
+                    TokenTable selectedToken = null;
+                    selectedToken = client.GetHardwareTokenByKeyValue(keyValue);
+                    selectedToken.TokenStatus = (byte)TokenStatus.Active;
+                    client.UpdateToken(selectedToken);
+                    client.KeyProgramVerification(unintializedKeyValue,
+                                                  Int32.Parse(keyName[0], System.Globalization.NumberStyles.HexNumber),
+                                                  Int32.Parse(keyName[1], System.Globalization.NumberStyles.HexNumber));
+                    HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Active.ToString();
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("Failed to activate hardware key : {0}. No uninitialized keys are attached to {1}",keyValue, m_ServerList[0]),
+                                    "Activation Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                }               
+            });
         }
 
 

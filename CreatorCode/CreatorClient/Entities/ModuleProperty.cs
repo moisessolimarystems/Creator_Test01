@@ -18,7 +18,7 @@ namespace Client.Creator
 
         public ModuleProperty()
         {
-            _module.moduleExpirationDate.TVal = DateTime.Today;
+            _module.moduleExpirationDate.TVal = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); //DateTime.Today;
         }
 
         public ModuleProperty(Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
@@ -29,7 +29,7 @@ namespace Client.Creator
         public void SetModuleProperty(ModuleProperty module)
         {
             _module.moduleID.TVal = module.ID;
-            _module.moduleExpirationDate.TVal = module.ExpirationDate;
+            _module.moduleExpirationDate.TVal = module.ExpirationDate.ToUniversalTime();
             _module.moduleAppInstance.TVal = module.AppInstance;
             _module.moduleValue.TVal = module.Units;
             _module.moduleState.TVal = module.ModuleState;
@@ -104,8 +104,8 @@ namespace Client.Creator
 
         public DateTime ExpirationDate
         {
-            get { return _module.moduleExpirationDate.TVal; }
-            set { _module.moduleExpirationDate.TVal = value; }
+            get { return _module.moduleExpirationDate.TVal.ToLocalTime(); }
+            set { _module.moduleExpirationDate.TVal = value.ToUniversalTime(); }
         }
 
         public Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState ModuleState

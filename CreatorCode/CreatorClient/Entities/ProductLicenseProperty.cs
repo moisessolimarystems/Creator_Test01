@@ -20,7 +20,8 @@ namespace Client.Creator
         ProductProperty _product;
         Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType _productLicType;
         PermissionsTable _permissions;
-        Solimar.Licensing.GlobalSoftwareSpec globalSwSpec; 
+        Solimar.Licensing.GlobalSoftwareSpec globalSwSpec;
+        DateTime _currentExpirationDate;
 
         public enum OrderAttributes
         {
@@ -83,6 +84,12 @@ namespace Client.Creator
         #region Properties
 
         #region NonBrowsable Properties
+        [Browsable(false)]
+        public DateTime CurrentExpirationDate
+        {
+            get { return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); }
+        }
+
         [Browsable(false)]
         [RefreshProperties(RefreshProperties.All)]
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType ProductLicenseType
@@ -185,7 +192,7 @@ namespace Client.Creator
                             }
                             else
                                 throw new Exception("Invalid Conversion");
-                            setDate = DateTime.Today;
+                            setDate = CurrentExpirationDate;
                             break;
                         case Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn:                                                                    
                             //need to allow for initial case and exclude changing from perm->addon, trial->addon
@@ -196,7 +203,7 @@ namespace Client.Creator
                                ((_orderRec.ExpirationDate.HasValue && 
                                  _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial)))                                
                                 throw new Exception("Invalid Conversion");
-                            setDate = DateTime.Today;
+                            setDate = CurrentExpirationDate;
                             break;
                         default:
                             break;
@@ -227,7 +234,7 @@ namespace Client.Creator
             {
                 SetReadOnlyOrderAttribStatus(OrderAttributes.ExpirationDate, !_permissions.pt_extension_pwd.Value);
                 if(_orderRec.ExpirationDate.HasValue)
-                    return _orderRec.ExpirationDate.Value;
+                    return _orderRec.ExpirationDate.Value.ToLocalTime();
                 return null;
             }
             set 
@@ -237,8 +244,11 @@ namespace Client.Creator
                     throw new Exception("Can't set expiration date for permanent type");
                 if ((LicenseName.Contains("T") || _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial) && !value.HasValue)                   
                     throw new Exception("Please set a valid expiration date");
-                _product.SetAllModulesExpDate(OrderNumber, value);
-                _orderRec.ExpirationDate = value;
+                _product.SetAllModulesExpDate(OrderNumber, new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime());
+                if (value.HasValue)
+                    _orderRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                else
+                    _orderRec.ExpirationDate = value;
             }
         }
 

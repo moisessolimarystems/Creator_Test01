@@ -22,6 +22,14 @@ namespace Client.Creator
         private Object selectedObject;
         private CommunicationLink m_CommLink;
         private bool m_Validated;
+        private DateTime _currentExpirationDate;
+
+        #region Properties
+        public DateTime CurrentExpirationDate
+        {
+            get { return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); }
+        }
+        #endregion
 
         #region Form Events
         public LicenseInfoForm(string title, ref CommunicationLink commLink)
@@ -177,7 +185,7 @@ namespace Client.Creator
             orderData.OrderInfo.Product.AppInstance = (uint)((orderData.OrderInfo.OrderStatus == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
             string[] versionNum = productLicenseVersionMaskedTextBox.Text.Split(".".ToCharArray());
             orderData.OrderInfo.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]),UInt32.Parse(versionNum[1]));
-            orderData.OrderInfo.ExpirationDate = DateTime.Today.AddDays(Int32.Parse(expDateTextBox.Text));
+            orderData.OrderInfo.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
             orderData.OrderInfo.Description = productLicenseDescriptionTextBox.Text;            
         }
         #endregion
@@ -580,7 +588,7 @@ namespace Client.Creator
                 KeyValueTextBox.Text = hardwareKeyData.KeyValue;
                 activateCheckBox.Checked = true;
                 label10.Visible = true;
-                keyNameListBox.Visible = true;
+                keyNameListView.Visible = true;
                 btnOk.Text = "Activate";
             }
             else
@@ -629,8 +637,7 @@ namespace Client.Creator
                     TokenTable selectedToken = null;
                     Service<ICreator>.Use((client) =>
                     {
-                        selectedToken = client.GetHardwareTokenByKeyValue((uint)Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
-                                                                          KeyValueTextBox.Text);
+                        selectedToken = client.GetHardwareTokenByKeyValue(KeyValueTextBox.Text);
                         selectedToken.TokenStatus = 1;
                         client.UpdateToken(selectedToken);
                     });
@@ -762,11 +769,6 @@ namespace Client.Creator
 
         #region TokenTabPage Events
 
-        private void keyNameListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            tokenValueTextBox.Text = keyNameListBox.SelectedItem.ToString();
-        }
-
         private void ValidateTokenForm()
         {
             Cursor.Current = Cursors.WaitCursor;
@@ -808,8 +810,7 @@ namespace Client.Creator
         private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {   
             LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;      
-            //keyNameGroupBox.Visible = false;
-            keyNameListBox.Visible = false;
+            keyNameListView.Visible = false;
             availableHWKeyLabel.Visible = false;
             tokenValueTextBox.Enabled = false;
             browseTokenFileButton.Visible = false;
@@ -819,22 +820,27 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
             if (selectedType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
             {   //Edit ttHardwareID has value, skip 
+                keyNameListView.Visible = true;
+                availableHWKeyLabel.Visible = true;
                 if (tokenValueTextBox.Text.Length == 0)
                 {   //New ttHardwareID needs to retrieve next available value
-                    keyNameListBox.Items.Clear();
+                    keyNameListView.Items.Clear();
                     Service<ICreator>.Use((client) => 
                     {
                         IList<TokenTable> tokenList = client.GetAvailableHardwareTokensByCustID(selectedOrder.CustID);
                         foreach (TokenTable token in tokenList)
                         {
-                            keyNameListBox.Items.Add(token.TokenValue);
+                            //ListViewItem lvItem = new ListViewItem();
+                            //lvItem.Text = token.TokenValue;                            
+                            keyNameListView.Items.Add(token.TokenValue);
                         }
                     });
                 }
-                if(keyNameListBox.Items.Count > 0)
-                    keyNameListBox.SelectedIndex = 0;                
-                keyNameListBox.Visible = true;
-                availableHWKeyLabel.Visible = true;
+                if (keyNameListView.Items.Count > 0)
+                {
+                    keyNameListView.Focus();
+                    keyNameListView.Items[0].Selected = true;
+                }
             }
             else
             {                
@@ -855,7 +861,7 @@ namespace Client.Creator
         {
             string[] value = tokenValueTextBox.Text.Split(new Char[] { '-' });
              
-            KeyProgramVerification(keyNameListBox.SelectedItem.ToString(), 
+            KeyProgramVerification(keyNameListView.SelectedItems[0].Text, 
                                    Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
                                    Int32.Parse(value[1], System.Globalization.NumberStyles.HexNumber));
         }
@@ -1130,6 +1136,12 @@ namespace Client.Creator
                 label10.Visible = false;
                 AvailableKeysListBox.Visible = false;
             }
+        }
+
+        private void keyNameListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(keyNameListView.SelectedItems.Count > 0)
+                tokenValueTextBox.Text = keyNameListView.SelectedItems[0].Text;
         }
     }
 

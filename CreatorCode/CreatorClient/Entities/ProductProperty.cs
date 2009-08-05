@@ -98,6 +98,7 @@ namespace Client.Creator
             return Name;
         }
 
+        //expects universal time
         public void SetAllModulesExpDate(string orderNumber, DateTime? expDate)
         {
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
@@ -160,6 +161,7 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
             //delete perm contract and any add-ons
             _product.moduleList.TVal.Clear();
+            DateTime expTime = new DateTime();
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in CreatorForm.s_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productID.TVal == ID)
@@ -168,8 +170,8 @@ namespace Client.Creator
                     {
                         module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
                         module.moduleID.TVal = moduleSpec.moduleID.TVal;
-                        module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
-                        module.moduleExpirationDate.TVal = DateTime.Today;
+                        module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;                       
+                        module.moduleExpirationDate.TVal = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0).ToUniversalTime();
                         module.moduleAppInstance.TVal = 1;
                         module.contractNumber.TVal = orderNumber;
                         module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial;
