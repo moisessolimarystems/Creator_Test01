@@ -58,14 +58,14 @@ namespace SolimarLicenseViewer
             try
             {
                 Disconnect();
-                m_licenseWrapper.ConnectEx(serverName);
+                m_licenseWrapper.ConnectEx(serverName, false, true);
                 m_licServer.Connect(serverName);
                 m_ServerName = serverName;
             }
             catch (COMException ex)
             {
                 m_exception = ex;
-                if(bDisconnectOnError)
+                if (bDisconnectOnError)
                     Disconnect();
                 else
                     m_ServerName = serverName;
