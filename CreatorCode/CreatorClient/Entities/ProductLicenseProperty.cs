@@ -244,11 +244,16 @@ namespace Client.Creator
                     throw new Exception("Can't set expiration date for permanent type");
                 if ((LicenseName.Contains("T") || _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial) && !value.HasValue)                   
                     throw new Exception("Please set a valid expiration date");
-                _product.SetAllModulesExpDate(OrderNumber, new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime());
                 if (value.HasValue)
+                {
+                    _product.SetAllModulesExpDate(OrderNumber, new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime());
                     _orderRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                }
                 else
+                {
+                    _product.SetAllModulesExpDate(OrderNumber, value);
                     _orderRec.ExpirationDate = value;
+                }
             }
         }
 
