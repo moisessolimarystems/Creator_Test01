@@ -655,7 +655,7 @@ namespace SolimarLicenseViewer
                                 if (DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0)
                                     lvItem.SubItems.Add(modInfo.moduleExpirationDate.TVal.ToLocalTime().ToString());
                                 else
-                                    lvItem.SubItems.Add("");
+                                    lvItem.SubItems.Add("Permanent");
                                 lviList.Add(lvItem);
                             }
                         }
@@ -1559,7 +1559,32 @@ namespace SolimarLicenseViewer
                         }
                         else if (InternalSortType == typeof(System.DateTime))
                         {
-                            compareResult = DateTime.Compare(Convert.ToDateTime(itemX), Convert.ToDateTime(itemY));
+                            DateTime? d1 = null;
+                            DateTime? d2 = null;
+                            try
+                            {
+                                d1 = Convert.ToDateTime(itemX);
+                            }
+                            catch(Exception)
+                            {
+                                compareResult = -1;
+                            }
+                            try
+                            {
+                                d2 = Convert.ToDateTime(itemY);
+                            }
+                            catch (Exception)
+                            {
+                                compareResult = 1;
+                            }
+                            if (d1 != null && d2 != null)
+                            {
+                                compareResult = DateTime.Compare(Convert.ToDateTime(itemX), Convert.ToDateTime(itemY));
+                            }
+                            if (d1 == null && d2 == null)
+                            {
+                                compareResult = 0;
+                            }
                             bCalculatedCompareResult = true;
                         }
                     }
