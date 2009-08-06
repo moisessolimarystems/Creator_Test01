@@ -815,7 +815,7 @@ namespace Client.Creator
                 {
                     case 0:
                         //customer level
-                        CustomerProperty custItem = DetailTreeView.SelectedNode.Tag as CustomerProperty;
+                        CustomerProperty custItem = DetailPropertyGrid.SelectedObject as CustomerProperty;
                         string oldValue = DetailTreeView.SelectedNode.Text.Remove(DetailTreeView.SelectedNode.Text.IndexOf("(")).Trim();
                         CustomerTable custRec = client.GetCustomer(oldValue, true);
                         custRec.SCRname = custItem.Name;
@@ -826,7 +826,7 @@ namespace Client.Creator
                     case 1:
                         //license level - only changes activations, validation tokens
                         licPackage = new Lic_PackageAttribs();
-                        LicenseServerProperty licItem = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
+                        LicenseServerProperty licItem = DetailPropertyGrid.SelectedObject as LicenseServerProperty;
                         licRec = client.GetLicenseByName(DetailTreeView.SelectedNode.Text, false);
                         licPackage.Stream = licRec.LicenseInfo;
                         LicenseItemTransactions(ref licPackage.licLicenseInfoAttribs, ref licItem);
@@ -841,7 +841,7 @@ namespace Client.Creator
                     case 3:
                         //orderdata level - no add-on orders
                         //alert failover, test dev, disaster recovery 
-                        selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
+                        selectedOrder = DetailPropertyGrid.SelectedObject as ProductLicenseProperty;
                         storedOrder = client.GetOrderByOrderName(selectedOrder.OrderNumber);
                         bOrderChanged = OrderTransactions(ref storedOrder, selectedOrder);
                         client.UpdateOrder(storedOrder);
@@ -881,7 +881,7 @@ namespace Client.Creator
                         //Add-on orderdata level         
                         TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
                         orderProduct = DetailTreeView.SelectedNode.Parent.Parent.Tag as ProductProperty;
-                        selectedOrder = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
+                        selectedOrder = DetailPropertyGrid.SelectedObject as ProductLicenseProperty;
                         storedOrder = client.GetOrderByOrderName(selectedOrder.OrderNumber);
                         //need to delete order if converting from add-on to perm
                         //issue, add-on order merged into perm, how to show transaction      
@@ -3215,7 +3215,12 @@ namespace Client.Creator
                     }
                 });
             }
-            if(!storedOrder.ExpirationDate.ToString().Equals(selectedOrder.ExpirationDate.ToString()))
+            DateTime? storedDT;
+            if(storedOrder.ExpirationDate.HasValue) 
+                storedDT = storedOrder.ExpirationDate.Value.ToLocalTime();
+            else
+                storedDT = null;
+            if (!storedDT.ToString().Equals(selectedOrder.ExpirationDate.ToString()))
             {                
                 string storedValue = "None", value = "None";
                 if (selectedOrder.ExpirationDate.HasValue)
@@ -3227,7 +3232,10 @@ namespace Client.Creator
                                   string.Format("{0}: Product License Expiration Date {1} to {2}", selectedOrder.OrderNumber,storedValue, value), 
                                   value);
                 bChanged = true;
-                storedOrder.ExpirationDate = selectedOrder.ExpirationDate;
+                if (selectedOrder.ExpirationDate.HasValue)
+                    storedOrder.ExpirationDate = selectedOrder.ExpirationDate.Value.ToUniversalTime();
+                else
+                    storedOrder.ExpirationDate = selectedOrder.ExpirationDate;
             }
             if (!storedOrder.Description.Equals(selectedOrder.Description))
             {
@@ -4357,7 +4365,7 @@ namespace Client.Creator
                         bFound = true;
                         if (bFound)
                         {
-                            client.KeyFormat("0100-0100");//keyValue);
+                            client.KeyFormat(keyValue);
                             selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
                             client.UpdateToken(selectedToken);
                             HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
