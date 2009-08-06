@@ -1577,6 +1577,7 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 				SysFreeString(tmpBstrLicName);
 			}
 		}
+		ResynchronizeSoftwareLicenses(true);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1682,6 +1683,7 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 			if(SUCCEEDED(hr))
 			SysFreeString(tmpBstrLicName);
 		}
+		ResynchronizeSoftwareLicenses(true);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -1784,6 +1786,8 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 				}
 			}
 		}
+
+		ResynchronizeSoftwareLicenses(true);
 	}
 	catch(HRESULT &eHr)
 	{
@@ -1857,6 +1861,8 @@ HRESULT SoftwareServer::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR 
 		hr = pSwLicMgr->UseActivationToExtendTime();
 		if(FAILED(hr))
 			throw hr;
+
+		ResynchronizeSoftwareLicenses(true);
 	
 		//Determine if pSwLicMgr has a protection key as the verification token, if so then cycle through
 		//all the softwareLicMgrMap and update the new license code from pSoftwareLicMgr to all the entries

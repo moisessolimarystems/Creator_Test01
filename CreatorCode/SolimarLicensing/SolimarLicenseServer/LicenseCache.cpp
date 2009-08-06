@@ -166,6 +166,8 @@ HRESULT LicenseCacheByProduct::ClearCache_Totals()
 	productMaxAppInstance = 0;
 	licensesTotalMap.clear();
 	licensesAppInstanceTotalMap.clear();
+	productMajorVersion = 0;
+	productMinorVersion = 0;
 	return hr;
 }
 HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR applicationInstance)
