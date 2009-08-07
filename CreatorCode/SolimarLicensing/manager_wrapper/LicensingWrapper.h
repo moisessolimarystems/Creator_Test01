@@ -95,7 +95,7 @@ public:
 	//
 
 	HRESULT ConnectEx(std::wstring server);
-	HRESULT ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+	HRESULT ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup, bool bUseOnlyLicenseViewer = false);
 	HRESULT ConnectByProductEx(long product, bool bUseSharedLicenseServers = false);
 	HRESULT GetInfoByProductEx(long product, BSTR* p_server, BSTR* p_backup_server, bool* p_bTestDev, bool bUseSharedLicenseServers = false);
 

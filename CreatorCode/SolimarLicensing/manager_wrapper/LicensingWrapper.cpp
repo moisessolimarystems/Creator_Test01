@@ -145,7 +145,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 					false,	//bUseOnlySharedLicenses
 					false);	//bUseAsBackup
 }
-HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup)
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup, bool bUseOnlyLicenseViewer)
 {
 //OutputDebugStringW(L"LicensingWrapper::ConnectEx() - Enter");
 	SafeMutex mutex(m_MemberLock);
@@ -165,9 +165,11 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 			{
 				// make a connection to the license manager
 				BSTR bstrServer = SysAllocString(server.c_str());
-				hr = pISolimarLicenseMgr->Connect2(	bstrServer,													//Key Server
-													(bUseOnlySharedLicenses ? VARIANT_TRUE : VARIANT_FALSE),	//Use only Shared Licensing
-													(bUseAsBackup ? VARIANT_TRUE : VARIANT_FALSE));				//Use as Backup
+				hr = pISolimarLicenseMgr->Connect3(	
+					bstrServer,														//Key Server
+					(bUseOnlySharedLicenses * CF_SOFTWARE_LICENSING) |	//Use only Shared Licensing
+					(bUseAsBackup * CF_BACKUP_SERVER) |						//Use as Backup
+					(bUseOnlyLicenseViewer * CF_ONLY_LICENSE_VIEWER));	//Use only License Viewer
 				SysFreeString(bstrServer);
 			}
 		}	

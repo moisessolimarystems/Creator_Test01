@@ -303,6 +303,25 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 
 		return ;
 	}
+	void SolimarLicenseWrapper::ConnectLicenseViewerEx(String^ server)
+	{
+		BSTR bstrServer;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(server));
+		bstrServer = (static_cast<BSTR>(static_cast<void *>(ptr)));
+
+		m_licServer = gcnew String(bstrServer);
+		HRESULT hrResult = m_pLicenseWrapper->ConnectEx(bstrServer, false, false, true);
+
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+			//throw GenerateException(hrResult);
+
+		return ;
+	}
 	void SolimarLicenseWrapper::ConnectByProductEx(long product, bool bUseSharedLicenseServers)
 	{
 		m_productID = product;

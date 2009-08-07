@@ -14,6 +14,15 @@ enum
 	UI_STYLE_EVENT_LOG =	0x20,
 };
 
+enum 
+{
+	CF_NONE =	0x00,
+	CF_BACKUP_SERVER = 0x01,
+	CF_ONLY_SHARED_LICENSE = 0x02,
+	CF_SOFTWARE_LICENSING = 0x04,
+	CF_ONLY_LICENSE_VIEWER = 0x08,
+};
+
 //#endif
 
 #ifndef __ISolimarLicenseMgr_INTERFACE_DEFINED__

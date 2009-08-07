@@ -363,6 +363,7 @@ private:
 		ServerInfo(_bstr_t servername, 
 			bool useOnlySharedLicenses, //Use Shared Licensing when accessing Protection Keys
 			bool useSoftwareLicensing,
+			bool useOnlyLicenseViewer,
 			GITPtr<ISolimarLicenseSvr4> pILicenseServer);
 
 		~ServerInfo();
@@ -370,6 +371,7 @@ private:
 		_bstr_t name;
 		bool bUseOnlySharedLicenses;
 		bool bUseSoftwareLicensing;	//Not used yet, maybe not needed
+		bool bUseOnlyLicenseViewer;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		SoftwareLicenseInfo software_license;
 		KeyList keys;
@@ -399,6 +401,7 @@ private:
 		CF_BACKUP_SERVER = 0x01,
 		CF_ONLY_SHARED_LICENSE = 0x02,
 		CF_SOFTWARE_LICENSING = 0x04,
+		CF_ONLY_LICENSE_VIEWER = 0x08,
 	};
 	
 	DWORD m_ui_level;

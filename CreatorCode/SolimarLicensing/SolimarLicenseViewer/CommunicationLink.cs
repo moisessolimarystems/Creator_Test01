@@ -58,7 +58,7 @@ namespace SolimarLicenseViewer
             try
             {
                 Disconnect();
-                m_licenseWrapper.ConnectEx(serverName, false, true);
+                m_licenseWrapper.ConnectLicenseViewerEx(serverName);
                 m_licServer.Connect(serverName);
                 m_ServerName = serverName;
             }

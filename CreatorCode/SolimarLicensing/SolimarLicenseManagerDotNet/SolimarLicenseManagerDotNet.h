@@ -30,6 +30,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 				CF_BACKUP_SERVER = 0x01,
 				CF_ONLY_SHARED_LICENSE = 0x02,
 				CF_SOFTWARE_LICENSING = 0x04,
+				CF_ONLY_LICENSE_VIEWER = 0x08,
 			};
 
 			SolimarLicenseWrapper();
@@ -56,6 +57,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 
 			void ConnectEx(String^ server);
 			void ConnectEx(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+			void ConnectLicenseViewerEx(String^ server);
 			void ConnectByProductEx(long product, bool bUseSharedLicenseServers);
 			void GetInfoByProductEx(long product, bool bUseSharedLicenseServers, String^% refLicServer, String^% refBackupLicServer, bool% refBUseTestDev);
 			void DisconnectEx();
