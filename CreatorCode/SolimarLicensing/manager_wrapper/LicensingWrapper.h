@@ -53,12 +53,6 @@ class LicensingWrapper : public ChallengeResponseHelper
 
 public:
 	LicensingWrapper();
-	LicensingWrapper(
-		std::wstring domain,
-		std::wstring username,
-		std::wstring password,
-		long authenticationLevel,
-		long impersonationLevel);
 	LicensingWrapper(const LicensingWrapper &o);
 	LicensingWrapper& operator=(const LicensingWrapper &o);
 	virtual ~LicensingWrapper();
@@ -147,7 +141,7 @@ public:
 	static KeySpec keyspec;
 
 	//MOVE FOR TESTING
-	GITPtr<ISolimarLicenseMgr8> m_licenseManagerPtr;
+	GITPtr<ISolimarLicenseMgr7> m_licenseManagerPtr;
 
 private:
 	
@@ -181,14 +175,6 @@ private:
 
 
 	std::map<int/*sessionID*/, std::map<int/*modID*/, int/*value*/>*> m_session_obtained_map;
-
-	void Initialize(
-		std::wstring domain,
-		std::wstring username,
-		std::wstring password,
-		long authenticationLevel,
-		long impersonationLevel);
-
 };
 
 };
