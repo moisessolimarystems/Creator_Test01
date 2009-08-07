@@ -36,8 +36,8 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
 //OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Enter");
-	ISolimarLicenseMgr6* pLocalLicenseMgr = NULL;
-	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr6), (void**)&pLocalLicenseMgr);
+	ISolimarLicenseMgr7* pLocalLicenseMgr = NULL;
+	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr7), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
 		hr = m_licenseManagerPtr.Attach(pLocalLicenseMgr);
@@ -78,12 +78,10 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(const Licensing
 	m_constructorHR(S_OK),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
-//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper(const) - Enter");
 	*this = o;
 	
 	m_MessageDispatchThread = CreateThread(0, 0, MessageDispatchThreadProc, this, 0, 0);
 	m_LicenseValidityThread = CreateThread(0, 0, LicenseValidityThreadProc, this, 0, 0);
-//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper(const) - Leave");
 }
 
 SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::LicensingWrapper::operator=(const LicensingWrapper &o)
@@ -95,7 +93,6 @@ SolimarLicenseManagerWrapper::LicensingWrapper& SolimarLicenseManagerWrapper::Li
 	m_license_invalid_callback_context = o.m_license_invalid_callback_context;
 	m_license_invalid_callback = o.m_license_invalid_callback;
 	m_licenseManagerPtr = o.m_licenseManagerPtr;
-
 	return *this;
 }
 
@@ -148,13 +145,14 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 					false,	//bUseOnlySharedLicenses
 					false);	//bUseAsBackup
 }
-HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup)
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup, bool bUseOnlyLicenseViewer)
 {
+//OutputDebugStringW(L"LicensingWrapper::ConnectEx() - Enter");
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
 	// authenticate
-	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -167,15 +165,18 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 			{
 				// make a connection to the license manager
 				BSTR bstrServer = SysAllocString(server.c_str());
-				hr = pISolimarLicenseMgr->Connect2(	bstrServer,													//Key Server
-													(bUseOnlySharedLicenses ? VARIANT_TRUE : VARIANT_FALSE),	//Use only Shared Licensing
-													(bUseAsBackup ? VARIANT_TRUE : VARIANT_FALSE));				//Use as Backup
+				hr = pISolimarLicenseMgr->Connect3(	
+					bstrServer,														//Key Server
+					(bUseOnlySharedLicenses * CF_SOFTWARE_LICENSING) |	//Use only Shared Licensing
+					(bUseAsBackup * CF_BACKUP_SERVER) |						//Use as Backup
+					(bUseOnlyLicenseViewer * CF_ONLY_LICENSE_VIEWER));	//Use only License Viewer
 				SysFreeString(bstrServer);
 			}
 		}	
 		pISolimarLicenseMgr->Release();
 	}
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx()", hr);
+//OutputDebugStringW(L"LicensingWrapper::ConnectEx() - Leave");
 	return hr;
 }
 
@@ -185,7 +186,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	// authenticate
-	ISolimarLicenseMgr6* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -203,6 +204,21 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 		pISolimarLicenseMgr->Release();
 	}
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx()", hr);
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx(long product, BSTR* p_server, BSTR* p_backup_server, bool* p_bTestDev, bool bUseSharedLicenseServers)
+{
+	SafeMutex mutex(m_MemberLock);
+	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+	HRESULT hr = S_OK;
+
+	VARIANT_BOOL bVtTestDev = VARIANT_FALSE;
+	hr = m_licenseManagerPtr->GetInfoByProduct(product, bUseSharedLicenseServers ? VARIANT_TRUE : VARIANT_FALSE, p_server, p_backup_server, &bVtTestDev);
+	if(SUCCEEDED(hr))
+	{
+		*p_bTestDev = (bVtTestDev==VARIANT_TRUE) ? true : false;
+	}
+	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx()", hr);
 	return hr;
 }
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
@@ -223,6 +239,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(long produc
 }
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level, unsigned long grace_period_minutes, bool application_instance_lock_keys, bool bypass_remote_key_restriction)
 {
+//OutputDebugStringW(L"LicensingWrapper::InitializeEx() - Enter");
    SafeMutex mutex(m_MemberLock);
    ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
@@ -245,10 +262,22 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(std::wstrin
 	ResumeThread(m_MessageDispatchThread);
 	ResumeThread(m_LicenseValidityThread);
 
-
+//OutputDebugStringW(L"LicensingWrapper::InitializeEx() - Leave");
    LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx()", hr);
    return hr;
 }
+HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeViewOnly(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor)
+{
+//OutputDebugStringW(L"LicensingWrapper::InitializeViewOnly() - Enter");
+   SafeMutex mutex(m_MemberLock);
+   BSTR bstrApplication_instance = SysAllocString(application_instance.c_str());
+   HRESULT hr = m_licenseManagerPtr->SoftwareLicense_InitializeViewOnly(bstrApplication_instance, product, prod_ver_major, prod_ver_minor);
+   SysFreeString(bstrApplication_instance);
+//OutputDebugStringW(L"LicensingWrapper::InitializeViewOnly() - Leave");
+   LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::InitializeViewOnly()", hr);
+   return hr;
+}
+
 
 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists)

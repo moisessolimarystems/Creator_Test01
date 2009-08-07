@@ -64,6 +64,7 @@ public:
 	bool Connect(std::wstring server) {return SUCCEEDED(ConnectEx(server));}
 	bool Connect(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup) {return SUCCEEDED(ConnectEx(server, bUseOnlySharedLicenses, bUseAsBackup));}
 	bool ConnectByProduct(long product, bool bUseSharedLicenseServers = false) {return SUCCEEDED(ConnectByProductEx(product, bUseSharedLicenseServers));}
+	bool GetInfoByProduct(long product, std::wstring* p_server, std::wstring* p_backup_server, bool* p_bTestDev, bool bUseSharedLicenseServers = false) {return GetInfoByProduct(product, p_server, p_backup_server, p_bTestDev, bUseSharedLicenseServers);}
 	bool Disconnect() {return SUCCEEDED(DisconnectEx());}
 
 	//unsigned long grace_period_minutes - How long license can still be validated after there is a violation because of no keys on the system.
@@ -71,6 +72,7 @@ public:
 	//bool bypass_remote_key_restriction - True means the restriction of remote license managers using non-remote keys has been lifted.
 	bool Initialize(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0)	{return SUCCEEDED(InitializeEx(product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes));}
 	bool Initialize(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false){return SUCCEEDED(InitializeEx(application_instance, product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes, application_instance_lock_keys, bypass_remote_key_restriction));}
+
 	bool KeyProductExists(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists) {return SUCCEEDED(KeyProductExistsEx(product, prod_ver_major, prod_ver_minor, bKeyExists));}
 	bool ModuleLicenseTotal(long module, long* license_count) {return SUCCEEDED(ModuleLicenseTotalEx(module, license_count));}
 	bool ModuleLicenseInUse(long module, long* license_count) {return SUCCEEDED(ModuleLicenseInUseEx(module, license_count));}
@@ -93,11 +95,15 @@ public:
 	//
 
 	HRESULT ConnectEx(std::wstring server);
-	HRESULT ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+	HRESULT ConnectEx(std::wstring server, bool bUseOnlySharedLicenses, bool bUseAsBackup, bool bUseOnlyLicenseViewer = false);
 	HRESULT ConnectByProductEx(long product, bool bUseSharedLicenseServers = false);
+	HRESULT GetInfoByProductEx(long product, BSTR* p_server, BSTR* p_backup_server, bool* p_bTestDev, bool bUseSharedLicenseServers = false);
+
 	HRESULT DisconnectEx();
 	HRESULT InitializeEx(long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0);
 	HRESULT InitializeEx(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor, bool single_key, std::wstring specific_single_key_ident, bool lock_keys, DWORD ui_level = UI_IGNORE, unsigned long grace_period_minutes=0, bool application_instance_lock_keys=false, bool bypass_remote_key_restriction=false);
+	HRESULT InitializeViewOnly(std::wstring application_instance, long product, long prod_ver_major, long prod_ver_minor);
+
 	HRESULT KeyProductExistsEx(long product, long prod_ver_major, long prod_ver_minor, bool* bKeyExists);
 	HRESULT ModuleLicenseTotalEx(long module, long* license_count);
 	HRESULT ModuleLicenseInUseEx(long module, long* license_count);
@@ -109,15 +115,15 @@ public:
 	HRESULT GetVersionLicenseManagerEx(long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 	HRESULT GetVersionLicenseServerEx(std::wstring server, long* p_ver_major, long* p_ver_minor, long* p_ver_build);
 
-
 	HRESULT StartLicensingSessionEx(long* session_id);
 	HRESULT ModuleLicenseObtainLicensingSessionEx(long session_id, long module, long license_count);
 	HRESULT ModuleLicenseReleaseLicensingSessionEx(long session_id, long module, long license_count);
 	HRESULT ModuleLicenseInUseLicensingSessionEx(long session_id, long module, long* license_count);
 	HRESULT EndLicensingSessionEx(long session_id);
 	
-	typedef void (*LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
-	typedef void (*LicenseInvalidCallbackPtr)(void* pContext, HRESULT lastHr, const wchar_t* message);
+	// Note the use of __stdcall for compatibility with managed code
+	typedef void (__stdcall *LicenseMessageCallbackPtr)(void* pContext, const wchar_t* key_ident, unsigned int message_type, HRESULT error, VARIANT *pvtTimestamp, const wchar_t* message);
+	typedef void (__stdcall *LicenseInvalidCallbackPtr)(void* pContext, HRESULT lastHr, const wchar_t* message);
 
 	bool RegisterMessageCallback(void* pContext, LicenseMessageCallbackPtr LicenseMessageCallback);
 	bool UnregisterMessageCallback();
@@ -135,7 +141,7 @@ public:
 	static KeySpec keyspec;
 
 	//MOVE FOR TESTING
-	//GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
+	GITPtr<ISolimarLicenseMgr7> m_licenseManagerPtr;
 
 private:
 	
@@ -162,7 +168,7 @@ private:
 	void* m_license_invalid_callback_context;
 	LicenseInvalidCallbackPtr m_license_invalid_callback;
 
-	GITPtr<ISolimarLicenseMgr6> m_licenseManagerPtr;
+	//GITPtr<ISolimarLicenseMgr5> m_licenseManagerPtr;
 	GITPtr<ILicensingMessage> m_licenseMessagePtr;
 
 	std::wstring StringToWstring(const std::string &s);
