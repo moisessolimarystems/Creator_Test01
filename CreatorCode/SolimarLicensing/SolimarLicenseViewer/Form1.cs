@@ -390,8 +390,19 @@ namespace SolimarLicenseViewer
 
             extendToolStripMenuItem.Visible = bDisplayExtendOption;
             extendToolStripSeparator.Visible = bDisplayExtendOption;
-            if(bDisplayExtendOption)
-                extendToolStripMenuItem.Enabled = m_listViewMgr.EnableDisasterRecoverExt;
+            if (bDisplayExtendOption)
+            {
+                // Cycle through all the selected items
+                extendToolStripMenuItem.Enabled = this.noFlickerListView.SelectedItems.Count > 0;
+                foreach(ListViewItem lvi in this.noFlickerListView.SelectedItems)
+                {
+                    if (m_listViewMgr.EnableDisasterRecoverExt_ByLicense(lvi.Text) == false)
+                    {
+                        extendToolStripMenuItem.Enabled = false;
+                        break;
+                    }
+                }
+            }
 
             editConnToolStripSeparator.Visible = bDisplayConnectionSettings;
             editConnToolStripMenuItem.Visible = bDisplayConnectionSettings;
@@ -416,8 +427,12 @@ namespace SolimarLicenseViewer
         {
             try
             {
-                m_CommLink.SoftwareLicenseDisasterRecoveryExtendTimeByLicense(this.noFlickerListView.SelectedItems[0].Text);
-                PopulateAllViews();
+                useActivationInternal(
+                    this.noFlickerListView.SelectedItems[0].Text,   //license name
+                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[4].Text),   //activationCurrent
+                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[5].Text),   //activationTotal
+                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[6].Text)    //activationAmountInDays
+                );
             }
             catch (COMException)
             {
@@ -813,23 +828,27 @@ namespace SolimarLicenseViewer
             {
                 ToolStripMenuItem tmpToolStripItem = sender as ToolStripMenuItem;
                 int[] intArray = (int[])tmpToolStripItem.Tag;  //should be in the format: activationCurrent, activationTotal, activationAmountInDays
-                string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", intArray[0], intArray[1], tmpToolStripItem.Text, intArray[2]);
-                if (MessageBox.Show(this, message, "Activate License: " + tmpToolStripItem.Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                useActivationInternal(tmpToolStripItem.Text, intArray[0], intArray[1], intArray[2]);
+            }
+        }
+        private void useActivationInternal(string _licenseName, int _activationCurrent, int _activationTotal, int _activationAmountInDays)
+        {
+            string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _licenseName, _activationAmountInDays);
+            if (MessageBox.Show(this, message, "Activate License: " + _licenseName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            {
+                try
                 {
-                    try
-                    {
-                        this.Cursor = Cursors.WaitCursor;
-                        m_CommLink.SoftwareLicenseDisasterRecoveryExtendTimeByLicense(tmpToolStripItem.Text);
-                        refreshToolStripButton_Click(null, new EventArgs());
-                    }
-                    catch (Exception ex)
-                    {
-                        HandleExceptions.DisplayException(this, ex, "Failed to Activate License!", "Activate License");
-                    }
-                    finally
-                    {
-                        this.Cursor = Cursors.Default;
-                    }
+                    this.Cursor = Cursors.WaitCursor;
+                    m_CommLink.SoftwareLicenseDisasterRecoveryExtendTimeByLicense(_licenseName);
+                    refreshToolStripButton_Click(null, new EventArgs());
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(this, ex, "Failed to Activate License!", "Activate License");
+                }
+                finally
+                {
+                    this.Cursor = Cursors.Default;
                 }
             }
         }

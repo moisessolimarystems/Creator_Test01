@@ -194,10 +194,10 @@ namespace SolimarLicenseViewer
             this.noFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.noFlickerListView.FullRowSelect = true;
             this.noFlickerListView.HideSelection = false;
-            this.noFlickerListView.Location = new System.Drawing.Point(0, 25);
+            this.noFlickerListView.Location = new System.Drawing.Point(0, 0);
             this.noFlickerListView.Name = "noFlickerListView";
             this.noFlickerListView.ShowItemToolTips = true;
-            this.noFlickerListView.Size = new System.Drawing.Size(463, 324);
+            this.noFlickerListView.Size = new System.Drawing.Size(463, 349);
             this.noFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.noFlickerListView.TabIndex = 3;
             this.noFlickerListView.UseCompatibleStateImageBehavior = false;
@@ -217,7 +217,7 @@ namespace SolimarLicenseViewer
             this.testConnSelToolStripMenuItem,
             this.testConnToAllToolStripMenuItem});
             this.lvContextMenuStrip.Name = "lvContextMenuStrip";
-            this.lvContextMenuStrip.Size = new System.Drawing.Size(253, 132);
+            this.lvContextMenuStrip.Size = new System.Drawing.Size(253, 154);
             this.lvContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.lvContextMenuStrip_Opening);
             // 
             // copyToolStripMenuItem
@@ -236,7 +236,7 @@ namespace SolimarLicenseViewer
             // 
             this.extendToolStripMenuItem.Name = "extendToolStripMenuItem";
             this.extendToolStripMenuItem.Size = new System.Drawing.Size(252, 22);
-            this.extendToolStripMenuItem.Text = "Extend";
+            this.extendToolStripMenuItem.Text = "Use Activation on License...";
             this.extendToolStripMenuItem.Click += new System.EventHandler(this.extendToolStripMenuItem_Click);
             // 
             // editConnToolStripSeparator
@@ -337,7 +337,7 @@ namespace SolimarLicenseViewer
             // refreshToolStripMenuItem
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripButton_Click);
             // 
