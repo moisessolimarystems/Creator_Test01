@@ -220,7 +220,7 @@ namespace Service.Creator
                 PacketName = packetName,
                 LicenseID = licRecord.ID,
                 PacketVerificationCode = verificationCode,
-                DateCreated = DateTime.Today,
+                DateCreated = DateTime.Now,
                 ExpiredDate = expDate,
                 IsVerified = false,
                 PacketComments = comments,
