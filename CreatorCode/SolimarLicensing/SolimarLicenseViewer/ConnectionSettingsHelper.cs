@@ -54,8 +54,8 @@ namespace SolimarLicenseViewer
                                         installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
                                     else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
                                         installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
+                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer);
                                 }
                             }
                         }
@@ -83,8 +83,8 @@ namespace SolimarLicenseViewer
                                         installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
                                     else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
                                         installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
+                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer);
                                 }
                             }
                         }
