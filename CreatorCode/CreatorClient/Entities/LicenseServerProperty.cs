@@ -173,8 +173,11 @@ namespace Client.Creator
                             Service<ICreator>.Use((client) =>
                             {
                                 TokenTable hwToken = client.GetTokenByLicenseName(Name, (byte)token.tokenType.TVal);
-                                if (hwToken.TokenStatus != 1)
-                                    bEnabled = false;
+                                if (hwToken != null)
+                                {
+                                    if (hwToken.TokenStatus != 1)
+                                        bEnabled = false;
+                                }
                             });
                             break;
                         }
