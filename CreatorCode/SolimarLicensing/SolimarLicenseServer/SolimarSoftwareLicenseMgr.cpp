@@ -1139,6 +1139,36 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 			}
 		}
 
+		// CR.FIX.11869.Item12 - Check to see what expiration date is
+		Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
+		hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs))).c_str(), &tmpFileInfo);
+		if(SUCCEEDED(hr))	// Will fail if this is a new license
+		{
+			SYSTEMTIME activationExpirationDateSystime;
+			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(tmpLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate)).c_str(), activationExpirationDateSystime))
+				throw(E_FAIL);
+			
+			_variant_t vtActivationExpirationDate(NULL);	
+			if (!SystemTimeToVariantTime(&activationExpirationDateSystime, &vtActivationExpirationDate.date)) 
+				throw(E_FAIL);
+			time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
+			time_t emptyExpiresDateTimeT = time_t(-1);
+			// CR.FIX.11869.Item12 - If the new package has an empty expiration date, see if there is a current expiration date
+			if(activationExpirationDateTimeT == emptyExpiresDateTimeT)	
+			{
+				BSTR tmpBstrSoftwareStream;	
+				hr = SoftwareLicenseFile::LoadFromLicenseFile(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicFileName)).c_str(), &tmpBstrSoftwareStream);
+				if(SUCCEEDED(hr))
+				{
+					Lic_PackageAttribs tmpOrigLicenseFileAttribs;
+					tmpOrigLicenseFileAttribs.InitFromString(tmpBstrSoftwareStream);
+					SysFreeString(tmpBstrSoftwareStream);
+					// CR.FIX.11869.Item12 - Use expiration date of existing package
+					tmpLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate = tmpOrigLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate;
+				}
+			}
+		}
+
 		tmpLicenseFileAttribs.licLicenseInfoAttribs.activationCurrent = currentActivations;
 
 		_bstr_t bstrHardwareKeyID = _bstr_t(L"");
