@@ -576,21 +576,9 @@ HRESULT LicenseCacheByProduct::ModuleLicenseReleaseByApp(BSTR licenseID, long mo
 
 		if(modSpecUnlimitedValue != 0)
 		{
-			// calculate the module inuse amount of all the licID with the given appID, 
-			// value might near Unlimited.
-			int currentModInuseByAppInst(0);
-			long tmpLicenseCount = 0;
-			for(LicenseToApplicationInstanceList::iterator licIdToAppIdIt = licenseToAppInstList.begin();
-				licIdToAppIdIt != licenseToAppInstList.end();
-				licIdToAppIdIt++)
-			{
-				if(_wcsicmp(appInst, licIdToAppIdIt->second) == 0)
-				{
-					hr = ModuleLicenseInUseByApp(licIdToAppIdIt->first, moduleIdent, &tmpLicenseCount);
-					if(SUCCEEDED(hr))
-						currentModInuseByAppInst += tmpLicenseCount;
-				}
-			}
+			// CR.FIX.11869.Item14 - calculate the module inuse amount of all the licID with the given appID, value might near Unlimited.
+			long currentModInuseByAppInst(0);
+			ModuleLicenseInUseByApp(licenseID, moduleIdent, &currentModInuseByAppInst);
 
 			// look at software spec, if currentModInuseByAppInst is at or near unlimited amount
 			if(currentModInuseByAppInst == 0)
