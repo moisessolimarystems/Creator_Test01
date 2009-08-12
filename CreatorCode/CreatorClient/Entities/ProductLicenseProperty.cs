@@ -28,6 +28,7 @@ namespace Client.Creator
             OrderStatus,
             ExpirationDate,
             ProductVersion,
+            ParentOrderNumber,
             AppInstance
         }
 
@@ -206,6 +207,7 @@ namespace Client.Creator
                             setDate = CurrentExpirationDate;
                             break;
                         default:
+                            throw new Exception("Invalid Product License State");
                             break;
                     }                   
                     _orderRec.OrderState = (byte)value;
@@ -214,12 +216,20 @@ namespace Client.Creator
             }
         }
 
+        [Browsable(false)]
         [Category("Product License"), PropertyOrder(3)]
         [DisplayName("Parent Product License Number")]
         [ReadOnly(true)]
         public string ParentOrderNumber
         {
-            get { return _orderRec.ParentOrderNumber; }
+            get 
+            {
+                if (_orderRec.ParentOrderNumber != null)
+                    SetBrowsableOrderAttribStatus(OrderAttributes.ParentOrderNumber, true);
+                else
+                    SetBrowsableOrderAttribStatus(OrderAttributes.ParentOrderNumber, false);
+                return _orderRec.ParentOrderNumber; 
+            }
             set { _orderRec.ParentOrderNumber = value; }
         }
 

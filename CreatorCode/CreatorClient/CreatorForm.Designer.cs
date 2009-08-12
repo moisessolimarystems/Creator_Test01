@@ -135,7 +135,6 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.addHardwareKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.deactivateTokenToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.activateToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.PacketContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.verifyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -164,6 +163,9 @@
             this.newFailoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newDisRecToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newTestDevToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.verifiedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.unVerifiedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lcmToolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.createPacketFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -1271,8 +1273,7 @@
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addHardwareKeyToolStripButton,
-            this.deactivateTokenToolStripButton,
-            this.activateToolStripButton});
+            this.deactivateTokenToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(832, 25);
@@ -1300,17 +1301,6 @@
             this.deactivateTokenToolStripButton.Size = new System.Drawing.Size(23, 22);
             this.deactivateTokenToolStripButton.Text = "Deactivate Hardware Key";
             this.deactivateTokenToolStripButton.Click += new System.EventHandler(this.deactivateTokenToolStripButton_Click);
-            // 
-            // activateToolStripButton
-            // 
-            this.activateToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.activateToolStripButton.Enabled = false;
-            this.activateToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("activateToolStripButton.Image")));
-            this.activateToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.activateToolStripButton.Name = "activateToolStripButton";
-            this.activateToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.activateToolStripButton.Text = "Activate Hardware Key";
-            this.activateToolStripButton.Click += new System.EventHandler(this.activateToolStripButton_Click);
             // 
             // statusStrip1
             // 
@@ -1414,10 +1404,11 @@
             this.deleteToolStripMenuItem,
             this.lcmToolStripSeparator2,
             this.addToolStripMenuItem,
+            this.toolStripMenuItem2,
             this.lcmToolStripSeparator3,
             this.createPacketFileToolStripMenuItem});
             this.LicenseContextMenuStrip.Name = "LicenseContextMenuStrip";
-            this.LicenseContextMenuStrip.Size = new System.Drawing.Size(188, 154);
+            this.LicenseContextMenuStrip.Size = new System.Drawing.Size(188, 176);
             // 
             // expandToolStripMenuItem
             // 
@@ -1533,6 +1524,27 @@
             this.newTestDevToolStripMenuItem.Size = new System.Drawing.Size(258, 22);
             this.newTestDevToolStripMenuItem.Text = "Test Development License Server...";
             this.newTestDevToolStripMenuItem.Click += new System.EventHandler(this.newTestDevLicenseToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.verifiedToolStripMenuItem,
+            this.unVerifiedToolStripMenuItem});
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(187, 22);
+            this.toolStripMenuItem2.Text = "Transfer";
+            // 
+            // verifiedToolStripMenuItem
+            // 
+            this.verifiedToolStripMenuItem.Name = "verifiedToolStripMenuItem";
+            this.verifiedToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.verifiedToolStripMenuItem.Text = "Verified ";
+            // 
+            // unVerifiedToolStripMenuItem
+            // 
+            this.unVerifiedToolStripMenuItem.Name = "unVerifiedToolStripMenuItem";
+            this.unVerifiedToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.unVerifiedToolStripMenuItem.Text = "UnVerified";
             // 
             // lcmToolStripSeparator3
             // 
@@ -1772,7 +1784,6 @@
         private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton deactivateTokenToolStripButton;
         private System.Windows.Forms.ToolStripComboBox moduleFilterToolStripComboBox;
-        private System.Windows.Forms.ToolStripButton activateToolStripButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripButton navigateBackToolStripButton;
         private System.Windows.Forms.ToolStripButton activateHardwareKeyToolStripButton;
@@ -1780,6 +1791,9 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton reserveHardwareKeyToolStripButton;
         private System.Windows.Forms.ToolStripButton deactivateHardwareKeyToolStripButton;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem verifiedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem unVerifiedToolStripMenuItem;
 
     }
 }

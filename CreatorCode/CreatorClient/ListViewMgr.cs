@@ -77,21 +77,17 @@ namespace Client.Creator
             if (columnIndex == _lvwColumnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.
-                if (_lvwColumnSorter.Order == SortOrder.Ascending)
-                {
+                if (_lvwColumnSorter.Order == SortOrder.Ascending || _lvwColumnSorter.Order == SortOrder.None)
                     _lvwColumnSorter.Order = SortOrder.Descending;
-                }
-                else
-                {
-                    _lvwColumnSorter.Order = SortOrder.Ascending;
-                }
+                else if (_lvwColumnSorter.Order == SortOrder.Descending)
+                    _lvwColumnSorter.Order = SortOrder.Ascending;                     
             }
             else
             {
                 SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
                 // Set the column number that is to be sorted; default to ascending.
                 _lvwColumnSorter.SortColumn = columnIndex;
-                _lvwColumnSorter.Order = SortOrder.Ascending;
+                _lvwColumnSorter.Order = SortOrder.None;
             }
             SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
             SetSelectedColumnColor(handle, columnIndex);
