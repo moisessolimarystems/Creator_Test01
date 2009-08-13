@@ -52,9 +52,7 @@ namespace Client.Creator
             else if (e.Data is PacketDialogData)
                 LoadPacketTabPage(e.Data as PacketDialogData);
             else if (e.Data is OrderDialogData)
-                LoadOrderTabPage(e.Data as OrderDialogData);
-            else
-                LoadHardwareKeyTabPage(e.Data as HardwareKeyDialogData);            
+                LoadOrderTabPage(e.Data as OrderDialogData);         
         }
 
         private void LicenseInfoForm_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
@@ -72,13 +70,11 @@ namespace Client.Creator
                 SavePacketTabPage(e.Data as PacketDialogData);
             else if (e.Data is OrderDialogData)
                 SaveOrderTabPage(e.Data as OrderDialogData);
-            else
-                SaveHardwareKeyTabPage();
         }
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (licInfoTabControl.SelectedTab == TokenTabPage)
+            if (tokenGroupBox.Parent == topPanel)
                 ValidateTokenForm();
         }
 
@@ -147,7 +143,10 @@ namespace Client.Creator
                         {
                             //should only add products that exist in the standard license
                             //and haven't already been added.
-                            string licenseBase = string.Format("{0:x4}-{1:x3}-{2:x4}-P01", orderData.LicenseInfo.CustID, orderData.LicenseInfo.DestID, orderData.LicenseInfo.GroupID);
+                            string licenseBase = "P";
+                            LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", orderData.LicenseInfo.CustID, orderData.LicenseInfo.DestID, orderData.LicenseInfo.GroupID, licenseBase), false);
+                            if (baseLicRec == null) //subscription type                            
+                                licenseBase = "S";                                                           
                             int pos = productSpec.productName.TVal.IndexOf("Test");
                             //1) call twice, once with product, then product test
                             //2) call once with product and add only when 1 order(standard) found
@@ -208,16 +207,6 @@ namespace Client.Creator
                     {
                         destNameComboBox.Items.Add(dn.DestName);
                     }
-                    if (destNameComboBox.Items.Count == 0) //add base customer
-                    {
-                        selectedDestName = client.GetCustomer(licData.LicInfo.CustID.ToString(), false).SCRname;
-                        DestinationNameTable baseDestination = new DestinationNameTable();
-                        baseDestination.CustID = (int)licData.LicInfo.CustID;
-                        baseDestination.DestID = (int)licData.LicInfo.DestID;
-                        baseDestination.DestName = selectedDestName;
-                        client.CreateDestinationName(baseDestination);
-                        destNameComboBox.Items.Add(selectedDestName);
-                    }
                 });
                 licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual);
                 licTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription);                
@@ -255,6 +244,7 @@ namespace Client.Creator
             //TODO : validate that the license does not already exist
             licData.LicInfo.LicType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)licTypeComboBox.SelectedItem;
             licData.LicInfo.Comments = licDescriptTextBox.Text;
+            licData.LicInfo.DestName = destNameComboBox.SelectedItem.ToString();
         }
         #endregion
 
@@ -264,7 +254,6 @@ namespace Client.Creator
             selectedObject = tokenData.LicInfo as Object;
             //hardware token get value from database
             btnOk.Enabled = true;
-            //licInfoTabControl.TabPages.Add(TokenTabPage);
             topPanel.Controls.Clear();
             tokenGroupBox.Parent = topPanel;
             //enabled when new token, ttNone passed in
@@ -439,19 +428,6 @@ namespace Client.Creator
                                 storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
                                 if (storedMod.moduleValue.TVal > 0)
                                 {                        
-                                    //if(storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.ad
-                                    //{
-                                    //    //std
-                                    //    storedMod.moduleAppInstance.TVal = 1;
-                                    //    if(GetTotalAddOnModuleAppInstance(moduleData,storedMod) > 0)
-                                    //        DecrementAddOnModuleAppInstance(moduleData, storedMod);
-                                    //}
-                                    //else
-                                    //{
-                                    //    //addon
-                                    //    if(GetTotalAddOnModuleAppInstance
-                                    //}
-
                                     if (GetTotalModuleAppInstance(moduleData, storedMod) == 0)
                                         storedMod.moduleAppInstance.TVal = 1;
                                     else //>1
@@ -574,87 +550,6 @@ namespace Client.Creator
         }
         #endregion
 
-        #region Hardware Key Methods
-        private void LoadHardwareKeyTabPage(HardwareKeyDialogData hardwareKeyData)        
-        {
-            topPanel.Controls.Clear();
-            hardwareKeyGroupBox.Parent = topPanel;
-            CustomerComboBox.Enabled = false;
-            KeyValueTextBox.Enabled = false;
-            activateCheckBox.Enabled = false;
-            if(hardwareKeyData.CustomerName.Length > 0)
-            {
-                CustomerComboBox.Items.Add(hardwareKeyData.CustomerName);
-                KeyValueTextBox.Text = hardwareKeyData.KeyValue;
-                activateCheckBox.Checked = true;
-                label10.Visible = true;
-                keyNameListView.Visible = true;
-                btnOk.Text = "Activate";
-            }
-            else
-            {
-                CustomerComboBox.Enabled = true;
-                KeyValueTextBox.Enabled = true;
-                activateCheckBox.Enabled = true;
-                List<CustomerTable> custList = null;          
-                Service<ICreator>.Use((client) =>
-                {
-                    custList = client.GetAllCustomers("", false);
-                });
-                foreach (CustomerTable cust in custList)
-                {
-                    CustomerComboBox.Items.Add(cust.SCRname);
-                }
-                activateCheckBox.Checked = false;
-            }
-            CustomerComboBox.SelectedIndex = 0;
-            RefreshKeyList();
-        }
-        private void SaveHardwareKeyTabPage()
-        {            
-            string[] value = KeyValueTextBox.Text.Split(new Char[] { '-' });
-            TokenTable newHardwareKey = new TokenTable();
-            newHardwareKey.TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
-            newHardwareKey.TokenValue = KeyValueTextBox.Text;
-            newHardwareKey.LicenseID = -1;
-            newHardwareKey.CustID = Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber);
-            if (activateCheckBox.Checked)
-            {
-                KeyProgramVerification(AvailableKeysListBox.SelectedItem.ToString(),
-                                       Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
-                                       Int32.Parse(value[1], System.Globalization.NumberStyles.HexNumber));
-                newHardwareKey.TokenStatus = 1;
-                if (activateCheckBox.Enabled)
-                {
-                    Service<ICreator>.Use((client) =>
-                    {
-                        client.CreateToken(newHardwareKey);
-                    });
-                }
-                else
-                {
-                    //update
-                    TokenTable selectedToken = null;
-                    Service<ICreator>.Use((client) =>
-                    {
-                        selectedToken = client.GetHardwareTokenByKeyValue(KeyValueTextBox.Text);
-                        selectedToken.TokenStatus = 1;
-                        client.UpdateToken(selectedToken);
-                    });
-                }
-            }
-            else
-            {
-                newHardwareKey.TokenStatus = 0;
-                Service<ICreator>.Use((client) =>
-                {
-                    client.CreateToken(newHardwareKey);
-                });
-            }
-
-        }
-        #endregion
-
         #region LicenseTabPage Events
 
         private void licTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -667,7 +562,7 @@ namespace Client.Creator
                     licInfo.GroupID = client.GetNextGroupID(licInfo.CustID, licInfo.DestID);                               
                 licInfo.LicInfo.softwareLicTypeIndex.TVal = (uint)(client.GetLicenseCountByType(licInfo.CustID, licInfo.DestID, licInfo.GroupID, licInfo.LicType) + 1);
             });
-            licNameTextBox.Text = licInfo.Name;
+            licNameTextBox.Text = licInfo.Name;            
         }
 
         //valid, existing dest name chosen from list in box
@@ -783,7 +678,8 @@ namespace Client.Creator
                     this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
 
                     // Set the ErrorProvider error with the text to display.
-                    errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+                    //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+                    MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             });
             Cursor.Current = Cursors.Default; 
@@ -799,12 +695,6 @@ namespace Client.Creator
                 tokenValue = client.GetNextHardwareTokenValue((uint)custRec.SCRnumber);
             });
             return string.Format("{0:x4}-{1:x4}", custRec.SCRnumber, tokenValue);
-        }
-
-        private void CustomerComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-           if(activateCheckBox.Enabled)
-                KeyValueTextBox.Text = GetNextAvailableHardwareKey(CustomerComboBox.SelectedItem.ToString());
         }
 
         private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -829,9 +719,7 @@ namespace Client.Creator
                     {
                         IList<TokenTable> tokenList = client.GetAvailableHardwareTokensByCustID(selectedOrder.CustID);
                         foreach (TokenTable token in tokenList)
-                        {
-                            //ListViewItem lvItem = new ListViewItem();
-                            //lvItem.Text = token.TokenValue;                            
+                        {                       
                             keyNameListView.Items.Add(token.TokenValue);
                         }
                     });
@@ -857,99 +745,6 @@ namespace Client.Creator
             btnOk.Enabled = tokenValueTextBox.Text.Length > 0;
         }
         
-        private void programBtn_Click(object sender, EventArgs e)
-        {
-            string[] value = tokenValueTextBox.Text.Split(new Char[] { '-' });
-             
-            KeyProgramVerification(keyNameListView.SelectedItems[0].Text, 
-                                   Int32.Parse(value[0], System.Globalization.NumberStyles.HexNumber),
-                                   Int32.Parse(value[1], System.Globalization.NumberStyles.HexNumber));
-        }
-
-        private void KeyProgramVerification(string keyInfo, int custID, int keyID)
-        {
-            using (BackgroundWorker worker = new BackgroundWorker())
-            {
-                worker.DoWork += ((sender, e) => ProgramVerification(keyInfo, custID, keyID));
-                worker.RunWorkerCompleted += ((sender, e) => OnProgrammedKey());
-                worker.RunWorkerAsync();
-            }
-            loadingCircle1.Visible = true;
-            loadingCircle1.Active = true;
-            btnOk.Enabled = false;
-            //refreshBtn.Enabled = false;
-        }
-
-        private void ProgramVerification(string keyInfo, int custID, int keyID)
-        {
-            Service<ICreator>.Use((client) => 
-            {
-                client.KeyProgramVerification(keyInfo, custID, keyID);
-            });
-        }
-
-        private void OnProgrammedKey()
-        {
-            loadingCircle1.Active = false;
-            loadingCircle1.Visible = false;
-            btnOk.Enabled = true;
-            //refreshBtn.Enabled = true;
-            //RefreshKeyList();
-        }
-
-        private void refreshBtn_Click(object sender, EventArgs e)
-        {
-            RefreshKeyList();
-        }
-
-        private void RefreshKeyList()
-        {
-            using (BackgroundWorker worker = new BackgroundWorker())
-            {
-                IList<SolimarLicenseProtectionKeyInfo> data = null;
-                worker.DoWork += ((sender, e) => data = LoadKeyNameListBox());
-                worker.RunWorkerCompleted += ((sender, e) => OnRefreshedKey(data));
-                worker.RunWorkerAsync();
-            }
-            btnOk.Enabled = false;
-            loadingCircle1.Visible = true;
-            loadingCircle1.Active = true;
-        }
-
-        private void OnRefreshedKey(IList<SolimarLicenseProtectionKeyInfo> keys)
-        {
-            //keyNameListBox.Items.Clear();
-            AvailableKeysListBox.Items.Clear();
-            if (keys != null)
-            {
-                if (keys.Count > 0)
-                {
-                    foreach (SolimarLicenseProtectionKeyInfo key in keys)
-                    {
-                        //if (key.IsKeyTypeUninitialized())
-                        //{
-                        //keyNameListBox.Items.Add(key.keyName);
-                        AvailableKeysListBox.Items.Add(key.keyName);
-                        //}
-                    }
-                }
-                if (AvailableKeysListBox.Items.Count < 1)
-                {
-                    AvailableKeysListBox.Items.Add("No Keys Attached");
-                    AvailableKeysListBox.Enabled = false;
-                    btnOk.Enabled = false;
-                }
-                else
-                {
-                    AvailableKeysListBox.Enabled = true;
-                    AvailableKeysListBox.SelectedIndex = 0;
-                    btnOk.Enabled = true;
-                }
-            }
-            loadingCircle1.Active = false;
-            loadingCircle1.Visible = false;
-        }
-
         private IList<SolimarLicenseProtectionKeyInfo> LoadKeyNameListBox()
         {
             IList<SolimarLicenseProtectionKeyInfo> pkeyList = null;
@@ -1058,8 +853,6 @@ namespace Client.Creator
         }
         #endregion
 
-
-
         private string GetCSVTokenAlias(string tokenType)
         {
             string retVal = "";
@@ -1106,35 +899,6 @@ namespace Client.Creator
                 catch (Exception)
                 {
                 }
-            }
-        }
-
-        private void CustomerComboBox_TextChanged(object sender, EventArgs e)
-        {            
-            //autocomplete
-            if (CustomerComboBox.Items.IndexOf(CustomerComboBox.Text) >= 0)
-            {
-                if(activateCheckBox.Enabled)
-                    KeyValueTextBox.Text = GetNextAvailableHardwareKey(CustomerComboBox.Text);
-                btnOk.Enabled = true;
-            }
-            else
-                btnOk.Enabled = false;
-        }
-
-        private void activateCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (activateCheckBox.Checked)
-            {
-                btnOk.Text = "Activate";
-                label10.Visible = true;
-                AvailableKeysListBox.Visible = true;
-            }
-            else
-            {
-                btnOk.Text = "Reserve";
-                label10.Visible = false;
-                AvailableKeysListBox.Visible = false;
             }
         }
 

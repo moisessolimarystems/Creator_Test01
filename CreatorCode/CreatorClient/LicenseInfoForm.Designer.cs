@@ -59,9 +59,9 @@
             this.moduleGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.modNameLabel = new System.Windows.Forms.Label();
-            this.modValueNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.modValueLabel = new System.Windows.Forms.Label();
             this.modNameComboBox = new System.Windows.Forms.ComboBox();
+            this.modValueNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.PacketTabPage = new System.Windows.Forms.TabPage();
             this.packetGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
@@ -89,17 +89,6 @@
             this.ProductLicenseProductComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.HardwareKeyTabPage = new System.Windows.Forms.TabPage();
-            this.hardwareKeyGroupBox = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.label8 = new System.Windows.Forms.Label();
-            this.CustomerComboBox = new System.Windows.Forms.ComboBox();
-            this.AvailableKeysListBox = new System.Windows.Forms.ListBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.KeyValueTextBox = new System.Windows.Forms.TextBox();
-            this.activateCheckBox = new System.Windows.Forms.CheckBox();
-            this.loadingCircle1 = new Shared.VisualComponents.LoadingCircle();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -121,9 +110,6 @@
             this.orderTabPage.SuspendLayout();
             this.orderGroupBox.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
-            this.HardwareKeyTabPage.SuspendLayout();
-            this.hardwareKeyGroupBox.SuspendLayout();
-            this.tableLayoutPanel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -156,7 +142,6 @@
             this.licInfoTabControl.Controls.Add(this.ModuleTabPage);
             this.licInfoTabControl.Controls.Add(this.PacketTabPage);
             this.licInfoTabControl.Controls.Add(this.orderTabPage);
-            this.licInfoTabControl.Controls.Add(this.HardwareKeyTabPage);
             this.licInfoTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.licInfoTabControl.Location = new System.Drawing.Point(20, 10);
             this.licInfoTabControl.Margin = new System.Windows.Forms.Padding(1);
@@ -339,7 +324,7 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
@@ -373,10 +358,10 @@
             // 
             this.tokenValueTextBox.CausesValidation = false;
             this.tokenValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tokenValueTextBox.Location = new System.Drawing.Point(155, 36);
+            this.tokenValueTextBox.Location = new System.Drawing.Point(153, 36);
             this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
-            this.tokenValueTextBox.Size = new System.Drawing.Size(170, 20);
+            this.tokenValueTextBox.Size = new System.Drawing.Size(168, 20);
             this.tokenValueTextBox.TabIndex = 0;
             this.tokenValueTextBox.TextChanged += new System.EventHandler(this.tokenValueTextBox_TextChanged);
             this.tokenValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenValueTextBox_KeyUp);
@@ -387,10 +372,10 @@
             this.tokenTypeComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
-            this.tokenTypeComboBox.Location = new System.Drawing.Point(155, 5);
+            this.tokenTypeComboBox.Location = new System.Drawing.Point(153, 5);
             this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
-            this.tokenTypeComboBox.Size = new System.Drawing.Size(170, 21);
+            this.tokenTypeComboBox.Size = new System.Drawing.Size(168, 21);
             this.tokenTypeComboBox.TabIndex = 1;
             this.tokenTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.tokenTypeComboBox_SelectedIndexChanged);
             this.tokenTypeComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenTypeComboBox_KeyUp);
@@ -421,7 +406,7 @@
             // browseTokenFileButton
             // 
             this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.browseTokenFileButton.Location = new System.Drawing.Point(325, 35);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(321, 35);
             this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
             this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
@@ -439,11 +424,11 @@
             this.keyNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.keyNameListView.FullRowSelect = true;
             this.keyNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.keyNameListView.Location = new System.Drawing.Point(155, 66);
+            this.keyNameListView.Location = new System.Drawing.Point(153, 66);
             this.keyNameListView.Margin = new System.Windows.Forms.Padding(5);
             this.keyNameListView.MultiSelect = false;
             this.keyNameListView.Name = "keyNameListView";
-            this.keyNameListView.Size = new System.Drawing.Size(241, 97);
+            this.keyNameListView.Size = new System.Drawing.Size(243, 97);
             this.keyNameListView.TabIndex = 10;
             this.keyNameListView.UseCompatibleStateImageBehavior = false;
             this.keyNameListView.View = System.Windows.Forms.View.Details;
@@ -484,13 +469,16 @@
             // tableLayoutPanel3
             // 
             this.tableLayoutPanel3.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel3.ColumnCount = 2;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 31.76179F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 68.23821F));
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 128F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.Controls.Add(this.modNameLabel, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.modValueNumericUpDown, 1, 1);
             this.tableLayoutPanel3.Controls.Add(this.modValueLabel, 0, 1);
             this.tableLayoutPanel3.Controls.Add(this.modNameComboBox, 1, 0);
+            this.tableLayoutPanel3.Controls.Add(this.modValueNumericUpDown, 1, 1);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -512,19 +500,6 @@
             this.modNameLabel.TabIndex = 0;
             this.modNameLabel.Text = "Module Name:";
             // 
-            // modValueNumericUpDown
-            // 
-            this.modValueNumericUpDown.Location = new System.Drawing.Point(134, 35);
-            this.modValueNumericUpDown.Margin = new System.Windows.Forms.Padding(5);
-            this.modValueNumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.modValueNumericUpDown.Name = "modValueNumericUpDown";
-            this.modValueNumericUpDown.Size = new System.Drawing.Size(95, 20);
-            this.modValueNumericUpDown.TabIndex = 6;
-            // 
             // modValueLabel
             // 
             this.modValueLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -539,13 +514,28 @@
             // modNameComboBox
             // 
             this.modNameComboBox.BackColor = System.Drawing.SystemColors.Window;
+            this.tableLayoutPanel3.SetColumnSpan(this.modNameComboBox, 2);
             this.modNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.modNameComboBox.FormattingEnabled = true;
-            this.modNameComboBox.Location = new System.Drawing.Point(134, 5);
+            this.modNameComboBox.Location = new System.Drawing.Point(133, 5);
             this.modNameComboBox.Margin = new System.Windows.Forms.Padding(5);
             this.modNameComboBox.Name = "modNameComboBox";
-            this.modNameComboBox.Size = new System.Drawing.Size(192, 21);
+            this.modNameComboBox.Size = new System.Drawing.Size(151, 21);
             this.modNameComboBox.TabIndex = 5;
+            // 
+            // modValueNumericUpDown
+            // 
+            this.tableLayoutPanel3.SetColumnSpan(this.modValueNumericUpDown, 2);
+            this.modValueNumericUpDown.Location = new System.Drawing.Point(133, 35);
+            this.modValueNumericUpDown.Margin = new System.Windows.Forms.Padding(5);
+            this.modValueNumericUpDown.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.modValueNumericUpDown.Name = "modValueNumericUpDown";
+            this.modValueNumericUpDown.Size = new System.Drawing.Size(69, 20);
+            this.modValueNumericUpDown.TabIndex = 6;
             // 
             // PacketTabPage
             // 
@@ -573,7 +563,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 48F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -609,7 +599,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(358, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(354, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -621,21 +611,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(111, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(110, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(242, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(239, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(111, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(110, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(242, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(239, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -663,11 +653,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(111, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(110, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(242, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(239, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -685,11 +675,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(111, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(110, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(242, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(239, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -873,150 +863,6 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Product:";
             // 
-            // HardwareKeyTabPage
-            // 
-            this.HardwareKeyTabPage.Controls.Add(this.hardwareKeyGroupBox);
-            this.HardwareKeyTabPage.Location = new System.Drawing.Point(4, 22);
-            this.HardwareKeyTabPage.Name = "HardwareKeyTabPage";
-            this.HardwareKeyTabPage.Size = new System.Drawing.Size(427, 257);
-            this.HardwareKeyTabPage.TabIndex = 5;
-            this.HardwareKeyTabPage.Text = "Hardware Key";
-            this.HardwareKeyTabPage.UseVisualStyleBackColor = true;
-            // 
-            // hardwareKeyGroupBox
-            // 
-            this.hardwareKeyGroupBox.Controls.Add(this.tableLayoutPanel6);
-            this.hardwareKeyGroupBox.Controls.Add(this.loadingCircle1);
-            this.hardwareKeyGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hardwareKeyGroupBox.Location = new System.Drawing.Point(0, 0);
-            this.hardwareKeyGroupBox.Name = "hardwareKeyGroupBox";
-            this.hardwareKeyGroupBox.Padding = new System.Windows.Forms.Padding(10);
-            this.hardwareKeyGroupBox.Size = new System.Drawing.Size(427, 257);
-            this.hardwareKeyGroupBox.TabIndex = 0;
-            this.hardwareKeyGroupBox.TabStop = false;
-            // 
-            // tableLayoutPanel6
-            // 
-            this.tableLayoutPanel6.ColumnCount = 3;
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 57.77778F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 42.22222F));
-            this.tableLayoutPanel6.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 142F));
-            this.tableLayoutPanel6.Controls.Add(this.label8, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.CustomerComboBox, 1, 0);
-            this.tableLayoutPanel6.Controls.Add(this.AvailableKeysListBox, 1, 2);
-            this.tableLayoutPanel6.Controls.Add(this.label10, 0, 2);
-            this.tableLayoutPanel6.Controls.Add(this.label9, 0, 1);
-            this.tableLayoutPanel6.Controls.Add(this.KeyValueTextBox, 1, 1);
-            this.tableLayoutPanel6.Controls.Add(this.activateCheckBox, 2, 1);
-            this.tableLayoutPanel6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel6.Location = new System.Drawing.Point(10, 23);
-            this.tableLayoutPanel6.Name = "tableLayoutPanel6";
-            this.tableLayoutPanel6.RowCount = 4;
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 82F));
-            this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 8F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(407, 224);
-            this.tableLayoutPanel6.TabIndex = 6;
-            // 
-            // label8
-            // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(3, 9);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(109, 13);
-            this.label8.TabIndex = 2;
-            this.label8.Text = "Choose Customer:";
-            // 
-            // CustomerComboBox
-            // 
-            this.tableLayoutPanel6.SetColumnSpan(this.CustomerComboBox, 2);
-            this.CustomerComboBox.FormattingEnabled = true;
-            this.CustomerComboBox.Location = new System.Drawing.Point(158, 5);
-            this.CustomerComboBox.Margin = new System.Windows.Forms.Padding(5);
-            this.CustomerComboBox.Name = "CustomerComboBox";
-            this.CustomerComboBox.Size = new System.Drawing.Size(207, 21);
-            this.CustomerComboBox.TabIndex = 0;
-            this.CustomerComboBox.SelectedIndexChanged += new System.EventHandler(this.CustomerComboBox_SelectedIndexChanged);
-            this.CustomerComboBox.TextChanged += new System.EventHandler(this.CustomerComboBox_TextChanged);
-            // 
-            // AvailableKeysListBox
-            // 
-            this.tableLayoutPanel6.SetColumnSpan(this.AvailableKeysListBox, 2);
-            this.AvailableKeysListBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AvailableKeysListBox.FormattingEnabled = true;
-            this.AvailableKeysListBox.Location = new System.Drawing.Point(158, 66);
-            this.AvailableKeysListBox.Margin = new System.Windows.Forms.Padding(5);
-            this.AvailableKeysListBox.Name = "AvailableKeysListBox";
-            this.AvailableKeysListBox.Size = new System.Drawing.Size(244, 69);
-            this.AvailableKeysListBox.TabIndex = 1;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(3, 71);
-            this.label10.Margin = new System.Windows.Forms.Padding(3, 10, 3, 0);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(118, 26);
-            this.label10.TabIndex = 4;
-            this.label10.Text = "Available Attached Keys:";
-            // 
-            // label9
-            // 
-            this.label9.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(3, 39);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(137, 13);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "Hardware Key Number:";
-            // 
-            // KeyValueTextBox
-            // 
-            this.KeyValueTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.KeyValueTextBox.Location = new System.Drawing.Point(158, 36);
-            this.KeyValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 1, 5);
-            this.KeyValueTextBox.Name = "KeyValueTextBox";
-            this.KeyValueTextBox.ReadOnly = true;
-            this.KeyValueTextBox.Size = new System.Drawing.Size(105, 20);
-            this.KeyValueTextBox.TabIndex = 1;
-            // 
-            // activateCheckBox
-            // 
-            this.activateCheckBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.activateCheckBox.AutoSize = true;
-            this.activateCheckBox.Checked = true;
-            this.activateCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.activateCheckBox.Location = new System.Drawing.Point(267, 39);
-            this.activateCheckBox.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
-            this.activateCheckBox.Name = "activateCheckBox";
-            this.activateCheckBox.Size = new System.Drawing.Size(65, 17);
-            this.activateCheckBox.TabIndex = 5;
-            this.activateCheckBox.Text = "Activate";
-            this.activateCheckBox.UseVisualStyleBackColor = true;
-            this.activateCheckBox.CheckedChanged += new System.EventHandler(this.activateCheckBox_CheckedChanged);
-            // 
-            // loadingCircle1
-            // 
-            this.loadingCircle1.Active = false;
-            this.loadingCircle1.Color = System.Drawing.Color.DarkGray;
-            this.loadingCircle1.DisplayText = null;
-            this.loadingCircle1.InnerCircleRadius = 6;
-            this.loadingCircle1.Location = new System.Drawing.Point(263, 31);
-            this.loadingCircle1.Name = "loadingCircle1";
-            this.loadingCircle1.NumberSpoke = 9;
-            this.loadingCircle1.OuterCircleRadius = 7;
-            this.loadingCircle1.RotationSpeed = 100;
-            this.loadingCircle1.Size = new System.Drawing.Size(115, 67);
-            this.loadingCircle1.SpokeThickness = 4;
-            this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.Firefox;
-            this.loadingCircle1.TabIndex = 5;
-            this.loadingCircle1.Text = "loadingCircle1";
-            // 
             // errorProvider1
             // 
             this.errorProvider1.ContainerControl = this;
@@ -1060,10 +906,6 @@
             this.orderGroupBox.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
-            this.HardwareKeyTabPage.ResumeLayout(false);
-            this.hardwareKeyGroupBox.ResumeLayout(false);
-            this.tableLayoutPanel6.ResumeLayout(false);
-            this.tableLayoutPanel6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
 
@@ -1109,16 +951,7 @@
         private System.Windows.Forms.TextBox productLicenseDescriptionTextBox;
         private System.Windows.Forms.MaskedTextBox productLicenseVersionMaskedTextBox;
         private System.Windows.Forms.ErrorProvider errorProvider1;
-        private System.Windows.Forms.TabPage HardwareKeyTabPage;
-        private System.Windows.Forms.GroupBox hardwareKeyGroupBox;
-        private System.Windows.Forms.TextBox KeyValueTextBox;
-        private System.Windows.Forms.ComboBox CustomerComboBox;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.ListBox AvailableKeysListBox;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox expDateTextBox;
-        private Shared.VisualComponents.LoadingCircle loadingCircle1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label licDescriptLabel;
         private System.Windows.Forms.Label licTypeLabel;
@@ -1136,11 +969,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.GroupBox orderGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel5;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel6;
         private System.Windows.Forms.TextBox packetExpDateTextBox;
         private System.Windows.Forms.Button browseTokenFileButton;
         private System.Windows.Forms.OpenFileDialog browseCSVOpenFileDialog;
-        private System.Windows.Forms.CheckBox activateCheckBox;
         private System.Windows.Forms.ListView keyNameListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
