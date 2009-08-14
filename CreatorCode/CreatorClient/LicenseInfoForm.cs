@@ -668,20 +668,20 @@ namespace Client.Creator
         {
             Cursor.Current = Cursors.WaitCursor;
             m_Validated = true;
-            Service<ICreator>.Use((client) =>
-            {
-                LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
-                if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
-                {
-                    m_Validated = false;
-                    this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
+            //Service<ICreator>.Use((client) =>
+            //{
+            //    LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+            //    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
+            //    if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
+            //    {
+            //        m_Validated = false;
+            //        this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
 
-                    // Set the ErrorProvider error with the text to display.
-                    //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-                    MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            });
+            //        // Set the ErrorProvider error with the text to display.
+            //        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+            //        MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    }
+            //});
             Cursor.Current = Cursors.Default; 
         }
 
