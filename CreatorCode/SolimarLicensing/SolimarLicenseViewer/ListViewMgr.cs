@@ -102,9 +102,8 @@ namespace SolimarLicenseViewer
             tmpTSItemList.Add(new ToolStripLabel());
 
             m_moduleFilterComboBox = new ToolStripComboBox();
-            m_moduleFilterComboBox.Items.Add(AppConstants.AllItem);
-            m_moduleFilterComboBox.Items.Add(AppConstants.ExpiredItem);
-            m_moduleFilterComboBox.Items.Add(AppConstants.NonExpiredItem);
+            m_moduleFilterComboBox.Items.Add(AppConstants.GroupByModuleItem);
+            m_moduleFilterComboBox.Items.Add(AppConstants.DetailsItem);
             m_moduleFilterComboBox.Alignment = ToolStripItemAlignment.Right;
             m_moduleFilterComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             m_moduleFilterComboBox.SelectedIndex = 0;
@@ -369,10 +368,20 @@ namespace SolimarLicenseViewer
                         colHeader.Tag = typeof(int);
                         TheListView.Columns.Add(colHeader);
 
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.ExpirationHeader;
-                        colHeader.Tag = typeof(DateTime);
-                        TheListView.Columns.Add(colHeader);
+                        if (m_moduleFilterComboBox.SelectedIndex == 0/*GroupBy*/)
+                        {
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.AppInstanceExpiredHeader;
+                            colHeader.Tag = typeof(int);
+                            TheListView.Columns.Add(colHeader);
+                        }
+                        else
+                        {
+                            colHeader = new ColumnHeader();
+                            colHeader.Text = AppConstants.ExpirationHeader;
+                            colHeader.Tag = typeof(DateTime);
+                            TheListView.Columns.Add(colHeader);
+                        }
                     }
                     #endregion
                     #region else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)
@@ -507,9 +516,9 @@ namespace SolimarLicenseViewer
                         toolTipBuilder.Append(licInfoAttrib.activationAmountInDays.TVal.ToString());
 
                         if (licInfoAttrib.activationCurrent.TVal < licInfoAttrib.activationTotal.TVal)
-                            m_EnableDisasterRecoverExt = true;
+                            enableActivationByLicense[softwareLicense] = true;  //m_EnableDisasterRecoverExt = true;
                         else
-                            m_EnableDisasterRecoverExt = false;
+                            enableActivationByLicense[softwareLicense] = false;  //m_EnableDisasterRecoverExt = false;
                         lvItem.SubItems.Add(licInfoAttrib.activationExpirationDate.TVal.ToLocalTime().ToString());
                         lvItem.SubItems.Add(licInfoAttrib.activationCurrent.TVal.ToString());
                         lvItem.SubItems.Add(licInfoAttrib.activationTotal.TVal.ToString());
@@ -592,7 +601,6 @@ namespace SolimarLicenseViewer
         public void LoadModuleData()
         {
             int productID, moduleID;
-            int useCount = -1;
             String generalStream = "";
             Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             try
@@ -617,6 +625,7 @@ namespace SolimarLicenseViewer
                     this.TheListViewToolStrip.Visible = false;
                 }
 
+                bool bDisplayGroupByModule = m_moduleFilterComboBox.SelectedIndex == 0/*GroupBy*/;
 
                 m_CommLink.GetSoftwareLicenseInfoByLicense(m_TreeNode.Parent.Name, ref generalStream);
                 licInfoAttrib.AssignMembersFromStream(generalStream);
@@ -625,41 +634,112 @@ namespace SolimarLicenseViewer
                     productID = System.Convert.ToInt32(prodInfo.productID.ToString(), 16);
                     if (string.Equals(m_CommLink.GetProductName(productID), m_TreeNode.Text))
                     {
-                        System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
-                        bool bDisplayExpired = m_moduleFilterComboBox.SelectedIndex == 0/*All*/ || m_moduleFilterComboBox.SelectedIndex == 1/*Expired*/;
-                        bool bDisplayNonExpired = m_moduleFilterComboBox.SelectedIndex == 0/*All*/ || m_moduleFilterComboBox.SelectedIndex == 2/*NonExpired*/;
-                        foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
+                        if (bDisplayGroupByModule)    //Grouping
                         {
-                            if (modInfo.moduleAppInstance != 0 && modInfo.moduleValue != 0)
+                            //Entry - 1st: ValidModValueSum, 2nd: ValidModAppInstanceSum, 3rd: ExpiredModAppInstanceSum
+                            System.Collections.Generic.SortedDictionary<int, int[]> sumModInfoList = new SortedDictionary<int, int[]>();
+                            System.Collections.Generic.SortedDictionary<int, System.Collections.Generic.SortedList<DateTime, int>> modExpirationDateList = new SortedDictionary<int, System.Collections.Generic.SortedList<DateTime, int>>();
+                            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                             {
-                                //Get Module Info using product id and module id
-                                ListViewItem lvItem = new ListViewItem();
-                                moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
-                                lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
-                                if ((DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0) && (DateTime.Now.ToUniversalTime().CompareTo(modInfo.moduleExpirationDate.TVal) > 0))
+                                if (modInfo.moduleAppInstance != 0 && modInfo.moduleValue != 0)
                                 {
-                                    lvItem.ForeColor = System.Drawing.Color.Red;
-                                    if (!bDisplayExpired)
-                                        continue;
-                                }
-                                else
-                                {
-                                    lvItem.ForeColor = m_TreeNode.ForeColor;
-                                    if (!bDisplayNonExpired)
-                                        continue;
-                                }
+                                    moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
+                                    if (!sumModInfoList.ContainsKey(moduleID))
+                                        sumModInfoList.Add(moduleID, new int[3]);
 
-                                lvItem.SubItems.Add(System.Convert.ToInt32(modInfo.moduleValue.ToString(), 16).ToString());
-                                m_CommLink.SoftwareModuleLicenseInUseForAllByProduct(productID, moduleID, ref useCount);
-                                lvItem.SubItems.Add(System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16).ToString());
-                                if (DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0)
-                                    lvItem.SubItems.Add(modInfo.moduleExpirationDate.TVal.ToLocalTime().ToString());
+                                    bool bHasExpirationDate = (DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal)) != 0;
+
+                                    if (bHasExpirationDate)
+                                    {
+                                        if (!modExpirationDateList.ContainsKey(moduleID))
+                                            modExpirationDateList.Add(moduleID, new SortedList<DateTime, int>());
+
+                                        if (!modExpirationDateList[moduleID].ContainsKey(modInfo.moduleExpirationDate.TVal))
+                                            modExpirationDateList[moduleID].Add(modInfo.moduleExpirationDate.TVal, 0);
+                                        modExpirationDateList[moduleID][modInfo.moduleExpirationDate.TVal] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                    }
+
+                                    if ((bHasExpirationDate) && (DateTime.Now.ToUniversalTime().CompareTo(modInfo.moduleExpirationDate.TVal) > 0))
+                                    {
+                                        sumModInfoList[moduleID][2] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                    }
+                                    else //Not Expired
+                                    {
+                                        sumModInfoList[moduleID][0] += System.Convert.ToInt32(modInfo.moduleValue.ToString(), 16);
+                                        sumModInfoList[moduleID][1] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                    }
+                                }
+                            }
+                            //foreach(System.Collections.Generic.)
+                            System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
+                            foreach(System.Collections.Generic.KeyValuePair<int/*ModuleID*/, int[]> keyPair in sumModInfoList)
+                            {
+                                ListViewItem lvItem = new ListViewItem();
+                                lvItem.Text = m_CommLink.GetModuleName(productID, keyPair.Key);
+
+                                lvItem.SubItems.Add(keyPair.Value[0].ToString());
+                                lvItem.SubItems.Add(keyPair.Value[1].ToString());
+                                lvItem.SubItems.Add(keyPair.Value[2].ToString());
+
+                                if(keyPair.Value[0] == 0)
+                                    lvItem.ForeColor = System.Drawing.Color.Red;
                                 else
-                                    lvItem.SubItems.Add("Permanent");
+                                    lvItem.ForeColor = m_TreeNode.ForeColor;
+
+                                StringBuilder toolTipSB = new StringBuilder();
+                                if (modExpirationDateList.ContainsKey(keyPair.Key) == true)
+                                {
+                                    foreach(System.Collections.Generic.KeyValuePair<DateTime, int> dTimeToIntKVPair in modExpirationDateList[keyPair.Key])
+                                    {
+                                        if (toolTipSB.Length != 0)
+                                            toolTipSB.Append("\n");
+                                        toolTipSB.Append(dTimeToIntKVPair.Value.ToString());
+                                        if (dTimeToIntKVPair.Value > 1)
+                                            toolTipSB.Append(" Modules'");
+                                        else
+                                            toolTipSB.Append(" Module's");
+                                        toolTipSB.Append(" Application Instance");
+
+                                        if (DateTime.Now.ToUniversalTime().CompareTo(dTimeToIntKVPair.Key) > 0)
+                                            toolTipSB.Append(" expired on: ");
+                                        else
+                                            toolTipSB.Append(" will expire on: ");
+
+                                        toolTipSB.Append(dTimeToIntKVPair.Key.ToLocalTime().ToString());
+                                    }
+                                }
+                                lvItem.ToolTipText = toolTipSB.ToString();
                                 lviList.Add(lvItem);
                             }
+                            this.TheListView.Items.AddRange(lviList.ToArray());
                         }
-                        this.TheListView.Items.AddRange(lviList.ToArray());
+                        else //Non Grouping View
+                        {
+                            System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
+                            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
+                            {
+                                if (modInfo.moduleAppInstance != 0 && modInfo.moduleValue != 0)
+                                {
+                                    //Get Module Info using product id and module id
+                                    ListViewItem lvItem = new ListViewItem();
+                                    moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
+                                    lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
+                                    if ((DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0) && (DateTime.Now.ToUniversalTime().CompareTo(modInfo.moduleExpirationDate.TVal) > 0))
+                                        lvItem.ForeColor = System.Drawing.Color.Red;
+                                    else
+                                        lvItem.ForeColor = m_TreeNode.ForeColor;
+
+                                    lvItem.SubItems.Add(System.Convert.ToInt32(modInfo.moduleValue.ToString(), 16).ToString());
+                                    lvItem.SubItems.Add(System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16).ToString());
+                                    if (DateTime.Compare(new DateTime(1900, 1, 1), modInfo.moduleExpirationDate.TVal) != 0)
+                                        lvItem.SubItems.Add(modInfo.moduleExpirationDate.TVal.ToLocalTime().ToString());
+                                    else
+                                        lvItem.SubItems.Add("");
+                                    lviList.Add(lvItem);
+                                }
+                            }
+                            this.TheListView.Items.AddRange(lviList.ToArray());
+                        }
                     }
                 }
             }
@@ -1447,11 +1527,15 @@ namespace SolimarLicenseViewer
             set { m_TreeNode = value; }
         }
 
-        public Boolean EnableDisasterRecoverExt
+        public Boolean EnableDisasterRecoverExt_ByLicense(String _licenseName)
         {
-            get { return m_EnableDisasterRecoverExt; }
-            set { m_EnableDisasterRecoverExt = value; }
+            Boolean bEnableDisaster = false;
+            if (enableActivationByLicense.ContainsKey(_licenseName))
+                bEnableDisaster = enableActivationByLicense[_licenseName];
+            return bEnableDisaster;
         }
+        private System.Collections.Generic.Dictionary<String, bool> enableActivationByLicense = new System.Collections.Generic.Dictionary<String, bool>();
+
         #endregion
 
         #region Private Variables
@@ -1482,6 +1566,7 @@ namespace SolimarLicenseViewer
 
         private Dictionary<string, List<ToolStripItem>> m_toolStripList;
         private ToolStripComboBox m_moduleFilterComboBox;
+        private ToolStripButton m_moduleGroupByTSButton;
         #endregion
     }
     // Implements the manual sorting of items by columns.

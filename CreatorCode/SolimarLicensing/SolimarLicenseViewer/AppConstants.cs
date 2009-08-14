@@ -54,7 +54,7 @@ namespace SolimarLicenseViewer
         public static readonly String NameHeader = "Name";
         public static readonly String LicenceTypeHeader = "License Type";
         public static readonly String VerificationStatusHeader = "Verification Status";
-        public static readonly String ExpirationHeader = "Valid Until";
+        public static readonly String ExpirationHeader = "Expiration Date";
         public static readonly String CurrentActivationHeader = "Current Activation";
         public static readonly String TotalActivationHeader = "Total Activations";
         public static readonly String DaysPerActivationHeader = "Days Per Activation";
@@ -71,10 +71,9 @@ namespace SolimarLicenseViewer
         public static readonly String ConnTestDevHeader = "Use Development Licensing";
         public static readonly String ConnStatusHeader = "Status";
 
-        public static readonly String FilterHeader = "Filter";
-        public static readonly String AllItem = "All Modules";
-        public static readonly String ExpiredItem = "Expired Modules";
-        public static readonly String NonExpiredItem = "Non-Expired Modules";
+        public static readonly String FilterHeader = "View";
+        public static readonly String GroupByModuleItem = "Group By Module";
+        public static readonly String DetailsItem = "Details";
 
 
         //Product Node Column Headers
@@ -86,6 +85,7 @@ namespace SolimarLicenseViewer
         //Module Node Column Headers
         public static readonly String LicensesHeader = "Licenses";
         public static readonly String UnitsHeader = "Module";
+        public static readonly String AppInstanceExpiredHeader = "Expired Application Instance";
 
         //Usage Node Column Headers
         public static readonly String UsageProductHeader = "Product";
