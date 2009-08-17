@@ -101,7 +101,7 @@ namespace Client.Creator
             }
             set 
             {
-                if (value == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
+                if (value == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)                   
                     SetBrowsableOrderAttribStatus(OrderAttributes.AppInstance, true);
                 else
                     SetBrowsableOrderAttribStatus(OrderAttributes.AppInstance, false);
@@ -312,9 +312,17 @@ namespace Client.Creator
             }
             set
             {
+                //need appinstance to be set for each product license
+                //non-client modules - 1
+                //add-on modules - always 0 unless total is 0 then 1
+                //client modules - matches product
+                //add-on modules - always 0 unless total is 0 then 1
                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.Product.moduleList.TVal)
                 {
-                    module.moduleAppInstance.TVal = value;
+                    if (module.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                        module.moduleAppInstance.TVal = value;
+                    else
+                        module.moduleAppInstance.TVal = 0;
                 }
                 _product.Product.productAppInstance.TVal = value;
             }

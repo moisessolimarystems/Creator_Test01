@@ -7,6 +7,7 @@
       <Column Name="SCRname" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="SCRoperator" Type="System.String" DbType="VarChar(14)" CanBeNull="true" UpdateCheck="Never" />
       <Association Name="CustomerTable_LicenseTable" Member="LicenseTables" Storage="_Licenses" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="LicenseTable" />
+      <Association Name="CustomerTable_DestinationName" Member="DestinationNameTables" ThisKey="SCRnumber" OtherKey="CustID" Type="DestinationNameTable" />
     </Type>
   </Table>
   <Table Name="[CORP\AChou].[Transaction]" Member="TransactionTables">
@@ -73,14 +74,6 @@
       <Column Name="pt_permanent_pwd" Type="System.Boolean" DbType="Bit" CanBeNull="true" UpdateCheck="Never" />
     </Type>
   </Table>
-  <Table Name="[CORP\AChou].DestinationName" Member="DestinationNameTables">
-    <Type Name="DestinationNameTable">
-      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="DestID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="DestName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-    </Type>
-  </Table>
   <Table Name="[CORP\AChou].Token" Member="TokenTables">
     <Type Name="TokenTable">
       <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
@@ -105,6 +98,15 @@
       <Column Name="ExpiredDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="VerifiedBy" Type="System.String" DbType="VarChar(50)" CanBeNull="true" UpdateCheck="Never" />
       <Association Name="LicenseTable_PacketTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].DestinationName" Member="DestinationNameTables">
+    <Type Name="DestinationNameTable">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="DestID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="DestName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="CustomerTable_DestinationName" Member="CustomerTable" ThisKey="CustID" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

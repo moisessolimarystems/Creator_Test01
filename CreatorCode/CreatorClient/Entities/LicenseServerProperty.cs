@@ -66,9 +66,9 @@ namespace Client.Creator
                 ReadOnlyAttribute attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
                 FieldInfo isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
                 isReadOnly.SetValue(attrib, !_permissions.pt_create_modify_key.Value);
-                 descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationTotal"];
-                 attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
-                 isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
+                descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationTotal"];
+                attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
+                isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
                 isReadOnly.SetValue(attrib, !_permissions.pt_create_modify_key.Value);
                 descriptor = TypeDescriptor.GetProperties(this.GetType())["ActivationAmtInDays"];
                 attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];

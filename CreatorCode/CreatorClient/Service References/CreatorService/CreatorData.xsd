@@ -51,6 +51,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ProductTable" nillable="true" type="tns:ProductTable" />
+  <xs:complexType name="ArrayOfPacketTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPacketTable" nillable="true" type="tns:ArrayOfPacketTable" />
   <xs:complexType name="PacketTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -132,6 +138,14 @@
           </xs:appinfo>
         </xs:annotation>
       </xs:element>
+      <xs:element minOccurs="0" name="DestinationNameTables" nillable="true" type="tns:ArrayOfDestinationNameTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CustomerTable" nillable="true" type="tns:CustomerTable" />
@@ -187,10 +201,4 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LicenseTable" nillable="true" type="tns:LicenseTable" />
-  <xs:complexType name="ArrayOfPacketTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfPacketTable" nillable="true" type="tns:ArrayOfPacketTable" />
 </xs:schema>

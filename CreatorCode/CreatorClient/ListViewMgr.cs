@@ -77,9 +77,9 @@ namespace Client.Creator
             if (columnIndex == _lvwColumnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.
-                if (_lvwColumnSorter.Order == SortOrder.Ascending || _lvwColumnSorter.Order == SortOrder.None)
+                if (_lvwColumnSorter.Order == SortOrder.Ascending)
                     _lvwColumnSorter.Order = SortOrder.Descending;
-                else if (_lvwColumnSorter.Order == SortOrder.Descending)
+                else if (_lvwColumnSorter.Order == SortOrder.Descending || _lvwColumnSorter.Order == SortOrder.None)
                     _lvwColumnSorter.Order = SortOrder.Ascending;                     
             }
             else
@@ -87,10 +87,23 @@ namespace Client.Creator
                 SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
                 // Set the column number that is to be sorted; default to ascending.
                 _lvwColumnSorter.SortColumn = columnIndex;
-                _lvwColumnSorter.Order = SortOrder.None;
+                _lvwColumnSorter.Order = SortOrder.Ascending;
             }
             SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
             SetSelectedColumnColor(handle, columnIndex);
+        }
+
+        public void ResetSortIcons(IntPtr handle, IntPtr sortColumn)
+        {
+            IntPtr hHeader = SendMessage(handle, LVM_GETHEADER, IntPtr.Zero, IntPtr.Zero);
+            HDITEM hdItem;
+            IntPtr rtn;
+            // Clear icon from the previous column.
+            hdItem = new HDITEM();
+            hdItem.mask = HDI_FORMAT;
+            rtn = SendMessageITEM(hHeader, HDM_GETITEM, sortColumn, ref hdItem);
+            hdItem.fmt &= ~HDF_SORTDOWN & ~HDF_SORTUP;
+            rtn = SendMessageITEM(hHeader, HDM_SETITEM, sortColumn, ref hdItem);
         }
 
         //sizes depending on what the current comparer's order
@@ -104,14 +117,7 @@ namespace Client.Creator
 
             // Only update the previous item if it existed and if it was a different one.
             if (previouslySortedColumn != -1 && previouslySortedColumn != newSortColumn)
-            {
-                // Clear icon from the previous column.
-                hdItem = new HDITEM();
-                hdItem.mask = HDI_FORMAT;
-                rtn = SendMessageITEM(hHeader, HDM_GETITEM, prevColumn, ref hdItem);
-                hdItem.fmt &= ~HDF_SORTDOWN & ~HDF_SORTUP;
-                rtn = SendMessageITEM(hHeader, HDM_SETITEM, prevColumn, ref hdItem);
-            }
+                ResetSortIcons(handle, prevColumn);            
 
             // Set icon on the new column.
             hdItem = new HDITEM();
@@ -171,8 +177,14 @@ namespace Client.Creator
 
         public void ResetListViewColumnSorter(ListView lv)
         {
-            if (lv.Items.Count > 0)
+            if (lv.Columns.Count > 0)
             {
+                IntPtr columnIndex;
+                foreach (ColumnHeader column in lv.Columns)
+                {
+                    columnIndex = new IntPtr(column.Index);
+                    ResetSortIcons(lv.Handle, columnIndex);
+                }
                 _lvwColumnSorter.ResetProperties();
                 SetSortIndexColumn(lv.Handle, 0);
             }
@@ -266,8 +278,6 @@ namespace Client.Creator
                 return 0;
             }
         }
-
-
 
         public void ResetProperties()
         {

@@ -101,6 +101,24 @@ namespace CreatorData
             }
         }
 
+        public static IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                if (enableLoadOptions)
+                {
+                    DataLoadOptions dlo = new DataLoadOptions();
+                    dlo.LoadWith<LicenseTable>(id => id.PacketTables);
+                    db.LoadOptions = dlo;
+                }
+                return db.LicenseTables.Where(c => c.CustomerTable.SCRname.Contains(custName) && 
+                                                  (c.LicenseName.Contains(searchString) ||
+                                                   c.OrderTables.Count(o => (o.OrderNumber.Contains(searchString) &&
+                                                                             o.LicenseID.Equals(c.ID))) > 0)).ToList();                
+            }
+        }
+
         public static int GetLicenseCountByID(int custID, int destID, int groupID)
         {
             int count = 0;

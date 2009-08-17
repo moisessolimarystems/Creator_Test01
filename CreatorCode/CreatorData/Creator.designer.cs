@@ -49,15 +49,15 @@ namespace CreatorData
     partial void InsertPermissionsTable(PermissionsTable instance);
     partial void UpdatePermissionsTable(PermissionsTable instance);
     partial void DeletePermissionsTable(PermissionsTable instance);
-    partial void InsertDestinationNameTable(DestinationNameTable instance);
-    partial void UpdateDestinationNameTable(DestinationNameTable instance);
-    partial void DeleteDestinationNameTable(DestinationNameTable instance);
     partial void InsertTokenTable(TokenTable instance);
     partial void UpdateTokenTable(TokenTable instance);
     partial void DeleteTokenTable(TokenTable instance);
     partial void InsertPacketTable(PacketTable instance);
     partial void UpdatePacketTable(PacketTable instance);
     partial void DeletePacketTable(PacketTable instance);
+    partial void InsertDestinationNameTable(DestinationNameTable instance);
+    partial void UpdateDestinationNameTable(DestinationNameTable instance);
+    partial void DeleteDestinationNameTable(DestinationNameTable instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -138,14 +138,6 @@ namespace CreatorData
 			}
 		}
 		
-		public System.Data.Linq.Table<DestinationNameTable> DestinationNameTables
-		{
-			get
-			{
-				return this.GetTable<DestinationNameTable>();
-			}
-		}
-		
 		public System.Data.Linq.Table<TokenTable> TokenTables
 		{
 			get
@@ -159,6 +151,14 @@ namespace CreatorData
 			get
 			{
 				return this.GetTable<PacketTable>();
+			}
+		}
+		
+		public System.Data.Linq.Table<DestinationNameTable> DestinationNameTables
+		{
+			get
+			{
+				return this.GetTable<DestinationNameTable>();
 			}
 		}
 	}
@@ -177,6 +177,8 @@ namespace CreatorData
 		private string _SCRoperator;
 		
 		private EntitySet<LicenseTable> _Licenses;
+		
+		private EntitySet<DestinationNameTable> _DestinationNameTables;
 		
 		private bool serializing;
 		
@@ -279,6 +281,25 @@ namespace CreatorData
 			}
 		}
 		
+		[Association(Name="CustomerTable_DestinationName", Storage="_DestinationNameTables", ThisKey="SCRnumber", OtherKey="CustID")]
+		[DataMember(Order=5, EmitDefaultValue=false)]
+		public EntitySet<DestinationNameTable> DestinationNameTables
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._DestinationNameTables.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._DestinationNameTables;
+			}
+			set
+			{
+				this._DestinationNameTables.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -311,9 +332,22 @@ namespace CreatorData
 			entity.CustomerTable = null;
 		}
 		
+		private void attach_DestinationNameTables(DestinationNameTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.CustomerTable = this;
+		}
+		
+		private void detach_DestinationNameTables(DestinationNameTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.CustomerTable = null;
+		}
+		
 		private void Initialize()
 		{
 			this._Licenses = new EntitySet<LicenseTable>(new Action<LicenseTable>(this.attach_Licenses), new Action<LicenseTable>(this.detach_Licenses));
+			this._DestinationNameTables = new EntitySet<DestinationNameTable>(new Action<DestinationNameTable>(this.attach_DestinationNameTables), new Action<DestinationNameTable>(this.detach_DestinationNameTables));
 			OnCreated();
 		}
 		
@@ -1794,157 +1828,6 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].DestinationName")]
-	[DataContract()]
-	public partial class DestinationNameTable : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _ID;
-		
-		private int _CustID;
-		
-		private int _DestID;
-		
-		private string _DestName;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIDChanging(int value);
-    partial void OnIDChanged();
-    partial void OnCustIDChanging(int value);
-    partial void OnCustIDChanged();
-    partial void OnDestIDChanging(int value);
-    partial void OnDestIDChanged();
-    partial void OnDestNameChanging(string value);
-    partial void OnDestNameChanged();
-    #endregion
-		
-		public DestinationNameTable()
-		{
-			this.Initialize();
-		}
-		
-		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=1)]
-		public int ID
-		{
-			get
-			{
-				return this._ID;
-			}
-			set
-			{
-				if ((this._ID != value))
-				{
-					this.OnIDChanging(value);
-					this.SendPropertyChanging();
-					this._ID = value;
-					this.SendPropertyChanged("ID");
-					this.OnIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_CustID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=2)]
-		public int CustID
-		{
-			get
-			{
-				return this._CustID;
-			}
-			set
-			{
-				if ((this._CustID != value))
-				{
-					this.OnCustIDChanging(value);
-					this.SendPropertyChanging();
-					this._CustID = value;
-					this.SendPropertyChanged("CustID");
-					this.OnCustIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_DestID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=3)]
-		public int DestID
-		{
-			get
-			{
-				return this._DestID;
-			}
-			set
-			{
-				if ((this._DestID != value))
-				{
-					this.OnDestIDChanging(value);
-					this.SendPropertyChanging();
-					this._DestID = value;
-					this.SendPropertyChanged("DestID");
-					this.OnDestIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_DestName", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=4)]
-		public string DestName
-		{
-			get
-			{
-				return this._DestName;
-			}
-			set
-			{
-				if ((this._DestName != value))
-				{
-					this.OnDestNameChanging(value);
-					this.SendPropertyChanging();
-					this._DestName = value;
-					this.SendPropertyChanged("DestName");
-					this.OnDestNameChanged();
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void Initialize()
-		{
-			OnCreated();
-		}
-		
-		[OnDeserializing()]
-		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnDeserializing(StreamingContext context)
-		{
-			this.Initialize();
-		}
-	}
-	
 	[Table(Name="[CORP\\AChou].Token")]
 	[DataContract()]
 	public partial class TokenTable : INotifyPropertyChanging, INotifyPropertyChanged
@@ -2518,6 +2401,198 @@ namespace CreatorData
 		private void Initialize()
 		{
 			this._LicenseTable = default(EntityRef<LicenseTable>);
+			OnCreated();
+		}
+		
+		[OnDeserializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[Table(Name="[CORP\\AChou].DestinationName")]
+	[DataContract()]
+	public partial class DestinationNameTable : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private int _CustID;
+		
+		private int _DestID;
+		
+		private string _DestName;
+		
+		private EntityRef<CustomerTable> _CustomerTable;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnCustIDChanging(int value);
+    partial void OnCustIDChanged();
+    partial void OnDestIDChanging(int value);
+    partial void OnDestIDChanged();
+    partial void OnDestNameChanging(string value);
+    partial void OnDestNameChanged();
+    #endregion
+		
+		public DestinationNameTable()
+		{
+			this.Initialize();
+		}
+		
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=1)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_CustID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=2)]
+		public int CustID
+		{
+			get
+			{
+				return this._CustID;
+			}
+			set
+			{
+				if ((this._CustID != value))
+				{
+					if (this._CustomerTable.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnCustIDChanging(value);
+					this.SendPropertyChanging();
+					this._CustID = value;
+					this.SendPropertyChanged("CustID");
+					this.OnCustIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_DestID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=3)]
+		public int DestID
+		{
+			get
+			{
+				return this._DestID;
+			}
+			set
+			{
+				if ((this._DestID != value))
+				{
+					this.OnDestIDChanging(value);
+					this.SendPropertyChanging();
+					this._DestID = value;
+					this.SendPropertyChanged("DestID");
+					this.OnDestIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_DestName", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=4)]
+		public string DestName
+		{
+			get
+			{
+				return this._DestName;
+			}
+			set
+			{
+				if ((this._DestName != value))
+				{
+					this.OnDestNameChanging(value);
+					this.SendPropertyChanging();
+					this._DestName = value;
+					this.SendPropertyChanged("DestName");
+					this.OnDestNameChanged();
+				}
+			}
+		}
+		
+		[Association(Name="CustomerTable_DestinationName", Storage="_CustomerTable", ThisKey="CustID", OtherKey="SCRnumber", IsForeignKey=true)]
+		public CustomerTable CustomerTable
+		{
+			get
+			{
+				return this._CustomerTable.Entity;
+			}
+			set
+			{
+				CustomerTable previousValue = this._CustomerTable.Entity;
+				if (((previousValue != value) 
+							|| (this._CustomerTable.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._CustomerTable.Entity = null;
+						previousValue.DestinationNameTables.Remove(this);
+					}
+					this._CustomerTable.Entity = value;
+					if ((value != null))
+					{
+						value.DestinationNameTables.Add(this);
+						this._CustID = value.SCRnumber;
+					}
+					else
+					{
+						this._CustID = default(int);
+					}
+					this.SendPropertyChanged("CustomerTable");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
+			this._CustomerTable = default(EntityRef<CustomerTable>);
 			OnCreated();
 		}
 		
