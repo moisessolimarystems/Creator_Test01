@@ -102,7 +102,10 @@ namespace Client.Creator
                     });
                     Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                     licPackage.Stream = licStream;
-                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[0];
+                    int index = 0;
+                    if(licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0);
+                        index = licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
+                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[index];
                     verificationCodeTextBox.Text = attrib.verificationValue;
                 }
                 catch (Exception ex)

@@ -324,7 +324,7 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
@@ -358,7 +358,7 @@
             // 
             this.tokenValueTextBox.CausesValidation = false;
             this.tokenValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tokenValueTextBox.Location = new System.Drawing.Point(153, 36);
+            this.tokenValueTextBox.Location = new System.Drawing.Point(152, 36);
             this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
             this.tokenValueTextBox.Size = new System.Drawing.Size(168, 20);
@@ -372,7 +372,7 @@
             this.tokenTypeComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
-            this.tokenTypeComboBox.Location = new System.Drawing.Point(153, 5);
+            this.tokenTypeComboBox.Location = new System.Drawing.Point(152, 5);
             this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
             this.tokenTypeComboBox.Size = new System.Drawing.Size(168, 21);
@@ -406,7 +406,7 @@
             // browseTokenFileButton
             // 
             this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.browseTokenFileButton.Location = new System.Drawing.Point(321, 35);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(320, 35);
             this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
             this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
@@ -424,11 +424,11 @@
             this.keyNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.keyNameListView.FullRowSelect = true;
             this.keyNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.keyNameListView.Location = new System.Drawing.Point(153, 66);
+            this.keyNameListView.Location = new System.Drawing.Point(152, 66);
             this.keyNameListView.Margin = new System.Windows.Forms.Padding(5);
             this.keyNameListView.MultiSelect = false;
             this.keyNameListView.Name = "keyNameListView";
-            this.keyNameListView.Size = new System.Drawing.Size(243, 97);
+            this.keyNameListView.Size = new System.Drawing.Size(244, 97);
             this.keyNameListView.TabIndex = 10;
             this.keyNameListView.UseCompatibleStateImageBehavior = false;
             this.keyNameListView.View = System.Windows.Forms.View.Details;
@@ -563,7 +563,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 52F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 53F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -599,7 +599,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(354, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(353, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -611,7 +611,7 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(110, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(109, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
@@ -621,7 +621,7 @@
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(110, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(109, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
@@ -653,7 +653,7 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(110, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(109, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
@@ -675,7 +675,7 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(110, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(109, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
