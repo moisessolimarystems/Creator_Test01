@@ -264,6 +264,17 @@ namespace Service.Creator
         [OperationContract]
         PermissionsTable GetPermissionsByUser(string user);
         #endregion
+
+        #region Product OperationContracts
+        [OperationContract]
+        IList<ProductTable> GetProducts();
+
+        [OperationContract]
+        ProductTable GetProduct(string product);
+
+        [OperationContract]
+        void UpdateProductTable(ProductTable product);
+        #endregion
     }
 
     [DataContract]

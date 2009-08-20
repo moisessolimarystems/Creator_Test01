@@ -529,6 +529,24 @@ namespace Service.Creator
         }
         #endregion
 
+        #region ProductTable Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<ProductTable> GetProducts()
+        {
+            return ProductTable.GetAllProducts();
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public ProductTable GetProduct(string product)
+        {
+            return ProductTable.GetProduct(product);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateProductTable(ProductTable product)
+        {
+            ProductTable.UpdateProductTable(product);
+        }
+        #endregion
+
         #endregion
     }
 }
