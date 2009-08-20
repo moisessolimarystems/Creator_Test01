@@ -469,7 +469,7 @@ namespace Client.Creator
                     PacketListView.Parent = MainSplitContainer.Panel2;
 
                 }
-                else if (MainTreeView.SelectedNode.Text == "Hardware Keys")
+                else if (MainTreeView.SelectedNode.Text == "Validation Keys")
                 {
                     ResetMainToolStripMenu();
                     EnableHardwareCustomerView();
@@ -847,6 +847,7 @@ namespace Client.Creator
                         licRec.LicenseComments = licItem.Comments;
                         client.UpdateLicense(licRec);
                         LoadTransactionItems(licItem.Name);
+                        DetailTreeView.SelectedNode.Tag = DetailPropertyGrid.SelectedObject;
                         SetCustomerLicenseState(DetailTreeView.SelectedNode);
                         break;
                     case 2:
@@ -894,6 +895,7 @@ namespace Client.Creator
                         //need to reload customer node to set modified and pending states for any licenses
                         //load license node to pass changes to secondary licenses if necessary.
                         //SetLicenseState
+                        DetailTreeView.SelectedNode.Tag = DetailPropertyGrid.SelectedObject;
                         SetCustomerLicenseState(DetailTreeView.SelectedNode);
                         LoadLicenseNode(DetailTreeView.SelectedNode.Parent.Parent);
                         LoadProductNode(DetailTreeView.SelectedNode.Parent);
@@ -946,6 +948,7 @@ namespace Client.Creator
                                 break;
                             }
                         }
+                        DetailTreeView.SelectedNode.Tag = DetailPropertyGrid.SelectedObject;
                         SetCustomerLicenseState(DetailTreeView.SelectedNode);
                         LoadProductNode(productNode);
                         LoadDetailListView(DetailTreeView.SelectedNode.Tag as ProductLicenseProperty);
@@ -1354,8 +1357,10 @@ namespace Client.Creator
                             if (item.Text.Equals(data.SelectedPacketName))
                             {
                                 item.ImageIndex = imageIndex;
-                                item.StateImageIndex = imageIndex;
+                                item.StateImageIndex = imageIndex;                                
                                 selectedIndex = item.Index;
+                                //update verified user
+                                item.SubItems[4].Text = WindowsIdentity.GetCurrent().Name;
                                 break;
                             }
                         }
@@ -2395,7 +2400,7 @@ namespace Client.Creator
                     reservedKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(0)).Count();
                     activeKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(1)).Count();
                     deactivatedKeys = tokens.Where(c => c.CustID.Equals(customers[index].SCRnumber) && c.TokenStatus.Equals(2)).Count();
-                    ListViewItem item = new ListViewItem(new string[] { customers[index].SCRname, reservedKeys.ToString(), activeKeys.ToString(), deactivatedKeys.ToString() });
+                    ListViewItem item = new ListViewItem(new string[] { string.Format("{0:x}",customers[index].SCRnumber), customers[index].SCRname, reservedKeys.ToString(), activeKeys.ToString(), deactivatedKeys.ToString() });
                     lvItems[index] = item;
                 }
                 HardwareKeyListView.Items.AddRange(lvItems);
@@ -2464,9 +2469,10 @@ namespace Client.Creator
             }
             else
             {
-                if (!(HardwareKeyListView.Columns.Count == 4))
+                if (!(HardwareKeyListView.Columns.Count == 5))
                 {
                     HardwareKeyListView.Columns.Clear();
+                    HardwareKeyListView.Columns.Add("ID");
                     HardwareKeyListView.Columns.Add("Customer");
                     HardwareKeyListView.Columns.Add("Reserved");
                     HardwareKeyListView.Columns.Add("Active");
@@ -3453,7 +3459,7 @@ namespace Client.Creator
                 case "Packets":
                     LoadPacketListView();
                     break;
-                case "Hardware Keys":
+                case "Validation Keys":
                     //how to differentiate between customer view and key view
                     //customer view 
                     //
@@ -4094,7 +4100,7 @@ namespace Client.Creator
                 PacketListView.Parent = MainSplitContainer.Panel2;
 
             }
-            else if (shortCutToolStripComboBox.Text == "Hardware Keys")
+            else if (shortCutToolStripComboBox.Text == "Validation Keys")
             {
                 //ResetMainToolStripMenu();
                 MainToolStrip.Visible = false;
@@ -4276,6 +4282,7 @@ namespace Client.Creator
             _selectedCustomer = "";
             SearchCurrentView(toolStripSearchBox.Text);
             EnableHardwareCustomerView();
+            ValidationKeyToolStrip.Visible = false;
         }
 
         private void HardwareKeyListView_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -4291,10 +4298,10 @@ namespace Client.Creator
                     ListViewItem item = HardwareKeyListView.SelectedItems[0];
                     if (item.Equals(hitInfo.Item))
                     {
-                        _selectedCustomer = item.Text;                        
+                        _selectedCustomer = item.SubItems[1].Text;                        
                         //launch edit dialog
                         LoadHardwareKeyListView("", _selectedCustomer);
-                        EnableHardwareKeyView();
+                        EnableHardwareKeyView();                        
                     }
                 }
             }
@@ -4334,7 +4341,7 @@ namespace Client.Creator
                 }             
             });
             if (!bKeyFound)
-                MessageBox.Show("No hardware keys attached", "Seek Error", MessageBoxButtons.OK);
+                MessageBox.Show("No validation keys attached", "Seek Error", MessageBoxButtons.OK);
             else
             {
                 HardwareKeyListView.Focus();
@@ -4353,9 +4360,11 @@ namespace Client.Creator
             if (HardwareKeyListView.SelectedItems.Count > 0)
             { 
                 deactivateHardwareKeyToolStripButton.Enabled = true;
-                if (HardwareKeyListView.SelectedItems[0].SubItems[2].Text != "Active")
+                if (HardwareKeyListView.SelectedItems[0].SubItems[2].Text == "Reserved")
                     activateHardwareKeyToolStripButton.Enabled = true;
             }
+            ValidationKeyToolStrip.Visible = true;
+            ValidationKeyCustomerLabel.Text = _selectedCustomer;
         }
 
         private void EnableHardwareCustomerView()
@@ -4367,6 +4376,7 @@ namespace Client.Creator
             reserveHardwareKeyToolStripButton.Enabled = false;
             deactivateHardwareKeyToolStripButton.Enabled = false;
             activateHardwareKeyToolStripButton.Enabled = false;
+            ValidationKeyToolStrip.Visible = false;            
         }
 
         private void reserveHardwareKeyToolStripButton_Click(object sender, EventArgs e)
@@ -4445,7 +4455,6 @@ namespace Client.Creator
                                 break;
                             }
                         }
-                        bFound = true;
                         if (bFound)
                         {
                             client.KeyFormat(keyValue);
@@ -4509,6 +4518,40 @@ namespace Client.Creator
             this.Cursor = storedCursor;
         }
 
+        private void updateVersionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ProductConfigurationDialog dlg = new ProductConfigurationDialog())
+            {                
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                }
+            }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (AboutDialog dlg = new AboutDialog())
+            {
+                int majorVer = 0;
+                int minorVer = 0;
+                int buildVer = 0;
+                dlg.SetCreatorVersion(string.Format("{0}.{1}.{2}", VersionInfo.MAJOR_REVISION_NUMBER, VersionInfo.MINOR_REVISION_NUMBER, VersionInfo.BUILD_NUMBER));
+                //try
+                //{
+                //    s_CommLink.GetVersionLicenseServer(s_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
+                //}
+                //catch (COMException)
+                //{
+                //    majorVer = 0;
+                //    minorVer = 0;
+                //    buildVer = 0;
+                //}
+                //dlg.SetServerVersion(string.Format("{0}.{1}.{2}",majorVer,minorVer,buildVer));
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                }
+            }
+        }
 
         //// Create a Font object for the node tags.
         //Font textFont = new Font("Helvetica", 8, FontStyle.Bold);

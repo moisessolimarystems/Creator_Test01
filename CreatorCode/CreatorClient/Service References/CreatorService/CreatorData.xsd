@@ -37,6 +37,20 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PermissionsTable" nillable="true" type="tns:PermissionsTable" />
+  <xs:complexType name="ArrayOfProductTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ProductTable" nillable="true" type="tns:ProductTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfProductTable" nillable="true" type="tns:ArrayOfProductTable" />
+  <xs:complexType name="ProductTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="pId" type="xs:int" />
+      <xs:element minOccurs="0" name="pVersion" type="xs:int" />
+      <xs:element minOccurs="0" name="pName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ProductTable" nillable="true" type="tns:ProductTable" />
   <xs:complexType name="PacketTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />

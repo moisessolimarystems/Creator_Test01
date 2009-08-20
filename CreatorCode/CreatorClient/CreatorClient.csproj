@@ -88,7 +88,16 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
+    <Compile Include="..\Common\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="AboutDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutDialog.Designer.cs">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NewDestinationName.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -133,6 +142,12 @@
       <DependentUpon>LicenseInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ListViewMgr.cs" />
+    <Compile Include="ProductConfigurationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProductConfigurationDialog.Designer.cs">
+      <DependentUpon>ProductConfigurationDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ProductLicenseSelectionForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -155,6 +170,9 @@
       <DependentUpon>CreatorForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="AboutDialog.resx">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewDestinationName.resx">
       <DependentUpon>NewDestinationName.cs</DependentUpon>
     </EmbeddedResource>
@@ -164,6 +182,9 @@
     <EmbeddedResource Include="LicenseInfoForm.resx">
       <DependentUpon>LicenseInfoForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProductConfigurationDialog.resx">
+      <DependentUpon>ProductConfigurationDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProductLicenseSelectionForm.resx">
       <DependentUpon>ProductLicenseSelectionForm.cs</DependentUpon>
@@ -284,6 +305,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.PermissionsTable.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.TokenTable.datasource">

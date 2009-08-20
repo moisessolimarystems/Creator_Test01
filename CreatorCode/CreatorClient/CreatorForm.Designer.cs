@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Validation Keys");
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2,
@@ -46,6 +46,7 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateVersionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -129,9 +130,11 @@
             this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.HardwareKeyTabPage = new System.Windows.Forms.TabPage();
+            this.ValidationKeysTabPage = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.HardwareKeyListView = new Shared.VisualComponents.NoFlickerListView();
+            this.ValidationKeyToolStrip = new System.Windows.Forms.ToolStrip();
+            this.ValidationKeyCustomerLabel = new System.Windows.Forms.ToolStripLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.addHardwareKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.deactivateTokenToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -200,8 +203,9 @@
             this.PacketListToolStrip.SuspendLayout();
             this.PacketsTabPage.SuspendLayout();
             this.ReportTabPage.SuspendLayout();
-            this.HardwareKeyTabPage.SuspendLayout();
+            this.ValidationKeysTabPage.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.ValidationKeyToolStrip.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.PacketContextMenuStrip.SuspendLayout();
             this.DetailListViewContextMenuStrip.SuspendLayout();
@@ -268,15 +272,23 @@
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.updateVersionsToolStripMenuItem,
             this.optionsToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(44, 20);
             this.toolStripMenuItem1.Text = "Tools";
             // 
+            // updateVersionsToolStripMenuItem
+            // 
+            this.updateVersionsToolStripMenuItem.Name = "updateVersionsToolStripMenuItem";
+            this.updateVersionsToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.updateVersionsToolStripMenuItem.Text = "Update Versions...";
+            this.updateVersionsToolStripMenuItem.Click += new System.EventHandler(this.updateVersionsToolStripMenuItem_Click);
+            // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.optionsToolStripMenuItem.Text = "Options...";
             // 
             // helpToolStripMenuItem
@@ -292,6 +304,7 @@
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // MainToolStrip
             // 
@@ -599,7 +612,7 @@
             treeNode2.SelectedImageIndex = 2;
             treeNode2.Text = "Packets";
             treeNode3.Name = "KeyNode";
-            treeNode3.Text = "Hardware Keys";
+            treeNode3.Text = "Validation Keys";
             treeNode4.ImageIndex = 3;
             treeNode4.Name = "CreatorRootNode";
             treeNode4.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -637,7 +650,7 @@
             this.MainTabControl.Controls.Add(this.LicensesTabPage);
             this.MainTabControl.Controls.Add(this.PacketsTabPage);
             this.MainTabControl.Controls.Add(this.ReportTabPage);
-            this.MainTabControl.Controls.Add(this.HardwareKeyTabPage);
+            this.MainTabControl.Controls.Add(this.ValidationKeysTabPage);
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTabControl.Location = new System.Drawing.Point(0, 0);
             this.MainTabControl.Margin = new System.Windows.Forms.Padding(0);
@@ -908,7 +921,7 @@
             this.loadingCircle1.Active = false;
             this.loadingCircle1.BackColor = System.Drawing.Color.Transparent;
             this.loadingCircle1.Color = System.Drawing.Color.DarkGray;
-            this.loadingCircle1.DisplayText = "Please Wait...";
+            this.loadingCircle1.DisplayText = null;
             this.loadingCircle1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.loadingCircle1.InnerCircleRadius = 6;
             this.loadingCircle1.Location = new System.Drawing.Point(0, 0);
@@ -1229,19 +1242,20 @@
             this.columnHeader2.Text = "Description";
             this.columnHeader2.Width = 104;
             // 
-            // HardwareKeyTabPage
+            // ValidationKeysTabPage
             // 
-            this.HardwareKeyTabPage.Controls.Add(this.panel1);
-            this.HardwareKeyTabPage.Location = new System.Drawing.Point(4, 22);
-            this.HardwareKeyTabPage.Name = "HardwareKeyTabPage";
-            this.HardwareKeyTabPage.Size = new System.Drawing.Size(832, 423);
-            this.HardwareKeyTabPage.TabIndex = 4;
-            this.HardwareKeyTabPage.Text = "Hardware Keys";
-            this.HardwareKeyTabPage.UseVisualStyleBackColor = true;
+            this.ValidationKeysTabPage.Controls.Add(this.panel1);
+            this.ValidationKeysTabPage.Location = new System.Drawing.Point(4, 22);
+            this.ValidationKeysTabPage.Name = "ValidationKeysTabPage";
+            this.ValidationKeysTabPage.Size = new System.Drawing.Size(832, 423);
+            this.ValidationKeysTabPage.TabIndex = 4;
+            this.ValidationKeysTabPage.Text = "Validation Keys";
+            this.ValidationKeysTabPage.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.HardwareKeyListView);
+            this.panel1.Controls.Add(this.ValidationKeyToolStrip);
             this.panel1.Controls.Add(this.toolStrip1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -1255,12 +1269,12 @@
             this.HardwareKeyListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.HardwareKeyListView.FullRowSelect = true;
             this.HardwareKeyListView.GridLines = true;
-            this.HardwareKeyListView.Location = new System.Drawing.Point(0, 0);
+            this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
             this.HardwareKeyListView.MultiSelect = false;
             this.HardwareKeyListView.Name = "HardwareKeyListView";
             this.HardwareKeyListView.NoItemsMessage = "There are no hardware keys to show in this view";
             this.HardwareKeyListView.ShowGroups = false;
-            this.HardwareKeyListView.Size = new System.Drawing.Size(832, 423);
+            this.HardwareKeyListView.Size = new System.Drawing.Size(832, 398);
             this.HardwareKeyListView.TabIndex = 1;
             this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
             this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
@@ -1268,6 +1282,24 @@
             this.HardwareKeyListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HardwareKeyListView_MouseUp);
             this.HardwareKeyListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.HardwareKeyListView_ColumnClick);
             this.HardwareKeyListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.HardwareKeyListView_ItemSelectionChanged);
+            // 
+            // ValidationKeyToolStrip
+            // 
+            this.ValidationKeyToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.ValidationKeyToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ValidationKeyCustomerLabel});
+            this.ValidationKeyToolStrip.Location = new System.Drawing.Point(0, 0);
+            this.ValidationKeyToolStrip.Name = "ValidationKeyToolStrip";
+            this.ValidationKeyToolStrip.Size = new System.Drawing.Size(832, 25);
+            this.ValidationKeyToolStrip.TabIndex = 2;
+            this.ValidationKeyToolStrip.Text = "toolStrip3";
+            // 
+            // ValidationKeyCustomerLabel
+            // 
+            this.ValidationKeyCustomerLabel.Margin = new System.Windows.Forms.Padding(5, 1, 0, 2);
+            this.ValidationKeyCustomerLabel.Name = "ValidationKeyCustomerLabel";
+            this.ValidationKeyCustomerLabel.Size = new System.Drawing.Size(33, 22);
+            this.ValidationKeyCustomerLabel.Text = "[Edit]";
             // 
             // toolStrip1
             // 
@@ -1643,9 +1675,11 @@
             this.PacketListToolStrip.PerformLayout();
             this.PacketsTabPage.ResumeLayout(false);
             this.ReportTabPage.ResumeLayout(false);
-            this.HardwareKeyTabPage.ResumeLayout(false);
+            this.ValidationKeysTabPage.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.ValidationKeyToolStrip.ResumeLayout(false);
+            this.ValidationKeyToolStrip.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.PacketContextMenuStrip.ResumeLayout(false);
@@ -1737,7 +1771,7 @@
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripLabel ImageToolStripLabel;
-        private System.Windows.Forms.TabPage HardwareKeyTabPage;
+        private System.Windows.Forms.TabPage ValidationKeysTabPage;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private Shared.VisualComponents.NoFlickerListView HardwareKeyListView;
@@ -1794,6 +1828,9 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem verifiedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unVerifiedToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip ValidationKeyToolStrip;
+        private System.Windows.Forms.ToolStripLabel ValidationKeyCustomerLabel;
+        private System.Windows.Forms.ToolStripMenuItem updateVersionsToolStripMenuItem;
 
     }
 }
