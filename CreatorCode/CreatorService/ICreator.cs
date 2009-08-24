@@ -51,6 +51,9 @@ namespace Service.Creator
         IList<LicenseTable> GetAllLicenses(string searchString, bool enableLoadOptions);
 
         [OperationContract]
+        IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions);
+
+        [OperationContract]
         IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions);
 
         [OperationContract]
@@ -274,6 +277,7 @@ namespace Service.Creator
 
         [OperationContract]
         void UpdateProductTable(ProductTable product);
+
         #endregion
     }
 

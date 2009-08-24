@@ -93,7 +93,11 @@ namespace Service.Creator
         {
             return LicenseTable.GetAllLicenses(searchString, enableLoadOptions);
         }
-
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions)
+        {
+            return LicenseTable.GetLicensesByCustomer(custName, searchString, enableLoadOptions);
+        }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions)
         {
