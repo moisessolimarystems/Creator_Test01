@@ -538,18 +538,30 @@ void Form1::refreshMenuItem_Click(Object* sender, System::EventArgs* e)
 
 System::Void Form1::OptionsMenuItem_Popup(System::Object*  sender, System::EventArgs*  e)
 {
+	bool bEnableMenuItem = false;
 	RegistryKey* rkey = Registry::LocalMachine->OpenSubKey(SOLIMAR_KEY);
 	if(rkey)
 	{
 		// Retrieve all the subkeys for the specified key.
 		String* productNames[] = rkey->GetSubKeyNames();
 		rkey->Close();
-		if(productNames->Count > 1)	//Solimar Licensing is one key
-			ServerSettingsMenuItem->Enabled = true;
-		else
-			ServerSettingsMenuItem->Enabled = false;
-
+		bEnableMenuItem = (productNames->Count > 1);	//Solimar Licensing is one key
 	}	
+
+	if(!bEnableMenuItem)
+	{
+		//Search 32-bit registry on 64-bit machines
+		rkey = Registry::LocalMachine->OpenSubKey(SOLIMAR_KEY_32);
+		if(rkey)
+		{
+			// Retrieve all the subkeys for the specified key.
+			String* productNames[] = rkey->GetSubKeyNames();
+			rkey->Close();
+			bEnableMenuItem = (productNames->Count > 1);	//Solimar Licensing is one key
+		}
+	}
+
+	ServerSettingsMenuItem->Enabled = bEnableMenuItem;
 }
 
 System::Void Form1::ServerSettingsMenuItem_Click(System::Object*  sender, System::EventArgs*  e)
