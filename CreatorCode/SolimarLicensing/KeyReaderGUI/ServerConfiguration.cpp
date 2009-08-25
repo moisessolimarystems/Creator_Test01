@@ -58,8 +58,8 @@ System::Void ServerConfiguration::ServerConfiguration_Load(System::Object*  send
 		pProdMap = NULL;
 	}
 	ConvertSettingsToXml_1_0();	// If XML version of LOCAL_CONNECTION_FILE is not 1.0, then convert to 1.0
-	if(ProductComboBox->Items->Count > 1)	//Solimar Licensing is one key
-			ProductComboBox->SelectedIndex = 0;
+	if(ProductComboBox->Items->Count > 0)
+		ProductComboBox->SelectedIndex = 0;
 	ServerPropertyGrid->SelectedObject = TheConnectionSetting;
 }
 
