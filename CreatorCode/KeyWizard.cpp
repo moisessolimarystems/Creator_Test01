@@ -29,8 +29,8 @@ TKeyWizardFrm *KeyWizardFrm;
 // Defines
 //------------------------------------------------------------------------------
 //static member initialized
-const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*Rubika*/, 13/*SOLFUSION*/, 14/*SPDE*/};
-const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, RUBIKA_PRODUCT, SOLFUSION_PRODUCT, SPDE_PRODUCT};
+const int TKeyWizardFrm::convertProductToIndex[] = { 0/*SPD_NT*/, 3/*XImage*/, 2/*XImage NT*/, 4/*Indexer*/, 6/*ConnectivityServer*/, 0/*SPD_LEGACY*/, 7/*iConvert*/, 8/*SS Enterprise*/, 9/*SOLscript*/, 10/*SDX_DESIGNER_PRODUCT*/, 11/*Quantum Server*/, 12/*Rubika*/, 13/*SOLFUSION*/, 14/*SPDE*/, 16/*SOLITRACK*/};
+const int TKeyWizardFrm::convertIndexToProduct[] = { SPD_PRODUCT, XIMAGENT_PRODUCT, XIMAGE_PRODUCT, INDEX_PLUGIN, CONNECT_PRODUCT, SPD_PRODUCT, ICONVERT_PRODUCT, SOLSEARCHER_ENTERPRISE_PRODUCT, SOLSCRIPT_PRODUCT, SDX_DESIGNER_PRODUCT, QUANTUM_PRODUCT, RUBIKA_PRODUCT, SOLFUSION_PRODUCT, SPDE_PRODUCT, SOLITRACK_PRODUCT};
 
 
 //==============================================================================
@@ -209,6 +209,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
    else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
             m_selectedProduct == SDX_DESIGNER_PRODUCT ||
             m_selectedProduct == SOLFUSION_PRODUCT  ||
+            m_selectedProduct == SOLITRACK_PRODUCT  ||
             m_selectedProduct == RUBIKA_PRODUCT) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
@@ -724,6 +725,7 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
          else if (m_selectedProduct == SOLSCRIPT_PRODUCT ||
                   m_selectedProduct == RUBIKA_PRODUCT  ||
                   m_selectedProduct == SOLFUSION_PRODUCT ||
+                  m_selectedProduct == SOLITRACK_PRODUCT  ||
                   m_selectedProduct == SDX_DESIGNER_PRODUCT ) {
             //Select Modules
             state.push( wsModuleSelection );
@@ -1205,6 +1207,7 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == SOLSCRIPT_PRODUCT ||
             m_selectedProduct == SDX_DESIGNER_PRODUCT ||
             m_selectedProduct == SOLFUSION_PRODUCT ||
+            m_selectedProduct == SOLITRACK_PRODUCT ||
             m_selectedProduct == RUBIKA_PRODUCT) {
       if (moduleState == msClear) {
          SpdProtectionKey* spd_key = static_cast<SpdProtectionKey*>(key_record->pkey);

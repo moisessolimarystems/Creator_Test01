@@ -7,7 +7,7 @@
 #include <vcl\vcl.h>
 #pragma hdrstop
 
-const int CREATOR_VERSION = 0x226;
+const int CREATOR_VERSION = 0x227;
 
 #include "CLookups.h"
 #include "CustomerForm.h"

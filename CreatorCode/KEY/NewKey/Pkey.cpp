@@ -132,6 +132,7 @@
 #include "Spdekey.h"
 #include "SPKey.h"
 #include "SOLfusionKey.h"
+#include "SOLitrackKey.h"
 
 // protection key passwords and developer ID
 const ushort WRITE_PASSWORD = 0x4AFC;
@@ -175,6 +176,7 @@ const char* ProductText[] =
    "Rubika",                                                    // PDF Utility = 12
    "SOLfusion",                                                 //SOLfusion = 13
    "SPDE",                                                    // SPDE_PRODUCT = 14
+   "SOLitrack",                                               //SOLITRACK_PRODUCT = 16
 // "123456789" <-- Maximum product name length is 9
 };
 
@@ -201,6 +203,7 @@ const char* longProductText[] =
    "SOLfusion",                                                 // SOLfusion = 13
    "Solimar Print/Director, Enterprise Edition",                // SPDE_PRODUCT = 14
    "SOLsearcher Enterprise, Single Platform",                   // SSE SP = 15
+   "SOLitrack",                                                 // SOLitrack = 16
 };
 
 /* productText[]
@@ -225,6 +228,7 @@ const char* mediumProductText[] =
    "SOLfusion",                                    // SOLfusion = 13
    "SP/D, Enterprise Edition",               // SPDE_PRODUCT = 14
    "SSE, Single Platform",                    // SSE SP = 15
+   "SOLitrack",                                 //SOLitrack = 16
 };
 
 /* KDPasswordText[]
@@ -890,6 +894,9 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLFUSION_PRODUCT :
          new_key = new SOLfusionProtectionKey();
          break;
+      case SOLITRACK_PRODUCT :
+         new_key = new SOLitrackProtectionKey();
+         break;
       case SDX_DESIGNER_PRODUCT:
          new_key = new SDXDesignerProtectionKey();
          break;
@@ -961,6 +968,9 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr3* pServer)
       case SOLFUSION_PRODUCT:
          new_key = new SOLfusionProtectionKey();
          break;
+      case SOLITRACK_PRODUCT:
+         new_key = new SOLitrackProtectionKey();
+         break;
       case RUBIKA_PRODUCT:
          new_key = new PDFUtilityProtectionKey();
          break;
@@ -1004,6 +1014,9 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
          break;
       case SOLFUSION_PRODUCT:
          new_key = new SOLfusionProtectionKey(*(SOLfusionProtectionKey*)pkey);
+         break;
+      case SOLITRACK_PRODUCT:
+         new_key = new SOLitrackProtectionKey(*(SOLitrackProtectionKey*)pkey);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);
