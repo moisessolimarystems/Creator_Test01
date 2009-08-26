@@ -497,6 +497,7 @@ unsigned short SKeyRecord::incrementPasswordNumber()
           case RUBIKA_PRODUCT :
           case SDX_DESIGNER_PRODUCT :
           case SOLFUSION_PRODUCT :
+       case SOLITRACK_PRODUCT :          
           case SOLSEARCHER_ENTERPRISE_PRODUCT :
                passwordNumber++;
                break;

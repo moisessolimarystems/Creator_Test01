@@ -651,6 +651,8 @@ bool TModuleFrame::createModulePassword(int units, const bool bPasswordExt)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 5000;
       else if(key_record->pkey->productId == SOLFUSION_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 6000;
+      else if(key_record->pkey->productId == SOLITRACK_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 7000;
       else
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
 
@@ -822,6 +824,8 @@ bool TModuleFrame::createCounterPassword(unsigned int units, const bool bPasswor
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 5000;
       else if(key_record->pkey->productId == SOLFUSION_PRODUCT)
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 6000;
+      else if(key_record->pkey->productId == SOLITRACK_PRODUCT)
+         ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id + 7000;
       else
          ModuleDetailQuery->ParamByName("mod_id")->AsInteger =  detail->id;
 
