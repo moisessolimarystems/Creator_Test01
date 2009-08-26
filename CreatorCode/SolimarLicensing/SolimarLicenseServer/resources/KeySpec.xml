@@ -52,7 +52,8 @@ enum ProductId {
 12  RUBIKA_PRODUCT
 13  SOLFUSION_PRODUCT
 14  SPDE_PRODUCT
-15	NUMBER_OF_PRODUCTS
+15  SOLITRACK_PRODUCT
+16	NUMBER_OF_PRODUCTS
 0xFFFF	UNKNOWN_PRODUCT
 };
 -->
@@ -654,7 +655,21 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<ModuleInclude id="0" default="0"/>
         </Product>
       </ProductList>
-    </KeyLayout>    
+    </KeyLayout>   
+    <KeyLayout name="SOLitrack">
+      <ModuleList>
+				<Module id="0"	offset="0x080" bits="16" name="Devices"/>		      
+				<Module id="1"	offset="0x090" bits="16" name="Operators"/>
+				<Module id="2"	offset="0x0a0" bits="16" name="Monitor Instances"/>
+      </ModuleList>
+      <ProductList>
+        <Product id="15" name="SOLitrack">
+				<ModuleInclude id="0" default="0"/>
+				<ModuleInclude id="1" default="0"/>
+				<ModuleInclude id="2" default="0"/>
+        </Product>
+      </ProductList>
+    </KeyLayout>   
 		<KeyLayout name="SPDE">
 			<ModuleList>
 				<!-- Twinax Input -->
