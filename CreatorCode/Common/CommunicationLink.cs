@@ -241,10 +241,14 @@ namespace Client.Creator
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(uint productID)
         {
+            string productName = GetProductName(productID) + " Test/Dev";
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.sameModSpecProductID == productID)
-                    return productSpec;
+                //want to find test dev product spec given base product id
+                if (productSpec.productName.TVal.Equals(productName))
+                {
+                    return productSpec;                        
+                }
             }
             //need to return a valid bad value
             return null;
@@ -269,6 +273,13 @@ namespace Client.Creator
                     return productSpec.productName;
             }
             return "Unknown";
+        }
+
+        public string GetProductBaseName(string productName)
+        {
+            if (productName.Contains("Test"))
+                productName = productName.Substring(0, productName.IndexOf("Test") - 1);            
+            return productName;        
         }
 
         public string GetModuleName(uint productID, uint moduleID)
