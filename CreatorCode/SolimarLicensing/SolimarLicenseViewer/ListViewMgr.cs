@@ -641,7 +641,7 @@ namespace SolimarLicenseViewer
                             System.Collections.Generic.SortedDictionary<int, System.Collections.Generic.SortedList<DateTime, int>> modExpirationDateList = new SortedDictionary<int, System.Collections.Generic.SortedList<DateTime, int>>();
                             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                             {
-                                if (modInfo.moduleAppInstance != 0 && modInfo.moduleValue != 0)
+                                if (modInfo.moduleAppInstance != 0 || modInfo.moduleValue != 0)
                                 {
                                     moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
                                     if (!sumModInfoList.ContainsKey(moduleID))
@@ -670,7 +670,6 @@ namespace SolimarLicenseViewer
                                     }
                                 }
                             }
-                            //foreach(System.Collections.Generic.)
                             System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
                             foreach(System.Collections.Generic.KeyValuePair<int/*ModuleID*/, int[]> keyPair in sumModInfoList)
                             {
@@ -718,7 +717,7 @@ namespace SolimarLicenseViewer
                             System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
                             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                             {
-                                if (modInfo.moduleAppInstance != 0 && modInfo.moduleValue != 0)
+                                if (modInfo.moduleAppInstance != 0 || modInfo.moduleValue != 0)
                                 {
                                     //Get Module Info using product id and module id
                                     ListViewItem lvItem = new ListViewItem();
