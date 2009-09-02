@@ -57,7 +57,7 @@ namespace SolimarLicenseViewer
             try
             {
                 //remove " Text/Dev" from key names...
-                string cleanKey = key.Replace(" Test/Dev", "");
+                string cleanKey = key.Replace("Test/Dev ", "");
                 iconIndex = (IconList)Enum.Parse(typeof(IconList), cleanKey.Replace(" ", ""), true);
                 //iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", ""), true);
             }
