@@ -289,7 +289,7 @@ namespace SolimarLicenseViewer
 
                             lvi.Tag = true;
                             lvi.SubItems.Add(m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString());
-                            string validation = "Validation Succeeded";
+                            string validation = "Found";
                             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs verToken in m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
                             {
                                 //if validation token is computer, only add if computer name is correct.
@@ -313,7 +313,7 @@ namespace SolimarLicenseViewer
                                     {
                                         if (string.Compare(keyInfo.keyName, verToken.tokenValue.TVal.ToString(), true) == 0)
                                         {
-                                            validation = "Validation Succeeded";
+                                            validation = "Found";
                                             lvi.ForeColor = System.Drawing.SystemColors.WindowText;
                                             lvi.Tag = true;
                                         }
