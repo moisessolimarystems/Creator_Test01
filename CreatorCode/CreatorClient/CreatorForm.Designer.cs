@@ -30,14 +30,14 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2,
-            treeNode3});
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode6,
+            treeNode7,
+            treeNode8});
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,10 +46,11 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateVersionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolStrip = new System.Windows.Forms.ToolStrip();
             this.navigateBackToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.navigateForwardToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -63,13 +64,10 @@
             this.addProductLicenseMainToolStripDropDownBtn = new System.Windows.Forms.ToolStripSplitButton();
             this.newProductLicenseMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.existingProductLicenseMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.createPacketMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
             this.SearchToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.searchToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
-            this.createPacketMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toggleViewMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.seekKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.reserveHardwareKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.deactivateHardwareKeyToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -78,9 +76,6 @@
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.LicensesTabPage = new System.Windows.Forms.TabPage();
-            this.CustomersListView = new Shared.VisualComponents.NoFlickerListView();
-            this.custNumColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.custNameColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.LicenseViewSplitContainer = new System.Windows.Forms.SplitContainer();
             this.DetailTreeView = new System.Windows.Forms.TreeView();
             this.DetailTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
@@ -97,35 +92,23 @@
             this.dlvAddToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.dlvEditToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.moduleFilterToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
-            this.loadingCircle1 = new Shared.VisualComponents.LoadingCircle();
             this.TransactionsTabPage = new System.Windows.Forms.TabPage();
-            this.TransactionListView = new Shared.VisualComponents.NoFlickerListView();
-            this.TransactionDateColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.DescriptionColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.ValueColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.UserColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.TransactionsToolStrip = new System.Windows.Forms.ToolStrip();
             this.GroupToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.SingleToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.PacketTabPage = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.LicensePacketListView = new Shared.VisualComponents.NoFlickerListView();
-            this.PacketNameColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.CreateDateColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.ExpDateColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.CreatedByColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.VerifiedByColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.packetDescriptionRichTextBox = new System.Windows.Forms.RichTextBox();
             this.PacketListToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
+            this.CustomerToolStrip = new System.Windows.Forms.ToolStrip();
+            this.CustomerToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.ValidationKeysTabPage = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.HardwareKeyListView = new Shared.VisualComponents.NoFlickerListView();
+            this.ValidationKeyToolStrip = new System.Windows.Forms.ToolStrip();
+            this.ValidationKeyCustomerLabel = new System.Windows.Forms.ToolStripLabel();
             this.ReportTabPage = new System.Windows.Forms.TabPage();
-            this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.MainTreeView = new System.Windows.Forms.TreeView();
             this.MainTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
@@ -167,11 +150,25 @@
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.newCustomerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ValidationKeyToolStrip = new System.Windows.Forms.ToolStrip();
-            this.ValidationKeyCustomerLabel = new System.Windows.Forms.ToolStripLabel();
-            this.CustomerToolStrip = new System.Windows.Forms.ToolStrip();
-            this.CustomerToolStripLabel = new System.Windows.Forms.ToolStripLabel();
-            this.updateVersionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CustomersListView = new Shared.VisualComponents.NoFlickerListView();
+            this.custNumColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.custNameColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.loadingCircle1 = new Shared.VisualComponents.LoadingCircle();
+            this.TransactionListView = new Shared.VisualComponents.NoFlickerListView();
+            this.TransactionDateColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.DescriptionColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.ValueColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.UserColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.LicensePacketListView = new Shared.VisualComponents.NoFlickerListView();
+            this.PacketNameColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.CreateDateColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.ExpDateColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.CreatedByColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.VerifiedByColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.HardwareKeyListView = new Shared.VisualComponents.NoFlickerListView();
+            this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -196,8 +193,10 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.PacketListToolStrip.SuspendLayout();
+            this.CustomerToolStrip.SuspendLayout();
             this.ValidationKeysTabPage.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.ValidationKeyToolStrip.SuspendLayout();
             this.ReportTabPage.SuspendLayout();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -206,8 +205,6 @@
             this.MainTreeViewContextMenuStrip.SuspendLayout();
             this.LicenseContextMenuStrip.SuspendLayout();
             this.customerContextMenuStrip.SuspendLayout();
-            this.ValidationKeyToolStrip.SuspendLayout();
-            this.CustomerToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenuStrip
@@ -275,11 +272,24 @@
             this.toolStripMenuItem1.Size = new System.Drawing.Size(44, 20);
             this.toolStripMenuItem1.Text = "Tools";
             // 
+            // updateVersionsToolStripMenuItem
+            // 
+            this.updateVersionsToolStripMenuItem.Name = "updateVersionsToolStripMenuItem";
+            this.updateVersionsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.updateVersionsToolStripMenuItem.Text = "Update Product Version...";
+            this.updateVersionsToolStripMenuItem.Click += new System.EventHandler(this.updateVersionsToolStripMenuItem_Click);
+            // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.optionsToolStripMenuItem.Text = "Options...";
+            // 
+            // viewToolStripMenuItem
+            // 
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+            this.viewToolStripMenuItem.Text = "View";
             // 
             // helpToolStripMenuItem
             // 
@@ -292,15 +302,9 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(114, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // viewToolStripMenuItem
-            // 
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
-            this.viewToolStripMenuItem.Text = "View";
             // 
             // MainToolStrip
             // 
@@ -312,13 +316,10 @@
             this.newCustMainToolStripBtn,
             this.addLicMainToolStripBtn,
             this.addProductLicenseMainToolStripDropDownBtn,
-            this.toolStripSeparator7,
+            this.createPacketMainToolStripBtn,
             this.SearchToolStripLabel,
             this.searchToolStripTextBox,
-            this.createPacketMainToolStripBtn,
             this.toolStripSeparator4,
-            this.toggleViewMainToolStripBtn,
-            this.toolStripSeparator8,
             this.seekKeyToolStripButton,
             this.reserveHardwareKeyToolStripButton,
             this.deactivateHardwareKeyToolStripButton,
@@ -437,10 +438,17 @@
             this.existingProductLicenseMainToolStripMenuItem.Text = "Existing Product License...";
             this.existingProductLicenseMainToolStripMenuItem.Click += new System.EventHandler(this.existingProductLicenseMainToolStripMenuItem_Click);
             // 
-            // toolStripSeparator7
+            // createPacketMainToolStripBtn
             // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 27);
+            this.createPacketMainToolStripBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.createPacketMainToolStripBtn.Enabled = false;
+            this.createPacketMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("createPacketMainToolStripBtn.Image")));
+            this.createPacketMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.createPacketMainToolStripBtn.Name = "createPacketMainToolStripBtn";
+            this.createPacketMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
+            this.createPacketMainToolStripBtn.Text = "Generate License";
+            this.createPacketMainToolStripBtn.ToolTipText = "Generate License Packet from selected license";
+            this.createPacketMainToolStripBtn.Click += new System.EventHandler(this.createPacketMainToolStripBtn_Click);
             // 
             // SearchToolStripLabel
             // 
@@ -472,41 +480,10 @@
             this.searchToolStripTextBox.Enter += new System.EventHandler(this.searchToolStripTextBox_Enter);
             this.searchToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.searchToolStripTextBox_KeyUp);
             // 
-            // createPacketMainToolStripBtn
-            // 
-            this.createPacketMainToolStripBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.createPacketMainToolStripBtn.Enabled = false;
-            this.createPacketMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("createPacketMainToolStripBtn.Image")));
-            this.createPacketMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.createPacketMainToolStripBtn.Name = "createPacketMainToolStripBtn";
-            this.createPacketMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
-            this.createPacketMainToolStripBtn.Text = "Generate License";
-            this.createPacketMainToolStripBtn.ToolTipText = "Generate License Packet from selected license";
-            this.createPacketMainToolStripBtn.Click += new System.EventHandler(this.createPacketMainToolStripBtn_Click);
-            // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
-            // 
-            // toggleViewMainToolStripBtn
-            // 
-            this.toggleViewMainToolStripBtn.CheckOnClick = true;
-            this.toggleViewMainToolStripBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toggleViewMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("toggleViewMainToolStripBtn.Image")));
-            this.toggleViewMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toggleViewMainToolStripBtn.Name = "toggleViewMainToolStripBtn";
-            this.toggleViewMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
-            this.toggleViewMainToolStripBtn.Text = "ViewMenuTree";
-            this.toggleViewMainToolStripBtn.ToolTipText = "Toggle View";
-            this.toggleViewMainToolStripBtn.Visible = false;
-            this.toggleViewMainToolStripBtn.CheckedChanged += new System.EventHandler(this.toggleViewMainToolStripBtn_CheckedChanged);
-            // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 27);
-            this.toolStripSeparator8.Visible = false;
             // 
             // seekKeyToolStripButton
             // 
@@ -610,37 +587,6 @@
             this.LicensesTabPage.Text = "Licenses";
             this.LicensesTabPage.UseVisualStyleBackColor = true;
             // 
-            // CustomersListView
-            // 
-            this.CustomersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.custNumColumnHeader,
-            this.custNameColumnHeader});
-            this.CustomersListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CustomersListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CustomersListView.FullRowSelect = true;
-            this.CustomersListView.GridLines = true;
-            this.CustomersListView.Location = new System.Drawing.Point(0, 25);
-            this.CustomersListView.MultiSelect = false;
-            this.CustomersListView.Name = "CustomersListView";
-            this.CustomersListView.NoItemsMessage = "";
-            this.CustomersListView.Size = new System.Drawing.Size(981, 401);
-            this.CustomersListView.TabIndex = 2;
-            this.CustomersListView.UseCompatibleStateImageBehavior = false;
-            this.CustomersListView.View = System.Windows.Forms.View.Details;
-            this.CustomersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseDoubleClick);
-            this.CustomersListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseUp);
-            this.CustomersListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.CustomersListView_ColumnClick);
-            // 
-            // custNumColumnHeader
-            // 
-            this.custNumColumnHeader.Text = "Customer";
-            this.custNumColumnHeader.Width = 76;
-            // 
-            // custNameColumnHeader
-            // 
-            this.custNameColumnHeader.Text = "Name";
-            this.custNameColumnHeader.Width = 129;
-            // 
             // LicenseViewSplitContainer
             // 
             this.LicenseViewSplitContainer.BackColor = System.Drawing.SystemColors.Control;
@@ -697,15 +643,17 @@
             this.DetailTreeViewImageList.Images.SetKeyName(9, "Queue Manager32.ico");
             this.DetailTreeViewImageList.Images.SetKeyName(10, "System Manager32.ico");
             this.DetailTreeViewImageList.Images.SetKeyName(11, "spde32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(12, "SPDNT.ICO");
-            this.DetailTreeViewImageList.Images.SetKeyName(13, "Customer.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(14, "License.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(15, "LicenseUpdate.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(16, "LicenseDisabled.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(17, "LicenseResync.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(18, "Order.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(19, "AppInstance.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(20, "Empty.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(12, "SOLitrack32.png");
+            this.DetailTreeViewImageList.Images.SetKeyName(13, "SPDNT.ICO");
+            this.DetailTreeViewImageList.Images.SetKeyName(14, "Customer.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(15, "License.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(16, "LicenseUpdate.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(17, "LicenseDisabled.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(18, "LicenseResync.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(19, "LicenseDeactivated.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(20, "Order.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(21, "AppInstance.ico");
+            this.DetailTreeViewImageList.Images.SetKeyName(22, "Empty.ico");
             // 
             // PropertyGridTabControl
             // 
@@ -885,25 +833,6 @@
             this.moduleFilterToolStripComboBox.Size = new System.Drawing.Size(121, 25);
             this.moduleFilterToolStripComboBox.SelectedIndexChanged += new System.EventHandler(this.moduleFilterToolStripComboBox_SelectedIndexChanged);
             // 
-            // loadingCircle1
-            // 
-            this.loadingCircle1.Active = false;
-            this.loadingCircle1.BackColor = System.Drawing.Color.Transparent;
-            this.loadingCircle1.Color = System.Drawing.Color.DarkGray;
-            this.loadingCircle1.DisplayText = "Please Wait...";
-            this.loadingCircle1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.loadingCircle1.InnerCircleRadius = 6;
-            this.loadingCircle1.Location = new System.Drawing.Point(0, 0);
-            this.loadingCircle1.Name = "loadingCircle1";
-            this.loadingCircle1.NumberSpoke = 9;
-            this.loadingCircle1.OuterCircleRadius = 7;
-            this.loadingCircle1.RotationSpeed = 100;
-            this.loadingCircle1.Size = new System.Drawing.Size(676, 202);
-            this.loadingCircle1.SpokeThickness = 4;
-            this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.Firefox;
-            this.loadingCircle1.TabIndex = 6;
-            this.loadingCircle1.Visible = false;
-            // 
             // TransactionsTabPage
             // 
             this.TransactionsTabPage.Controls.Add(this.TransactionListView);
@@ -912,49 +841,10 @@
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
-            this.TransactionsTabPage.Size = new System.Drawing.Size(676, 394);
+            this.TransactionsTabPage.Size = new System.Drawing.Size(676, 369);
             this.TransactionsTabPage.TabIndex = 1;
             this.TransactionsTabPage.Text = "Transactions";
             this.TransactionsTabPage.UseVisualStyleBackColor = true;
-            // 
-            // TransactionListView
-            // 
-            this.TransactionListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.TransactionDateColumnHeader,
-            this.DescriptionColumnHeader,
-            this.ValueColumnHeader,
-            this.UserColumnHeader});
-            this.TransactionListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TransactionListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TransactionListView.FullRowSelect = true;
-            this.TransactionListView.Location = new System.Drawing.Point(0, 25);
-            this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
-            this.TransactionListView.Name = "TransactionListView";
-            this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(676, 369);
-            this.TransactionListView.TabIndex = 0;
-            this.TransactionListView.UseCompatibleStateImageBehavior = false;
-            this.TransactionListView.View = System.Windows.Forms.View.Details;
-            this.TransactionListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.TransactionListView_ColumnClick);
-            // 
-            // TransactionDateColumnHeader
-            // 
-            this.TransactionDateColumnHeader.Text = "Date";
-            this.TransactionDateColumnHeader.Width = 88;
-            // 
-            // DescriptionColumnHeader
-            // 
-            this.DescriptionColumnHeader.Text = "Description";
-            this.DescriptionColumnHeader.Width = 81;
-            // 
-            // ValueColumnHeader
-            // 
-            this.ValueColumnHeader.Text = "Value";
-            // 
-            // UserColumnHeader
-            // 
-            this.UserColumnHeader.Text = "User";
-            this.UserColumnHeader.Width = 79;
             // 
             // TransactionsToolStrip
             // 
@@ -997,7 +887,7 @@
             this.PacketTabPage.ImageIndex = 4;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(676, 394);
+            this.PacketTabPage.Size = new System.Drawing.Size(676, 369);
             this.PacketTabPage.TabIndex = 2;
             this.PacketTabPage.Text = "Packets";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -1019,69 +909,17 @@
             // 
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
-            this.splitContainer1.Size = new System.Drawing.Size(676, 369);
-            this.splitContainer1.SplitterDistance = 328;
+            this.splitContainer1.Size = new System.Drawing.Size(676, 344);
+            this.splitContainer1.SplitterDistance = 312;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
-            // 
-            // LicensePacketListView
-            // 
-            this.LicensePacketListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.PacketNameColumnHeader,
-            this.CreateDateColumnHeader,
-            this.ExpDateColumnHeader,
-            this.CreatedByColumnHeader,
-            this.VerifiedByColumnHeader});
-            this.LicensePacketListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LicensePacketListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LicensePacketListView.FullRowSelect = true;
-            this.LicensePacketListView.GridLines = true;
-            this.LicensePacketListView.HideSelection = false;
-            this.LicensePacketListView.Location = new System.Drawing.Point(0, 0);
-            this.LicensePacketListView.Margin = new System.Windows.Forms.Padding(0);
-            this.LicensePacketListView.MultiSelect = false;
-            this.LicensePacketListView.Name = "LicensePacketListView";
-            this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(674, 326);
-            this.LicensePacketListView.StateImageList = this.ListViewImageList;
-            this.LicensePacketListView.TabIndex = 4;
-            this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
-            this.LicensePacketListView.View = System.Windows.Forms.View.Details;
-            this.LicensePacketListView.SelectedIndexChanged += new System.EventHandler(this.LicensePacketListView_SelectedIndexChanged);
-            this.LicensePacketListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LicensePacketListView_MouseUp);
-            this.LicensePacketListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.LicensePacketListView_ColumnClick);
-            // 
-            // PacketNameColumnHeader
-            // 
-            this.PacketNameColumnHeader.Text = "Name";
-            this.PacketNameColumnHeader.Width = 56;
-            // 
-            // CreateDateColumnHeader
-            // 
-            this.CreateDateColumnHeader.Text = "Date Created";
-            this.CreateDateColumnHeader.Width = 84;
-            // 
-            // ExpDateColumnHeader
-            // 
-            this.ExpDateColumnHeader.Text = "Expired Date";
-            this.ExpDateColumnHeader.Width = 85;
-            // 
-            // CreatedByColumnHeader
-            // 
-            this.CreatedByColumnHeader.Text = "Created By";
-            this.CreatedByColumnHeader.Width = 77;
-            // 
-            // VerifiedByColumnHeader
-            // 
-            this.VerifiedByColumnHeader.Text = "Verified By";
-            this.VerifiedByColumnHeader.Width = 86;
             // 
             // packetDescriptionRichTextBox
             // 
             this.packetDescriptionRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.packetDescriptionRichTextBox.Location = new System.Drawing.Point(0, 0);
             this.packetDescriptionRichTextBox.Name = "packetDescriptionRichTextBox";
-            this.packetDescriptionRichTextBox.Size = new System.Drawing.Size(674, 38);
+            this.packetDescriptionRichTextBox.Size = new System.Drawing.Size(674, 29);
             this.packetDescriptionRichTextBox.TabIndex = 0;
             this.packetDescriptionRichTextBox.Text = "";
             this.packetDescriptionRichTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.packetDescriptionRichTextBox_MouseUp);
@@ -1116,6 +954,24 @@
             this.toolStripComboBox1.Size = new System.Drawing.Size(121, 23);
             this.toolStripComboBox1.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox1_SelectedIndexChanged);
             // 
+            // CustomerToolStrip
+            // 
+            this.CustomerToolStrip.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CustomerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.CustomerToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.CustomerToolStripLabel});
+            this.CustomerToolStrip.Location = new System.Drawing.Point(0, 0);
+            this.CustomerToolStrip.Name = "CustomerToolStrip";
+            this.CustomerToolStrip.Size = new System.Drawing.Size(981, 25);
+            this.CustomerToolStrip.TabIndex = 3;
+            this.CustomerToolStrip.Text = "toolStrip1";
+            // 
+            // CustomerToolStripLabel
+            // 
+            this.CustomerToolStripLabel.Name = "CustomerToolStripLabel";
+            this.CustomerToolStripLabel.Size = new System.Drawing.Size(38, 22);
+            this.CustomerToolStripLabel.Text = "[Edit]";
+            // 
             // ValidationKeysTabPage
             // 
             this.ValidationKeysTabPage.Controls.Add(this.panel1);
@@ -1137,24 +993,23 @@
             this.panel1.Size = new System.Drawing.Size(981, 426);
             this.panel1.TabIndex = 0;
             // 
-            // HardwareKeyListView
+            // ValidationKeyToolStrip
             // 
-            this.HardwareKeyListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.HardwareKeyListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.HardwareKeyListView.FullRowSelect = true;
-            this.HardwareKeyListView.GridLines = true;
-            this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
-            this.HardwareKeyListView.MultiSelect = false;
-            this.HardwareKeyListView.Name = "HardwareKeyListView";
-            this.HardwareKeyListView.NoItemsMessage = "There are no hardware keys to show in this view";
-            this.HardwareKeyListView.ShowGroups = false;
-            this.HardwareKeyListView.Size = new System.Drawing.Size(981, 401);
-            this.HardwareKeyListView.TabIndex = 1;
-            this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
-            this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
-            this.HardwareKeyListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HardwareKeyListView_MouseDoubleClick);
-            this.HardwareKeyListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.HardwareKeyListView_ColumnClick);
-            this.HardwareKeyListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.HardwareKeyListView_ItemSelectionChanged);
+            this.ValidationKeyToolStrip.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ValidationKeyToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.ValidationKeyToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ValidationKeyCustomerLabel});
+            this.ValidationKeyToolStrip.Location = new System.Drawing.Point(0, 0);
+            this.ValidationKeyToolStrip.Name = "ValidationKeyToolStrip";
+            this.ValidationKeyToolStrip.Size = new System.Drawing.Size(981, 25);
+            this.ValidationKeyToolStrip.TabIndex = 2;
+            this.ValidationKeyToolStrip.Text = "toolStrip1";
+            // 
+            // ValidationKeyCustomerLabel
+            // 
+            this.ValidationKeyCustomerLabel.Name = "ValidationKeyCustomerLabel";
+            this.ValidationKeyCustomerLabel.Size = new System.Drawing.Size(38, 22);
+            this.ValidationKeyCustomerLabel.Text = "[Edit]";
             // 
             // ReportTabPage
             // 
@@ -1166,30 +1021,6 @@
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Reports";
             this.ReportTabPage.UseVisualStyleBackColor = true;
-            // 
-            // ReportListView
-            // 
-            this.ReportListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.ReportListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ReportListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ReportListView.Location = new System.Drawing.Point(0, 0);
-            this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(981, 426);
-            this.ReportListView.TabIndex = 0;
-            this.ReportListView.UseCompatibleStateImageBehavior = false;
-            this.ReportListView.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "License Name";
-            this.columnHeader1.Width = 99;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Description";
-            this.columnHeader2.Width = 104;
             // 
             // MainSplitContainer
             // 
@@ -1224,29 +1055,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode1.ImageIndex = 1;
-            treeNode1.Name = "LicenseNode";
-            treeNode1.SelectedImageIndex = 1;
-            treeNode1.Text = "Licenses";
-            treeNode2.ImageIndex = 2;
-            treeNode2.Name = "PacketNode";
-            treeNode2.SelectedImageIndex = 2;
-            treeNode2.Text = "Packets";
-            treeNode3.Name = "KeyNode";
-            treeNode3.Text = "Hardware Keys";
-            treeNode4.ImageIndex = 3;
-            treeNode4.Name = "CreatorRootNode";
-            treeNode4.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode4.SelectedImageIndex = 3;
-            treeNode4.Text = "Creator";
-            treeNode5.ImageIndex = 0;
-            treeNode5.Name = "ReportRootNode";
-            treeNode5.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode5.SelectedImageIndex = 0;
-            treeNode5.Text = "Reports";
+            treeNode6.ImageIndex = 1;
+            treeNode6.Name = "LicenseNode";
+            treeNode6.SelectedImageIndex = 1;
+            treeNode6.Text = "Licenses";
+            treeNode7.ImageIndex = 2;
+            treeNode7.Name = "PacketNode";
+            treeNode7.SelectedImageIndex = 2;
+            treeNode7.Text = "Packets";
+            treeNode8.Name = "KeyNode";
+            treeNode8.Text = "Hardware Keys";
+            treeNode9.ImageIndex = 3;
+            treeNode9.Name = "CreatorRootNode";
+            treeNode9.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode9.SelectedImageIndex = 3;
+            treeNode9.Text = "Creator";
+            treeNode10.ImageIndex = 0;
+            treeNode10.Name = "ReportRootNode";
+            treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode10.SelectedImageIndex = 0;
+            treeNode10.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4,
-            treeNode5});
+            treeNode9,
+            treeNode10});
             this.MainTreeView.SelectedImageIndex = 0;
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
@@ -1559,48 +1390,189 @@
             this.customerToolStripMenuItem.Text = "Customer";
             this.customerToolStripMenuItem.Click += new System.EventHandler(this.customerToolStripMenuItem_Click);
             // 
-            // ValidationKeyToolStrip
+            // CustomersListView
             // 
-            this.ValidationKeyToolStrip.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ValidationKeyToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.ValidationKeyToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ValidationKeyCustomerLabel});
-            this.ValidationKeyToolStrip.Location = new System.Drawing.Point(0, 0);
-            this.ValidationKeyToolStrip.Name = "ValidationKeyToolStrip";
-            this.ValidationKeyToolStrip.Size = new System.Drawing.Size(981, 25);
-            this.ValidationKeyToolStrip.TabIndex = 2;
-            this.ValidationKeyToolStrip.Text = "toolStrip1";
+            this.CustomersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.custNumColumnHeader,
+            this.custNameColumnHeader});
+            this.CustomersListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CustomersListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CustomersListView.FullRowSelect = true;
+            this.CustomersListView.GridLines = true;
+            this.CustomersListView.Location = new System.Drawing.Point(0, 25);
+            this.CustomersListView.MultiSelect = false;
+            this.CustomersListView.Name = "CustomersListView";
+            this.CustomersListView.NoItemsMessage = "";
+            this.CustomersListView.Size = new System.Drawing.Size(981, 401);
+            this.CustomersListView.TabIndex = 2;
+            this.CustomersListView.UseCompatibleStateImageBehavior = false;
+            this.CustomersListView.View = System.Windows.Forms.View.Details;
+            this.CustomersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseDoubleClick);
+            this.CustomersListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseUp);
+            this.CustomersListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.CustomersListView_ColumnClick);
             // 
-            // ValidationKeyCustomerLabel
+            // custNumColumnHeader
             // 
-            this.ValidationKeyCustomerLabel.Name = "ValidationKeyCustomerLabel";
-            this.ValidationKeyCustomerLabel.Size = new System.Drawing.Size(38, 22);
-            this.ValidationKeyCustomerLabel.Text = "[Edit]";
+            this.custNumColumnHeader.Text = "Customer";
+            this.custNumColumnHeader.Width = 76;
             // 
-            // CustomerToolStrip
+            // custNameColumnHeader
             // 
-            this.CustomerToolStrip.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CustomerToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.CustomerToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.CustomerToolStripLabel});
-            this.CustomerToolStrip.Location = new System.Drawing.Point(0, 0);
-            this.CustomerToolStrip.Name = "CustomerToolStrip";
-            this.CustomerToolStrip.Size = new System.Drawing.Size(981, 25);
-            this.CustomerToolStrip.TabIndex = 3;
-            this.CustomerToolStrip.Text = "toolStrip1";
+            this.custNameColumnHeader.Text = "Name";
+            this.custNameColumnHeader.Width = 901;
             // 
-            // CustomerToolStripLabel
+            // loadingCircle1
             // 
-            this.CustomerToolStripLabel.Name = "CustomerToolStripLabel";
-            this.CustomerToolStripLabel.Size = new System.Drawing.Size(38, 22);
-            this.CustomerToolStripLabel.Text = "[Edit]";
+            this.loadingCircle1.Active = false;
+            this.loadingCircle1.BackColor = System.Drawing.Color.Transparent;
+            this.loadingCircle1.Color = System.Drawing.Color.DarkGray;
+            this.loadingCircle1.DisplayText = "Please Wait...";
+            this.loadingCircle1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.loadingCircle1.InnerCircleRadius = 6;
+            this.loadingCircle1.Location = new System.Drawing.Point(0, 0);
+            this.loadingCircle1.Name = "loadingCircle1";
+            this.loadingCircle1.NumberSpoke = 9;
+            this.loadingCircle1.OuterCircleRadius = 7;
+            this.loadingCircle1.RotationSpeed = 100;
+            this.loadingCircle1.Size = new System.Drawing.Size(676, 202);
+            this.loadingCircle1.SpokeThickness = 4;
+            this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.Firefox;
+            this.loadingCircle1.TabIndex = 6;
+            this.loadingCircle1.Visible = false;
             // 
-            // updateVersionsToolStripMenuItem
+            // TransactionListView
             // 
-            this.updateVersionsToolStripMenuItem.Name = "updateVersionsToolStripMenuItem";
-            this.updateVersionsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.updateVersionsToolStripMenuItem.Text = "Update Product Version...";
-            this.updateVersionsToolStripMenuItem.Click += new System.EventHandler(this.updateVersionsToolStripMenuItem_Click);
+            this.TransactionListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.TransactionDateColumnHeader,
+            this.DescriptionColumnHeader,
+            this.ValueColumnHeader,
+            this.UserColumnHeader});
+            this.TransactionListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TransactionListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TransactionListView.FullRowSelect = true;
+            this.TransactionListView.Location = new System.Drawing.Point(0, 25);
+            this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
+            this.TransactionListView.Name = "TransactionListView";
+            this.TransactionListView.NoItemsMessage = "";
+            this.TransactionListView.Size = new System.Drawing.Size(676, 344);
+            this.TransactionListView.TabIndex = 0;
+            this.TransactionListView.UseCompatibleStateImageBehavior = false;
+            this.TransactionListView.View = System.Windows.Forms.View.Details;
+            this.TransactionListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.TransactionListView_ColumnClick);
+            // 
+            // TransactionDateColumnHeader
+            // 
+            this.TransactionDateColumnHeader.Text = "Date";
+            this.TransactionDateColumnHeader.Width = 88;
+            // 
+            // DescriptionColumnHeader
+            // 
+            this.DescriptionColumnHeader.Text = "Description";
+            this.DescriptionColumnHeader.Width = 81;
+            // 
+            // ValueColumnHeader
+            // 
+            this.ValueColumnHeader.Text = "Value";
+            // 
+            // UserColumnHeader
+            // 
+            this.UserColumnHeader.Text = "User";
+            this.UserColumnHeader.Width = 79;
+            // 
+            // LicensePacketListView
+            // 
+            this.LicensePacketListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.PacketNameColumnHeader,
+            this.CreateDateColumnHeader,
+            this.ExpDateColumnHeader,
+            this.CreatedByColumnHeader,
+            this.VerifiedByColumnHeader});
+            this.LicensePacketListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LicensePacketListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LicensePacketListView.FullRowSelect = true;
+            this.LicensePacketListView.GridLines = true;
+            this.LicensePacketListView.HideSelection = false;
+            this.LicensePacketListView.Location = new System.Drawing.Point(0, 0);
+            this.LicensePacketListView.Margin = new System.Windows.Forms.Padding(0);
+            this.LicensePacketListView.MultiSelect = false;
+            this.LicensePacketListView.Name = "LicensePacketListView";
+            this.LicensePacketListView.NoItemsMessage = "";
+            this.LicensePacketListView.Size = new System.Drawing.Size(674, 310);
+            this.LicensePacketListView.StateImageList = this.ListViewImageList;
+            this.LicensePacketListView.TabIndex = 4;
+            this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
+            this.LicensePacketListView.View = System.Windows.Forms.View.Details;
+            this.LicensePacketListView.SelectedIndexChanged += new System.EventHandler(this.LicensePacketListView_SelectedIndexChanged);
+            this.LicensePacketListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.LicensePacketListView_MouseUp);
+            this.LicensePacketListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.LicensePacketListView_ColumnClick);
+            // 
+            // PacketNameColumnHeader
+            // 
+            this.PacketNameColumnHeader.Text = "Name";
+            this.PacketNameColumnHeader.Width = 56;
+            // 
+            // CreateDateColumnHeader
+            // 
+            this.CreateDateColumnHeader.Text = "Date Created";
+            this.CreateDateColumnHeader.Width = 84;
+            // 
+            // ExpDateColumnHeader
+            // 
+            this.ExpDateColumnHeader.Text = "Expired Date";
+            this.ExpDateColumnHeader.Width = 85;
+            // 
+            // CreatedByColumnHeader
+            // 
+            this.CreatedByColumnHeader.Text = "Created By";
+            this.CreatedByColumnHeader.Width = 77;
+            // 
+            // VerifiedByColumnHeader
+            // 
+            this.VerifiedByColumnHeader.Text = "Verified By";
+            this.VerifiedByColumnHeader.Width = 86;
+            // 
+            // HardwareKeyListView
+            // 
+            this.HardwareKeyListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.HardwareKeyListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.HardwareKeyListView.FullRowSelect = true;
+            this.HardwareKeyListView.GridLines = true;
+            this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
+            this.HardwareKeyListView.MultiSelect = false;
+            this.HardwareKeyListView.Name = "HardwareKeyListView";
+            this.HardwareKeyListView.NoItemsMessage = "There are no hardware keys to show in this view";
+            this.HardwareKeyListView.ShowGroups = false;
+            this.HardwareKeyListView.Size = new System.Drawing.Size(981, 401);
+            this.HardwareKeyListView.TabIndex = 1;
+            this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
+            this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
+            this.HardwareKeyListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HardwareKeyListView_MouseDoubleClick);
+            this.HardwareKeyListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.HardwareKeyListView_ColumnClick);
+            this.HardwareKeyListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.HardwareKeyListView_ItemSelectionChanged);
+            // 
+            // ReportListView
+            // 
+            this.ReportListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.ReportListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ReportListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ReportListView.Location = new System.Drawing.Point(0, 0);
+            this.ReportListView.Name = "ReportListView";
+            this.ReportListView.Size = new System.Drawing.Size(981, 426);
+            this.ReportListView.TabIndex = 0;
+            this.ReportListView.UseCompatibleStateImageBehavior = false;
+            this.ReportListView.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "License Name";
+            this.columnHeader1.Width = 99;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Description";
+            this.columnHeader2.Width = 104;
             // 
             // CreatorForm
             // 
@@ -1651,9 +1623,13 @@
             this.splitContainer1.ResumeLayout(false);
             this.PacketListToolStrip.ResumeLayout(false);
             this.PacketListToolStrip.PerformLayout();
+            this.CustomerToolStrip.ResumeLayout(false);
+            this.CustomerToolStrip.PerformLayout();
             this.ValidationKeysTabPage.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.ValidationKeyToolStrip.ResumeLayout(false);
+            this.ValidationKeyToolStrip.PerformLayout();
             this.ReportTabPage.ResumeLayout(false);
             this.MainSplitContainer.Panel1.ResumeLayout(false);
             this.MainSplitContainer.ResumeLayout(false);
@@ -1662,10 +1638,6 @@
             this.MainTreeViewContextMenuStrip.ResumeLayout(false);
             this.LicenseContextMenuStrip.ResumeLayout(false);
             this.customerContextMenuStrip.ResumeLayout(false);
-            this.ValidationKeyToolStrip.ResumeLayout(false);
-            this.ValidationKeyToolStrip.PerformLayout();
-            this.CustomerToolStrip.ResumeLayout(false);
-            this.CustomerToolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1735,9 +1707,6 @@
         private System.Windows.Forms.ColumnHeader CreatedByColumnHeader;
         private Shared.VisualComponents.LoadingCircle loadingCircle1;
         private System.Windows.Forms.ToolStripButton newCustMainToolStripBtn;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
-        private System.Windows.Forms.ToolStripButton toggleViewMainToolStripBtn;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripLabel ImageToolStripLabel;

@@ -98,6 +98,7 @@
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="ItemNameDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -268,8 +269,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo.datasource" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Service References\CreatorService\Arrays.xsd" />
     <None Include="Service References\CreatorService\CreatorData.xsd" />
     <None Include="Service References\CreatorService\Service.Creator.xsd" />
     <None Include="Service References\CreatorService\service.wsdl" />
@@ -288,7 +288,6 @@
     <None Include="Service References\CreatorService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\CreatorService\Arrays.xsd" />
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.CustomerTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -298,13 +297,13 @@
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.LicenseTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\CreatorService\Client.Creator.CreatorService.OrderTable.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.PacketTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.PermissionsTable.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductLicenseTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductTable.datasource">

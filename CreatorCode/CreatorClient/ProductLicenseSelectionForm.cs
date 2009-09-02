@@ -14,12 +14,13 @@ namespace Client.Creator
     public partial class ProductLicenseSelectionForm : Shared.VisualComponents.DialogBaseForm
     {
         private ListViewMgr _lvManager;
-
-        public ProductLicenseSelectionForm()
+        private CommunicationLink _commLink;
+        public ProductLicenseSelectionForm(CommunicationLink commLink)
         {
             InitializeComponent();
             _lvManager = new ListViewMgr();
             _lvManager.SetListViewColumnSorter(listView1);
+            _commLink = commLink;
         }
 
         private void ProductLicenseSelectionForm_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
@@ -28,37 +29,37 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string licenseBase = "P";
-                List<OrderTable> standardOrders = client.GetOrdersByLicenseName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
-                if (standardOrders.Count == 0) //subscription type
+                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                if (productLicenses.Count == 0) //subscription type
                 {
                     licenseBase = "S";
-                    standardOrders = client.GetOrdersByLicenseName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                    productLicenses = client.GetProductLicenses(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
                 }
-                List<OrderTable> subOrders = client.GetOrdersByLicenseName(licData.Name);
-                foreach (OrderTable order in standardOrders)
+                List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
+                foreach (ProductLicenseTable plRecord in productLicenses)
                 {
-                    if (order.OrderState != (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                    if (plRecord.plState != (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
                     {
                         //if order already exists apply check to checkbox and make greyed out? unselectable?
                         ListViewItem lvItem = new ListViewItem();
-                        if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
+                        if (licData.LicType == LicenseServerType.DisasterRecovery) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
                         {
-                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace(licenseBase, "D"))))
+                            if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "D"))))
                                 continue;
                         }
-                        else if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
+                        else if (licData.LicType == LicenseServerType.TestDevelopment) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
                         {
-                            if (subOrders.Exists(c => c.OrderNumber.Equals(order.OrderNumber.Replace(licenseBase, "T"))))
-                                continue;                            
+                            if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "T"))))
+                                continue;
                         }
-                        lvItem.Text = order.OrderNumber;
-                        lvItem.SubItems.Add(Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), order.OrderState));
-                        lvItem.SubItems.Add(order.ProductName);
-                        if (order.ExpirationDate.HasValue)
-                            lvItem.SubItems.Add(order.ExpirationDate.Value.ToLocalTime().ToShortDateString());
+                        lvItem.Text = plRecord.plID;
+                        lvItem.SubItems.Add(Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), plRecord.plState));
+                        lvItem.SubItems.Add(_commLink.GetProductName((uint)plRecord.ProductID));
+                        if (plRecord.ExpirationDate.HasValue)
+                            lvItem.SubItems.Add(plRecord.ExpirationDate.Value.ToLocalTime().ToShortDateString());
                         else
                             lvItem.SubItems.Add("");
-                        lvItem.SubItems.Add(order.Description);
+                        lvItem.SubItems.Add(plRecord.Description);
                         listView1.Items.Add(lvItem);
                     }
                 }
