@@ -350,63 +350,69 @@ namespace Service.Creator
 
         #region Order Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<OrderTable> GetAllOrders()
+        public IList<ProductLicenseTable> GetAllProductLicenses()
         {
-            return OrderTable.GetAllOrders();
+            return ProductLicenseTable.GetAllProductLicenses();
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<OrderTable> GetOrdersByLicenseName(string licenseName)
+        public IList<ProductLicenseTable> GetProductLicenses(string licenseServerID)
         {
-            return OrderTable.GetOrdersByLicenseName(licenseName);
+            return ProductLicenseTable.GetProductLicenses(licenseServerID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<OrderTable> GetOrdersEqualsProduct(string licenseName, string productName)
+        public IList<ProductLicenseTable> GetProductLicensesByProduct(string licenseServerID, int productID)
         {
-            return OrderTable.GetOrdersEqualsProduct(licenseName, productName);
+            return ProductLicenseTable.GetProductLicenses(licenseServerID, productID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public OrderTable GetOrderByOrderName(string orderName)
+        public ProductLicenseTable GetProductLicense(string productLicenseID)
         {
-            return OrderTable.GetOrderByOrderName(orderName);
+            return ProductLicenseTable.GetProductLicense(productLicenseID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<string> GetAddOnOrdersByStandardOrder(string standardOrder)
+        public IList<string> GetAddOnProductLicenses(string productLicenseID)
         {
-            return OrderTable.GetAddOnOrdersByStandardOrder(standardOrder);
+            return ProductLicenseTable.GetAddOnProductLicenses(productLicenseID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetNextOrderIndex(string licenseName)
+        public int GetNextProductLicenseIndex(string licenseServerID)
         {
-            return OrderTable.GetNextOrderIndex(licenseName);
+            return ProductLicenseTable.GetNextProductLicenseIndex(licenseServerID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetProductVersionFromTable(int productID)
         {
-            return OrderTable.GetProductVersionFromTable(productID);
+            return ProductLicenseTable.GetProductVersionFromTable(productID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void CreateOrder(OrderTable contract)
+        public void DeleteAllProductLicenses(string licenseServer)
         {
-            OrderTable.CreateOrder(contract);
+            ProductLicenseTable.DeleteAllProductLicenses(licenseServer);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void UpdateOrder(OrderTable contract)
+        public void CreateProductLicense(ProductLicenseTable pl)
         {
-            OrderTable.UpdateOrder(contract);
+            ProductLicenseTable.CreateProductLicense(pl);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void DeleteOrder(OrderTable contract)
+        public void UpdateProductLicense(ProductLicenseTable pl)
         {
-            OrderTable.DeleteOrder(contract);
+            ProductLicenseTable.UpdateProductLicense(pl);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void DeleteProductLicense(ProductLicenseTable pl)
+        {
+            ProductLicenseTable.DeleteProductLicense(pl);
         }
         #endregion
 

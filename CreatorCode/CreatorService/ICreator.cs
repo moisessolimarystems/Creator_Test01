@@ -167,36 +167,39 @@ namespace Service.Creator
         void DeleteTransaction(TransactionTable ta);
         #endregion
 
-        #region Order OperationContracts
+        #region Product License OperationContracts
         [OperationContract]
-        IList<OrderTable> GetAllOrders();
+        IList<ProductLicenseTable> GetAllProductLicenses();
 
         [OperationContract]
-        IList<OrderTable> GetOrdersByLicenseName(string licenseName);
+        IList<ProductLicenseTable> GetProductLicenses(string licenseServerID);
 
         [OperationContract]
-        IList<OrderTable> GetOrdersEqualsProduct(string licenseName, string productName);
+        IList<ProductLicenseTable> GetProductLicensesByProduct(string licenseServerID, int productID);
 
         [OperationContract]
-        IList<string> GetAddOnOrdersByStandardOrder(string standardOrder);
+        ProductLicenseTable GetProductLicense(string productLicenseID);
 
         [OperationContract]
-        OrderTable GetOrderByOrderName(string orderName);
+        IList<string> GetAddOnProductLicenses(string productLicenseID);
 
         [OperationContract]
-        int GetNextOrderIndex(string licenseName);
+        int GetNextProductLicenseIndex(string licenseServerID);
 
         [OperationContract]
         int GetProductVersionFromTable(int productID);
 
-        [OperationContract()]
-        void CreateOrder(OrderTable ta);
+        [OperationContract]
+        void DeleteAllProductLicenses(string licenseServer);
 
         [OperationContract()]
-        void UpdateOrder(OrderTable ta);
+        void CreateProductLicense(ProductLicenseTable ta);
 
         [OperationContract()]
-        void DeleteOrder(OrderTable ta);
+        void UpdateProductLicense(ProductLicenseTable ta);
+
+        [OperationContract()]
+        void DeleteProductLicense(ProductLicenseTable ta);
 
         #endregion
 
