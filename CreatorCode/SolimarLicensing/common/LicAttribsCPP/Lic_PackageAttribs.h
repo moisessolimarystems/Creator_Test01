@@ -43,20 +43,22 @@ public:
 		pid_SolFusion = 13,
 		pid_Spde = 14,
 		pid_SolsearcherSp = 15,
-		pid_RubikaProcessBuilder = 16,
-		pid_SdxDesigner = 17,
-		pid_SpdeQueueManager = 18,
-		pid_TestDevIconvert = 19,
-		pid_TestDevSolsearcherEp = 20,
-		pid_TestDevSolIndexer = 21,
-		pid_TestDevRubika = 22,
-		pid_TestDevSpde = 23,
-		pid_TestDevSseSp = 24,
-		pid_TestDevSolfusionSp = 25,
-		pid_TestDevSdxDesigner = 26,
-		pid_TestDevSpdeQueueManager = 27,
-		pid_TestDevRubikaProcessBuilder = 28,
-		pid_TestDevSolScript = 29,
+		pid_SOLitrack = 16,
+		pid_RubikaProcessBuilder = 17,
+		pid_SdxDesigner = 18,
+		pid_SpdeQueueManager = 19,
+		pid_TestDevIconvert = 107,
+		pid_TestDevSolsearcherEp = 108,
+		pid_TestDevSolScript = 109,
+		pid_TestDevSolIndexer = 110,
+		pid_TestDevRubika = 112,
+		pid_TestDevSolfusionSp = 113,
+		pid_TestDevSpde = 114,
+		pid_TestDevSseSp = 115,
+		pid_TestDevSOLitrack = 116,
+		pid_TestDevRubikaProcessBuilder = 117,
+		pid_TestDevSdxDesigner = 118,
+		pid_TestDevSpdeQueueManager = 119,
 		pid_UnknownProduct = 0xFFFF,
 	} TLic_ProductID;
 	
@@ -540,10 +542,9 @@ public:
 			return *this ;
 		}
 		typedef enum {
-			msPerm = 0,
+			msLicensed = 0,
 			msTrial = 1,
 			msAddOn = 2,
-			msSubscription = 3,
 		} TModuleState;
 		
 			
@@ -574,7 +575,7 @@ public:
 			moduleAppInstance(m_mapAttribObjs, L"mAI", 0),
 			moduleExpirationDate(m_mapAttribObjs, L"exDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
-			moduleState(m_mapAttribObjs, L"mSt", msPerm){;}
+			moduleState(m_mapAttribObjs, L"mSt", msTrial){;}
 		
 		Lic_ModuleInfoAttribs(const Lic_ModuleInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
@@ -592,7 +593,7 @@ public:
 			moduleAppInstance(m_mapAttribObjs, L"mAI", 0),
 			moduleExpirationDate(m_mapAttribObjs, L"exDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
-			moduleState(m_mapAttribObjs, L"mSt", msPerm){;}
+			moduleState(m_mapAttribObjs, L"mSt", msTrial){;}
 		
 		Lic_ModuleInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ModuleInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),

@@ -47,7 +47,7 @@ namespace Client.Creator
             {
                 if (_module.moduleValue.TVal > 0)
                 {
-                    if (_module.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm)
+                    if (_module.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed)
                     {
                         if (!CreatorForm.s_CommLink.IsDefaultModule(_productID, _module.moduleID.TVal))
                             return true;

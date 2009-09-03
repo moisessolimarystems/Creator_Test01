@@ -30,7 +30,7 @@ namespace CreatorData
                     var foundTransaction = db.TransactionTables.Where(c => c.taDateCreated.Equals(trans.taDateCreated) && c.taOrderID.Equals(subLicOrderID)).FirstOrDefault();
                     if(foundTransaction == null)
                     {
-                        var order = db.OrderTables.Where(o => o.ID.Equals(subLicOrderID)).FirstOrDefault();
+                        var order = db.ProductLicenseTables.Where(o => o.ID.Equals(subLicOrderID)).FirstOrDefault();
                         TransactionTable newTransaction = new TransactionTable();
                         newTransaction.taDateCreated = trans.taDateCreated;
                         newTransaction.taDescription = trans.taDescription;

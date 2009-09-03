@@ -19,6 +19,7 @@ namespace Client.Creator
         private string _destinationName;
         private string _comments;
         private PermissionsTable _permissions;
+        private LicenseServerType _licType;
 
         #endregion
 
@@ -34,6 +35,7 @@ namespace Client.Creator
             _comments = license.Comments;
             _permissions = license.Permissions;
             _destinationName = license.DestName;
+            _licType = license.LicType;
         }
 
         //requires a licPackage stream for licStream not just licLicenseInfoAttribs.
@@ -45,6 +47,7 @@ namespace Client.Creator
             _licInfo = licPackage.licLicenseInfoAttribs;           
             _comments = license.LicenseComments;
             Permissions = permissions;
+            _licType = (LicenseServerType)license.LicenseType;
             Service<ICreator>.Use((client) => 
             {
                 DestinationNameTable dest = client.GetDestinationName((int)CustID, (int)DestID);
@@ -83,6 +86,13 @@ namespace Client.Creator
             get { return _licInfo; }
             set { _licInfo = value; }
         }
+
+        [Browsable(false)]
+        public Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType SoftwareLicenseType
+        {
+            get { return _licInfo.softwareLicType.TVal; }
+            set { _licInfo.softwareLicType.TVal = value; }
+        }
         
         [Browsable(false)]
         public bool HasUpdates
@@ -117,9 +127,12 @@ namespace Client.Creator
         {
             get
             {
-                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual ||
-                    LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription)
-                    return true;
+                if (_licInfo != null)
+                {
+                    if (_licInfo.softwareLicType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual ||
+                        _licInfo.softwareLicType.TVal ==  Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription)
+                        return true;
+                }
                 return false;
             }
         }
@@ -129,9 +142,12 @@ namespace Client.Creator
         {
             get
             {
-                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery ||
-                    LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
-                    return true;
+                if(_licInfo != null)
+                {
+                     if (_licInfo.softwareLicType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery ||
+                        _licInfo.softwareLicType.TVal ==  Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
+                        return true;
+                }
                 return false;
             }
         }
@@ -141,8 +157,11 @@ namespace Client.Creator
         {
             get
             {
-                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
-                    return true;
+                if (_licInfo != null)
+                {
+                    if (_licInfo.softwareLicType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
+                        return true;
+                }
                 return false;
             }
         }
@@ -152,7 +171,21 @@ namespace Client.Creator
         {
             get
             {
-                if (LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
+                if (_licInfo != null)
+                {
+                    if (_licInfo.softwareLicType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
+                        return true;
+                }
+                return false;
+            }
+        }
+
+        [Browsable(false)]
+        public bool IsDeactivated
+        {
+            get
+            {
+                if (LicType == LicenseServerType.Deactivated)
                     return true;
                 return false;
             }
@@ -246,14 +279,30 @@ namespace Client.Creator
             set { _destinationName = value; }
         }
 
+        //[Category("License Server"), PropertyOrder(3)]
+        //[DisplayName("Type")]
+        //[Description("Type")]
+        //[ReadOnly(true)]
+        //public Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType LicType
+        //{
+        //    get { return _licInfo.softwareLicType.TVal; }
+        //    set { _licInfo.softwareLicType.TVal = value; }
+        //}
+
         [Category("License Server"), PropertyOrder(3)]
         [DisplayName("Type")]
         [Description("Type")]
         [ReadOnly(true)]
-        public Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType LicType
+        public LicenseServerType LicType
         {
-            get { return _licInfo.softwareLicType.TVal; }
-            set { _licInfo.softwareLicType.TVal = value; }
+            get { return _licType; }
+            set
+            {
+                
+                _licType = value;
+                if(_licType != LicenseServerType.Deactivated)
+                    LicInfo.softwareLicType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(value);                
+            }
         }
 
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]

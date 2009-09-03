@@ -16,16 +16,16 @@ namespace Client.Creator
     public class ProductLicenseProperty
     {
         string _licenseName;
-        OrderTable _orderRec;
+        ProductLicenseTable _plRec;
         ProductProperty _product;
         Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType _productLicType;
         PermissionsTable _permissions;
         Solimar.Licensing.GlobalSoftwareSpec globalSwSpec;
         DateTime _currentExpirationDate;
 
-        public enum OrderAttributes
+        public enum ProductLicenseAttributes
         {
-            OrderStatus,
+            Status,
             ExpirationDate,
             ProductVersion,
             ParentOrderNumber,
@@ -34,24 +34,24 @@ namespace Client.Creator
 
         public ProductLicenseProperty()
         {
-            _orderRec = new OrderTable();
+            _plRec = new ProductLicenseTable();
             _product = new ProductProperty();
             globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
         }
 
-        public ProductLicenseProperty(OrderTable orderData, ProductProperty product, PermissionsTable permissions)
+        public ProductLicenseProperty(ProductLicenseTable plData, ProductProperty product, PermissionsTable permissions)
         {
             Permissions = permissions;
             globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
             Service<ICreator>.Use((client) => 
             {
-                LicenseTable currentLicense = client.GetLicenseByID(orderData.LicenseID, false);
+                LicenseTable currentLicense = client.GetLicenseByID(plData.LicenseID, false);
                 if(currentLicense != null)
                     _licenseName = currentLicense.LicenseName;
             });           
-            _orderRec = orderData;
+            _plRec = plData;
             _product = product;
-            ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;
+            ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;  
         }
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetProductSpec(uint productID)
@@ -66,7 +66,7 @@ namespace Client.Creator
             return null;
         }
 
-        public void SetReadOnlyOrderAttribStatus(OrderAttributes property, bool value)
+        public void SetReadOnlyOrderAttribStatus(ProductLicenseAttributes property, bool value)
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property.ToString()];
             ReadOnlyAttribute attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
@@ -74,7 +74,7 @@ namespace Client.Creator
             isReadOnly.SetValue(attrib, value);
         }
 
-        public void SetBrowsableOrderAttribStatus(OrderAttributes property, bool value)
+        public void SetBrowsableOrderAttribStatus(ProductLicenseAttributes property, bool value)
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property.ToString()];
             BrowsableAttribute attrib = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
@@ -102,9 +102,9 @@ namespace Client.Creator
             set 
             {
                 if (value == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)                   
-                    SetBrowsableOrderAttribStatus(OrderAttributes.AppInstance, true);
+                    SetBrowsableOrderAttribStatus(ProductLicenseAttributes.AppInstance, true);
                 else
-                    SetBrowsableOrderAttribStatus(OrderAttributes.AppInstance, false);
+                    SetBrowsableOrderAttribStatus(ProductLicenseAttributes.AppInstance, false);
                 _productLicType = value; 
             }
         }
@@ -127,8 +127,8 @@ namespace Client.Creator
         [Browsable(false)]
         public int OrderIndex
         {
-            get { return _orderRec.OrderIndex; }
-            set { _orderRec.OrderIndex = value; }
+            get { return _plRec.plIndex; }
+            set { _plRec.plIndex = value; }
         }
 
         [Browsable(false)]
@@ -146,50 +146,57 @@ namespace Client.Creator
         public string OrderNumber
         {
             get { return string.Format("{0}-{1}", LicenseName, OrderIndex); }
-            set { _orderRec.OrderNumber = value; }
+            set { _plRec.plID = value; }
         }
 
         [Category("Product License"), PropertyOrder(2)]
         [DisplayName("Status")]
         [ReadOnly(true)]
-        public Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState OrderStatus
+        public Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState Status
         {
             get 
             {
-                SetReadOnlyOrderAttribStatus(OrderAttributes.OrderStatus, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseName.Contains("T") || LicenseName.Contains("U"))
+                SetReadOnlyOrderAttribStatus(ProductLicenseAttributes.Status, !_permissions.pt_permanent_pwd.Value);
+                if (LicenseName.Contains("T") || LicenseName.Contains("S"))
                 {
                     if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyOrderAttribStatus(OrderAttributes.OrderStatus, true);
+                        SetReadOnlyOrderAttribStatus(ProductLicenseAttributes.Status, true);
                 }
-                return (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)_orderRec.OrderState; 
+                return (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)_plRec.plState; 
             }
             set 
             {
                 DateTime? setDate = null;
                 //only set if value changed.
-                if (!_orderRec.OrderState.Equals((byte)value))
+                if (!_plRec.plState.Equals((byte)value))
                 {
                     switch (value)
-                    {
-                        case Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm:                           
+                    {                         
+                        case Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed:                           
                         //was trial now perm    
                         //clear modules of non-defaults and set defaults             
-                            if (_orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial)
-                                _product.SetTrialToPerm(OrderNumber);
-                            else if (_orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                _product.SetAddOnToPerm(OrderNumber, ParentOrderNumber);
+                            LicenseTable licRecord = null;
+                            Service<ICreator>.Use((client) =>
+                            {
+                                licRecord = client.GetLicenseByName(LicenseName, false);
+                            });
+                            LicenseServerType lsType = (LicenseServerType)licRecord.LicenseType;
+                            if (_plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial)                            
+                                    _product.SetTrialToLicensed(OrderNumber, lsType);                                
+                            else if (_plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                _product.SetAddOnToLicensed(OrderNumber, ParentOrderNumber);
                             else
                                 throw new Exception("invalid conversion");
-                            setDate = null;
+                            setDate = (lsType != LicenseServerType.Subscription) ? null : ExpirationDate;    
                             break;
                         case Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial:
                             //was perm now trial
-                            if (_orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm)
+                            if (_plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed)
                             {
-                                _product.SetPermToTrial(OrderNumber);
-                                if(_licenseName.Contains("U01")) //standard - subscription
-                                    SetReadOnlyOrderAttribStatus(OrderAttributes.OrderStatus, true);
+
+                                _product.SetLicensedToTrial(OrderNumber);
+                                if(_licenseName.Contains("S01")) //standard - subscription
+                                    SetReadOnlyOrderAttribStatus(ProductLicenseAttributes.Status, true);
                             }
                             else
                                 throw new Exception("Invalid Conversion");
@@ -198,11 +205,11 @@ namespace Client.Creator
                         case Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn:                                                                    
                             //need to allow for initial case and exclude changing from perm->addon, trial->addon
                             //initial case is always 0 -> perm
-                            if (((!_orderRec.ExpirationDate.HasValue &&
-                                  _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm && 
-                                  _orderRec.OrderNumber != null)) ||
-                               ((_orderRec.ExpirationDate.HasValue && 
-                                 _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial)))                                
+                            if (((!_plRec.ExpirationDate.HasValue &&
+                                  _plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed && 
+                                  _plRec.plID != null)) ||
+                               ((_plRec.ExpirationDate.HasValue && 
+                                 _plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial)))                                
                                 throw new Exception("Invalid Conversion");
                             setDate = CurrentExpirationDate;
                             break;
@@ -210,7 +217,7 @@ namespace Client.Creator
                             throw new Exception("Invalid Product License State");
                             break;
                     }                   
-                    _orderRec.OrderState = (byte)value;
+                    _plRec.plState = (byte)value;
                     ExpirationDate = setDate;
                 }
             }
@@ -224,13 +231,13 @@ namespace Client.Creator
         {
             get 
             {
-                if (_orderRec.ParentOrderNumber != null)
-                    SetBrowsableOrderAttribStatus(OrderAttributes.ParentOrderNumber, true);
+                if (_plRec.ParentProductLicenseID != null)
+                    SetBrowsableOrderAttribStatus(ProductLicenseAttributes.ParentOrderNumber, true);
                 else
-                    SetBrowsableOrderAttribStatus(OrderAttributes.ParentOrderNumber, false);
-                return _orderRec.ParentOrderNumber; 
+                    SetBrowsableOrderAttribStatus(ProductLicenseAttributes.ParentOrderNumber, false);
+                return _plRec.ParentProductLicenseID; 
             }
-            set { _orderRec.ParentOrderNumber = value; }
+            set { _plRec.ParentProductLicenseID = value; }
         }
 
         [EditorAttribute(typeof(DateTimeEditor), typeof(UITypeEditor))]
@@ -242,27 +249,27 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyOrderAttribStatus(OrderAttributes.ExpirationDate, !_permissions.pt_extension_pwd.Value);
-                if(_orderRec.ExpirationDate.HasValue)
-                    return _orderRec.ExpirationDate.Value.ToLocalTime();
+                SetReadOnlyOrderAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_extension_pwd.Value);
+                if(_plRec.ExpirationDate.HasValue)
+                    return _plRec.ExpirationDate.Value.ToLocalTime();
                 return null;
             }
             set 
             {
-                if (_orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm &&
-                    !_orderRec.ExpirationDate.HasValue)
+                if (_plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed &&
+                    !_plRec.ExpirationDate.HasValue)
                     throw new Exception("Can't set expiration date for permanent type");
-                if ((LicenseName.Contains("T") || _orderRec.OrderState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial) && !value.HasValue)                   
+                if ((LicenseName.Contains("T") || _plRec.plState == (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial) && !value.HasValue)                   
                     throw new Exception("Please set a valid expiration date");
                 if (value.HasValue)
                 {
                     _product.SetAllModulesExpDate(OrderNumber, new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime());
-                    _orderRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                    _plRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
                 }
                 else
                 {
                     _product.SetAllModulesExpDate(OrderNumber, value);
-                    _orderRec.ExpirationDate = value;
+                    _plRec.ExpirationDate = value;
                 }
             }
         }
@@ -272,8 +279,8 @@ namespace Client.Creator
         [DisplayName("Description")]
         public string Description
         {
-            get { return _orderRec.Description; }
-            set { _orderRec.Description = value; }
+            get { return _plRec.Description; }
+            set { _plRec.Description = value; }
         }
 
         [Category("Product"), PropertyOrder(1)]

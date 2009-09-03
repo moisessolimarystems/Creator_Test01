@@ -112,9 +112,9 @@ namespace CreatorData
                     dlo.LoadWith<LicenseTable>(id => id.PacketTables);
                     db.LoadOptions = dlo;
                 }
-                return db.LicenseTables.Where(c => c.CustomerTable.SCRname.Contains(custName) && 
+                return db.LicenseTables.Where(c => c.CustomerTable.SCRname.Equals(custName) && 
                                                   (c.LicenseName.Contains(searchString) ||
-                                                   c.OrderTables.Count(o => (o.OrderNumber.Contains(searchString) &&
+                                                   c.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
                                                                              o.LicenseID.Equals(c.ID))) > 0)).ToList();                
             }
         }
@@ -221,12 +221,12 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-
+                string prefix = (licType == 0) ? "-P" : "-S";
                 var licenses = from l in db.LicenseTables
                                where l.GroupID.Equals(groupID) &&
                                      l.DestinationID.Equals(destID) &&
                                      l.SCRnumber.Equals(custID) &&
-                                     l.LicenseType != licType
+                                     !l.LicenseName.Contains(prefix)
                                select l;
                 return licenses.Count();
             }
@@ -323,13 +323,13 @@ namespace CreatorData
                             string baseProductLicense;
                             int baseProductLicenseID = 0;
                             string licenseBase = (standardLicense.LicenseType == 0) ? "P" : "S";
-                            var productLicenses = db.OrderTables.Where(c => c.LicenseID.Equals(license.ID));
+                            var productLicenses = db.ProductLicenseTables.Where(c => c.LicenseID.Equals(license.ID));
                             foreach (var order in productLicenses)
                             {
                                 //issue -> corresponding order id for standard is necessary
-                                baseProductLicense = (license.LicenseType.Equals(2)) ? order.OrderNumber.Replace("D", licenseBase) : order.OrderNumber.Replace("T", licenseBase);
-                                var storedOrder = db.OrderTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
-                                                                          c.OrderNumber.Equals(baseProductLicense)).FirstOrDefault();
+                                baseProductLicense = (license.LicenseType.Equals(2)) ? order.plID.Replace("D", licenseBase) : order.plID.Replace("T", licenseBase);
+                                var storedOrder = db.ProductLicenseTables.Where(c => c.LicenseID.Equals(standardLicense.ID) &&
+                                                                          c.plID.Equals(baseProductLicense)).FirstOrDefault();
                                 if (storedOrder != null)
                                     baseProductLicenseID = storedOrder.ID;
                                 else

@@ -7,7 +7,7 @@
       <Column Name="SCRname" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="SCRoperator" Type="System.String" DbType="VarChar(14)" CanBeNull="true" UpdateCheck="Never" />
       <Association Name="CustomerTable_LicenseTable" Member="LicenseTables" Storage="_Licenses" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="LicenseTable" />
-      <Association Name="CustomerTable_DestinationName" Member="DestinationNameTables" ThisKey="SCRnumber" OtherKey="CustID" Type="DestinationNameTable" />
+      <Association Name="CustomerTable_DestinationNameTable" Member="DestinationNameTables" ThisKey="SCRnumber" OtherKey="CustID" Type="DestinationNameTable" />
     </Type>
   </Table>
   <Table Name="[CORP\AChou].[Transaction]" Member="TransactionTables">
@@ -36,25 +36,10 @@
       <Column Name="LicenseComments" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="OrderIndex" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Association Name="LicenseTable_TransactionTable" Member="TransactionTables" Storage="_Transactions" ThisKey="ID" OtherKey="taLicenseID" Type="TransactionTable" />
-      <Association Name="LicenseTable_OrderTable" Member="OrderTables" Storage="_Orders" ThisKey="ID" OtherKey="LicenseID" Type="OrderTable" />
       <Association Name="LicenseTable_TokenTable" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
       <Association Name="LicenseTable_PacketTable" Member="PacketTables" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
+      <Association Name="LicenseTable_ProductLicense" Member="ProductLicenseTables" ThisKey="ID" OtherKey="LicenseID" Type="ProductLicenseTable" />
       <Association Name="CustomerTable_LicenseTable" Member="CustomerTable" Storage="_SCustomerRecord" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
-    </Type>
-  </Table>
-  <Table Name="[CORP\AChou].[Order]" Member="OrderTables">
-    <Type Name="OrderTable">
-      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="OrderIndex" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="OrderNumber" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="OrderState" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="ExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="Description" Type="System.String" DbType="VarChar(100)" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="ProductName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="ProductVersion" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="ParentOrderNumber" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Association Name="LicenseTable_OrderTable" Member="LicenseTable" Storage="_License" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.sProducts" Member="ProductTables">
@@ -106,7 +91,22 @@
       <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="DestID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="DestName" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Association Name="CustomerTable_DestinationName" Member="CustomerTable" ThisKey="CustID" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
+      <Association Name="CustomerTable_DestinationNameTable" Member="CustomerTable" ThisKey="CustID" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].ProductLicense" Member="ProductLicenseTables">
+    <Type Name="ProductLicenseTable">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="plIndex" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="plID" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="plState" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Description" Type="System.String" DbType="VarChar(100)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="ProductID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ProductVersion" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ParentProductLicenseID" Type="System.String" DbType="VarChar(50)" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="LicenseTable_ProductLicense" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

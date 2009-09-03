@@ -797,9 +797,9 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="OrderTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ProductLicenseTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
-    public partial class OrderTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ProductLicenseTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -808,13 +808,13 @@ namespace Client.Creator.CreatorService {
         private int IDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int OrderIndexField;
+        private int plIndexField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string OrderNumberField;
+        private string plIDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte OrderStateField;
+        private byte plStateField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int LicenseIDField;
@@ -826,13 +826,13 @@ namespace Client.Creator.CreatorService {
         private string DescriptionField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ProductNameField;
+        private short ProductIDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ProductVersionField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ParentOrderNumberField;
+        private string ParentProductLicenseIDField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -858,40 +858,40 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int OrderIndex {
+        public int plIndex {
             get {
-                return this.OrderIndexField;
+                return this.plIndexField;
             }
             set {
-                if ((this.OrderIndexField.Equals(value) != true)) {
-                    this.OrderIndexField = value;
-                    this.RaisePropertyChanged("OrderIndex");
+                if ((this.plIndexField.Equals(value) != true)) {
+                    this.plIndexField = value;
+                    this.RaisePropertyChanged("plIndex");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string OrderNumber {
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public string plID {
             get {
-                return this.OrderNumberField;
+                return this.plIDField;
             }
             set {
-                if ((object.ReferenceEquals(this.OrderNumberField, value) != true)) {
-                    this.OrderNumberField = value;
-                    this.RaisePropertyChanged("OrderNumber");
+                if ((object.ReferenceEquals(this.plIDField, value) != true)) {
+                    this.plIDField = value;
+                    this.RaisePropertyChanged("plID");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public byte OrderState {
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public byte plState {
             get {
-                return this.OrderStateField;
+                return this.plStateField;
             }
             set {
-                if ((this.OrderStateField.Equals(value) != true)) {
-                    this.OrderStateField = value;
-                    this.RaisePropertyChanged("OrderState");
+                if ((this.plStateField.Equals(value) != true)) {
+                    this.plStateField = value;
+                    this.RaisePropertyChanged("plState");
                 }
             }
         }
@@ -936,14 +936,14 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
-        public string ProductName {
+        public short ProductID {
             get {
-                return this.ProductNameField;
+                return this.ProductIDField;
             }
             set {
-                if ((object.ReferenceEquals(this.ProductNameField, value) != true)) {
-                    this.ProductNameField = value;
-                    this.RaisePropertyChanged("ProductName");
+                if ((this.ProductIDField.Equals(value) != true)) {
+                    this.ProductIDField = value;
+                    this.RaisePropertyChanged("ProductID");
                 }
             }
         }
@@ -962,14 +962,14 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
-        public string ParentOrderNumber {
+        public string ParentProductLicenseID {
             get {
-                return this.ParentOrderNumberField;
+                return this.ParentProductLicenseIDField;
             }
             set {
-                if ((object.ReferenceEquals(this.ParentOrderNumberField, value) != true)) {
-                    this.ParentOrderNumberField = value;
-                    this.RaisePropertyChanged("ParentOrderNumber");
+                if ((object.ReferenceEquals(this.ParentProductLicenseIDField, value) != true)) {
+                    this.ParentProductLicenseIDField = value;
+                    this.RaisePropertyChanged("ParentProductLicenseID");
                 }
             }
         }
@@ -1133,13 +1133,13 @@ namespace Client.Creator.CreatorService {
         private System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> TransactionTablesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> OrderTablesField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTablesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTablesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> ProductLicenseTablesField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1282,19 +1282,6 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
-        public System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> OrderTables {
-            get {
-                return this.OrderTablesField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.OrderTablesField, value) != true)) {
-                    this.OrderTablesField = value;
-                    this.RaisePropertyChanged("OrderTables");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTables {
             get {
                 return this.TokenTablesField;
@@ -1307,7 +1294,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTables {
             get {
                 return this.PacketTablesField;
@@ -1316,6 +1303,19 @@ namespace Client.Creator.CreatorService {
                 if ((object.ReferenceEquals(this.PacketTablesField, value) != true)) {
                     this.PacketTablesField = value;
                     this.RaisePropertyChanged("PacketTables");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> ProductLicenseTables {
+            get {
+                return this.ProductLicenseTablesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ProductLicenseTablesField, value) != true)) {
+                    this.ProductLicenseTablesField = value;
+                    this.RaisePropertyChanged("ProductLicenseTables");
                 }
             }
         }
@@ -1442,6 +1442,9 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
+        uint GetNextHardwareTokenValue(uint custID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
         void CreateToken(Client.Creator.CreatorService.TokenTable ta);
         
@@ -1523,35 +1526,38 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteTransaction", ReplyAction="http://tempuri.org/ICreator/DeleteTransactionResponse")]
         void DeleteTransaction(Client.Creator.CreatorService.TransactionTable ta);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllOrders", ReplyAction="http://tempuri.org/ICreator/GetAllOrdersResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetAllOrders();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllProductLicenses", ReplyAction="http://tempuri.org/ICreator/GetAllProductLicensesResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetOrdersByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetOrdersByLicenseNameResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetOrdersByLicenseName(string licenseName);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductLicenses", ReplyAction="http://tempuri.org/ICreator/GetProductLicensesResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicenses(string licenseServerID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetOrdersEqualsProduct", ReplyAction="http://tempuri.org/ICreator/GetOrdersEqualsProductResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetOrdersEqualsProduct(string licenseName, string productName);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductLicensesByProduct", ReplyAction="http://tempuri.org/ICreator/GetProductLicensesByProductResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByProduct(string licenseServerID, int productID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrder", ReplyAction="http://tempuri.org/ICreator/GetAddOnOrdersByStandardOrderResponse")]
-        System.Collections.Generic.List<string> GetAddOnOrdersByStandardOrder(string standardOrder);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductLicense", ReplyAction="http://tempuri.org/ICreator/GetProductLicenseResponse")]
+        Client.Creator.CreatorService.ProductLicenseTable GetProductLicense(string productLicenseID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetOrderByOrderName", ReplyAction="http://tempuri.org/ICreator/GetOrderByOrderNameResponse")]
-        Client.Creator.CreatorService.OrderTable GetOrderByOrderName(string orderName);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAddOnProductLicenses", ReplyAction="http://tempuri.org/ICreator/GetAddOnProductLicensesResponse")]
+        System.Collections.Generic.List<string> GetAddOnProductLicenses(string productLicenseID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextOrderIndex", ReplyAction="http://tempuri.org/ICreator/GetNextOrderIndexResponse")]
-        int GetNextOrderIndex(string licenseName);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextProductLicenseIndex", ReplyAction="http://tempuri.org/ICreator/GetNextProductLicenseIndexResponse")]
+        int GetNextProductLicenseIndex(string licenseServerID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductVersionFromTable", ReplyAction="http://tempuri.org/ICreator/GetProductVersionFromTableResponse")]
         int GetProductVersionFromTable(int productID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateOrder", ReplyAction="http://tempuri.org/ICreator/CreateOrderResponse")]
-        void CreateOrder(Client.Creator.CreatorService.OrderTable ta);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteAllProductLicenses", ReplyAction="http://tempuri.org/ICreator/DeleteAllProductLicensesResponse")]
+        void DeleteAllProductLicenses(string licenseServer);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateOrder", ReplyAction="http://tempuri.org/ICreator/UpdateOrderResponse")]
-        void UpdateOrder(Client.Creator.CreatorService.OrderTable ta);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateProductLicense", ReplyAction="http://tempuri.org/ICreator/CreateProductLicenseResponse")]
+        void CreateProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteOrder", ReplyAction="http://tempuri.org/ICreator/DeleteOrderResponse")]
-        void DeleteOrder(Client.Creator.CreatorService.OrderTable ta);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateProductLicense", ReplyAction="http://tempuri.org/ICreator/UpdateProductLicenseResponse")]
+        void UpdateProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteProductLicense", ReplyAction="http://tempuri.org/ICreator/DeleteProductLicenseResponse")]
+        void DeleteProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllTokens", ReplyAction="http://tempuri.org/ICreator/GetAllTokensResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
@@ -1576,9 +1582,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
         bool IsHardwareTokenActive(uint custID, string tokenValue);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
-        uint GetNextHardwareTokenValue(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
@@ -1704,6 +1707,10 @@ namespace Client.Creator.CreatorService {
                 base(binding, remoteAddress) {
         }
         
+        public uint GetNextHardwareTokenValue(uint custID) {
+            return base.Channel.GetNextHardwareTokenValue(custID);
+        }
+        
         public void CreateToken(Client.Creator.CreatorService.TokenTable ta) {
             base.Channel.CreateToken(ta);
         }
@@ -1812,44 +1819,48 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteTransaction(ta);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetAllOrders() {
-            return base.Channel.GetAllOrders();
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses() {
+            return base.Channel.GetAllProductLicenses();
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetOrdersByLicenseName(string licenseName) {
-            return base.Channel.GetOrdersByLicenseName(licenseName);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicenses(string licenseServerID) {
+            return base.Channel.GetProductLicenses(licenseServerID);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.OrderTable> GetOrdersEqualsProduct(string licenseName, string productName) {
-            return base.Channel.GetOrdersEqualsProduct(licenseName, productName);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByProduct(string licenseServerID, int productID) {
+            return base.Channel.GetProductLicensesByProduct(licenseServerID, productID);
         }
         
-        public System.Collections.Generic.List<string> GetAddOnOrdersByStandardOrder(string standardOrder) {
-            return base.Channel.GetAddOnOrdersByStandardOrder(standardOrder);
+        public Client.Creator.CreatorService.ProductLicenseTable GetProductLicense(string productLicenseID) {
+            return base.Channel.GetProductLicense(productLicenseID);
         }
         
-        public Client.Creator.CreatorService.OrderTable GetOrderByOrderName(string orderName) {
-            return base.Channel.GetOrderByOrderName(orderName);
+        public System.Collections.Generic.List<string> GetAddOnProductLicenses(string productLicenseID) {
+            return base.Channel.GetAddOnProductLicenses(productLicenseID);
         }
         
-        public int GetNextOrderIndex(string licenseName) {
-            return base.Channel.GetNextOrderIndex(licenseName);
+        public int GetNextProductLicenseIndex(string licenseServerID) {
+            return base.Channel.GetNextProductLicenseIndex(licenseServerID);
         }
         
         public int GetProductVersionFromTable(int productID) {
             return base.Channel.GetProductVersionFromTable(productID);
         }
         
-        public void CreateOrder(Client.Creator.CreatorService.OrderTable ta) {
-            base.Channel.CreateOrder(ta);
+        public void DeleteAllProductLicenses(string licenseServer) {
+            base.Channel.DeleteAllProductLicenses(licenseServer);
         }
         
-        public void UpdateOrder(Client.Creator.CreatorService.OrderTable ta) {
-            base.Channel.UpdateOrder(ta);
+        public void CreateProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta) {
+            base.Channel.CreateProductLicense(ta);
         }
         
-        public void DeleteOrder(Client.Creator.CreatorService.OrderTable ta) {
-            base.Channel.DeleteOrder(ta);
+        public void UpdateProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta) {
+            base.Channel.UpdateProductLicense(ta);
+        }
+        
+        public void DeleteProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta) {
+            base.Channel.DeleteProductLicense(ta);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token) {
@@ -1882,10 +1893,6 @@ namespace Client.Creator.CreatorService {
         
         public bool IsHardwareTokenActive(uint custID, string tokenValue) {
             return base.Channel.IsHardwareTokenActive(custID, tokenValue);
-        }
-        
-        public uint GetNextHardwareTokenValue(uint custID) {
-            return base.Channel.GetNextHardwareTokenValue(custID);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {

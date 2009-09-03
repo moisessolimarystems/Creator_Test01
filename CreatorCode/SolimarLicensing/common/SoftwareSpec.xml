@@ -18,27 +18,29 @@
 <enum name="pid_Connect" value="6" alias="CONNECT_PRODUCT"/>
 <enum name="pid_Iconvert" value="7" alias="ICONVERT_PRODUCT"/>
 <enum name="pid_SolsearcherEnt" value="8" alias="SOLSEARCHER_ENTERPRISE_PRODUCT"/>
-<enum name="pid_SolSript" value="9" alias="SOLSCRIPT_PRODUCT"/>
-<enum name="pid_SdxDesigner" value="10" alias="SDX_DESIGNER_PRODUCT"/>
+<enum name="pid_SolScript" value="9" alias="SOLSCRIPT_PRODUCT"/>
+<enum name="pid_SolIndexer" value="10" alias="SOLINDEXER_PRODUCT"/>
 <enum name="pid_Quantum" value="11" alias="QUANTUM_PRODUCT"/>
 <enum name="pid_Rubika" value="12" alias="RUBIKA_PRODUCT"/>
 <enum name="pid_SolFusion" value="13" alias="SOLFUSION_PRODUCT"/>
 <enum name="pid_Spde" value="14" alias="SPDE_PRODUCT"/>
 <enum name="pid_SolsearcherSp" value="15" alias="SSE_SP_PRODUCT"/>
-<enum name="pid_RubikaProcessBuilder" value="16" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
-<enum name="pid_SolIndexer" value="17" alias="SOLINDEXER_PRODUCT"/>
-<enum name="pid_SpdeQueueManager" value="18" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
-<enum name="pid_TestDevIconvert" value="19" alias="TEST_DEV_ICONVERT_PRODUCT"/>
-<enum name="pid_TestDevSolsearcherEp" value="20" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
-<enum name="pid_TestDevSdxDesigner" value="21" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
-<enum name="pid_TestDevRubika" value="22" alias="TEST_DEV_RUBIKA_PRODUCT"/>
-<enum name="pid_TestDevSpde" value="23" alias="TEST_DEV_SPDE_PRODUCT"/>
-<enum name="pid_TestDevSseSp" value="24" alias="TEST_DEV_SSE_SP_PRODUCT"/>
-<enum name="pid_TestDevSolfusionSp" value="25" alias="TEST_DEV_SOLFUSION_SP_PRODUCT"/>
-<enum name="pid_TestDevSdxDesigner" value="26" alias="TEST_DEV_SDXDESIGNER_PRODUCT"/>
-<enum name="pid_TestDevSpdeQueueManager" value="27" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
-<enum name="pid_TestDevRubikaProcessBuilder" value="28" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
-<enum name="pid_TestDevSolScript" value="29" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
+<enum name="pid_SOLitrack" value="16" alias="SOLITRACK_PRODUCT"/>
+<enum name="pid_RubikaProcessBuilder" value="17" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
+<enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
+<enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
+<enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
+<enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
+<enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
+<enum name="pid_TestDevSolIndexer" value="110" alias="TEST_DEV_SOLINDEXER_PRODUCT"/>
+<enum name="pid_TestDevRubika" value="112" alias="TEST_DEV_RUBIKA_PRODUCT"/>
+<enum name="pid_TestDevSolfusionSp" value="113" alias="TEST_DEV_SOLFUSION_SP_PRODUCT"/>
+<enum name="pid_TestDevSpde" value="114" alias="TEST_DEV_SPDE_PRODUCT"/>
+<enum name="pid_TestDevSseSp" value="115" alias="TEST_DEV_SSE_SP_PRODUCT"/>
+<enum name="pid_TestDevSOLitrack" value="116" alias="TEST_DEV_SOLITRACK_PRODUCT"/>
+<enum name="pid_TestDevRubikaProcessBuilder" value="117" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
+<enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
+<enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 </typedef>
 -->
@@ -317,7 +319,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="305" moduleName="XCHANGE::PS (DBCS) PPM" modUnlimitedValue="500"/>
 			
 			<!-- Client licensing -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"/><!--IsSharable-->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/><!--IsSharable-->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255"/>
 			<!--<Lic_ModuleSoftwareSpecAttribs moduleID="402" moduleName="Concurrent Administrator Sessions" modUnlimitedValue="255"/>-->
 			
@@ -326,42 +328,51 @@
 	
 	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="16" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="16" productName="SOLitrack">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Devices"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Operators"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances"/>
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>	
+	<Lic_ProductSoftwareSpecAttribs productID="17" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="17" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="19" productName="iCONVERT Test/Dev" sameModSpecProductID="7">
+	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="20" productName="SOLsearcher Enterprise Test/Dev" sameModSpecProductID="8">
+	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev SOLsearcher Enterprise" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="21" productName="SOLindexer Test/Dev" sameModSpecProductID="10">
+	<Lic_ProductSoftwareSpecAttribs productID="109" productName="Test/Dev SOLscript" sameModSpecProductID="9">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="22" productName="Rubika Test/Dev" sameModSpecProductID="12">
+	<Lic_ProductSoftwareSpecAttribs productID="110" productName="Test/Dev SOLindexer" sameModSpecProductID="10" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="23" productName="SPDE Test/Dev" sameModSpecProductID="14">
+	<Lic_ProductSoftwareSpecAttribs productID="112" productName="Test/Dev Rubika" sameModSpecProductID="12">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="24" productName="SOLsearcher Enterprise Single Platform Test/Dev" sameModSpecProductID="8">
+	<Lic_ProductSoftwareSpecAttribs productID="113" productName="Test/Dev SOLfusion" sameModSpecProductID="13">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="25" productName="SOLfusion Single Platform Test/Dev" sameModSpecProductID="13">
+	<Lic_ProductSoftwareSpecAttribs productID="114" productName="Test/Dev SPDE" sameModSpecProductID="14">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="26" productName="SDX Designer Test/Dev" sameModSpecProductID="17" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="115" productName="Test/Dev SOLsearcher Enterprise Single Platform" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="27" productName="SPDE Queue Manager Test/Dev" sameModSpecProductID="18" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="116" productName="Test/Dev SOLitrack" sameModSpecProductID="16">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="28" productName="Rubika Process Builder Test/Dev" sameModSpecProductID="16" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="117" productName="Test/Dev Rubika Process Builder" sameModSpecProductID="17" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="29" productName="SOLscript Test/Dev" sameModSpecProductID="9">
+	<Lic_ProductSoftwareSpecAttribs productID="118" productName="Test/Dev SDX Designer" sameModSpecProductID="18">
+	</Lic_ProductSoftwareSpecAttribs>
+	<Lic_ProductSoftwareSpecAttribs productID="119" productName="Test/Dev SPDE Queue Manager" sameModSpecProductID="19" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
 </Lic_SoftwareSpecAttribs>
 

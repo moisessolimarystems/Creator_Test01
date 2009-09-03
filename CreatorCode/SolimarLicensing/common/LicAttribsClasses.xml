@@ -73,37 +73,38 @@
 	-->
 	<AttribsClass code_class_name="Lic_PackageAttribs" name="L_PkgA" descriptive_name="License Validation Attributes" base="" filename="Lic_PackageAttribs">
 		<typedef type="enum" name="TLic_ProductID">
-		<enum name="pid_SPD" value="0" alias="SPD_PRODUCT"/>
-		<enum name="pid_XImage" value="1" alias="XIMAGE_PRODUCT"/>
-		<enum name="pid_XImageNT" value="2" alias="XIMAGENT_PRODUCT"/>
-		<enum name="pid_SolPCL" value="3" alias="SOLPCLNT_PRODUCT"/>
-		<enum name="pid_NotAvailable1" value="4" alias="NOT_AVAILABLE"/>
-		<enum name="pid_IndexPlugin" value="5" alias="INDEX_PLUGIN"/>
-		<enum name="pid_Connect" value="6" alias="CONNECT_PRODUCT"/>
-		<enum name="pid_Iconvert" value="7" alias="ICONVERT_PRODUCT"/>
-		<enum name="pid_SolsearcherEnt" value="8" alias="SOLSEARCHER_ENTERPRISE_PRODUCT"/>
-		<enum name="pid_SolScript" value="9" alias="SOLSCRIPT_PRODUCT"/>
-		<enum name="pid_SolIndexer" value="10" alias="SOLINDEXER_PRODUCT"/>
-		<enum name="pid_Quantum" value="11" alias="QUANTUM_PRODUCT"/>
-		<enum name="pid_Rubika" value="12" alias="RUBIKA_PRODUCT"/>
-		<enum name="pid_SolFusion" value="13" alias="SOLFUSION_PRODUCT"/>
-		<enum name="pid_Spde" value="14" alias="SPDE_PRODUCT"/>
-		<enum name="pid_SolsearcherSp" value="15" alias="SSE_SP_PRODUCT"/>
-		<enum name="pid_RubikaProcessBuilder" value="16" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
-		<enum name="pid_SdxDesigner" value="17" alias="SDX_DESIGNER_PRODUCT"/>
-		<enum name="pid_SpdeQueueManager" value="18" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
-		<enum name="pid_TestDevIconvert" value="19" alias="TEST_DEV_ICONVERT_PRODUCT"/>
-		<enum name="pid_TestDevSolsearcherEp" value="20" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
-		<enum name="pid_TestDevSolIndexer" value="21" alias="TEST_DEV_SOLINDEXER_PRODUCT"/>
-		<enum name="pid_TestDevRubika" value="22" alias="TEST_DEV_RUBIKA_PRODUCT"/>
-		<enum name="pid_TestDevSpde" value="23" alias="TEST_DEV_SPDE_PRODUCT"/>
-		<enum name="pid_TestDevSseSp" value="24" alias="TEST_DEV_SSE_SP_PRODUCT"/>
-		<enum name="pid_TestDevSolfusionSp" value="25" alias="TEST_DEV_SOLFUSION_SP_PRODUCT"/>
-		<enum name="pid_TestDevSdxDesigner" value="26" alias="TEST_DEV_SDXDESIGNER_PRODUCT"/>
-		<enum name="pid_TestDevSpdeQueueManager" value="27" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
-		<enum name="pid_TestDevRubikaProcessBuilder" value="28" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
-		<enum name="pid_TestDevSolScript" value="29" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
-		
+      <enum name="pid_SPD" value="0" alias="SPD_PRODUCT"/>
+      <enum name="pid_XImage" value="1" alias="XIMAGE_PRODUCT"/>
+      <enum name="pid_XImageNT" value="2" alias="XIMAGENT_PRODUCT"/>
+      <enum name="pid_SolPCL" value="3" alias="SOLPCLNT_PRODUCT"/>
+      <enum name="pid_NotAvailable1" value="4" alias="NOT_AVAILABLE"/>
+      <enum name="pid_IndexPlugin" value="5" alias="INDEX_PLUGIN"/>
+      <enum name="pid_Connect" value="6" alias="CONNECT_PRODUCT"/>
+      <enum name="pid_Iconvert" value="7" alias="ICONVERT_PRODUCT"/>
+      <enum name="pid_SolsearcherEnt" value="8" alias="SOLSEARCHER_ENTERPRISE_PRODUCT"/>
+      <enum name="pid_SolScript" value="9" alias="SOLSCRIPT_PRODUCT"/>
+      <enum name="pid_SolIndexer" value="10" alias="SOLINDEXER_PRODUCT"/>
+      <enum name="pid_Quantum" value="11" alias="QUANTUM_PRODUCT"/>
+      <enum name="pid_Rubika" value="12" alias="RUBIKA_PRODUCT"/>
+      <enum name="pid_SolFusion" value="13" alias="SOLFUSION_PRODUCT"/>
+      <enum name="pid_Spde" value="14" alias="SPDE_PRODUCT"/>
+      <enum name="pid_SolsearcherSp" value="15" alias="SSE_SP_PRODUCT"/>
+      <enum name="pid_SOLitrack" value="16" alias="SOLITRACK_PRODUCT"/>
+      <enum name="pid_RubikaProcessBuilder" value="17" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
+      <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
+      <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
+      <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
+      <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
+      <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
+      <enum name="pid_TestDevSolIndexer" value="110" alias="TEST_DEV_SOLINDEXER_PRODUCT"/>
+      <enum name="pid_TestDevRubika" value="112" alias="TEST_DEV_RUBIKA_PRODUCT"/>
+      <enum name="pid_TestDevSolfusionSp" value="113" alias="TEST_DEV_SOLFUSION_SP_PRODUCT"/>
+      <enum name="pid_TestDevSpde" value="114" alias="TEST_DEV_SPDE_PRODUCT"/>
+      <enum name="pid_TestDevSseSp" value="115" alias="TEST_DEV_SSE_SP_PRODUCT"/>
+      <enum name="pid_TestDevSOLitrack" value="116" alias="TEST_DEV_SOLITRACK_PRODUCT"/>
+      <enum name="pid_TestDevRubikaProcessBuilder" value="117" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
+      <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
+      <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
 		<!-- Dont include, these typedefs can never change, not sure what this is...
 			<enum name="pid_NumberOfProducts" value="22" alias="NUMBER_OF_PRODUCTS"/>
 			-->
@@ -171,17 +172,16 @@
 		<AttribsClass code_class_name="Lic_ModuleInfoAttribs" name="L_MIA" descriptive_name="License Information - Module Attributes" base="">
 			<comments>License Information - Module Attributes</comments>
 			<typedef type="enum" name="TModuleState">
-				<enum name="msPerm" value="0" alias="Permanent"/>
+				<enum name="msLicensed" value="0" alias="Licensed"/>
 				<enum name="msTrial" value="1" alias="Trial"/>
-				<enum name="msAddOn" value="2" alias="Add-On"/>
-				<enum name="msSubscription" value="3" alias="Subscription"/>
+				<enum name="msAddOn" value="2" alias="AddOn"/>
 			</typedef>
 			<attrib type="unsigned __int32" name="moduleID" tagname="mI" default="0"/>
 			<attrib type="unsigned __int32" name="moduleValue" tagname="mV" default="0"/>
 			<attrib type="unsigned __int32" name="moduleAppInstance" tagname="mAI" default="0"/>
 			<attrib type="DateTime" name="moduleExpirationDate" tagname="exDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="string" name="contractNumber" tagname="cN" default=""/>
-			<attrib type="TModuleState" name="moduleState" tagname="mSt" default="msPerm"/>
+			<attrib type="TModuleState" name="moduleState" tagname="mSt" default="msTrial"/>
 		</AttribsClass>
 		</typedef>
 

@@ -37,20 +37,22 @@ namespace Solimar
 					pid_SolFusion = 13,
 					pid_Spde = 14,
 					pid_SolsearcherSp = 15,
-					pid_RubikaProcessBuilder = 16,
-					pid_SdxDesigner = 17,
-					pid_SpdeQueueManager = 18,
-					pid_TestDevIconvert = 19,
-					pid_TestDevSolsearcherEp = 20,
-					pid_TestDevSolIndexer = 21,
-					pid_TestDevRubika = 22,
-					pid_TestDevSpde = 23,
-					pid_TestDevSseSp = 24,
-					pid_TestDevSolfusionSp = 25,
-					pid_TestDevSdxDesigner = 26,
-					pid_TestDevSpdeQueueManager = 27,
-					pid_TestDevRubikaProcessBuilder = 28,
-					pid_TestDevSolScript = 29,
+					pid_SOLitrack = 16,
+					pid_RubikaProcessBuilder = 17,
+					pid_SdxDesigner = 18,
+					pid_SpdeQueueManager = 19,
+					pid_TestDevIconvert = 107,
+					pid_TestDevSolsearcherEp = 108,
+					pid_TestDevSolScript = 109,
+					pid_TestDevSolIndexer = 110,
+					pid_TestDevRubika = 112,
+					pid_TestDevSolfusionSp = 113,
+					pid_TestDevSpde = 114,
+					pid_TestDevSseSp = 115,
+					pid_TestDevSOLitrack = 116,
+					pid_TestDevRubikaProcessBuilder = 117,
+					pid_TestDevSdxDesigner = 118,
+					pid_TestDevSpdeQueueManager = 119,
 					pid_UnknownProduct = 0xFFFF,
 				};
 				
@@ -122,51 +124,57 @@ namespace Solimar
 						m_MapAliasToEnum.Add("SSE_SP_PRODUCT",TLic_ProductID.pid_SolsearcherSp);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_SolsearcherSp,"SSE_SP_PRODUCT");
 						m_MapOrderingIndexToAlias.Add(16,"SSE_SP_PRODUCT");
+						m_MapAliasToEnum.Add("SOLITRACK_PRODUCT",TLic_ProductID.pid_SOLitrack);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_SOLitrack,"SOLITRACK_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(17,"SOLITRACK_PRODUCT");
 						m_MapAliasToEnum.Add("RUBIKA_PROCESS_BUILDER_PRODUCT",TLic_ProductID.pid_RubikaProcessBuilder);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_RubikaProcessBuilder,"RUBIKA_PROCESS_BUILDER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(17,"RUBIKA_PROCESS_BUILDER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(18,"RUBIKA_PROCESS_BUILDER_PRODUCT");
 						m_MapAliasToEnum.Add("SDX_DESIGNER_PRODUCT",TLic_ProductID.pid_SdxDesigner);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_SdxDesigner,"SDX_DESIGNER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(18,"SDX_DESIGNER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(19,"SDX_DESIGNER_PRODUCT");
 						m_MapAliasToEnum.Add("SPDE_QUEUEMANAGER_PRODUCT",TLic_ProductID.pid_SpdeQueueManager);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_SpdeQueueManager,"SPDE_QUEUEMANAGER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(19,"SPDE_QUEUEMANAGER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(20,"SPDE_QUEUEMANAGER_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_ICONVERT_PRODUCT",TLic_ProductID.pid_TestDevIconvert);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevIconvert,"TEST_DEV_ICONVERT_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(20,"TEST_DEV_ICONVERT_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(21,"TEST_DEV_ICONVERT_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT",TLic_ProductID.pid_TestDevSolsearcherEp);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSolsearcherEp,"TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(21,"TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(22,"TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SOLSCRIPT_PRODUCT",TLic_ProductID.pid_TestDevSolScript);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSolScript,"TEST_DEV_SOLSCRIPT_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(23,"TEST_DEV_SOLSCRIPT_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_SOLINDEXER_PRODUCT",TLic_ProductID.pid_TestDevSolIndexer);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSolIndexer,"TEST_DEV_SOLINDEXER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(22,"TEST_DEV_SOLINDEXER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(24,"TEST_DEV_SOLINDEXER_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_RUBIKA_PRODUCT",TLic_ProductID.pid_TestDevRubika);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevRubika,"TEST_DEV_RUBIKA_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(23,"TEST_DEV_RUBIKA_PRODUCT");
-						m_MapAliasToEnum.Add("TEST_DEV_SPDE_PRODUCT",TLic_ProductID.pid_TestDevSpde);
-						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSpde,"TEST_DEV_SPDE_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(24,"TEST_DEV_SPDE_PRODUCT");
-						m_MapAliasToEnum.Add("TEST_DEV_SSE_SP_PRODUCT",TLic_ProductID.pid_TestDevSseSp);
-						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSseSp,"TEST_DEV_SSE_SP_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(25,"TEST_DEV_SSE_SP_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(25,"TEST_DEV_RUBIKA_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_SOLFUSION_SP_PRODUCT",TLic_ProductID.pid_TestDevSolfusionSp);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSolfusionSp,"TEST_DEV_SOLFUSION_SP_PRODUCT");
 						m_MapOrderingIndexToAlias.Add(26,"TEST_DEV_SOLFUSION_SP_PRODUCT");
-						m_MapAliasToEnum.Add("TEST_DEV_SDXDESIGNER_PRODUCT",TLic_ProductID.pid_TestDevSdxDesigner);
-						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSdxDesigner,"TEST_DEV_SDXDESIGNER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(27,"TEST_DEV_SDXDESIGNER_PRODUCT");
-						m_MapAliasToEnum.Add("TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT",TLic_ProductID.pid_TestDevSpdeQueueManager);
-						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSpdeQueueManager,"TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(28,"TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SPDE_PRODUCT",TLic_ProductID.pid_TestDevSpde);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSpde,"TEST_DEV_SPDE_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(27,"TEST_DEV_SPDE_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SSE_SP_PRODUCT",TLic_ProductID.pid_TestDevSseSp);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSseSp,"TEST_DEV_SSE_SP_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(28,"TEST_DEV_SSE_SP_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SOLITRACK_PRODUCT",TLic_ProductID.pid_TestDevSOLitrack);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSOLitrack,"TEST_DEV_SOLITRACK_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(29,"TEST_DEV_SOLITRACK_PRODUCT");
 						m_MapAliasToEnum.Add("TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT",TLic_ProductID.pid_TestDevRubikaProcessBuilder);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevRubikaProcessBuilder,"TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(29,"TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT");
-						m_MapAliasToEnum.Add("TEST_DEV_SOLSCRIPT_PRODUCT",TLic_ProductID.pid_TestDevSolScript);
-						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSolScript,"TEST_DEV_SOLSCRIPT_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(30,"TEST_DEV_SOLSCRIPT_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(30,"TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SDX_DESIGNER_PRODUCT",TLic_ProductID.pid_TestDevSdxDesigner);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSdxDesigner,"TEST_DEV_SDX_DESIGNER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(31,"TEST_DEV_SDX_DESIGNER_PRODUCT");
+						m_MapAliasToEnum.Add("TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT",TLic_ProductID.pid_TestDevSpdeQueueManager);
+						m_MapEnumToAlias.Add(TLic_ProductID.pid_TestDevSpdeQueueManager,"TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(32,"TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT");
 						m_MapAliasToEnum.Add("UNKNOWN_PRODUCT",TLic_ProductID.pid_UnknownProduct);
 						m_MapEnumToAlias.Add(TLic_ProductID.pid_UnknownProduct,"UNKNOWN_PRODUCT");
-						m_MapOrderingIndexToAlias.Add(31,"UNKNOWN_PRODUCT");
+						m_MapOrderingIndexToAlias.Add(33,"UNKNOWN_PRODUCT");
 						m_MapAliasToIndex.Add("SPD_PRODUCT",0);
 						m_MapAliasToIndex.Add("XIMAGE_PRODUCT",1);
 						m_MapAliasToIndex.Add("XIMAGENT_PRODUCT",2);
@@ -183,21 +191,23 @@ namespace Solimar
 						m_MapAliasToIndex.Add("SOLFUSION_PRODUCT",13);
 						m_MapAliasToIndex.Add("SPDE_PRODUCT",14);
 						m_MapAliasToIndex.Add("SSE_SP_PRODUCT",15);
-						m_MapAliasToIndex.Add("RUBIKA_PROCESS_BUILDER_PRODUCT",16);
-						m_MapAliasToIndex.Add("SDX_DESIGNER_PRODUCT",17);
-						m_MapAliasToIndex.Add("SPDE_QUEUEMANAGER_PRODUCT",18);
-						m_MapAliasToIndex.Add("TEST_DEV_ICONVERT_PRODUCT",19);
-						m_MapAliasToIndex.Add("TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT",20);
-						m_MapAliasToIndex.Add("TEST_DEV_SOLINDEXER_PRODUCT",21);
-						m_MapAliasToIndex.Add("TEST_DEV_RUBIKA_PRODUCT",22);
-						m_MapAliasToIndex.Add("TEST_DEV_SPDE_PRODUCT",23);
-						m_MapAliasToIndex.Add("TEST_DEV_SSE_SP_PRODUCT",24);
+						m_MapAliasToIndex.Add("SOLITRACK_PRODUCT",16);
+						m_MapAliasToIndex.Add("RUBIKA_PROCESS_BUILDER_PRODUCT",17);
+						m_MapAliasToIndex.Add("SDX_DESIGNER_PRODUCT",18);
+						m_MapAliasToIndex.Add("SPDE_QUEUEMANAGER_PRODUCT",19);
+						m_MapAliasToIndex.Add("TEST_DEV_ICONVERT_PRODUCT",20);
+						m_MapAliasToIndex.Add("TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT",21);
+						m_MapAliasToIndex.Add("TEST_DEV_SOLSCRIPT_PRODUCT",22);
+						m_MapAliasToIndex.Add("TEST_DEV_SOLINDEXER_PRODUCT",23);
+						m_MapAliasToIndex.Add("TEST_DEV_RUBIKA_PRODUCT",24);
 						m_MapAliasToIndex.Add("TEST_DEV_SOLFUSION_SP_PRODUCT",25);
-						m_MapAliasToIndex.Add("TEST_DEV_SDXDESIGNER_PRODUCT",26);
-						m_MapAliasToIndex.Add("TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT",27);
-						m_MapAliasToIndex.Add("TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT",28);
-						m_MapAliasToIndex.Add("TEST_DEV_SOLSCRIPT_PRODUCT",29);
-						m_MapAliasToIndex.Add("UNKNOWN_PRODUCT",30);
+						m_MapAliasToIndex.Add("TEST_DEV_SPDE_PRODUCT",26);
+						m_MapAliasToIndex.Add("TEST_DEV_SSE_SP_PRODUCT",27);
+						m_MapAliasToIndex.Add("TEST_DEV_SOLITRACK_PRODUCT",28);
+						m_MapAliasToIndex.Add("TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT",29);
+						m_MapAliasToIndex.Add("TEST_DEV_SDX_DESIGNER_PRODUCT",30);
+						m_MapAliasToIndex.Add("TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT",31);
+						m_MapAliasToIndex.Add("UNKNOWN_PRODUCT",32);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_SPD,0);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_XImage,1);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_XImageNT,2);
@@ -214,21 +224,23 @@ namespace Solimar
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_SolFusion,13);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_Spde,14);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_SolsearcherSp,15);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_RubikaProcessBuilder,16);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_SdxDesigner,17);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_SpdeQueueManager,18);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevIconvert,19);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolsearcherEp,20);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolIndexer,21);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevRubika,22);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSpde,23);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSseSp,24);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_SOLitrack,16);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_RubikaProcessBuilder,17);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_SdxDesigner,18);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_SpdeQueueManager,19);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevIconvert,20);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolsearcherEp,21);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolScript,22);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolIndexer,23);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevRubika,24);
 						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolfusionSp,25);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSdxDesigner,26);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSpdeQueueManager,27);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevRubikaProcessBuilder,28);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSolScript,29);
-						m_MapEnumToIndex.Add(TLic_ProductID.pid_UnknownProduct,30);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSpde,26);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSseSp,27);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSOLitrack,28);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevRubikaProcessBuilder,29);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSdxDesigner,30);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_TestDevSpdeQueueManager,31);
+						m_MapEnumToIndex.Add(TLic_ProductID.pid_UnknownProduct,32);
 					}
 					
 				
@@ -521,10 +533,9 @@ namespace Solimar
 					[FlagsAttribute]
 					public enum TModuleState : uint
 					{
-						msPerm = 0,
+						msLicensed = 0,
 						msTrial = 1,
 						msAddOn = 2,
-						msSubscription = 3,
 					};
 					
 					public class AttribsMemberEnum_TModuleState : AttribsMemberEnum
@@ -547,26 +558,21 @@ namespace Solimar
 							m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
 							m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
 							m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapAliasToEnum.Add("Permanent",TModuleState.msPerm);
-							m_MapEnumToAlias.Add(TModuleState.msPerm,"Permanent");
-							m_MapOrderingIndexToAlias.Add(1,"Permanent");
+							m_MapAliasToEnum.Add("Licensed",TModuleState.msLicensed);
+							m_MapEnumToAlias.Add(TModuleState.msLicensed,"Licensed");
+							m_MapOrderingIndexToAlias.Add(1,"Licensed");
 							m_MapAliasToEnum.Add("Trial",TModuleState.msTrial);
 							m_MapEnumToAlias.Add(TModuleState.msTrial,"Trial");
 							m_MapOrderingIndexToAlias.Add(2,"Trial");
-							m_MapAliasToEnum.Add("Add-On",TModuleState.msAddOn);
-							m_MapEnumToAlias.Add(TModuleState.msAddOn,"Add-On");
-							m_MapOrderingIndexToAlias.Add(3,"Add-On");
-							m_MapAliasToEnum.Add("Subscription",TModuleState.msSubscription);
-							m_MapEnumToAlias.Add(TModuleState.msSubscription,"Subscription");
-							m_MapOrderingIndexToAlias.Add(4,"Subscription");
-							m_MapAliasToIndex.Add("Permanent",0);
+							m_MapAliasToEnum.Add("AddOn",TModuleState.msAddOn);
+							m_MapEnumToAlias.Add(TModuleState.msAddOn,"AddOn");
+							m_MapOrderingIndexToAlias.Add(3,"AddOn");
+							m_MapAliasToIndex.Add("Licensed",0);
 							m_MapAliasToIndex.Add("Trial",1);
-							m_MapAliasToIndex.Add("Add-On",2);
-							m_MapAliasToIndex.Add("Subscription",3);
-							m_MapEnumToIndex.Add(TModuleState.msPerm,0);
+							m_MapAliasToIndex.Add("AddOn",2);
+							m_MapEnumToIndex.Add(TModuleState.msLicensed,0);
 							m_MapEnumToIndex.Add(TModuleState.msTrial,1);
 							m_MapEnumToIndex.Add(TModuleState.msAddOn,2);
-							m_MapEnumToIndex.Add(TModuleState.msSubscription,3);
 						}
 						
 					
@@ -623,7 +629,7 @@ namespace Solimar
 					public AttribsMemberDWORD moduleAppInstance = new AttribsMemberDWORD("mAI", 0);
 					public AttribsMemberDateTime moduleExpirationDate = new AttribsMemberDateTime("exDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");
-					public AttribsMemberEnum_TModuleState moduleState = new AttribsMemberEnum_TModuleState("mSt", TModuleState.msPerm);
+					public AttribsMemberEnum_TModuleState moduleState = new AttribsMemberEnum_TModuleState("mSt", TModuleState.msTrial);
 				
 				};
 				

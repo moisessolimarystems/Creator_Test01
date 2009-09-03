@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DestinationNameTable.cs" />
-    <Compile Include="OrderTable.cs" />
+    <Compile Include="ProductLicenseTable.cs" />
     <Compile Include="Creator.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

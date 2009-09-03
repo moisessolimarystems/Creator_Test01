@@ -99,11 +99,11 @@ namespace Client.Creator
         }
 
         //expects universal time
-        public void SetAllModulesExpDate(string orderNumber, DateTime? expDate)
+        public void SetAllModulesExpDate(string plNumber, DateTime? expDate)
         {
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
             {
-                if (module.contractNumber.TVal.Equals(orderNumber))
+                if (module.contractNumber.TVal.Equals(plNumber))
                 {
                     if (expDate.HasValue)
                         module.moduleExpirationDate.TVal = expDate.Value;
@@ -115,14 +115,15 @@ namespace Client.Creator
 
         //1) set trial modules to perm
         //2) clean up trial order node and listview after saving license.
-        public void SetTrialToPerm(string orderNumber)
+        public void SetTrialToLicensed(string plNumber, LicenseServerType lsType)
         {
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
             {
-                if(module.contractNumber.TVal.Equals(orderNumber))
+                if (module.contractNumber.TVal.Equals(plNumber))
                 {
-                    module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
-                    module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm;
+                    if (lsType != LicenseServerType.Subscription)
+                        module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
+                    module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
                     if (CreatorForm.s_CommLink.IsDefaultModule(ID, module.moduleID.TVal))
                     {
                         module.moduleValue.TVal = (uint)CreatorForm.s_CommLink.GetDefaultModuleValue(ID, module.moduleID.TVal);
@@ -138,17 +139,17 @@ namespace Client.Creator
 
         //1) set add-on modules to perm
         //2) clean up add-on order node and listview after saving license.
-        public void SetAddOnToPerm(string orderNumber, string parentOrderNumber)
+        public void SetAddOnToLicensed(string plNumber, string parentOrderNumber)
         {            
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
             {
                 //remove any non default module
-                if (module.contractNumber.TVal.Equals(orderNumber))
+                if (module.contractNumber.TVal.Equals(plNumber))
                 {
                     //module value, module app instance
                     if (module.moduleState.TVal.Equals(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn))
                     {                            
-                        module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msPerm;
+                        module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
                         module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
                         module.contractNumber.TVal = parentOrderNumber;
                     }
@@ -156,12 +157,11 @@ namespace Client.Creator
             }
         }
 
-        public void SetPermToTrial(string orderNumber)
+        public void SetLicensedToTrial(string plNumber)
         {
             Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
             //delete perm contract and any add-ons
             _product.moduleList.TVal.Clear();
-            DateTime expTime = new DateTime();
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in CreatorForm.s_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productID.TVal == ID)
@@ -173,7 +173,7 @@ namespace Client.Creator
                         module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;                       
                         module.moduleExpirationDate.TVal = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0).ToUniversalTime();
                         module.moduleAppInstance.TVal = 1;
-                        module.contractNumber.TVal = orderNumber;
+                        module.contractNumber.TVal = plNumber;
                         module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial;
                         _product.moduleList.TVal.Add(module);
                     }
