@@ -19,86 +19,78 @@ namespace Solimar.Licensing
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs tmpModSpec;
 			
-			#region ProdID:24, ProdName: SOLsearcher Enterprise Single Platform Test/Dev
+			#region ProdID:115, ProdName: Test/Dev SOLsearcher Enterprise Single Platform
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 24;
-			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Single Platform Test/Dev";
+			tmpProdSpec.productID.TVal = 115;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLsearcher Enterprise Single Platform";
 			tmpProdSpec.sameModSpecProductID.TVal = 8;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:25, ProdName: SOLfusion Single Platform Test/Dev
+			#region ProdID:114, ProdName: Test/Dev SPDE
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 25;
-			tmpProdSpec.productName.TVal = "SOLfusion Single Platform Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 13;
+			tmpProdSpec.productID.TVal = 114;
+			tmpProdSpec.productName.TVal = "Test/Dev SPDE";
+			tmpProdSpec.sameModSpecProductID.TVal = 14;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:26, ProdName: SDX Designer Test/Dev
+			#region ProdID:117, ProdName: Test/Dev Rubika Process Builder
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 26;
-			tmpProdSpec.productName.TVal = "SDX Designer Test/Dev";
+			tmpProdSpec.productID.TVal = 117;
+			tmpProdSpec.productName.TVal = "Test/Dev Rubika Process Builder";
 			tmpProdSpec.sameModSpecProductID.TVal = 17;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:27, ProdName: SPDE Queue Manager Test/Dev
+			#region ProdID:116, ProdName: Test/Dev SOLitrack
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 27;
-			tmpProdSpec.productName.TVal = "SPDE Queue Manager Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 18;
+			tmpProdSpec.productID.TVal = 116;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLitrack";
+			tmpProdSpec.sameModSpecProductID.TVal = 16;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+			#endregion
+			
+			#region ProdID:110, ProdName: Test/Dev SOLindexer
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 110;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLindexer";
+			tmpProdSpec.sameModSpecProductID.TVal = 10;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:20, ProdName: SOLsearcher Enterprise Test/Dev
+			#region ProdID:113, ProdName: Test/Dev SOLfusion
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 20;
-			tmpProdSpec.productName.TVal = "SOLsearcher Enterprise Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 8;
+			tmpProdSpec.productID.TVal = 113;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLfusion";
+			tmpProdSpec.sameModSpecProductID.TVal = 13;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:21, ProdName: SOLindexer Test/Dev
+			#region ProdID:112, ProdName: Test/Dev Rubika
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 21;
-			tmpProdSpec.productName.TVal = "SOLindexer Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 10;
-			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
-			#endregion
-			
-			#region ProdID:22, ProdName: Rubika Test/Dev
-			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 22;
-			tmpProdSpec.productName.TVal = "Rubika Test/Dev";
+			tmpProdSpec.productID.TVal = 112;
+			tmpProdSpec.productName.TVal = "Test/Dev Rubika";
 			tmpProdSpec.sameModSpecProductID.TVal = 12;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:23, ProdName: SPDE Test/Dev
+			#region ProdID:119, ProdName: Test/Dev SPDE Queue Manager
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 23;
-			tmpProdSpec.productName.TVal = "SPDE Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 14;
-			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
-			#endregion
-			
-			#region ProdID:28, ProdName: Rubika Process Builder Test/Dev
-			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 28;
-			tmpProdSpec.productName.TVal = "Rubika Process Builder Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 16;
+			tmpProdSpec.productID.TVal = 119;
+			tmpProdSpec.productName.TVal = "Test/Dev SPDE Queue Manager";
+			tmpProdSpec.sameModSpecProductID.TVal = 19;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:29, ProdName: SOLscript Test/Dev
+			#region ProdID:118, ProdName: Test/Dev SDX Designer
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 29;
-			tmpProdSpec.productName.TVal = "SOLscript Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 9;
+			tmpProdSpec.productID.TVal = 118;
+			tmpProdSpec.productName.TVal = "Test/Dev SDX Designer";
+			tmpProdSpec.sameModSpecProductID.TVal = 18;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
@@ -1033,6 +1025,30 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
+			#region ProdID:108, ProdName: Test/Dev SOLsearcher Enterprise
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 108;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLsearcher Enterprise";
+			tmpProdSpec.sameModSpecProductID.TVal = 8;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+			#endregion
+			
+			#region ProdID:109, ProdName: Test/Dev SOLscript
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 109;
+			tmpProdSpec.productName.TVal = "Test/Dev SOLscript";
+			tmpProdSpec.sameModSpecProductID.TVal = 9;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+			#endregion
+			
+			#region ProdID:107, ProdName: Test/Dev iCONVERT
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 107;
+			tmpProdSpec.productName.TVal = "Test/Dev iCONVERT";
+			tmpProdSpec.sameModSpecProductID.TVal = 7;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
 			#region ProdID:10, ProdName: SOLindexer
@@ -2261,8 +2277,8 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 7;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 1;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
@@ -2895,37 +2911,9 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:17, ProdName: SDX Designer
+			#region ProdID:17, ProdName: Rubika Process Builder
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 17;
-			tmpProdSpec.productName.TVal = "SDX Designer";
-			tmpProdSpec.prevSharedProductID.TVal = 10;
-			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
-			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 0;
-			tmpModSpec.moduleName.TVal = "SDX Designer";
-			tmpModSpec.modUnlimitedValue.TVal = 0;
-			tmpModSpec.moduleTrialLicense.TVal = 127;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-			#endregion
-			
-			#region ProdID:16, ProdName: Rubika Process Builder
-			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 16;
 			tmpProdSpec.productName.TVal = "Rubika Process Builder";
 			tmpProdSpec.prevSharedProductID.TVal = 12;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
@@ -2951,17 +2939,73 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:19, ProdName: iCONVERT Test/Dev
+			#region ProdID:16, ProdName: SOLitrack
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 19;
-			tmpProdSpec.productName.TVal = "iCONVERT Test/Dev";
-			tmpProdSpec.sameModSpecProductID.TVal = 7;
+			tmpProdSpec.productID.TVal = 16;
+			tmpProdSpec.productName.TVal = "SOLitrack";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 1;
+			tmpModSpec.moduleName.TVal = "Operators";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 0;
+			tmpModSpec.moduleName.TVal = "Devices";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 2;
+			tmpModSpec.moduleName.TVal = "Monitor Instances";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:18, ProdName: SPDE Queue Manager
+			#region ProdID:19, ProdName: SPDE Queue Manager
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 18;
+			tmpProdSpec.productID.TVal = 19;
 			tmpProdSpec.productName.TVal = "SPDE Queue Manager";
 			tmpProdSpec.prevSharedProductID.TVal = 14;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
@@ -2972,6 +3016,34 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleName.TVal = "Concurrent Operator Sessions";
 			tmpModSpec.modUnlimitedValue.TVal = 255;
 			tmpModSpec.moduleTrialLicense.TVal = 255;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
+			#region ProdID:18, ProdName: SDX Designer
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 18;
+			tmpProdSpec.productName.TVal = "SDX Designer";
+			tmpProdSpec.prevSharedProductID.TVal = 10;
+			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 0;
+			tmpModSpec.moduleName.TVal = "SDX Designer";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
