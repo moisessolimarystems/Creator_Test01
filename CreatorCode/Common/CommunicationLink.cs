@@ -241,7 +241,7 @@ namespace Client.Creator
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(uint productID)
         {
-            string productName = GetProductName(productID) + " Test/Dev";
+            string productName = "Test/Dev " + GetProductName(productID);
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 //want to find test dev product spec given base product id
@@ -278,7 +278,7 @@ namespace Client.Creator
         public string GetProductBaseName(string productName)
         {
             if (productName.Contains("Test"))
-                productName = productName.Substring(0, productName.IndexOf("Test") - 1);            
+                productName = productName.Replace("Test/Dev","").Trim();            
             return productName;        
         }
 
