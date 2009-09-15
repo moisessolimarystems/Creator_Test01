@@ -57,6 +57,19 @@ namespace CreatorData
             }
         }
 
+        public static void DeactivateProductLicense(string plID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                ProductLicenseTable plt = db.ProductLicenseTables.Where(c => c.plID.Equals(plID)).First();
+                if (plt != null)
+                {
+                    plt.plState = 3;
+                    UpdateProductLicense(plt);
+                }
+            }
+        }
+
         //how to get unique order index
         //save last used index in license table
         //update everytime order gets added 
