@@ -89,11 +89,6 @@ namespace Service.Creator
 
         #region License Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetAllLicenses(string searchString, bool enableLoadOptions)
-        {
-            return LicenseTable.GetAllLicenses(searchString, enableLoadOptions);
-        }
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions)
         {
             return LicenseTable.GetLicensesByCustomer(custName, searchString, enableLoadOptions);
@@ -149,6 +144,12 @@ namespace Service.Creator
         public bool IsLicenseUpdated(string licenseName)
         {
             return LicenseTable.IsLicenseUpdated(licenseName); 
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public int GetLicenseType(string licenseName)
+        {
+            return LicenseTable.GetLicenseType(licenseName);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -348,7 +349,7 @@ namespace Service.Creator
 
         #endregion
 
-        #region Order Implementation
+        #region Product License Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ProductLicenseTable> GetAllProductLicenses()
         {
@@ -389,6 +390,12 @@ namespace Service.Creator
         public int GetProductVersionFromTable(int productID)
         {
             return ProductLicenseTable.GetProductVersionFromTable(productID);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void DeactivateProductLicense(string productLicenseID)
+        {
+            ProductLicenseTable.DeactivateProductLicense(productLicenseID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

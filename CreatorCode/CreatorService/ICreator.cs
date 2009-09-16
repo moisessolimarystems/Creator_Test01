@@ -48,9 +48,6 @@ namespace Service.Creator
 
         #region License OperationContracts
         [OperationContract]
-        IList<LicenseTable> GetAllLicenses(string searchString, bool enableLoadOptions);
-
-        [OperationContract]
         IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions);
 
         [OperationContract]
@@ -76,6 +73,9 @@ namespace Service.Creator
 
         [OperationContract]
         uint GetLastDestinationID(uint custID);
+
+        [OperationContract]
+        int GetLicenseType(string licenseName);
 
         [OperationContract]
         IList<LicenseTable> GetLicencesByConditions(IList<Condition> conditionList);
@@ -188,6 +188,9 @@ namespace Service.Creator
 
         [OperationContract]
         int GetProductVersionFromTable(int productID);
+
+        [OperationContract]
+        void DeactivateProductLicense(string productLicenseID);
 
         [OperationContract]
         void DeleteAllProductLicenses(string licenseServer);
