@@ -324,7 +324,7 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 87F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 88F));
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
@@ -361,7 +361,7 @@
             this.tokenValueTextBox.Location = new System.Drawing.Point(149, 36);
             this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
-            this.tokenValueTextBox.Size = new System.Drawing.Size(164, 20);
+            this.tokenValueTextBox.Size = new System.Drawing.Size(163, 20);
             this.tokenValueTextBox.TabIndex = 0;
             this.tokenValueTextBox.TextChanged += new System.EventHandler(this.tokenValueTextBox_TextChanged);
             this.tokenValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenValueTextBox_KeyUp);
@@ -375,7 +375,7 @@
             this.tokenTypeComboBox.Location = new System.Drawing.Point(149, 5);
             this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
-            this.tokenTypeComboBox.Size = new System.Drawing.Size(164, 21);
+            this.tokenTypeComboBox.Size = new System.Drawing.Size(163, 21);
             this.tokenTypeComboBox.TabIndex = 1;
             this.tokenTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.tokenTypeComboBox_SelectedIndexChanged);
             this.tokenTypeComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenTypeComboBox_KeyUp);
@@ -406,7 +406,7 @@
             // browseTokenFileButton
             // 
             this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.browseTokenFileButton.Location = new System.Drawing.Point(313, 35);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(312, 35);
             this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
             this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
@@ -563,7 +563,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -599,7 +599,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(346, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(345, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -615,7 +615,7 @@
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(234, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(233, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
@@ -625,7 +625,7 @@
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(234, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(233, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -657,7 +657,7 @@
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(234, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(233, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -679,7 +679,7 @@
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(234, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(233, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage

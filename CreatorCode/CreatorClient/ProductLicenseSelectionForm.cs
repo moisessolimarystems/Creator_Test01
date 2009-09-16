@@ -38,7 +38,7 @@ namespace Client.Creator
                 List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
                 foreach (ProductLicenseTable plRecord in productLicenses)
                 {
-                    if (plRecord.plState != (byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                    if (plRecord.plState != (byte)ProductLicenseState.AddOn)
                     {
                         //if order already exists apply check to checkbox and make greyed out? unselectable?
                         ListViewItem lvItem = new ListViewItem();
@@ -53,7 +53,7 @@ namespace Client.Creator
                                 continue;
                         }
                         lvItem.Text = plRecord.plID;
-                        lvItem.SubItems.Add(Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), plRecord.plState));
+                        lvItem.SubItems.Add(Enum.GetName(typeof(ProductLicenseState), plRecord.plState));
                         lvItem.SubItems.Add(_commLink.GetProductName((uint)plRecord.ProductID));
                         if (plRecord.ExpirationDate.HasValue)
                             lvItem.SubItems.Add(plRecord.ExpirationDate.Value.ToLocalTime().ToShortDateString());

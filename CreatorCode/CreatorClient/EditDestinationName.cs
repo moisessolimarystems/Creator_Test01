@@ -131,7 +131,7 @@ namespace Client.Creator
                         destTable.DestName = e.Label;
                         client.UpdateDestinationName(destTable);
                         _modified = true;
-                    });
+                    });                     
                 }
                 else
                     e.CancelEdit = true;

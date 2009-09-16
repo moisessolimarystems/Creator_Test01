@@ -105,12 +105,12 @@ namespace Client.Creator
             return bRetVal;
         }
 
-        void LoadProductLicenseTabPage(ProductLicenseDialogData orderData)
+        void LoadProductLicenseTabPage(ProductLicenseDialogData plData)
         {
-            selectedObject = orderData as Object;
+            selectedObject = plData as Object;
             topPanel.Controls.Clear();
             productLicenseGroupBox.Parent = topPanel;
-            productLicenseNumberTextBox.Text = orderData.OrderInfo.OrderNumber;
+            productLicenseNumberTextBox.Text = plData.ProductLicense.ID;
             List<ProductLicenseTable> productLicenses;
             List<string> productList = new List<string>();
             Service<ICreator>.Use((client) => 
@@ -119,14 +119,14 @@ namespace Client.Creator
                 //perm -> add-on available : 1 order
                 //perm, add-on -> zero available : 2 order    
 
-                if (orderData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
+                if (plData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
                 {   //standard,failover,disaster             
                     foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                     {
                         bool bSkip = false;
                         if (!productSpec.productName.TVal.Contains("Test"))
                         {
-                            productLicenses = client.GetProductLicensesByProduct(orderData.OrderInfo.LicenseName, (int)productSpec.productID.TVal);
+                            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseName, (int)productSpec.productID.TVal);
                             //0 order => product hasnt been added
                             //if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             //    productLicenses.Count > 0)
@@ -153,7 +153,7 @@ namespace Client.Creator
                             //should only add products that exist in the standard license
                             //and haven't already been added.
                             string licenseBase = "P";
-                            LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", orderData.LicenseInfo.CustID, orderData.LicenseInfo.DestID, orderData.LicenseInfo.GroupID, licenseBase), false);
+                            LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
                             if (baseLicRec == null) //subscription type                            
                                 licenseBase = "S";                                                           
                             int pos = productSpec.productName.TVal.IndexOf("Test");
@@ -162,7 +162,7 @@ namespace Client.Creator
                             productLicenses = client.GetProductLicensesByProduct(licenseBase, (int)productSpec.productID.TVal);
                             if (productLicenses.Count == 1)
                             {   //0 order => product hasnt been added                     
-                                productLicenses = client.GetProductLicensesByProduct(orderData.OrderInfo.LicenseName, (int)productSpec.productID.TVal);
+                                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseName, (int)productSpec.productID.TVal);
                                 if (productLicenses.Count == 0)
                                     productList.Add(productSpec.productName);
                             }
@@ -183,19 +183,19 @@ namespace Client.Creator
             //can only be one or two
             if (splitStatus.Count() > 1)
             {
-                plData.OrderInfo.Status = (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)Enum.Parse(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), splitStatus[0].Trim());
-                plData.OrderInfo.ParentOrderNumber = splitStatus[1].Trim();
+                plData.ProductLicense.Status = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
+                plData.ProductLicense.ParentID = splitStatus[1].Trim();
             }
             else
-                plData.OrderInfo.Status = (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)Enum.Parse(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), splitStatus[0]);
+                plData.ProductLicense.Status = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0]);
 
-            plData.OrderInfo.Product.ID = (uint)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
-            plData.OrderInfo.ProductLicenseType = m_CommLink.GetProductSpec(plData.OrderInfo.Product.ID).productLicType.TVal;
-            plData.OrderInfo.Product.AppInstance = (uint)((plData.OrderInfo.Status == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+            plData.ProductLicense.Product.ID = (uint)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
+            plData.ProductLicense.ProductLicenseType = m_CommLink.GetProductSpec(plData.ProductLicense.Product.ID).productLicType.TVal;
+            plData.ProductLicense.Product.AppInstance = (uint)((plData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
             string[] versionNum = productLicenseVersionMaskedTextBox.Text.Split(".".ToCharArray());
-            plData.OrderInfo.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]), UInt32.Parse(versionNum[1]));
-            plData.OrderInfo.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
-            plData.OrderInfo.Description = productLicenseDescriptionTextBox.Text;            
+            plData.ProductLicense.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]), UInt32.Parse(versionNum[1]));
+            plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
+            plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;            
         }
         #endregion
 
@@ -359,21 +359,21 @@ namespace Client.Creator
                 modNameComboBox.Items.Add(moduleName);
                 modNameComboBox.SelectedIndex = 0;
                 uint modID, unlimitedValue, totalValue = 0;
-                modID = (uint)m_CommLink.GetModuleID(moduleData.OrderData.Product.ID, moduleName);
-                unlimitedValue = (uint)m_CommLink.GetUnlimitedModuleValue(moduleData.OrderData.Product.ID, modID);
+                modID = (uint)m_CommLink.GetModuleID(moduleData.ProductLicense.Product.ID, moduleName);
+                unlimitedValue = (uint)m_CommLink.GetUnlimitedModuleValue(moduleData.ProductLicense.Product.ID, modID);
                 //need total product value 
                 Service<ICreator>.Use((client) => 
                 {
-                    LicenseTable licRec = client.GetLicenseByName(moduleData.OrderData.LicenseName, false);
+                    LicenseTable licRec = client.GetLicenseByName(moduleData.ProductLicense.LicenseName, false);
                     Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                     licPackage.Stream = licRec.LicenseInfo;                        
                     foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
                     {
-                        if (product.productID.TVal.Equals(moduleData.OrderData.Product.ID))
+                        if (product.productID.TVal.Equals(moduleData.ProductLicense.Product.ID))
                         {
                             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
                             {
-                                if (modRec.moduleID.TVal.Equals(modID) && (modRec.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber) || modRec.contractNumber.TVal.Equals(moduleData.OrderData.ParentOrderNumber)))
+                                if (modRec.moduleID.TVal.Equals(modID) && (modRec.contractNumber.TVal.Equals(moduleData.ProductLicense.ID) || modRec.contractNumber.TVal.Equals(moduleData.ProductLicense.ParentID)))
                                 {
                                     totalValue += modRec.moduleValue.TVal;
                                     break;
@@ -384,7 +384,7 @@ namespace Client.Creator
                 });
                 int availableUnits = (int)(unlimitedValue - totalValue);
                 //need to set max to 0 if availability is 0
-                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in moduleData.OrderData.Product.ModuleList.TVal)
+                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in moduleData.ProductLicense.Product.ModuleList.TVal)
                 {                        
                     if (module.moduleID.TVal.Equals(modID))
                     {
@@ -425,12 +425,12 @@ namespace Client.Creator
             int modID, totalModAppInstance;
             foreach (string modName in moduleData.ModuleNames)
             {
-                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
+                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
                 {
-                    modID = m_CommLink.GetModuleID(moduleData.OrderData.Product.ID, modName);
+                    modID = m_CommLink.GetModuleID(moduleData.ProductLicense.Product.ID, modName);
                     if(modID >= 0)
                     {
-                        if (storedMod.contractNumber.TVal.Equals(moduleData.OrderData.OrderNumber))
+                        if (storedMod.contractNumber.TVal.Equals(moduleData.ProductLicense.ID))
                         {
                             if (storedMod.moduleID.TVal.Equals((uint)modID))
                             {
@@ -446,10 +446,10 @@ namespace Client.Creator
                                     {
                                         if (totalModAppInstance > 1)
                                         {
-                                            if (IsClientType(moduleData.OrderData.ProductName) && storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)                                                                                                                                      
-                                                    storedMod.moduleAppInstance.TVal = moduleData.OrderData.Product.AppInstance;                                            
-                                            else                                            
-                                                storedMod.moduleAppInstance.TVal = (uint)((moduleData.OrderData.Status == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? 0 : 1);
+                                            if (IsClientType(moduleData.ProductLicense.ProductName) && storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                                storedMod.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;                                            
+                                            else
+                                                storedMod.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
                                         }
                                         else
                                         {
@@ -489,10 +489,10 @@ namespace Client.Creator
             IList<string> addOnOrders = null;
             Service<ICreator>.Use((client) =>
             {
-                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.OrderData.OrderNumber : moduleData.OrderData.ParentOrderNumber;
+                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.ProductLicense.ID : moduleData.ProductLicense.ParentID;
                     addOnOrders = client.GetAddOnProductLicenses(stdProductLicense);
             });
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.ProductLicense.Product.ModuleList.TVal)
             {
                 if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal)))
                     totalValue += modRec.moduleAppInstance.TVal;
@@ -507,10 +507,10 @@ namespace Client.Creator
             IList<string> addOnOrders = null;
             Service<ICreator>.Use((client) =>
             {
-                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.OrderData.OrderNumber : moduleData.OrderData.ParentOrderNumber;
+                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.ProductLicense.ID : moduleData.ProductLicense.ParentID;
                 addOnOrders = client.GetAddOnProductLicenses(stdProductLicense);
             });
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.OrderData.Product.ModuleList.TVal)
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.ProductLicense.Product.ModuleList.TVal)
             {
                 if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal) || modRec.contractNumber.TVal.Equals(stdProductLicense)))
                     totalValue += modRec.moduleAppInstance.TVal;
@@ -530,7 +530,7 @@ namespace Client.Creator
             {
                 if(addOnOrders.Count > 0)
                 {
-                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
                     {
                         if (storedMod.moduleID.TVal == module.moduleID.TVal &&
                             addOnOrders.Contains(storedMod.contractNumber.TVal))
@@ -552,7 +552,7 @@ namespace Client.Creator
             {
                 if (addOnOrders.Count > 0)
                 {
-                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.OrderData.Product.ModuleList.TVal)
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
                     {
                         if (storedMod.moduleID.TVal == module.moduleID.TVal &&
                             addOnOrders.Contains(storedMod.contractNumber.TVal))
@@ -798,27 +798,27 @@ namespace Client.Creator
             Service<ICreator>.Use((client) => 
             {
                 //get all orders for a given product
-                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.OrderInfo.LicenseName, (int)m_CommLink.GetProductID(selectedProduct));
+                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseName, (int)m_CommLink.GetProductID(selectedProduct));
                 List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     if (productSpec.productName.TVal.Equals(selectedProduct) && !productSpec.productName.TVal.Contains("Test"))
                     {
-                        productLicenses = client.GetProductLicensesByProduct(storedObject.OrderInfo.LicenseName, (int)m_CommLink.GetProductID(productSpec.productName.TVal));
+                        productLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseName, (int)m_CommLink.GetProductID(productSpec.productName.TVal));
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             productLicenses.Count > 0))
-                            ProductLicenseTypeComboBox.Items.Add(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial);
+                            ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
                         break;
                     }
                 }
                 if (dbProductLicenses.Count > 0)
                 {
-                    Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState state = (Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)dbProductLicenses[0].plState;
+                    ProductLicenseState state = (ProductLicenseState)dbProductLicenses[0].plState;
                     foreach (ProductLicenseTable plRec in dbProductLicenses)
                     {
-                        if (plRec.plState.Equals((byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed))
+                        if (plRec.plState.Equals((byte)ProductLicenseState.Licensed))
                         {
-                            ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn, plRec.plID));  
+                            ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", ProductLicenseState.AddOn, plRec.plID));  
                         }
                     }               
                 }
@@ -1027,14 +1027,14 @@ namespace Client.Creator
     #region ModuleDialogData class
     public class ModuleDialogData : Shared.VisualComponents.DialogData
     {
-        private List<string> m_ModuleNames;
-        private ProductLicenseProperty m_OrderData;
+        private List<string> _moduleNames;
+        private ProductLicenseProperty _plData;
         #region Constructors
 
-        public ModuleDialogData(List<string> moduleNames, ProductLicenseProperty orderData)
+        public ModuleDialogData(List<string> moduleNames, ProductLicenseProperty plData)
         {
-            m_ModuleNames = moduleNames;
-            m_OrderData = orderData;
+            _moduleNames = moduleNames;
+            _plData = plData;
         }
         #endregion
 
@@ -1042,13 +1042,13 @@ namespace Client.Creator
 
         public List<string> ModuleNames
         {
-            get { return this.m_ModuleNames; }
-            set { this.m_ModuleNames = value; }
+            get { return this._moduleNames; }
+            set { this._moduleNames = value; }
         }
-        public ProductLicenseProperty OrderData
+        public ProductLicenseProperty ProductLicense
         {
-            get { return this.m_OrderData; }
-            set { this.m_OrderData = value; }
+            get { return this._plData; }
+            set { this._plData = value; }
         }
         #endregion
     }
@@ -1057,30 +1057,30 @@ namespace Client.Creator
     #region ProductLicenseDialogData class
     public class ProductLicenseDialogData : Shared.VisualComponents.DialogData
     {
-        private ProductLicenseProperty m_OrderInfo;
-        private LicenseServerProperty m_LicenseInfo;
+        private ProductLicenseProperty _plInfo;
+        private LicenseServerProperty _LicenseInfo;
 
         #region Constructors
 
-        public ProductLicenseDialogData(ProductLicenseProperty orderInfo, LicenseServerProperty licInfo)
+        public ProductLicenseDialogData(ProductLicenseProperty plInfo, LicenseServerProperty licInfo)
         {
-            m_OrderInfo = orderInfo;
-            m_LicenseInfo = licInfo;
+            _plInfo = plInfo;
+            _LicenseInfo = licInfo;
         }
         #endregion
 
         #region Properties
 
-        public ProductLicenseProperty OrderInfo
+        public ProductLicenseProperty ProductLicense
         {
-            get { return this.m_OrderInfo; }
-            set { this.m_OrderInfo = value; }
+            get { return this._plInfo; }
+            set { this._plInfo = value; }
         }
 
         public LicenseServerProperty LicenseInfo
         {
-            get { return this.m_LicenseInfo; }
-            set { this.m_LicenseInfo = value; }
+            get { return this._LicenseInfo; }
+            set { this._LicenseInfo = value; }
         }
         #endregion
     }

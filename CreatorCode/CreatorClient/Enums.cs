@@ -88,7 +88,7 @@ namespace Client.Creator
             Deactivated
         }
 
-        public enum ProductLicenseType
+        public enum ProductLicenseState
         {
             Trial,
             Licensed,
@@ -151,23 +151,23 @@ namespace Client.Creator
                 return licenseType;
             }
 
-            public static int GetProductLicenseType(ProductLicenseType plType)
+            public static int GetProductLicenseState(ProductLicenseState plState)
             {
-                int productLicenseType;
-                switch (plType)
+                int productLicenseState;
+                switch (plState)
                 {
-                    case ProductLicenseType.Trial:
-                        productLicenseType = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial;
+                    case ProductLicenseState.Trial:
+                        productLicenseState = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial;
                         break;
-                    case ProductLicenseType.AddOn:
-                        productLicenseType = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn;
+                    case ProductLicenseState.AddOn:
+                        productLicenseState = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn;
                         break;
-                    case ProductLicenseType.Licensed:
-                        productLicenseType = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
+                    case ProductLicenseState.Licensed:
+                        productLicenseState = (int)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
                         break;
-                    default: productLicenseType = -1; break;
+                    default: productLicenseState = -1; break;
                 }
-                return productLicenseType;
+                return productLicenseState;
             }
 
             public static String GetLicenseServerPrefix(LicenseServerType licType)
