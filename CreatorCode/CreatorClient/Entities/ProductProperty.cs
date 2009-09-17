@@ -6,6 +6,7 @@ using Solimar.Licensing.Attribs;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Drawing.Design;
+using System.Reflection;
 
 namespace Client.Creator
 {
@@ -31,7 +32,7 @@ namespace Client.Creator
             _product.moduleList.TVal = product.moduleList.TVal;
         }
 
-        [Browsable(false)]
+       [Browsable(false)]
         public uint ID
         {
             get { return _product.productID.TVal; }
@@ -52,9 +53,13 @@ namespace Client.Creator
         [DisplayName("Version")]
         [Description("Version")]
         [TypeConverter(typeof(VersionConverter))]
+        [ReadOnly(true)]
         public LicenseVersion Version
         {
-            get { return _version; }
+            get 
+            {
+                return _version; 
+            }
             set 
             {
                 //Regex reg = new Regex(@"([01]?\d\d|2[0-4]\d|25[0-5])\." + @"([01]?\d\d|2[0-4]\d|25[0-5])\." + @"([01]?\d\d|2[0-4]\d|25[0-5])\." + @"([01]?\d\d|2[0-4]\d|25[0-5])");
@@ -73,6 +78,7 @@ namespace Client.Creator
         [Category("Product"),PropertyOrder(3)]
         [DisplayName("Product Connections")]
         [Description("Number of connections allowed per product.")]
+        [ReadOnly(true)]
         public uint AppInstance
         {
             get { return _product.productAppInstance.TVal; }
@@ -139,7 +145,7 @@ namespace Client.Creator
 
         //1) set add-on modules to perm
         //2) clean up add-on order node and listview after saving license.
-        public void SetAddOnToLicensed(string plNumber, string parentOrderNumber)
+        public void SetAddOnToLicensed(string plNumber, string parentID)
         {            
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
             {
@@ -151,7 +157,7 @@ namespace Client.Creator
                     {                            
                         module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
                         module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
-                        module.contractNumber.TVal = parentOrderNumber;
+                        module.contractNumber.TVal = parentID;
                     }
                 }
             }

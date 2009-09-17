@@ -25,22 +25,7 @@ namespace CreatorData
                 else
                 {
                     if (token != 0)
-                    {
-                        //list = (from t in db.TokenTables //115
-                        //        from c in db.CustomerTables
-                        //        from l in db.LicenseTables
-                        //        where t.TokenType.Equals(token) &&
-                        //             (t.TokenValue.Contains(searchString) ||
-                        //              (l.LicenseName.Contains(searchString) && t.LicenseID.Equals(l.ID)) 
-                        //             )
-                        //        select t).ToList();
-                        //list = (from t in db.TokenTables //0
-                        //        from l in db.LicenseTables
-                        //        where t.TokenType.Equals(token) &&
-                        //             (t.TokenValue.Contains(searchString) ||
-                        //              (l.LicenseName.Contains(searchString) && t.LicenseID.Equals(l.ID))
-                        //             )
-                        //        select t).ToList();
+                    {                      
                         list = (from t in db.TokenTables //5
                                 from c in db.CustomerTables
                                 where t.TokenType.Equals(token) &&
