@@ -54,8 +54,6 @@ namespace CreatorData
             }
         }
 
-
-
         public static LicenseTable GetLicenseByID(int licID, bool enableLoadOptions)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -71,36 +69,6 @@ namespace CreatorData
             }
         }
 
-        public static IList<LicenseTable> GetAllLicenses(string searchString, bool enableLoadOptions)
-        {
-            IList<LicenseTable> list;
-            int result;
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                if (enableLoadOptions)
-                {
-                    DataLoadOptions dlo = new DataLoadOptions();
-                    dlo.LoadWith<LicenseTable>(id => id.PacketTables);
-                    db.LoadOptions = dlo;
-                }
-                if (searchString.Length == 0)
-                {
-                    list = db.LicenseTables.OrderBy(c => c.ID).ToList();
-                    
-                }
-                else
-                {
-                    Int32.TryParse(searchString, out result);
-                    list = db.LicenseTables.Where(c => c.LicenseName.Contains(searchString) ||    
-                                                  c.CustomerTable.SCRname.Contains(searchString) ||                                                                                                                          
-                                                  c.LicenseComments.Contains(searchString)).ToList();
-                }
-
-                return list;
-            }
-        }
-
         public static IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -112,10 +80,19 @@ namespace CreatorData
                     dlo.LoadWith<LicenseTable>(id => id.PacketTables);
                     db.LoadOptions = dlo;
                 }
-                return db.LicenseTables.Where(c => c.CustomerTable.SCRname.Equals(custName) && 
-                                                  (c.LicenseName.Contains(searchString) ||
-                                                   c.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
-                                                                             o.LicenseID.Equals(c.ID))) > 0)).ToList();                
+                //need to be able to translate destid to destname from searchstring
+                var licenseFilter = from l in db.LicenseTables
+                                    join d in db.DestinationNameTables on
+                                    new { DestID = l.DestinationID, CustID = l.SCRnumber }
+                                    equals
+                                    new { DestID = d.DestID, CustID = d.CustID }
+                                    where l.CustomerTable.SCRname.Equals(custName) &&
+                                         (d.DestName.Contains(searchString) ||
+                                          l.LicenseName.Contains(searchString) ||
+                                          l.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
+                                                                                          o.LicenseID.Equals(l.ID))) > 0)
+                                    select l;
+                return licenseFilter.ToList();
             }
         }
 
@@ -360,6 +337,19 @@ namespace CreatorData
                 }                                      
             }
             return true;
+        }
+
+        public static int GetLicenseType(string licenseName)
+        {
+            int lsType = -1;
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var license = db.LicenseTables.Where(c => c.LicenseName.Equals(licenseName)).FirstOrDefault();
+                if (license != null)
+                    lsType = (int)license.LicenseType;
+            }
+            return lsType;
         }
 
         public static IList<string> GetUpdatedLicensesByCustomer(string custName)
