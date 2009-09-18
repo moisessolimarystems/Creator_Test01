@@ -133,7 +133,7 @@ namespace Client.Creator
                             foreach (ProductLicenseTable pl in productLicenses)
                             {          
                                 //skip if client and not perm
-                                if(pl.plState.Equals((byte)Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msTrial) &&
+                                if(pl.plState.Equals((byte)ProductLicenseState.Trial) &&
                                    productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
                                     bSkip = true;
                             }

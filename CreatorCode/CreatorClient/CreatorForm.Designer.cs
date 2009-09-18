@@ -112,7 +112,6 @@
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.MainTreeView = new System.Windows.Forms.TreeView();
             this.MainTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.PacketContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.verifyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -169,6 +168,8 @@
             this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.editDestinationNamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -267,6 +268,7 @@
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.updateVersionsToolStripMenuItem,
+            this.editDestinationNamesToolStripMenuItem,
             this.optionsToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(44, 20);
@@ -538,6 +540,7 @@
             // splitContainer2
             // 
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer2.Location = new System.Drawing.Point(0, 0);
             this.splitContainer2.Name = "splitContainer2";
             this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -551,10 +554,10 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.statusStrip1);
-            this.splitContainer2.Panel2MinSize = 10;
+            this.splitContainer2.Panel2MinSize = 21;
             this.splitContainer2.Size = new System.Drawing.Size(989, 474);
             this.splitContainer2.SplitterDistance = 452;
-            this.splitContainer2.SplitterWidth = 2;
+            this.splitContainer2.SplitterWidth = 1;
             this.splitContainer2.TabIndex = 2;
             // 
             // MainTabControl
@@ -1097,14 +1100,6 @@
             this.MainTreeViewImageList.Images.SetKeyName(2, "History.ico");
             this.MainTreeViewImageList.Images.SetKeyName(3, "tree.ico");
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, -2);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(989, 22);
-            this.statusStrip1.TabIndex = 0;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
             // PacketContextMenuStrip
             // 
             this.PacketContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1574,6 +1569,22 @@
             this.columnHeader2.Text = "Description";
             this.columnHeader2.Width = 104;
             // 
+            // editDestinationNamesToolStripMenuItem
+            // 
+            this.editDestinationNamesToolStripMenuItem.Name = "editDestinationNamesToolStripMenuItem";
+            this.editDestinationNamesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.editDestinationNamesToolStripMenuItem.Text = "Edit Destination Names...";
+            this.editDestinationNamesToolStripMenuItem.Visible = false;
+            this.editDestinationNamesToolStripMenuItem.Click += new System.EventHandler(this.editDestinationNamesToolStripMenuItem_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, -1);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(989, 22);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
             // CreatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1744,7 +1755,6 @@
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ColumnHeader ExpDateColumnHeader;
         private System.Windows.Forms.ColumnHeader VerifiedByColumnHeader;
         private System.Windows.Forms.RichTextBox packetDescriptionRichTextBox;
@@ -1776,6 +1786,8 @@
         private System.Windows.Forms.ToolStrip CustomerToolStrip;
         private System.Windows.Forms.ToolStripLabel CustomerToolStripLabel;
         private System.Windows.Forms.ToolStripMenuItem updateVersionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editDestinationNamesToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip1;
 
     }
 }

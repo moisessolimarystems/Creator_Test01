@@ -870,9 +870,13 @@ namespace Client.Creator
                     //set pl state to deactivated
                     if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
                     {
+                        LicenseServerProperty lsProperty = DetailPropertyGrid.SelectedObject as LicenseServerProperty;
+                        CreateTransaction(TransactionType.License,
+                                          lsProperty.Name,
+                                          string.Format("Changed License Server Status from {0} to {1}", lsProperty.LicType.ToString(), LicenseServerType.Deactivated.ToString()),
+                                          lsProperty.LicType.ToString());
                         Service<ICreator>.Use((client) =>
                         {
-                            LicenseServerProperty lsProperty = DetailPropertyGrid.SelectedObject as LicenseServerProperty;
                             LicenseTable licRecord = client.GetLicenseByName(lsProperty.Name, false);
                             licRecord.LicenseType = (byte)LicenseServerType.Deactivated;
                             lsProperty.LicType = LicenseServerType.Deactivated;
@@ -885,7 +889,7 @@ namespace Client.Creator
                     {   //propertygrid object needs to be update, treenode status needs to be updated
                         ProductLicenseProperty plProperty = DetailPropertyGrid.SelectedObject as ProductLicenseProperty;
                         Service<ICreator>.Use((client) =>
-                        {
+                        {   //decrement app instance and modules from product view
                             List<string> plAddOns = client.GetAddOnProductLicenses(plProperty.ID);
                             plAddOns.Add(plProperty.ID);
                             if (plAddOns.Count > 0)
@@ -894,8 +898,42 @@ namespace Client.Creator
                                 foreach (string pl in plAddOns)
                                 {
                                     plt = client.GetProductLicense(pl);
+                                    CreateTransaction(TransactionType.Order,
+                                                      plt.plID.Substring(0, plt.plID.LastIndexOf("-")),
+                                                      string.Format("{0} : Changed Product License Status from {1} to {2}", 
+                                                                    plt.plID,
+                                                                    Enum.GetName(typeof(ProductLicenseState),plt.plState), 
+                                                                    ProductLicenseState.Deactivated.ToString()),
+                                                      ProductLicenseState.Deactivated.ToString());
                                     plt.plState = (byte)ProductLicenseState.Deactivated;
                                     client.UpdateProductLicense(plt);
+                                    //Deactivate product
+                                    LicenseTable storedLicense = client.GetLicenseByID(plt.LicenseID, false);
+                                    Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
+                                    licPackage.Stream = storedLicense.LicenseInfo;
+                                    foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+                                    {
+                                        if (product.productID.TVal.Equals((uint)plt.ProductID))
+                                        {
+                                            //order product has same value as dbproduct
+                                            //client type subtract total, client add-on subtract nothing
+                                            //decrement appinstance for product when removing an order
+                                            //1) non-client, non addon - decrement appinstance
+                                            //2) non-client, add-on - skip
+                                            //3) client, non addon - decrement all app instances
+                                            //4) client, add-on - skip
+                                            if (plt.plState != (byte)ProductLicenseState.AddOn)
+                                            {
+                                                if (s_CommLink.GetProductSpec((uint)plt.ProductID).productLicType.TVal != Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
+                                                    product.productAppInstance.TVal -= 1;
+                                                else
+                                                    product.productAppInstance.TVal = 0;           
+                                            }         
+                                            break;
+                                        }
+                                    }
+                                    storedLicense.LicenseInfo = licPackage.Stream;
+                                    client.UpdateLicense(storedLicense);
                                 }
                             }
                         });
@@ -1075,8 +1113,6 @@ namespace Client.Creator
                 {
                     m_selectedDirectory = Path.GetFullPath(data.PacketInfo.OutputPath + "\\..");
                     GeneratePacket(data.PacketInfo.Name, DetailTreeView.SelectedNode.Name, data.ExpDate, data.PacketInfo.Description, data.PacketInfo.OutputPath);
-                    //restore license text to normal from modified
-                    
                 }
             }
         }
@@ -1632,7 +1668,7 @@ namespace Client.Creator
                         dbProduct.product_Major.TVal = plData.Product.Product.product_Major.TVal;
                         dbProduct.product_Minor.TVal = plData.Product.Product.product_Minor.TVal;
                         if(plData.ProductLicenseType != Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
-                            if (plData.Status != ProductLicenseState.AddOn)
+                            if (plData.Status != ProductLicenseState.AddOn && plData.Status != ProductLicenseState.Deactivated)
                                 dbProduct.productAppInstance.TVal += 1;
                         product = dbProduct;
                         bFound = true;
@@ -1789,7 +1825,7 @@ namespace Client.Creator
                             storedRec = client.GetProductLicense(orderRec.plID);
                             CreateTransaction(TransactionType.Order,
                                               licData.Name,
-                                              string.Format("Added {0} Product License - {1}", s_CommLink.GetProductName((uint)orderRec.ProductID), Enum.GetName(typeof(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState), orderRec.plState)),
+                                              string.Format("Added {0} Product License - {1}", s_CommLink.GetProductName((uint)orderRec.ProductID), Enum.GetName(typeof(ProductLicenseState), orderRec.plState)),
                                               orderRec.plID);
                             //convert product into test/dev product for test/dev key
                             //Don't include add-on orders
@@ -2069,11 +2105,6 @@ namespace Client.Creator
                     else
                     {
                         productNode.Tag = new ProductProperty(storedProduct);
-                        //now set to either product node or perm order node
-                        if (plData.ParentID!= null)
-                            LoadDetailListView(productNode.Nodes.Find(plData.ParentID, true).FirstOrDefault().Tag as ProductLicenseProperty);
-                        else
-                            LoadDetailListView(productNode.Tag as ProductProperty);
                     }
                     return true;
                 }
@@ -2135,7 +2166,7 @@ namespace Client.Creator
                         //client type subtract total, client add-on subtract nothing
                         //decrement appinstance for product when removing an order
                         if (plData.ProductLicenseType != Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
-                            if (plData.Status != ProductLicenseState.AddOn)
+                            if (plData.Status != ProductLicenseState.AddOn && plData.Status != ProductLicenseState.Deactivated)
                                 product.productAppInstance.TVal -= 1;
                         Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList moduleList = Lic_LicenseInfoAttribsHelper.GetModuleList_ByContractNumber(product, plData.ID);
                         foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs mod in moduleList.TVal)
@@ -2420,22 +2451,16 @@ namespace Client.Creator
             HardwareKeyListView.Columns.Clear();
             if (custName.Length > 0)
             {
-                //if (!(HardwareKeyListView.Columns.Count == 3))
-                //{
-                    HardwareKeyListView.Columns.Add("Key Value");                    
-                    HardwareKeyListView.Columns.Add("License Server");
-                    HardwareKeyListView.Columns.Add("Status");
-                //}
+                HardwareKeyListView.Columns.Add("Key Value");                    
+                HardwareKeyListView.Columns.Add("License Server");
+                HardwareKeyListView.Columns.Add("Status");
             }
             else
             {
-                //if (!(HardwareKeyListView.Columns.Count == 4))
-                //{
-                    HardwareKeyListView.Columns.Add("Customer");
-                    HardwareKeyListView.Columns.Add("Reserved");
-                    HardwareKeyListView.Columns.Add("Active");
-                    HardwareKeyListView.Columns.Add("Deactivated");
-                //}
+                HardwareKeyListView.Columns.Add("Customer");
+                HardwareKeyListView.Columns.Add("Reserved");
+                HardwareKeyListView.Columns.Add("Active");
+                HardwareKeyListView.Columns.Add("Deactivated");
             }
             _lvManager.ResetListViewColumnSorter(HardwareKeyListView);
         }
@@ -2506,13 +2531,23 @@ namespace Client.Creator
             dlvRemoveToolStripButton.Enabled = false;
             dlvEditToolStripButton.Enabled = false;
             moduleFilterToolStripComboBox.Visible = false;
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs properties in productData.ModuleList.TVal)
+            //needs to skip any product,modules that are deactivated            
+            IList<string> plDeactive = null;
+            LicenseServerProperty lsp = DetailTreeView.SelectedNode.Parent.Tag as LicenseServerProperty;
+            Service<ICreator>.Use((client) =>
             {
-                if (!(properties.moduleAppInstance.TVal.Equals(0) && properties.moduleValue.TVal.Equals(0)))
+                plDeactive = client.GetDeactivatedProductLicenses(lsp.Name, (int)productData.ID);
+            });
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in productData.ModuleList.TVal)
+            {
+                if (!plDeactive.Contains(module.contractNumber))
                 {
-                    ListViewItem lvItem = CreateModuleListViewItem(properties, productData.ID, true);
-                    if (DetailListView.Items.Find(lvItem.Name, false).Count() == 0)
-                        DetailListView.Items.Add(lvItem);
+                    if (!(module.moduleAppInstance.TVal.Equals(0) && module.moduleValue.TVal.Equals(0)))
+                    {
+                        ListViewItem lvItem = CreateModuleListViewItem(module, productData.ID, true);
+                        if (DetailListView.Items.Find(lvItem.Name, false).Count() == 0)
+                            DetailListView.Items.Add(lvItem);
+                    }
                 }
             }
         }
@@ -2577,13 +2612,10 @@ namespace Client.Creator
                             availableUnits = "0";
                     }
                     else
-                    {
-                        //totalValue = perm + any addons
+                    {   //totalValue = perm + any addons
                         uint totalValue = 0;
-                        //perm order
                         node = DetailTreeView.SelectedNode;
-                        if (plData.ParentID != null)
-                            node = DetailTreeView.SelectedNode.Parent;
+                        if (plData.ParentID != null) node = DetailTreeView.SelectedNode.Parent;
                         plData = node.Tag as ProductLicenseProperty;
                         foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedModule in plData.Product.Product.moduleList.TVal)
                         {
@@ -2666,8 +2698,6 @@ namespace Client.Creator
         private void SetLicenseServerState(TreeNode currentNode)
         {
             TreeNode licenseNode = null;         
-            //if (node.Tag is CustomerProperty)            
-            //    customerNode = node;
             if (currentNode.Tag is LicenseServerProperty)
                 licenseNode = currentNode;
             else if (currentNode.Tag is ProductProperty)
@@ -2770,7 +2800,9 @@ namespace Client.Creator
         private void LoadProductNode(TreeNode node)
         {
             List<ProductLicenseTable> plRecords = null;
-            ProductProperty selectedProduct = node.Tag as ProductProperty;
+            LoadLicenseNode(node.Parent);
+            ProductProperty selectedProduct = new ProductProperty((node.Tag as ProductProperty).Product);            
+            //productproperty can be different from product license product
             Service<ICreator>.Use((client) => 
             {
                 plRecords = client.GetProductLicensesByProduct(node.Parent.Name, s_CommLink.GetProductID(selectedProduct.Name));                
@@ -2779,11 +2811,14 @@ namespace Client.Creator
             foreach (ProductLicenseTable plt in plRecords)
             {       
                 TreeNode plNode = null;
+                if (plt.plState == (byte)ProductLicenseState.Deactivated)
+                    selectedProduct.AppInstance = 0;
                 if (!node.Nodes.ContainsKey(plt.plID))
                 {
                     plNode = new TreeNode(plt.plID);
                     plNode.Name = plt.plID;
-                    plNode.Tag = new ProductLicenseProperty(plt, selectedProduct, m_Permissions);
+                    //modify app instance before loading depending on deactivation?
+                    plNode.Tag = new ProductLicenseProperty(plt, selectedProduct, m_Permissions);                    
                     if (plt.ParentProductLicenseID != null)
                     {
                         plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ADDONORDER");
@@ -3241,7 +3276,7 @@ namespace Client.Creator
             {
                 CreateTransaction(TransactionType.Order,
                                   productLicense,
-                                  string.Format("{0}: Product License Status from {1} to {2}", productLicense.ID, ((Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState)plData.plState).ToString(), productLicense.Status.ToString()),
+                                  string.Format("{0}: Product License Status from {1} to {2}", productLicense.ID, ((ProductLicenseState)plData.plState).ToString(), productLicense.Status.ToString()),
                                   productLicense.Status.ToString());
                 plData.plState = (byte)productLicense.Status;
                 bChanged = true;
@@ -3352,7 +3387,7 @@ namespace Client.Creator
                     if (!prodInfo.productAppInstance.TVal.Equals(selectedProduct.AppInstance))
                     {
                         if (!bOrderChanged)
-                            CreateTransaction(TransactionType.Product, plData, string.Format("{0}:{1} - Application Instance from {1} to {2}", plData.ID, selectedProduct.Name, prodInfo.productAppInstance.SVal, selectedProduct.AppInstance.ToString()), selectedProduct.AppInstance.ToString());
+                            CreateTransaction(TransactionType.Product, plData, string.Format("{0}:{1} - Application Instance from {2} to {3}", plData.ID, selectedProduct.Name, prodInfo.productAppInstance.SVal, selectedProduct.AppInstance.ToString()), selectedProduct.AppInstance.ToString());
                         prodInfo.productAppInstance.TVal = selectedProduct.AppInstance;
                     }
                     prodInfo.product_Major.TVal = selectedProduct.Product.product_Major.TVal;
@@ -3550,15 +3585,51 @@ namespace Client.Creator
             loadingCircle1.Active = true;
         }
 
+        private void RemoveDeactivatedProductLicenses(ref LicenseTable licRec)
+        {
+            List<string> productLicenses = null;
+            List<Lic_PackageAttribs.Lic_ModuleInfoAttribs> removeModules = new List<Lic_PackageAttribs.Lic_ModuleInfoAttribs>();
+            List<Lic_PackageAttribs.Lic_ProductInfoAttribs> removeProducts = new List<Lic_PackageAttribs.Lic_ProductInfoAttribs>();
+            //get all product license ids 
+            Lic_PackageAttribs licInfo = new Lic_PackageAttribs();
+            licInfo.Stream = licRec.LicenseInfo;
+            foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licInfo.licLicenseInfoAttribs.TVal.productList.TVal)
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    productLicenses = client.GetDeactivatedProductLicenses(Lic_LicenseInfoAttribsHelper.GetDisplayLabel(licInfo.licLicenseInfoAttribs), (int)product.productID.TVal);
+                });
+                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs mod in product.moduleList.TVal)
+                {
+                    if(productLicenses.Contains(mod.contractNumber.TVal))
+                        removeModules.Add(mod);
+                }
+                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs removeMod in removeModules)
+                {
+                    product.moduleList.TVal.Remove(removeMod);
+                }                     
+                removeModules.Clear();
+                if (product.moduleList.TVal.Count == 0)
+                    removeProducts.Add(product);
+            }
+            foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs prod in removeProducts)
+            {
+                licInfo.licLicenseInfoAttribs.TVal.productList.TVal.Remove(prod);
+            }
+            licRec.LicenseInfo = licInfo.Stream;
+        }
+
         private void GenerateDBPacket(string packetName, string licenseName, DateTime expDate, string description, string outputPath)
         {
             Service<ICreator>.Use((client) => 
             {
                 Byte[] newByteArrayLicensePacket = null;
                 string verificationCode = "";
-
+                LicenseTable licRec = client.GetLicenseByName(licenseName, false);
+                RemoveDeactivatedProductLicenses(ref licRec);
+                //strip license of deactivated product licenses
                 client.GenerateLicensePacket(packetName,
-                                             licenseName,
+                                             licRec,
                                              expDate,
                                              description,
                                              ref verificationCode,
@@ -3566,9 +3637,8 @@ namespace Client.Creator
                                              WindowsIdentity.GetCurrent().Name);
                 PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCode);
                 if (storedPacket == null)
-                {
                     return;
-                }
+                
                 //retrieve all transactions for a given license that doesnt have a packet id
                 IList<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(licenseName);
                 foreach (TransactionTable recordedTransaction in transactionList)
@@ -4606,6 +4676,28 @@ namespace Client.Creator
                 {
                 }
             }
+        }
+
+        private void editDestinationNamesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //using (EditDestinationName dlg = new EditDestinationName(licInfo, destNameComboBox.Items))
+            //{
+            //    dlg.ShowDialog(this);
+            //    if (dlg.Modified)
+            //    {
+            //        destNameComboBox.Items.Clear();
+            //        IList<DestinationNameTable> destTables = client.GetDestNamesByCustID((int)licInfo.CustID).OrderBy(c => c.DestID).ToList();
+            //        foreach (DestinationNameTable table in destTables)
+            //        {
+            //            destNameComboBox.Items.Add(table.DestName);
+            //        }
+            //        destNameComboBox.Items.Add("<New...>");
+            //        destNameComboBox.Items.Add("<Edit...>");
+            //    }
+            //    licInfo.DestID = (uint)dlg.SelectedDestinationID;
+            //    licInfo.DestName = dlg.SelectedDestinationName;
+            //    destNameComboBox.SelectedItem = dlg.SelectedDestinationName;
+            //}
         }
 
         //// Returns the bounds of the specified node, including the region 
