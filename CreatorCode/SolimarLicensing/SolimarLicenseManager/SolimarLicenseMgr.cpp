@@ -1074,7 +1074,6 @@ OutputDebugString(tmpbuf);
 			ModuleLicenseRelease(m->first, m->second);
 	}
 	
-	m_ui_level = auto_ui_level;
 	m_specific_single_key_ident = _bstr_t(specific_single_key_ident, true);
 	m_single_key = (single_key==VARIANT_TRUE);
 	m_lock_keys = (lock_keys==VARIANT_TRUE);
@@ -1084,6 +1083,15 @@ OutputDebugString(tmpbuf);
 
 	m_prod_ver_major = prod_ver_major;
 	m_prod_ver_minor = prod_ver_minor;
+
+	// JWL - HACK - Add special case for Rubika 2.2 and below. Rubika 2.2 and below incoreectly register for licensing
+	// message to be displayed via message boxes, but this causes problems when SOLfusion (a service) kicks off Rubika and there 
+	// are any licensing messages, SOLfusion hangs forever.
+	if((m_product == Lic_PackageAttribs::pid_Rubika) && ((m_prod_ver_major == 2 && m_prod_ver_minor <=2) || m_prod_ver_major<=1))
+		m_ui_level = UI_LEVEL_CRITICAL | UI_STYLE_EVENT_LOG;
+	else	// for all other products
+		m_ui_level = auto_ui_level;
+
 	m_current_single_key = _bstr_t(L"");
 	m_initialized = true;
 	m_dtRefreshLicenses = 0;	//Force refresh on call to Initialize
@@ -1342,6 +1350,12 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 			if(!m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized)
 			{
 				break;	// Break out of loop
+			}
+			else if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
+			{
+				// case that license file has been removed via license archive, do not allow going to backup server,
+				// go into license violation.
+				break;
 			}
 			else if(m_bUsingBackupServers || !use_back_up_on_error)
 			{
