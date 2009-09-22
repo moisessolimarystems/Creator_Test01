@@ -99,7 +99,7 @@ namespace Service.Creator
         int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
 
         [OperationContract]
-        void GenerateLicensePacket(string packetName, string licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
+        void GenerateLicensePacket(string packetName, LicenseTable licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
 
         [OperationContract]
         IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate();
@@ -188,6 +188,9 @@ namespace Service.Creator
 
         [OperationContract]
         int GetProductVersionFromTable(int productID);
+
+        [OperationContract]
+        IList<string> GetDeactivatedProductLicenses(string licenseServerName, int productID);
 
         [OperationContract]
         void DeactivateProductLicense(string productLicenseID);

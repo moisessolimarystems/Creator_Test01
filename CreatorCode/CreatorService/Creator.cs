@@ -208,7 +208,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void GenerateLicensePacket(string packetName, string licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user)
+        public void GenerateLicensePacket(string packetName, LicenseTable licRecord, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user)
         {
             //convert licinfo into a string to store into DB and to pass into license server
             //save verification code
@@ -218,7 +218,8 @@ namespace Service.Creator
             //    m_licServer = new SolimarLicenseServerWrapper();
                 m_licServer.Connect("localhost");
             //}
-            LicenseTable licRecord = LicenseTable.GetLicenseByName(licenseName, false);
+            //LicenseTable licRecord = LicenseTable.GetLicenseByName(licenseName, false);
+
             m_licServer.GenerateSoftwareLicPacket(licRecord.LicenseInfo, expDate, ref verificationCode, ref newByteArrayLicensePacket);
             PacketTable newPacket = new PacketTable()
             {
@@ -378,6 +379,12 @@ namespace Service.Creator
         public IList<string> GetAddOnProductLicenses(string productLicenseID)
         {
             return ProductLicenseTable.GetAddOnProductLicenses(productLicenseID);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetDeactivatedProductLicenses(string licenseServerName, int productID)
+        {
+            return ProductLicenseTable.GetDeactivateProductLicenses(licenseServerName, productID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
