@@ -299,7 +299,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Parallel Input"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="104" moduleName="Parallel Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="105" moduleName="SCSI SDI Output"/>
-			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="Solitrack Input"/>
+
 			<!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PS Interpreter"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
