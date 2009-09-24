@@ -1106,6 +1106,12 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Input (polaris)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(106, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(106))->second);
+	pTmpModSpec->moduleID = 106;
+	pTmpModSpec->moduleName = std::wstring(L"Solitrack Input");
+	pTmpModSpec->moduleTrialLicense = 127;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(104, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(104))->second);
 	pTmpModSpec->moduleID = 104;
