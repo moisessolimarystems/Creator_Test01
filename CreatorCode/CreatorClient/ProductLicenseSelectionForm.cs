@@ -38,7 +38,7 @@ namespace Client.Creator
                 List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
                 foreach (ProductLicenseTable plRecord in productLicenses)
                 {
-                    if (plRecord.plState != (byte)ProductLicenseState.AddOn)
+                    if (plRecord.plState != (byte)ProductLicenseState.AddOn && plRecord.plState != (byte)ProductLicenseState.Deactivated)
                     {
                         //if order already exists apply check to checkbox and make greyed out? unselectable?
                         ListViewItem lvItem = new ListViewItem();

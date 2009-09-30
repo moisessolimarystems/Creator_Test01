@@ -118,7 +118,6 @@ namespace Client.Creator
                 //trial -> zero options : 1 order
                 //perm -> add-on available : 1 order
                 //perm, add-on -> zero available : 2 order    
-
                 if (plData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
                 {   //standard,failover,disaster             
                     foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
@@ -126,7 +125,7 @@ namespace Client.Creator
                         bool bSkip = false;
                         if (!productSpec.productName.TVal.Contains("Test"))
                         {
-                            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseName, (int)productSpec.productID.TVal);
+                            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
                             //0 order => product hasnt been added
                             //if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             //    productLicenses.Count > 0)
@@ -162,7 +161,7 @@ namespace Client.Creator
                             productLicenses = client.GetProductLicensesByProduct(licenseBase, (int)productSpec.productID.TVal);
                             if (productLicenses.Count == 1)
                             {   //0 order => product hasnt been added                     
-                                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseName, (int)productSpec.productID.TVal);
+                                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
                                 if (productLicenses.Count == 0)
                                     productList.Add(productSpec.productName);
                             }
@@ -203,21 +202,13 @@ namespace Client.Creator
 
         private void LoadLicenseTabPage(LicenseDialogData licData)
         {
-            string selectedDestName;
             topPanel.Controls.Clear();
             licenseGroupBox.Parent = topPanel;
             //need to get next available value from DB for destination ID and group ID.
             selectedObject = licData.LicInfo as Object;
             if (licData.LicInfo.IsStandardLicenseType)
             {               
-                Service<ICreator>.Use((client) =>
-                {                
-                    IList<DestinationNameTable> destNames = client.GetDestNamesByCustID((int)licData.LicInfo.CustID).OrderBy(c => c.DestID).ToList();
-                    foreach (DestinationNameTable dn in destNames)
-                    {
-                        destNameComboBox.Items.Add(dn.DestName);
-                    }
-                });
+                destinationTextBox.Text = licData.LicInfo.DestName;
                 licTypeComboBox.Items.Add(LicenseServerType.Perpetual);
                 licTypeComboBox.Items.Add(LicenseServerType.Subscription);                
                 licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
@@ -226,28 +217,18 @@ namespace Client.Creator
             {   //secondary keys only allow comment
                 Service<ICreator>.Use((client) =>
                 {   
-                    selectedDestName = client.GetCustomer(licData.LicInfo.CustID.ToString(), false).SCRname;
-                    destNameComboBox.Items.Add(selectedDestName);
-                    destNameComboBox.DropDownStyle = ComboBoxStyle.Simple;
-                    destNameComboBox.Enabled = false;
                     //increment index for test/dev and disaster recovery
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(licData.LicInfo.LicType);
                     licData.LicInfo.LicInfo.softwareLicTypeIndex.TVal = (uint)client.GetLicenseCountByType(licData.LicInfo.CustID, licData.LicInfo.DestID, licData.LicInfo.GroupID, licType) + 1;
                 });
+                destinationTextBox.Text = licData.LicInfo.DestName;
                 licTypeComboBox.Items.Add(licData.LicInfo.LicType);                
                 licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
-                licTypeComboBox.DropDownStyle = ComboBoxStyle.Simple;
-                licTypeComboBox.Enabled = false;
+                //licTypeComboBox.DropDownStyle = ComboBoxStyle.Simple;
+                //licTypeComboBox.Enabled = false;
             }
-            //User Options for destination names
-            destNameComboBox.Items.Add("<New...>");
-            destNameComboBox.Items.Add("<Edit...>");
             //license name
             licNameTextBox.Text = licData.LicInfo.Name;
-            //select destination name
-            destNameComboBox.SelectedIndex = 0;
-            //initialize comments
-            licDescriptTextBox.Text = licData.LicInfo.Comments;
         }
 
         private void SaveLicenseTabPage(LicenseDialogData licData)
@@ -255,7 +236,6 @@ namespace Client.Creator
             //TODO : validate that the license does not already exist
             licData.LicInfo.LicType = (LicenseServerType)Enum.Parse(typeof(LicenseServerType), licTypeComboBox.SelectedItem.ToString());
             licData.LicInfo.Comments = licDescriptTextBox.Text;
-            licData.LicInfo.DestName = destNameComboBox.SelectedItem.ToString();
         }
         #endregion
 
@@ -364,7 +344,7 @@ namespace Client.Creator
                 //need total product value 
                 Service<ICreator>.Use((client) => 
                 {
-                    LicenseTable licRec = client.GetLicenseByName(moduleData.ProductLicense.LicenseName, false);
+                    LicenseTable licRec = client.GetLicenseByName(moduleData.ProductLicense.LicenseServer, false);
                     Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                     licPackage.Stream = licRec.LicenseInfo;                        
                     foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
@@ -583,72 +563,6 @@ namespace Client.Creator
             licNameTextBox.Text = licInfo.Name;            
         }
 
-        //valid, existing dest name chosen from list in box
-        private void destNameComboBox_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            LicenseServerProperty licInfo = selectedObject as LicenseServerProperty;
-            Service<ICreator>.Use((client) => 
-            {
-                if (destNameComboBox.Text == "<New...>")
-                {                    
-                    using (ItemNameDialog dlg = new ItemNameDialog("Create New Destination Name"))
-                    {
-                        DestNameDialogData destNameData = new DestNameDialogData(licInfo.CustID);
-                        if (dlg.ShowDialog(this, destNameData) == DialogResult.OK)
-                        {   //create the new destination name for this customer                                                    
-                            DestinationNameTable newDestName = new DestinationNameTable();
-                            newDestName.CustID = (int)licInfo.CustID;
-                            newDestName.DestID = (int)client.GetNextDestinationID(licInfo.CustID);
-                            newDestName.DestName = dlg.Name;
-                            client.CreateDestinationName(newDestName);
-                            licInfo.DestID = (uint)newDestName.DestID;
-                            licInfo.DestName = newDestName.DestName;
-                            destNameComboBox.Items.Insert(newDestName.DestID, dlg.Name);
-                            destNameComboBox.SelectedItem = dlg.Name;
-                        }
-                        else
-                        {
-                            destNameComboBox.SelectedIndex = 0;
-                        }
-                    }
-                }
-                else if (destNameComboBox.Text == "<Edit...>")
-                {
-                    using (EditDestinationName dlg = new EditDestinationName(licInfo, destNameComboBox.Items))
-                    {
-                        dlg.ShowDialog(this);
-                        if (dlg.Modified)
-                        {
-                            destNameComboBox.Items.Clear();
-                            IList<DestinationNameTable> destTables = client.GetDestNamesByCustID((int)licInfo.CustID).OrderBy(c => c.DestID).ToList();
-                            foreach(DestinationNameTable table in destTables)
-                            {
-                                destNameComboBox.Items.Add(table.DestName);                                
-                            }
-                            destNameComboBox.Items.Add("<New...>");
-                            destNameComboBox.Items.Add("<Edit...>");
-                        }
-                        licInfo.DestID = (uint)dlg.SelectedDestinationID;
-                        licInfo.DestName = dlg.SelectedDestinationName; 
-                        destNameComboBox.SelectedItem = dlg.SelectedDestinationName;
-                    }
-                }
-                else
-                {
-                    DestinationNameTable destName = client.GetDestinationID((int)licInfo.CustID, destNameComboBox.SelectedItem.ToString());
-                    if (destName != null)
-                    {
-                        //set current license info to destid
-                        licInfo.DestID = (uint)destName.DestID;
-                        licInfo.DestName = destNameComboBox.SelectedItem.ToString();
-                    }
-                }
-                licInfo.GroupID = client.GetNextGroupID(licInfo.CustID, licInfo.DestID);
-            });
-            licTypeComboBox.SelectedIndex = 0;   
-            licNameTextBox.Text = licInfo.Name;
-        }
-
         #endregion
 
         #region ModuleTabPage Events
@@ -798,13 +712,13 @@ namespace Client.Creator
             Service<ICreator>.Use((client) => 
             {
                 //get all orders for a given product
-                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseName, (int)m_CommLink.GetProductID(selectedProduct));
+                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseServer, (int)m_CommLink.GetProductID(selectedProduct));
                 List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     if (productSpec.productName.TVal.Equals(selectedProduct) && !productSpec.productName.TVal.Contains("Test"))
                     {
-                        productLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseName, (int)m_CommLink.GetProductID(productSpec.productName.TVal));
+                        productLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseServer, (int)m_CommLink.GetProductID(productSpec.productName.TVal));
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             productLicenses.Count > 0))
                             ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
@@ -878,6 +792,7 @@ namespace Client.Creator
             }
             return retVal;
         }
+
         private void browseTokenFileButton_Click(object sender, EventArgs e)
         {
             if (this.browseCSVOpenFileDialog.ShowDialog() == DialogResult.OK)
@@ -924,7 +839,7 @@ namespace Client.Creator
 
         public LicenseDialogData(LicenseServerProperty licInfo)
         {
-            m_LicInfo = licInfo;
+            m_LicInfo = licInfo;            
         }
         #endregion
 

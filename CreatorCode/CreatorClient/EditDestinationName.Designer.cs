@@ -31,11 +31,11 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
+            this.destNameListView = new System.Windows.Forms.ListView();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.removeDestNameButton = new System.Windows.Forms.Button();
             this.renameDestNameButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.destNameListView = new System.Windows.Forms.ListView();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -97,6 +97,23 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Destination Names:";
             // 
+            // destNameListView
+            // 
+            this.destNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.destNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.destNameListView.HideSelection = false;
+            this.destNameListView.LabelEdit = true;
+            this.destNameListView.Location = new System.Drawing.Point(13, 26);
+            this.destNameListView.MultiSelect = false;
+            this.destNameListView.Name = "destNameListView";
+            this.destNameListView.Size = new System.Drawing.Size(225, 147);
+            this.destNameListView.TabIndex = 1;
+            this.destNameListView.UseCompatibleStateImageBehavior = false;
+            this.destNameListView.View = System.Windows.Forms.View.List;
+            this.destNameListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.destNameListView_AfterLabelEdit);
+            this.destNameListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.destNameListView_ItemSelectionChanged);
+            this.destNameListView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.destNameListView_BeforeLabelEdit);
+            // 
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Controls.Add(this.removeDestNameButton);
@@ -136,21 +153,6 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(336, 176);
             this.panel1.TabIndex = 4;
-            // 
-            // destNameListView
-            // 
-            this.destNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.destNameListView.HideSelection = false;
-            this.destNameListView.LabelEdit = true;
-            this.destNameListView.Location = new System.Drawing.Point(13, 26);
-            this.destNameListView.MultiSelect = false;
-            this.destNameListView.Name = "destNameListView";
-            this.destNameListView.Size = new System.Drawing.Size(225, 147);
-            this.destNameListView.TabIndex = 1;
-            this.destNameListView.UseCompatibleStateImageBehavior = false;
-            this.destNameListView.View = System.Windows.Forms.View.List;
-            this.destNameListView.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.destNameListView_AfterLabelEdit);
-            this.destNameListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.destNameListView_ItemSelectionChanged);
             // 
             // EditDestinationName
             // 

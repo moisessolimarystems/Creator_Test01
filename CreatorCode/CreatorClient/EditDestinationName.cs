@@ -12,8 +12,9 @@ namespace Client.Creator
 {
     public partial class EditDestinationName : Shared.VisualComponents.DialogBaseForm
     {
-        private LicenseServerProperty _licInfo;
         private bool _modified;
+        private int _custID;
+        private string _baseDestination;
 
         public bool Modified
         {
@@ -29,7 +30,7 @@ namespace Client.Creator
                 int id = -1;
                 Service<ICreator>.Use((client) =>
                 {
-                    DestinationNameTable destTable = client.GetDestinationID((int)_licInfo.CustID, SelectedDestinationName);
+                    DestinationNameTable destTable = client.GetDestinationID(_custID, SelectedDestinationName);
                     if (destTable != null)
                         id = destTable.DestID;
                 });                
@@ -47,14 +48,18 @@ namespace Client.Creator
             }
         }
 
-        public EditDestinationName(LicenseServerProperty licInfo, ComboBox.ObjectCollection destNameCollection)
+        public EditDestinationName(int custID, ComboBox.ObjectCollection destNameCollection)
         {            
             InitializeComponent();
             _modified = false;
-            _licInfo = licInfo;
+            _custID = custID;
+            Service<ICreator>.Use((client) =>
+            {
+                _baseDestination = client.GetDestinationName(_custID, 0).DestName;
+            });
             foreach (string item in destNameCollection)
             {
-                if (!item.Equals("<New...>") && !item.Equals("<Edit...>"))
+                if (!item.Equals("<Create...>") && !item.Equals("<Edit...>"))
                 {
                     ListViewItem lvItem = new ListViewItem(item);
                     lvItem.Name = item;
@@ -74,7 +79,7 @@ namespace Client.Creator
                 int licCount = 0;
                 Service<ICreator>.Use((client) =>
                 {
-                    licCount = client.GetLicenseCountByDestName((uint)_licInfo.CustID, (uint)SelectedDestinationID);
+                    licCount = client.GetLicenseCountByDestName((uint)_custID, (uint)SelectedDestinationID);
                 });
                 if (licCount == 0)
                 {
@@ -82,7 +87,7 @@ namespace Client.Creator
                     DestinationNameTable destTable;
                     Service<ICreator>.Use((client) =>
                     {
-                        destTable = client.GetDestinationID((int)_licInfo.CustID, SelectedDestinationName);
+                        destTable = client.GetDestinationID(_custID, SelectedDestinationName);
                         client.DeleteDestinationName(destTable);
                     });
                     destNameListView.Items.RemoveAt(removeIndex);
@@ -127,7 +132,7 @@ namespace Client.Creator
                     DestinationNameTable destTable;
                     Service<ICreator>.Use((client) =>
                     {
-                        destTable = client.GetDestinationID((int)_licInfo.CustID, SelectedDestinationName);
+                        destTable = client.GetDestinationID(_custID, SelectedDestinationName);
                         destTable.DestName = e.Label;
                         client.UpdateDestinationName(destTable);
                         _modified = true;
@@ -140,7 +145,7 @@ namespace Client.Creator
 
         private void destNameListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {   //allow selected and non default destination names to be remove & renamed.
-            if (e.IsSelected && e.ItemIndex > 0)
+            if (e.IsSelected && !e.Item.Text.Equals(_baseDestination))
             {
                 removeDestNameButton.Enabled = true;
                 renameDestNameButton.Enabled = true;
@@ -150,6 +155,13 @@ namespace Client.Creator
                 removeDestNameButton.Enabled = false;
                 renameDestNameButton.Enabled = false;
             }
+        }
+
+        private void destNameListView_BeforeLabelEdit(object sender, LabelEditEventArgs e)
+        {
+            if (destNameListView.SelectedItems.Count > 0)
+                if(destNameListView.SelectedItems[0].Text == _baseDestination)
+                    e.CancelEdit = true;
         }
     }
 }

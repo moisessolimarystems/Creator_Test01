@@ -98,6 +98,7 @@
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Entities\CustomerManager.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ItemNameDialog.cs">
       <SubType>Form</SubType>

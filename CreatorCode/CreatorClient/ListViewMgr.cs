@@ -258,8 +258,11 @@ namespace Client.Creator
             //{
                 listviewX = (ListViewItem)x;
                 listviewY = (ListViewItem)y;
-                // Compare the two items           
-                compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+                if(IsDate(listviewX.SubItems[ColumnToSort].Text))
+                    compareResult = DateTime.Compare(DateTime.Parse(listviewX.SubItems[ColumnToSort].Text), DateTime.Parse(listviewY.SubItems[ColumnToSort].Text));
+                else
+                    // Compare the two items           
+                    compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
             //}
             // Calculate correct return value based on object comparison
             if (OrderOfSort == SortOrder.Ascending)
@@ -278,6 +281,25 @@ namespace Client.Creator
                 return 0;
             }
         }
+
+        public bool IsDate(object Expression)
+        {
+            if (Expression != null)
+            {
+                if (Expression is DateTime)
+                {
+                    return true;
+                }
+                if (Expression is string)
+                {
+                    DateTime dateValue;
+                    if (DateTime.TryParse(Expression as string, out dateValue))
+                        return true;
+                }
+            }
+            return false;
+        }
+
 
         public void ResetProperties()
         {

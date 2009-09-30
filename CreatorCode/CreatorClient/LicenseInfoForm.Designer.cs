@@ -40,9 +40,9 @@
             this.licDestIDLabel = new System.Windows.Forms.Label();
             this.licDescriptTextBox = new System.Windows.Forms.TextBox();
             this.licTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.destNameComboBox = new System.Windows.Forms.ComboBox();
             this.licNameTextBox = new System.Windows.Forms.TextBox();
             this.licNameLabel = new System.Windows.Forms.Label();
+            this.destinationTextBox = new System.Windows.Forms.TextBox();
             this.TokenTabPage = new System.Windows.Forms.TabPage();
             this.tokenGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -184,9 +184,9 @@
             this.tableLayoutPanel1.Controls.Add(this.licDestIDLabel, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.licDescriptTextBox, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.licTypeComboBox, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.destNameComboBox, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.licNameTextBox, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.licNameLabel, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.destinationTextBox, 1, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -204,7 +204,7 @@
             // 
             this.licDescriptLabel.AutoSize = true;
             this.licDescriptLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licDescriptLabel.Location = new System.Drawing.Point(3, 102);
+            this.licDescriptLabel.Location = new System.Drawing.Point(3, 101);
             this.licDescriptLabel.Margin = new System.Windows.Forms.Padding(3, 10, 3, 0);
             this.licDescriptLabel.Name = "licDescriptLabel";
             this.licDescriptLabel.Size = new System.Drawing.Size(75, 13);
@@ -216,12 +216,12 @@
             this.licTypeLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.licTypeLabel.AutoSize = true;
             this.licTypeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licTypeLabel.Location = new System.Drawing.Point(3, 71);
+            this.licTypeLabel.Location = new System.Drawing.Point(3, 70);
             this.licTypeLabel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.licTypeLabel.Name = "licTypeLabel";
-            this.licTypeLabel.Size = new System.Drawing.Size(87, 13);
+            this.licTypeLabel.Size = new System.Drawing.Size(39, 13);
             this.licTypeLabel.TabIndex = 7;
-            this.licTypeLabel.Text = "License Type:";
+            this.licTypeLabel.Text = "Type:";
             // 
             // licDestIDLabel
             // 
@@ -231,16 +231,16 @@
             this.licDestIDLabel.Location = new System.Drawing.Point(3, 40);
             this.licDestIDLabel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.licDestIDLabel.Name = "licDestIDLabel";
-            this.licDestIDLabel.Size = new System.Drawing.Size(111, 13);
+            this.licDestIDLabel.Size = new System.Drawing.Size(75, 13);
             this.licDestIDLabel.TabIndex = 3;
-            this.licDestIDLabel.Text = "Destination Name:";
+            this.licDestIDLabel.Text = "Destination:";
             // 
             // licDescriptTextBox
             // 
             this.licDescriptTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.licDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.licDescriptTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licDescriptTextBox.Location = new System.Drawing.Point(135, 97);
+            this.licDescriptTextBox.Location = new System.Drawing.Point(135, 96);
             this.licDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.licDescriptTextBox.Multiline = true;
             this.licDescriptTextBox.Name = "licDescriptTextBox";
@@ -253,30 +253,16 @@
             this.licTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.licTypeComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.licTypeComboBox.FormattingEnabled = true;
-            this.licTypeComboBox.Location = new System.Drawing.Point(135, 66);
+            this.licTypeComboBox.Location = new System.Drawing.Point(135, 65);
             this.licTypeComboBox.Margin = new System.Windows.Forms.Padding(5);
             this.licTypeComboBox.Name = "licTypeComboBox";
             this.licTypeComboBox.Size = new System.Drawing.Size(188, 21);
             this.licTypeComboBox.TabIndex = 6;
             this.licTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.licTypeComboBox_SelectedIndexChanged);
             // 
-            // destNameComboBox
-            // 
-            this.destNameComboBox.BackColor = System.Drawing.SystemColors.Window;
-            this.destNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.destNameComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.destNameComboBox.FormattingEnabled = true;
-            this.destNameComboBox.Location = new System.Drawing.Point(135, 35);
-            this.destNameComboBox.Margin = new System.Windows.Forms.Padding(5);
-            this.destNameComboBox.Name = "destNameComboBox";
-            this.destNameComboBox.Size = new System.Drawing.Size(188, 21);
-            this.destNameComboBox.TabIndex = 12;
-            this.destNameComboBox.SelectionChangeCommitted += new System.EventHandler(this.destNameComboBox_SelectionChangeCommitted);
-            // 
             // licNameTextBox
             // 
             this.licNameTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.licNameTextBox.Enabled = false;
             this.licNameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.licNameTextBox.Location = new System.Drawing.Point(135, 5);
             this.licNameTextBox.Margin = new System.Windows.Forms.Padding(5);
@@ -296,6 +282,16 @@
             this.licNameLabel.Size = new System.Drawing.Size(55, 13);
             this.licNameLabel.TabIndex = 0;
             this.licNameLabel.Text = "License:";
+            // 
+            // destinationTextBox
+            // 
+            this.destinationTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.destinationTextBox.Location = new System.Drawing.Point(135, 35);
+            this.destinationTextBox.Margin = new System.Windows.Forms.Padding(5);
+            this.destinationTextBox.Name = "destinationTextBox";
+            this.destinationTextBox.ReadOnly = true;
+            this.destinationTextBox.Size = new System.Drawing.Size(188, 20);
+            this.destinationTextBox.TabIndex = 10;
             // 
             // TokenTabPage
             // 
@@ -324,7 +320,7 @@
             this.tableLayoutPanel2.ColumnCount = 3;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 46.08696F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 53.91304F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 88F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 93F));
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tokenValueTextBox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.tokenTypeComboBox, 1, 0);
@@ -358,10 +354,10 @@
             // 
             this.tokenValueTextBox.CausesValidation = false;
             this.tokenValueTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tokenValueTextBox.Location = new System.Drawing.Point(149, 36);
+            this.tokenValueTextBox.Location = new System.Drawing.Point(146, 36);
             this.tokenValueTextBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenValueTextBox.Name = "tokenValueTextBox";
-            this.tokenValueTextBox.Size = new System.Drawing.Size(163, 20);
+            this.tokenValueTextBox.Size = new System.Drawing.Size(161, 20);
             this.tokenValueTextBox.TabIndex = 0;
             this.tokenValueTextBox.TextChanged += new System.EventHandler(this.tokenValueTextBox_TextChanged);
             this.tokenValueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenValueTextBox_KeyUp);
@@ -372,10 +368,10 @@
             this.tokenTypeComboBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tokenTypeComboBox.FormattingEnabled = true;
-            this.tokenTypeComboBox.Location = new System.Drawing.Point(149, 5);
+            this.tokenTypeComboBox.Location = new System.Drawing.Point(146, 5);
             this.tokenTypeComboBox.Margin = new System.Windows.Forms.Padding(5, 5, 0, 5);
             this.tokenTypeComboBox.Name = "tokenTypeComboBox";
-            this.tokenTypeComboBox.Size = new System.Drawing.Size(163, 21);
+            this.tokenTypeComboBox.Size = new System.Drawing.Size(161, 21);
             this.tokenTypeComboBox.TabIndex = 1;
             this.tokenTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.tokenTypeComboBox_SelectedIndexChanged);
             this.tokenTypeComboBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tokenTypeComboBox_KeyUp);
@@ -406,7 +402,7 @@
             // browseTokenFileButton
             // 
             this.browseTokenFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.browseTokenFileButton.Location = new System.Drawing.Point(312, 35);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(307, 35);
             this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
             this.browseTokenFileButton.Size = new System.Drawing.Size(25, 22);
@@ -424,11 +420,11 @@
             this.keyNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.keyNameListView.FullRowSelect = true;
             this.keyNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.keyNameListView.Location = new System.Drawing.Point(149, 66);
+            this.keyNameListView.Location = new System.Drawing.Point(146, 66);
             this.keyNameListView.Margin = new System.Windows.Forms.Padding(5);
             this.keyNameListView.MultiSelect = false;
             this.keyNameListView.Name = "keyNameListView";
-            this.keyNameListView.Size = new System.Drawing.Size(247, 97);
+            this.keyNameListView.Size = new System.Drawing.Size(250, 97);
             this.keyNameListView.TabIndex = 10;
             this.keyNameListView.UseCompatibleStateImageBehavior = false;
             this.keyNameListView.View = System.Windows.Forms.View.Details;
@@ -563,7 +559,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 61F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 66F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -599,7 +595,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(345, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(340, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -611,21 +607,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(107, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(106, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(233, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(229, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(107, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(106, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(233, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(229, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -653,11 +649,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(107, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(106, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(233, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(229, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -675,11 +671,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(107, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(106, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(233, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(229, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -961,7 +957,6 @@
         private System.Windows.Forms.Label licDestIDLabel;
         private System.Windows.Forms.TextBox licDescriptTextBox;
         private System.Windows.Forms.ComboBox licTypeComboBox;
-        private System.Windows.Forms.ComboBox destNameComboBox;
         private System.Windows.Forms.TextBox licNameTextBox;
         private System.Windows.Forms.Label licNameLabel;
         private System.Windows.Forms.GroupBox licenseGroupBox;
@@ -978,6 +973,7 @@
         private System.Windows.Forms.ListView keyNameListView;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.TextBox destinationTextBox;
 
 
     }

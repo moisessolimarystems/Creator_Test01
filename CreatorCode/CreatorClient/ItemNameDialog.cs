@@ -37,7 +37,7 @@ namespace Client.Creator
 
         private void ValidateDialogInput(string inputString)
         {
-            if (inputString != Name)
+            if (inputString != Name || inputString.Length == 0)
             {
                 if (_selectedObject is CustomerDialogData)
                     _bValidItem = (_selectedObject as CustomerDialogData).IsCustomerNameValid(inputString);
