@@ -89,15 +89,17 @@ namespace Service.Creator
 
         #region License Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string searchString, bool enableLoadOptions)
+        {
+            return LicenseTable.GetLicensesByDestination(custName, destName, searchString, enableLoadOptions);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)] 
         public IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions)
         {
             return LicenseTable.GetLicensesByCustomer(custName, searchString, enableLoadOptions);
         }
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions)
-        {
-            return LicenseTable.GetLicensesByID(custID, destID, groupID, enableLoadOptions);
-        }
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public LicenseTable GetLicenseByName(string licenseName, bool enableLoadOptions)
         {
@@ -173,6 +175,12 @@ namespace Service.Creator
         public int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType)
         {
             return LicenseTable.GetDerivedLicenseCount(custID, destID, groupID, (Byte)licType);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType)
+        {
+            return LicenseTable.GetDerivedLicenseNames(custID, destID, groupID, licType);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

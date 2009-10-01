@@ -15,7 +15,7 @@ namespace Client.Creator
     [TypeConverter(typeof(PropertySorterTypeConverter))]
     public class ProductLicenseProperty
     {
-        string _licenseName;
+        string _licenseServer;
         ProductLicenseTable _plRec;
         ProductProperty _product;
         Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType _productLicType;
@@ -48,7 +48,7 @@ namespace Client.Creator
             {
                 LicenseTable currentLicense = client.GetLicenseByID(plData.LicenseID, false);
                 if(currentLicense != null)
-                    _licenseName = currentLicense.LicenseName;
+                    _licenseServer = currentLicense.LicenseName;
             });           
             _plRec = plData;
             _product = product;
@@ -117,10 +117,10 @@ namespace Client.Creator
         }  
 
         [Browsable(false)]
-        public string LicenseName
+        public string LicenseServer
         {
-            get { return _licenseName; }
-            set { _licenseName = value; }
+            get { return _licenseServer; }
+            set { _licenseServer = value; }
         }
 
         [Browsable(false)]
@@ -150,7 +150,7 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string ID
         {
-            get { return string.Format("{0}-{1}", LicenseName, Index); }
+            get { return string.Format("{0}-{1}", LicenseServer, Index); }
             set { _plRec.plID = value; }
         }
 
@@ -162,7 +162,7 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseName.Contains("T") || LicenseName.Contains("D") || LicenseName.Contains("F"))
+                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
                 {
                     if (_permissions.pt_permanent_pwd.Value)
                         SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, true);
@@ -176,7 +176,7 @@ namespace Client.Creator
                 LicenseServerType lsType = LicenseServerType.Deactivated;
                 Service<ICreator>.Use((client) =>
                 {
-                    lsType = (LicenseServerType)client.GetLicenseType(LicenseName);
+                    lsType = (LicenseServerType)client.GetLicenseType(LicenseServer);
                 });
                 //only set if value changed.
                 if (!_plStatus.Equals(value))
@@ -254,7 +254,7 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseName.Contains("D") || LicenseName.Contains("F"))
+                if (LicenseServer.Contains("D") || LicenseServer.Contains("F"))
                 {
                     if (_permissions.pt_permanent_pwd.Value)
                         SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, true);
@@ -268,7 +268,7 @@ namespace Client.Creator
                 if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
                     !_plRec.ExpirationDate.HasValue)
                     throw new Exception("Can't set expiration date for permanent type");
-                if ((LicenseName.Contains("T") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
+                if ((LicenseServer.Contains("T") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
                     throw new Exception("Please set a valid expiration date");
                 if (value.HasValue)
                 {
@@ -308,7 +308,7 @@ namespace Client.Creator
             get 
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseName.Contains("T") || LicenseName.Contains("D") || LicenseName.Contains("F"))
+                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
                 {
                     if (_permissions.pt_permanent_pwd.Value)
                         SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, true);
@@ -326,7 +326,7 @@ namespace Client.Creator
             get 
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseName.Contains("T") || LicenseName.Contains("D") || LicenseName.Contains("F"))
+                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
                 {
                     if (_permissions.pt_permanent_pwd.Value)
                         SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, true);

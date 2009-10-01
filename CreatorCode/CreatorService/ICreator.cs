@@ -51,7 +51,7 @@ namespace Service.Creator
         IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions);
+        IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string searchString, bool enableLoadOptions);        
 
         [OperationContract]
         LicenseTable GetLicenseByName(string licenseName, bool enableLoadOptions);
@@ -97,6 +97,9 @@ namespace Service.Creator
 
         [OperationContract]
         int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
+
+        [OperationContract]
+        IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType);
 
         [OperationContract]
         void GenerateLicensePacket(string packetName, LicenseTable licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
