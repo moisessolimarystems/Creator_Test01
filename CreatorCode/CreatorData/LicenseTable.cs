@@ -19,26 +19,6 @@ namespace CreatorData
             }
         }
 
-        public static IList<LicenseTable> GetLicensesByID(int custID, int destID, int groupID, bool enableLoadOptions)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                if (enableLoadOptions)
-                {
-                    DataLoadOptions dlo = new DataLoadOptions();
-                    dlo.LoadWith<LicenseTable>(id => id.PacketTables);
-                    db.LoadOptions = dlo;
-                }
-                var licenses = from l in db.LicenseTables
-                               where l.GroupID.Equals(groupID) && 
-                                     l.DestinationID.Equals(destID) &&
-                                     l.SCRnumber.Equals(custID)                                                                         
-                               select l;
-                return licenses.ToList();                               
-            }
-        }
-
         public static LicenseTable GetLicenseByName(string licenseName, bool enableLoadOptions)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -88,6 +68,33 @@ namespace CreatorData
                                     new { DestID = d.DestID, CustID = d.CustID }
                                     where l.CustomerTable.SCRname.Equals(custName) &&
                                          (d.DestName.Contains(searchString) ||
+                                          l.LicenseName.Contains(searchString) ||
+                                          l.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
+                                                                                          o.LicenseID.Equals(l.ID))) > 0)
+                                    select l;
+                return licenseFilter.ToList();
+            }
+        }
+
+        public static IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string searchString, bool enableLoadOptions)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                if (enableLoadOptions)
+                {
+                    DataLoadOptions dlo = new DataLoadOptions();
+                    dlo.LoadWith<LicenseTable>(id => id.PacketTables);
+                    db.LoadOptions = dlo;
+                }
+                //need to be able to translate destid to destname from searchstring
+                var licenseFilter = from l in db.LicenseTables
+                                    join d in db.DestinationNameTables on
+                                    new { DestID = l.DestinationID, CustID = l.SCRnumber }
+                                    equals
+                                    new { DestID = d.DestID, CustID = d.CustID }
+                                    where l.CustomerTable.SCRname.Equals(custName) &&
+                                         (d.DestName.Contains(destName) ||
                                           l.LicenseName.Contains(searchString) ||
                                           l.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
                                                                                           o.LicenseID.Equals(l.ID))) > 0)
@@ -206,6 +213,22 @@ namespace CreatorData
                                      !l.LicenseName.Contains(prefix)
                                select l;
                 return licenses.Count();
+            }
+        }
+
+        public static IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                string prefix = (licType == 0) ? "-P" : "-S";
+                var licenses = from l in db.LicenseTables
+                               where l.GroupID.Equals(groupID) &&
+                                     l.DestinationID.Equals(destID) &&
+                                     l.SCRnumber.Equals(custID) &&
+                                     !l.LicenseName.Contains(prefix)
+                               select l.LicenseName;
+                return licenses.ToList();
             }
         }
 
