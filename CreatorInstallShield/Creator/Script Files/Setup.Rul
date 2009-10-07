@@ -124,7 +124,7 @@ Dlg_SdWelcome:
     szTitle = "";
     szMsg   = "";
     nResult = SdWelcome(szTitle, szMsg);
-    if (nResult = BACK) goto Dlg_SdWelcome;	
+    if (nResult = BACK) goto Dlg_SdWelcome;	      
 
 Dlg_SdLicense:
     szLicenseFile = SUPPORTDIR ^ "End Use License Agreement.rtf";
@@ -132,25 +132,30 @@ Dlg_SdLicense:
     szMsg      = "";
     szQuestion = "";
     nResult    = SdLicenseRtf( szTitle, szMsg, szQuestion, szLicenseFile );
-    if (nResult = BACK) goto Dlg_SdWelcome;      
+    if (nResult = BACK) goto Dlg_SdWelcome; 
+    
+Dlg_SdAskDestPath:    	
+    nResult = SdAskDestPathDlg();
+    if (nResult = BACK) goto Dlg_SdLicense;             
 
 Dlg_SetupType:
     szTitle = "";
     szMsg   = "";   
     listStartCopy = ListCreate( STRINGLIST );
     svDir = INSTALLDIR;
-    nResult = SdSetupType2(szTitle, szMsg, svDir, 0);
+    //nResult = SdSetupType2(szTitle, szMsg, svDir, 0);
+    nResult = SdSetupTypeEx(szTitle, szMsg, "", svSetupType,0);
     if (nResult = BACK) then
-        goto Dlg_SdLicense;
+        goto Dlg_SdAskDestPath;
     else
     	nSetupType = nResult;
     	TARGETDIR = svDir; 
     	// Create a string that describes the selected setup type. 
-    	switch (nSetupType)
-             case COMPLETE:                 
-                  svSetupTypeMsg = "Complete: Application will be installed with all features."; 
-             case CUSTOM: 
-                  svSetupTypeMsg = "Custom: User selects the features to be installed."; 
+    	switch (svSetupType)
+             case "Client":                 
+                  svSetupTypeMsg = "Application will be installed with Client Feature."; 
+             case "Server": 
+                  svSetupTypeMsg = "Application will be installed with Client and Server Feature."; 
              default: 
                   MessageBox ("Invalid setup type selection!", SEVERE); 
                   abort; 
@@ -173,28 +178,7 @@ Dlg_SetupType:
           	  	goto Dlg_SetupType;
         	endif; 
         endif;
-    endif;    
-
-Dlg_SdFeatureDialog2: 
-    szTitle    = "";
-    szMsg      = "";
-    if (nSetupType = CUSTOM) then
-		nResult = SdFeatureDialog2(szTitle, szMsg, svDir, ""); 
-		if (nResult = BACK) goto Dlg_SetupType;      
-        ListAddString(listStartCopy, "Feature Select:", AFTER);                 
-        nResult = FeatureIsItemSelected (MEDIA,  "Client");        
-        if nResult = 1 then                              
-        	/** Start Setup Type Information **/   
-        	ListAddString(listStartCopy, "              Client feature selected.", AFTER);  
-        	/** End Setup Type Information **/   
-        endif;
-		nResult = FeatureIsItemSelected (MEDIA,  "Server");
-		if nResult = 1 then  
-        	/** Start Setup Type Information **/   
-        	ListAddString(listStartCopy, "              Server feature selected.", AFTER);  
-        	/** End Setup Type Information **/ 
-		endif;
-    endif;         
+    endif;        
 
 Dlg_SdUserLoginCustomDlg:   
 	if(FeatureIsItemSelected (MEDIA,  "Server")) then     
@@ -203,11 +187,7 @@ Dlg_SdUserLoginCustomDlg:
 		StrReplace (IFX_NETAPI_PASSWORD, "\"", "\\\"", 0 );
 		OnLogonUserSetMsiProperties();
 		if(nResult = BACK) then  
-		    if(nSetupType = CUSTOM) then
-			 	goto Dlg_SdFeatureDialog2;         
-			else    
-				goto Dlg_SetupType;  
-			endif;
+			goto Dlg_SetupType;  
 		endif;
 	endif;
     
@@ -222,11 +202,7 @@ Dlg_SdStartCopy:
     	if(FeatureIsItemSelected (MEDIA,  "Server")) then   
     		goto Dlg_SdUserLoginCustomDlg;    	
     	else  
-    		if(nSetupType = CUSTOM) then
-    			goto Dlg_SdFeatureDialog2;
-    		else   
-    			goto Dlg_SetupType;
-    		endif; 
+    		goto Dlg_SetupType;    
     	endif;
     endif;
 
