@@ -20,6 +20,7 @@ public:
 	HRESULT TrialHours(long *trial_hours);
 	HRESULT IsActive(VARIANT_BOOL *key_active);
 	HRESULT IsProgrammed(VARIANT_BOOL *key_programmed);
+	HRESULT IsSolimarProtectionKey(VARIANT_BOOL *key_solimar_protection_key);
 	HRESULT HeaderQuery(long header_ident, VARIANT *value);
 	HRESULT IsPresent(VARIANT_BOOL *key_present);
 	HRESULT EnterPassword(BSTR password);

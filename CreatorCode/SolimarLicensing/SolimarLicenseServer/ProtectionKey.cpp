@@ -282,6 +282,23 @@ HRESULT ProtectionKey::IsProgrammed(VARIANT_BOOL *key_programmed)
 	}
 	return S_OK;
 }
+// Verify that the attached key is a solimar protection key and not a validation token key
+HRESULT ProtectionKey::IsSolimarProtectionKey(VARIANT_BOOL *key_solimar_protection_key)
+{
+	SafeMutex mutex(license_use_lock);
+	*key_solimar_protection_key = VARIANT_FALSE;
+	try
+	{
+		unsigned short product_ident = ReadHeaderCache(L"Product ID").uiVal;
+		if((product_ident >= 0 && product_ident <= 3) || (product_ident >= 5 && product_ident <= 14))
+			*key_solimar_protection_key = VARIANT_TRUE;
+	}
+	catch(_com_error &e)
+	{
+		return e.Error();
+	}
+	return S_OK;
+}
 
 HRESULT ProtectionKey::HeaderQuery(long header_ident, VARIANT *value)
 {
@@ -2319,6 +2336,11 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 
 HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2335,6 +2357,11 @@ HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_numbe
 
 HRESULT ProtectionKey::GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	KeySpec::Header &header_app_instance = m_keyspec->headers[L"Application Instances"];
@@ -2349,6 +2376,11 @@ HRESULT ProtectionKey::GenerateApplicationInstancePassword(long customer_number,
 
 HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2366,6 +2398,11 @@ HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_nu
 
 HRESULT ProtectionKey::GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2381,6 +2418,11 @@ HRESULT ProtectionKey::GenerateExtensionPassword(long customer_number, long key_
 
 HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	bool password_generated = false;
 	DWORD password_hash;
 	wchar_t password_string[128];
@@ -2499,6 +2541,11 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 }
 HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	bool password_generated = false;
 	DWORD password_hash;
 	wchar_t password_string[128];

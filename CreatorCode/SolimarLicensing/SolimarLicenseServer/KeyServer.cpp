@@ -566,6 +566,8 @@ HRESULT KeyServer::GenerateBasePassword(long customer_number, long key_number, B
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateBasePassword(customer_number, key_number, &temp_password);
@@ -599,6 +601,8 @@ HRESULT KeyServer::GenerateApplicationInstancePassword(long customer_number, lon
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, &temp_password);
@@ -630,6 +634,8 @@ HRESULT KeyServer::GenerateVersionPassword(long customer_number, long key_number
 	{
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
+		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
@@ -664,6 +670,8 @@ HRESULT KeyServer::GenerateExtensionPassword(long customer_number, long key_numb
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateExtensionPassword(customer_number, key_number, extend_days, extension_num, &temp_password);
@@ -697,6 +705,8 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, &temp_password);
@@ -728,6 +738,8 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	{
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
+		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
