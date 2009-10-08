@@ -867,6 +867,25 @@ short KeyMaster::read(SKeyRecord* keyrec)
    return 0;    // SUCCESS
 }
 
+bool KeyMaster::isAttachedKeyValid()
+{
+    HRESULT hr = 0;
+    VARIANT TheProductID;
+
+    //using the solimar license server, query the key header for the specified info
+    hr = pTheServer->KeyHeaderQuery(*CurrentKeyID,
+                               10021,
+                               &TheProductID);
+    if(!SUCCEEDED(hr))
+        return false;
+
+    ProductId product_id = (ProductId)TheProductID.iVal;
+    VariantClear(&TheProductID);
+    if(product_id > MAX_SOLIMAR_PRODUCTS)
+        return false;
+    return true;
+}
+
 //==============================================================================
 // Function:    resetKey
 // Purpose:     resets the key to it's initial state. This does not work for the
@@ -1025,6 +1044,7 @@ void KeyMaster::initializeMaxModules( SKeyRecord* keyrec )
        case SDX_DESIGNER_PRODUCT :
        case RUBIKA_PRODUCT :
        case SOLFUSION_PRODUCT :
+       case SOLITRACK_PRODUCT :
             {
                 spd_key->setOutputUnits(0);
 
@@ -1123,6 +1143,7 @@ void KeyMaster::initializeMinModules( SKeyRecord* keyrec)
         case RUBIKA_PRODUCT :
         case SDX_DESIGNER_PRODUCT :
         case SOLFUSION_PRODUCT :
+       case SOLITRACK_PRODUCT :
              {
 
                  if(spd_key->productVersion > 0x0000)
@@ -1428,6 +1449,7 @@ void KeyMaster::applyPermanentPassword(SKeyRecord* key_record)
        case RUBIKA_PRODUCT :
        case SDX_DESIGNER_PRODUCT :
        case SOLFUSION_PRODUCT :
+       case SOLITRACK_PRODUCT :
             {
                  spd_key->setOutputUnits(0); //does not belong to SOLSCRIPT
                  key_record->xch_ipds_ppm = 0;

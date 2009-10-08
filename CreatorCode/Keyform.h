@@ -364,6 +364,7 @@ public:
         bool dbSaveKey(SKeyRecord*,TKeyWizardFrm*);
         bool CheckDateFormat(AnsiString dateString);
         BSTR AsciiToBSTR(const char* pStr);
+        bool isAttachedKeyValid();
 
         //
         // Used to update the private member variable sql_statement for queries/searches

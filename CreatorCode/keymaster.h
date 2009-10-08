@@ -102,6 +102,7 @@ public:
    void resetKey(SKeyRecord*, ProductId);
    short program(SKeyRecord* key_record);
    bool programmed();
+   bool isAttachedKeyValid();
 
    //operate on specificed SKeyRecord
    void initializeMaxModules(SKeyRecord*);

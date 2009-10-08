@@ -274,6 +274,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
                                  (key_record->getProductId() != RUBIKA_PRODUCT)          &&
                                  (key_record->getProductId() != SDX_DESIGNER_PRODUCT)    &&
                                  (key_record->getProductId() != SOLFUSION_PRODUCT)       &&
+                                 (key_record->getProductId() != SOLITRACK_PRODUCT)       &&
                                  (key_record->getProductId() != SOLSCRIPT_PRODUCT))
                                 ? true : false;
          mmSPDEOperatorSessions->Visible = (key_record->getProductId() == SPDE_PRODUCT) ? true : false;
@@ -341,6 +342,7 @@ void __fastcall TFCustomerKeys::setGUIOptions()
          (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
           key_record->pkey->productId == RUBIKA_PRODUCT     ||
           key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+          key_record->pkey->productId == SOLITRACK_PRODUCT      ||
           key_record->pkey->productId == SOLFUSION_PRODUCT)
          )
      {
@@ -508,6 +510,7 @@ void __fastcall TFCustomerKeys::OnKeyRowChange(TObject *Sender)
                 else if (key_record->pkey->productId == SOLSCRIPT_PRODUCT ||
                          key_record->pkey->productId == RUBIKA_PRODUCT    ||
                          key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
+                         key_record->pkey->productId == SOLITRACK_PRODUCT ||
                          key_record->pkey->productId == SOLFUSION_PRODUCT) {
                         //
                         // This is important to go between SP/D Keys & SSKeys....DO NOT REMOVE THIS
@@ -743,6 +746,7 @@ void __fastcall TFCustomerKeys::setKeyInfoValues()
              key_record->pkey->productId == RUBIKA_PRODUCT ||
              key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
              key_record->pkey->productId == SOLFUSION_PRODUCT ||
+             key_record->pkey->productId == SOLITRACK_PRODUCT ||
              key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) {
         showPagesPerMinuteInfo(false);
         showLicenseInfo(false);
@@ -807,8 +811,17 @@ bool TFCustomerKeys::isAttachedKeyReady()
       return false;
    }
 
+   if(keyMaster->isAttachedKeyValid() == false)
+   {
+      //add message, attached key must be programmed to generate a password
+      Application->MessageBox("Attached key is invalid.", "Information", MB_OK);
+      return false;
+   }
+
    return true;
 }
+
+
 
 //==============================================================================
 // Function:    resetPhysicalFlag
@@ -1536,6 +1549,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
                      key_record->pkey->productId == RUBIKA_PRODUCT ||
                      key_record->pkey->productId == SDX_DESIGNER_PRODUCT ||
                      key_record->pkey->productId == SOLFUSION_PRODUCT ||
+                     key_record->pkey->productId == SOLITRACK_PRODUCT ||
                      key_record->pkey->productId == SOLSEARCHER_ENTERPRISE_PRODUCT) {
                KeyFormModuleFrame->load(key_record);
             }
@@ -1571,6 +1585,7 @@ void __fastcall TFCustomerKeys::RefreshKeyPage(int _index)
               case RUBIKA_PRODUCT :
               case SOLSCRIPT_PRODUCT :
               case SOLFUSION_PRODUCT :
+              case SOLITRACK_PRODUCT :
                    ArchiveBtn->Enabled = true;
               case SDX_DESIGNER_PRODUCT :
               case SOLSEARCHER_ENTERPRISE_PRODUCT :
