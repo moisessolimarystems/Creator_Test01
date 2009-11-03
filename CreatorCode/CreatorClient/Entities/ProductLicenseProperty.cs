@@ -142,6 +142,19 @@ namespace Client.Creator
         {
             get { return (Status != ProductLicenseState.Deactivated) ? true : false; }
         }
+        [Browsable(false)]
+        public bool IsExpired
+        {
+            get 
+            {
+                if (ExpirationDate.HasValue)
+                {
+                    if (ExpirationDate.Value.CompareTo(CurrentExpirationDate) < 0)
+                        return true;
+                }
+                return false; 
+            }
+        }
         #endregion
 
         #region Browsable Properties
@@ -285,7 +298,7 @@ namespace Client.Creator
 
         [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         [Category("Product License"), PropertyOrder(5)]
-        [DisplayName("Description")]
+        [DisplayName("Notes")]
         public string Description
         {
             get { return _plRec.Description; }

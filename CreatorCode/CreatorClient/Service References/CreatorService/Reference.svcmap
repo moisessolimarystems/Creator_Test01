@@ -26,9 +26,9 @@
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="57fa5796-6a43-467a-809a-93c45628dcb9" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
     <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="647a41a7-c77d-49ad-b91d-b3c524c6fa4b" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
     <MetadataFile FileName="CreatorData.xsd" MetadataType="Schema" ID="fd8b4afb-4425-454f-891d-c7b8535403ab" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="Service.Creator.xsd" MetadataType="Schema" ID="9cfdab0b-3fdb-41d5-a332-97731cf89ac7" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
     <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="c3234e0f-46d5-43ef-becb-318b88d89748" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
     <MetadataFile FileName="Solimar.Licensing.Attribs.xsd" MetadataType="Schema" ID="f5d8dc17-9959-4e63-bd37-2d7d5bfa4ac7" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
-    <MetadataFile FileName="Service.Creator.xsd" MetadataType="Schema" ID="9cfdab0b-3fdb-41d5-a332-97731cf89ac7" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
     <MetadataFile FileName="Solimar.Licensing.LicenseManagerWrapper.xsd" MetadataType="Schema" ID="8d40f3d2-ca7e-471c-9991-cb4cb9f2adeb" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
   </Metadata>
   <Extensions>

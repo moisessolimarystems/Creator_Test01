@@ -7,27 +7,11 @@ namespace Client.Creator
 {
     public class ConditionProperty
     {
-        public enum Name
-        {
-            Customer,
-            DestinationID,
-            GroupID,
-            LicenseType
-        }
-
-        public enum Operator
-        { 
-            Equals,
-            Contains,
-            LessThan,
-            GreaterThan
-        }
-
-        private Name? _name;
-        private Operator? _operator;
+        private Creator.CreatorService.Name _name;
+        private Creator.CreatorService.Operator _operator;
         private string _value;
 
-        public Name? ConditionName
+        public Creator.CreatorService.Name ConditionName
         {
             get { return _name; }
             set { _name = value; }
@@ -35,7 +19,7 @@ namespace Client.Creator
 
         //numeric operators - =, >, <
         //string operators - is, contains, is not, does not contain
-        public Operator? ConditionOperator
+        public Creator.CreatorService.Operator ConditionOperator
         {
             get { return _operator;  }
             set { _operator = value; }

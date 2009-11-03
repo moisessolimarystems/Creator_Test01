@@ -2,11 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Linq.Dynamic;
 
 namespace CreatorData
 {
     public partial class ProductLicenseTable
     {
+        public static IList<ProductLicenseTable> GetProductLicensesByConditions(string conditionStrings)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var licenses = db.ProductLicenseTables.Where(conditionStrings).ToList();
+                return licenses;
+            }
+        }
+
         public static IList<ProductLicenseTable> GetAllProductLicenses()
         {
             using (CreatorDataContext db = new CreatorDataContext())

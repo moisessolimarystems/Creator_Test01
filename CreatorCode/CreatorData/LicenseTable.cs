@@ -94,8 +94,8 @@ namespace CreatorData
                                     equals
                                     new { DestID = d.DestID, CustID = d.CustID }
                                     where l.CustomerTable.SCRname.Equals(custName) &&
-                                         (d.DestName.Contains(destName) ||
-                                          l.LicenseName.Contains(searchString) ||
+                                          d.DestName.Equals(destName) &&                                          
+                                          (l.LicenseName.Contains(searchString) ||
                                           l.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
                                                                                           o.LicenseID.Equals(l.ID))) > 0)
                                     select l;

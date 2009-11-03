@@ -20,6 +20,8 @@
       <xs:enumeration value="DestinationID" />
       <xs:enumeration value="GroupID" />
       <xs:enumeration value="LicenseType" />
+      <xs:enumeration value="ExpirationDate" />
+      <xs:enumeration value="plState" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="Name" nillable="true" type="tns:Name" />

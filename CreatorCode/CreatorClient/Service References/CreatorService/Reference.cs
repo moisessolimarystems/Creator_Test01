@@ -1223,6 +1223,120 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Condition", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
+    [System.SerializableAttribute()]
+    public partial class Condition : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Client.Creator.CreatorService.Name ConditionNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private Client.Creator.CreatorService.Operator ConditionOperatorField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ConditionValueField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Client.Creator.CreatorService.Name ConditionName {
+            get {
+                return this.ConditionNameField;
+            }
+            set {
+                if ((this.ConditionNameField.Equals(value) != true)) {
+                    this.ConditionNameField = value;
+                    this.RaisePropertyChanged("ConditionName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public Client.Creator.CreatorService.Operator ConditionOperator {
+            get {
+                return this.ConditionOperatorField;
+            }
+            set {
+                if ((this.ConditionOperatorField.Equals(value) != true)) {
+                    this.ConditionOperatorField = value;
+                    this.RaisePropertyChanged("ConditionOperator");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ConditionValue {
+            get {
+                return this.ConditionValueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ConditionValueField, value) != true)) {
+                    this.ConditionValueField = value;
+                    this.RaisePropertyChanged("ConditionValue");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Name", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
+    public enum Name : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Customer = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        DestinationID = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        GroupID = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LicenseType = 3,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ExpirationDate = 4,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        plState = 5,
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Operator", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
+    public enum Operator : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Equals = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LessThan = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        GreaterThan = 2,
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="CustomerTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class CustomerTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1330,117 +1444,12 @@ namespace Client.Creator.CreatorService {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Condition", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
-    [System.SerializableAttribute()]
-    public partial class Condition : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Client.Creator.CreatorService.Name ConditionNameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Client.Creator.CreatorService.Operator ConditionOperatorField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ConditionValueField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Client.Creator.CreatorService.Name ConditionName {
-            get {
-                return this.ConditionNameField;
-            }
-            set {
-                if ((this.ConditionNameField.Equals(value) != true)) {
-                    this.ConditionNameField = value;
-                    this.RaisePropertyChanged("ConditionName");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public Client.Creator.CreatorService.Operator ConditionOperator {
-            get {
-                return this.ConditionOperatorField;
-            }
-            set {
-                if ((this.ConditionOperatorField.Equals(value) != true)) {
-                    this.ConditionOperatorField = value;
-                    this.RaisePropertyChanged("ConditionOperator");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ConditionValue {
-            get {
-                return this.ConditionValueField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ConditionValueField, value) != true)) {
-                    this.ConditionValueField = value;
-                    this.RaisePropertyChanged("ConditionValue");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Name", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
-    public enum Name : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Customer = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        DestinationID = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        GroupID = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        LicenseType = 3,
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Operator", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
-    public enum Operator : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Equals = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        LessThan = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        GreaterThan = 2,
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID", ReplyAction="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustIDResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTokenByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTokenByLicenseNameResponse")]
         Client.Creator.CreatorService.TokenTable GetTokenByLicenseName(string licenseName, byte tokenType);
@@ -1538,6 +1547,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteTransaction", ReplyAction="http://tempuri.org/ICreator/DeleteTransactionResponse")]
         void DeleteTransaction(Client.Creator.CreatorService.TransactionTable ta);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductLicensesByConditions", ReplyAction="http://tempuri.org/ICreator/GetProductLicensesByConditionsResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllProductLicenses", ReplyAction="http://tempuri.org/ICreator/GetAllProductLicensesResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses();
         
@@ -1588,9 +1600,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetHardwareTokenByKeyValue", ReplyAction="http://tempuri.org/ICreator/GetHardwareTokenByKeyValueResponse")]
         Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(string keyValue);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID", ReplyAction="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustIDResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
@@ -1646,8 +1655,8 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseType", ReplyAction="http://tempuri.org/ICreator/GetLicenseTypeResponse")]
         int GetLicenseType(string licenseName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicencesByConditions", ReplyAction="http://tempuri.org/ICreator/GetLicencesByConditionsResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicencesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicensesByConditions", ReplyAction="http://tempuri.org/ICreator/GetLicensesByConditionsResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsLicenseModified", ReplyAction="http://tempuri.org/ICreator/IsLicenseModifiedResponse")]
         bool IsLicenseModified(string licenseName);
@@ -1714,6 +1723,10 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID) {
+            return base.Channel.GetAvailableHardwareTokensByCustID(custID);
         }
         
         public Client.Creator.CreatorService.TokenTable GetTokenByLicenseName(string licenseName, byte tokenType) {
@@ -1844,6 +1857,10 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteTransaction(ta);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList) {
+            return base.Channel.GetProductLicensesByConditions(conditionList);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses() {
             return base.Channel.GetAllProductLicenses();
         }
@@ -1910,10 +1927,6 @@ namespace Client.Creator.CreatorService {
         
         public Client.Creator.CreatorService.TokenTable GetHardwareTokenByKeyValue(string keyValue) {
             return base.Channel.GetHardwareTokenByKeyValue(keyValue);
-        }
-        
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAvailableHardwareTokensByCustID(uint custID) {
-            return base.Channel.GetAvailableHardwareTokensByCustID(custID);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions) {
@@ -1988,8 +2001,8 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetLicenseType(licenseName);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicencesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList) {
-            return base.Channel.GetLicencesByConditions(conditionList);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> conditionList) {
+            return base.Channel.GetLicensesByConditions(conditionList);
         }
         
         public bool IsLicenseModified(string licenseName) {

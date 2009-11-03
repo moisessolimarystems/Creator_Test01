@@ -279,16 +279,6 @@ namespace Client.Creator
             set { _destinationName = value; }
         }
 
-        //[Category("License Server"), PropertyOrder(3)]
-        //[DisplayName("Type")]
-        //[Description("Type")]
-        //[ReadOnly(true)]
-        //public Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType LicType
-        //{
-        //    get { return _licInfo.softwareLicType.TVal; }
-        //    set { _licInfo.softwareLicType.TVal = value; }
-        //}
-
         [Category("License Server"), PropertyOrder(3)]
         [DisplayName("Type")]
         [Description("Type")]
@@ -297,8 +287,7 @@ namespace Client.Creator
         {
             get { return _licType; }
             set
-            {
-                
+            {                
                 _licType = value;
                 if(_licType != LicenseServerType.Deactivated)
                     LicInfo.softwareLicType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(value);                
@@ -307,8 +296,8 @@ namespace Client.Creator
 
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [Category("License Server"), PropertyOrder(4)]
-        [DisplayName("Comments")]
-        [Description("Comments")]
+        [DisplayName("Notes")]
+        [Description("Notes")]
         public string Comments
         {
             get { return _comments; }
