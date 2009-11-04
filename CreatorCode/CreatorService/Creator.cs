@@ -24,7 +24,9 @@ namespace Service.Creator
                     {"Customer", "SCustomerRecord.SCRname"},
                     {"DestinationID", "DestinationID"},
                     {"GroupID", "GroupID"},
-                    {"LicenseType", "LicenseType"}
+                    {"LicenseType", "LicenseType"},
+                    {"ExpirationDate", "ExpirationDate"},
+                    {"plState", "plState"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -190,7 +192,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetLicencesByConditions(IList<Condition> conditionList)
+        public IList<LicenseTable> GetLicensesByConditions(IList<Condition> conditionList)
         {
             String value;
             int result;
@@ -359,6 +361,39 @@ namespace Service.Creator
         #endregion
 
         #region Product License Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> conditionList)
+        {
+            String value;
+            int result;
+            DateTime date;
+            StringBuilder conditionString = new StringBuilder();
+            foreach (Condition userCondition in conditionList)
+            {
+                if (conditionString.Length != 0)
+                    conditionString.Append(" and ");
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                conditionString.Append(_filterNames[userCondition.ConditionName.ToString()]);
+                conditionString.Append(_filterOperators[userCondition.ConditionOperator.ToString()]);
+                value = userCondition.ConditionValue;
+                if (Int32.TryParse(value, out result))
+                {
+                    conditionString.Append(value);
+                }
+                else if (DateTime.TryParse(value, out date))
+                {
+                    conditionString.Append(string.Format("DateTime({0},{1},{2})", date.Year,date.Month,date.Day));
+                }
+                else
+                {
+                    conditionString.Append("\"");
+                    conditionString.Append(userCondition.ConditionValue.ToString());
+                    conditionString.Append("\"");
+                }
+            }
+            return ProductLicenseTable.GetProductLicensesByConditions(conditionString.ToString());    
+        }
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ProductLicenseTable> GetAllProductLicenses()
         {

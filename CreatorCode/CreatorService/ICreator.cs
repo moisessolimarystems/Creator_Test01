@@ -78,7 +78,7 @@ namespace Service.Creator
         int GetLicenseType(string licenseName);
 
         [OperationContract]
-        IList<LicenseTable> GetLicencesByConditions(IList<Condition> conditionList);
+        IList<LicenseTable> GetLicensesByConditions(IList<Condition> conditionList);
 
         [OperationContract]
         bool IsLicenseModified(string licenseName);
@@ -171,6 +171,9 @@ namespace Service.Creator
         #endregion
 
         #region Product License OperationContracts
+        [OperationContract]
+        IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> conditionList);
+
         [OperationContract]
         IList<ProductLicenseTable> GetAllProductLicenses();
 
@@ -303,7 +306,11 @@ namespace Service.Creator
         [EnumMember]
         GroupID,
         [EnumMember]
-        LicenseType
+        LicenseType,
+        [EnumMember]
+        ExpirationDate,
+        [EnumMember]
+        plState
     }
     
     [DataContract]
