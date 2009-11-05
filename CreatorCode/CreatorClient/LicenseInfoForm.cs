@@ -240,64 +240,54 @@ namespace Client.Creator
         #endregion
 
         #region Token Methods
+        //needs to support SOFTWARE/HARDWARE validation
         private void LoadTokenTabPage(TokenDialogData tokenData)
         {
             selectedObject = tokenData.LicInfo as Object;
-            //hardware token get value from database
+            ////hardware token get value from database
             btnOk.Enabled = true;
             topPanel.Controls.Clear();
             tokenGroupBox.Parent = topPanel;
-            //enabled when new token, ttNone passed in
-            tokenTypeComboBox.Enabled = (tokenData.Token.TokenType != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone) ? false : true;
-            //load token
-            if (tokenTypeComboBox.Enabled)
-            {   //new token
-                foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
-                {
-                    tokenData.ValidTokenList.Remove(token.tokenType);
-                }
-                if (tokenData.ValidTokenList.Count == 0)
-                    tokenData.ValidTokenList.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
+            hardwareRadioButton.Checked = true;
+        }
 
+        private Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType GetTokenEnum(string tokenName)        
+        {
+            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone;
+            switch (tokenName)
+            {
+                case "Computer Name":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName;
+                    break;
+                case "Mac Address":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttMacAddress;
+                    break;
+                case "Bios Serial Number":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttBiosSerialNumber;
+                    break;
+                default: break;
             }
-            else
-            {   //old token
-                foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
-                {
-                    if (token.tokenType.TVal.Equals(tokenData.Token.TokenType))
-                    {
-                        tokenData.ValidTokenList.Clear();
-                        tokenData.ValidTokenList.Add(token.tokenType.TVal);
-                        tokenValueTextBox.Text = token.tokenValue.TVal;
-                        break;
-                    }
-                }
-            }
-            tokenTypeComboBox.DataSource = tokenData.ValidTokenList;
-            tokenTypeComboBox.SelectedItem = tokenTypeComboBox.Items[0];
+            return token;
         }
 
         private void SaveTokenTabPage(TokenDialogData tokenData)
         {
-            //new case -> create new token and then add to tokendata            
-            if (tokenData.Token.TokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
+            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken;
+            if (hardwareRadioButton.Checked)
             {
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-                newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
-                newToken.tokenValue.TVal = tokenValueTextBox.Text;
+                newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                newToken.tokenType.TVal =  Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
+                newToken.tokenValue.TVal = tokenListView.SelectedItems[0].Text;
                 tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
-                tokenData.Token.ValidationToken = newToken;
             }
             else
-            { //edit case -> find token then modify tokendata
-                foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
+            {
+                foreach (ListViewItem lvItem in tokenListView.Items)
                 {
-                    if (token.tokenType.TVal.Equals((Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem))
-                    {
-                        token.tokenValue.TVal = tokenValueTextBox.Text;
-                        tokenData.Token.ValidationToken = token;
-                        break;
-                    }
+                    newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                    newToken.tokenType.TVal = GetTokenEnum(lvItem.Text);  
+                    newToken.tokenValue.TVal = lvItem.SubItems[1].Text; 
+                    tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken); 
                 }
             }
         }
@@ -331,13 +321,11 @@ namespace Client.Creator
             //Need to grab license from database to find last 
             topPanel.Controls.Clear();
             moduleGroupBox.Parent = topPanel;
-            modNameComboBox.Enabled = false;
             //edit module
             if (moduleData.ModuleNames.Count != 0)
             {               
                 string moduleName = moduleData.ModuleNames[0];
-                modNameComboBox.Items.Add(moduleName);
-                modNameComboBox.SelectedIndex = 0;
+                modNameTextBox.Text = moduleName;               
                 uint modID, unlimitedValue, totalValue = 0;
                 modID = (uint)m_CommLink.GetModuleID(moduleData.ProductLicense.Product.ID, moduleName);
                 unlimitedValue = (uint)m_CommLink.GetUnlimitedModuleValue(moduleData.ProductLicense.Product.ID, modID);
@@ -591,110 +579,25 @@ namespace Client.Creator
             //Service<ICreator>.Use((client) =>
             //{
             //    LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
-            //    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
-            //    if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenValueTextBox.Text))
+            //    if (hardwareRadioButton.Checked)
             //    {
-            //        m_Validated = false;
-            //        this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
 
-            //        // Set the ErrorProvider error with the text to display.
-            //        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-            //        MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
+            //        if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenListView.SelectedItems[0].Text))
+            //        {
+            //            m_Validated = false;
+            //            this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
+
+            //            // Set the ErrorProvider error with the text to display.
+            //            //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+            //            MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //        }
+            //    }
+            //    else
+            //    {
             //    }
             //});
             Cursor.Current = Cursors.Default; 
-        }
-
-        private string GetNextAvailableHardwareKey(string customerName)
-        {
-            CustomerTable custRec = null;
-            uint tokenValue = 0;
-            Service<ICreator>.Use((client) =>
-            {
-                custRec = client.GetCustomer(customerName, false);
-                tokenValue = client.GetNextHardwareTokenValue((uint)custRec.SCRnumber);
-            });
-            return string.Format("{0:x4}-{1:x4}", custRec.SCRnumber, tokenValue);
-        }
-
-        private void tokenTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {   
-            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;      
-            keyNameListView.Visible = false;
-            availableHWKeyLabel.Visible = false;
-            tokenValueTextBox.Enabled = false;
-            browseTokenFileButton.Visible = false;
-            btnOk.Enabled = false;
-            if (tokenTypeComboBox.Enabled)
-                tokenValueTextBox.Text = "";
-            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenTypeComboBox.SelectedItem;
-            if (selectedType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
-            {   //Edit ttHardwareID has value, skip 
-                keyNameListView.Visible = true;
-                availableHWKeyLabel.Visible = true;
-                if (tokenValueTextBox.Text.Length == 0)
-                {   //New ttHardwareID needs to retrieve next available value
-                    keyNameListView.Items.Clear();
-                    Service<ICreator>.Use((client) => 
-                    {
-                        IList<TokenTable> tokenList = client.GetAvailableHardwareTokensByCustID(selectedOrder.CustID);
-                        foreach (TokenTable token in tokenList)
-                        {                       
-                            keyNameListView.Items.Add(token.TokenValue);
-                        }
-                    });
-                }
-                if (keyNameListView.Items.Count > 0)
-                {
-                    keyNameListView.Focus();
-                    keyNameListView.Items[0].Selected = true;
-                }
-            }
-            else
-            {                
-                if (selectedType != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
-                {
-                    tokenValueTextBox.Enabled = true;
-                    browseTokenFileButton.Visible = true;
-                }
-            }                
-        }
-
-        private void tokenValueTextBox_TextChanged(object sender, EventArgs e)
-        {
-            btnOk.Enabled = tokenValueTextBox.Text.Length > 0;
-        }
-        
-        private IList<SolimarLicenseProtectionKeyInfo> LoadKeyNameListBox()
-        {
-            IList<SolimarLicenseProtectionKeyInfo> pkeyList = null;
-            Service<ICreator>.Use((client) => 
-            {
-                pkeyList = client.KeyEnumerate();
-            });
-            return pkeyList;
-        }
-
-        private void tokenValueTextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-            {
-                ValidateTokenForm();
-                if (m_Validated)                
-                    DialogResult = DialogResult.OK;
-            }
-            else if (e.KeyCode == Keys.Escape)
-            {
-                DialogResult = DialogResult.Cancel;
-            }
-        }
-
-        private void tokenTypeComboBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Escape)
-            {
-                DialogResult = DialogResult.Cancel;
-            }
         }
 
         #endregion
@@ -793,28 +696,67 @@ namespace Client.Creator
             return retVal;
         }
 
+        private bool IsValidTokenType(string tokenType)
+        {
+            if (tokenType == "Computer Name" ||
+               tokenType == "Bios Serial Number" ||
+               tokenType == "Mac Address")
+                return true;
+            return false;
+        }
+            
         private void browseTokenFileButton_Click(object sender, EventArgs e)
         {
+            LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+            //if software use browse csv dialog
             if (this.browseCSVOpenFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
                     using (StreamReader sr = new StreamReader(browseCSVOpenFileDialog.FileName))
                     {
-                        String line, importedValue, selectedToken;
-                        selectedToken = GetCSVTokenAlias(tokenTypeComboBox.SelectedItem.ToString());
+                        CustomerTable ct = null;
+                        String line, tokenValue, tokenName;                        
                         while ((line = sr.ReadLine()) != null)
                         {
-                            if (line.Contains(selectedToken))
+                            tokenName = line.Substring(0, line.IndexOf(",") -1);
+                            tokenName = tokenName.Trim(new Char[] { '"' });
+                            tokenValue = line.Remove(0, line.IndexOf(",") + 1);
+                            tokenValue = tokenValue.Trim(new Char[] { '"' });
+                            //file validation
+                            if (tokenName == "Company")
                             {
-                                //strip the line for value and load it into textbox
-                                importedValue = line.Remove(0, line.IndexOf(",")+1);
-                                importedValue = importedValue.Trim(new Char[] { '"' });
-                                tokenValueTextBox.Text = importedValue;
-                                break;
+                                Service<ICreator>.Use((client) =>
+                                {
+                                    ct = client.GetCustomer(selectedLicense.CustID.ToString(), false);
+                                });
+                                if (ct != null)
+                                {
+                                    if (ct.SCRname != tokenValue)
+                                    {
+                                        MessageBox.Show("Invalid Validation Token file for " + ct.SCRname, "Software Token Error");
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (IsValidTokenType(tokenName))
+                                {
+                                    ListViewItem lvItem = new ListViewItem(tokenName);
+                                    lvItem.SubItems.Add(tokenValue);
+                                    tokenListView.Items.Add(lvItem);
+                                }
                             }
                         }
                         sr.Close();
+                    }
+                    if (tokenListView.Items.Count > 0)
+                    {
+                        tokenListView.Columns[0].Width = -2;
+                        tokenListView.Columns[1].Width = -2; 
+                        btnOk.Enabled = true;
+                        TokenDescriptionLabel.Text = "Customer Validation Information";
                     }
                 }
                 catch (Exception)
@@ -822,12 +764,51 @@ namespace Client.Creator
                 }
             }
         }
-
-        private void keyNameListView_SelectedIndexChanged(object sender, EventArgs e)
+        //fill tokenlist with available hardware tokens
+        //hide browse button
+        private void hardwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            if(keyNameListView.SelectedItems.Count > 0)
-                tokenValueTextBox.Text = keyNameListView.SelectedItems[0].Text;
+            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
+            TokenDescriptionLabel.Text = "Available Hardware Tokens";
+            browseTokenFileButton.Visible = false;
+            tokenListView.Items.Clear();
+            btnOk.Enabled = true;
+            Service<ICreator>.Use((client) =>
+            {
+                IList<TokenTable> tokenList = client.GetAvailableHardwareTokensByCustID(selectedOrder.CustID);
+                foreach (TokenTable token in tokenList)
+                {
+                    if (token.TokenStatus != (byte)TokenStatus.Deactivated)
+                    {
+                        ListViewItem lvItem = new ListViewItem(token.TokenValue);
+                        lvItem.SubItems.Add(((TokenStatus)token.TokenStatus).ToString());
+                        tokenListView.Items.Add(lvItem);
+                    }
+                }
+            });
+            if (tokenListView.Items.Count > 0)
+            {
+                tokenListView.Focus();
+                tokenListView.Items[0].Selected = true;
+                tokenListView.Columns[0].Width = -2;
+                tokenListView.Columns[1].Width = -2;
+            }
+
         }
+        //enable browse button, ask for 
+        private void softwareRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            TokenDescriptionLabel.Text = "Please browse for customer information.";
+            browseTokenFileButton.Visible = true;
+            tokenListView.Items.Clear();
+            btnOk.Enabled = false;
+        }
+
+        //private void keyNameListView_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    if(keyNameListView.SelectedItems.Count > 0)
+        //        tokenValueTextBox.Text = keyNameListView.SelectedItems[0].Text;
+        //}
     }
 
     #region LicenseDialogData class
@@ -896,43 +877,22 @@ namespace Client.Creator
     #region TokenDialogData class
     public class TokenDialogData : Shared.VisualComponents.DialogData
     {        
-        private ValidationProperty m_Token;
-        private LicenseServerProperty m_LicInfo;
-        private List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType> m_ValidTokenTypes;
+        private LicenseServerProperty m_LicInfo;       
 
         #region Constructors
 
-        public TokenDialogData(ValidationProperty token, LicenseServerProperty licInfo)
+        public TokenDialogData(LicenseServerProperty licInfo)
         {
-            m_Token = token;
             m_LicInfo = licInfo;
-            m_ValidTokenTypes = new List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType>();
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName);
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttMacAddress);
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttBiosSerialNumber);
-            m_ValidTokenTypes.Add(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
         }
         #endregion
 
         #region Properties
 
-        public ValidationProperty Token
-        {
-            get { return this.m_Token; }
-            set { this.m_Token = value; }
-        }
-
         public LicenseServerProperty LicInfo
         {
             get { return this.m_LicInfo; }
             set { this.m_LicInfo = value; }
-        }
-
-        public List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType> ValidTokenList
-        {
-            get { return this.m_ValidTokenTypes; }
-            set { this.m_ValidTokenTypes = value; }
         }
 
         #endregion

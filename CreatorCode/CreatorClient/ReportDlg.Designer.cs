@@ -36,7 +36,6 @@
             this.conditionNameComboBox = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-
             // 
             // groupBox1
             // 
@@ -47,7 +46,7 @@
             this.groupBox1.Controls.Add(this.conditionNameComboBox);
             this.groupBox1.Location = new System.Drawing.Point(12, 26);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(425, 50);
+            this.groupBox1.Size = new System.Drawing.Size(425, 57);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             // 
