@@ -9,6 +9,8 @@ class Lic_PackageAttribsHelper
 	static std::wstring GetDisplayLabel(Lic_PackageAttribs::Lic_LicenseInfoAttribs* _pLicInfoAttribs)
 	{
 		wchar_t wcstrDiplayLabel[1024];
+		wchar_t wcstrDestinationID[5];
+		wchar_t wcstrSwGroupID[5];
 		if(_pLicInfoAttribs)
 		{
 			wchar_t wLetter = L'U';
@@ -33,17 +35,37 @@ class Lic_PackageAttribsHelper
 					wLetter = L'U';
 					break;
 			}
+
+			_itow_s(_pLicInfoAttribs->destinationID, wcstrDestinationID, 36);
+			_itow_s(_pLicInfoAttribs->softwareGroupLicenseID, wcstrSwGroupID, 36);
+			for(int idx=0;idx<_countof(wcstrDestinationID);idx++)
+				wcstrDestinationID[idx] = towupper(wcstrDestinationID[idx]);
+			for(int idx=0;idx<_countof(wcstrSwGroupID);idx++)
+				wcstrSwGroupID[idx] = towupper(wcstrSwGroupID[idx]);
+			
+
 			_snwprintf_s(
 				wcstrDiplayLabel,
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
-				L"%04x-%03x-%04x-%c%02d",
+				L"%03x-%02s-%02s-%c%d",
 				(int)_pLicInfoAttribs->customerID,
-				(int)_pLicInfoAttribs->destinationID,
-				(int)_pLicInfoAttribs->softwareGroupLicenseID,
+				wcstrDestinationID,
+				wcstrSwGroupID,
 				wLetter,
 				(int)_pLicInfoAttribs->softwareLicTypeIndex
 				);
+			//_snwprintf_s(
+			//	wcstrDiplayLabel,
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	L"%04x-%03x-%04x-%c%02d",
+			//	(int)_pLicInfoAttribs->customerID,
+			//	(int)_pLicInfoAttribs->destinationID,
+			//	(int)_pLicInfoAttribs->softwareGroupLicenseID,
+			//	wLetter,
+			//	(int)_pLicInfoAttribs->softwareLicTypeIndex
+			//	);
 		}
 		return std::wstring(wcstrDiplayLabel);
 	}
