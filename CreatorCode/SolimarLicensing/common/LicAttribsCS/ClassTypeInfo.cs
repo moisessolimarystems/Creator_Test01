@@ -70,10 +70,17 @@ namespace Solimar
 				map_class_base["L_SysInA"] = new ClassInfoBase("L_SysInA","","System Info Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_SysInA");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["computerNameList"] = new AttribInfo("computerNameList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["systemUuidList"] = new AttribInfo("systemUuidList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["systemModelList"] = new AttribInfo("systemModelList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["systemManufacturerList"] = new AttribInfo("systemManufacturerList","","");
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["licenseServerVersion"] = new AttribInfo("licenseServerVersion","","");
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["macAddressList"] = new AttribInfo("macAddressList","","");
-				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["computerNameList"] = new AttribInfo("computerNameList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["operatingSystemList"] = new AttribInfo("operatingSystemList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["systemTypeList"] = new AttribInfo("systemTypeList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["domainNameList"] = new AttribInfo("domainNameList","","");
 				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["biosSerialNumberList"] = new AttribInfo("biosSerialNumberList","","");
+				((ClassInfoBase)map_class_base["L_SysInA"]).attribs["bPartOFDomain"] = new AttribInfo("bPartOFDomain","","");
 				map_class_base["L_LcSysA"] = new ClassInfoBase("L_LcSysA","","License System Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_LcSysA");
@@ -88,9 +95,13 @@ namespace Solimar
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_SvrDtA");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionSubMinor"] = new AttribInfo("versionSubMinor","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionSubMajor"] = new AttribInfo("versionSubMajor","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["bInClockViol"] = new AttribInfo("bInClockViol","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["fileInfoList"] = new AttribInfo("fileInfoList","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["clockViolCount"] = new AttribInfo("clockViolCount","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["clockViolLastDate"] = new AttribInfo("clockViolLastDate","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionMajor"] = new AttribInfo("versionMajor","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["versionMinor"] = new AttribInfo("versionMinor","","");
+				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["clockViolHistoryList"] = new AttribInfo("clockViolHistoryList","","");
 				((ClassInfoBase)map_class_base["L_SvrDtA"]).attribs["lastTouchDate"] = new AttribInfo("lastTouchDate","","");
 			}
 			

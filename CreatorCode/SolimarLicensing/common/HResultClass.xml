@@ -110,6 +110,9 @@
 		<HResult name="EHR_LIC_SOFTWARE_NO_PRODUCT"	ecode="EC_LIC_SOFTWARE_NO_PRODUCT"	value="44" alias="Software Licensing does not contain licensing for the given product (License Server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION"	ecode="EC_LIC_SOFTWARE_PRODUCT_NO_VERSION"	value="45" alias="Software Licensing contains licensing for the given product, but not at the desired version (License Server)"/>
 		<HResult name="EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER"	ecode="EC_LIC_MOD_NO_OBTAIN_USING_FAILOVER"	value="46" alias="Unable to obtain module when using Backup Server (License Server)"/>
+		<HResult name="EHR_LIC_CLOCK_LIC_PACKET"	ecode="EC_LIC_CLOCK_LIC_PACKET"	value="47" alias="The System Time does not seem to be set correctly (License Server)"/>
+		<HResult name="EHR_LIC_CLOCK_LIC_ARCHIVE"	ecode="EC_LIC_CLOCK_LIC_ARCHIVE" value="48" alias="The System Time does not seem to be set correctly (License Server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC" value="49" alias="Failed to validate software license with a Validation Token (License server)"/>
 		
 	</HResultType>
 	<!--	-->

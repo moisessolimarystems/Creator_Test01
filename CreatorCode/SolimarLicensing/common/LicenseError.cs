@@ -109,6 +109,9 @@ namespace Solimar
 			private const uint EHR_LIC_SOFTWARE_NO_PRODUCT = ITF_LIC_SVR_OFFSET+44;
 			private const uint EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION = ITF_LIC_SVR_OFFSET+45;
 			private const uint EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER = ITF_LIC_SVR_OFFSET+46;
+			private const uint EHR_LIC_CLOCK_LIC_PACKET = ITF_LIC_SVR_OFFSET+47;
+			private const uint EHR_LIC_CLOCK_LIC_ARCHIVE = ITF_LIC_SVR_OFFSET+48;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC = ITF_LIC_SVR_OFFSET+49;
 		
 			// Rainbow driver errors
 			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -210,6 +213,9 @@ namespace Solimar
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_NO_PRODUCT,"Software Licensing does not contain licensing for the given product (License Server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION,"Software Licensing contains licensing for the given product, but not at the desired version (License Server)");
 				SolLicErrors.Add(EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER,"Unable to obtain module when using Backup Server (License Server)");
+				SolLicErrors.Add(EHR_LIC_CLOCK_LIC_PACKET,"The System Time does not seem to be set correctly (License Server)");
+				SolLicErrors.Add(EHR_LIC_CLOCK_LIC_ARCHIVE,"The System Time does not seem to be set correctly (License Server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,"Failed to validate software license with a Validation Token (License server)");
 				SolLicErrors.Add(EHR_SP_INVALID_FUNCTION_CODE,"Invalid function code (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_PACKET,"Invalid packet (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_UNIT_NOT_FOUND,"Unit not found (Rainbow driver)");

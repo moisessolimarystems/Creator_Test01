@@ -106,10 +106,17 @@ namespace Solimar
 			{
 					map_class_base[L"L_SysInA"] = new ClassInfoBase(L"L_SysInA",L"",L"System Info Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_SysInA"));
+					map_class_base[L"L_SysInA"]->attribs[L"computerNameList"] = AttribInfo(L"computerNameList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"systemUuidList"] = AttribInfo(L"systemUuidList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"systemModelList"] = AttribInfo(L"systemModelList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"systemManufacturerList"] = AttribInfo(L"systemManufacturerList",L"",L"");
 					map_class_base[L"L_SysInA"]->attribs[L"licenseServerVersion"] = AttribInfo(L"licenseServerVersion",L"",L"");
 					map_class_base[L"L_SysInA"]->attribs[L"macAddressList"] = AttribInfo(L"macAddressList",L"",L"");
-					map_class_base[L"L_SysInA"]->attribs[L"computerNameList"] = AttribInfo(L"computerNameList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"operatingSystemList"] = AttribInfo(L"operatingSystemList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"systemTypeList"] = AttribInfo(L"systemTypeList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"domainNameList"] = AttribInfo(L"domainNameList",L"",L"");
 					map_class_base[L"L_SysInA"]->attribs[L"biosSerialNumberList"] = AttribInfo(L"biosSerialNumberList",L"",L"");
+					map_class_base[L"L_SysInA"]->attribs[L"bPartOFDomain"] = AttribInfo(L"bPartOFDomain",L"",L"");
 			}
 			void constructor_helper_3()
 			{
@@ -128,9 +135,13 @@ namespace Solimar
 					map_base_classes.insert(std::make_pair(L"",L"L_SvrDtA"));
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionSubMinor"] = AttribInfo(L"versionSubMinor",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionSubMajor"] = AttribInfo(L"versionSubMajor",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"bInClockViol"] = AttribInfo(L"bInClockViol",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"fileInfoList"] = AttribInfo(L"fileInfoList",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"clockViolCount"] = AttribInfo(L"clockViolCount",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"clockViolLastDate"] = AttribInfo(L"clockViolLastDate",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionMajor"] = AttribInfo(L"versionMajor",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"versionMinor"] = AttribInfo(L"versionMinor",L"",L"");
+					map_class_base[L"L_SvrDtA"]->attribs[L"clockViolHistoryList"] = AttribInfo(L"clockViolHistoryList",L"",L"");
 					map_class_base[L"L_SvrDtA"]->attribs[L"lastTouchDate"] = AttribInfo(L"lastTouchDate",L"",L"");
 			}
 			

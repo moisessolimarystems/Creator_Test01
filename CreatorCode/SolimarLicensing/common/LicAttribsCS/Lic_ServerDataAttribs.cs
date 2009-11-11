@@ -18,7 +18,42 @@ namespace Solimar
 					;
 				}
 				
-				public class Lic_ServerDataFileInfoAttribs : LicensingAttribsBase
+				public class Lic_ClockViolationInfoAttribs : LicensingAttribsBase
+				{
+					public static string ClassName = "cV";
+					
+					public Lic_ClockViolationInfoAttribs() : 
+						base(ClassName)
+					{
+						;
+					}
+					
+					
+					public AttribsMemberDateTime fileDate = new AttribsMemberDateTime("fDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public AttribsMemberDateTime systemDate = new AttribsMemberDateTime("sDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+				
+				};
+				
+				public class AttribsMemberAttribsClass_Lic_ClockViolationInfoAttribs : AttribsMemberAttribsClass
+				{
+					public AttribsMemberAttribsClass_Lic_ClockViolationInfoAttribs(string keyName, Lic_ClockViolationInfoAttribs defaultVal) : 
+						base(keyName, defaultVal)
+					{
+						;
+					}
+					
+					public static implicit operator Lic_ClockViolationInfoAttribs(AttribsMemberAttribsClass_Lic_ClockViolationInfoAttribs t)
+					{
+						return (Lic_ClockViolationInfoAttribs)t.m_tVal;
+					}
+				
+					public Lic_ClockViolationInfoAttribs TVal
+					{
+						get {return this;}
+						set {m_tVal = (Object)value;}
+					}
+				}
+					public class Lic_ServerDataFileInfoAttribs : LicensingAttribsBase
 				{
 					public static string ClassName = "fi";
 					
@@ -59,12 +94,18 @@ namespace Solimar
 					
 				public class Lic_ServerDataFileInfoAttribsList : AttribsMemberGenericList {public Lic_ServerDataFileInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ServerDataFileInfoAttribs), defaultVal){;} }
 					
+				public class Lic_ClockViolationInfoAttribsList : AttribsMemberGenericList {public Lic_ClockViolationInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ClockViolationInfoAttribs), defaultVal){;} }
+					
 				public Lic_ServerDataFileInfoAttribsList fileInfoList = new Lic_ServerDataFileInfoAttribsList("fiLt", new ArrayList());
+				public Lic_ClockViolationInfoAttribsList clockViolHistoryList = new Lic_ClockViolationInfoAttribsList("cVLt", new ArrayList());
 				public AttribsMemberDWORD versionMajor = new AttribsMemberDWORD("vMj", 1);
 				public AttribsMemberDWORD versionMinor = new AttribsMemberDWORD("vMn", 0);
 				public AttribsMemberDWORD versionSubMajor = new AttribsMemberDWORD("vSMj", 0);
 				public AttribsMemberDWORD versionSubMinor = new AttribsMemberDWORD("vSMn", 0);
 				public AttribsMemberDateTime lastTouchDate = new AttribsMemberDateTime("lDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+				public AttribsMemberDWORD clockViolCount = new AttribsMemberDWORD("cVC", 0);
+				public AttribsMemberDateTime clockViolLastDate = new AttribsMemberDateTime("cVD", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+				public AttribsMemberBOOL bInClockViol = new AttribsMemberBOOL("iCV", false);
 			
 			};
 			
