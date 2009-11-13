@@ -836,6 +836,13 @@ public:
 				ttTypeCopyFromCustomerOnly = 6,
 				ttTypeArchiveOnly = 7,
 				ttTypePackageOnly = 8,
+				ttDomainName = 9,
+				ttOperatingSystem = 10,
+				ttPartOfDomain = 11,
+				ttSystemManufacturer = 12,
+				ttSystemModel = 13,
+				ttSystemType = 14,
+				ttSystemUuid = 15,
 			} TTokenType;
 			
 				
@@ -1052,7 +1059,9 @@ public:
 		SpdAttribs::DwordAttrib activationTotal;
 		SpdAttribs::DwordAttrib activationCurrent;
 		SpdAttribs::DwordAttrib activationAmountInDays;
+		SpdAttribs::BoolAttrib bActivationCurrentOverride;
 		SpdAttribs::WStringAttrib modifiedDate;
+		SpdAttribs::BoolAttrib bLicClockViolation;
 		Lic_ProductInfoAttribsList productList;
 		Lic_VerificationAttribs licVerificationAttribs;
 	
@@ -1069,7 +1078,9 @@ public:
 			activationTotal = c.activationTotal;
 			activationCurrent = c.activationCurrent;
 			activationAmountInDays = c.activationAmountInDays;
+			bActivationCurrentOverride = c.bActivationCurrentOverride;
 			modifiedDate = c.modifiedDate;
+			bLicClockViolation = c.bLicClockViolation;
 			productList = c.productList;
 			licVerificationAttribs = c.licVerificationAttribs;
 			return *this ;
@@ -1086,7 +1097,9 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", 0),
 			activationCurrent(m_mapAttribObjs, L"aC", 0),
 			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			bLicClockViolation(m_mapAttribObjs, L"lv", false),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", Lic_VerificationAttribs()){;}
 		
@@ -1101,7 +1114,9 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
 			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
 			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
+			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", c.licVerificationAttribs){;}
 		
@@ -1116,7 +1131,9 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", 0),
 			activationCurrent(m_mapAttribObjs, L"aC", 0),
 			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			bLicClockViolation(m_mapAttribObjs, L"lv", false),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", Lic_VerificationAttribs()){;}
 		
@@ -1131,7 +1148,9 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
 			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
 			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
+			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", c.licVerificationAttribs){;}
 		
@@ -1145,7 +1164,9 @@ public:
 			const SpdAttribs::DwordAttrib &param_activationTotal,
 			const SpdAttribs::DwordAttrib &param_activationCurrent,
 			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
+			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
+			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
 			const Lic_ProductInfoAttribsList &param_productList,
 			const Lic_VerificationAttribs &param_licVerificationAttribs) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
@@ -1158,7 +1179,9 @@ public:
 				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
 				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
 				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
+				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
+				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
 				productList(m_mapAttribObjs, L"pLt", param_productList),
 				licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", param_licVerificationAttribs){;}
 		
@@ -1172,7 +1195,9 @@ public:
 			const SpdAttribs::DwordAttrib &param_activationTotal,
 			const SpdAttribs::DwordAttrib &param_activationCurrent,
 			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
+			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
+			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
 			const Lic_ProductInfoAttribsList &param_productList,
 			const Lic_VerificationAttribs &param_licVerificationAttribs) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -1185,7 +1210,9 @@ public:
 				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
 				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
 				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
+				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
+				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
 				productList(m_mapAttribObjs, L"pLt", param_productList),
 				licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", param_licVerificationAttribs){;}
 		

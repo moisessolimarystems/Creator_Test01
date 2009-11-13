@@ -836,6 +836,13 @@ namespace Solimar
 							ttTypeCopyFromCustomerOnly = 6,
 							ttTypeArchiveOnly = 7,
 							ttTypePackageOnly = 8,
+							ttDomainName = 9,
+							ttOperatingSystem = 10,
+							ttPartOfDomain = 11,
+							ttSystemManufacturer = 12,
+							ttSystemModel = 13,
+							ttSystemType = 14,
+							ttSystemUuid = 15,
 						};
 						
 						public class AttribsMemberEnum_TTokenType : AttribsMemberEnum
@@ -885,6 +892,27 @@ namespace Solimar
 								m_MapAliasToEnum.Add("TypePackageOnly",TTokenType.ttTypePackageOnly);
 								m_MapEnumToAlias.Add(TTokenType.ttTypePackageOnly,"TypePackageOnly");
 								m_MapOrderingIndexToAlias.Add(9,"TypePackageOnly");
+								m_MapAliasToEnum.Add("DomainName",TTokenType.ttDomainName);
+								m_MapEnumToAlias.Add(TTokenType.ttDomainName,"DomainName");
+								m_MapOrderingIndexToAlias.Add(10,"DomainName");
+								m_MapAliasToEnum.Add("OperatingSystem",TTokenType.ttOperatingSystem);
+								m_MapEnumToAlias.Add(TTokenType.ttOperatingSystem,"OperatingSystem");
+								m_MapOrderingIndexToAlias.Add(11,"OperatingSystem");
+								m_MapAliasToEnum.Add("True",TTokenType.ttPartOfDomain);
+								m_MapEnumToAlias.Add(TTokenType.ttPartOfDomain,"True");
+								m_MapOrderingIndexToAlias.Add(12,"True");
+								m_MapAliasToEnum.Add("SystemManufacturer",TTokenType.ttSystemManufacturer);
+								m_MapEnumToAlias.Add(TTokenType.ttSystemManufacturer,"SystemManufacturer");
+								m_MapOrderingIndexToAlias.Add(13,"SystemManufacturer");
+								m_MapAliasToEnum.Add("SystemModel",TTokenType.ttSystemModel);
+								m_MapEnumToAlias.Add(TTokenType.ttSystemModel,"SystemModel");
+								m_MapOrderingIndexToAlias.Add(14,"SystemModel");
+								m_MapAliasToEnum.Add("SystemType",TTokenType.ttSystemType);
+								m_MapEnumToAlias.Add(TTokenType.ttSystemType,"SystemType");
+								m_MapOrderingIndexToAlias.Add(15,"SystemType");
+								m_MapAliasToEnum.Add("SystemUUID",TTokenType.ttSystemUuid);
+								m_MapEnumToAlias.Add(TTokenType.ttSystemUuid,"SystemUUID");
+								m_MapOrderingIndexToAlias.Add(16,"SystemUUID");
 								m_MapAliasToIndex.Add("None",0);
 								m_MapAliasToIndex.Add("HardwareKeyID",1);
 								m_MapAliasToIndex.Add("LicenseCode",2);
@@ -894,6 +922,13 @@ namespace Solimar
 								m_MapAliasToIndex.Add("TypeCopyCustOnly",6);
 								m_MapAliasToIndex.Add("TypeArchiveOnly",7);
 								m_MapAliasToIndex.Add("TypePackageOnly",8);
+								m_MapAliasToIndex.Add("DomainName",9);
+								m_MapAliasToIndex.Add("OperatingSystem",10);
+								m_MapAliasToIndex.Add("True",11);
+								m_MapAliasToIndex.Add("SystemManufacturer",12);
+								m_MapAliasToIndex.Add("SystemModel",13);
+								m_MapAliasToIndex.Add("SystemType",14);
+								m_MapAliasToIndex.Add("SystemUUID",15);
 								m_MapEnumToIndex.Add(TTokenType.ttNone,0);
 								m_MapEnumToIndex.Add(TTokenType.ttHardwareKeyID,1);
 								m_MapEnumToIndex.Add(TTokenType.ttLicenseCode,2);
@@ -903,6 +938,13 @@ namespace Solimar
 								m_MapEnumToIndex.Add(TTokenType.ttTypeCopyFromCustomerOnly,6);
 								m_MapEnumToIndex.Add(TTokenType.ttTypeArchiveOnly,7);
 								m_MapEnumToIndex.Add(TTokenType.ttTypePackageOnly,8);
+								m_MapEnumToIndex.Add(TTokenType.ttDomainName,9);
+								m_MapEnumToIndex.Add(TTokenType.ttOperatingSystem,10);
+								m_MapEnumToIndex.Add(TTokenType.ttPartOfDomain,11);
+								m_MapEnumToIndex.Add(TTokenType.ttSystemManufacturer,12);
+								m_MapEnumToIndex.Add(TTokenType.ttSystemModel,13);
+								m_MapEnumToIndex.Add(TTokenType.ttSystemType,14);
+								m_MapEnumToIndex.Add(TTokenType.ttSystemUuid,15);
 							}
 							
 						
@@ -1062,7 +1104,9 @@ namespace Solimar
 					public AttribsMemberDWORD activationTotal = new AttribsMemberDWORD("aT", 0);
 					public AttribsMemberDWORD activationCurrent = new AttribsMemberDWORD("aC", 0);
 					public AttribsMemberDWORD activationAmountInDays = new AttribsMemberDWORD("aA", 0);
+					public AttribsMemberBOOL bActivationCurrentOverride = new AttribsMemberBOOL("bAC", false);
 					public AttribsMemberDateTime modifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public AttribsMemberBOOL bLicClockViolation = new AttribsMemberBOOL("lv", false);
 					public Lic_ProductInfoAttribsList productList = new Lic_ProductInfoAttribsList("pLt", new ArrayList());
 					public AttribsMemberAttribsClass_Lic_VerificationAttribs licVerificationAttribs = new AttribsMemberAttribsClass_Lic_VerificationAttribs("lVA", new Lic_VerificationAttribs());
 				

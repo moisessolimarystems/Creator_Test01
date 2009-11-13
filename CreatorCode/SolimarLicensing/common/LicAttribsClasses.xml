@@ -223,7 +223,9 @@
 			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  
 			<attrib type="unsigned __int32" name="activationCurrent" tagname="aC" default="0"/>  
 			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/>  
+			<attrib type="bool" name="bActivationCurrentOverride" tagname="bAC" default="false"/>  
 			<attrib type="DateTime" name="modifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="bool" name="bLicClockViolation" tagname="lv" default="false" />
 			<typedef type="collection" name="Lic_ProductInfoAttribsList">
 			<List value_type="Lic_ProductInfoAttribs"/>
 			</typedef>
@@ -244,6 +246,13 @@
 					<enum name="ttTypeCopyFromCustomerOnly" value="6" alias="TypeCopyCustOnly"/>
 					<enum name="ttTypeArchiveOnly" value="7" alias="TypeArchiveOnly"/>
 					<enum name="ttTypePackageOnly" value="8" alias="TypePackageOnly"/>
+					<enum name="ttDomainName" value="9" alias="DomainName"/>
+					<enum name="ttOperatingSystem" value="10" alias="OperatingSystem"/>
+					<enum name="ttPartOfDomain" value="11" alias="True"/>
+					<enum name="ttSystemManufacturer" value="12" alias="SystemManufacturer"/>
+					<enum name="ttSystemModel" value="13" alias="SystemModel"/>
+					<enum name="ttSystemType" value="14" alias="SystemType"/>
+					<enum name="ttSystemUuid" value="15" alias="SystemUUID"/>
 				</typedef>
 				<attrib type="TTokenType" name="tokenType" tagname="tT" default="ttNone"/>
 				
@@ -284,6 +293,14 @@
 	
 	<AttribsClass code_class_name="Lic_ServerDataAttribs" name="L_SvrDtA" descriptive_name="License Server Data Attributes" base="" filename="Lic_ServerDataAttribs">
 	
+		<!-- Lic_ClockViolationInfoAttribs -->
+		<typedef type="class" name="Lic_ClockViolationInfoAttribs">
+			<AttribsClass code_class_name="Lic_ClockViolationInfoAttribs" name="cV" descriptive_name="Clock Violation Info Attributes" base="">
+				<attrib type="DateTime" name="fileDate" tagname="fDt" default="1900-01-01 00:00:00.0000"/>
+				<attrib type="DateTime" name="systemDate" tagname="sDt" default="1900-01-01 00:00:00.0000"/>
+			</AttribsClass>
+		</typedef>	
+	
 		<!-- Lic_ServerDataFileInfoAttribs -->
 		<typedef type="class" name="Lic_ServerDataFileInfoAttribs">
 			<AttribsClass code_class_name="Lic_ServerDataFileInfoAttribs" name="fi" descriptive_name="License Server Data File Info Attributes" base="">
@@ -299,12 +316,20 @@
 			<List value_type="Lic_ServerDataFileInfoAttribs"/>
 		</typedef>
 		<attrib type="Lic_ServerDataFileInfoAttribsList" name="fileInfoList" tagname="fiLt" default="" />
+		
+		<typedef type="collection" name="Lic_ClockViolationInfoAttribsList">
+			<List value_type="Lic_ClockViolationInfoAttribs"/>
+		</typedef>
+		<attrib type="Lic_ClockViolationInfoAttribsList" name="clockViolHistoryList" tagname="cVLt" default="" />
 	
 		<attrib type="unsigned __int32" name="versionMajor" tagname="vMj" default="1"/>
 		<attrib type="unsigned __int32" name="versionMinor" tagname="vMn" default="0"/>
 		<attrib type="unsigned __int32" name="versionSubMajor" tagname="vSMj" default="0"/>
 		<attrib type="unsigned __int32" name="versionSubMinor" tagname="vSMn" default="0"/>
 		<attrib type="DateTime" name="lastTouchDate" tagname="lDt" default="1900-01-01 00:00:00.0000"/>
+		<attrib type="unsigned __int32" name="clockViolCount" tagname="cVC" default="0"/>
+		<attrib type="DateTime" name="clockViolLastDate" tagname="cVD" default="1900-01-01 00:00:00.0000"/>
+		<attrib type="bool" name="bInClockViol" tagname="iCV" default="false" />
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_KeyAttribs" name="L_KyA" descriptive_name="License Key Attributes" base="" filename="Lic_KeyAttribs">
@@ -320,6 +345,13 @@
 		<attrib type="list(string)" name="computerNameList" tagname="cLt" default="" />
 		<attrib type="list(string)" name="macAddressList" tagname="mLt" default="" />
 		<attrib type="list(string)" name="biosSerialNumberList" tagname="bLt" default="" />
+		<attrib type="list(string)" name="domainNameList" tagname="dLt" default="" />
+		<attrib type="list(string)" name="operatingSystemList" tagname="osLt" default="" />
+		<attrib type="bool" name="bPartOFDomain" tagname="pD" default="true" />
+		<attrib type="list(string)" name="systemManufacturerList" tagname="sMFLt" default="" />
+		<attrib type="list(string)" name="systemModelList" tagname="sMLt" default="" />
+		<attrib type="list(string)" name="systemTypeList" tagname="sTLt" default="" />
+		<attrib type="list(string)" name="systemUuidList" tagname="sULt" default="" />
 	</AttribsClass>
 
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
