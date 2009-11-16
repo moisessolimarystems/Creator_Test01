@@ -74,7 +74,7 @@ namespace SolimarLicenseViewer
             this.linkLabel1.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(102)))), ((int)(((byte)(153)))));
             this.linkLabel1.Location = new System.Drawing.Point(418, 360);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(208, 16);
+            this.linkLabel1.Size = new System.Drawing.Size(235, 16);
             this.linkLabel1.TabIndex = 1;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "ftp://downloads.solimarsystems.com";
@@ -88,7 +88,7 @@ namespace SolimarLicenseViewer
             this.linkWebsite.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(102)))), ((int)(((byte)(153)))));
             this.linkWebsite.Location = new System.Drawing.Point(418, 344);
             this.linkWebsite.Name = "linkWebsite";
-            this.linkWebsite.Size = new System.Drawing.Size(208, 16);
+            this.linkWebsite.Size = new System.Drawing.Size(235, 16);
             this.linkWebsite.TabIndex = 0;
             this.linkWebsite.TabStop = true;
             this.linkWebsite.Text = "http://www.solimarsystems.com";
@@ -152,7 +152,7 @@ namespace SolimarLicenseViewer
             this.linkTechSupport.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(102)))), ((int)(((byte)(153)))));
             this.linkTechSupport.Location = new System.Drawing.Point(418, 376);
             this.linkTechSupport.Name = "linkTechSupport";
-            this.linkTechSupport.Size = new System.Drawing.Size(208, 16);
+            this.linkTechSupport.Size = new System.Drawing.Size(235, 16);
             this.linkTechSupport.TabIndex = 2;
             this.linkTechSupport.TabStop = true;
             this.linkTechSupport.Text = "tech.support@solimarsystems.com";
@@ -166,7 +166,7 @@ namespace SolimarLicenseViewer
             this.linkSales.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(102)))), ((int)(((byte)(153)))));
             this.linkSales.Location = new System.Drawing.Point(418, 392);
             this.linkSales.Name = "linkSales";
-            this.linkSales.Size = new System.Drawing.Size(208, 16);
+            this.linkSales.Size = new System.Drawing.Size(235, 16);
             this.linkSales.TabIndex = 3;
             this.linkSales.TabStop = true;
             this.linkSales.Text = "sales@solimarsystems.com";
