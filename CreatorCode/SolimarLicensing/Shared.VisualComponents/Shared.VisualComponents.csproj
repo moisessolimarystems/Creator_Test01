@@ -62,6 +62,7 @@
     <Compile Include="LicenseInfoViewerControl.Designer.cs">
       <DependentUpon>LicenseInfoViewerControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="ListViewHelper.cs" />
     <Compile Include="ListView_Scroll.cs">
       <SubType>Component</SubType>
     </Compile>

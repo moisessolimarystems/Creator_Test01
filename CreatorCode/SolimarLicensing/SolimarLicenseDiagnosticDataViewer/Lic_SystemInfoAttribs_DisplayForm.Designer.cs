@@ -29,128 +29,31 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.outerSplitContainer = new System.Windows.Forms.SplitContainer();
-			this.computerNameListView = new Shared.VisualComponents.NoFlickerListView();
-			this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-			this.macAddressListView = new Shared.VisualComponents.NoFlickerListView();
-			this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-			this.biosSerialNumberListView = new Shared.VisualComponents.NoFlickerListView();
-			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.headerPanel = new System.Windows.Forms.Panel();
 			this.licenseServerVersionLabel = new System.Windows.Forms.Label();
 			this.licenseServerVersionTitleLabel = new System.Windows.Forms.Label();
-			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.outerSplitContainer.Panel1.SuspendLayout();
-			this.outerSplitContainer.Panel2.SuspendLayout();
-			this.outerSplitContainer.SuspendLayout();
-			this.splitContainer2.Panel1.SuspendLayout();
-			this.splitContainer2.Panel2.SuspendLayout();
-			this.splitContainer2.SuspendLayout();
-			this.headerPanel.SuspendLayout();
+			this.valTokenListView = new Shared.VisualComponents.NoFlickerListView();
+			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
 			this.contextMenuStrip1.SuspendLayout();
+			this.headerPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// outerSplitContainer
+			// contextMenuStrip1
 			// 
-			this.outerSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.outerSplitContainer.Location = new System.Drawing.Point(0, 31);
-			this.outerSplitContainer.Name = "outerSplitContainer";
+			this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem});
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size(103, 26);
+			this.contextMenuStrip1.Click += new System.EventHandler(this.contextMenuStrip1_Click);
 			// 
-			// outerSplitContainer.Panel1
+			// copyToolStripMenuItem
 			// 
-			this.outerSplitContainer.Panel1.Controls.Add(this.computerNameListView);
-			// 
-			// outerSplitContainer.Panel2
-			// 
-			this.outerSplitContainer.Panel2.Controls.Add(this.splitContainer2);
-			this.outerSplitContainer.Size = new System.Drawing.Size(364, 122);
-			this.outerSplitContainer.SplitterDistance = 113;
-			this.outerSplitContainer.TabIndex = 0;
-			// 
-			// computerNameListView
-			// 
-			this.computerNameListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
-			this.computerNameListView.ContextMenuStrip = this.contextMenuStrip1;
-			this.computerNameListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.computerNameListView.FullRowSelect = true;
-			this.computerNameListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.computerNameListView.HideSelection = false;
-			this.computerNameListView.Location = new System.Drawing.Point(0, 0);
-			this.computerNameListView.Name = "computerNameListView";
-			this.computerNameListView.Size = new System.Drawing.Size(113, 122);
-			this.computerNameListView.TabIndex = 1;
-			this.computerNameListView.UseCompatibleStateImageBehavior = false;
-			this.computerNameListView.View = System.Windows.Forms.View.Details;
-			this.computerNameListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
-			// 
-			// columnHeader1
-			// 
-			this.columnHeader1.Text = "Computer Name";
-			this.columnHeader1.Width = 103;
-			// 
-			// splitContainer2
-			// 
-			this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-			this.splitContainer2.Name = "splitContainer2";
-			// 
-			// splitContainer2.Panel1
-			// 
-			this.splitContainer2.Panel1.Controls.Add(this.macAddressListView);
-			// 
-			// splitContainer2.Panel2
-			// 
-			this.splitContainer2.Panel2.Controls.Add(this.biosSerialNumberListView);
-			this.splitContainer2.Size = new System.Drawing.Size(247, 122);
-			this.splitContainer2.SplitterDistance = 112;
-			this.splitContainer2.TabIndex = 0;
-			// 
-			// macAddressListView
-			// 
-			this.macAddressListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader2});
-			this.macAddressListView.ContextMenuStrip = this.contextMenuStrip1;
-			this.macAddressListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.macAddressListView.FullRowSelect = true;
-			this.macAddressListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.macAddressListView.HideSelection = false;
-			this.macAddressListView.Location = new System.Drawing.Point(0, 0);
-			this.macAddressListView.Name = "macAddressListView";
-			this.macAddressListView.Size = new System.Drawing.Size(112, 122);
-			this.macAddressListView.TabIndex = 2;
-			this.macAddressListView.UseCompatibleStateImageBehavior = false;
-			this.macAddressListView.View = System.Windows.Forms.View.Details;
-			this.macAddressListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
-			// 
-			// columnHeader2
-			// 
-			this.columnHeader2.Text = "MAC Address";
-			this.columnHeader2.Width = 101;
-			// 
-			// biosSerialNumberListView
-			// 
-			this.biosSerialNumberListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3});
-			this.biosSerialNumberListView.ContextMenuStrip = this.contextMenuStrip1;
-			this.biosSerialNumberListView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.biosSerialNumberListView.FullRowSelect = true;
-			this.biosSerialNumberListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.biosSerialNumberListView.HideSelection = false;
-			this.biosSerialNumberListView.Location = new System.Drawing.Point(0, 0);
-			this.biosSerialNumberListView.Name = "biosSerialNumberListView";
-			this.biosSerialNumberListView.Size = new System.Drawing.Size(131, 122);
-			this.biosSerialNumberListView.TabIndex = 3;
-			this.biosSerialNumberListView.UseCompatibleStateImageBehavior = false;
-			this.biosSerialNumberListView.View = System.Windows.Forms.View.Details;
-			this.biosSerialNumberListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
-			// 
-			// columnHeader3
-			// 
-			this.columnHeader3.Text = "BIOS Serial Number";
-			this.columnHeader3.Width = 118;
+			this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+			this.copyToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+			this.copyToolStripMenuItem.Text = "Copy";
 			// 
 			// headerPanel
 			// 
@@ -181,57 +84,61 @@
 			this.licenseServerVersionTitleLabel.TabIndex = 0;
 			this.licenseServerVersionTitleLabel.Text = "License Server Version:";
 			// 
-			// contextMenuStrip1
+			// valTokenListView
 			// 
-			this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.copyToolStripMenuItem});
-			this.contextMenuStrip1.Name = "contextMenuStrip1";
-			this.contextMenuStrip1.Size = new System.Drawing.Size(103, 26);
-			this.contextMenuStrip1.Click += new System.EventHandler(this.contextMenuStrip1_Click);
+			this.valTokenListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader4,
+            this.columnHeader5});
+			this.valTokenListView.ContextMenuStrip = this.contextMenuStrip1;
+			this.valTokenListView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.valTokenListView.FullRowSelect = true;
+			this.valTokenListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.valTokenListView.HideSelection = false;
+			this.valTokenListView.Location = new System.Drawing.Point(0, 31);
+			this.valTokenListView.Name = "valTokenListView";
+			this.valTokenListView.Size = new System.Drawing.Size(364, 243);
+			this.valTokenListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			this.valTokenListView.TabIndex = 2;
+			this.valTokenListView.UseCompatibleStateImageBehavior = false;
+			this.valTokenListView.View = System.Windows.Forms.View.Details;
+			this.valTokenListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
 			// 
-			// copyToolStripMenuItem
+			// columnHeader4
 			// 
-			this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-			this.copyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.copyToolStripMenuItem.Text = "Copy";
+			this.columnHeader4.Text = "Validation Token";
+			this.columnHeader4.Width = 157;
+			// 
+			// columnHeader5
+			// 
+			this.columnHeader5.Text = "Validation Value";
+			this.columnHeader5.Width = 194;
 			// 
 			// Lic_SystemInfoAttribs_DisplayForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(364, 153);
-			this.Controls.Add(this.outerSplitContainer);
+			this.ClientSize = new System.Drawing.Size(364, 274);
+			this.Controls.Add(this.valTokenListView);
 			this.Controls.Add(this.headerPanel);
 			this.Name = "Lic_SystemInfoAttribs_DisplayForm";
 			this.ShowIcon = false;
 			this.Text = "Lic_SystemInfoAttribs";
-			this.outerSplitContainer.Panel1.ResumeLayout(false);
-			this.outerSplitContainer.Panel2.ResumeLayout(false);
-			this.outerSplitContainer.ResumeLayout(false);
-			this.splitContainer2.Panel1.ResumeLayout(false);
-			this.splitContainer2.Panel2.ResumeLayout(false);
-			this.splitContainer2.ResumeLayout(false);
+			this.contextMenuStrip1.ResumeLayout(false);
 			this.headerPanel.ResumeLayout(false);
 			this.headerPanel.PerformLayout();
-			this.contextMenuStrip1.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 
 		#endregion
 
-		private System.Windows.Forms.SplitContainer outerSplitContainer;
-		private System.Windows.Forms.SplitContainer splitContainer2;
-		private Shared.VisualComponents.NoFlickerListView computerNameListView;
-		private System.Windows.Forms.ColumnHeader columnHeader1;
-		private Shared.VisualComponents.NoFlickerListView macAddressListView;
-		private System.Windows.Forms.ColumnHeader columnHeader2;
-		private Shared.VisualComponents.NoFlickerListView biosSerialNumberListView;
-		private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.Panel headerPanel;
-        private System.Windows.Forms.Label licenseServerVersionLabel;
-        private System.Windows.Forms.Label licenseServerVersionTitleLabel;
+		private System.Windows.Forms.Panel headerPanel;
+		private System.Windows.Forms.Label licenseServerVersionLabel;
+		private System.Windows.Forms.Label licenseServerVersionTitleLabel;
 		private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
 		private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+		private Shared.VisualComponents.NoFlickerListView valTokenListView;
+		private System.Windows.Forms.ColumnHeader columnHeader4;
+		private System.Windows.Forms.ColumnHeader columnHeader5;
 	}
 }

@@ -13,7 +13,9 @@ class LicenseCacheByProduct
 		~LicenseCacheByProduct();
 
 		HRESULT GetCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
-		HRESULT RefreshCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
+
+		// bLicSvrClockViolation is true when the current system time is before the last touch time, user has set their system clock backwards in time.
+		HRESULT RefreshCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo, bool bLicSvrClockViolation);
 		HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pSoftwareSpec);
 		HRESULT ClearCache_Totals();
 
@@ -91,7 +93,7 @@ class LicenseCache
 		HRESULT GetApplicationInstanceList(long productID, BSTR licenseID, BSTR *pBstrListAppInstStream);
 		
 
-		HRESULT RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList);
+		HRESULT RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation);
 		HRESULT GetCache_ByProduct(long productID, Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
 		HRESULT GetCache(Lic_PackageAttribs::Lic_LicenseInfoAttribs* pLicInfo);
 		HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec);

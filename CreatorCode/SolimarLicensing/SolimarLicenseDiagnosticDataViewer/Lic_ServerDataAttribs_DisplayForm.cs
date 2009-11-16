@@ -28,6 +28,10 @@ namespace SolimarLicenseDiagnosticDataViewer
 				lastTouchLabel.Text = _data.lastTouchDate.TVal.ToLocalTime().ToString();
 				versionLabel.Text = string.Format("{0}.{1}.{2}.{3}", _data.versionMajor, _data.versionMinor, _data.versionSubMajor, _data.versionSubMinor);
 
+				inClockViolLabel.Text = _data.bInClockViol.TVal == true ? "True" : "False";
+				clockViolCountLabel.Text = _data.clockViolCount.TVal.ToString();
+				lastClockViolationLabel.Text = ((DateTime.Compare(new DateTime(1900, 1, 1), _data.clockViolLastDate.TVal)) != 0) ? _data.clockViolLastDate.TVal.ToLocalTime().ToString() : "Never Had Violation.";
+
 				noFlickerListView1.BeginUpdate();
 				noFlickerListView1.Items.Clear();
 				foreach (Lic_ServerDataAttribs.Lic_ServerDataFileInfoAttribs tmpSvrFileInfoAttribs in _data.fileInfoList.TVal)
@@ -42,6 +46,17 @@ namespace SolimarLicenseDiagnosticDataViewer
 				}
 				noFlickerListView1.EndUpdate();
 
+				clockViolationsListView.BeginUpdate();
+				clockViolationsListView.Items.Clear();
+				foreach (Lic_ServerDataAttribs.Lic_ClockViolationInfoAttribs tmpClockViolInfoAttribs in _data.clockViolHistoryList.TVal)
+				{
+					ListViewItem lvi = new ListViewItem();
+					lvi.Text = tmpClockViolInfoAttribs.fileDate.TVal.ToLocalTime().ToString();
+					lvi.SubItems.Add(tmpClockViolInfoAttribs.systemDate.TVal.ToLocalTime().ToString());
+					lvi.SubItems.Add(tmpClockViolInfoAttribs.fileDate.TVal.Subtract(tmpClockViolInfoAttribs.systemDate.TVal).ToString());
+					clockViolationsListView.Items.Add(lvi);
+				}
+				clockViolationsListView.EndUpdate();
 			}
 		}
 
@@ -121,6 +136,5 @@ namespace SolimarLicenseDiagnosticDataViewer
 			return copyStrBuilder.ToString();
 		}
 
-		
 	}
 }

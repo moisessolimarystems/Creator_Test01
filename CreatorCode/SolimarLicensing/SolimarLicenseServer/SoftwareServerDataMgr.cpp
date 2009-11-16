@@ -6,6 +6,7 @@
 #include "..\common\CryptoAndFlateHelper.h"
 #include "..\common\SafeMutex.h"
 #include "..\common\TimeHelper.h"
+#include "SoftwareServerInstance.h"	// For g_licenseController
 #include <shlobj.h> //For SHGetFolderPath
 #include <shlwapi.h> //For PathAppend
 #include <math.h>			//For abs
@@ -177,23 +178,130 @@ HRESULT SoftwareServerDataMgr::Touch()
 			throw hr;
 
 		time_t timeNowTimeT = time(NULL);	//Retrieves Universal Time
-		double timeDiffSeconds = difftime(lastTouchDateTimeT, timeNowTimeT);
-		if(abs(timeDiffSeconds) > (60.0*5))		//Don't touch if have touched within last 5 minutes...
+		double timeDiffSeconds = difftime(timeNowTimeT, lastTouchDateTimeT);
+		bool bUpdateLastTouch(false);
+		bool bEnterClockViolation(false);
+		bool bLeaveClockViolation(false);
+		bool bLogWarning_ClockViolation(false);
+		bool bSaveToFile(true);
+
+		if(timeDiffSeconds > (60.0 * 5))
 		{
-			lastTouchDateTimeT = timeNowTimeT;
+			//Don't touch if have touched within last 5 minutes...
+			bUpdateLastTouch = true;
+			if(pServerDataAttribs->bInClockViol == true)
+				bLeaveClockViolation = true;
+
+			if(pServerDataAttribs->clockViolCount > 0)
+			{
+				//double timeDiffSeconds = difftime(timeNowTimeT, lastTouchDateTimeT);
+				SYSTEMTIME lastClockViolationDateSystime;
+				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pServerDataAttribs->clockViolLastDate)).c_str(), lastClockViolationDateSystime))
+					throw(E_FAIL);
+				_variant_t lastClockViolationDateVt(NULL);	
+				if (!SystemTimeToVariantTime(&lastClockViolationDateSystime, &lastClockViolationDateVt.date)) 
+					throw(E_FAIL);
+				time_t lastClockViolationDateTimeT = TimeHelper::VariantToTimeT(lastClockViolationDateVt, false);
+				if(difftime(timeNowTimeT, lastClockViolationDateTimeT) >= (60.0 * 60 * 24 * 60))
+				{
+					//if it has been 60 days since last clock violation, clear all clockViolationWarnings
+					pServerDataAttribs->clockViolCount = 0;
+					pServerDataAttribs->clockViolHistoryList->clear();
+				}
+			}
+		}
+		else if(timeDiffSeconds < (60.0 * -30) && timeDiffSeconds > (60.0 * 60.0 * -6))
+		{
+			//timeDiffSeconds is in the range greater than -6 hours, but less than -30 minutes
+			bUpdateLastTouch = true;
+			
+			if(pServerDataAttribs->bInClockViol == false)
+			{
+				pServerDataAttribs->clockViolCount = pServerDataAttribs->clockViolCount + 1;
+
+				//if current violation warnings counter is >= 3, go into violation
+				if(pServerDataAttribs->clockViolCount >= 3)
+					bEnterClockViolation = true;
+				else
+					bLogWarning_ClockViolation = true;
+			}
+			else if(pServerDataAttribs->bInClockViol == true)
+				bLeaveClockViolation = true;
+		}
+		else if(timeDiffSeconds < (60.0 * 60.0 * -6))
+		{
+			//timeDiffSeconds is in the range less than -6 hours
+			if(pServerDataAttribs->bInClockViol == false)
+				bEnterClockViolation = true;
+
+			//if not in violation, go into violation
+			bUpdateLastTouch = false;
+		}
+		else
+		{
+			bSaveToFile = false;
+		}
+
+
+		if(bEnterClockViolation == true || bLogWarning_ClockViolation == true)
+		{
+			bSaveToFile = true;
+			Lic_ServerDataAttribs::Lic_ClockViolationInfoAttribs clockViolationInfoAttribs;
+
+			clockViolationInfoAttribs.fileDate = pServerDataAttribs->lastTouchDate;
 			_variant_t vtCurTime;
-			vtCurTime = TimeHelper::TimeTToVariant(timeNowTimeT, true);
+			vtCurTime = TimeHelper::TimeTToVariant(timeNowTimeT, false);
+			SYSTEMTIME curTimeSystime;
+			VariantTimeToSystemTime(vtCurTime.date, &curTimeSystime);
+			wchar_t curTimeStamp[256];
+			TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
+			clockViolationInfoAttribs.systemDate = std::wstring(curTimeStamp);
+
+			pServerDataAttribs->clockViolLastDate = std::wstring(curTimeStamp);
+			pServerDataAttribs->clockViolHistoryList->push_back(clockViolationInfoAttribs);
+		}
+		if(bEnterClockViolation == true)
+		{
+			bSaveToFile = true;
+			pServerDataAttribs->bInClockViol = true;
+			//Cycle through all the license info objects, update so they are in violation
+
+			g_licenseController.GenerateMessage(L"License Server", MT_ERROR, S_OK, time(0), MessageGeneric, L"Error - License Server has entered Clock Violation Period, please contact Solimar Systems, Inc. for assistance.");
+		}
+		else if(bLeaveClockViolation == true)
+		{
+			bSaveToFile = true;
+			pServerDataAttribs->bInClockViol = false;
+
+			//Cycle through all the license info objects, update so they are out of violation
+
+			g_licenseController.GenerateMessage(L"License Server", MT_INFO, S_OK, time(0), MessageGeneric, L"Information - License Server has left Clock Violation Period");
+		}
+
+		if(bLogWarning_ClockViolation == true)	//Log to message scheme
+		{
+			g_licenseController.GenerateMessage(L"License Server", MT_WARNING, S_OK, time(0), MessageGeneric, L"Warning - License Server has detected a Clock Violation Warning");
+		}
+
+		if(bUpdateLastTouch == true)
+		{
+			_variant_t vtCurTime;
+			//vtCurTime = TimeHelper::TimeTToVariant(timeNowTimeT, true);
+			vtCurTime = TimeHelper::TimeTToVariant(timeNowTimeT, false);
 			SYSTEMTIME curTimeSystime;
 			VariantTimeToSystemTime(vtCurTime.date, &curTimeSystime);
 			wchar_t curTimeStamp[256];
 			TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
 			pServerDataAttribs->lastTouchDate = std::wstring(curTimeStamp);
-
+			lastTouchDateTimeT = timeNowTimeT;
+			bSaveToFile = true;
+		}
+		if(bSaveToFile == true)
+		{
 			hr = SaveToFile();
 			if(FAILED(hr))
 				throw hr;
 		}
-
 
 		//SYSTEMTIME currentSystime;
 		//GetSystemTime(&currentSystime);
@@ -331,6 +439,15 @@ HRESULT SoftwareServerDataMgr::LoadFromFile()
 		if(bstrSoftwareStream != NULL)
 		{
 			pServerDataAttribs->InitFromString(bstrSoftwareStream);
+			
+			SYSTEMTIME lastTouchDateSystime;
+			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pServerDataAttribs->lastTouchDate)).c_str(), lastTouchDateSystime))
+				throw(E_FAIL);
+			_variant_t vtLastTouchExpiresDate(NULL);	
+			if (!SystemTimeToVariantTime(&lastTouchDateSystime, &vtLastTouchExpiresDate.date)) 
+				throw(E_FAIL);
+			lastTouchDateTimeT = TimeHelper::VariantToTimeT(vtLastTouchExpiresDate, false);
+
 			SysFreeString(bstrSoftwareStream);	//Clean up
 		}
 

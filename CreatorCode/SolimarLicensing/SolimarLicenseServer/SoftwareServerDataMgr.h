@@ -12,6 +12,7 @@ class SoftwareServerDataMgr
 		HRESULT SetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pFileInfo);
 
 		HRESULT Touch();
+		bool InClockViolation() { return (pServerDataAttribs!=NULL) ? pServerDataAttribs->bInClockViol: true;}
 
 		// Up to caller to free pBstrSoftwareStream
 		HRESULT GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream);

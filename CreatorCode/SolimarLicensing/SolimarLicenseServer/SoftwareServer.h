@@ -89,6 +89,9 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//Use a cache of the streamed version of the License Info because large License Infos take a long time to convert from an object to a stream
 		std::map<std::wstring/*SW Lic Name*/, std::pair<std::wstring/*Last Touched Date*/, std::wstring/*SW Lic Streamed*/>> swLicStreamedCacheMap;
 
+		//Use to determine if the cache sent a violation license info object or not
+		std::map<std::wstring/*SW Lic Name*/, bool/*bClockViolation*/> swLicClockViolationMap;
+
 		RainbowDriver* pRainbowDriver;
 		bool bFirstTime;
 

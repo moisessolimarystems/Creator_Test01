@@ -21,19 +21,70 @@ namespace SolimarLicenseDiagnosticDataViewer
 		{
 			if (_data != null)
 			{
-                licenseServerVersionLabel.Text = _data.licenseServerVersion.TVal;
-
-				computerNameListView.Items.Clear();
+				licenseServerVersionLabel.Text = _data.licenseServerVersion.TVal;
+				valTokenListView.Items.Clear();
+				ListViewItem lvi = null;
 				foreach (string computerName in _data.computerNameList.TVal)
-					computerNameListView.Items.Add(computerName.ToLower());
-				
-				macAddressListView.Items.Clear();
+				{
+					lvi = new ListViewItem("Computer Name");
+					lvi.SubItems.Add(computerName.ToLower());
+					valTokenListView.Items.Add(lvi);
+				}
 				foreach (string macAddress in _data.macAddressList.TVal)
-					macAddressListView.Items.Add(macAddress);
-
-				biosSerialNumberListView.Items.Clear();
+				{
+					lvi = new ListViewItem("Mac Address");
+					lvi.SubItems.Add(macAddress);
+					valTokenListView.Items.Add(lvi);
+				}
 				foreach (string biosSerialNumber in _data.biosSerialNumberList.TVal)
-					biosSerialNumberListView.Items.Add(biosSerialNumber);
+				{
+					lvi = new ListViewItem("Bios Serial Number");
+					lvi.SubItems.Add(biosSerialNumber);
+					valTokenListView.Items.Add(lvi);
+				}
+
+				foreach (string os in _data.operatingSystemList.TVal)
+				{
+					lvi = new ListViewItem("Operating System");
+					lvi.SubItems.Add(os);
+					valTokenListView.Items.Add(lvi);
+				}
+				foreach (string sysManufacturer in _data.systemManufacturerList.TVal)
+				{
+					lvi = new ListViewItem("System Manufacturer");
+					lvi.SubItems.Add(sysManufacturer);
+					valTokenListView.Items.Add(lvi);
+				}
+				foreach (string sysModel in _data.systemModelList.TVal)
+				{
+					lvi = new ListViewItem("System Model");
+					lvi.SubItems.Add(sysModel);
+					valTokenListView.Items.Add(lvi);
+				}
+				foreach (string sysType in _data.systemTypeList.TVal)
+				{
+					lvi = new ListViewItem("System Type");
+					lvi.SubItems.Add(sysType);
+					valTokenListView.Items.Add(lvi);
+				}
+				foreach (string sysUUID in _data.systemUuidList.TVal)
+				{
+					lvi = new ListViewItem("System UUID");
+					lvi.SubItems.Add(sysUUID);
+					valTokenListView.Items.Add(lvi);
+				}
+				foreach (string domain in _data.domainNameList.TVal)
+				{
+					lvi = new ListViewItem("Domain");
+					lvi.SubItems.Add(domain);
+					valTokenListView.Items.Add(lvi);
+				}
+
+				lvi = new ListViewItem("Part of Domain");
+				lvi.SubItems.Add(_data.bPartOFDomain.TVal.ToString());
+				valTokenListView.Items.Add(lvi);
+
+				Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(valTokenListView);
 			}
 		}
 

@@ -66,7 +66,7 @@ HRESULT LicenseCacheByProduct::GetCache(Lic_PackageAttribs::Lic_ProductInfoAttri
 	}
 	return hr;
 }
-HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo)
+HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo, bool bLicSvrClockViolation)
 {
 	HRESULT hr(S_OK);
 	SafeMutex mutex(licenseUseCacheByProductLock);
@@ -114,9 +114,9 @@ HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoA
 			// ignore expiration date if it equals 1900/1/1
 			if(moduleExpiresDateTimeT != emptyExpiresDateTimeT)
 			{
-				// only add licensing to cache if the current date is below the expiration date
+				// only add licensing to cache if the current date is below the expiration date and no lic svr clock violation
 				time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-				if(currentTimeDateTimeT > moduleExpiresDateTimeT)
+				if(bLicSvrClockViolation || (currentTimeDateTimeT > moduleExpiresDateTimeT))
 				{
 					bAddToCache = false;
 				}
@@ -768,7 +768,7 @@ HRESULT LicenseCache::GetApplicationInstanceList(long productID, BSTR licenseID,
 }
 
 
-HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList)
+HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation)
 {
 	HRESULT hr(S_OK);
 
@@ -786,29 +786,47 @@ HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfo
 			licInfoAttribIt != pLicInfoList->end();
 			licInfoAttribIt++)
 	{
-		for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = (*licInfoAttribIt)->productList->begin();
-			prodIt != (*licInfoAttribIt)->productList->end();
-			prodIt++)
+		SYSTEMTIME activationExpirationDateSystime;
+		if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj((*licInfoAttribIt)->activationExpirationDate)).c_str(), activationExpirationDateSystime))
+			continue;
+		_variant_t vtActivationExpirationDate(NULL);	
+		if (!SystemTimeToVariantTime(&activationExpirationDateSystime, &vtActivationExpirationDate.date)) 
+			continue;
+		time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
+		time_t emptyExpiresDateTimeT = time_t(-1);
+
+		// if expiration date == 1900/1/1 && total == 0 && activation in days == 0, this is standard licensing, non licensing activation or expiring type
+		bool bExpiringLicense = (!((*licInfoAttribIt)->activationTotal == 0 && 
+			(*licInfoAttribIt)->activationAmountInDays == 0 &&
+			activationExpirationDateTimeT == emptyExpiresDateTimeT));
+
+		//If in bLicSvrClockViolation, only add product licenses to cache if the license info is a non-expiring type
+		if(!bLicSvrClockViolation || (bLicSvrClockViolation && !bExpiringLicense))
 		{
-			//Add new item if needed.
-			if(productCacheMap.find((*prodIt).productID) == productCacheMap.end())
-				productCacheMap[(*prodIt).productID] = new LicenseCacheByProduct();
-				//productCacheMap.insert(std::map<int,LicenseCacheByProduct*>::value_type((*prodIt).productID), new LicenseCacheByProduct()));
+			for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = (*licInfoAttribIt)->productList->begin();
+				prodIt != (*licInfoAttribIt)->productList->end();
+				prodIt++)
+			{
+				//Add new item if needed.
+				if(productCacheMap.find((*prodIt).productID) == productCacheMap.end())
+					productCacheMap[(*prodIt).productID] = new LicenseCacheByProduct();
+					//productCacheMap.insert(std::map<int,LicenseCacheByProduct*>::value_type((*prodIt).productID), new LicenseCacheByProduct()));
 
-			productCacheMap[(*prodIt).productID]->RefreshCache(&(*prodIt));
-			//productCacheMap[(*prodIt).productID].RefreshCache(&(*prodIt));
+				productCacheMap[(*prodIt).productID]->RefreshCache(&(*prodIt), bLicSvrClockViolation);
+				//productCacheMap[(*prodIt).productID].RefreshCache(&(*prodIt));
 
-			//LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find((*prodIt).productID);
-			//if(prodCacheMapIt != productCacheMap.end())	//Found existing product
-			//{
-			//	hr = prodCacheMapIt->second->RefreshCache(*prodIt);
-			//}
-			//else	//add new product
-			//{
-			//}
-			
-			//int x = (*prodIt).productID;
-			//productCacheMap[(*prodIt).productID].RefreshCache(*prodIt);
+				//LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find((*prodIt).productID);
+				//if(prodCacheMapIt != productCacheMap.end())	//Found existing product
+				//{
+				//	hr = prodCacheMapIt->second->RefreshCache(*prodIt);
+				//}
+				//else	//add new product
+				//{
+				//}
+				
+				//int x = (*prodIt).productID;
+				//productCacheMap[(*prodIt).productID].RefreshCache(*prodIt);
+			}
 		}
 
 		//Lic_LicenseInfoAttribs* pTmp = *licInfoAttribIt;

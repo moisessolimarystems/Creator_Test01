@@ -33,10 +33,6 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Solimar.Licensing.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\Solimar.Licensing.Common.dll</HintPath>
-    </Reference>
     <Reference Include="Solimar.Licensing.LicenseManagerWrapper, Version=9.9.9.9, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Image\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
@@ -193,6 +189,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\common\Solimar.Licensing.Common.csproj">
+      <Project>{8FB109FF-36E9-4A3F-A2D6-9DE37EFA2C78}</Project>
+      <Name>Solimar.Licensing.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shared.VisualComponents\Shared.VisualComponents.csproj">
       <Project>{1B63AAE8-F2DF-4495-A7E1-2277ED836BF1}</Project>
       <Name>Shared.VisualComponents</Name>

@@ -27,43 +27,124 @@ namespace ValidationTokenRetriever
 
 		private void RefreshState()
 		{
+			m_vData = new SolimarValidationData();
+			StringBuilder errorStrBuilder = new StringBuilder();
+
 			try
 			{
-				compNameTextBox.Text = FindComputerName();
+				m_vData.DomainName = FindDomain();
 			}
 			catch (Exception exc)
 			{
-				globalErrorProvider.SetError(compNameTextBox, exc.Message);
-			}
-			
-			try
-			{
-				macTextBox.Text = FindMACAddress();
-			}
-			catch (Exception exc)
-			{
-				globalErrorProvider.SetError(macTextBox, exc.Message);
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
 			}
 
 			try
 			{
-				uuidTextBox.Text = FindSystemUuid();
+				m_vData.PartOfDomain = FindPartOfDomain();
 			}
 			catch (Exception exc)
 			{
-				globalErrorProvider.SetError(uuidTextBox, exc.Message);
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
 			}
 
 			try
 			{
-				biosTextBox.Text = FindBiosSerialNumber();
+				m_vData.ComputerName = FindComputerName();
 			}
 			catch (Exception exc)
 			{
-				globalErrorProvider.SetError(biosTextBox, exc.Message);
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
 			}
+
+			try
+			{
+				m_vData.macAddress = FindMACAddress();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			try
+			{
+				m_vData.SystemUUID = FindSystemUuid();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			try
+			{
+				m_vData.BiosSerialNumber = FindBiosSerialNumber();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			try
+			{
+				m_vData.SystemManufacturer = FindSystemManufacturer();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			try
+			{
+				m_vData.SystemModel = FindSystemModel();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			try
+			{
+				m_vData.SystemType = FindSystemType();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+			try
+			{
+				m_vData.OperatingSystem = FindOperatingSystem();
+			}
+			catch (Exception exc)
+			{
+				if (errorStrBuilder.Length > 0)
+					errorStrBuilder.Append("\r\n");
+				errorStrBuilder.Append(exc.Message);
+			}
+
+			propertyGrid1.SelectedObject = m_vData;
+			if (errorStrBuilder.Length > 0)
+				globalErrorProvider.SetError(propertyGrid1, errorStrBuilder.ToString());
+			this.ActiveControl = companyTextBox;
 		}
-
+		private SolimarValidationData m_vData = null;
 		private string FindComputerName()
 		{
 			return System.Environment.MachineName.ToLower();
@@ -86,7 +167,7 @@ namespace ValidationTokenRetriever
 					//grab the value from the first network adapter we find
 					//you can change the string to an array and get all
 					//network adapters found as well
-					if ((bool)obj["IPEnabled"] == true) 
+					if ((bool)obj["IPEnabled"] == true)
 						address = obj["MacAddress"].ToString();
 				}
 				//dispose of our object
@@ -100,7 +181,7 @@ namespace ValidationTokenRetriever
 		}
 		private string FindSystemUuid()
 		{
-			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("Select * FROM Win32_ComputerSystemProduct");
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystemProduct");
 			System.Management.ManagementObjectCollection objList = query1.Get();
 			StringBuilder strBuilderSerialNumber = new StringBuilder();
 			string uuid = String.Empty;
@@ -114,7 +195,7 @@ namespace ValidationTokenRetriever
 		}
 		private string FindBiosSerialNumber()
 		{
-			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("Select * FROM Win32_BIOS");
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_BIOS");
 			System.Management.ManagementObjectCollection objList = query1.Get();
 			StringBuilder strBuilderSerialNumber = new StringBuilder();
 			string serialNumber = String.Empty;
@@ -126,7 +207,7 @@ namespace ValidationTokenRetriever
 			}
 			return serialNumber == String.Empty ? "NULL" : serialNumber;
 
-			//System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("Select * FROM Win32_BIOS");
+			//System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_BIOS");
 			//System.Management.ManagementObjectCollection sers = query1.Get();
 			//StringBuilder strBuilderSerialNumber = new StringBuilder();
 			////string dSerialNumber = String.Empty;
@@ -141,7 +222,7 @@ namespace ValidationTokenRetriever
 			//    strBuilderSerialNumber.Append("SerialNumber=\"");
 			//    strBuilderSerialNumber.Append(serial["SerialNumber"] != null ? serial["SerialNumber"].ToString() : "NULL");
 			//    strBuilderSerialNumber.Append("\"");
-				
+
 			//    //dispose of our object
 			//    serial.Dispose();
 			//}
@@ -167,11 +248,101 @@ namespace ValidationTokenRetriever
 			////return dSerialNumber;
 			//return strBuilderSerialNumber.ToString();
 		}
+		private string FindDomain()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string domain = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (domain == String.Empty && obj["Domain"] != null)  // only return first UUID hit
+					domain = obj["Domain"] != null ? obj["Domain"].ToString() : "NULL";
+				obj.Dispose();
+			}
+			return domain == String.Empty ? "NULL" : domain;
+		}
+		private string FindPartOfDomain()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string partOfDomain = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (partOfDomain == String.Empty && obj["PartOfDomain"] != null)  // only return first UUID hit
+					partOfDomain = obj["PartOfDomain"] != null ? obj["PartOfDomain"].ToString() : "NULL";
+				obj.Dispose();
+			}
+			return partOfDomain == String.Empty ? "NULL" : partOfDomain;
+		}
+		private string FindSystemManufacturer()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string manufacturer = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (manufacturer == String.Empty && obj["Manufacturer"] != null)  // only return first manufacturer hit
+					manufacturer = obj["Manufacturer"] != null ? obj["Manufacturer"].ToString() : "NULL";
+				obj.Dispose();
+			}
+			return manufacturer == String.Empty ? "NULL" : manufacturer;
+		}
+		private string FindSystemModel()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string model = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (model == String.Empty && obj["Model"] != null)  // only return first model hit
+					model = obj["Model"] != null ? obj["Model"].ToString() : "NULL";
+				obj.Dispose();
+			}
+			return model == String.Empty ? "NULL" : model;
+		}
+		private string FindSystemType()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string systemType = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (systemType == String.Empty && obj["SystemType"] != null)  // only return first SystemType hit
+					systemType = obj["SystemType"] != null ? obj["SystemType"].ToString() : "NULL";
+				obj.Dispose();
+			}
+			return systemType == String.Empty ? "NULL" : systemType;
+		}
+		private string FindOperatingSystem()
+		{
+			System.Management.ManagementObjectSearcher query1 = new System.Management.ManagementObjectSearcher("SELECT * FROM Win32_OperatingSystem");
+			System.Management.ManagementObjectCollection objList = query1.Get();
+			StringBuilder strBuilderSerialNumber = new StringBuilder();
+			string operatingSystem = String.Empty;
+			foreach (System.Management.ManagementObject obj in objList)
+			{
+				if (operatingSystem == String.Empty && obj["Caption"] != null)  // only return first Caption hit
+				{
+					operatingSystem = obj["Caption"] != null ? obj["Caption"].ToString() : "NULL";
+
+					// The '™' character causes the encrypting of the xml to fail, remove.
+					operatingSystem = operatingSystem.Replace('™', ' ');
+				}
+
+				obj.Dispose();
+			}
+			return operatingSystem == String.Empty ? "NULL" : operatingSystem;
+		}
 
 		private void genButton_Click(object sender, EventArgs e)
 		{
 			exportToFile();
-			
+
 		}
 		private void generateFileForSolimarSystemsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -180,17 +351,19 @@ namespace ValidationTokenRetriever
 
 		private void copyAllContentsToClipboardToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			System.Windows.Forms.Clipboard.SetText(generateExportText());
+			//System.Windows.Forms.Clipboard.SetText(generateExportText());
+			System.Windows.Forms.Clipboard.SetText(m_vData.ToCSV());
 		}
 
 		private void exportToFile()
 		{
-			globalSaveFileDialog.FileName = MakeFileNameSafe(companyTextBox.Text) + "-" + MakeFileNameSafe(compNameTextBox.Text) + ".svt.csv";
+			globalSaveFileDialog.FileName = MakeFileNameSafe(m_vData.CompanyName) + "-" + MakeFileNameSafe(m_vData.ComputerName) + ".svt.csv";
 			if (globalSaveFileDialog.ShowDialog() == DialogResult.OK)
 			{
 				using (System.IO.TextWriter txtWriter = new System.IO.StreamWriter(globalSaveFileDialog.OpenFile()))
 				{
-					txtWriter.Write(generateExportText());
+					//txtWriter.Write(generateExportText());
+					txtWriter.Write(m_vData.ToCSV());
 					txtWriter.Close();
 				}
 			}
@@ -235,7 +408,7 @@ namespace ValidationTokenRetriever
 
 			return strLine.ToString();
 		}
-		
+
 		private string MakeFileNameSafe(string _input)
 		{
 			return _input != null ? _input.Replace('\\', '-').Replace('/', '-').Replace(':', '_').Replace('*', '_').Replace('?', '_').Replace('\"', '_').Replace('<', '_').Replace('>', '_').Replace('|', '_') : "";
@@ -260,5 +433,189 @@ namespace ValidationTokenRetriever
 				}
 			}
 		}
+
+		private void companyTextBox_TextChanged(object sender, EventArgs e)
+		{
+			m_vData.CompanyName = companyTextBox.Text;
+		}
+	}
+
+	public class SolimarValidationData
+	{
+		[Category("Validation Token"),
+		 Browsable(false),
+		 DisplayName("Company Name")]
+		public string CompanyName
+		{
+			get { return m_companyName; }
+			set { m_companyName = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("Domain Name")]
+		public string DomainName
+		{
+			get { return m_domainName; }
+			set { m_domainName = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("Computer Name")]
+		public string ComputerName
+		{
+			get { return m_computerName; }
+			set { m_computerName = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("Bios Serial Number")]
+		public string BiosSerialNumber
+		{
+			get { return m_biosSerialNumber; }
+			set { m_biosSerialNumber = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("MAC Address")]
+		public string macAddress
+		{
+			get { return m_macAddress; }
+			set { m_macAddress = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("Operating System")]
+		public string OperatingSystem
+		{
+			get { return m_operatingSystem; }
+			set { m_operatingSystem = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("Part of Domain")]
+		public string PartOfDomain
+		{
+			get { return m_bPartOfDomain; }
+			set { m_bPartOfDomain = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("System Manufacturer")]
+		public string SystemManufacturer
+		{
+			get { return m_systemManufacturer; }
+			set { m_systemManufacturer = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("System Model")]
+		public string SystemModel
+		{
+			get { return m_systemModel; }
+			set { m_systemModel = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("System Type")]
+		public string SystemType
+		{
+			get { return m_systemType; }
+			set { m_systemType = value; }
+		}
+		[Category("Validation Token"),
+		 ReadOnly(true),
+		 DisplayName("System UUID")]
+		public string SystemUUID
+		{
+			get { return m_systemUUID; }
+			set { m_systemUUID = value; }
+		}
+
+
+
+		public string ToCSV()
+		{
+			StringBuilder csvStrBuilder = new StringBuilder();
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Field"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Value"));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Version"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("1.0.0.0"));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Company"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_companyName));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Computer Name"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_computerName));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Domain Name"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_domainName));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Bios Serial Number"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_biosSerialNumber));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Mac Address"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_macAddress));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Operating System"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_operatingSystem));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Part of Domain"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_bPartOfDomain));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Manufacturer"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemManufacturer));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Model"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemModel));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Type"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemType));
+			csvStrBuilder.Append("\r\n");
+
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Product UUID"));
+			csvStrBuilder.Append(",");
+			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemUUID));
+			csvStrBuilder.Append("\r\n");
+
+			return csvStrBuilder.ToString();
+		}
+
+		private string m_companyName = "";
+		private string m_domainName = "";
+		private string m_bPartOfDomain = "";
+		private string m_computerName = "";
+		private string m_macAddress = "";
+		private string m_biosSerialNumber = "";
+		private string m_systemUUID = "";
+		private string m_systemManufacturer = "";
+		private string m_systemModel = "";
+		private string m_systemType = "";
+		private string m_operatingSystem = "";
+
+
 	}
 }
