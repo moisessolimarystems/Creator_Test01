@@ -37,6 +37,10 @@
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
+            // btnOk
+            // 
+            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.conditionPlusButton);
@@ -58,6 +62,7 @@
             this.conditionPlusButton.TabIndex = 4;
             this.conditionPlusButton.Text = "+";
             this.conditionPlusButton.UseVisualStyleBackColor = true;
+            this.conditionPlusButton.Click += new System.EventHandler(this.conditionPlusButton_Click);
             // 
             // conditionMinusButton
             // 
@@ -73,11 +78,12 @@
             // 
             this.conditionValueTextBox.Location = new System.Drawing.Point(242, 20);
             this.conditionValueTextBox.Name = "conditionValueTextBox";
-            this.conditionValueTextBox.Size = new System.Drawing.Size(128, 20);
+            this.conditionValueTextBox.Size = new System.Drawing.Size(109, 20);
             this.conditionValueTextBox.TabIndex = 2;
             // 
             // conditionOperatorComboBox
             // 
+            this.conditionOperatorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.conditionOperatorComboBox.FormattingEnabled = true;
             this.conditionOperatorComboBox.Location = new System.Drawing.Point(133, 19);
             this.conditionOperatorComboBox.Name = "conditionOperatorComboBox";
@@ -86,6 +92,7 @@
             // 
             // conditionNameComboBox
             // 
+            this.conditionNameComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.conditionNameComboBox.FormattingEnabled = true;
             this.conditionNameComboBox.Location = new System.Drawing.Point(6, 19);
             this.conditionNameComboBox.Name = "conditionNameComboBox";
@@ -102,6 +109,7 @@
             this.Text = "Report";
             this.FinishDialog += new Shared.VisualComponents.FinishDialogEventHandler(this.ReportDlg_FinishDialog);
             this.InitDialog += new Shared.VisualComponents.InitDialogEventHandler(this.ReportDlg_InitDialog);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ReportDlg_FormClosing);
             this.Controls.SetChildIndex(this.groupBox1, 0);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

@@ -152,7 +152,9 @@ namespace Client.Creator
                             //should only add products that exist in the standard license
                             //and haven't already been added.
                             string licenseBase = "P";
-                            LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
+                            string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)plData.LicenseInfo.CustID, (int)plData.LicenseInfo.DestID, (int)plData.LicenseInfo.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
+                            LicenseTable baseLicRec = client.GetLicenseByName(licenseName, false);
+                            //LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
                             if (baseLicRec == null) //subscription type                            
                                 licenseBase = "S";                                                           
                             int pos = productSpec.productName.TVal.IndexOf("Test");
@@ -265,6 +267,27 @@ namespace Client.Creator
                 case "Bios Serial Number":
                     token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttBiosSerialNumber;
                     break;
+                case "Domain Name":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttDomainName;
+                    break;
+                case "Operating System":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttOperatingSystem;
+                    break;
+                case "Part of Domain":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttPartOfDomain;
+                    break;
+                case "System Manufacturer":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttSystemManufacturer;
+                    break;
+                case "System Model":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttSystemModel;
+                    break;
+                case "System Type":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttSystemType;
+                    break;
+                case "System Product UUID":
+                    token = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttSystemUuid;
+                    break;
                 default: break;
             }
             return token;
@@ -272,13 +295,14 @@ namespace Client.Creator
 
         private void SaveTokenTabPage(TokenDialogData tokenData)
         {
-            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken;
+            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken;            
             if (hardwareRadioButton.Checked)
             {
                 newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                 newToken.tokenType.TVal =  Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
                 newToken.tokenValue.TVal = tokenListView.SelectedItems[0].Text;
-                tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
+                tokenData.TokenList.Add(newToken);
+               // tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
             }
             else
             {
@@ -286,8 +310,9 @@ namespace Client.Creator
                 {
                     newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     newToken.tokenType.TVal = GetTokenEnum(lvItem.Text);  
-                    newToken.tokenValue.TVal = lvItem.SubItems[1].Text; 
-                    tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken); 
+                    newToken.tokenValue.TVal = lvItem.SubItems[1].Text;
+                    tokenData.TokenList.Add(newToken);
+                    //tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken); 
                 }
             }
         }
@@ -676,31 +701,12 @@ namespace Client.Creator
         }
         #endregion
 
-        private string GetCSVTokenAlias(string tokenType)
-        {
-            string retVal = "";
-            switch (tokenType)
-            {
-                case "ttComputerName"://computername
-                    retVal = "Computer Name";
-                    break;
-                case "ttBiosNumber"://bios
-                    retVal = "Bios Serial Number";
-                    break;
-                case "ttMacAddress"://macaddress
-                    retVal = "Mac Address";
-                    break;
-                default:
-                    break;
-            }
-            return retVal;
-        }
-
         private bool IsValidTokenType(string tokenType)
         {
-            if (tokenType == "Computer Name" ||
-               tokenType == "Bios Serial Number" ||
-               tokenType == "Mac Address")
+            //if (tokenType == "Computer Name" ||
+            //   tokenType == "Bios Serial Number" ||
+            //   tokenType == "Mac Address")
+            if(GetTokenEnum(tokenType) != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
                 return true;
             return false;
         }
@@ -711,6 +717,7 @@ namespace Client.Creator
             //if software use browse csv dialog
             if (this.browseCSVOpenFileDialog.ShowDialog() == DialogResult.OK)
             {
+                tokenListView.Items.Clear();
                 try
                 {
                     using (StreamReader sr = new StreamReader(browseCSVOpenFileDialog.FileName))
@@ -877,13 +884,15 @@ namespace Client.Creator
     #region TokenDialogData class
     public class TokenDialogData : Shared.VisualComponents.DialogData
     {        
-        private LicenseServerProperty m_LicInfo;       
+        private LicenseServerProperty m_LicInfo;
+        private List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs> m_TokenList;
 
         #region Constructors
 
         public TokenDialogData(LicenseServerProperty licInfo)
         {
             m_LicInfo = licInfo;
+            m_TokenList = new List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs>();
         }
         #endregion
 
@@ -893,6 +902,12 @@ namespace Client.Creator
         {
             get { return this.m_LicInfo; }
             set { this.m_LicInfo = value; }
+        }
+
+        public List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs> TokenList
+        {
+            get { return this.m_TokenList; }
+            set { this.TokenList = value; }
         }
 
         #endregion

@@ -29,11 +29,13 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string licenseBase = "P";
-                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
+                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(licenseName);//string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
                 if (productLicenses.Count == 0) //subscription type
                 {
                     licenseBase = "S";
-                    productLicenses = client.GetProductLicenses(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
+                    licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription, 1);
+                    productLicenses = client.GetProductLicenses(licenseName);//string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
                 }
                 List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
                 foreach (ProductLicenseTable plRecord in productLicenses)

@@ -318,7 +318,7 @@
             this.tokenGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenGroupBox.Location = new System.Drawing.Point(3, 3);
             this.tokenGroupBox.Name = "tokenGroupBox";
-            this.tokenGroupBox.Padding = new System.Windows.Forms.Padding(10);
+            this.tokenGroupBox.Padding = new System.Windows.Forms.Padding(6, 10, 6, 10);
             this.tokenGroupBox.Size = new System.Drawing.Size(421, 251);
             this.tokenGroupBox.TabIndex = 4;
             this.tokenGroupBox.TabStop = false;
@@ -326,8 +326,8 @@
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 67.33167F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 32.66833F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 87.22359F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 12.77641F));
             this.tableLayoutPanel2.Controls.Add(this.softwareRadioButton, 0, 4);
             this.tableLayoutPanel2.Controls.Add(this.label10, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.hardwareRadioButton, 0, 3);
@@ -335,21 +335,21 @@
             this.tableLayoutPanel2.Controls.Add(this.TokenDescriptionLabel, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.browseTokenFileButton, 1, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(10, 23);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 23);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 5;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 18F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 114F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 124F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 19F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 22F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 8F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(401, 218);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(409, 218);
             this.tableLayoutPanel2.TabIndex = 8;
             // 
             // softwareRadioButton
             // 
             this.softwareRadioButton.AutoSize = true;
-            this.softwareRadioButton.Location = new System.Drawing.Point(5, 175);
+            this.softwareRadioButton.Location = new System.Drawing.Point(5, 182);
             this.softwareRadioButton.Margin = new System.Windows.Forms.Padding(5, 1, 3, 3);
             this.softwareRadioButton.Name = "softwareRadioButton";
             this.softwareRadioButton.Size = new System.Drawing.Size(67, 17);
@@ -362,7 +362,7 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(3, 135);
+            this.label10.Location = new System.Drawing.Point(3, 145);
             this.label10.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(135, 13);
@@ -372,10 +372,10 @@
             // hardwareRadioButton
             // 
             this.hardwareRadioButton.AutoSize = true;
-            this.hardwareRadioButton.Location = new System.Drawing.Point(5, 155);
+            this.hardwareRadioButton.Location = new System.Drawing.Point(5, 164);
             this.hardwareRadioButton.Margin = new System.Windows.Forms.Padding(5, 3, 3, 1);
             this.hardwareRadioButton.Name = "hardwareRadioButton";
-            this.hardwareRadioButton.Size = new System.Drawing.Size(71, 17);
+            this.hardwareRadioButton.Size = new System.Drawing.Size(71, 16);
             this.hardwareRadioButton.TabIndex = 11;
             this.hardwareRadioButton.Text = "Hardware";
             this.hardwareRadioButton.UseVisualStyleBackColor = true;
@@ -392,7 +392,7 @@
             this.tokenListView.Location = new System.Drawing.Point(5, 23);
             this.tokenListView.Margin = new System.Windows.Forms.Padding(5);
             this.tokenListView.Name = "tokenListView";
-            this.tokenListView.Size = new System.Drawing.Size(260, 104);
+            this.tokenListView.Size = new System.Drawing.Size(346, 114);
             this.tokenListView.TabIndex = 14;
             this.tokenListView.UseCompatibleStateImageBehavior = false;
             this.tokenListView.View = System.Windows.Forms.View.Details;
@@ -420,10 +420,10 @@
             // 
             // browseTokenFileButton
             // 
-            this.browseTokenFileButton.Location = new System.Drawing.Point(270, 21);
-            this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.browseTokenFileButton.Location = new System.Drawing.Point(356, 21);
+            this.browseTokenFileButton.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.browseTokenFileButton.Name = "browseTokenFileButton";
-            this.browseTokenFileButton.Size = new System.Drawing.Size(63, 22);
+            this.browseTokenFileButton.Size = new System.Drawing.Size(53, 22);
             this.browseTokenFileButton.TabIndex = 9;
             this.browseTokenFileButton.Text = "Browse";
             this.browseTokenFileButton.UseVisualStyleBackColor = true;
@@ -548,7 +548,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 83F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -584,7 +584,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(323, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(321, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -596,21 +596,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(101, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(100, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(217, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(216, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(101, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(100, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(217, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(216, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -638,11 +638,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(101, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(100, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(217, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(216, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -660,11 +660,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(101, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(100, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(217, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(216, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage

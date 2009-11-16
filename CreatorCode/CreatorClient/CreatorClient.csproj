@@ -227,6 +227,7 @@
     <Compile Include="ReportDlg.Designer.cs">
       <DependentUpon>ReportDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="ReportManager.cs" />
     <Compile Include="Service References\CreatorService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -310,6 +311,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductTable.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\CreatorService\Client.Creator.CreatorService.SoftwareTokenTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.TokenTable.datasource">

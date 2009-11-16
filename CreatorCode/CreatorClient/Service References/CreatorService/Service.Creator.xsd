@@ -8,29 +8,33 @@
   <xs:element name="ArrayOfCondition" nillable="true" type="tns:ArrayOfCondition" />
   <xs:complexType name="Condition">
     <xs:sequence>
-      <xs:element minOccurs="0" name="ConditionName" type="tns:Name" />
-      <xs:element minOccurs="0" name="ConditionOperator" type="tns:Operator" />
-      <xs:element minOccurs="0" name="ConditionValue" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" type="tns:ConditionName" />
+      <xs:element minOccurs="0" name="Operator" type="tns:ConditionOperator" />
+      <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Condition" nillable="true" type="tns:Condition" />
-  <xs:simpleType name="Name">
+  <xs:simpleType name="ConditionName">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Customer" />
-      <xs:enumeration value="DestinationID" />
-      <xs:enumeration value="GroupID" />
+      <xs:enumeration value="LicenseServer" />
       <xs:enumeration value="LicenseType" />
+      <xs:enumeration value="ProductLicense" />
       <xs:enumeration value="ExpirationDate" />
-      <xs:enumeration value="plState" />
+      <xs:enumeration value="Product" />
+      <xs:enumeration value="ProductVersion" />
+      <xs:enumeration value="State" />
     </xs:restriction>
   </xs:simpleType>
-  <xs:element name="Name" nillable="true" type="tns:Name" />
-  <xs:simpleType name="Operator">
+  <xs:element name="ConditionName" nillable="true" type="tns:ConditionName" />
+  <xs:simpleType name="ConditionOperator">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="Equals" />
+      <xs:enumeration value="Equal" />
+      <xs:enumeration value="NotEqual" />
       <xs:enumeration value="LessThan" />
       <xs:enumeration value="GreaterThan" />
+      <xs:enumeration value="Contains" />
     </xs:restriction>
   </xs:simpleType>
-  <xs:element name="Operator" nillable="true" type="tns:Operator" />
+  <xs:element name="ConditionOperator" nillable="true" type="tns:ConditionOperator" />
 </xs:schema>

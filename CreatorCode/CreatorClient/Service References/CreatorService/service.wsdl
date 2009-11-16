@@ -135,6 +135,24 @@
   <wsdl:message name="ICreator_UpdateProductTable_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateProductTableResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_UpdateSoftwareTokenTable_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSoftwareTokenTable" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateSoftwareTokenTable_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSoftwareTokenTableResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetSoftwareToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetSoftwareToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetSoftwareToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetSoftwareTokenResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllSoftwareTokens_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllSoftwareTokens" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllSoftwareTokens_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllSoftwareTokensResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_DeleteLicense_InputMessage">
     <wsdl:part name="parameters" element="tns:DeleteLicense" />
   </wsdl:message>
@@ -596,6 +614,18 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateProductTable" message="tns:ICreator_UpdateProductTable_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateProductTableResponse" message="tns:ICreator_UpdateProductTable_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="UpdateSoftwareTokenTable">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateSoftwareTokenTable" message="tns:ICreator_UpdateSoftwareTokenTable_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateSoftwareTokenTableResponse" message="tns:ICreator_UpdateSoftwareTokenTable_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetSoftwareToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetSoftwareToken" message="tns:ICreator_GetSoftwareToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetSoftwareTokenResponse" message="tns:ICreator_GetSoftwareToken_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllSoftwareTokens">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokens" message="tns:ICreator_GetAllSoftwareTokens_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokensResponse" message="tns:ICreator_GetAllSoftwareTokens_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="DeleteLicense">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteLicense" message="tns:ICreator_DeleteLicense_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteLicenseResponse" message="tns:ICreator_DeleteLicense_OutputMessage" />
@@ -1021,6 +1051,33 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateProductTable">
       <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateProductTable" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSoftwareTokenTable">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateSoftwareTokenTable" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetSoftwareToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetSoftwareToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllSoftwareTokens">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllSoftwareTokens" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

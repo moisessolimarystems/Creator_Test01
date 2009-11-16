@@ -57,6 +57,20 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ProductTable" nillable="true" type="tns:ProductTable" />
+  <xs:complexType name="SoftwareTokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="TokenType" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Status" type="xs:unsignedByte" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SoftwareTokenTable" nillable="true" type="tns:SoftwareTokenTable" />
+  <xs:complexType name="ArrayOfSoftwareTokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="SoftwareTokenTable" nillable="true" type="tns:SoftwareTokenTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfSoftwareTokenTable" nillable="true" type="tns:ArrayOfSoftwareTokenTable" />
   <xs:complexType name="LicenseTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />

@@ -163,7 +163,7 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string ID
         {
-            get { return string.Format("{0}-{1}", LicenseServer, Index); }
+            get { return Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(LicenseServer, Index); }
             set { _plRec.plID = value; }
         }
 

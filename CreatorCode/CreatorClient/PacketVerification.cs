@@ -16,6 +16,7 @@ namespace Client.Creator
     {
         private bool _validVerificationCode;
         private string _selectedPacketName;
+        private string _licenseName;
         public PacketVerification()
         {
             _validVerificationCode = false;
@@ -32,6 +33,7 @@ namespace Client.Creator
             PacketVerificationDialogData data = e.Data as PacketVerificationDialogData;
             data.Verified = _validVerificationCode;
             data.SelectedPacketName = _selectedPacketName;
+            data.LicenseName = _licenseName;
         }
 
         private void PacketVerification_FormClosing(object sender, FormClosingEventArgs e)
@@ -50,42 +52,31 @@ namespace Client.Creator
         {
             Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
             {
-                //_validVerificationCode = client.ValidateVerificationCode(_selectedPacketName, verificationCodeTextBox.Text);
-                //if (_validVerificationCode)
-                //{
-                    PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCodeTextBox.Text);
-                    if (storedPacket != null)
-                    {
-                        storedPacket.IsVerified = true;
-                        storedPacket.VerifiedBy = WindowsIdentity.GetCurrent().Name;
-                        client.UpdatePacket(storedPacket);
-                        _selectedPacketName = storedPacket.PacketName;
-                        MessageBox.Show("Verified packet " + _selectedPacketName, 
-                                        "Successful Verification",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Information);
-                        _validVerificationCode = true;
-                    }
-                    else
-                    {
-                        // Set the ErrorProvider error with the text to display.
-                        MessageBox.Show("Verification code entered could not be validated for any packet.",
-                                        "Verification Code Error",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Error);
-                        verificationCodeTextBox.Select(0, this.verificationCodeTextBox.Text.Length);      
-                    }
-                //}
+                PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCodeTextBox.Text);
+                if (storedPacket != null)
+                {
+                    storedPacket.IsVerified = true;
+                    storedPacket.VerifiedBy = WindowsIdentity.GetCurrent().Name;
+                    client.UpdatePacket(storedPacket);
+                    _selectedPacketName = storedPacket.PacketName;
+                    LicenseTable lt = client.GetLicenseByID(storedPacket.LicenseID, false);
+                    _licenseName = lt.LicenseName;
+                    MessageBox.Show("Verified packet " + _selectedPacketName, 
+                                    "Successful Verification",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                    _validVerificationCode = true;
+                }
+                else
+                {
+                    // Set the ErrorProvider error with the text to display.
+                    MessageBox.Show("Verification code entered could not be validated for any packet.",
+                                    "Verification Code Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                    verificationCodeTextBox.Select(0, this.verificationCodeTextBox.Text.Length);      
+                }
             });
-            //if (!_validVerificationCode)
-            //{                
-            //    // Set the ErrorProvider error with the text to display.
-            //    MessageBox.Show(string.Format("Verification code entered is invalid for packet : {0}", _selectedPacketName),
-            //                    "Verification Code Error",
-            //                    MessageBoxButtons.OK,
-            //                    MessageBoxIcon.Error);
-            //    verificationCodeTextBox.Select(0, this.verificationCodeTextBox.Text.Length);                    
-            //}
          }
 
         private void VerificationFileBrowseButton_Click(object sender, EventArgs e)
@@ -119,6 +110,7 @@ namespace Client.Creator
     public class PacketVerificationDialogData : Shared.VisualComponents.DialogData
     {
         private string _packetName;
+        private string _licenseName;
         private bool _verified;
 
         #region Constructors
@@ -142,6 +134,12 @@ namespace Client.Creator
         {
             get { return _verified; }
             set { _verified = true; }
+        }
+
+        public string LicenseName
+        {
+            get { return _licenseName; }
+            set { _licenseName = value; }
         }
         #endregion
     }

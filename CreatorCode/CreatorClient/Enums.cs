@@ -30,8 +30,8 @@ namespace Client.Creator
 
         enum TransactionType
         {
-            License,
-            Order,
+            LicenseServer,
+            ProductLicense,
             Product
         }
 

@@ -304,12 +304,18 @@ namespace CreatorData
                             break;
                         case 1:
                             //failover
-                            var latestStdTransaction = db.TransactionTables.Where(t => t.taLicenseID.Equals(standardLicense.ID) &&
+                            //ISSUE: transactions returned include deactivated, removed which don't mean a new PL
+                            var latestStdTransaction = db.TransactionTables.Where(t => t.taLicenseID.Equals(standardLicense.ID) &&                                                                                           
                                                                                  (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
                             var latestLicTransaction = db.TransactionTables.Where(t => t.taLicenseID.Equals(license.ID) &&
                                                                                  (t.taType.Equals(1) || t.taType.Equals(2))).OrderByDescending(d => d.taDateCreated).FirstOrDefault();
+                            
                             if (latestLicTransaction == null && latestStdTransaction != null)
                                 return false;
+                            //deactivated/removed transactions are recorded as latest and are not reflected in sublicense transactions
+                            //this causes an error when trying to report if there are differences
+                            //ignore removed transactions for standard licenses?
+                            //
                             if (latestLicTransaction != null && latestStdTransaction != null)
                             {
                                 if (latestStdTransaction.taDateCreated.CompareTo(latestLicTransaction.taDateCreated) > 0)

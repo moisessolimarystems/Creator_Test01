@@ -196,28 +196,44 @@ namespace Client.Creator
         {
             get
             {
+                //bool bEnabled = true;
+                //if (_licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Count > 1)
+                //{
+                //    foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
+                //    {
+                //        if (token.tokenType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                //        {
+                //            Service<ICreator>.Use((client) =>
+                //            {
+                //                TokenTable hwToken = client.GetTokenByLicenseName(Name, (byte)token.tokenType.TVal);
+                //                if (hwToken != null)
+                //                {
+                //                    if (hwToken.TokenStatus != 1)
+                //                        bEnabled = false;
+                //                }
+                //            });
+                //            break;
+                //        }
+                //    }
                 bool bEnabled = true;
-                if (_licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Count > 1)
+                Service<ICreator>.Use((client) =>
                 {
-                    foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licInfo.licVerificationAttribs.TVal.validationTokenList.TVal)
+                    IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
+                    if(tokenList != null && tokenList.Count > 0)
                     {
-                        if (token.tokenType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                        foreach (TokenTable token in tokenList)
                         {
-                            Service<ICreator>.Use((client) =>
+                            if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                             {
-                                TokenTable hwToken = client.GetTokenByLicenseName(Name, (byte)token.tokenType.TVal);
-                                if (hwToken != null)
-                                {
-                                    if (hwToken.TokenStatus != 1)
-                                        bEnabled = false;
-                                }
-                            });
-                            break;
+                                if (token.TokenStatus != 1)
+                                    bEnabled = false;
+                                break;
+                            }
                         }
                     }
-                }
-                else
-                    bEnabled = false;
+                    else
+                        bEnabled = false;
+                });
                 return bEnabled;
             }
         }

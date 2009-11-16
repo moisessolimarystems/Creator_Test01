@@ -435,6 +435,83 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SoftwareTokenTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class SoftwareTokenTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int IDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string TokenTypeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte StatusField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string TokenType {
+            get {
+                return this.TokenTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenTypeField, value) != true)) {
+                    this.TokenTypeField = value;
+                    this.RaisePropertyChanged("TokenType");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public byte Status {
+            get {
+                return this.StatusField;
+            }
+            set {
+                if ((this.StatusField.Equals(value) != true)) {
+                    this.StatusField = value;
+                    this.RaisePropertyChanged("Status");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="LicenseTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class LicenseTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1231,13 +1308,13 @@ namespace Client.Creator.CreatorService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Client.Creator.CreatorService.Name ConditionNameField;
+        private Client.Creator.CreatorService.ConditionName NameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private Client.Creator.CreatorService.Operator ConditionOperatorField;
+        private Client.Creator.CreatorService.ConditionOperator OperatorField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string ConditionValueField;
+        private string ValueField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1250,40 +1327,40 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public Client.Creator.CreatorService.Name ConditionName {
+        public Client.Creator.CreatorService.ConditionName Name {
             get {
-                return this.ConditionNameField;
+                return this.NameField;
             }
             set {
-                if ((this.ConditionNameField.Equals(value) != true)) {
-                    this.ConditionNameField = value;
-                    this.RaisePropertyChanged("ConditionName");
+                if ((this.NameField.Equals(value) != true)) {
+                    this.NameField = value;
+                    this.RaisePropertyChanged("Name");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public Client.Creator.CreatorService.Operator ConditionOperator {
+        public Client.Creator.CreatorService.ConditionOperator Operator {
             get {
-                return this.ConditionOperatorField;
+                return this.OperatorField;
             }
             set {
-                if ((this.ConditionOperatorField.Equals(value) != true)) {
-                    this.ConditionOperatorField = value;
-                    this.RaisePropertyChanged("ConditionOperator");
+                if ((this.OperatorField.Equals(value) != true)) {
+                    this.OperatorField = value;
+                    this.RaisePropertyChanged("Operator");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public string ConditionValue {
+        public string Value {
             get {
-                return this.ConditionValueField;
+                return this.ValueField;
             }
             set {
-                if ((object.ReferenceEquals(this.ConditionValueField, value) != true)) {
-                    this.ConditionValueField = value;
-                    this.RaisePropertyChanged("ConditionValue");
+                if ((object.ReferenceEquals(this.ValueField, value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
                 }
             }
         }
@@ -1299,40 +1376,52 @@ namespace Client.Creator.CreatorService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Name", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
-    public enum Name : int {
+    [System.Runtime.Serialization.DataContractAttribute(Name="ConditionName", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
+    public enum ConditionName : int {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Customer = 0,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        DestinationID = 1,
+        LicenseServer = 1,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        GroupID = 2,
+        LicenseType = 2,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        LicenseType = 3,
+        ProductLicense = 3,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         ExpirationDate = 4,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        plState = 5,
+        Product = 5,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ProductVersion = 6,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        State = 7,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Operator", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
-    public enum Operator : int {
+    [System.Runtime.Serialization.DataContractAttribute(Name="ConditionOperator", Namespace="http://schemas.datacontract.org/2004/07/Service.Creator")]
+    public enum ConditionOperator : int {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Equals = 0,
+        Equal = 0,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        LessThan = 1,
+        NotEqual = 1,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        GreaterThan = 2,
+        LessThan = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        GreaterThan = 3,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Contains = 4,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1504,6 +1593,15 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateProductTable", ReplyAction="http://tempuri.org/ICreator/UpdateProductTableResponse")]
         void UpdateProductTable(Client.Creator.CreatorService.ProductTable product);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateSoftwareTokenTable", ReplyAction="http://tempuri.org/ICreator/UpdateSoftwareTokenTableResponse")]
+        void UpdateSoftwareTokenTable(Client.Creator.CreatorService.SoftwareTokenTable token);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetSoftwareToken", ReplyAction="http://tempuri.org/ICreator/GetSoftwareTokenResponse")]
+        Client.Creator.CreatorService.SoftwareTokenTable GetSoftwareToken(string tokenType);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllSoftwareTokens", ReplyAction="http://tempuri.org/ICreator/GetAllSoftwareTokensResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.SoftwareTokenTable> GetAllSoftwareTokens();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteLicense", ReplyAction="http://tempuri.org/ICreator/DeleteLicenseResponse")]
         void DeleteLicense(Client.Creator.CreatorService.LicenseTable license);
@@ -1799,6 +1897,18 @@ namespace Client.Creator.CreatorService {
         
         public void UpdateProductTable(Client.Creator.CreatorService.ProductTable product) {
             base.Channel.UpdateProductTable(product);
+        }
+        
+        public void UpdateSoftwareTokenTable(Client.Creator.CreatorService.SoftwareTokenTable token) {
+            base.Channel.UpdateSoftwareTokenTable(token);
+        }
+        
+        public Client.Creator.CreatorService.SoftwareTokenTable GetSoftwareToken(string tokenType) {
+            return base.Channel.GetSoftwareToken(tokenType);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.SoftwareTokenTable> GetAllSoftwareTokens() {
+            return base.Channel.GetAllSoftwareTokens();
         }
         
         public void DeleteLicense(Client.Creator.CreatorService.LicenseTable license) {

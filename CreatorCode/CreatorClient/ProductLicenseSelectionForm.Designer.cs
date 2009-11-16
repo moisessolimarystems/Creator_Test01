@@ -65,6 +65,7 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "Product License Number";
+            this.columnHeader1.Width = 142;
             // 
             // columnHeader2
             // 

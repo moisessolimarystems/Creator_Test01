@@ -38,7 +38,7 @@
       <Association Name="LicenseTable_TransactionTable" Member="TransactionTables" Storage="_Transactions" ThisKey="ID" OtherKey="taLicenseID" Type="TransactionTable" />
       <Association Name="LicenseTable_TokenTable" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
       <Association Name="LicenseTable_PacketTable" Member="PacketTables" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
-      <Association Name="LicenseTable_ProductLicense" Member="ProductLicenseTables" ThisKey="ID" OtherKey="LicenseID" Type="ProductLicenseTable" />
+      <Association Name="LicenseTable_ProductLicenseTable" Member="ProductLicenseTables" ThisKey="ID" OtherKey="LicenseID" Type="ProductLicenseTable" />
       <Association Name="CustomerTable_LicenseTable" Member="CustomerTable" Storage="_SCustomerRecord" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
     </Type>
   </Table>
@@ -106,7 +106,14 @@
       <Column Name="ProductID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ProductVersion" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ParentProductLicenseID" Type="System.String" DbType="VarChar(50)" CanBeNull="true" UpdateCheck="Never" />
-      <Association Name="LicenseTable_ProductLicense" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
+      <Association Name="LicenseTable_ProductLicenseTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].SoftwareTokenTable" Member="SoftwareTokenTables">
+    <Type Name="SoftwareTokenTable">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TokenType" Type="System.String" DbType="VarChar(20) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="Status" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
     </Type>
   </Table>
 </Database>

@@ -58,6 +58,9 @@ namespace CreatorData
     partial void InsertProductLicenseTable(ProductLicenseTable instance);
     partial void UpdateProductLicenseTable(ProductLicenseTable instance);
     partial void DeleteProductLicenseTable(ProductLicenseTable instance);
+    partial void InsertSoftwareTokenTable(SoftwareTokenTable instance);
+    partial void UpdateSoftwareTokenTable(SoftwareTokenTable instance);
+    partial void DeleteSoftwareTokenTable(SoftwareTokenTable instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -159,6 +162,14 @@ namespace CreatorData
 			get
 			{
 				return this.GetTable<ProductLicenseTable>();
+			}
+		}
+		
+		public System.Data.Linq.Table<SoftwareTokenTable> SoftwareTokenTables
+		{
+			get
+			{
+				return this.GetTable<SoftwareTokenTable>();
 			}
 		}
 	}
@@ -1006,7 +1017,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_ProductLicense", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
+		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
 		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<ProductLicenseTable> ProductLicenseTables
 		{
@@ -2536,7 +2547,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_ProductLicense", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
+		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
 		public LicenseTable LicenseTable
 		{
 			get
@@ -2593,6 +2604,132 @@ namespace CreatorData
 		private void Initialize()
 		{
 			this._LicenseTable = default(EntityRef<LicenseTable>);
+			OnCreated();
+		}
+		
+		[OnDeserializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[Table(Name="[CORP\\AChou].SoftwareTokenTable")]
+	[DataContract()]
+	public partial class SoftwareTokenTable : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private string _TokenType;
+		
+		private byte _Status;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnTokenTypeChanging(string value);
+    partial void OnTokenTypeChanged();
+    partial void OnStatusChanging(byte value);
+    partial void OnStatusChanged();
+    #endregion
+		
+		public SoftwareTokenTable()
+		{
+			this.Initialize();
+		}
+		
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=1)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_TokenType", DbType="VarChar(20) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=2)]
+		public string TokenType
+		{
+			get
+			{
+				return this._TokenType;
+			}
+			set
+			{
+				if ((this._TokenType != value))
+				{
+					this.OnTokenTypeChanging(value);
+					this.SendPropertyChanging();
+					this._TokenType = value;
+					this.SendPropertyChanged("TokenType");
+					this.OnTokenTypeChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_Status", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=3)]
+		public byte Status
+		{
+			get
+			{
+				return this._Status;
+			}
+			set
+			{
+				if ((this._Status != value))
+				{
+					this.OnStatusChanging(value);
+					this.SendPropertyChanging();
+					this._Status = value;
+					this.SendPropertyChanged("Status");
+					this.OnStatusChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
 			OnCreated();
 		}
 		
