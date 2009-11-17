@@ -56,6 +56,13 @@ class SoftwareLicenseMgr
 		HRESULT ValidateHardwareBiosSerialNumber(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareMacAddress(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareCompuerName(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwareDomainName(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwareOperatingSystem(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwarePartOfDomain(bool bValidationValue);
+		HRESULT ValidateHardwareSystemManufacturer(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwareSystemModel(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwareSystemType(_bstr_t bstrValidationValue);
+		HRESULT ValidateHardwareSystemUUID(_bstr_t bstrValidationValue);
 	private:
 		time_t m_lastTimeCheck;
 		RainbowDriver* m_pRainbowKeyDriver;
@@ -72,6 +79,8 @@ class SoftwareLicenseMgr
 		HRESULT InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, _bstr_t _newLicenseGUID);
 
 		HRESULT VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* _pLicPackageAttribs, bool _bIgnoreLicenseCode, bool _bIgnoreModifiedDate);
+		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, _bstr_t _bstrValue);
+		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, bool _boolValue);
 
 
 		Lic_PackageAttribs::Lic_ProductInfoAttribs TestingOnly_GenerateLicense_Rubika();
