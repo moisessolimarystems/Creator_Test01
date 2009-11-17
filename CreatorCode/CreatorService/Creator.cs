@@ -19,25 +19,34 @@ namespace Service.Creator
     public class Creator : ICreator
     {
         private static readonly IDictionary<string, string>
-            _filterNames = new Dictionary<string, string>
-                {
-                    {"Customer", "SCustomerRecord.SCRname"},
-                    {"DestinationID", "DestinationID"},
-                    {"GroupID", "GroupID"},
+            _filterLSNames = new Dictionary<string, string>
+                {            
+                    {"Customer", "CustomerTable.SCRname"},
+                    {"LicenseServer", "LicenseName"},
                     {"LicenseType", "LicenseType"},
                     {"ExpirationDate", "ExpirationDate"},
-                    {"plState", "plState"}
+                };
+
+        private static readonly IDictionary<string, string>
+            _filterPLNames = new Dictionary<string, string>
+                {            
+                    {"Customer", "LicenseTable.CustomerTable.SCRname"},
+                    {"ProductLicense", "plID"},
+                    {"ExpirationDate", "ExpirationDate"},
+                    {"Product", "ProductID"},
+                    {"ProductVersion", "ProductVersion"},
+                    {"State", "plState"}
                 };
 
         private static readonly IDictionary<string, string>
             _filterOperators = new Dictionary<string, string>
                 {
-                    {"Equals", "="},
+                    {"Equal", "="},
+                    {"NotEqual", "!="},
                     {"LessThan", "<"},
                     {"GreaterThan", ">"},
                     {"Contains", "Contains"}
                 };
-
         public static SolimarLicenseServerWrapper m_licServer = new SolimarLicenseServerWrapper();
 
         #region ICreator Members
@@ -196,25 +205,34 @@ namespace Service.Creator
         {
             String value;
             int result;
+            DateTime date;
             StringBuilder conditionString = new StringBuilder();
             foreach (Condition userCondition in conditionList)
             {
+                if (conditionString.Length != 0)
+                    conditionString.Append(" and ");
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
-                conditionString.Append(_filterNames[userCondition.ConditionName.ToString()]);
-                conditionString.Append(_filterOperators[userCondition.ConditionOperator.ToString()]);
-                value = userCondition.ConditionValue;
-                if (Int32.TryParse(value, out result))
+                conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
+                value = userCondition.Value;
+                if (DateTime.TryParse(value, out date))
                 {
-                    conditionString.Append(value);
+                    value = string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day);
+                }
+                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                {
+                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                 }
                 else
                 {
-                    conditionString.Append("\"");
-                    conditionString.Append(userCondition.ConditionValue.ToString());
-                    conditionString.Append("\"");
+                    if (!Int32.TryParse(value, out result))
+                    {
+                        value = "\"" + value + "\"";
+                    }
+                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                    conditionString.Append(value);
                 }
             }
-            return LicenseTable.GetLicensesByConditions(conditionString.ToString());                        
+            return LicenseTable.GetLicensesByConditions(conditionString.ToString());
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -361,6 +379,7 @@ namespace Service.Creator
         #endregion
 
         #region Product License Implementation
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> conditionList)
         {
@@ -373,25 +392,27 @@ namespace Service.Creator
                 if (conditionString.Length != 0)
                     conditionString.Append(" and ");
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
-                conditionString.Append(_filterNames[userCondition.ConditionName.ToString()]);
-                conditionString.Append(_filterOperators[userCondition.ConditionOperator.ToString()]);
-                value = userCondition.ConditionValue;
-                if (Int32.TryParse(value, out result))
+                conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);
+                value = userCondition.Value;                
+                if (DateTime.TryParse(value, out date))
                 {
-                    conditionString.Append(value);
+                    value = string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day);
                 }
-                else if (DateTime.TryParse(value, out date))
+                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
                 {
-                    conditionString.Append(string.Format("DateTime({0},{1},{2})", date.Year,date.Month,date.Day));
+                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                 }
                 else
                 {
-                    conditionString.Append("\"");
-                    conditionString.Append(userCondition.ConditionValue.ToString());
-                    conditionString.Append("\"");
+                    if(!Int32.TryParse(value, out result))
+                    {
+                        value = "\"" + value + "\"";
+                    }
+                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                    conditionString.Append(value);
                 }
             }
-            return ProductLicenseTable.GetProductLicensesByConditions(conditionString.ToString());    
+            return ProductLicenseTable.GetProductLicensesByConditions(conditionString.ToString());
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -614,6 +635,23 @@ namespace Service.Creator
         }
         #endregion
 
+        #region SoftwareTokenTable Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateSoftwareTokenTable(SoftwareTokenTable token)
+        {
+            SoftwareTokenTable.UpdateProductTable(token);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public SoftwareTokenTable GetSoftwareToken(string tokenType)
+        {
+            return SoftwareTokenTable.GetSoftwareToken(tokenType);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<SoftwareTokenTable> GetAllSoftwareTokens()
+        {
+            return SoftwareTokenTable.GetAllSoftwareTokens();
+        }
+        #endregion
         #endregion
     }
 }

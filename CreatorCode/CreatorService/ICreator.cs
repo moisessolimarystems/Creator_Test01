@@ -294,45 +294,62 @@ namespace Service.Creator
         void UpdateProductTable(ProductTable product);
 
         #endregion
+
+        #region SoftwareToken OperationContracts
+        [OperationContract]
+        void UpdateSoftwareTokenTable(SoftwareTokenTable token);
+        [OperationContract]
+        SoftwareTokenTable GetSoftwareToken(string tokenType);
+        [OperationContract]
+        IList<SoftwareTokenTable> GetAllSoftwareTokens();
+        #endregion
     }
 
     [DataContract]
-    public enum Name
+    public enum ConditionName
     {
         [EnumMember]
         Customer,
         [EnumMember]
-        DestinationID,
-        [EnumMember]
-        GroupID,
+        LicenseServer,
         [EnumMember]
         LicenseType,
         [EnumMember]
-        ExpirationDate,
+        ProductLicense,
         [EnumMember]
-        plState
+        ExpirationDate,       
+        [EnumMember]
+        Product,
+        [EnumMember]
+        ProductVersion,
+        [EnumMember]
+        State
     }
-    
+
     [DataContract]
-    public enum Operator
-    { 
+    public enum ConditionOperator
+    {
         [EnumMember]
-        Equals,
+        Equal,
+        [EnumMember]
+        NotEqual,
         [EnumMember]
         LessThan,
         [EnumMember]
-        GreaterThan
-    }     
+        GreaterThan,
+        [EnumMember]
+        Contains
+    }
 
     [DataContract]
     public class Condition
     {
-        private Name _name;
-        private Operator _operator;
+        private ConditionName _name;
+        private ConditionOperator _operator;
         private string _value;
 
         [DataMember]
-        public Name ConditionName
+        public ConditionName Name
         {
             get { return _name; }
             set { _name = value; }
@@ -341,15 +358,15 @@ namespace Service.Creator
         //numeric operators - =, >, <
         //string operators - is, contains, is not, does not contain
         [DataMember]
-        public Operator ConditionOperator
+        public ConditionOperator Operator
         {
-            get { return _operator;  }
+            get { return _operator; }
             set { _operator = value; }
         }
 
         //can be numeric or string       
         [DataMember]
-        public string ConditionValue
+        public string Value
         {
             get { return _value; }
             set { _value = value; }
