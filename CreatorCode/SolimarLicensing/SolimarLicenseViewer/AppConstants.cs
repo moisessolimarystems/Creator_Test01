@@ -74,6 +74,7 @@ namespace SolimarLicenseViewer
         public static readonly String FilterHeader = "View";
         public static readonly String GroupByModuleItem = "Group By Module";
         public static readonly String DetailsItem = "Details";
+        public static readonly String ProductLicNumberItem = "Group By Product License Number";
 
 
         //Product Node Column Headers

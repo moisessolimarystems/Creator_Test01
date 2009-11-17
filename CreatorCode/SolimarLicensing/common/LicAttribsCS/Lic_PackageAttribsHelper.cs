@@ -6,36 +6,110 @@ namespace Solimar.Licensing.Attribs
 {
 	public class Lic_LicenseInfoAttribsHelper
 	{
-		public static string GetDisplayLabel(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs)
+		public static string GenerateLicenseServerName(int _customerNumber, int _destinationNumber, int _groupNumber, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType _eSWLType, int _typeIndex)
 		{
 			string displayLabel = "";
-			if (_licInfoAttribs != null)
+			string licType = "U";
+			switch (_eSWLType)
 			{
-				string licType = "U";
-				switch (_licInfoAttribs.softwareLicType.TVal)
-				{
-					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
-						licType = "F";
-						break;
-					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
-						licType = "D";
-						break;
-					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
-						licType = "P";
-						break;
-					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
-						licType = "S";
-						break;
-					case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
-						licType = "T";
-						break;
-					default:
-						break;
-				};
-				//displayLabel = string.Format("{0:x4}-{1:x4}-{2}{3:d2}", _licInfoAttribs.customerID.TVal, _licInfoAttribs.softwareGroupLicenseID.TVal, licType, _licInfoAttribs.softwareLicTypeIndex.TVal);
-				displayLabel = string.Format("{0:x4}-{1:x3}-{2:x4}-{3}{4:d2}", _licInfoAttribs.customerID.TVal, _licInfoAttribs.destinationID.TVal, _licInfoAttribs.softwareGroupLicenseID.TVal, licType, _licInfoAttribs.softwareLicTypeIndex.TVal);
-			}
+				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
+					licType = "F";
+					break;
+				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
+					licType = "D";
+					break;
+				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
+					licType = "P";
+					break;
+				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
+					licType = "S";
+					break;
+				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
+					licType = "T";
+					break;
+				default:
+					break;
+			};
+			//displayLabel = string.Format("{0:x4}-{1:x4}-{2}{3:d2}", _licInfoAttribs.customerID.TVal, _licInfoAttribs.softwareGroupLicenseID.TVal, licType, _licInfoAttribs.softwareLicTypeIndex.TVal);
+			string destId_Base36 = ConvertToBase36(_destinationNumber);
+			string swGrpId_Base36 = ConvertToBase36(_groupNumber);
+			displayLabel = string.Format("{0:x3}-{1}-{2}-{3}{4}",
+				_customerNumber,
+				(destId_Base36.Length == 1) ? "0" + destId_Base36 : destId_Base36,
+				(swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
+				licType,
+				_typeIndex);
+
 			return displayLabel;
+		}
+		public static string GetDisplayLabel(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs)
+		{
+			return (_licInfoAttribs == null) ? "" : GenerateLicenseServerName((int)_licInfoAttribs.customerID.TVal, (int)_licInfoAttribs.destinationID.TVal, (int)_licInfoAttribs.softwareGroupLicenseID.TVal, _licInfoAttribs.softwareLicType.TVal, (int)_licInfoAttribs.softwareLicTypeIndex.TVal);
+		}
+		public static string GenerateProductLicenseName(string _name, int _productLicenseIndex)
+		{
+			return string.Format("{0}-{1}", _name, ConvertToBase36(_productLicenseIndex));
+		}
+		private static string ConvertToBase36(int _base10Number)
+		{
+			String newNumber = "";
+			String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			//String chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+			while (_base10Number >= 36)
+			{
+				int r = _base10Number % 36;
+				newNumber = chars[r] + newNumber;
+				_base10Number = _base10Number / 36;
+			}
+			// the last number to convert
+			newNumber = chars[_base10Number] + newNumber;
+
+			return newNumber;
+		}
+		private static Int64 ConvertFromBase36(string _base36Number)
+		{
+			string base36Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			char[] arrInput = _base36Number.ToCharArray();
+			Array.Reverse(arrInput);
+			Int64 returnValue = 0;
+			for (int i = 0; i < arrInput.Length; i++)
+			{
+				int valueindex = base36Chars.IndexOf(arrInput[i]);
+				returnValue += Convert.ToInt64(valueindex * Math.Pow(36, i));
+			}
+			return returnValue;
+		}
+		private static bool SplitProductLicenseName(string _productLicenseName, out string _outName, out long _outProductLicenseIndex)
+		{
+			bool bSuccess = false;
+			_outName = "";
+			_outProductLicenseIndex = -1;
+			if (_productLicenseName != string.Empty)
+			{
+				int lastIdx = _productLicenseName.LastIndexOf('-'); //returns -1 if not found
+				if (lastIdx != -1)
+				{
+					_outName = _productLicenseName.Substring(0, lastIdx);
+					_outProductLicenseIndex = ConvertFromBase36(_productLicenseName.Substring(lastIdx + 1, _productLicenseName.Length - (lastIdx + 1)));
+					bSuccess = true;
+				}
+			}
+			return bSuccess;
+		}
+
+		public static int CompareProductLicenseName(string _prodLicNumber1, string _prodLicNumber2)
+		{
+			int compareValue = -1000;
+			string prodLic1 = "", prodLic2 = "";
+			long num1 = -1, num2 = -1;
+			if (SplitProductLicenseName(_prodLicNumber1, out prodLic1, out num1) && SplitProductLicenseName(_prodLicNumber2, out prodLic2, out num2))
+			{
+				compareValue = string.Compare(prodLic1, prodLic2, true);
+				if (compareValue == 0)
+					compareValue = (int)(num1 - num2);
+			}
+
+			return compareValue;
 		}
 
 		public static string GetValidationValue(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationAttribs.Lic_ValidationTokenAttribsList _tokenList, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType _tokenType)
