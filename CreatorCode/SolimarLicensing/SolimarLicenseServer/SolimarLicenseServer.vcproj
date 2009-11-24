@@ -778,6 +778,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProtectionKey_Version1.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RainbowDriver.cpp"
 				>
 			</File>
@@ -920,6 +924,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ProtectionKey_Version1.h"
+				>
+			</File>
+			<File
 				RelativePath=".\RainbowDriver.h"
 				>
 			</File>
@@ -991,6 +999,14 @@
 			>
 			<File
 				RelativePath=".\resources\KeySpecXMLCompiler.py"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Architecture"
+			>
+			<File
+				RelativePath=".\Key Architecture.txt"
 				>
 			</File>
 		</Filter>
