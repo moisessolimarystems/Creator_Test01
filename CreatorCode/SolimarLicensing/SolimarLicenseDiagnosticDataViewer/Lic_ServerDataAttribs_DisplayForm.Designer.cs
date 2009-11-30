@@ -42,13 +42,15 @@
 			this.versionLabel = new System.Windows.Forms.Label();
 			this.lastTouchTitleLabel = new System.Windows.Forms.Label();
 			this.versionTitleLabel = new System.Windows.Forms.Label();
-			this.noFlickerListView1 = new Shared.VisualComponents.NoFlickerListView();
+			this.licenseInfoListView = new Shared.VisualComponents.NoFlickerListView();
 			this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-			this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+			this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.centerPanel = new System.Windows.Forms.Panel();
+			this.lic_KeyAttribs_DisplayControl = new SolimarLicenseDiagnosticDataViewer.Lic_KeyAttribs_DisplayControl();
 			this.clockViolationsListView = new Shared.VisualComponents.NoFlickerListView();
 			this.columnHeader6 = new System.Windows.Forms.ColumnHeader();
 			this.columnHeader7 = new System.Windows.Forms.ColumnHeader();
@@ -58,6 +60,7 @@
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			this.centerPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// headerPanel
@@ -183,42 +186,44 @@
 			this.versionTitleLabel.TabIndex = 0;
 			this.versionTitleLabel.Text = "Version:";
 			// 
-			// noFlickerListView1
+			// licenseInfoListView
 			// 
-			this.noFlickerListView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.licenseInfoListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
-            this.columnHeader2,
             this.columnHeader3,
+            this.columnHeader2,
             this.columnHeader4,
             this.columnHeader5});
-			this.noFlickerListView1.ContextMenuStrip = this.contextMenuStrip1;
-			this.noFlickerListView1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.noFlickerListView1.FullRowSelect = true;
-			this.noFlickerListView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-			this.noFlickerListView1.Location = new System.Drawing.Point(0, 57);
-			this.noFlickerListView1.Name = "noFlickerListView1";
-			this.noFlickerListView1.Size = new System.Drawing.Size(605, 114);
-			this.noFlickerListView1.Sorting = System.Windows.Forms.SortOrder.Ascending;
-			this.noFlickerListView1.TabIndex = 1;
-			this.noFlickerListView1.UseCompatibleStateImageBehavior = false;
-			this.noFlickerListView1.View = System.Windows.Forms.View.Details;
-			this.noFlickerListView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.noFlickerListView1_ColumnClick);
-			this.noFlickerListView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
+			this.licenseInfoListView.ContextMenuStrip = this.contextMenuStrip1;
+			this.licenseInfoListView.Dock = System.Windows.Forms.DockStyle.Left;
+			this.licenseInfoListView.FullRowSelect = true;
+			this.licenseInfoListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.licenseInfoListView.HideSelection = false;
+			this.licenseInfoListView.Location = new System.Drawing.Point(0, 0);
+			this.licenseInfoListView.Name = "licenseInfoListView";
+			this.licenseInfoListView.Size = new System.Drawing.Size(227, 145);
+			this.licenseInfoListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			this.licenseInfoListView.TabIndex = 1;
+			this.licenseInfoListView.UseCompatibleStateImageBehavior = false;
+			this.licenseInfoListView.View = System.Windows.Forms.View.Details;
+			this.licenseInfoListView.SelectedIndexChanged += new System.EventHandler(this.licenseInfoListView_SelectedIndexChanged);
+			this.licenseInfoListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.noFlickerListView1_ColumnClick);
+			this.licenseInfoListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.general_KeyDown);
 			// 
 			// columnHeader1
 			// 
 			this.columnHeader1.Text = "License Name";
 			this.columnHeader1.Width = 100;
 			// 
-			// columnHeader2
-			// 
-			this.columnHeader2.Text = "Verification Code";
-			this.columnHeader2.Width = 100;
-			// 
 			// columnHeader3
 			// 
 			this.columnHeader3.Text = "File Name";
 			this.columnHeader3.Width = 114;
+			// 
+			// columnHeader2
+			// 
+			this.columnHeader2.Text = "Verification Code";
+			this.columnHeader2.Width = 100;
 			// 
 			// columnHeader4
 			// 
@@ -240,15 +245,33 @@
 			// 
 			// splitContainer1.Panel1
 			// 
-			this.splitContainer1.Panel1.Controls.Add(this.noFlickerListView1);
+			this.splitContainer1.Panel1.Controls.Add(this.centerPanel);
 			this.splitContainer1.Panel1.Controls.Add(this.headerPanel);
 			// 
 			// splitContainer1.Panel2
 			// 
 			this.splitContainer1.Panel2.Controls.Add(this.clockViolationsListView);
-			this.splitContainer1.Size = new System.Drawing.Size(605, 225);
-			this.splitContainer1.SplitterDistance = 171;
+			this.splitContainer1.Size = new System.Drawing.Size(605, 267);
+			this.splitContainer1.SplitterDistance = 202;
 			this.splitContainer1.TabIndex = 2;
+			// 
+			// centerPanel
+			// 
+			this.centerPanel.Controls.Add(this.lic_KeyAttribs_DisplayControl);
+			this.centerPanel.Controls.Add(this.licenseInfoListView);
+			this.centerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.centerPanel.Location = new System.Drawing.Point(0, 57);
+			this.centerPanel.Name = "centerPanel";
+			this.centerPanel.Size = new System.Drawing.Size(605, 145);
+			this.centerPanel.TabIndex = 2;
+			// 
+			// lic_KeyAttribs_DisplayControl
+			// 
+			this.lic_KeyAttribs_DisplayControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.lic_KeyAttribs_DisplayControl.Location = new System.Drawing.Point(227, 0);
+			this.lic_KeyAttribs_DisplayControl.Name = "lic_KeyAttribs_DisplayControl";
+			this.lic_KeyAttribs_DisplayControl.Size = new System.Drawing.Size(378, 145);
+			this.lic_KeyAttribs_DisplayControl.TabIndex = 2;
 			// 
 			// clockViolationsListView
 			// 
@@ -260,9 +283,10 @@
 			this.clockViolationsListView.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.clockViolationsListView.FullRowSelect = true;
 			this.clockViolationsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.clockViolationsListView.HideSelection = false;
 			this.clockViolationsListView.Location = new System.Drawing.Point(0, 0);
 			this.clockViolationsListView.Name = "clockViolationsListView";
-			this.clockViolationsListView.Size = new System.Drawing.Size(605, 50);
+			this.clockViolationsListView.Size = new System.Drawing.Size(605, 61);
 			this.clockViolationsListView.TabIndex = 0;
 			this.clockViolationsListView.UseCompatibleStateImageBehavior = false;
 			this.clockViolationsListView.View = System.Windows.Forms.View.Details;
@@ -287,7 +311,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(605, 225);
+			this.ClientSize = new System.Drawing.Size(605, 267);
 			this.Controls.Add(this.splitContainer1);
 			this.DoubleBuffered = true;
 			this.Name = "Lic_ServerDataAttribs_DisplayForm";
@@ -299,6 +323,7 @@
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			this.splitContainer1.ResumeLayout(false);
+			this.centerPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -310,7 +335,7 @@
 		private System.Windows.Forms.Label versionLabel;
 		private System.Windows.Forms.Label lastTouchTitleLabel;
 		private System.Windows.Forms.Label versionTitleLabel;
-		private Shared.VisualComponents.NoFlickerListView noFlickerListView1;
+		private Shared.VisualComponents.NoFlickerListView licenseInfoListView;
 		private System.Windows.Forms.ColumnHeader columnHeader1;
 		private System.Windows.Forms.ColumnHeader columnHeader2;
 		private System.Windows.Forms.ColumnHeader columnHeader3;
@@ -329,5 +354,7 @@
 		private System.Windows.Forms.ColumnHeader columnHeader6;
 		private System.Windows.Forms.ColumnHeader columnHeader7;
 		private System.Windows.Forms.ColumnHeader columnHeader8;
+		private System.Windows.Forms.Panel centerPanel;
+		private Lic_KeyAttribs_DisplayControl lic_KeyAttribs_DisplayControl;
 	}
 }

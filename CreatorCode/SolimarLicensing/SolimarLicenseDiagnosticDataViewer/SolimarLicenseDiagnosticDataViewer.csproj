@@ -78,6 +78,12 @@
     <Compile Include="LicenseDiagnosticDataViewerForm.Designer.cs">
       <DependentUpon>LicenseDiagnosticDataViewerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lic_KeyAttribs_DisplayControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Lic_KeyAttribs_DisplayControl.Designer.cs">
+      <DependentUpon>Lic_KeyAttribs_DisplayControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Lic_KeyAttribs_DisplayForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -121,6 +127,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LicenseDiagnosticDataViewerForm.resx">
       <DependentUpon>LicenseDiagnosticDataViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lic_KeyAttribs_DisplayControl.resx">
+      <DependentUpon>Lic_KeyAttribs_DisplayControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Lic_KeyAttribs_DisplayForm.resx">
       <DependentUpon>Lic_KeyAttribs_DisplayForm.cs</DependentUpon>

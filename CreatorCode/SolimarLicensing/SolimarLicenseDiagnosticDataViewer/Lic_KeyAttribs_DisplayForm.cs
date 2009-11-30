@@ -15,76 +15,98 @@ namespace SolimarLicenseDiagnosticDataViewer
 		public Lic_KeyAttribs_DisplayForm()
 		{
 			InitializeComponent();
-            Initialize();
+			Initialize();
 		}
-        public void Initialize()
-        {
-            m_heightPanel = keyListView.Height;
-            ToogleControl(false);
-            //this.Height -= m_heightPanel;
-        }
-        private int m_heightPanel;
+		public void Initialize()
+		{
+			m_heightPanel = keyListView.Height;
+			ToogleControl(false);
+			//this.Height -= m_heightPanel;
+		}
+		private int m_heightPanel;
 		public void SetData(Lic_KeyAttribs _data)
 		{
 			if (_data != null)
 			{
 				this.Text = string.Format("Lic_KeyAttribs: [{0}]", _data.keyName);
-				this.keyNameLabel.Text = _data.keyName.TVal;
+
+				lic_KeyAttribs_DisplayControl.SetData(_data);
+
+				//this.keyNameLabel.Text = _data.keyName.TVal;
 				this.keyListView.BeginUpdate();
 				this.keyListView.Items.Clear();
 				int rowIdx = 0;
-				int productIdx = -1;
-				string version = "";
+				//int productIdx = -1;
+				//string version = "";
 				foreach (AttribsMemberBuffer bufferRow in _data.layout.TVal)
 				{
 					ListViewItem lvi = new ListViewItem();
 					for (int bufIdx = 0; bufIdx < bufferRow.TVal.Length; bufIdx += 2)
 					{
 						if (bufIdx == 0)
-							lvi.Text = string.Format("{0:X2}{1:X2}", bufferRow.TVal[bufIdx], bufferRow.TVal[bufIdx+1]);
+							lvi.Text = string.Format("{0:X2}{1:X2}", bufferRow.TVal[bufIdx], bufferRow.TVal[bufIdx + 1]);
 						else
-							lvi.SubItems.Add(string.Format("{0:X2}{1:X2}", bufferRow.TVal[bufIdx], bufferRow.TVal[bufIdx+1]));
+							lvi.SubItems.Add(string.Format("{0:X2}{1:X2}", bufferRow.TVal[bufIdx], bufferRow.TVal[bufIdx + 1]));
 
-						if (rowIdx == 7 && bufIdx == 2)
-						{
-							productIdx = bufferRow.TVal[bufIdx + 1];
-						}
-						if (rowIdx == 7 && bufIdx == 4)
-						{
-							version = string.Format("{0:x}.{1:x}{2:x}", bufferRow.TVal[bufIdx]/16, bufferRow.TVal[bufIdx]%16, bufferRow.TVal[bufIdx+1]/16);
-						}
+						//if (rowIdx == 7 && bufIdx == 2)
+						//{
+						//    productIdx = bufferRow.TVal[bufIdx + 1];
+						//}
+						//if (rowIdx == 7 && bufIdx == 4)
+						//{
+						//    version = string.Format("{0:x}.{1:x}{2:x}", bufferRow.TVal[bufIdx]/16, bufferRow.TVal[bufIdx]%16, bufferRow.TVal[bufIdx+1]/16);
+						//}
 					}
-					
+
 					this.keyListView.Items.Add(lvi);
 					rowIdx++;
 				}
 
 
-				if (productIdx == 0xff)	//Verification Key
-				{
-					this.verificationCodeLabel.Text = _data.verificationCode.TVal;
-					this.modifiedDateLabel.Text = _data.modifiedDate.TVal.ToLocalTime().ToString();
-					this.currentActivationsLabel.Text = _data.currentActivations.TVal.ToString();
-				}
-				else  //Product
-				{
-					if (_data.keyName.TVal.Contains('{') == true) // Uninitialized Key has a '{' in its name
-					{
-						this.verificationCodeTitleLabel.Text = "Type:";
-						this.verificationCodeLabel.Text = "Uninitialized Key";
-						this.modifiedDateTitlelabel.Visible = false;
-						this.modifiedDateLabel.Visible = false;
-					}
-					else
-					{
-						this.verificationCodeTitleLabel.Text = "Product:";
-						this.verificationCodeLabel.Text = Lic_PackageAttribs.AttribsMemberEnum_TLic_ProductID.GetAlias((Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)productIdx);
-						this.modifiedDateTitlelabel.Text = "Version:";
-						this.modifiedDateLabel.Text = version;
-					}
-					this.currentActivationsTitleLabel.Visible = false;
-					this.currentActivationsLabel.Visible = false;
-				}
+				//if (productIdx == 0xff)	//Verification Key
+				//{
+				//    this.verificationCodeLabel.Text = _data.licenseCode.TVal;
+				//    this.modifiedDateLabel.Text = _data.packetCreationDate.TVal.ToLocalTime().ToString();
+				//    //this.currentActivationsLabel.Text = _data.currentActivations.TVal.ToString();
+				//    if (_data.keyVersion.TVal == 1) // Populate Activation ListView
+				//    {
+				//        activitySlotLView.BeginUpdate();
+				//        activitySlotLView.Items.Clear();
+				//        for (int idx = 0; idx < _data.activationInfoList.TVal.Count; idx++)
+				//        {
+				//            ListViewItem lvi = new ListViewItem();
+				//            Lic_KeyAttribs.Lic_ActivationInfoAttribs actInfo = (Lic_KeyAttribs.Lic_ActivationInfoAttribs)_data.activationInfoList.TVal[idx];
+				//            lvi.Text = idx.ToString();
+				//            //lvi.SubItems.Add(actInfo.activationSlotCurrentActivation.TVal.ToString());
+				//            lvi.SubItems.Add(string.Format("{0} (0x{0:X2})", actInfo.activationSlotCurrentActivation.TVal));
+				//            //lvi.SubItems.Add(actInfo.activationSlotHoursToExpire.TVal.ToString());
+				//            lvi.SubItems.Add(string.Format("{0} (0x{0:X3})", actInfo.activationSlotHoursToExpire.TVal));
+				//            activitySlotLView.Items.Add(lvi);
+				//        }
+				//        Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(activitySlotLView);
+				//        activitySlotLView.EndUpdate();
+
+				//    }
+				//}
+				//else  //Product
+				//{
+				//    if (_data.keyName.TVal.Contains('{') == true) // Uninitialized Key has a '{' in its name
+				//    {
+				//        this.verificationCodeTitleLabel.Text = "Type:";
+				//        this.verificationCodeLabel.Text = "Uninitialized Key";
+				//        this.modifiedDateTitlelabel.Visible = false;
+				//        this.modifiedDateLabel.Visible = false;
+				//    }
+				//    else
+				//    {
+				//        this.verificationCodeTitleLabel.Text = "Product:";
+				//        this.verificationCodeLabel.Text = Lic_PackageAttribs.AttribsMemberEnum_TLic_ProductID.GetAlias((Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)productIdx);
+				//        this.modifiedDateTitlelabel.Text = "Version:";
+				//        this.modifiedDateLabel.Text = version;
+				//    }
+				//    this.currentActivationsTitleLabel.Visible = false;
+				//    this.currentActivationsLabel.Visible = false;
+				//}
 
 				this.keyListView.EndUpdate();
 			}
@@ -102,85 +124,49 @@ namespace SolimarLicenseDiagnosticDataViewer
 			}
 		}
 
-        private void ToogleControl(bool _bShow)
-        {
-            if (_bShow) // show
-            {
-                displayButton.Tag = "1";
-                displayButton.Text = "Hide Key Cells";
-                this.Height += m_heightPanel;
-                this.FormBorderStyle = FormBorderStyle.Sizable;
-            }
-            else // hide
-            {
-                displayButton.Tag = "0";
-                displayButton.Text = "Show Key Cells";
-                m_heightPanel = keyListView.Height;
-                this.Height -= m_heightPanel;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            }
-        }
-        private void displayButton_Click(object sender, EventArgs e)
-        {
-            if (sender is Button)
-            {
-                Button tmpButton = sender as Button;
-                ToogleControl(string.Compare(tmpButton.Tag as string, "0", true) == 0);
-                //if (string.Compare(tmpButton.Tag as string, "0", true) == 0)
-                //{
-                //    tmpButton.Tag = "1";
-                //    tmpButton.Text = "Hide Key Cells";
-                //    this.Height += m_heightPanel;
-                //}
-                //else
-                //{
-                //    tmpButton.Tag = "0";
-                //    tmpButton.Text = "Show Key Cells";
-                //    this.Height -= m_heightPanel;
-                //}
-            }
-        }
+		private void ToogleControl(bool _bShow)
+		{
+			if (_bShow) // show
+			{
+				displayButton.Tag = "1";
+				displayButton.Text = "Hide Key Cells";
+				this.Height += m_heightPanel;
+				this.FormBorderStyle = FormBorderStyle.Sizable;
+			}
+			else // hide
+			{
+				displayButton.Tag = "0";
+				displayButton.Text = "Show Key Cells";
+				m_heightPanel = keyListView.Height;
+				this.Height -= m_heightPanel;
+				this.FormBorderStyle = FormBorderStyle.FixedSingle;
+			}
+		}
+		private void displayButton_Click(object sender, EventArgs e)
+		{
+			if (sender is Button)
+			{
+				Button tmpButton = sender as Button;
+				ToogleControl(string.Compare(tmpButton.Tag as string, "0", true) == 0);
+				//if (string.Compare(tmpButton.Tag as string, "0", true) == 0)
+				//{
+				//    tmpButton.Tag = "1";
+				//    tmpButton.Text = "Hide Key Cells";
+				//    this.Height += m_heightPanel;
+				//}
+				//else
+				//{
+				//    tmpButton.Tag = "0";
+				//    tmpButton.Text = "Show Key Cells";
+				//    this.Height -= m_heightPanel;
+				//}
+			}
+		}
 
 		private void contextMenuStrip1_Click(object sender, EventArgs e)
 		{
-			string copyText = "";
-			if (sender is System.Windows.Forms.ContextMenuStrip)
-			{
-				if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is Panel)
-				{
-					StringBuilder copyStrBuilder = new StringBuilder();
-					copyStrBuilder.Append(keyNameTitleLabel.Text);
-					copyStrBuilder.Append(" ");
-					copyStrBuilder.Append(keyNameLabel.Text);
-
-					copyStrBuilder.Append("\r\n");
-					copyStrBuilder.Append(verificationCodeTitleLabel.Text);
-					copyStrBuilder.Append(" ");
-					copyStrBuilder.Append(verificationCodeLabel.Text);
-
-					copyStrBuilder.Append("\r\n");
-					copyStrBuilder.Append(modifiedDateTitlelabel.Text);
-					copyStrBuilder.Append(" ");
-					copyStrBuilder.Append(modifiedDateLabel.Text);
-
-					if (currentActivationsTitleLabel.Visible)
-					{
-						copyStrBuilder.Append("\r\n");
-						copyStrBuilder.Append(currentActivationsTitleLabel.Text);
-						copyStrBuilder.Append(" ");
-						copyStrBuilder.Append(currentActivationsLabel.Text);
-					}
-
-					copyText = copyStrBuilder.ToString();
-				}
-				else if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is ListView)
-					copyText = getCopyTextForListView(((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) as ListView);
-			}
-			if (copyText.Length != 0)
-				System.Windows.Forms.Clipboard.SetText(copyText);
-			else
-				System.Windows.Forms.Clipboard.Clear();
 		}
+
 
 		private void general_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -216,3 +202,4 @@ namespace SolimarLicenseDiagnosticDataViewer
 		}
 	}
 }
+
