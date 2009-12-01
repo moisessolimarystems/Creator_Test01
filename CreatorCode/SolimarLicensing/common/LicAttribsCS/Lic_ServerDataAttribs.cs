@@ -63,12 +63,53 @@ namespace Solimar
 						;
 					}
 					
+					public class Lic_ActivationInfoAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "ai";
+						
+						public Lic_ActivationInfoAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						
+						public AttribsMemberString productLicenseNumber = new AttribsMemberString("pLB", "");
+						public AttribsMemberWORD activationSlotId = new AttribsMemberWORD("aI", 0);
+						public AttribsMemberWORD activationSlotCurrentActivation = new AttribsMemberWORD("aC", 0);
+						public AttribsMemberWORD activationSlotHoursToExpire = new AttribsMemberWORD("aE", 0);
 					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_ActivationInfoAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_ActivationInfoAttribs(string keyName, Lic_ActivationInfoAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_ActivationInfoAttribs(AttribsMemberAttribsClass_Lic_ActivationInfoAttribs t)
+						{
+							return (Lic_ActivationInfoAttribs)t.m_tVal;
+						}
+					
+						public Lic_ActivationInfoAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						
+					public class Lic_ActivationInfoAttribsList : AttribsMemberGenericList {public Lic_ActivationInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ActivationInfoAttribs), defaultVal){;} }
+						
 					public AttribsMemberString LicFileName = new AttribsMemberString("fN", "");
-					public AttribsMemberString LicFileVerificationCode = new AttribsMemberString("fV", "");
+					public AttribsMemberString LicFileLicenseCode = new AttribsMemberString("fV", "");
 					public AttribsMemberString LicName = new AttribsMemberString("lB", "");
 					public AttribsMemberDateTime LicModifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
-					public AttribsMemberDWORD LicCurrentActivations = new AttribsMemberDWORD("cA", 0);
+					public AttribsMemberDateTime LicCurrentDate = new AttribsMemberDateTime("cDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public Lic_ActivationInfoAttribsList activationInfoList = new Lic_ActivationInfoAttribsList("aiLt", new ArrayList());
+					public AttribsMemberString Streamed_ActivationAttribs = new AttribsMemberString("saA", "");
 				
 				};
 				

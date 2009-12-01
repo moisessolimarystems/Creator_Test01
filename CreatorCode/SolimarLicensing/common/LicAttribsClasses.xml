@@ -171,7 +171,7 @@
 		<typedef type="class" name="Lic_ModuleInfoAttribs">
 		<AttribsClass code_class_name="Lic_ModuleInfoAttribs" name="L_MIA" descriptive_name="License Information - Module Attributes" base="">
 			<comments>License Information - Module Attributes</comments>
-			<typedef type="enum" name="TModuleState">
+			<typedef type="enum" name="TModuleState"><!--Remove Later-->
 				<enum name="msLicensed" value="0" alias="Licensed"/>
 				<enum name="msTrial" value="1" alias="Trial"/>
 				<enum name="msAddOn" value="2" alias="AddOn"/>
@@ -180,8 +180,8 @@
 			<attrib type="unsigned __int32" name="moduleValue" tagname="mV" default="0"/>
 			<attrib type="unsigned __int32" name="moduleAppInstance" tagname="mAI" default="0"/>
 			<attrib type="DateTime" name="moduleExpirationDate" tagname="exDt" default="1900-01-01 00:00:00.0000"/>
-			<attrib type="string" name="contractNumber" tagname="cN" default=""/>
-			<attrib type="TModuleState" name="moduleState" tagname="mSt" default="msTrial"/>
+			<attrib type="string" name="contractNumber" tagname="cN" default=""/><!--Remove Later-->
+			<attrib type="TModuleState" name="moduleState" tagname="mSt" default="msTrial"/><!--Remove Later-->
 		</AttribsClass>
 		</typedef>
 
@@ -195,6 +195,22 @@
 			<attrib type="unsigned __int32" name="product_Minor" tagname="pMn" default="0"/>
 			<attrib type="unsigned __int32" name="product_SubMajor" tagname="pSMj" default="0"/>
 			<attrib type="unsigned __int32" name="product_SubMinor" tagname="pSMn" default="0"/>
+			<attrib type="DateTime" name="activationCurrentExpirationDate" tagname="aCDt" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="DateTime" name="expirationDate" tagname="eDt" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  
+			<attrib type="unsigned __int32" name="activationCurrent" tagname="aC" default="0"/>  
+			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/>  
+			<attrib type="bool" name="bActivationCurrentOverride" tagname="bAC" default="false"/> 
+			<attrib type="bool" name="bUseActivations" tagname="bUA" default="false"/> 
+			<attrib type="bool" name="bUseExpirationDate" tagname="bUE" default="true"/> 
+			<!--<attrib type="bool" name="bActivationCurrentExpirationDateOverride" tagname="bACE" default="false"/> -->
+			<attrib type="string" name="contractNumber" tagname="cN" default=""/>
+			<typedef type="enum" name="TProductState">
+				<enum name="psLicensed" value="0" alias="Licensed"/>
+				<enum name="psTrial" value="1" alias="Trial"/>
+				<enum name="psAddOn" value="2" alias="AddOn"/>
+			</typedef>
+			<attrib type="TProductState" name="productState" tagname="pSt" default="psTrial"/>
 			<typedef type="collection" name="Lic_ModuleInfoAttribsList">
 			<List value_type="Lic_ModuleInfoAttribs"/>
 			</typedef>
@@ -219,18 +235,62 @@
 			<attrib type="unsigned __int32" name="softwareGroupLicenseID" tagname="swI" default="0"/>
 			<attrib type="TSoftwareLicenseType" name="softwareLicType" tagname="lT" default="sltPerpetual"/>
 			<attrib type="unsigned __int32" name="softwareLicTypeIndex" tagname="lTI" default="1"/>
-			<attrib type="DateTime" name="activationExpirationDate" tagname="aEDt" default="1900-01-01 00:00:00.0000"/>
-			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  
-			<attrib type="unsigned __int32" name="activationCurrent" tagname="aC" default="0"/>  
-			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/>  
-			<attrib type="bool" name="bActivationCurrentOverride" tagname="bAC" default="false"/>  
+			<attrib type="DateTime" name="activationExpirationDate" tagname="aEDt" default="1900-01-01 00:00:00.0000"/><!--Remove Later-->
+			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  <!--Remove Later-->
+			<attrib type="unsigned __int32" name="activationCurrent" tagname="aC" default="0"/>  <!--Remove Later-->
+			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/>  <!--Remove Later-->
+			<attrib type="bool" name="bActivationCurrentOverride" tagname="bAC" default="false"/>  <!--Remove Later-->
 			<attrib type="DateTime" name="modifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="bool" name="bLicClockViolation" tagname="lv" default="false" />
+
+			<!--License Activity Slot Info-->
+			<typedef type="class" name="Lic_ActivitySlotInfoAttribs">
+			<AttribsClass code_class_name="Lic_ActivitySlotInfoAttribs" name="L_aSA" descriptive_name="License Activity Slot Attributes" base="">
+				<attrib type="unsigned __int16" name="activitySlotID" tagname="aI" default="0"/>
+				<attrib type="string" name="contractNumber" tagname="cN" default=""/>
+			</AttribsClass>
+			</typedef>
+			<typedef type="collection" name="Lic_ActivitySlotInfoAttribsList">
+				<List value_type="Lic_ActivitySlotInfoAttribs"/>
+			</typedef>
+			<attrib type="Lic_ActivitySlotInfoAttribsList" name="activitySlotList" tagname="aSLt" default="" />
+
+			<!--License Activity Slot Change Info-->
+			<typedef type="class" name="Lic_ActivitySlotChangeInfoAttribs">
+			<AttribsClass code_class_name="Lic_ActivitySlotChangeInfoAttribs" name="L_aSCA" descriptive_name="License Activity Slot Change Attributes" base="">
+			<typedef type="enum" name="TActivitySlotChangeActionType">
+				<enum name="ascaIgnore" value="0" alias="Ignore"/>  <!--Do nothing-->
+				<enum name="ascaAdd" value="1" alias="Add"/>        <!--param1 contains the activity slot for the contractNumber-->
+				<enum name="ascaDelete" value="2" alias="Delete"/>  <!--param1 contains the activity slot for the contractNumber-->
+				<enum name="ascaMove" value="3" alias="Move"/>      <!--param1 contains the old activity slot for the contractNumber, param2 contains the new activity slot to move contractNumber to-->
+				<enum name="ascaSetActivations" value="4" alias="Set Activations"/>       <!--param1 contains the activity slot for the contractNumber, param2 contains the activations to replace for the activity slot-->
+				<enum name="ascaSetHoursToExpire" value="5" alias="Set Hours To Expire"/> <!--param1 contains the activity slot for the contractNumber, param2 contains the "hours to expire" to replace for the activity slot-->
+			</typedef>
+			<attrib type="string" name="contractNumber" tagname="cN" default=""/>
+			<attrib type="unsigned __int16" name="param1" tagname="p1" default="0"/>
+			<attrib type="unsigned __int16" name="param2" tagname="p2" default="0"/>
+			<attrib type="TActivitySlotChangeActionType" name="actionType" tagname="aT" default="ascaIgnore"/>
+			</AttribsClass>
+			</typedef>
+			<!--License Activity Slot History Info-->
+			<typedef type="class" name="Lic_ActivitySlotHistoryInfoAttribs">
+			<AttribsClass code_class_name="Lic_ActivitySlotHistoryInfoAttribs" name="L_aSHA" descriptive_name="License Activity Slot History Attributes" base="">
+				<attrib type="unsigned __int16" name="historyNumber" tagname="hN" default="0"/>
+				<typedef type="collection" name="Lic_ActivitySlotChangeInfoAttribsList">
+					<List value_type="Lic_ActivitySlotChangeInfoAttribs"/>
+				</typedef>
+				<attrib type="Lic_ActivitySlotChangeInfoAttribsList" name="activitySlotChangeInfoList" tagname="aSCLt" default="" />
+			</AttribsClass>
+			</typedef>
+			<typedef type="collection" name="Lic_ActivitySlotHistoryInfoAttribsList">
+				<List value_type="Lic_ActivitySlotHistoryInfoAttribs"/>
+			</typedef>
+			<attrib type="Lic_ActivitySlotHistoryInfoAttribsList" name="activitySlotHistoryList" tagname="aSHLt" default="" />
+			
 			<typedef type="collection" name="Lic_ProductInfoAttribsList">
-			<List value_type="Lic_ProductInfoAttribs"/>
+				<List value_type="Lic_ProductInfoAttribs"/>
 			</typedef>
 			<attrib type="Lic_ProductInfoAttribsList" name="productList" tagname="pLt" default="" />
-			
 			
 			<!--License Validation-->
 			<typedef type="class" name="Lic_ValidationTokenAttribs">
@@ -305,10 +365,26 @@
 		<typedef type="class" name="Lic_ServerDataFileInfoAttribs">
 			<AttribsClass code_class_name="Lic_ServerDataFileInfoAttribs" name="fi" descriptive_name="License Server Data File Info Attributes" base="">
 				<attrib type="string" name="LicFileName" tagname="fN" default=""/>
-				<attrib type="string" name="LicFileVerificationCode" tagname="fV" default=""/>
+				<attrib type="string" name="LicFileLicenseCode" tagname="fV" default=""/>
 				<attrib type="string" name="LicName" tagname="lB" default=""/>
 				<attrib type="DateTime" name="LicModifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
-				<attrib type="unsigned __int32" name="LicCurrentActivations" tagname="cA" default="0"/>
+				<!--<attrib type="unsigned __int32" name="LicCurrentActivations" tagname="cA" default="0"/>-->
+
+				<attrib type="DateTime" name="LicCurrentDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
+				<typedef type="class" name="Lic_ActivationInfoAttribs">
+					<AttribsClass code_class_name="Lic_ActivationInfoAttribs" name="ai" descriptive_name="Activation Slot Info Attributes" base="">
+						<attrib type="string" name="productLicenseNumber" tagname="pLB" default=""/>
+						<attrib type="unsigned __int16" name="activationSlotId" tagname="aI" default="0"/>
+						<attrib type="unsigned __int16" name="activationSlotCurrentActivation" tagname="aC" default="0"/>
+						<attrib type="unsigned __int16" name="activationSlotHoursToExpire" tagname="aE" default="0"/>
+					</AttribsClass>
+				</typedef>
+				<typedef type="collection" name="Lic_ActivationInfoAttribsList">
+					<List value_type="Lic_ActivationInfoAttribs"/>
+				</typedef>
+				<attrib type="Lic_ActivationInfoAttribsList" name="activationInfoList" tagname="aiLt" default="" />
+				<attrib type="string" name="Streamed_ActivationAttribs" tagname="saA" default=""/>
+				
 			</AttribsClass>
 		</typedef>	
 		
@@ -335,9 +411,22 @@
 	<AttribsClass code_class_name="Lic_KeyAttribs" name="L_KyA" descriptive_name="License Key Attributes" base="" filename="Lic_KeyAttribs">
 		<attrib type="list(byte[])" name="layout" tagname="lo" default="" />		
 		<attrib type="string" name="keyName" tagname="kN" default="" />
-		<attrib type="string" name="verificationCode" tagname="vC" default=""/>
-		<attrib type="DateTime" name="modifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
-		<attrib type="unsigned __int32" name="currentActivations" tagname="cA" default="0"/>
+		<attrib type="unsigned __int32" name="keyVersion" tagname="kV" default="1"/>
+		<attrib type="string" name="licenseCode" tagname="lC" default=""/>
+		<attrib type="DateTime" name="packetCreationDate" tagname="pDt" default="1900-01-01 00:00:00.0000"/>
+		<attrib type="DateTime" name="currentDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
+		<attrib type="unsigned __int16" name="historyNumber" tagname="hN" default="0"/>
+		<typedef type="class" name="Lic_ActivationInfoAttribs">
+			<AttribsClass code_class_name="Lic_ActivationInfoAttribs" name="ai" descriptive_name="Activation Slot Info Attributes" base="">
+				<attrib type="unsigned __int16" name="activationSlotId" tagname="aS" default="0"/>
+				<attrib type="unsigned __int16" name="activationSlotCurrentActivation" tagname="aC" default="0"/>
+				<attrib type="unsigned __int16" name="activationSlotHoursToExpire" tagname="aE" default="0"/>
+			</AttribsClass>
+		</typedef>
+		<typedef type="collection" name="Lic_ActivationInfoAttribsList">
+			<List value_type="Lic_ActivationInfoAttribs"/>
+		</typedef>
+		<attrib type="Lic_ActivationInfoAttribsList" name="activationInfoList" tagname="aiLt" default="" />
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_SystemInfoAttribs" name="L_SysInA" descriptive_name="System Info Attributes" base="" filename="Lic_SystemInfoAttribs">

@@ -665,7 +665,100 @@ namespace Solimar
 						;
 					}
 					
+					[FlagsAttribute]
+					public enum TProductState : uint
+					{
+						psLicensed = 0,
+						psTrial = 1,
+						psAddOn = 2,
+					};
 					
+					public class AttribsMemberEnum_TProductState : AttribsMemberEnum
+					{
+						public AttribsMemberEnum_TProductState(string keyName, TProductState defaultVal) :
+							base(keyName, defaultVal, typeof(TProductState))
+						{
+							;
+						}
+						
+						protected static SortedList m_MapAliasToEnum;
+						protected static SortedList m_MapEnumToAlias;
+						protected static SortedList m_MapOrderingIndexToAlias;
+						protected static SortedList m_MapAliasToIndex;
+						protected static SortedList m_MapEnumToIndex;
+						static AttribsMemberEnum_TProductState()
+						{
+							m_MapAliasToEnum = new SortedList();
+							m_MapEnumToAlias = new SortedList();
+							m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
+							m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+							m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+							m_MapAliasToEnum.Add("Licensed",TProductState.psLicensed);
+							m_MapEnumToAlias.Add(TProductState.psLicensed,"Licensed");
+							m_MapOrderingIndexToAlias.Add(1,"Licensed");
+							m_MapAliasToEnum.Add("Trial",TProductState.psTrial);
+							m_MapEnumToAlias.Add(TProductState.psTrial,"Trial");
+							m_MapOrderingIndexToAlias.Add(2,"Trial");
+							m_MapAliasToEnum.Add("AddOn",TProductState.psAddOn);
+							m_MapEnumToAlias.Add(TProductState.psAddOn,"AddOn");
+							m_MapOrderingIndexToAlias.Add(3,"AddOn");
+							m_MapAliasToIndex.Add("Licensed",0);
+							m_MapAliasToIndex.Add("Trial",1);
+							m_MapAliasToIndex.Add("AddOn",2);
+							m_MapEnumToIndex.Add(TProductState.psLicensed,0);
+							m_MapEnumToIndex.Add(TProductState.psTrial,1);
+							m_MapEnumToIndex.Add(TProductState.psAddOn,2);
+						}
+						
+					
+						public static string GetAlias(System.Enum enum_value)
+						{
+							return (string)m_MapEnumToAlias[enum_value];
+						}
+						public static StringCollection GetAliases()
+						{
+							StringCollection alias_list = new StringCollection();
+							foreach (string alias in m_MapOrderingIndexToAlias.Values)
+							{
+								alias_list.Add(alias);
+							}
+							return alias_list;
+						}
+						public static System.Enum GetEnumValueFromAlias(string alias)
+						{
+							return (System.Enum)m_MapAliasToEnum[alias];
+						}
+						public static int GetIndexFromAlias(string alias)
+						{
+							return (int)m_MapAliasToIndex[alias];
+						}
+						public static int GetIndexFromEnum(System.Enum enum_value)
+						{
+							return (int)m_MapEnumToIndex[enum_value];
+						}
+						
+						public string GetAlias()
+						{
+							return GetAlias(EVal);
+						}
+						public void SetEnumValueFromAlias(string alias)
+						{
+							EVal = GetEnumValueFromAlias(alias);
+						}
+					
+						public static implicit operator TProductState(AttribsMemberEnum_TProductState t)
+						{
+							return (TProductState)t.m_tVal;
+						}
+						
+						public TProductState TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+					
+						
 					public class Lic_ModuleInfoAttribsList : AttribsMemberGenericList {public Lic_ModuleInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ModuleInfoAttribs), defaultVal){;} }
 						
 					public AttribsMemberDWORD productID = new AttribsMemberDWORD("pI", 0);
@@ -674,6 +767,16 @@ namespace Solimar
 					public AttribsMemberDWORD product_Minor = new AttribsMemberDWORD("pMn", 0);
 					public AttribsMemberDWORD product_SubMajor = new AttribsMemberDWORD("pSMj", 0);
 					public AttribsMemberDWORD product_SubMinor = new AttribsMemberDWORD("pSMn", 0);
+					public AttribsMemberDateTime activationCurrentExpirationDate = new AttribsMemberDateTime("aCDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public AttribsMemberDateTime expirationDate = new AttribsMemberDateTime("eDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public AttribsMemberDWORD activationTotal = new AttribsMemberDWORD("aT", 0);
+					public AttribsMemberDWORD activationCurrent = new AttribsMemberDWORD("aC", 0);
+					public AttribsMemberDWORD activationAmountInDays = new AttribsMemberDWORD("aA", 0);
+					public AttribsMemberBOOL bActivationCurrentOverride = new AttribsMemberBOOL("bAC", false);
+					public AttribsMemberBOOL bUseActivations = new AttribsMemberBOOL("bUA", false);
+					public AttribsMemberBOOL bUseExpirationDate = new AttribsMemberBOOL("bUE", true);
+					public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");
+					public AttribsMemberEnum_TProductState productState = new AttribsMemberEnum_TProductState("pSt", TProductState.psTrial);
 					public Lic_ModuleInfoAttribsList moduleList = new Lic_ModuleInfoAttribsList("mLt", new ArrayList());
 				
 				};
@@ -812,6 +915,230 @@ namespace Solimar
 						}
 					}
 					
+						public class Lic_ActivitySlotInfoAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "L_aSA";
+						
+						public Lic_ActivitySlotInfoAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						
+						public AttribsMemberWORD activitySlotID = new AttribsMemberWORD("aI", 0);
+						public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");
+					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_ActivitySlotInfoAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_ActivitySlotInfoAttribs(string keyName, Lic_ActivitySlotInfoAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_ActivitySlotInfoAttribs(AttribsMemberAttribsClass_Lic_ActivitySlotInfoAttribs t)
+						{
+							return (Lic_ActivitySlotInfoAttribs)t.m_tVal;
+						}
+					
+						public Lic_ActivitySlotInfoAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						
+					public class Lic_ActivitySlotInfoAttribsList : AttribsMemberGenericList {public Lic_ActivitySlotInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ActivitySlotInfoAttribs), defaultVal){;} }
+						public class Lic_ActivitySlotChangeInfoAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "L_aSCA";
+						
+						public Lic_ActivitySlotChangeInfoAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						[FlagsAttribute]
+						public enum TActivitySlotChangeActionType : uint
+						{
+							ascaIgnore = 0,
+							ascaAdd = 1,
+							ascaDelete = 2,
+							ascaMove = 3,
+							ascaSetActivations = 4,
+							ascaSetHoursToExpire = 5,
+						};
+						
+						public class AttribsMemberEnum_TActivitySlotChangeActionType : AttribsMemberEnum
+						{
+							public AttribsMemberEnum_TActivitySlotChangeActionType(string keyName, TActivitySlotChangeActionType defaultVal) :
+								base(keyName, defaultVal, typeof(TActivitySlotChangeActionType))
+							{
+								;
+							}
+							
+							protected static SortedList m_MapAliasToEnum;
+							protected static SortedList m_MapEnumToAlias;
+							protected static SortedList m_MapOrderingIndexToAlias;
+							protected static SortedList m_MapAliasToIndex;
+							protected static SortedList m_MapEnumToIndex;
+							static AttribsMemberEnum_TActivitySlotChangeActionType()
+							{
+								m_MapAliasToEnum = new SortedList();
+								m_MapEnumToAlias = new SortedList();
+								m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
+								m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapAliasToEnum.Add("Ignore",TActivitySlotChangeActionType.ascaIgnore);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaIgnore,"Ignore");
+								m_MapOrderingIndexToAlias.Add(1,"Ignore");
+								m_MapAliasToEnum.Add("Add",TActivitySlotChangeActionType.ascaAdd);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaAdd,"Add");
+								m_MapOrderingIndexToAlias.Add(2,"Add");
+								m_MapAliasToEnum.Add("Delete",TActivitySlotChangeActionType.ascaDelete);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaDelete,"Delete");
+								m_MapOrderingIndexToAlias.Add(3,"Delete");
+								m_MapAliasToEnum.Add("Move",TActivitySlotChangeActionType.ascaMove);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaMove,"Move");
+								m_MapOrderingIndexToAlias.Add(4,"Move");
+								m_MapAliasToEnum.Add("Set Activations",TActivitySlotChangeActionType.ascaSetActivations);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaSetActivations,"Set Activations");
+								m_MapOrderingIndexToAlias.Add(5,"Set Activations");
+								m_MapAliasToEnum.Add("Set Hours To Expire",TActivitySlotChangeActionType.ascaSetHoursToExpire);
+								m_MapEnumToAlias.Add(TActivitySlotChangeActionType.ascaSetHoursToExpire,"Set Hours To Expire");
+								m_MapOrderingIndexToAlias.Add(6,"Set Hours To Expire");
+								m_MapAliasToIndex.Add("Ignore",0);
+								m_MapAliasToIndex.Add("Add",1);
+								m_MapAliasToIndex.Add("Delete",2);
+								m_MapAliasToIndex.Add("Move",3);
+								m_MapAliasToIndex.Add("Set Activations",4);
+								m_MapAliasToIndex.Add("Set Hours To Expire",5);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaIgnore,0);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaAdd,1);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaDelete,2);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaMove,3);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaSetActivations,4);
+								m_MapEnumToIndex.Add(TActivitySlotChangeActionType.ascaSetHoursToExpire,5);
+							}
+							
+						
+							public static string GetAlias(System.Enum enum_value)
+							{
+								return (string)m_MapEnumToAlias[enum_value];
+							}
+							public static StringCollection GetAliases()
+							{
+								StringCollection alias_list = new StringCollection();
+								foreach (string alias in m_MapOrderingIndexToAlias.Values)
+								{
+									alias_list.Add(alias);
+								}
+								return alias_list;
+							}
+							public static System.Enum GetEnumValueFromAlias(string alias)
+							{
+								return (System.Enum)m_MapAliasToEnum[alias];
+							}
+							public static int GetIndexFromAlias(string alias)
+							{
+								return (int)m_MapAliasToIndex[alias];
+							}
+							public static int GetIndexFromEnum(System.Enum enum_value)
+							{
+								return (int)m_MapEnumToIndex[enum_value];
+							}
+							
+							public string GetAlias()
+							{
+								return GetAlias(EVal);
+							}
+							public void SetEnumValueFromAlias(string alias)
+							{
+								EVal = GetEnumValueFromAlias(alias);
+							}
+						
+							public static implicit operator TActivitySlotChangeActionType(AttribsMemberEnum_TActivitySlotChangeActionType t)
+							{
+								return (TActivitySlotChangeActionType)t.m_tVal;
+							}
+							
+							public TActivitySlotChangeActionType TVal
+							{
+								get {return this;}
+								set {m_tVal = (Object)value;}
+							}
+						}
+						
+							
+						public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");
+						public AttribsMemberWORD param1 = new AttribsMemberWORD("p1", 0);
+						public AttribsMemberWORD param2 = new AttribsMemberWORD("p2", 0);
+						public AttribsMemberEnum_TActivitySlotChangeActionType actionType = new AttribsMemberEnum_TActivitySlotChangeActionType("aT", TActivitySlotChangeActionType.ascaIgnore);
+					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_ActivitySlotChangeInfoAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_ActivitySlotChangeInfoAttribs(string keyName, Lic_ActivitySlotChangeInfoAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_ActivitySlotChangeInfoAttribs(AttribsMemberAttribsClass_Lic_ActivitySlotChangeInfoAttribs t)
+						{
+							return (Lic_ActivitySlotChangeInfoAttribs)t.m_tVal;
+						}
+					
+						public Lic_ActivitySlotChangeInfoAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						public class Lic_ActivitySlotHistoryInfoAttribs : LicensingAttribsBase
+					{
+						public static string ClassName = "L_aSHA";
+						
+						public Lic_ActivitySlotHistoryInfoAttribs() : 
+							base(ClassName)
+						{
+							;
+						}
+						
+						
+						public class Lic_ActivitySlotChangeInfoAttribsList : AttribsMemberGenericList {public Lic_ActivitySlotChangeInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ActivitySlotChangeInfoAttribs), defaultVal){;} }
+							
+						public AttribsMemberWORD historyNumber = new AttribsMemberWORD("hN", 0);
+						public Lic_ActivitySlotChangeInfoAttribsList activitySlotChangeInfoList = new Lic_ActivitySlotChangeInfoAttribsList("aSCLt", new ArrayList());
+					
+					};
+					
+					public class AttribsMemberAttribsClass_Lic_ActivitySlotHistoryInfoAttribs : AttribsMemberAttribsClass
+					{
+						public AttribsMemberAttribsClass_Lic_ActivitySlotHistoryInfoAttribs(string keyName, Lic_ActivitySlotHistoryInfoAttribs defaultVal) : 
+							base(keyName, defaultVal)
+						{
+							;
+						}
+						
+						public static implicit operator Lic_ActivitySlotHistoryInfoAttribs(AttribsMemberAttribsClass_Lic_ActivitySlotHistoryInfoAttribs t)
+						{
+							return (Lic_ActivitySlotHistoryInfoAttribs)t.m_tVal;
+						}
+					
+						public Lic_ActivitySlotHistoryInfoAttribs TVal
+						{
+							get {return this;}
+							set {m_tVal = (Object)value;}
+						}
+					}
+						
+					public class Lic_ActivitySlotHistoryInfoAttribsList : AttribsMemberGenericList {public Lic_ActivitySlotHistoryInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ActivitySlotHistoryInfoAttribs), defaultVal){;} }
 						
 					public class Lic_ProductInfoAttribsList : AttribsMemberGenericList {public Lic_ProductInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ProductInfoAttribs), defaultVal){;} }
 						public class Lic_ValidationTokenAttribs : LicensingAttribsBase
@@ -1107,6 +1434,8 @@ namespace Solimar
 					public AttribsMemberBOOL bActivationCurrentOverride = new AttribsMemberBOOL("bAC", false);
 					public AttribsMemberDateTime modifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberBOOL bLicClockViolation = new AttribsMemberBOOL("lv", false);
+					public Lic_ActivitySlotInfoAttribsList activitySlotList = new Lic_ActivitySlotInfoAttribsList("aSLt", new ArrayList());
+					public Lic_ActivitySlotHistoryInfoAttribsList activitySlotHistoryList = new Lic_ActivitySlotHistoryInfoAttribsList("aSHLt", new ArrayList());
 					public Lic_ProductInfoAttribsList productList = new Lic_ProductInfoAttribsList("pLt", new ArrayList());
 					public AttribsMemberAttribsClass_Lic_VerificationAttribs licVerificationAttribs = new AttribsMemberAttribsClass_Lic_VerificationAttribs("lVA", new Lic_VerificationAttribs());
 				

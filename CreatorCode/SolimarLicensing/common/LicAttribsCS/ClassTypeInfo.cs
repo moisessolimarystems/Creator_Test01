@@ -57,11 +57,14 @@ namespace Solimar
 						map_class_base["L_KyA"] = new ClassInfoBase("L_KyA","","License Key Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_KyA");
-				((ClassInfoBase)map_class_base["L_KyA"]).attribs["currentActivations"] = new AttribInfo("currentActivations","","");
-				((ClassInfoBase)map_class_base["L_KyA"]).attribs["keyName"] = new AttribInfo("keyName","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["keyVersion"] = new AttribInfo("keyVersion","","");
 				((ClassInfoBase)map_class_base["L_KyA"]).attribs["layout"] = new AttribInfo("layout","","");
-				((ClassInfoBase)map_class_base["L_KyA"]).attribs["modifiedDate"] = new AttribInfo("modifiedDate","","");
-				((ClassInfoBase)map_class_base["L_KyA"]).attribs["verificationCode"] = new AttribInfo("verificationCode","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["historyNumber"] = new AttribInfo("historyNumber","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["keyName"] = new AttribInfo("keyName","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["licenseCode"] = new AttribInfo("licenseCode","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["currentDate"] = new AttribInfo("currentDate","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["packetCreationDate"] = new AttribInfo("packetCreationDate","","");
+				((ClassInfoBase)map_class_base["L_KyA"]).attribs["activationInfoList"] = new AttribInfo("activationInfoList","","");
 				map_class_base["L_PkgA"] = new ClassInfoBase("L_PkgA","","License Validation Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_PkgA");

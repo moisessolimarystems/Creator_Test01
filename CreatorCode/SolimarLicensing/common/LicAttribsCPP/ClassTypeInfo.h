@@ -89,11 +89,14 @@ namespace Solimar
 			{
 					map_class_base[L"L_KyA"] = new ClassInfoBase(L"L_KyA",L"",L"License Key Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_KyA"));
-					map_class_base[L"L_KyA"]->attribs[L"currentActivations"] = AttribInfo(L"currentActivations",L"",L"");
-					map_class_base[L"L_KyA"]->attribs[L"keyName"] = AttribInfo(L"keyName",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"keyVersion"] = AttribInfo(L"keyVersion",L"",L"");
 					map_class_base[L"L_KyA"]->attribs[L"layout"] = AttribInfo(L"layout",L"",L"");
-					map_class_base[L"L_KyA"]->attribs[L"modifiedDate"] = AttribInfo(L"modifiedDate",L"",L"");
-					map_class_base[L"L_KyA"]->attribs[L"verificationCode"] = AttribInfo(L"verificationCode",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"historyNumber"] = AttribInfo(L"historyNumber",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"keyName"] = AttribInfo(L"keyName",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"licenseCode"] = AttribInfo(L"licenseCode",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"currentDate"] = AttribInfo(L"currentDate",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"packetCreationDate"] = AttribInfo(L"packetCreationDate",L"",L"");
+					map_class_base[L"L_KyA"]->attribs[L"activationInfoList"] = AttribInfo(L"activationInfoList",L"",L"");
 			}
 			void constructor_helper_1()
 			{

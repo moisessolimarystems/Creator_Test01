@@ -124,82 +124,199 @@ public:
 			InitFromString(wsData);
 			return *this ;
 		}
+		class Lic_ActivationInfoAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"ai";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"Activation Slot Info Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_ActivationInfoAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+				
+			SpdAttribs::WStringAttrib productLicenseNumber;
+			SpdAttribs::WordAttrib activationSlotId;
+			SpdAttribs::WordAttrib activationSlotCurrentActivation;
+			SpdAttribs::WordAttrib activationSlotHoursToExpire;
+		
+			
+		
+			Lic_ActivationInfoAttribs& operator =(const Lic_ActivationInfoAttribs &c)
+			{
+				productLicenseNumber = c.productLicenseNumber;
+				activationSlotId = c.activationSlotId;
+				activationSlotCurrentActivation = c.activationSlotCurrentActivation;
+				activationSlotHoursToExpire = c.activationSlotHoursToExpire;
+				return *this ;
+			}
+		
+			Lic_ActivationInfoAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				productLicenseNumber(m_mapAttribObjs, L"pLB", SpdAttribs::WStringObj(L"")),
+				activationSlotId(m_mapAttribObjs, L"aI", 0),
+				activationSlotCurrentActivation(m_mapAttribObjs, L"aC", 0),
+				activationSlotHoursToExpire(m_mapAttribObjs, L"aE", 0){;}
+			
+			Lic_ActivationInfoAttribs(const Lic_ActivationInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				productLicenseNumber(m_mapAttribObjs, L"pLB", c.productLicenseNumber),
+				activationSlotId(m_mapAttribObjs, L"aI", c.activationSlotId),
+				activationSlotCurrentActivation(m_mapAttribObjs, L"aC", c.activationSlotCurrentActivation),
+				activationSlotHoursToExpire(m_mapAttribObjs, L"aE", c.activationSlotHoursToExpire){;}
+			
+			Lic_ActivationInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				productLicenseNumber(m_mapAttribObjs, L"pLB", SpdAttribs::WStringObj(L"")),
+				activationSlotId(m_mapAttribObjs, L"aI", 0),
+				activationSlotCurrentActivation(m_mapAttribObjs, L"aC", 0),
+				activationSlotHoursToExpire(m_mapAttribObjs, L"aE", 0){;}
+			
+			Lic_ActivationInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ActivationInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				productLicenseNumber(m_mapAttribObjs, L"pLB", c.productLicenseNumber),
+				activationSlotId(m_mapAttribObjs, L"aI", c.activationSlotId),
+				activationSlotCurrentActivation(m_mapAttribObjs, L"aC", c.activationSlotCurrentActivation),
+				activationSlotHoursToExpire(m_mapAttribObjs, L"aE", c.activationSlotHoursToExpire){;}
+			
+			Lic_ActivationInfoAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WStringAttrib &param_productLicenseNumber,
+				const SpdAttribs::WordAttrib &param_activationSlotId,
+				const SpdAttribs::WordAttrib &param_activationSlotCurrentActivation,
+				const SpdAttribs::WordAttrib &param_activationSlotHoursToExpire) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					productLicenseNumber(m_mapAttribObjs, L"pLB", param_productLicenseNumber),
+					activationSlotId(m_mapAttribObjs, L"aI", param_activationSlotId),
+					activationSlotCurrentActivation(m_mapAttribObjs, L"aC", param_activationSlotCurrentActivation),
+					activationSlotHoursToExpire(m_mapAttribObjs, L"aE", param_activationSlotHoursToExpire){;}
+			
+			Lic_ActivationInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WStringAttrib &param_productLicenseNumber,
+				const SpdAttribs::WordAttrib &param_activationSlotId,
+				const SpdAttribs::WordAttrib &param_activationSlotCurrentActivation,
+				const SpdAttribs::WordAttrib &param_activationSlotHoursToExpire) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					productLicenseNumber(m_mapAttribObjs, L"pLB", param_productLicenseNumber),
+					activationSlotId(m_mapAttribObjs, L"aI", param_activationSlotId),
+					activationSlotCurrentActivation(m_mapAttribObjs, L"aC", param_activationSlotCurrentActivation),
+					activationSlotHoursToExpire(m_mapAttribObjs, L"aE", param_activationSlotHoursToExpire){;}
+			
+		
+		};
+		
+		typedef std::vector< Lic_ActivationInfoAttribs > TVector_Lic_ActivationInfoAttribsList;
+		typedef SpdAttribs::CStreamableVectors< TVector_Lic_ActivationInfoAttribsList  > Vector_Lic_ActivationInfoAttribsList_Obj;
+		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ActivationInfoAttribsList_Obj, TVector_Lic_ActivationInfoAttribsList > Lic_ActivationInfoAttribsList;
 			
 		SpdAttribs::WStringAttrib LicFileName;
-		SpdAttribs::WStringAttrib LicFileVerificationCode;
+		SpdAttribs::WStringAttrib LicFileLicenseCode;
 		SpdAttribs::WStringAttrib LicName;
 		SpdAttribs::WStringAttrib LicModifiedDate;
-		SpdAttribs::DwordAttrib LicCurrentActivations;
+		SpdAttribs::WStringAttrib LicCurrentDate;
+		Lic_ActivationInfoAttribsList activationInfoList;
+		SpdAttribs::WStringAttrib Streamed_ActivationAttribs;
 	
 		
 	
 		Lic_ServerDataFileInfoAttribs& operator =(const Lic_ServerDataFileInfoAttribs &c)
 		{
 			LicFileName = c.LicFileName;
-			LicFileVerificationCode = c.LicFileVerificationCode;
+			LicFileLicenseCode = c.LicFileLicenseCode;
 			LicName = c.LicName;
 			LicModifiedDate = c.LicModifiedDate;
-			LicCurrentActivations = c.LicCurrentActivations;
+			LicCurrentDate = c.LicCurrentDate;
+			activationInfoList = c.activationInfoList;
+			Streamed_ActivationAttribs = c.Streamed_ActivationAttribs;
 			return *this ;
 		}
 	
 		Lic_ServerDataFileInfoAttribs() : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			LicFileName(m_mapAttribObjs, L"fN", SpdAttribs::WStringObj(L"")),
-			LicFileVerificationCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
+			LicFileLicenseCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
 			LicName(m_mapAttribObjs, L"lB", SpdAttribs::WStringObj(L"")),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			LicCurrentActivations(m_mapAttribObjs, L"cA", 0){;}
+			LicCurrentDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			activationInfoList(m_mapAttribObjs, L"aiLt", Vector_Lic_ActivationInfoAttribsList_Obj()),
+			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", SpdAttribs::WStringObj(L"")){;}
 		
 		Lic_ServerDataFileInfoAttribs(const Lic_ServerDataFileInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			LicFileName(m_mapAttribObjs, L"fN", c.LicFileName),
-			LicFileVerificationCode(m_mapAttribObjs, L"fV", c.LicFileVerificationCode),
+			LicFileLicenseCode(m_mapAttribObjs, L"fV", c.LicFileLicenseCode),
 			LicName(m_mapAttribObjs, L"lB", c.LicName),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", c.LicModifiedDate),
-			LicCurrentActivations(m_mapAttribObjs, L"cA", c.LicCurrentActivations){;}
+			LicCurrentDate(m_mapAttribObjs, L"cDt", c.LicCurrentDate),
+			activationInfoList(m_mapAttribObjs, L"aiLt", c.activationInfoList),
+			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", c.Streamed_ActivationAttribs){;}
 		
 		Lic_ServerDataFileInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			LicFileName(m_mapAttribObjs, L"fN", SpdAttribs::WStringObj(L"")),
-			LicFileVerificationCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
+			LicFileLicenseCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
 			LicName(m_mapAttribObjs, L"lB", SpdAttribs::WStringObj(L"")),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			LicCurrentActivations(m_mapAttribObjs, L"cA", 0){;}
+			LicCurrentDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			activationInfoList(m_mapAttribObjs, L"aiLt", Vector_Lic_ActivationInfoAttribsList_Obj()),
+			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", SpdAttribs::WStringObj(L"")){;}
 		
 		Lic_ServerDataFileInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ServerDataFileInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			LicFileName(m_mapAttribObjs, L"fN", c.LicFileName),
-			LicFileVerificationCode(m_mapAttribObjs, L"fV", c.LicFileVerificationCode),
+			LicFileLicenseCode(m_mapAttribObjs, L"fV", c.LicFileLicenseCode),
 			LicName(m_mapAttribObjs, L"lB", c.LicName),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", c.LicModifiedDate),
-			LicCurrentActivations(m_mapAttribObjs, L"cA", c.LicCurrentActivations){;}
+			LicCurrentDate(m_mapAttribObjs, L"cDt", c.LicCurrentDate),
+			activationInfoList(m_mapAttribObjs, L"aiLt", c.activationInfoList),
+			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", c.Streamed_ActivationAttribs){;}
 		
 		Lic_ServerDataFileInfoAttribs(const CWStringStream &wsAttribsClassName,
 			const SpdAttribs::WStringAttrib &param_LicFileName,
-			const SpdAttribs::WStringAttrib &param_LicFileVerificationCode,
+			const SpdAttribs::WStringAttrib &param_LicFileLicenseCode,
 			const SpdAttribs::WStringAttrib &param_LicName,
 			const SpdAttribs::WStringAttrib &param_LicModifiedDate,
-			const SpdAttribs::DwordAttrib &param_LicCurrentActivations) : 
+			const SpdAttribs::WStringAttrib &param_LicCurrentDate,
+			const Lic_ActivationInfoAttribsList &param_activationInfoList,
+			const SpdAttribs::WStringAttrib &param_Streamed_ActivationAttribs) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
 				LicFileName(m_mapAttribObjs, L"fN", param_LicFileName),
-				LicFileVerificationCode(m_mapAttribObjs, L"fV", param_LicFileVerificationCode),
+				LicFileLicenseCode(m_mapAttribObjs, L"fV", param_LicFileLicenseCode),
 				LicName(m_mapAttribObjs, L"lB", param_LicName),
 				LicModifiedDate(m_mapAttribObjs, L"mDt", param_LicModifiedDate),
-				LicCurrentActivations(m_mapAttribObjs, L"cA", param_LicCurrentActivations){;}
+				LicCurrentDate(m_mapAttribObjs, L"cDt", param_LicCurrentDate),
+				activationInfoList(m_mapAttribObjs, L"aiLt", param_activationInfoList),
+				Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", param_Streamed_ActivationAttribs){;}
 		
 		Lic_ServerDataFileInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 			const SpdAttribs::WStringAttrib &param_LicFileName,
-			const SpdAttribs::WStringAttrib &param_LicFileVerificationCode,
+			const SpdAttribs::WStringAttrib &param_LicFileLicenseCode,
 			const SpdAttribs::WStringAttrib &param_LicName,
 			const SpdAttribs::WStringAttrib &param_LicModifiedDate,
-			const SpdAttribs::DwordAttrib &param_LicCurrentActivations) : 
+			const SpdAttribs::WStringAttrib &param_LicCurrentDate,
+			const Lic_ActivationInfoAttribsList &param_activationInfoList,
+			const SpdAttribs::WStringAttrib &param_Streamed_ActivationAttribs) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 				LicFileName(m_mapAttribObjs, L"fN", param_LicFileName),
-				LicFileVerificationCode(m_mapAttribObjs, L"fV", param_LicFileVerificationCode),
+				LicFileLicenseCode(m_mapAttribObjs, L"fV", param_LicFileLicenseCode),
 				LicName(m_mapAttribObjs, L"lB", param_LicName),
 				LicModifiedDate(m_mapAttribObjs, L"mDt", param_LicModifiedDate),
-				LicCurrentActivations(m_mapAttribObjs, L"cA", param_LicCurrentActivations){;}
+				LicCurrentDate(m_mapAttribObjs, L"cDt", param_LicCurrentDate),
+				activationInfoList(m_mapAttribObjs, L"aiLt", param_activationInfoList),
+				Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", param_Streamed_ActivationAttribs){;}
 		
 	
 	};

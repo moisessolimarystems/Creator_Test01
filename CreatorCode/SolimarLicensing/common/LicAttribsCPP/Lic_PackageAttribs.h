@@ -664,6 +664,12 @@ public:
 			InitFromString(wsData);
 			return *this ;
 		}
+		typedef enum {
+			psLicensed = 0,
+			psTrial = 1,
+			psAddOn = 2,
+		} TProductState;
+		
 		typedef std::vector< Lic_ModuleInfoAttribs > TVector_Lic_ModuleInfoAttribsList;
 		typedef SpdAttribs::CStreamableVectors< TVector_Lic_ModuleInfoAttribsList  > Vector_Lic_ModuleInfoAttribsList_Obj;
 		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ModuleInfoAttribsList_Obj, TVector_Lic_ModuleInfoAttribsList > Lic_ModuleInfoAttribsList;
@@ -674,6 +680,16 @@ public:
 		SpdAttribs::DwordAttrib product_Minor;
 		SpdAttribs::DwordAttrib product_SubMajor;
 		SpdAttribs::DwordAttrib product_SubMinor;
+		SpdAttribs::WStringAttrib activationCurrentExpirationDate;
+		SpdAttribs::WStringAttrib expirationDate;
+		SpdAttribs::DwordAttrib activationTotal;
+		SpdAttribs::DwordAttrib activationCurrent;
+		SpdAttribs::DwordAttrib activationAmountInDays;
+		SpdAttribs::BoolAttrib bActivationCurrentOverride;
+		SpdAttribs::BoolAttrib bUseActivations;
+		SpdAttribs::BoolAttrib bUseExpirationDate;
+		SpdAttribs::WStringAttrib contractNumber;
+		SpdAttribs::AttribEnumTypeMember<TProductState> productState;
 		Lic_ModuleInfoAttribsList moduleList;
 	
 		
@@ -686,6 +702,16 @@ public:
 			product_Minor = c.product_Minor;
 			product_SubMajor = c.product_SubMajor;
 			product_SubMinor = c.product_SubMinor;
+			activationCurrentExpirationDate = c.activationCurrentExpirationDate;
+			expirationDate = c.expirationDate;
+			activationTotal = c.activationTotal;
+			activationCurrent = c.activationCurrent;
+			activationAmountInDays = c.activationAmountInDays;
+			bActivationCurrentOverride = c.bActivationCurrentOverride;
+			bUseActivations = c.bUseActivations;
+			bUseExpirationDate = c.bUseExpirationDate;
+			contractNumber = c.contractNumber;
+			productState = c.productState;
 			moduleList = c.moduleList;
 			return *this ;
 		}
@@ -698,6 +724,16 @@ public:
 			product_Minor(m_mapAttribObjs, L"pMn", 0),
 			product_SubMajor(m_mapAttribObjs, L"pSMj", 0),
 			product_SubMinor(m_mapAttribObjs, L"pSMn", 0),
+			activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			expirationDate(m_mapAttribObjs, L"eDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			activationTotal(m_mapAttribObjs, L"aT", 0),
+			activationCurrent(m_mapAttribObjs, L"aC", 0),
+			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
+			bUseActivations(m_mapAttribObjs, L"bUA", false),
+			bUseExpirationDate(m_mapAttribObjs, L"bUE", true),
+			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
+			productState(m_mapAttribObjs, L"pSt", psTrial),
 			moduleList(m_mapAttribObjs, L"mLt", Vector_Lic_ModuleInfoAttribsList_Obj()){;}
 		
 		Lic_ProductInfoAttribs(const Lic_ProductInfoAttribs &c) : 
@@ -708,6 +744,16 @@ public:
 			product_Minor(m_mapAttribObjs, L"pMn", c.product_Minor),
 			product_SubMajor(m_mapAttribObjs, L"pSMj", c.product_SubMajor),
 			product_SubMinor(m_mapAttribObjs, L"pSMn", c.product_SubMinor),
+			activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", c.activationCurrentExpirationDate),
+			expirationDate(m_mapAttribObjs, L"eDt", c.expirationDate),
+			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
+			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
+			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
+			bUseActivations(m_mapAttribObjs, L"bUA", c.bUseActivations),
+			bUseExpirationDate(m_mapAttribObjs, L"bUE", c.bUseExpirationDate),
+			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
+			productState(m_mapAttribObjs, L"pSt", c.productState),
 			moduleList(m_mapAttribObjs, L"mLt", c.moduleList){;}
 		
 		Lic_ProductInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
@@ -718,6 +764,16 @@ public:
 			product_Minor(m_mapAttribObjs, L"pMn", 0),
 			product_SubMajor(m_mapAttribObjs, L"pSMj", 0),
 			product_SubMinor(m_mapAttribObjs, L"pSMn", 0),
+			activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			expirationDate(m_mapAttribObjs, L"eDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			activationTotal(m_mapAttribObjs, L"aT", 0),
+			activationCurrent(m_mapAttribObjs, L"aC", 0),
+			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
+			bUseActivations(m_mapAttribObjs, L"bUA", false),
+			bUseExpirationDate(m_mapAttribObjs, L"bUE", true),
+			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
+			productState(m_mapAttribObjs, L"pSt", psTrial),
 			moduleList(m_mapAttribObjs, L"mLt", Vector_Lic_ModuleInfoAttribsList_Obj()){;}
 		
 		Lic_ProductInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ProductInfoAttribs &c) : 
@@ -728,6 +784,16 @@ public:
 			product_Minor(m_mapAttribObjs, L"pMn", c.product_Minor),
 			product_SubMajor(m_mapAttribObjs, L"pSMj", c.product_SubMajor),
 			product_SubMinor(m_mapAttribObjs, L"pSMn", c.product_SubMinor),
+			activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", c.activationCurrentExpirationDate),
+			expirationDate(m_mapAttribObjs, L"eDt", c.expirationDate),
+			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
+			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
+			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
+			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
+			bUseActivations(m_mapAttribObjs, L"bUA", c.bUseActivations),
+			bUseExpirationDate(m_mapAttribObjs, L"bUE", c.bUseExpirationDate),
+			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
+			productState(m_mapAttribObjs, L"pSt", c.productState),
 			moduleList(m_mapAttribObjs, L"mLt", c.moduleList){;}
 		
 		Lic_ProductInfoAttribs(const CWStringStream &wsAttribsClassName,
@@ -737,6 +803,16 @@ public:
 			const SpdAttribs::DwordAttrib &param_product_Minor,
 			const SpdAttribs::DwordAttrib &param_product_SubMajor,
 			const SpdAttribs::DwordAttrib &param_product_SubMinor,
+			const SpdAttribs::WStringAttrib &param_activationCurrentExpirationDate,
+			const SpdAttribs::WStringAttrib &param_expirationDate,
+			const SpdAttribs::DwordAttrib &param_activationTotal,
+			const SpdAttribs::DwordAttrib &param_activationCurrent,
+			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
+			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
+			const SpdAttribs::BoolAttrib &param_bUseActivations,
+			const SpdAttribs::BoolAttrib &param_bUseExpirationDate,
+			const SpdAttribs::WStringAttrib &param_contractNumber,
+			const TProductState &param_productState,
 			const Lic_ModuleInfoAttribsList &param_moduleList) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
 				productID(m_mapAttribObjs, L"pI", param_productID),
@@ -745,6 +821,16 @@ public:
 				product_Minor(m_mapAttribObjs, L"pMn", param_product_Minor),
 				product_SubMajor(m_mapAttribObjs, L"pSMj", param_product_SubMajor),
 				product_SubMinor(m_mapAttribObjs, L"pSMn", param_product_SubMinor),
+				activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", param_activationCurrentExpirationDate),
+				expirationDate(m_mapAttribObjs, L"eDt", param_expirationDate),
+				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
+				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
+				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
+				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
+				bUseActivations(m_mapAttribObjs, L"bUA", param_bUseActivations),
+				bUseExpirationDate(m_mapAttribObjs, L"bUE", param_bUseExpirationDate),
+				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
+				productState(m_mapAttribObjs, L"pSt", param_productState),
 				moduleList(m_mapAttribObjs, L"mLt", param_moduleList){;}
 		
 		Lic_ProductInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
@@ -754,6 +840,16 @@ public:
 			const SpdAttribs::DwordAttrib &param_product_Minor,
 			const SpdAttribs::DwordAttrib &param_product_SubMajor,
 			const SpdAttribs::DwordAttrib &param_product_SubMinor,
+			const SpdAttribs::WStringAttrib &param_activationCurrentExpirationDate,
+			const SpdAttribs::WStringAttrib &param_expirationDate,
+			const SpdAttribs::DwordAttrib &param_activationTotal,
+			const SpdAttribs::DwordAttrib &param_activationCurrent,
+			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
+			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
+			const SpdAttribs::BoolAttrib &param_bUseActivations,
+			const SpdAttribs::BoolAttrib &param_bUseExpirationDate,
+			const SpdAttribs::WStringAttrib &param_contractNumber,
+			const TProductState &param_productState,
 			const Lic_ModuleInfoAttribsList &param_moduleList) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 				productID(m_mapAttribObjs, L"pI", param_productID),
@@ -762,6 +858,16 @@ public:
 				product_Minor(m_mapAttribObjs, L"pMn", param_product_Minor),
 				product_SubMajor(m_mapAttribObjs, L"pSMj", param_product_SubMajor),
 				product_SubMinor(m_mapAttribObjs, L"pSMn", param_product_SubMinor),
+				activationCurrentExpirationDate(m_mapAttribObjs, L"aCDt", param_activationCurrentExpirationDate),
+				expirationDate(m_mapAttribObjs, L"eDt", param_expirationDate),
+				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
+				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
+				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
+				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
+				bUseActivations(m_mapAttribObjs, L"bUA", param_bUseActivations),
+				bUseExpirationDate(m_mapAttribObjs, L"bUE", param_bUseExpirationDate),
+				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
+				productState(m_mapAttribObjs, L"pSt", param_productState),
 				moduleList(m_mapAttribObjs, L"mLt", param_moduleList){;}
 		
 	
@@ -799,6 +905,266 @@ public:
 			sltSubscription = 4,
 		} TSoftwareLicenseType;
 		
+		class Lic_ActivitySlotInfoAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"L_aSA";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"License Activity Slot Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_ActivitySlotInfoAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+				
+			SpdAttribs::WordAttrib activitySlotID;
+			SpdAttribs::WStringAttrib contractNumber;
+		
+			
+		
+			Lic_ActivitySlotInfoAttribs& operator =(const Lic_ActivitySlotInfoAttribs &c)
+			{
+				activitySlotID = c.activitySlotID;
+				contractNumber = c.contractNumber;
+				return *this ;
+			}
+		
+			Lic_ActivitySlotInfoAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				activitySlotID(m_mapAttribObjs, L"aI", 0),
+				contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")){;}
+			
+			Lic_ActivitySlotInfoAttribs(const Lic_ActivitySlotInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				activitySlotID(m_mapAttribObjs, L"aI", c.activitySlotID),
+				contractNumber(m_mapAttribObjs, L"cN", c.contractNumber){;}
+			
+			Lic_ActivitySlotInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				activitySlotID(m_mapAttribObjs, L"aI", 0),
+				contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")){;}
+			
+			Lic_ActivitySlotInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ActivitySlotInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				activitySlotID(m_mapAttribObjs, L"aI", c.activitySlotID),
+				contractNumber(m_mapAttribObjs, L"cN", c.contractNumber){;}
+			
+			Lic_ActivitySlotInfoAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WordAttrib &param_activitySlotID,
+				const SpdAttribs::WStringAttrib &param_contractNumber) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					activitySlotID(m_mapAttribObjs, L"aI", param_activitySlotID),
+					contractNumber(m_mapAttribObjs, L"cN", param_contractNumber){;}
+			
+			Lic_ActivitySlotInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WordAttrib &param_activitySlotID,
+				const SpdAttribs::WStringAttrib &param_contractNumber) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					activitySlotID(m_mapAttribObjs, L"aI", param_activitySlotID),
+					contractNumber(m_mapAttribObjs, L"cN", param_contractNumber){;}
+			
+		
+		};
+		
+		typedef std::vector< Lic_ActivitySlotInfoAttribs > TVector_Lic_ActivitySlotInfoAttribsList;
+		typedef SpdAttribs::CStreamableVectors< TVector_Lic_ActivitySlotInfoAttribsList  > Vector_Lic_ActivitySlotInfoAttribsList_Obj;
+		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ActivitySlotInfoAttribsList_Obj, TVector_Lic_ActivitySlotInfoAttribsList > Lic_ActivitySlotInfoAttribsList;
+		class Lic_ActivitySlotChangeInfoAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"L_aSCA";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"License Activity Slot Change Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_ActivitySlotChangeInfoAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+			typedef enum {
+				ascaIgnore = 0,
+				ascaAdd = 1,
+				ascaDelete = 2,
+				ascaMove = 3,
+				ascaSetActivations = 4,
+				ascaSetHoursToExpire = 5,
+			} TActivitySlotChangeActionType;
+			
+				
+			SpdAttribs::WStringAttrib contractNumber;
+			SpdAttribs::WordAttrib param1;
+			SpdAttribs::WordAttrib param2;
+			SpdAttribs::AttribEnumTypeMember<TActivitySlotChangeActionType> actionType;
+		
+			
+		
+			Lic_ActivitySlotChangeInfoAttribs& operator =(const Lic_ActivitySlotChangeInfoAttribs &c)
+			{
+				contractNumber = c.contractNumber;
+				param1 = c.param1;
+				param2 = c.param2;
+				actionType = c.actionType;
+				return *this ;
+			}
+		
+			Lic_ActivitySlotChangeInfoAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
+				param1(m_mapAttribObjs, L"p1", 0),
+				param2(m_mapAttribObjs, L"p2", 0),
+				actionType(m_mapAttribObjs, L"aT", ascaIgnore){;}
+			
+			Lic_ActivitySlotChangeInfoAttribs(const Lic_ActivitySlotChangeInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
+				param1(m_mapAttribObjs, L"p1", c.param1),
+				param2(m_mapAttribObjs, L"p2", c.param2),
+				actionType(m_mapAttribObjs, L"aT", c.actionType){;}
+			
+			Lic_ActivitySlotChangeInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
+				param1(m_mapAttribObjs, L"p1", 0),
+				param2(m_mapAttribObjs, L"p2", 0),
+				actionType(m_mapAttribObjs, L"aT", ascaIgnore){;}
+			
+			Lic_ActivitySlotChangeInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ActivitySlotChangeInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
+				param1(m_mapAttribObjs, L"p1", c.param1),
+				param2(m_mapAttribObjs, L"p2", c.param2),
+				actionType(m_mapAttribObjs, L"aT", c.actionType){;}
+			
+			Lic_ActivitySlotChangeInfoAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WStringAttrib &param_contractNumber,
+				const SpdAttribs::WordAttrib &param_param1,
+				const SpdAttribs::WordAttrib &param_param2,
+				const TActivitySlotChangeActionType &param_actionType) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
+					param1(m_mapAttribObjs, L"p1", param_param1),
+					param2(m_mapAttribObjs, L"p2", param_param2),
+					actionType(m_mapAttribObjs, L"aT", param_actionType){;}
+			
+			Lic_ActivitySlotChangeInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WStringAttrib &param_contractNumber,
+				const SpdAttribs::WordAttrib &param_param1,
+				const SpdAttribs::WordAttrib &param_param2,
+				const TActivitySlotChangeActionType &param_actionType) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
+					param1(m_mapAttribObjs, L"p1", param_param1),
+					param2(m_mapAttribObjs, L"p2", param_param2),
+					actionType(m_mapAttribObjs, L"aT", param_actionType){;}
+			
+		
+		};
+		
+		class Lic_ActivitySlotHistoryInfoAttribs : public SpdAttribs::CAttribsBase
+		{
+		public:
+			static wchar_t* GetAttribsClassName()
+			{
+				 return L"L_aSHA";
+			}
+			
+		
+			static const wchar_t* DescriptiveName()
+			{
+				return L"License Activity Slot History Attributes";
+			}
+		
+			virtual const wchar_t* GetDescriptiveName() const
+			{
+				return DescriptiveName();
+			}
+		
+			Lic_ActivitySlotHistoryInfoAttribs& operator =(const CWStringStream &wsData)
+			{
+				InitFromString(wsData);
+				return *this ;
+			}
+			typedef std::vector< Lic_ActivitySlotChangeInfoAttribs > TVector_Lic_ActivitySlotChangeInfoAttribsList;
+			typedef SpdAttribs::CStreamableVectors< TVector_Lic_ActivitySlotChangeInfoAttribsList  > Vector_Lic_ActivitySlotChangeInfoAttribsList_Obj;
+			typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ActivitySlotChangeInfoAttribsList_Obj, TVector_Lic_ActivitySlotChangeInfoAttribsList > Lic_ActivitySlotChangeInfoAttribsList;
+				
+			SpdAttribs::WordAttrib historyNumber;
+			Lic_ActivitySlotChangeInfoAttribsList activitySlotChangeInfoList;
+		
+			
+		
+			Lic_ActivitySlotHistoryInfoAttribs& operator =(const Lic_ActivitySlotHistoryInfoAttribs &c)
+			{
+				historyNumber = c.historyNumber;
+				activitySlotChangeInfoList = c.activitySlotChangeInfoList;
+				return *this ;
+			}
+		
+			Lic_ActivitySlotHistoryInfoAttribs() : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				historyNumber(m_mapAttribObjs, L"hN", 0),
+				activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", Vector_Lic_ActivitySlotChangeInfoAttribsList_Obj()){;}
+			
+			Lic_ActivitySlotHistoryInfoAttribs(const Lic_ActivitySlotHistoryInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(GetAttribsClassName()),
+				historyNumber(m_mapAttribObjs, L"hN", c.historyNumber),
+				activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", c.activitySlotChangeInfoList){;}
+			
+			Lic_ActivitySlotHistoryInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				historyNumber(m_mapAttribObjs, L"hN", 0),
+				activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", Vector_Lic_ActivitySlotChangeInfoAttribsList_Obj()){;}
+			
+			Lic_ActivitySlotHistoryInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ActivitySlotHistoryInfoAttribs &c) : 
+				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+				historyNumber(m_mapAttribObjs, L"hN", c.historyNumber),
+				activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", c.activitySlotChangeInfoList){;}
+			
+			Lic_ActivitySlotHistoryInfoAttribs(const CWStringStream &wsAttribsClassName,
+				const SpdAttribs::WordAttrib &param_historyNumber,
+				const Lic_ActivitySlotChangeInfoAttribsList &param_activitySlotChangeInfoList) : 
+					SpdAttribs::CAttribsBase(wsAttribsClassName),
+					historyNumber(m_mapAttribObjs, L"hN", param_historyNumber),
+					activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", param_activitySlotChangeInfoList){;}
+			
+			Lic_ActivitySlotHistoryInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
+				const SpdAttribs::WordAttrib &param_historyNumber,
+				const Lic_ActivitySlotChangeInfoAttribsList &param_activitySlotChangeInfoList) : 
+					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
+					historyNumber(m_mapAttribObjs, L"hN", param_historyNumber),
+					activitySlotChangeInfoList(m_mapAttribObjs, L"aSCLt", param_activitySlotChangeInfoList){;}
+			
+		
+		};
+		
+		typedef std::vector< Lic_ActivitySlotHistoryInfoAttribs > TVector_Lic_ActivitySlotHistoryInfoAttribsList;
+		typedef SpdAttribs::CStreamableVectors< TVector_Lic_ActivitySlotHistoryInfoAttribsList  > Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj;
+		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj, TVector_Lic_ActivitySlotHistoryInfoAttribsList > Lic_ActivitySlotHistoryInfoAttribsList;
 		typedef std::vector< Lic_ProductInfoAttribs > TVector_Lic_ProductInfoAttribsList;
 		typedef SpdAttribs::CStreamableVectors< TVector_Lic_ProductInfoAttribsList  > Vector_Lic_ProductInfoAttribsList_Obj;
 		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_ProductInfoAttribsList_Obj, TVector_Lic_ProductInfoAttribsList > Lic_ProductInfoAttribsList;
@@ -1062,6 +1428,8 @@ public:
 		SpdAttribs::BoolAttrib bActivationCurrentOverride;
 		SpdAttribs::WStringAttrib modifiedDate;
 		SpdAttribs::BoolAttrib bLicClockViolation;
+		Lic_ActivitySlotInfoAttribsList activitySlotList;
+		Lic_ActivitySlotHistoryInfoAttribsList activitySlotHistoryList;
 		Lic_ProductInfoAttribsList productList;
 		Lic_VerificationAttribs licVerificationAttribs;
 	
@@ -1081,6 +1449,8 @@ public:
 			bActivationCurrentOverride = c.bActivationCurrentOverride;
 			modifiedDate = c.modifiedDate;
 			bLicClockViolation = c.bLicClockViolation;
+			activitySlotList = c.activitySlotList;
+			activitySlotHistoryList = c.activitySlotHistoryList;
 			productList = c.productList;
 			licVerificationAttribs = c.licVerificationAttribs;
 			return *this ;
@@ -1100,6 +1470,8 @@ public:
 			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
+			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
+			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj()),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", Lic_VerificationAttribs()){;}
 		
@@ -1117,6 +1489,8 @@ public:
 			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
+			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
+			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", c.activitySlotHistoryList),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", c.licVerificationAttribs){;}
 		
@@ -1134,6 +1508,8 @@ public:
 			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
+			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
+			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj()),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", Lic_VerificationAttribs()){;}
 		
@@ -1151,6 +1527,8 @@ public:
 			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
+			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
+			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", c.activitySlotHistoryList),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
 			licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", c.licVerificationAttribs){;}
 		
@@ -1167,6 +1545,8 @@ public:
 			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
+			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
+			const Lic_ActivitySlotHistoryInfoAttribsList &param_activitySlotHistoryList,
 			const Lic_ProductInfoAttribsList &param_productList,
 			const Lic_VerificationAttribs &param_licVerificationAttribs) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
@@ -1182,6 +1562,8 @@ public:
 				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
+				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),
+				activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", param_activitySlotHistoryList),
 				productList(m_mapAttribObjs, L"pLt", param_productList),
 				licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", param_licVerificationAttribs){;}
 		
@@ -1198,6 +1580,8 @@ public:
 			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
+			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
+			const Lic_ActivitySlotHistoryInfoAttribsList &param_activitySlotHistoryList,
 			const Lic_ProductInfoAttribsList &param_productList,
 			const Lic_VerificationAttribs &param_licVerificationAttribs) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -1213,6 +1597,8 @@ public:
 				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
+				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),
+				activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", param_activitySlotHistoryList),
 				productList(m_mapAttribObjs, L"pLt", param_productList),
 				licVerificationAttribs(m_mapAttribObjs, L"L_VrfA", L"lVA", param_licVerificationAttribs){;}
 		
