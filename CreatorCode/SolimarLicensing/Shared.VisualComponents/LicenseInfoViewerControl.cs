@@ -116,6 +116,9 @@ namespace Shared.VisualComponents
 
                 prodNode.Expand();
                 Tree_Add_Lic_VerificationAttribs(ref param_refRootNode, param_licInfoAttribs.licVerificationAttribs, param_licInfoAttribs);
+
+                Tree_Add_Lic_ActivitySlotAttribs(ref param_refRootNode, param_licInfoAttribs);
+
             }
         }
 
@@ -125,16 +128,19 @@ namespace Shared.VisualComponents
             string nodeText;
 
 
-            nodeText = "Product: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal) + " (" + System.Convert.ToInt32(param_prodInfoAttribs.productID.ToString(), 16).ToString() + ")";
+            nodeText = string.Format("Product: {0} (0x{1:x})", Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal), param_prodInfoAttribs.productID.TVal);
             toolTipBuilder.Append("ProductName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal) + "\r\n");
 
-            //nodeText = "Product " + System.Convert.ToInt32(param_prodInfoAttribs.productID.ToString(), 16).ToString();
             TreeNode prodNode = new TreeNode(nodeText);
 
-            nodeText = "ProductID: " + System.Convert.ToInt32(param_prodInfoAttribs.productID.ToString(), 16).ToString();
+            nodeText = string.Format("ProductID: {0} (0x{0:x})", param_prodInfoAttribs.productID.TVal);
             prodNode.Nodes.Add(new TreeNode(nodeText));
             toolTipBuilder.Append(nodeText + "\r\n");
 
+            nodeText = "ContractNumber: " + param_prodInfoAttribs.contractNumber.TVal;
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+            
             nodeText = "ProductAppInstance: " + System.Convert.ToInt32(param_prodInfoAttribs.productAppInstance.ToString(), 16).ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
             toolTipBuilder.Append(nodeText + "\r\n");
@@ -149,7 +155,35 @@ namespace Shared.VisualComponents
             //strBuilderIntro.Append(".");
             //strBuilderIntro.Append(param_prodInfoAttribs.product_SubMinor.ToString());
             prodNode.Nodes.Add(new TreeNode(strBuilderIntro.ToString()));
-            toolTipBuilder.Append(strBuilderIntro.ToString());
+            toolTipBuilder.Append(strBuilderIntro.ToString() + "\r\n");
+
+            nodeText = "bUseExpirationDate: " + param_prodInfoAttribs.bUseExpirationDate.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+
+            nodeText = "ExpirationDate: " + param_prodInfoAttribs.expirationDate.TVal.ToLocalTime().ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+
+            nodeText = "bUseActivations: " + param_prodInfoAttribs.bUseActivations.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+
+            nodeText = "ActivationTotal: " + System.Convert.ToInt32(param_prodInfoAttribs.activationTotal.ToString(), 16).ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+            
+            nodeText = "ActivationAmountInDays: " + System.Convert.ToInt32(param_prodInfoAttribs.activationAmountInDays.ToString(), 16).ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+
+            nodeText = "ActivationCurrent: " + System.Convert.ToInt32(param_prodInfoAttribs.activationCurrent.ToString(), 16).ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+
+            nodeText = "ActivationCurrentExpirationDate: " + param_prodInfoAttribs.activationCurrentExpirationDate.TVal.ToLocalTime().ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText);
 
             TreeNode modNode = new TreeNode("ModuleList");
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in param_prodInfoAttribs.moduleList.TVal)
@@ -212,6 +246,13 @@ namespace Shared.VisualComponents
                 childNode.ForeColor = modNode.ForeColor;
                 modNode.Nodes.Add(childNode);
             }
+
+            nodeText = "ProductLicense: " + param_modInfoAttribs.contractNumber.TVal;
+            toolTipBuilder.Append("\r\n" + nodeText);
+            childNode = new TreeNode(nodeText);
+            childNode.ForeColor = modNode.ForeColor;
+            modNode.Nodes.Add(childNode);
+
             modNode.ToolTipText = toolTipBuilder.ToString();
             AlphaAdd_ModuleInfoTreeNode(ref param_refRootNode, modNode);
 
@@ -314,6 +355,88 @@ namespace Shared.VisualComponents
             //TreeNode verificationCodeNode = new TreeNode(ValidateToken(param_verificationTokenAttribs, ref bSuccess));
             //TreeNode childNode = null;
 
+        }
+
+        private void Tree_Add_Lic_ActivitySlotAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licInfoAttribs)
+        {
+            TreeNode activitySlotNode = new TreeNode("ActivitySlotNode");
+
+            TreeNode activitySlotLayoutNode = new TreeNode("ActivitySlotLayoutList");
+            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs slotInfo in param_licInfoAttribs.activitySlotList.TVal)
+            {
+                Tree_Add_Lic_ActivitySlotInfoAttribs(ref activitySlotLayoutNode, slotInfo);
+            }
+            activitySlotNode.Nodes.Add(activitySlotLayoutNode);
+
+
+            TreeNode activitySlotHistoryNode = new TreeNode("ActivitySlotHistoryList");
+            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotHistoryInfoAttribs historyInfo in param_licInfoAttribs.activitySlotHistoryList.TVal)
+            {
+                Tree_Add_Lic_ActivitySlotHistoryInfoAttribs(ref activitySlotHistoryNode, historyInfo);
+            }
+            activitySlotNode.Nodes.Add(activitySlotHistoryNode);
+
+            activitySlotNode.ExpandAll();
+            param_refRootNode.Nodes.Add(activitySlotNode);
+        }
+        private void Tree_Add_Lic_ActivitySlotInfoAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs param_activitySlotInfoAttribs)
+        {
+            if (param_activitySlotInfoAttribs != null)
+            {
+                string nodeText = string.Format("Activity Slot: {0}, ContractNumber: {1}", param_activitySlotInfoAttribs.activitySlotID.TVal, param_activitySlotInfoAttribs.contractNumber.TVal);
+                TreeNode tmpNode = new TreeNode(nodeText);
+                tmpNode.ToolTipText = nodeText;
+                param_refRootNode.Nodes.Add(tmpNode);
+            }
+        }
+        private void Tree_Add_Lic_ActivitySlotHistoryInfoAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotHistoryInfoAttribs param_activitySlotHistoryInfoAttribs)
+        {
+            if (param_activitySlotHistoryInfoAttribs != null)
+            {
+                string nodeText = string.Format("HistoryNumber: {0}", param_activitySlotHistoryInfoAttribs.historyNumber.TVal.ToString());
+                TreeNode tmpNode = new TreeNode(nodeText);
+                tmpNode.ToolTipText = nodeText;
+                foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs changeInfo in param_activitySlotHistoryInfoAttribs.activitySlotChangeInfoList.TVal)
+                {
+                    Tree_Add_Lic_ActivitySlotChangeInfoAttribs(ref tmpNode, changeInfo);
+                }
+                param_refRootNode.Nodes.Add(tmpNode);
+            }
+        }
+        private void Tree_Add_Lic_ActivitySlotChangeInfoAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs param_activitySlotChangeInfoAttribs)
+        {
+            if (param_activitySlotChangeInfoAttribs != null)
+            {
+                StringBuilder toolTipBuilder = new StringBuilder();
+                string nodeText = "";
+                TreeNode tmpNode = null;
+
+                nodeText = string.Format("Action: {0}, ContractNumber : {1}, param1: {2}, param2: {3}", param_activitySlotChangeInfoAttribs.actionType.GetAlias(), param_activitySlotChangeInfoAttribs.contractNumber.TVal, param_activitySlotChangeInfoAttribs.param1.TVal, param_activitySlotChangeInfoAttribs.param2.TVal);
+
+                tmpNode = new TreeNode(nodeText);
+                toolTipBuilder.Append(nodeText);
+                param_refRootNode.Nodes.Add(tmpNode);
+
+                //nodeText = string.Format("ContractNumber : {0}", param_activitySlotChangeInfoAttribs.contractNumber.TVal);
+                //tmpNode = new TreeNode(nodeText);
+                //toolTipBuilder.Append("\r\n");
+                //toolTipBuilder.Append(nodeText);
+                //param_refRootNode.Nodes.Add(tmpNode);
+
+                //nodeText = string.Format("param1: {0}", param_activitySlotChangeInfoAttribs.param1.TVal);
+                //tmpNode = new TreeNode(nodeText);
+                //toolTipBuilder.Append("\r\n");
+                //toolTipBuilder.Append(nodeText);
+                //param_refRootNode.Nodes.Add(tmpNode);
+
+                //nodeText = string.Format("param2: {0}", param_activitySlotChangeInfoAttribs.param2.TVal);
+                //tmpNode = new TreeNode(nodeText);
+                //toolTipBuilder.Append("\r\n");
+                //toolTipBuilder.Append(nodeText);
+                //param_refRootNode.Nodes.Add(tmpNode);
+                //param_refRootNode.ToolTipText = toolTipBuilder.ToString();
+            }
+            
         }
 
         private string ValidateToken(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs param_verificationTokenAttribs, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licInfoAttribs, ref bool bRefSuccess)

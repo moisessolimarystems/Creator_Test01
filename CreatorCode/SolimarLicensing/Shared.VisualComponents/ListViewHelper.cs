@@ -15,11 +15,13 @@ namespace Shared.VisualComponents
                 _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                 List<int> headerMinSize = new List<int>();
                 for (int colIdx = 0; colIdx < _listView.Columns.Count; colIdx++)
-                    headerMinSize.Add(_listView.Columns[colIdx].Width);
+                    headerMinSize.Add((_listView.Columns[colIdx].Text!=string.Empty) ? _listView.Columns[colIdx].Width : 0);
                 _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
                 for (int colIdx = 0; colIdx < _listView.Columns.Count; colIdx++)
                 {
-                    if (headerMinSize[colIdx] > _listView.Columns[colIdx].Width)
+                    if (headerMinSize[colIdx] == 0)
+                        _listView.Columns[colIdx].Width = 0;
+                    else if (headerMinSize[colIdx] > _listView.Columns[colIdx].Width)
                         _listView.Columns[colIdx].Width = headerMinSize[colIdx];
                 }
             }

@@ -49,6 +49,7 @@ namespace SolimarLicenseViewer
             this.testConnToAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvToolStrip = new System.Windows.Forms.ToolStrip();
             this.bottomNoFlickerListView = new Shared.VisualComponents.NoFlickerListView();
+            this.bottomLvToolStrip = new System.Windows.Forms.ToolStrip();
             this.importPktDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportPktDialog = new System.Windows.Forms.SaveFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
@@ -183,9 +184,10 @@ namespace SolimarLicenseViewer
             // infoSplitContainer.Panel2
             // 
             this.infoSplitContainer.Panel2.Controls.Add(this.bottomNoFlickerListView);
+            this.infoSplitContainer.Panel2.Controls.Add(this.bottomLvToolStrip);
             this.infoSplitContainer.Panel2Collapsed = true;
             this.infoSplitContainer.Size = new System.Drawing.Size(463, 349);
-            this.infoSplitContainer.SplitterDistance = 165;
+            this.infoSplitContainer.SplitterDistance = 104;
             this.infoSplitContainer.TabIndex = 2;
             // 
             // noFlickerListView
@@ -217,7 +219,7 @@ namespace SolimarLicenseViewer
             this.testConnSelToolStripMenuItem,
             this.testConnToAllToolStripMenuItem});
             this.lvContextMenuStrip.Name = "lvContextMenuStrip";
-            this.lvContextMenuStrip.Size = new System.Drawing.Size(253, 154);
+            this.lvContextMenuStrip.Size = new System.Drawing.Size(253, 132);
             this.lvContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.lvContextMenuStrip_Opening);
             // 
             // copyToolStripMenuItem
@@ -288,6 +290,7 @@ namespace SolimarLicenseViewer
             this.bottomNoFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
             this.bottomNoFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.bottomNoFlickerListView.FullRowSelect = true;
+            this.bottomNoFlickerListView.HideSelection = false;
             this.bottomNoFlickerListView.Location = new System.Drawing.Point(0, 0);
             this.bottomNoFlickerListView.Name = "bottomNoFlickerListView";
             this.bottomNoFlickerListView.ShowItemToolTips = true;
@@ -298,6 +301,16 @@ namespace SolimarLicenseViewer
             this.bottomNoFlickerListView.View = System.Windows.Forms.View.Details;
             this.bottomNoFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
             this.bottomNoFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
+            // 
+            // bottomLvToolStrip
+            // 
+            this.bottomLvToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.bottomLvToolStrip.Location = new System.Drawing.Point(0, 0);
+            this.bottomLvToolStrip.Name = "bottomLvToolStrip";
+            this.bottomLvToolStrip.Size = new System.Drawing.Size(463, 25);
+            this.bottomLvToolStrip.TabIndex = 5;
+            this.bottomLvToolStrip.Text = "toolStrip1";
+            this.bottomLvToolStrip.Visible = false;
             // 
             // importPktDialog
             // 
@@ -337,7 +350,7 @@ namespace SolimarLicenseViewer
             // refreshToolStripMenuItem
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripButton_Click);
             // 
@@ -523,6 +536,7 @@ namespace SolimarLicenseViewer
             this.infoSplitContainer.Panel1.ResumeLayout(false);
             this.infoSplitContainer.Panel1.PerformLayout();
             this.infoSplitContainer.Panel2.ResumeLayout(false);
+            this.infoSplitContainer.Panel2.PerformLayout();
             this.infoSplitContainer.ResumeLayout(false);
             this.lvContextMenuStrip.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
@@ -581,6 +595,7 @@ namespace SolimarLicenseViewer
         private System.Windows.Forms.ToolStripMenuItem testConnSelToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem testConnToAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator remoteConnectToolStripMenuSeparator;
+        private System.Windows.Forms.ToolStrip bottomLvToolStrip;
 
     }
 }

@@ -118,14 +118,22 @@ namespace SolimarLicenseViewer
                             swLicNode.ForeColor = System.Drawing.Color.Red;
                         }
                         #region foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
+
                         foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                         {
                             productName = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
-                            TreeNode prodNode = new TreeNode(productName);
-                            prodNode.ImageIndex = GetIconIndex(productName);
-                            prodNode.SelectedImageIndex = prodNode.ImageIndex;
-                            prodNode.Name = swLicNode.Name + prodNode.Text;
-                            prodNode.ForeColor = swLicNode.ForeColor;
+
+                            TreeNode prodNode = FindChildTreeNode(swLicNode, productName);
+                            bool bNewNode = (prodNode == null);
+
+                            if (bNewNode == true)
+                            {
+                                prodNode = new TreeNode(productName);
+                                prodNode.ImageIndex = GetIconIndex(productName);
+                                prodNode.SelectedImageIndex = prodNode.ImageIndex;
+                                prodNode.Name = swLicNode.Name + prodNode.Text;
+                                prodNode.ForeColor = swLicNode.ForeColor;
+                            }
 
                             toolTipBuilder = new StringBuilder();
                             toolTipBuilder.Append("Product: ");
@@ -151,7 +159,8 @@ namespace SolimarLicenseViewer
                             toolTipBuilder.Append(prodInfo.productAppInstance.TVal.ToString());
 
                             prodNode.ToolTipText = toolTipBuilder.ToString();
-                            InsertIntoTree_Alpha(swLicNode, prodNode);
+                            if (bNewNode == true)
+                                InsertIntoTree_Alpha(swLicNode, prodNode);
                         }
                         #endregion
 
@@ -339,6 +348,22 @@ namespace SolimarLicenseViewer
                 insertIdx++;
             }
             parentTreeNode.Nodes.Insert(insertIdx, newChildTreeNode);
+        }
+        TreeNode FindChildTreeNode(TreeNode _parentTreeNode, string _nodeText)
+        {
+            TreeNode foundNode = null;
+            if (_parentTreeNode != null && _nodeText != string.Empty)
+            {
+                foreach (TreeNode childNode in _parentTreeNode.Nodes)
+                {
+                    if (string.Compare(childNode.Text, _nodeText, true) == 0)
+                    {
+                        foundNode = childNode;
+                        break;
+                    }
+                }
+            }
+            return foundNode;
         }
 
         #region Private Variables
