@@ -2,10 +2,11 @@
 //#include "..\Common\LicAttribsCPP\SoftwareSpec.h"
 #include "LicenseCache.h"
 #include "SolimarSoftwareLicenseMgr.h"
-#include "ProtectionKey.h"
+//#include "ProtectionKey.h"
 #include <list>
 #include <map>
-#include "RainbowDriver.h"
+#include "KeyServer.h"
+//#include "RainbowDriver.h"
 
 class SoftwareServer //: public USBNotification //Derive to get USB calls
 {
@@ -13,7 +14,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		SoftwareServer();
 		~SoftwareServer();
 
-		HRESULT Initialize(RainbowDriver* pDriver);
+		HRESULT Initialize(KeyServer* pKeyServer, RainbowDriver* pDriver);
 	
 		HRESULT AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
 		HRESULT RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
@@ -72,7 +73,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 
 		HRESULT ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue);
 
-		HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR softwareLicense);
+		HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR softwareLicense, BSTR contractNumber);
 
 		//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one will create new license file.
 		HRESULT ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicense, BSTR keyIdent);
@@ -93,6 +94,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		std::map<std::wstring/*SW Lic Name*/, bool/*bClockViolation*/> swLicClockViolationMap;
 
 		RainbowDriver* pRainbowDriver;
+		KeyServer* pKeyServer;
 		bool bFirstTime;
 
 		//variables to help with sending out messages

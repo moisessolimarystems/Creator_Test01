@@ -1,6 +1,7 @@
 #pragma once
 #include <comdef.h>
 #include "..\Common\LicAttribsCPP\Lic_ServerDataAttribs.h"
+#include "..\Common\LicAttribsCPP\Lic_KeyAttribs.h"
 class SoftwareServerDataMgr
 {
 	public:

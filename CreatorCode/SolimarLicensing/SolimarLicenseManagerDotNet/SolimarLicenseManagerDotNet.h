@@ -320,7 +320,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			//throws an exception on a failure, returns licenseInfoAttribsStream on success.
 			String^ GenerateStream_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket);
 
-			void SoftwareLicenseUseActivationToExtendTime_ByLicense(String^ softwareLicense);
+			void SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber);
 
 			System::Collections::Generic::List<SolimarLicenseProtectionKeyInfo^>^ KeyEnumerate();
 

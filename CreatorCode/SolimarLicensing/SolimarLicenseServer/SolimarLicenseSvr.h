@@ -12,6 +12,7 @@
 #include "KeyServerInstance.h"	// creates a global keyserver
 #include "SoftwareServer.h"
 #include "SoftwareServerInstance.h"	// creates a global softwareServer
+#include "..\common\WMIHelper.h"	//For WMIHelper
 #include <comutil.h>
 
 // ISolimarLicenseSvr
@@ -165,7 +166,7 @@ __interface ISolimarSoftwareLicenseSvr : IDispatch
 
 	[id(102),helpstring("method ValidateToken_ByLicense")] HRESULT ValidateToken_ByLicense([in] BSTR softwareLicense, [in] long validationTokenType, [in] BSTR validationValue);
 
-	[id(103),helpstring("method SoftwareLicenseUseActivationToExtendTime_ByLicense")] HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicense([in] BSTR softwareLicense);
+	[id(103),helpstring("method SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber")] HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber([in] BSTR softwareLicense, [in] BSTR contractNumber);
 
 	[id(104),helpstring("method GenerateVerifyDataWithVerCode_ByLicense")] HRESULT GenerateVerifyDataWithVerCode_ByLicense([in] BSTR softwareLicense, [out,retval] VARIANT* pVtLicensePacket);
 	[id(105),helpstring("method GenerateVerifyDataWithLicInfo_ByLicense")] HRESULT GenerateVerifyDataWithLicInfo_ByLicense([in] BSTR softwareLicense, [out,retval] VARIANT* pVtLicensePacket);
@@ -241,8 +242,75 @@ public:
 
 		//No longer start heart beat requirement until a key or license is obtained.
 		//keyserver.Heartbeat(m_licenseId);
-		
-		return S_OK;
+
+		//Internal License Server, only allow to run if there is a domain, and it is called corp.solimarsystems.com
+		#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+		{
+			// Hide the string so it doesn't appear in the strings of the image - "\\localhost\root\cimv2"
+			BYTE wmiLocation_Byte[] = {
+				0x5c, 0x00, 0x5c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x63, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x68, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x72, 0x00,
+				0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x63, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x76, 0x00, 0x32, 0x00, 0x00, 0x00
+			};
+			WMIHelper wmi((wchar_t*)wmiLocation_Byte);
+			hr = wmi.Connect();
+
+			// gather part of domain information
+			WMIHelper::ResultsType rList;
+			// Hide the string so it doesn't appear in the strings of the image - "SELECT * FROM Win32_ComputerSystem"
+			BYTE wmiQuery_Byte[] = {
+				0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x2a, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 
+				0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x75, 0x00, 0x74, 0x00, 0x65, 0x00, 0x72, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 
+				0x65, 0x00, 0x6d, 0x00, 0x00, 0x00
+			};
+			hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_Byte, rList);
+			if(SUCCEEDED(hr) && rList.size()>0)
+			{
+				for (unsigned int idx=0; idx<rList.size(); ++idx)
+				{
+					// Hide the string so it doesn't appear in the strings of the image - "PartOfDomain"
+					BYTE partOfDomainByte[] = {
+						0x50, 0x00, 0x61, 0x00, 0x72, 0x00, 0x74, 0x00, 0x4f, 0x00, 0x66, 0x00, 0x44, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x00, 0x00
+					};
+
+					VARIANT* pvtPartOfDomain = &rList[idx][(wchar_t*)partOfDomainByte];
+					if ((pvtPartOfDomain->vt == VT_BOOL) && (pvtPartOfDomain->boolVal == VARIANT_TRUE))
+						hr = S_OK;
+					else
+						hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED);
+
+					if(FAILED(hr))
+						break;
+
+					
+					// Hide the string so it doesn't appear in the strings of the image - "Domain"
+					BYTE domainByte[] = {
+						0x44, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x00, 0x00
+					};
+
+					// Hide the string so it doesn't appear in the strings of the image - "Corp.Solimarsystems.com"
+					BYTE solimarByte[] = {
+						0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x70, 0x00, 0x2e, 0x00, 0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x73, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 
+						0x65, 0x00, 0x6d, 0x00, 0x73, 0x00, 0x2e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x00, 0x00
+					};
+					VARIANT* pvtDomain = &rList[idx][(wchar_t*)domainByte];
+					if ((pvtDomain->vt == VT_BSTR) && 
+						(_wcsicmp(std::wstring(pvtDomain->bstrVal).c_str(), (wchar_t*)solimarByte) == 0))
+						hr = S_OK;
+					else
+						hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED);
+
+					if(FAILED(hr))
+						break;
+				}
+				WMIHelper::Clear(rList);
+				rList.clear();
+			}
+		}
+		#endif
+
+		return hr;
+		//return E_FAIL;
+		//return S_OK;
 	}
 	
 	void FinalRelease() 
@@ -369,7 +437,7 @@ public:
 
 	STDMETHOD(ValidateToken_ByLicense)(BSTR softwareLicense, long validationTokenType, BSTR validationValue);
 
-	STDMETHOD(SoftwareLicenseUseActivationToExtendTime_ByLicense)(BSTR softwareLicense);
+	STDMETHOD(SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber)(BSTR softwareLicense, BSTR contractNumber);
 
 	// ISolimarConversionToSoftwareLicenseSvr
 	//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one then will create new license file.

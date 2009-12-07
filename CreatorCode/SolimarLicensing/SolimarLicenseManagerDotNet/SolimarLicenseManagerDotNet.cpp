@@ -1647,16 +1647,23 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 		return retLicSysDataAttribsStream;
 	}
 
-	void SolimarLicenseServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicense(String^ softwareLicense)
+	void SolimarLicenseServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber)
 	{
 		BSTR bstrSoftwareLicense;
+		BSTR bstrContractNumber;
 		//convert the string* to a BSTR
 		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(softwareLicense));
 		bstrSoftwareLicense = (static_cast<BSTR>(static_cast<void *>(ptr)));
-		HRESULT hrResult = m_pLicenseServerWrapper->SoftwareLicenseUseActivationToExtendTime_ByLicense(bstrSoftwareLicense);
+
+		System::IntPtr ptr2(System::Runtime::InteropServices::Marshal::StringToBSTR(contractNumber));
+		bstrContractNumber = (static_cast<BSTR>(static_cast<void *>(ptr2)));
+		
+
+		HRESULT hrResult = m_pLicenseServerWrapper->SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(bstrSoftwareLicense, bstrContractNumber);
 
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr2);
 
 		if(FAILED(hrResult))
 			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);

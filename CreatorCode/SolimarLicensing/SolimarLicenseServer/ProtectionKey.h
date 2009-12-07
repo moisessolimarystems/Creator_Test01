@@ -7,6 +7,8 @@
 #include <map>
 #include <list>
 
+//This class is to access Protection Keys at Key Version 0
+//Keys with made for a single product with passwords being entered are of this type
 class ProtectionKey
 {
 public:
@@ -14,7 +16,8 @@ public:
 	ProtectionKey();
 	ProtectionKey(_bstr_t virtualKeyIdent, const ProtectionKey &k);
 	ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, KeySpec *keyspec, RainbowDriver *driver, bool bUseSharedLicensing);
-	~ProtectionKey();
+	virtual ~ProtectionKey();
+	virtual ProtectionKey* Copy(_bstr_t virtualKeyIdent);
 	
 	HRESULT TrialExpires(VARIANT *expire_date);
 	HRESULT TrialHours(long *trial_hours);
@@ -100,21 +103,25 @@ public:
 
 	void UpdateAllCellsCache(bool bForceRefresh = false);
 	void UpdateCellCache(unsigned int cell);
-	HRESULT DecrementTrialHours();
-	bool TimesUp();
+	virtual HRESULT DecrementTrialHours();
+	virtual bool TimesUp();
 	bool TimesUpClockViolation();
 	
 	// returns true if the key is a trial key
-	bool isOnTrial();
+	virtual bool isOnTrial();
 	// returns true if the key is currently obtained by at least one application
-	bool KeyInUse();
+	virtual bool KeyInUse();
 
 	HRESULT ApplicationInstanceCount(long* application_instance_count);
 	
 	_bstr_t GetPhysicalKeyIdent() {return m_physicalKeyIdent;}
 	void SetUseSharedLicensing(bool value) {b_use_shared_licensing = value;}
 	HRESULT CopyCellCache(const ProtectionKey &k);
-private:
+
+	//Functions to help with muliple Key Version's (How the cells on a Key will be interpreted
+	HRESULT GetKeyVersion(unsigned short* key_version);
+
+protected:
 
 	bool b_use_shared_licensing;
 	_bstr_t m_physicalKeyIdent;	
@@ -174,8 +181,10 @@ public:
 	static const unsigned int HOURS_PER_DAY = 24;
 	static const unsigned int SECONDS_PER_HOUR = 3600;
 	static const unsigned int SECONDS_PER_DAY = 86400;
-	
-private:
+		
+	// read a cell (a 16 bit segment of data) off of the protection key
+	unsigned short ReadCellCache(unsigned short cell);
+protected:
 	HANDLE cells_lock;
 	static const unsigned int KeyCellCount = 64;
 	unsigned short cells[KeyCellCount];
@@ -212,9 +221,7 @@ private:
 	// predefined queries
 	typedef enum {PRIMARY_1=0, PRIMARY_2=1, SECONDARY_1=2, SECONDARY_2=3} PredefinedQuery;
 	static const BYTE predefined_queries[8][5];
-	
-	// read a cell (a 16 bit segment of data) off of the protection key
-	unsigned short ReadCellCache(unsigned short cell);
+
 	
 	// storage sizes in bits must be a power of 2 and no greater than 32 {1,2,...16,32}
 	// offsets must be aligned to an integral multiple of bits

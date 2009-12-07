@@ -364,12 +364,12 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStream_ByL
 	return hr;
 }
 
-HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR bstrSoftwareLicense)
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR bstrSoftwareLicense, BSTR bstrContractNumber)
 {
 	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
 	if(bConnected)
 	{
-		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, SoftwareLicenseUseActivationToExtendTime_ByLicense, (bstrSoftwareLicense), hr);
+		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber, (bstrSoftwareLicense, bstrContractNumber), hr);
 	}
 	return hr;
 }

@@ -335,11 +335,11 @@ namespace SolimarLicenseViewer
             }
         }
 
-        public void SoftwareLicenseDisasterRecoveryExtendTimeByLicense(String softwareLicense)
+        public void SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String softwareLicense, String contractNumber)
         {
             try
             {
-                m_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicense(softwareLicense);
+                m_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(softwareLicense, contractNumber);
             }
             catch (COMException)
             {

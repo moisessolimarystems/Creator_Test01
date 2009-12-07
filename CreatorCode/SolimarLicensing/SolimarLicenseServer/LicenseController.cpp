@@ -49,7 +49,7 @@ LicenseController::LicenseController() :
 	//this.keyserver.Initialize(&this.driver);
 	//this.softwareServer.Initialize(&this.driver);
 	this->keyserver.Initialize(&this->driver);
-	this->softwareServer.Initialize(&this->driver);
+	this->softwareServer.Initialize(&this->keyserver, &this->driver);
 
 
 	//UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod/6, InitTimerThreadCB, this);
@@ -381,7 +381,8 @@ void LicenseController::HeartbeatCheck()
 			//xxx debug
 			wchar_t debug_buf[1024];
 			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			//_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - LicenseID: %s - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (wchar_t*)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
 			debug_buf[1023] = 0;
 			OutputDebugStringW(debug_buf);
 
@@ -432,7 +433,7 @@ HRESULT LicenseController::TimesUp()
 	//xxx check for expired keys?
 	keyserver.TimesUp();
 
-	//Sent out warning messages for close to expired keys...
+	//Sent out warning messages for close to expired product licenses...
 	softwareServer.TimesUp();
 	return S_OK;
 }
@@ -441,7 +442,17 @@ HRESULT LicenseController::TimesUp()
 void LicenseController::USBEventCallback(LPVOID pContext)
 {
 //OutputDebugStringW(L"KeyServer::USBEventCallback() - Enter");
+//try
+//{
+//	OutputDebugStringW(L"KeyServer::USBEventCallback() - a");
 	keyserver.ResynchronizeKeys(true);
+//	OutputDebugStringW(L"KeyServer::USBEventCallback() - b");
 	softwareServer.ResynchronizeSoftwareLicenses(true);
+//	OutputDebugStringW(L"KeyServer::USBEventCallback() - c");
+//}
+//catch(...)
+//{
+//	OutputDebugStringW(L"KeyServer::USBEventCallback() - Unexpected Exception");
+//}
 //OutputDebugStringW(L"KeyServer::USBEventCallback() - Leave");
 }

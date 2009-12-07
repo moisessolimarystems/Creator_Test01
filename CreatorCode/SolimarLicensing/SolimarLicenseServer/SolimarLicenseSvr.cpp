@@ -32,27 +32,28 @@ CSolimarLicenseSvr::CSolimarLicenseSvr() :
 	ChallengeResponseHelper(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private)/sizeof(BYTE), challenge_key_server_thisauthuser_public, sizeof(challenge_key_server_thisauthuser_public)/sizeof(BYTE))
 {
 //wchar_t debug_buf[1024];
-//_snwprintf_s(debug_buf, _countof(debug_buf, L"CSolimarLicenseSvr::CSolimarLicenseSvr() - Enter, m_licenseId: %s", (wchar_t*)m_licenseId);
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::CSolimarLicenseSvr() - m_licenseId: %s", (wchar_t*)m_licenseId);
 //OutputDebugStringW(debug_buf);
 	//keyserver.ResynchronizeKeys();
 	//keyserver.Initialize(&driver);
 	g_licenseController.keyserver.Initialize(&g_licenseController.driver);
-	g_licenseController.softwareServer.Initialize(&g_licenseController.driver);
+	//g_licenseController.softwareServer.Initialize(&g_licenseController.driver);
+	g_licenseController.softwareServer.Initialize(&g_licenseController.keyserver, &g_licenseController.driver);
 	//g_licenseController.softwareServer.Initialize(&keyserver.driver);
-//_snwprintf_s(debug_buf, _countof(debug_buf, L"CSolimarLicenseSvr::CSolimarLicenseSvr() - Leave, m_licenseId: %s", (wchar_t*)m_licenseId);
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::CSolimarLicenseSvr() - Leave, m_licenseId: %s", (wchar_t*)m_licenseId);
 //OutputDebugStringW(debug_buf);
 }
 
 CSolimarLicenseSvr::~CSolimarLicenseSvr()
 {
 //wchar_t debug_buf[1024];
-//_snwprintf_s(debug_buf, _countof(debug_buf, L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Enter, m_licenseId: %s", (wchar_t*)m_licenseId);
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Enter, m_licenseId: %s", (wchar_t*)m_licenseId);
 //OutputDebugStringW(debug_buf);
 
 	g_licenseController.keyserver.LicenseReleaseAll(m_licenseId);
 	g_licenseController.RemoveHeartbeat(m_licenseId);
 	
-//_snwprintf_s(debug_buf, _countof(debug_buf, L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Leave, m_licenseId: %s", (wchar_t*)m_licenseId);
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Leave, m_licenseId: %s", (wchar_t*)m_licenseId);
 //OutputDebugStringW(debug_buf);
 }
 
@@ -122,6 +123,9 @@ STDMETHODIMP CSolimarLicenseSvr::PutResponse(VARIANT vtResponse)
 
 STDMETHODIMP CSolimarLicenseSvr::Heartbeat()
 {
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::Heartbeat() m_licenseId: %s", (wchar_t*)m_licenseId);
+//OutputDebugStringW(debug_buf);
 	return g_licenseController.Heartbeat(m_licenseId);
 }
 
@@ -447,7 +451,7 @@ STDMETHODIMP CSolimarLicenseSvr::SoftwareModuleLicenseInUseForAll_ByProduct(long
 STDMETHODIMP CSolimarLicenseSvr::SoftwareValidateLicenseApp_ByProduct(long productID, VARIANT_BOOL *pbLicenseValid)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	throw E_NOTIMPL;
+	return E_NOTIMPL;
 	//return g_licenseController.softwareServer.ValidateLicense(productID, m_licenseId, pbLicenseValid);
 }
 
@@ -624,10 +628,10 @@ STDMETHODIMP CSolimarLicenseSvr::ValidateToken_ByLicense(BSTR softwareLicense, l
 	CHECK_CLIENT_AUTHENTICATION;
 	return g_licenseController.softwareServer.ValidateToken_ByLicense(softwareLicense, validationTokenType, validationValue);
 }
-STDMETHODIMP CSolimarLicenseSvr::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR softwareLicense)
+STDMETHODIMP CSolimarLicenseSvr::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR softwareLicense, BSTR contractNumber)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.SoftwareLicenseUseActivationToExtendTime_ByLicense(softwareLicense);
+	return g_licenseController.softwareServer.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(softwareLicense, contractNumber);
 }
 
 //
