@@ -15,30 +15,39 @@ namespace Solimar.Licensing.Attribs
 				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
 					licType = "F";
 					break;
-				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
-					licType = "D";
-					break;
-				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
-					licType = "P";
-					break;
-				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
-					licType = "S";
-					break;
-				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
-					licType = "T";
-					break;
+				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
+				//    licType = "D";
+				//    break;
+				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
+				//    licType = "P";
+				//    break;
+				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
+				//    licType = "S";
+				//    break;
+				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
+				//    licType = "T";
+				//    break;
 				default:
+					//All other types 
+					licType = "S";
 					break;
 			};
 			//displayLabel = string.Format("{0:x4}-{1:x4}-{2}{3:d2}", _licInfoAttribs.customerID.TVal, _licInfoAttribs.softwareGroupLicenseID.TVal, licType, _licInfoAttribs.softwareLicTypeIndex.TVal);
 			string destId_Base36 = ConvertToBase36(_destinationNumber);
 			string swGrpId_Base36 = ConvertToBase36(_groupNumber);
+			/*
 			displayLabel = string.Format("{0:x3}-{1}-{2}-{3}{4}",
 				_customerNumber,
 				(destId_Base36.Length == 1) ? "0" + destId_Base36 : destId_Base36,
 				(swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
-				licType,
+				(licType==string.Empty) ? "" : licType + "-",
 				_typeIndex);
+			*/
+			displayLabel = string.Format("{0:x3}-{1}-{2}-{3}",
+				_customerNumber,
+				(destId_Base36.Length == 1) ? "0" + destId_Base36 : destId_Base36,
+				(swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
+				licType);
 
 			return displayLabel;
 		}
@@ -239,6 +248,155 @@ namespace Solimar.Licensing.Attribs
         {
             //_valTokenAttribs2
             return false;
+        }
+        
+        // C# only function
+        public static bool GenerateActivitySlotHistoryInfo(ref Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs1)
+        {
+            bool bSuccess = false;
+            Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotHistoryInfoAttribs activitySlotHistInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotHistoryInfoAttribs();
+            Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs slotChangesInfo = null;
+            
+            //Cycle through last list of ActivitySlotIds to ContractNumbers
+            SortedDictionary<string/*ContractNumber*/, ushort/*ActivitySlotId*/> previousContractNumberToActivitySlotId = new SortedDictionary<string, ushort>();
+            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs activitySlotInfo in _licInfoAttribs1.activitySlotList.TVal)
+                previousContractNumberToActivitySlotId[activitySlotInfo.contractNumber.TVal] = activitySlotInfo.activitySlotID.TVal;
+
+            //Cycle through all the ProductLicenses of current LicenseInfo object, remember all that have activations, and if they 
+            //are overriding current activations or hours to expire
+            SortedDictionary<string/*contractNumber*/, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs> contractNumberToProdInfo = new SortedDictionary<string, Lic_PackageAttribs.Lic_ProductInfoAttribs>();
+            foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in _licInfoAttribs1.productList.TVal)
+            {
+                if (prodInfo.bUseActivations.TVal == true)
+                    contractNumberToProdInfo[prodInfo.contractNumber] = prodInfo;
+            }
+
+            #region Generate add, remove and contract number lists
+            List<string> removeContractNumberList = new List<string>();
+            List<string> addContractNumberList = new List<string>();
+            foreach (string contractNumber in previousContractNumberToActivitySlotId.Keys)
+            {
+                if (contractNumberToProdInfo.ContainsKey(contractNumber) == false)
+                    removeContractNumberList.Add(contractNumber);
+            }
+            foreach (string contractNumber in contractNumberToProdInfo.Keys)
+            {
+                if(previousContractNumberToActivitySlotId.ContainsKey(contractNumber) == false)
+                    addContractNumberList.Add(contractNumber);
+            }
+            #endregion
+
+            #region Cycle through remove list, and do remove changes
+            List<ushort/*ActivitySlotId*/> openActivitySlots = new List<ushort>();
+            foreach (string removeContractNumber in removeContractNumberList)
+            {
+                if (previousContractNumberToActivitySlotId.ContainsKey(removeContractNumber))
+                {
+                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaDelete;
+                    slotChangesInfo.contractNumber.TVal = removeContractNumber;
+                    slotChangesInfo.param1.TVal = previousContractNumberToActivitySlotId[removeContractNumber];
+                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+
+                    openActivitySlots.Add(previousContractNumberToActivitySlotId[removeContractNumber]);
+                    previousContractNumberToActivitySlotId.Remove(removeContractNumber);
+                    
+                }
+            }
+            openActivitySlots.Sort();
+            #endregion
+
+            SortedDictionary<ushort/*ActivitySlotId*/, string/*ContractNumber*/> newActivitySlotIdToContractNumber = new SortedDictionary<ushort, string>();
+            foreach (KeyValuePair<string, ushort> kvPair in previousContractNumberToActivitySlotId)
+            {
+                newActivitySlotIdToContractNumber.Add(kvPair.Value, kvPair.Key);
+            }
+            foreach (string addContractNumber in addContractNumberList)
+            {
+                if (openActivitySlots.Count > 0)    // There is a existing slot to insert into
+                {
+                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaAdd;
+                    slotChangesInfo.contractNumber.TVal = addContractNumber;
+                    slotChangesInfo.param1.TVal = openActivitySlots[0];
+                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+
+                    newActivitySlotIdToContractNumber.Add(openActivitySlots[0], addContractNumber);
+                    openActivitySlots.RemoveAt(0);
+                }
+                else // Append to the end of the List
+                {
+                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaAdd;
+                    slotChangesInfo.contractNumber.TVal = addContractNumber;
+                    slotChangesInfo.param1.TVal = (ushort)newActivitySlotIdToContractNumber.Count;
+                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+
+                    newActivitySlotIdToContractNumber.Add((ushort)newActivitySlotIdToContractNumber.Count, addContractNumber);
+                }
+            }
+
+            #region if there are any open activity slots, push all other items up, start with items at the end of the list to minimize changes
+            ushort[] newSlotIdList = new ushort[newActivitySlotIdToContractNumber.Keys.Count];  //ordered list with biggest indexed items at end
+            newActivitySlotIdToContractNumber.Keys.CopyTo(newSlotIdList, 0);
+            for (   int idx = newSlotIdList.Length - 1; 
+                    idx >= 0 && openActivitySlots.Count > 0; 
+                    idx--)
+            {
+                if (newSlotIdList[idx] > openActivitySlots[0])
+                {
+                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaMove;
+                    slotChangesInfo.contractNumber.TVal = newActivitySlotIdToContractNumber[newSlotIdList[idx]];
+                    slotChangesInfo.param1.TVal = newSlotIdList[idx];   // Old activity slot id
+                    slotChangesInfo.param2.TVal = openActivitySlots[0]; // New activity slot id
+                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+                    newActivitySlotIdToContractNumber.Remove(newSlotIdList[idx]);
+                    newActivitySlotIdToContractNumber.Add(openActivitySlots[0], slotChangesInfo.contractNumber.TVal);
+                    openActivitySlots.RemoveAt(0);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            #endregion
+            #region add all override changes
+            foreach (KeyValuePair<string/*contractNumber*/, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs> kvPair in contractNumberToProdInfo)
+            {
+                if (kvPair.Value.bActivationCurrentOverride.TVal == true)
+                {
+                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaSetActivations;
+                    slotChangesInfo.contractNumber.TVal = kvPair.Key;
+                    slotChangesInfo.param1.TVal = (ushort)kvPair.Value.activationCurrent.TVal;
+                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+                }
+            }
+            #endregion
+
+            //Update History Node - Only add if there are changes
+            if (activitySlotHistInfo.activitySlotChangeInfoList.TVal.Count > 0)
+            {
+                activitySlotHistInfo.historyNumber.TVal = (ushort)(_licInfoAttribs1.activitySlotHistoryList.TVal.Count + 1);
+                _licInfoAttribs1.activitySlotHistoryList.TVal.Add(activitySlotHistInfo);
+            }
+            //Update Activity Slot List
+            _licInfoAttribs1.activitySlotList.TVal.Clear();
+            foreach (KeyValuePair<ushort, string> kvPair in newActivitySlotIdToContractNumber)
+            {
+                Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs tmpSlotAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs();
+                tmpSlotAttribs.activitySlotID.TVal = (ushort)kvPair.Key;
+                tmpSlotAttribs.contractNumber.TVal = kvPair.Value;
+                _licInfoAttribs1.activitySlotList.TVal.Add(tmpSlotAttribs);
+//System.Diagnostics.Trace.WriteLine(string.Format("Slot: {0}, ContractNumber {1}", tmpSlotAttribs.activitySlotID.TVal, tmpSlotAttribs.contractNumber.TVal));
+            }
+            bSuccess = true;
+            return bSuccess;
+        }
+        private static bool InitializeDate(DateTime _dateTime)
+        {
+            return (DateTime.Compare(new DateTime(1900, 1, 1), _dateTime) != 0);
         }
         
 	}

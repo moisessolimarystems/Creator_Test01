@@ -19,20 +19,23 @@ class Lic_PackageAttribsHelper
 				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover:
 					wLetter = L'F';
 					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery:
-					wLetter = L'D';
-					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual:
-					wLetter = L'P';
-					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltSubscription:
-					wLetter = L'S';
-					break;
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev:
-					wLetter = L'T';
-					break;
+				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery:
+				//	wLetter = L'D';
+				//	break;
+				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual:
+				//	wLetter = L'P';
+				//	break;
+				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltSubscription:
+				//	wLetter = L'S';
+				//	break;
+				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev:
+				//	wLetter = L'T';
+				//	break;
+				//default:
+				//	wLetter = L'U';
+				//	break;
 				default:
-					wLetter = L'U';
+					wLetter = L'S';
 					break;
 			}
 
@@ -43,18 +46,27 @@ class Lic_PackageAttribsHelper
 			for(int idx=0;idx<_countof(wcstrSwGroupID);idx++)
 				wcstrSwGroupID[idx] = towupper(wcstrSwGroupID[idx]);
 			
-
 			_snwprintf_s(
 				wcstrDiplayLabel,
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
-				L"%03x-%02s-%02s-%c%d",
+				L"%03x-%02s-%02s-%c",
 				(int)_pLicInfoAttribs->customerID,
 				wcstrDestinationID,
 				wcstrSwGroupID,
-				wLetter,
-				(int)_pLicInfoAttribs->softwareLicTypeIndex
+				wLetter
 				);
+			//_snwprintf_s(
+			//	wcstrDiplayLabel,
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	L"%03x-%02s-%02s-%c%d",
+			//	(int)_pLicInfoAttribs->customerID,
+			//	wcstrDestinationID,
+			//	wcstrSwGroupID,
+			//	wLetter,
+			//	(int)_pLicInfoAttribs->softwareLicTypeIndex
+			//	);
 			//_snwprintf_s(
 			//	wcstrDiplayLabel,
 			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
