@@ -6,6 +6,7 @@
 
 #include "KeySpec.h"
 #include "ProtectionKey.h"
+#include "ProtectionKey_Version1.h"
 #include "RainbowDriver.h"
 #include "..\common\SafeMutex.h"
 #include "..\common\apctimer.h"
@@ -14,6 +15,7 @@
 #include "KeyMessages.h"
 #include "..\common\LicensingMessage.h"
 #include "..\common\CryptoHelper.h"
+#include "..\common\LicAttribsCPP\Lic_KeyAttribs.h"
 
 //#include "USBNotification.h"
 
@@ -93,7 +95,13 @@ public:
 	//// for reporting messages to clients and the event log
 	//void GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...);
 	//void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
-	//
+
+
+	// For Software Server to access Validation Keys
+	HRESULT GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs);
+	// For Software Server to access Validation Keys, will only work on keys of version 1
+	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate=false);
+
 private:
 	//static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	//static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)

@@ -20,6 +20,7 @@ typedef std::vector<String> StringList;
 #include "..\Common\StringUtils.h"
 #include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
+#include "..\common\TimeHelper.h"	//For TimeHelper
 
 // only include the password packet signing PRIVATE key on debug and solimar internal builds
 BYTE KeyServer::crypto_key_password_packet_private[] = {
@@ -117,6 +118,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Enter, bForceRefresh: %s, ThreadID: %d", bForceRefresh ? L"true" : L"false", GetCurrentThreadId());
 //OutputDebugString(tmpbuf);
+//OutputDebugString(L"KeyServer::ResynchronizeKeys() - Enter");
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
 
@@ -133,7 +135,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 					skeyIt++)
 			{
 				// CR.11876 - Make a copy of the Protection Keys.
-				tmpKeyList.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
+				tmpKeyList.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
 			}
 		}
 
@@ -150,31 +152,44 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 				if (tmpKeyList.find(dkey->first)==tmpKeyList.end())
 				{
 					_bstr_t keyName = dkey->first;
-					tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
-					long application_instances = 0;
-					tmpProKey->ApplicationInstanceCount(&application_instances);
-					if(application_instances > 1)	
-					{
-						//application_instances == virtual keys this single key will represent
-						for(int idx=1; idx<=application_instances; idx++)
-						{
-							wchar_t key_id[128];
-							_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
-							key_id[127]=0;
 
-							if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
-							{
-								//Use Share Licensing - only the first key can use the shared licensing.
-								ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
-								tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
-								tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
-								virtual_key_to_physical_key_list[key_id] = keyName;
-							}
-						}
-						delete tmpProKey;
-					}
-					else	//Only 1 Key
+					unsigned short keyVersion = 0;
+					hr = pRainbowDriver->GetKeyVersion(keyName, &keyVersion);
+
+					if(keyVersion == 0)	//Old Style Protection Key
 					{
+						tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
+						long application_instances = 0;
+						tmpProKey->ApplicationInstanceCount(&application_instances);
+						if(application_instances > 1)	
+						{
+							//application_instances == virtual keys this single key will represent
+							for(int idx=1; idx<=application_instances; idx++)
+							{
+								wchar_t key_id[128];
+								_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
+								key_id[127]=0;
+
+								if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
+								{
+									//Use Share Licensing - only the first key can use the shared licensing.
+									ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
+									tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
+									tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
+									virtual_key_to_physical_key_list[key_id] = keyName;
+								}
+							}
+							delete tmpProKey;
+						}
+						else	//Only 1 Key
+						{
+							tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
+							virtual_key_to_physical_key_list[dkey->first] = dkey->first;
+						}
+					}
+					else if(keyVersion == 1)	//Validation key for Software Licenses
+					{
+						tmpProKey = new ProtectionKey_Version1(dkey->first, &keyspec, pRainbowDriver);
 						tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
 						virtual_key_to_physical_key_list[dkey->first] = dkey->first;
 					}
@@ -243,20 +258,23 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 				if(keyIt != keys.end())	// Update existing Key Cells
 					keyIt->second->CopyCellCache(*(skeyIt->second));
 				else	// Add new Key
-					keys.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
+					keys.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
 			}
 
 			// CR.FIX.11909 - Delete temp cache of keys
 			while(!tmpKeyList.empty())
 			{
-				delete tmpKeyList.begin()->second;
+				if(tmpKeyList.begin()->second != NULL)
+					delete tmpKeyList.begin()->second;
 				tmpKeyList.erase(tmpKeyList.begin());
 			}
 		}
 	} // release the lock on the driver's key list
-
+//	swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - keys.count: %d", keys.size());
+//OutputDebugString(tmpbuf);
 //swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave: hr=0x%08x, ThreadID: %d", hr, GetCurrentThreadId());
 //OutputDebugString(tmpbuf);
+//OutputDebugString(L"KeyServer::ResynchronizeKeys() - Leave");
 	return hr;
 }
 
@@ -1326,9 +1344,235 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	}
 }
 
+// Populate the pKeyAttribs based on the key_ident.  The values populated in pKeyAttribs will be based 
+// on the key version ProtectionKey that maps to key_ident
+HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs)
+{
+	SafeMutex mutex(KeyListLock);
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+
+	HRESULT hr(S_OK);
+	try
+	{
+		if (key==keys.end())
+			throw E_INVALIDARG;
+
+		// key->second contains a protectionKey
+		ProtectionKey* pKey = (ProtectionKey*)key->second;
+		
+		// attributes common to all versions
+		unsigned short keyVersion(0);
+		hr = pKey->GetKeyVersion(&keyVersion);
+		if (FAILED(hr))
+			throw hr;
+
+		pKeyAttribs->keyVersion = keyVersion;
+		pKeyAttribs->keyName = std::wstring(key_ident);
+
+		// Cycle through all the cells of a given key
+		unsigned short shortValue;
+		byte valueByte[16];
+		int arrayIdx = 0;
+		for(unsigned short cell = 0; cell<64; cell++)
+		{
+			try
+			{
+				shortValue = pKey->ReadCellCache(cell);
+			}
+			catch(HRESULT&)
+			{
+				shortValue = 0;
+			}
+			catch(_com_error&)
+			{
+				shortValue = 0;
+			}
+			//hr = pRainbowDriver->ReadCell(dkey->first, cell, &shortValue);
+			arrayIdx = (2 * cell) % 16;
+
+			valueByte[arrayIdx] = SUCCEEDED(hr) ? shortValue>>8 : 0;
+			valueByte[arrayIdx+1] = SUCCEEDED(hr) ? (byte)shortValue : 0;
+
+//swprintf_s(tmpbuf, 1024, L" SoftwareServer::GenerateLicenseSystemData() - key: %s, cell: 0x%x, shortValue: 0x%x, valueByte[0x%x]: 0x%x, valueByte[0x%x]: 0x%x", (wchar_t*)dkey->first, cell, shortValue, arrayIdx, valueByte[arrayIdx], arrayIdx+1, valueByte[arrayIdx+1]);
+//OutputDebugString(tmpbuf);
+			if(cell % 8 == 7)
+			{
+				SpdAttribs::CBuffer cBuffer;
+				cBuffer.SetBuffer((byte*)&valueByte, 16);
+				pKeyAttribs->layout->push_back(cBuffer);
+			}
+		}
+		
+		
+		if (keyVersion == 1) // attributes for only key version 1
+		{
+			ProtectionKey_Version1* pKeyV1 = (ProtectionKey_Version1*)pKey;
+			BSTR bstrKeyLicenseCode;
+			hr = pKeyV1->GetSoftwareKeyCode(&bstrKeyLicenseCode);
+			if(SUCCEEDED(hr))
+			{
+				pKeyAttribs->licenseCode = std::wstring(bstrKeyLicenseCode);
+				SysFreeString(bstrKeyLicenseCode);
+			}
+
+			//find the times from key
+			time_t packetCreationTimeT = 0;
+			hr = pKeyV1->GetSoftwarePacketCreationDateTime(&packetCreationTimeT);
+			if(SUCCEEDED(hr) && packetCreationTimeT != 0)
+			{
+				SYSTEMTIME tmpSystime;
+				VARIANT tmpVt;
+				tmpVt = TimeHelper::TimeTToVariant(packetCreationTimeT);
+				VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+				wchar_t timestamp[256];
+				TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+				pKeyAttribs->packetCreationDate = std::wstring(timestamp);
+			}
+
+			time_t currentTimeT = 0;
+			hr = pKeyV1->GetSoftwareCurrentDateTime(&currentTimeT);
+			if(SUCCEEDED(hr) && currentTimeT != 0)
+			{
+				SYSTEMTIME tmpSystime;
+				VARIANT tmpVt;
+				tmpVt = TimeHelper::TimeTToVariant(currentTimeT);
+				VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+				wchar_t timestamp[256];
+				TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+				pKeyAttribs->currentDate = std::wstring(timestamp);
+			}
+
+			unsigned short historyNumber = 0;
+			hr = pKeyV1->GetHistoryNumber(&historyNumber);
+			if(SUCCEEDED(hr))
+				pKeyAttribs->historyNumber = historyNumber;
+			
+			//Get ActivitySlot info
+			for(unsigned short idx=0; idx<20; idx++)
+			{
+				Lic_KeyAttribs::Lic_ActivationInfoAttribs actInfo;
+				unsigned short currentActivations = 0;
+				unsigned short hoursToExpire = 0;
+				hr = pKeyV1->GetSoftwareActivitySlotCurrentActivation(idx, &currentActivations);
+				if(SUCCEEDED(hr))
+					hr = pKeyV1->GetSoftwareActivitySlotHoursToExpiration(idx, &hoursToExpire);
+
+				if(SUCCEEDED(hr))
+				{
+					actInfo.activationSlotId = idx;
+					actInfo.activationSlotCurrentActivation = currentActivations;
+					actInfo.activationSlotHoursToExpire = hoursToExpire;
+					pKeyAttribs->activationInfoList->push_back(actInfo);
+				}
+			}
+
+		}
+		else //if (keyVersion != 1) // all other known or unknown versions
+		{
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
 
 
 
+
+// For Software Server to access Validation Keys, will only work on keys of version 1
+HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate)
+{
+	HRESULT hr = S_OK;
+	SafeMutex mutex(KeyListLock);
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	try
+	{	
+		if (key==keys.end())
+			throw E_INVALIDARG;
+
+		// key->second contains a protectionKey
+		ProtectionKey* pKey = (ProtectionKey*)key->second;
+		
+		// attributes common to all versions
+		unsigned short keyVersion(0);
+		hr = pKey->GetKeyVersion(&keyVersion);
+		if (FAILED(hr))
+			throw hr;
+
+
+		if (keyVersion == 1)
+		{
+			ProtectionKey_Version1* pKeyV1 = (ProtectionKey_Version1*)pKey;
+			hr = pKeyV1->SetSoftwareKeyCode(_bstr_t(std::wstring(keyAttribs.licenseCode).c_str()));
+			if(FAILED(hr)) throw hr;
+
+			SYSTEMTIME tmpDateSystime;
+			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.packetCreationDate)).c_str(), tmpDateSystime))
+				throw(E_FAIL);
+
+			_variant_t tmpDateVt(NULL);	
+			if (!SystemTimeToVariantTime(&tmpDateSystime, &tmpDateVt.date)) 
+				throw(E_FAIL);
+
+			hr = pKeyV1->SetSoftwarePacketCreationDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
+			if(FAILED(hr)) throw hr;
+
+			unsigned short historyNumber(0);
+			hr = pKeyV1->GetHistoryNumber(&historyNumber);
+			if(FAILED(hr)) throw hr;
+
+			if(bForceActivitySlotUpdate || historyNumber < keyAttribs.historyNumber)
+			{
+				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.currentDate)).c_str(), tmpDateSystime))
+				throw(E_FAIL);
+
+				if (!SystemTimeToVariantTime(&tmpDateSystime, &tmpDateVt.date)) 
+					throw(E_FAIL);
+
+				hr = pKeyV1->SetSoftwareCurrentDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
+				if(FAILED(hr)) throw hr;
+
+				//replace all activity slots on key with values in keyAttribs
+				for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actSlotIt = keyAttribs.activationInfoList->begin();
+					actSlotIt != keyAttribs.activationInfoList->end();
+					actSlotIt++)
+				{
+					hr = pKeyV1->SetSoftwareActivitySlotCurrentActivation(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotCurrentActivation));
+					//if(FAILED(hr))
+					//	throw hr;
+					hr = pKeyV1->SetSoftwareActivitySlotHoursToExpiration(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotHoursToExpire));
+					//if(FAILED(hr))
+					//	throw hr;
+				}
+				hr = pKeyV1->SetHistoryNumber(unsigned short(keyAttribs.historyNumber));
+					if(FAILED(hr)) throw hr;
+			}
+
+			//cycle through activation list, if there are any overrides, then overide value on key.
+		}
+		else //if (keyVersion != 1) // all other known or unknown versions
+		{
+			hr = E_INVALIDARG;
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
 
 // support for blocking brute force attempts at password cracking
 // returns the number of milliseconds to delay before checking a password
@@ -1344,6 +1588,7 @@ DWORD KeyServer::PasswordEntryDelay(long failed_attempts)
 //
 HRESULT KeyServer::TimesUp()
 {
+//OutputDebugStringW(L"KeyServer::TimesUp() - Enter");
 	// get the key list and check if any keys in it are not in the trial key list
 	{
 		SafeMutex mutex1(KeyListLock);
@@ -1417,11 +1662,17 @@ HRESULT KeyServer::TimesUp()
 								HRESULT hr = key->second->DecrementTrialHours();
 //swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
 //OutputDebugString(tmpbuf);
-								g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
 								if (SUCCEEDED(hr))
 								{
 									tk->second.key_obtained = false;
 									tk->second.last_decrement = cur_time;
+
+									unsigned short key_version(0);
+									hr = key->second->GetKeyVersion(&key_version);
+									//Check for key version, if key version 0 then send current message
+									if(key_version == 0)
+										g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
+									//if key version 1 then send no message
 								}
 							}
 						}
@@ -1430,7 +1681,7 @@ HRESULT KeyServer::TimesUp()
 			}
 		}
 	}
-	
+//OutputDebugStringW(L"KeyServer::TimesUp() - Leave");	
 	//xxx check for expired keys?
 	return S_OK;
 }

@@ -107,7 +107,7 @@ namespace SolimarLicenseViewer
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (ImportLicense() == true)
+            if (btnOk.Enabled && ImportLicense() == true)
                 DialogResult = DialogResult.OK;
             else
                 DialogResult = DialogResult.None;   //continue running dialog

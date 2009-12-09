@@ -82,6 +82,7 @@
             this.licSelectionListView.UseCompatibleStateImageBehavior = false;
             this.licSelectionListView.View = System.Windows.Forms.View.Details;
             this.licSelectionListView.SelectedIndexChanged += new System.EventHandler(this.licSelectionListView_SelectedIndexChanged);
+            this.licSelectionListView.DoubleClick += new System.EventHandler(this.btnOk_Click);
             // 
             // columnHeader1
             // 
