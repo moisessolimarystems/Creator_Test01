@@ -7,8 +7,10 @@
 #include "..\common\CryptoHelper.h"
 #include "..\common\TimeHelper.h"
 #include "KeyServerInstance.h"
+#include "SoftwareServerInstance.h"
 #include <time.h>
-#include <algorithm>		//for std::find
+#include <algorithm>		//For std::find
+#include <math.h>			//For abs
 
 
 /* KDPasswordText[]
@@ -208,6 +210,10 @@ ProtectionKey::~ProtectionKey()
 	m_driver = NULL;
 }
 
+ProtectionKey* ProtectionKey::Copy(_bstr_t virtualKeyIdent)
+{
+	return new ProtectionKey(virtualKeyIdent, *this);
+}
 HRESULT ProtectionKey::TrialExpires(VARIANT *expire_date)
 {
 	SafeMutex mutex(license_use_lock);
@@ -273,6 +279,23 @@ HRESULT ProtectionKey::IsProgrammed(VARIANT_BOOL *key_programmed)
 	try
 	{
 		*key_programmed = (ReadHeaderCache(L"Customer Number").uiVal || ReadHeaderCache(L"Key Number").uiVal ? VARIANT_TRUE : VARIANT_FALSE);
+	}
+	catch(_com_error &e)
+	{
+		return e.Error();
+	}
+	return S_OK;
+}
+// Verify that the attached key is a solimar protection key and not a validation token key
+HRESULT ProtectionKey::IsSolimarProtectionKey(VARIANT_BOOL *key_solimar_protection_key)
+{
+	SafeMutex mutex(license_use_lock);
+	*key_solimar_protection_key = VARIANT_FALSE;
+	try
+	{
+		unsigned short product_ident = ReadHeaderCache(L"Product ID").uiVal;
+		if((product_ident >= 0 && product_ident <= 3) || (product_ident >= 5 && product_ident <= 14))
+			*key_solimar_protection_key = VARIANT_TRUE;
 	}
 	catch(_com_error &e)
 	{
@@ -382,7 +405,7 @@ HRESULT ProtectionKey::Release(BSTR license_id)
 	key_use[_bstr_t(license_id,true)]--;
 	if (key_use[_bstr_t(license_id,true)]<0)
 	{
-		keyserver.GenerateMessage(m_virtualKeyIdent, MT_INFO, S_OK, time(0), MessageTooManyReleases);
+		g_licenseController.GenerateMessage(m_virtualKeyIdent, MT_INFO, S_OK, time(0), MessageTooManyReleases);
 		key_use[_bstr_t(license_id,true)]=0;
 	}
 	return S_OK;
@@ -807,7 +830,7 @@ HRESULT ProtectionKey::RemoveApplicationInstance(BSTR license_id, BSTR applicati
 	LicenseToApplicationInstanceList::iterator licAppIt = license_to_app.find(_bstr_t(license_id,true));
 	if(licAppIt != license_to_app.end())
 	{
-		if(wcsicmp(bstrAppId, L"") == 0)
+		if(_wcsicmp(bstrAppId, L"") == 0)
 			bstrAppId =  _bstr_t(licAppIt->second,true);
 		license_to_app.erase(licAppIt);
 	}
@@ -1139,61 +1162,72 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Produc
 
 	// write the header data
 	WriteHeader(L"Product ID",(unsigned int)(unsigned short)product_ident);
-	WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
 	WriteHeader(L"Key Type",(unsigned int)(unsigned short)key_type);
-	WriteHeader(L"Status",(unsigned int)(unsigned short)INITIAL_TRIAL);
-	WriteHeader(L"Application Instances",(unsigned int)(unsigned short)application_instances);
+
+//xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Customer: %x, Key Number %x)", customer_number, key_number);
+#endif
+	WriteHeader(L"Customer Number",(unsigned int)(unsigned short)customer_number);
+	WriteHeader(L"Key Number",(unsigned int)(unsigned short)key_number);
 	
+//xxx debug
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentKeyIdent()");
+#endif
+	
+	hr = m_driver->ComputeCurrentKeyIdent(m_physicalKeyIdent, new_key_ident);
+	if (FAILED(hr)) throw _com_error(hr);
+
+	//key_type == KEYVerification uses a key layout version of 1, all other key_types use key layout version of 0
+	if(key_type == KEYVerification)
+	{
+		WriteHeader(L"Key Version", 1);
+	}
+	if(key_type != KEYVerification)
+	{
+		WriteHeader(L"Key Version", 0);
+		WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
+		WriteHeader(L"Status",(unsigned int)(unsigned short)INITIAL_TRIAL);
+		WriteHeader(L"Application Instances",(unsigned int)(unsigned short)application_instances);
+
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteCounterDays(%d)", days);
 #endif
-	
-	// write the initial/extended counter
-	hr = WriteCounterDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
+
+		// write the initial/extended counter
+		hr = WriteCounterDays((unsigned short)days);		
+		if (FAILED(hr)) throw _com_error(hr);
 	
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Call WriteExpirationDays(%d)", days);
 #endif
 	
-	// write the expiration date
-	hr = WriteExpirationDays((unsigned short)days);		if (FAILED(hr)) throw _com_error(hr);
-	
-//xxx debug
-#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
-OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Customer: %x, Key Number %x)", customer_number, key_number);
-#endif
-	
-	WriteHeader(L"Customer Number",(unsigned int)(unsigned short)customer_number);
-	WriteHeader(L"Key Number",(unsigned int)(unsigned short)key_number);
-	
-	// get the new key id for this key now that the customer number and key number are written
-	if (new_key_ident)
-	{
-//xxx debug
-#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
-OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentKeyIdent()");
-#endif
-		
-	    hr = m_driver->ComputeCurrentKeyIdent(m_physicalKeyIdent, new_key_ident);
+		// write the expiration date
+		hr = WriteExpirationDays((unsigned short)days);		
 		if (FAILED(hr)) throw _com_error(hr);
-	}
 
-	hr = m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);		if (FAILED(hr)) throw _com_error(hr);
-	InitializePasswordNumber();	// Set the module password number to 0
+		
+	
+		hr = m_driver->ClearKeyUnprogrammedIdentifier(m_physicalKeyIdent);		
+		if (FAILED(hr)) throw _com_error(hr);
+
+		InitializePasswordNumber();	// Set the module password number to 0
 	
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primary descriptor, primary password, secondary descriptor)");
 #endif
+		
+		KeySpec::Header &header_primary_descriptor = m_keyspec->headers[L"Primary Descriptor"];
+		KeySpec::Header &header_secondary_descriptor = m_keyspec->headers[L"Secondary Descriptor"];
+		KeySpec::Header &header_primary_password = m_keyspec->headers[L"Primary Password"];
+		WriteHeader(header_primary_descriptor.id, header_primary_descriptor.default_value);
+		WriteHeader(header_primary_password.id, header_primary_password.default_value);
+		WriteHeader(header_secondary_descriptor.id, header_secondary_descriptor.default_value);
 	
-	KeySpec::Header &header_primary_descriptor = m_keyspec->headers[L"Primary Descriptor"];
-	KeySpec::Header &header_secondary_descriptor = m_keyspec->headers[L"Secondary Descriptor"];
-	KeySpec::Header &header_primary_password = m_keyspec->headers[L"Primary Password"];
-	WriteHeader(header_primary_descriptor.id, header_primary_descriptor.default_value);
-	WriteHeader(header_primary_password.id, header_primary_password.default_value);
-	WriteHeader(header_secondary_descriptor.id, header_secondary_descriptor.default_value);
 			
 	
 	
@@ -1203,97 +1237,98 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing headers (Primar
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data");
 #endif
 	
-	// write the default module data if provided
-	//xxx I don't know if this is supposed to happen
-	//xxx review what happens when you program a key
-	// for each module for this product
-	KeySpec::Product &product(m_keyspec->products[product_ident]);
-	for (KeySpec::Product::data_list_t::iterator module = product.data.begin(); module != product.data.end(); ++module)
-	{
+		// write the default module data if provided
+		//xxx I don't know if this is supposed to happen
+		//xxx review what happens when you program a key
+		// for each module for this product
+		KeySpec::Product &product(m_keyspec->products[product_ident]);
+		for (KeySpec::Product::data_list_t::iterator module = product.data.begin(); module != product.data.end(); ++module)
+		{
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing default module data (<%04x><%02d>  %08x)", module->offset, module->bits, (unsigned int)module->default_license);
 #endif
-		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
-	}
-	
+			WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
+		}
+		
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides");
 #endif
-	
-	// write the values specified in the module value list if appropriate
-	if (module_value_list.vt==(VT_ARRAY | VT_VARIANT))
-	{
-		MultidimensionalSafeArray::DimensionsType dims, index;
-		hr = MultidimensionalSafeArray::SizeofMultidimensionalSafearray(&module_value_list, dims);
-		if (SUCCEEDED(hr) && dims.size()==2)
+		
+		// write the values specified in the module value list if appropriate
+		if (module_value_list.vt==(VT_ARRAY | VT_VARIANT))
 		{
-			// for each module license
-			for (unsigned int row=0; row<dims[0]; ++row)
+			MultidimensionalSafeArray::DimensionsType dims, index;
+			hr = MultidimensionalSafeArray::SizeofMultidimensionalSafearray(&module_value_list, dims);
+			if (SUCCEEDED(hr) && dims.size()==2)
 			{
-				VARIANT *pElement = 0;
-				unsigned int module_id = 0;
-				unsigned int module_value = 0;
-				index.push_back(row);
-					index.push_back(0);
-						MultidimensionalSafeArray::AccessMultidimensionalSafearray(&module_value_list, index, &pElement);
-						module_id = (unsigned int)pElement->ulVal;
-						MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&module_value_list, index);
-					index.pop_back();
-					index.push_back(1);
-						MultidimensionalSafeArray::AccessMultidimensionalSafearray(&module_value_list, index, &pElement);
-						module_value = (unsigned int)pElement->ulVal;
-						MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&module_value_list, index);
-					index.pop_back();
-				index.pop_back();
-				
-				try
+				// for each module license
+				for (unsigned int row=0; row<dims[0]; ++row)
 				{
-					KeySpec::Module &module(m_keyspec->products[product_ident][module_id]);
-					if (module.isLicense)
+					VARIANT *pElement = 0;
+					unsigned int module_id = 0;
+					unsigned int module_value = 0;
+					index.push_back(row);
+						index.push_back(0);
+							MultidimensionalSafeArray::AccessMultidimensionalSafearray(&module_value_list, index, &pElement);
+							module_id = (unsigned int)pElement->ulVal;
+							MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&module_value_list, index);
+						index.pop_back();
+						index.push_back(1);
+							MultidimensionalSafeArray::AccessMultidimensionalSafearray(&module_value_list, index, &pElement);
+							module_value = (unsigned int)pElement->ulVal;
+							MultidimensionalSafeArray::UnaccessMultidimensionalSafearray(&module_value_list, index);
+						index.pop_back();
+					index.pop_back();
+					
+					try
 					{
+						KeySpec::Module &module(m_keyspec->products[product_ident][module_id]);
+						if (module.isLicense)
+						{
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteLicense(%d, %08x)", module_id, module_value);
 #endif
-						WriteLicense(module_id, module_value);
-					}
-					else
-					{
+							WriteLicense(module_id, module_value);
+						}
+						else
+						{
 //xxx debug
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Writing creator provided module default overrides WriteModule(%d, %08x)", module_id, module_value);
 #endif
-						WriteModule(module_id, module_value);
+							WriteModule(module_id, module_value);
+						}
 					}
-				}
-				catch (_com_error &e)
-				{
-					//xxx debug
-					#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
-					OutputFormattedDebugString(L"ProtectionKey::Program() -- Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
-					#endif
-					return e.Error();
+					catch (_com_error &e)
+					{
+						//xxx debug
+						#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+						OutputFormattedDebugString(L"ProtectionKey::Program() -- Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
+						#endif
+						return e.Error();
+					}
 				}
 			}
 		}
-	}
-	else if (module_value_list.vt != VT_EMPTY)
-	{
-		//xxx debug
-		#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
-		OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
-		#endif
-		return E_INVALIDARG;
-	}
+		else if (module_value_list.vt != VT_EMPTY)
+		{
+			//xxx debug
+			#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+			OutputFormattedDebugString(L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
+			#endif
+			return E_INVALIDARG;
+		}
 
-	//CR.9124 - Somehow a key that was "Headers Initialized" was not set got programmed, didn't think that was possible.
-	//Do one last validity check here to ensure that it has been set, else return E_FAIL.
-	unsigned int headersInitialized = ReadHeaderCache(L"Headers Initialized").ulVal;
-	if(headersInitialized != HEADER_INITIALIZED)
-		return E_FAIL;
+		//CR.9124 - Somehow a key that was "Headers Initialized" was not set got programmed, didn't think that was possible.
+		//Do one last validity check here to ensure that it has been set, else return E_FAIL.
+		unsigned int headersInitialized = ReadHeaderCache(L"Headers Initialized").ulVal;
+		if(headersInitialized != HEADER_INITIALIZED)
+			return E_FAIL;
 
+	}
 #if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 OutputFormattedDebugString(L"ProtectionKey::Program() -- Leave");	
 #endif
@@ -1387,9 +1422,11 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 		
 		memset(tmp_cells,0,sizeof(tmp_cells));
 		memset(tmp_cells_valid,0,sizeof(tmp_cells));
+		unsigned short key_layout_version = 0;
+		this->GetKeyVersion(&key_layout_version);
 		for (unsigned int i=0; i<ProtectionKey::KeyCellCount; ++i)
 		{
-			if (RainbowDriver::accessCode[i]==RainbowDriver::ALGORITHM)
+			if (RainbowDriver::ALGORITHM == ((key_layout_version==0) ? RainbowDriver::accessCode[i] : RainbowDriver::accessCode_version1[i]))
 			{
 				tmp_cells[i] = 0;
 				tmp_cells_valid[i] = LicenseServerError::EHR_SP_ACCESS_DENIED;
@@ -1436,10 +1473,6 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 			memcpy(cells,tmp_cells,sizeof(cells));
 			memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
 		}
-
-		
-		
-		
 	}
 }
 
@@ -1833,12 +1866,12 @@ bool ProtectionKey::EnterBasePassword(DWORD user_password, bool trial_key, bool 
 	{
 		if (!permanent_allowed_key)
 		{
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 			throw _com_error(LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED);
 		}
 		else if (!trial_key)
 		{
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_WARNING, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 			throw _com_error(E_FAIL);
 		}
 		else
@@ -1852,7 +1885,7 @@ bool ProtectionKey::EnterBasePassword(DWORD user_password, bool trial_key, bool 
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EC_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteAccessDenied);
 				throw e;
 			}
 			
@@ -1875,11 +1908,11 @@ bool ProtectionKey::EnterProductVersionPassword(DWORD user_password, bool trial_
 			WriteHeader(L"Product Version", product_version);
 			unsigned short major = product_version >> 12;	//Want last digit of short.
 			unsigned short minor = product_version & 0xFFF; //Want all but last digit of short.
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordVersion, major, minor);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordVersion, major, minor);
 		}
 		catch (_com_error &e)
 		{
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 			throw e;
 		}
 		
@@ -1988,11 +2021,11 @@ bool ProtectionKey::EnterExtensionPassword(DWORD user_password, bool trial_key, 
 			hr = WriteExpirationDays(extend_days);
 			if (FAILED(hr)) throw _com_error(hr);
 
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordExtension, extend_days);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordExtension, extend_days);
 		}
 		catch (_com_error &e)
 		{
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 			throw e;
 		}
 		
@@ -2034,7 +2067,7 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -2046,7 +2079,7 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 				WriteLicense(module_id, units_licensed);
 
 				if (!bModuleIsCounter)
-					keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, tmpModuleName, units_licensed);
+					g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, tmpModuleName, units_licensed);
 
 				//if password_number > 0 then write it into the PASSWORD_NUMBER cell.
 				if(password_number > 0)
@@ -2054,7 +2087,7 @@ bool ProtectionKey::EnterModulePassword(DWORD user_password, bool trial_key, boo
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 			
@@ -2080,12 +2113,12 @@ bool ProtectionKey::EnterApplicationInstancePassword(DWORD user_password, unsign
 			WriteHeader(L"Application Instances", units_licensed);
 
 			if(oldAppInstCount == 0 && units_licensed > 0)
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordRemote);
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordApplicationInstance, units_licensed);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordRemote);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordApplicationInstance, units_licensed);
 		}
 		catch (_com_error &e)
 		{
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 			throw e;
 		}
 		return true;
@@ -2123,7 +2156,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -2134,7 +2167,7 @@ bool ProtectionKey::EnterSPDModulePassword(DWORD user_password, bool trial_key, 
 			{
 				WriteLicense(module_id, units_licensed);
 
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
 			}
 			catch(_com_error &e) {throw e;}
 			
@@ -2166,7 +2199,7 @@ bool ProtectionKey::EnterSPDOutputPassword(DWORD user_password, bool trial_key, 
 			}
 			catch (_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 		}
@@ -2175,7 +2208,7 @@ bool ProtectionKey::EnterSPDOutputPassword(DWORD user_password, bool trial_key, 
 			try 
 			{
 				WriteLicense(L"Output Pool", output_units);
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDOutput, output_units);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDOutput, output_units);
 			}
 			catch(_com_error &e) {throw e;}
 			
@@ -2244,7 +2277,7 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 		{
 			// Write the pages per minute license
 			WriteLicense(ppm_module_id, ppm_pages);
-			keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDPPM2, ppm_module_id, ppm_pages);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDPPM2, ppm_module_id, ppm_pages);
 
 			// Write the pages per minute extension count license
 			KeySpec::Module &extensions_module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][L"Pages Per Minute Extensions"]);
@@ -2282,11 +2315,11 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 				WriteLicense(module_id, units_licensed);
 
 				KeySpec::Module &module(m_keyspec->products[ReadHeaderCache(_bstr_t(L"Product ID")).ulVal][module_id]);
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordModule, module.name, units_licensed);
 			}
 			catch(_com_error &e)
 			{
-				keyserver.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
+				g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
 				throw e;
 			}
 			
@@ -2311,6 +2344,11 @@ bool ProtectionKey::EnterSolSearcherModulePassword(DWORD user_password, bool tri
 
 HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2327,6 +2365,11 @@ HRESULT ProtectionKey::GenerateBasePassword(long customer_number, long key_numbe
 
 HRESULT ProtectionKey::GenerateApplicationInstancePassword(long customer_number, long key_number, long license_count, long password_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	KeySpec::Header &header_app_instance = m_keyspec->headers[L"Application Instances"];
@@ -2341,6 +2384,11 @@ HRESULT ProtectionKey::GenerateApplicationInstancePassword(long customer_number,
 
 HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2358,6 +2406,11 @@ HRESULT ProtectionKey::GenerateVersionPassword(long customer_number, long key_nu
 
 HRESULT ProtectionKey::GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	DWORD password_hash;
 	wchar_t password_string[128];
 	
@@ -2373,6 +2426,11 @@ HRESULT ProtectionKey::GenerateExtensionPassword(long customer_number, long key_
 
 HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	bool password_generated = false;
 	DWORD password_hash;
 	wchar_t password_string[128];
@@ -2491,6 +2549,11 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 }
 HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, long password_number, BSTR *password)
 {
+	VARIANT_BOOL vtValid = VARIANT_FALSE;
+	IsSolimarProtectionKey(&vtValid);
+	if (vtValid==VARIANT_FALSE)
+		return E_FAIL;
+
 	bool password_generated = false;
 	DWORD password_hash;
 	wchar_t password_string[128];
@@ -2635,7 +2698,11 @@ unsigned short ProtectionKey::ReadCellPhysical(unsigned short cell)
 void ProtectionKey::WriteCellPhysical(unsigned short cell, unsigned short value)
 {
 	HRESULT hr = S_OK;
-	hr = m_driver->WriteCell(m_physicalKeyIdent, cell, value);
+	unsigned short keyVersion(0);
+	hr = this->GetKeyVersion(&keyVersion);
+	if (FAILED(hr))
+		throw _com_error(hr);
+	hr = m_driver->WriteCell(m_physicalKeyIdent, cell, value, keyVersion);
 	if (FAILED(hr))
 		throw _com_error(hr);
 	
@@ -3006,28 +3073,34 @@ _variant_t ProtectionKey::BitsToVariant(unsigned int value, unsigned int bits)
 
 bool ProtectionKey::isOnTrial()
 {
-	unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
-	
-	bool ontrial = (
-		key_status==INITIAL_TRIAL ||
-		key_status==EXTENDED_TRIAL ||
-		key_status==EXTENDED_TRIAL2 ||
-		key_status==EXTENDED_TRIAL3 ||
-		key_status==EXTENDED_TRIAL4 ||
-		key_status==EXTENDED_TRIAL5 ||
-		key_status==EXTENDED_TRIAL6 ||
-		key_status==EXTENDED_TRIAL7 ||
-		key_status==EXTENDED_TRIAL8 ||
-		key_status==EXTENDED_TRIAL9 ||
-		key_status==EXTENDED_TRIAL10 ||
-		key_status==EXTENDED_TRIAL11 ||
-		key_status==EXTENDED_TRIAL12 ||
-		key_status==EXTENDED_TRIAL13 ||
-		key_status==EXTENDED_TRIAL14 ||
-		key_status==EXTENDED_TRIAL15 ||
-		key_status==EXTENDED_TRIAL16 ||
-		key_status==UNINITIALIZED_TRIAL
-		);
+	unsigned short key_version = 0;
+	GetKeyVersion(&key_version);
+	bool ontrial = false;
+	if(key_version == 0)	//key_version ==0 are the old style protection keys
+	{
+		unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
+		
+		ontrial = (
+			key_status==INITIAL_TRIAL ||
+			key_status==EXTENDED_TRIAL ||
+			key_status==EXTENDED_TRIAL2 ||
+			key_status==EXTENDED_TRIAL3 ||
+			key_status==EXTENDED_TRIAL4 ||
+			key_status==EXTENDED_TRIAL5 ||
+			key_status==EXTENDED_TRIAL6 ||
+			key_status==EXTENDED_TRIAL7 ||
+			key_status==EXTENDED_TRIAL8 ||
+			key_status==EXTENDED_TRIAL9 ||
+			key_status==EXTENDED_TRIAL10 ||
+			key_status==EXTENDED_TRIAL11 ||
+			key_status==EXTENDED_TRIAL12 ||
+			key_status==EXTENDED_TRIAL13 ||
+			key_status==EXTENDED_TRIAL14 ||
+			key_status==EXTENDED_TRIAL15 ||
+			key_status==EXTENDED_TRIAL16 ||
+			key_status==UNINITIALIZED_TRIAL
+			);
+	}
 	
 	return ontrial;
 }
@@ -3450,7 +3523,7 @@ void ProtectionKey::TrialToPermanent()
 		WriteBitsPhysical(module->offset, module->bits, (unsigned int)module->default_license);
 	}
 
-	keyserver.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordPermanent);
+	g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordPermanent);
 }
 
 void ProtectionKey::InitializePasswordNumber()
@@ -3551,3 +3624,11 @@ HRESULT ProtectionKey::WriteExpirationDays(unsigned short extend_days)
 	return S_OK;
 }
 
+
+
+//Returns the Key Version, a key version will correspond to a certain key layout
+HRESULT ProtectionKey::GetKeyVersion(unsigned short* key_version)
+{
+	*key_version = ReadHeaderCache(_bstr_t(L"Key Version")).uiVal;
+	return S_OK;
+}

@@ -8,6 +8,10 @@
 class TimeHelper
 {
 public:
+	static const time_t ONE_HOUR_IN_SECONDS = (time_t)(60*60);
+	static const time_t ONE_DAY_IN_SECONDS = (time_t)(24*ONE_HOUR_IN_SECONDS);
+	static const time_t ONE_DAY_IN_HOURS = (time_t)(24);
+
 	static time_t VariantToTimeT(VARIANT &timestamp, bool bConvertToLocalTime=false)
 	{
 		SYSTEMTIME systimestamp;
@@ -48,10 +52,49 @@ public:
 		return vtTimestamp;
 	}
 
-		//	Converts SystemTime to a string in the Structure "YYYY-MM-DD HH-MM-SS-UUUU"
-	static bool SystemTimeToString(wchar_t *pwcBuf, size_t count, SYSTEMTIME sysTmOutVal) 
+	//	Converts string in the Structure "YYYY-MM-DD HH-MM-SS-UUUU" where in order:
+	//	Y - Year
+	//	M - Month
+	//	D - Day
+	//	H - Hour
+	//	M - Minute
+	//	S - Second
+	// U - Millisecond
+	static bool StringToSystemTime(const wchar_t *pwcBuf, SYSTEMTIME &sysTmOutVal) 
 	{
-			_snwprintf(pwcBuf, count,
+		bool bRetVal(true) ;
+		wchar_t wcCpy[25] ;
+		wchar_t *pwcNull(NULL) ;
+		//
+		// Make a working copy of the const input buffer.
+		//
+		wmemcpy(wcCpy, pwcBuf, 24) ;
+		//
+		// Set intermediate delimiters to NULL.
+		//
+		wcCpy[4] = wcCpy[7] = wcCpy[10] = wcCpy[13] = wcCpy[16] = wcCpy[19] = wcCpy[24] = 0 ;
+		//
+		// Now convert known fixed offsets to their appropriate values.
+		//
+		sysTmOutVal.wYear =     (WORD)_wcstoi64(wcCpy+0 , &pwcNull, 10) ;
+		sysTmOutVal.wMonth =    (WORD)_wcstoi64(wcCpy+5 , &pwcNull, 10) ;
+		sysTmOutVal.wDay =      (WORD)_wcstoi64(wcCpy+8 , &pwcNull, 10) ;
+		sysTmOutVal.wHour =     (WORD)_wcstoi64(wcCpy+11, &pwcNull, 10) ;
+		sysTmOutVal.wMinute =   (WORD)_wcstoi64(wcCpy+14, &pwcNull, 10) ;
+		sysTmOutVal.wSecond =   (WORD)_wcstoi64(wcCpy+17, &pwcNull, 10) ;
+		sysTmOutVal.wMilliseconds = (WORD)_wcstoi64(wcCpy+20, &pwcNull, 10) % 1000 ;
+		sysTmOutVal.wDayOfWeek = 0 ;
+
+		return bRetVal ;
+	}
+
+
+	//	Converts SystemTime to a string in the Structure "YYYY-MM-DD HH-MM-SS-UUUU" or "YYYY-MM-DD HH-MM-SS"
+	static bool SystemTimeToString(wchar_t *pwcBuf, size_t count, SYSTEMTIME sysTmOutVal, bool bShowMilliSeconds=true)
+	{
+		if(bShowMilliSeconds)
+		{
+			_snwprintf_s(pwcBuf, count, count,
 				L"%04d-%02d-%02d %02d:%02d:%02d.%04d",
 				sysTmOutVal.wYear, 
 				sysTmOutVal.wMonth, 
@@ -60,7 +103,19 @@ public:
 				sysTmOutVal.wMinute,
 				sysTmOutVal.wSecond, 
 				sysTmOutVal.wMilliseconds);
-			return true;
+		}
+		else
+		{
+			_snwprintf_s(pwcBuf, count, count,
+				L"%04d-%02d-%02d %02d:%02d:%02d",
+				sysTmOutVal.wYear, 
+				sysTmOutVal.wMonth, 
+				sysTmOutVal.wDay, 
+				sysTmOutVal.wHour, 
+				sysTmOutVal.wMinute,
+				sysTmOutVal.wSecond);
+		}
+		return true;
 	}
 };
 
