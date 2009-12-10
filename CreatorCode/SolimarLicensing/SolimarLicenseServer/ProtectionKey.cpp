@@ -2230,8 +2230,6 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 		unsigned short ppm_extensions = ReadModuleCache(_bstr_t(L"Pages Per Minute Extensions")).bVal;
 		unsigned short ppm_module_id = (pages_per_minute_struct & 0xFF000) >> 12;
 		unsigned short ppm_pages = (pages_per_minute_struct & 0x00FFF);
-		wchar_t ppm_buff[256];
-		swprintf_s(ppm_buff, L"");
 		
 		// the module id in the struct is the non-ppm module that the ppm password is associated with
 		// translate this to the new ppm module that it maps to. For a ppm password for "XCHANGE::PS" 
@@ -2260,25 +2258,15 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 		switch(ppm_module_id)
 		{
 		case 2:
-			ppm_module_id = 68;
-			swprintf_s(ppm_buff, L"XCHANGE::IPDS PPM");
-			break;
+			ppm_module_id = 68;		break;
 		case 35:
-			ppm_module_id = 70;
-			swprintf_s(ppm_buff, L"XCHANGE::PCL PPM");
-			break;
+			ppm_module_id = 70;		break;
 		case 39:
-			ppm_module_id = 160;
-			swprintf_s(ppm_buff, L"XCHANGE::PS PPM");
-			break;
+			ppm_module_id = 160;		break;
 		case 44:
-			ppm_module_id = 64;
-			swprintf_s(ppm_buff, L"XCHANGE::PS (DBCS) PPM");
-			break;
+			ppm_module_id = 64;		break;
 		case 47:
-			ppm_module_id = 66;
-			swprintf_s(ppm_buff, L"AFPDS::PS PPM");
-			break;
+			ppm_module_id = 66;		break;
 		default:
 			return false;
 		}
@@ -2289,9 +2277,7 @@ bool ProtectionKey::EnterSPDPagesPerMinutePassword(DWORD user_password, bool tri
 		{
 			// Write the pages per minute license
 			WriteLicense(ppm_module_id, ppm_pages);
-
-			// CR.FIX.15054 - Fixed problem passing an int to the printf %s when generating a message.
-			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDPPM2, ppm_buff, ppm_pages);
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_INFO, S_OK, time(0), MessagePasswordSPDPPM2, ppm_module_id, ppm_pages);
 
 			// Write the pages per minute extension count license
 			KeySpec::Module &extensions_module(m_keyspec->products[ReadHeaderCache(L"Product ID").uiVal][L"Pages Per Minute Extensions"]);
