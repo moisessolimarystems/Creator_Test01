@@ -47,6 +47,7 @@ namespace SolimarLicenseViewer
         public static readonly String VerifiedStatus = "Verified";
         public static readonly String UnVerifiedStatus = "UnVerified";
         public static readonly String NotUsedStatus = "Not Used";
+        public static readonly String ExpiredStatus = "Activation Expired";
         public static readonly String HistoryNode = "History";
         
 
@@ -55,9 +56,11 @@ namespace SolimarLicenseViewer
         public static readonly String LicenceTypeHeader = "License Type";
         public static readonly String VerificationStatusHeader = "Verification Status";
         public static readonly String ExpirationHeader = "Expiration Date";
-        public static readonly String CurrentActivationHeader = "Current Activation";
+        //public static readonly String CurrentActivationHeader = "Current Activation";
+        public static readonly String CurrentActivationHeader = "Activation Usage";
         public static readonly String TotalActivationHeader = "Total Activations";
         public static readonly String DaysPerActivationHeader = "Days Per Activation";
+        public static readonly String ActivationExpirationHeader = "Current Activation Valid Until";
         public static readonly String KeyTypeHeader = "Key Type";
         public static readonly String KeyNameHeader = "Key Name";
         public static readonly String KeyProductIdHeader = "Product ID";
@@ -74,7 +77,7 @@ namespace SolimarLicenseViewer
         public static readonly String FilterHeader = "View";
         public static readonly String GroupByModuleItem = "Group By Module";
         public static readonly String DetailsItem = "Details";
-        public static readonly String ProductLicNumberItem = "Group By Product License Number";
+        public static readonly String ProductLicNumberItem = "Group By Product License";
 
 
         //Product Node Column Headers
@@ -84,9 +87,15 @@ namespace SolimarLicenseViewer
         public static readonly String VerificationCodeHeader = "Verification Code";
         public static readonly String DateAppliedHeader = "Date Applied";
         //Module Node Column Headers
+        public static readonly String SummaryAllProdLicNum = " Summary of all Product Licenses";
+        public static readonly String ProdLicNumHeader = "Product License";
+        public static readonly String ProdLicNumStateHeader = "Status";
         public static readonly String LicensesHeader = "Licenses";
         public static readonly String UnitsHeader = "Module";
         public static readonly String AppInstanceExpiredHeader = "Expired Application Instance";
+        public static readonly String BottomLicenseRootNode = "BottomLicenses";
+        public static readonly String BottomUnitsHeader = "BottomModule";
+
 
         //Usage Node Column Headers
         public static readonly String UsageProductHeader = "Product";

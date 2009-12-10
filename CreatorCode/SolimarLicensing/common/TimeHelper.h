@@ -8,6 +8,10 @@
 class TimeHelper
 {
 public:
+	static const time_t ONE_HOUR_IN_SECONDS = (time_t)(60*60);
+	static const time_t ONE_DAY_IN_SECONDS = (time_t)(24*ONE_HOUR_IN_SECONDS);
+	static const time_t ONE_DAY_IN_HOURS = (time_t)(24);
+
 	static time_t VariantToTimeT(VARIANT &timestamp, bool bConvertToLocalTime=false)
 	{
 		SYSTEMTIME systimestamp;

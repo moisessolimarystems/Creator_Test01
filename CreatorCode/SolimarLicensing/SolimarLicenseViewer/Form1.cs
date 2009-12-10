@@ -49,7 +49,12 @@ namespace SolimarLicenseViewer
                     this.treeView.SelectedNode = null;
             }
             else if (this.treeView.Nodes.Count > 0)
-                this.treeView.SelectedNode = this.treeView.Nodes[0];
+            {
+                if (this.treeView.Nodes[0].Nodes.Count > 0)
+                    this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes[0];
+                else
+                    this.treeView.SelectedNode = this.treeView.Nodes[0];
+            }
             Cursor.Current = Cursors.Default;
         }
 
@@ -111,7 +116,7 @@ namespace SolimarLicenseViewer
                             Settings.Default.ServerList.AddRange(data.ServerList.ToArray());
                             Settings.Default.Save();
                         }
-                        
+
                         if (this.parentForm is SolimarLicenseViewer.Form1)
                             (this.parentForm as SolimarLicenseViewer.Form1).setChildInformation(this, m_CommLink.ServerName);
                     }
@@ -142,7 +147,7 @@ namespace SolimarLicenseViewer
                 this.Text = string.Format("Connecting to [{0}]...", m_CommLink.ServerName);
 
                 //create treeview manager
-                m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, m_CommLink);
+                m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, this.bottomLvToolStrip, m_CommLink);
                 //create listview manager
                 m_treeViewMgr = new TreeViewMgr(this.treeView, m_CommLink);
                 //fill listview/treeview
@@ -168,7 +173,7 @@ namespace SolimarLicenseViewer
                     buildVer = 0;
                     licSvrVer = "";
                 }
-                
+
                 this.Text = string.Format("{0} [{1}]{2}{3}",
                     AppConstants.FormTitle,
                     m_CommLink.ServerName,
@@ -362,25 +367,33 @@ namespace SolimarLicenseViewer
 
         private void lvContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
+            bool bTopListViewSelected = false;
             if (sender is System.Windows.Forms.ContextMenuStrip)
             {
                 object tmpObj = ((System.Windows.Forms.ContextMenuStrip)(sender)).SourceControl;
                 if (tmpObj is Shared.VisualComponents.NoFlickerListView)
                     copyToolStripMenuItem.Enabled = (tmpObj as Shared.VisualComponents.NoFlickerListView).SelectedItems.Count > 0;
+                bTopListViewSelected = (tmpObj == this.noFlickerListView);
             }
 
             bool bDisplayExtendOption = false;
             bool bDisplayConnectionSettings = false;
             bool bSelectedItem = false;
             ListViewItem item = null;
-            if(string.Compare(m_listViewMgr.SelectedNode.Text, AppConstants.LicenseRootNode, true) == 0)
+            //if(string.Compare(m_listViewMgr.SelectedNode.Text, AppConstants.LicenseRootNode, true) == 0)
+            //Look for Product License Level
+            if (m_listViewMgr.SelectedNode.Level == 2 && m_listViewMgr.SelectedNode.Parent != null && m_listViewMgr.SelectedNode.Parent.Parent != null
+                && string.Compare(m_listViewMgr.SelectedNode.Parent.Parent.Text, AppConstants.LicenseRootNode, true) == 0
+                && bTopListViewSelected)
             {
                 // find any selected 
                 if (this.noFlickerListView.SelectedItems.Count > 0)
                     item = this.noFlickerListView.SelectedItems[0];
 
+                //YYY - Stopped here on friday 12-4-09
                 // user clicked in the background 
-                bDisplayExtendOption = (item == null || item.SubItems[1].Text != AppConstants.DisasterRecoveryLicType);
+                //bDisplayExtendOption = (item == null || item.SubItems[1].Text != AppConstants.DisasterRecoveryLicType);
+                bDisplayExtendOption = true;
             }
             else if (string.Compare(m_listViewMgr.SelectedNode.Text, AppConstants.ProductConnectionSettingsRootNode, true) == 0)
             {
@@ -394,9 +407,14 @@ namespace SolimarLicenseViewer
             {
                 // Cycle through all the selected items
                 extendToolStripMenuItem.Enabled = this.noFlickerListView.SelectedItems.Count > 0;
-                foreach(ListViewItem lvi in this.noFlickerListView.SelectedItems)
+                foreach (ListViewItem lvi in this.noFlickerListView.SelectedItems)
                 {
-                    if (m_listViewMgr.EnableDisasterRecoverExt_ByLicense(lvi.Text) == false)
+                    //if (m_listViewMgr.EnableDisasterRecoverExt_ByLicense(lvi.Text) == false)
+                    //{
+                    //    extendToolStripMenuItem.Enabled = false;
+                    //    break;
+                    //}
+                    if (m_listViewMgr.EnableActivationExt_ByProductLicense(lvi.Text) == false)
                     {
                         extendToolStripMenuItem.Enabled = false;
                         break;
@@ -427,12 +445,28 @@ namespace SolimarLicenseViewer
         {
             try
             {
-                useActivationInternal(
-                    this.noFlickerListView.SelectedItems[0].Text,   //license name
-                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[4].Text),   //activationCurrent
-                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[5].Text),   //activationTotal
-                    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[6].Text)    //activationAmountInDays
-                );
+                //useActivationInternal(
+                //    this.noFlickerListView.SelectedItems[0].Text,   //license name
+                //    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[4].Text),   //activationCurrent
+                //    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[5].Text),   //activationTotal
+                //    Convert.ToInt32(this.noFlickerListView.SelectedItems[0].SubItems[6].Text)    //activationAmountInDays
+                //);
+                //int[] intArray = (int[])this.noFlickerListView.SelectedItems[0].Tag;  //should be in the format: activationCurrent, activationTotal, activationAmountInDays
+                //useActivationInternal(this.noFlickerListView.SelectedItems[0].Text,
+                //    intArray[0], //activationCurrent
+                //    intArray[1], //activationTotal
+                //    intArray[2]);//activationAmountInDays
+
+                object[] objArray = (object[])this.noFlickerListView.SelectedItems[0].Tag;  //should be in the format: (string)softwareLicense, (int)activationCurrent, (int)activationTotal, (int)activationAmountInDays
+                useActivationInternal((string)objArray[0], //software license
+                    this.noFlickerListView.SelectedItems[0].Text, //product license number
+                    (int)objArray[1], //activationCurrent
+                    (int)objArray[2], //activationTotal
+                    (int)objArray[3]);//activationAmountInDays
+
+
+                //useActivationInternal(tmpToolStripItem.Text, objArray[0], objArray[1], objArray[2], objArray[3]);
+
             }
             catch (COMException)
             {
@@ -528,6 +562,7 @@ namespace SolimarLicenseViewer
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             m_listViewMgr.SelectedNode = this.treeView.SelectedNode;
+            m_listViewMgr.SelectedNode.Expand();
             PopulateListView();
         }
 
@@ -556,7 +591,7 @@ namespace SolimarLicenseViewer
                 this.Size = Settings.Default.WindowSize;
             }
 
-            if(Settings.Default.SelectedDirectory != null)
+            if (Settings.Default.SelectedDirectory != null)
             {
                 m_selectedDirectory = Settings.Default.SelectedDirectory;
             }
@@ -609,7 +644,7 @@ namespace SolimarLicenseViewer
             sep5ToolStripMenuItem.Visible = false;
             foreach (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo in m_CommLink.KeyEnumerate(false))
             {
-                if (keyInfo.IsKeyTypeUninitialized()==false && keyInfo.IsKeyTypeVerification()==false)
+                if (keyInfo.IsKeyTypeUninitialized() == false && keyInfo.IsKeyTypeVerification() == false)
                 {
                     enterPasswordToolStripMenuItem.Visible = true;
                     enterPasswordPacketToolStripMenuItem.Visible = true;
@@ -639,9 +674,11 @@ namespace SolimarLicenseViewer
                 {
                     tsMenuItem = new ToolStripMenuItem(softwareLicense);
                     tsMenuItem.Click += new EventHandler(tsUseActivationMenuItem_Click);
-                    tsMenuItem.Tag = new int[] { (int)licInfoAttrib.activationCurrent.TVal, (int)licInfoAttrib.activationTotal.TVal, (int)licInfoAttrib.activationAmountInDays.TVal };
+                    //tsMenuItem.Tag = new int[] { (int)licInfoAttrib.activationCurrent.TVal, (int)licInfoAttrib.activationTotal.TVal, (int)licInfoAttrib.activationAmountInDays.TVal };
+                    tsMenuItem.Tag = new object[] { softwareLicense, (int)licInfoAttrib.activationCurrent.TVal, (int)licInfoAttrib.activationTotal.TVal, (int)licInfoAttrib.activationAmountInDays.TVal };
                     useLicArchiveSortedList.Add(softwareLicense, tsMenuItem);
                 }
+                //
 
                 tsMenuItem = new ToolStripMenuItem(softwareLicense);
                 tsMenuItem.ToolTipText = "Generate Verification Data of License: " + softwareLicense + " for Solimar";
@@ -673,7 +710,7 @@ namespace SolimarLicenseViewer
             sep2ToolStripMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
 
             genLicArchiveOnLicenseDropDownMenuItem.Visible = genLicArchiveOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
-            
+
             useActivationOnLicenseDropDownMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
             sep3ToolStripMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
         }
@@ -827,19 +864,27 @@ namespace SolimarLicenseViewer
             if (sender is ToolStripMenuItem)
             {
                 ToolStripMenuItem tmpToolStripItem = sender as ToolStripMenuItem;
-                int[] intArray = (int[])tmpToolStripItem.Tag;  //should be in the format: activationCurrent, activationTotal, activationAmountInDays
-                useActivationInternal(tmpToolStripItem.Text, intArray[0], intArray[1], intArray[2]);
+                //int[] intArray = (int[])tmpToolStripItem.Tag;  //should be in the format: activationCurrent, activationTotal, activationAmountInDays
+                //useActivationInternal(tmpToolStripItem.Text, intArray[0], intArray[1], intArray[2]);
+                object[] objArray = (object[])tmpToolStripItem.Tag;  //should be in the format: (string)softwareLicense, (int)activationCurrent, (int)activationTotal, (int)activationAmountInDays
+                //useActivationInternal(tmpToolStripItem.Text, objArray[0], objArray[1], objArray[2], objArray[3]);
+                useActivationInternal((string)objArray[0], //product license number
+                    tmpToolStripItem.Text, //software license
+                    (int)objArray[1], //activationCurrent
+                    (int)objArray[2], //activationTotal
+                    (int)objArray[3]);//activationAmountInDays
             }
         }
-        private void useActivationInternal(string _licenseName, int _activationCurrent, int _activationTotal, int _activationAmountInDays)
+        private void useActivationInternal(string _softwareLicense, string _productLicenseNumber, int _activationCurrent, int _activationTotal, int _activationAmountInDays)
         {
-            string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _licenseName, _activationAmountInDays);
-            if (MessageBox.Show(this, message, "Activate License: " + _licenseName, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _productLicenseNumber, _activationAmountInDays);
+            if (MessageBox.Show(this, message, "Activate Product License: " + _productLicenseNumber, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 try
                 {
+                    //throw new COMException(message);
                     this.Cursor = Cursors.WaitCursor;
-                    m_CommLink.SoftwareLicenseDisasterRecoveryExtendTimeByLicense(_licenseName);
+                    m_CommLink.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(_softwareLicense, _productLicenseNumber);
                     refreshToolStripButton_Click(null, new EventArgs());
                 }
                 catch (Exception ex)
@@ -914,7 +959,7 @@ namespace SolimarLicenseViewer
         public void childFormClose(object _sender, string _serverName)
         {
             ToolStripMenuItem removeTsItem = null;
-            for(int idx=0; idx<remoteServerToolStripMenuItem.DropDownItems.Count; idx++)
+            for (int idx = 0; idx < remoteServerToolStripMenuItem.DropDownItems.Count; idx++)
             {
                 if (remoteServerToolStripMenuItem.DropDownItems[idx] is ToolStripMenuItem &&
                     remoteServerToolStripMenuItem.DropDownItems[idx].Tag == _sender)

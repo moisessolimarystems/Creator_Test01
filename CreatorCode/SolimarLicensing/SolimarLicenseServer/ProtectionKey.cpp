@@ -210,6 +210,10 @@ ProtectionKey::~ProtectionKey()
 	m_driver = NULL;
 }
 
+ProtectionKey* ProtectionKey::Copy(_bstr_t virtualKeyIdent)
+{
+	return new ProtectionKey(virtualKeyIdent, *this);
+}
 HRESULT ProtectionKey::TrialExpires(VARIANT *expire_date)
 {
 	SafeMutex mutex(license_use_lock);
@@ -1175,8 +1179,14 @@ OutputFormattedDebugString(L"ProtectionKey::Program() -- Calling ComputeCurrentK
 	hr = m_driver->ComputeCurrentKeyIdent(m_physicalKeyIdent, new_key_ident);
 	if (FAILED(hr)) throw _com_error(hr);
 
+	//key_type == KEYVerification uses a key layout version of 1, all other key_types use key layout version of 0
+	if(key_type == KEYVerification)
+	{
+		WriteHeader(L"Key Version", 1);
+	}
 	if(key_type != KEYVerification)
 	{
+		WriteHeader(L"Key Version", 0);
 		WriteHeader(L"Product Version",(unsigned int)(unsigned short)product_version);
 		WriteHeader(L"Status",(unsigned int)(unsigned short)INITIAL_TRIAL);
 		WriteHeader(L"Application Instances",(unsigned int)(unsigned short)application_instances);
@@ -1412,9 +1422,11 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 		
 		memset(tmp_cells,0,sizeof(tmp_cells));
 		memset(tmp_cells_valid,0,sizeof(tmp_cells));
+		unsigned short key_layout_version = 0;
+		this->GetKeyVersion(&key_layout_version);
 		for (unsigned int i=0; i<ProtectionKey::KeyCellCount; ++i)
 		{
-			if (RainbowDriver::accessCode[i]==RainbowDriver::ALGORITHM)
+			if (RainbowDriver::ALGORITHM == ((key_layout_version==0) ? RainbowDriver::accessCode[i] : RainbowDriver::accessCode_version1[i]))
 			{
 				tmp_cells[i] = 0;
 				tmp_cells_valid[i] = LicenseServerError::EHR_SP_ACCESS_DENIED;
@@ -1461,10 +1473,6 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 			memcpy(cells,tmp_cells,sizeof(cells));
 			memcpy(cells_valid,tmp_cells_valid,sizeof(cells_valid));
 		}
-
-		
-		
-		
 	}
 }
 
@@ -2690,7 +2698,11 @@ unsigned short ProtectionKey::ReadCellPhysical(unsigned short cell)
 void ProtectionKey::WriteCellPhysical(unsigned short cell, unsigned short value)
 {
 	HRESULT hr = S_OK;
-	hr = m_driver->WriteCell(m_physicalKeyIdent, cell, value);
+	unsigned short keyVersion(0);
+	hr = this->GetKeyVersion(&keyVersion);
+	if (FAILED(hr))
+		throw _com_error(hr);
+	hr = m_driver->WriteCell(m_physicalKeyIdent, cell, value, keyVersion);
 	if (FAILED(hr))
 		throw _com_error(hr);
 	
@@ -3061,28 +3073,34 @@ _variant_t ProtectionKey::BitsToVariant(unsigned int value, unsigned int bits)
 
 bool ProtectionKey::isOnTrial()
 {
-	unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
-	
-	bool ontrial = (
-		key_status==INITIAL_TRIAL ||
-		key_status==EXTENDED_TRIAL ||
-		key_status==EXTENDED_TRIAL2 ||
-		key_status==EXTENDED_TRIAL3 ||
-		key_status==EXTENDED_TRIAL4 ||
-		key_status==EXTENDED_TRIAL5 ||
-		key_status==EXTENDED_TRIAL6 ||
-		key_status==EXTENDED_TRIAL7 ||
-		key_status==EXTENDED_TRIAL8 ||
-		key_status==EXTENDED_TRIAL9 ||
-		key_status==EXTENDED_TRIAL10 ||
-		key_status==EXTENDED_TRIAL11 ||
-		key_status==EXTENDED_TRIAL12 ||
-		key_status==EXTENDED_TRIAL13 ||
-		key_status==EXTENDED_TRIAL14 ||
-		key_status==EXTENDED_TRIAL15 ||
-		key_status==EXTENDED_TRIAL16 ||
-		key_status==UNINITIALIZED_TRIAL
-		);
+	unsigned short key_version = 0;
+	GetKeyVersion(&key_version);
+	bool ontrial = false;
+	if(key_version == 0)	//key_version ==0 are the old style protection keys
+	{
+		unsigned short key_status = ReadHeaderCache(_bstr_t(L"Status")).uiVal;
+		
+		ontrial = (
+			key_status==INITIAL_TRIAL ||
+			key_status==EXTENDED_TRIAL ||
+			key_status==EXTENDED_TRIAL2 ||
+			key_status==EXTENDED_TRIAL3 ||
+			key_status==EXTENDED_TRIAL4 ||
+			key_status==EXTENDED_TRIAL5 ||
+			key_status==EXTENDED_TRIAL6 ||
+			key_status==EXTENDED_TRIAL7 ||
+			key_status==EXTENDED_TRIAL8 ||
+			key_status==EXTENDED_TRIAL9 ||
+			key_status==EXTENDED_TRIAL10 ||
+			key_status==EXTENDED_TRIAL11 ||
+			key_status==EXTENDED_TRIAL12 ||
+			key_status==EXTENDED_TRIAL13 ||
+			key_status==EXTENDED_TRIAL14 ||
+			key_status==EXTENDED_TRIAL15 ||
+			key_status==EXTENDED_TRIAL16 ||
+			key_status==UNINITIALIZED_TRIAL
+			);
+	}
 	
 	return ontrial;
 }
@@ -3606,3 +3624,11 @@ HRESULT ProtectionKey::WriteExpirationDays(unsigned short extend_days)
 	return S_OK;
 }
 
+
+
+//Returns the Key Version, a key version will correspond to a certain key layout
+HRESULT ProtectionKey::GetKeyVersion(unsigned short* key_version)
+{
+	*key_version = ReadHeaderCache(_bstr_t(L"Key Version")).uiVal;
+	return S_OK;
+}

@@ -71,71 +71,94 @@ HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoA
 	HRESULT hr(S_OK);
 	SafeMutex mutex(licenseUseCacheByProductLock);
 
-	//Should only be 1 pProdInfo for productMaxAppInstance
-	//Cycle all the modules in the Lic_ProductInfoAttribs
-	productMaxAppInstance = pProdInfo->productAppInstance;
 	productID = pProdInfo->productID;
 
-	//	There should only be 1 pProdInfo for product version, if not set to the lowest value seen.
-	//	To implment this option properly the version should really be set on the module itself, not
-	//		at the product.
-	//	Another option would be to have a list of these Lic_PackageAttribs::Lic_ProductInfoAttribs* all
-	//		at different versions, think about...
+	//See if pProdInfo is not expired or in validation, if valid add to cache.
+	bool bAddToCache(!bLicSvrClockViolation);
 
-	if((unsigned)productMajorVersion == 0 || 
-		(unsigned)productMajorVersion > pProdInfo->product_Major || 
-		((unsigned)productMajorVersion == pProdInfo->product_Major && (unsigned)productMinorVersion > pProdInfo->product_Minor))
+	if(bAddToCache)
 	{
-		productMajorVersion = pProdInfo->product_Major;
-		productMinorVersion = pProdInfo->product_Minor;
-	}
-
-
-	
-	for(Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = pProdInfo->moduleList->begin();
-		modIt != pProdInfo->moduleList->end();
-		modIt++)
-	{
-		
-		hr = S_OK;
-		bool bAddToCache(true);
-		try
+		//See if expirations dates come into play.  if both pProdInfo->bUseActivations and pProdInfo->bUseExpirationDate are set to use, 
+		//then use the lower one.
+		bool bUseActivationExpirationDate = (bool)pProdInfo->bUseActivations;
+		bool bUseProdLicExpirationDate = (bool)pProdInfo->bUseExpirationDate;
+		if(bUseActivationExpirationDate || bUseProdLicExpirationDate)
 		{
-			SYSTEMTIME moduleExpiresDateSystime;
-			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(modIt->moduleExpirationDate)).c_str(), moduleExpiresDateSystime))
-				throw(E_FAIL);
-			
-			_variant_t vtModuleExpiresDate(NULL);	
-			if (!SystemTimeToVariantTime(&moduleExpiresDateSystime, &vtModuleExpiresDate.date)) 
-				throw(E_FAIL);
-			time_t moduleExpiresDateTimeT = TimeHelper::VariantToTimeT(vtModuleExpiresDate, false);
-			time_t emptyExpiresDateTimeT = time_t(-1);
+			time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
+			time_t activationExpirationTimeT = 0; //0 means not used
+			time_t prodLicExpirationTimeT = 0; //0 means not used
 
-			// ignore expiration date if it equals 1900/1/1
-			if(moduleExpiresDateTimeT != emptyExpiresDateTimeT)
+			try
 			{
-				// only add licensing to cache if the current date is below the expiration date and no lic svr clock violation
-				time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-				if(bLicSvrClockViolation || (currentTimeDateTimeT > moduleExpiresDateTimeT))
+				if(bUseActivationExpirationDate)
 				{
-					bAddToCache = false;
+					SYSTEMTIME tmpSystime;
+					if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pProdInfo->activationCurrentExpirationDate)).c_str(), tmpSystime))
+						throw(E_FAIL);
+					_variant_t tmpVt(NULL);	
+					if (!SystemTimeToVariantTime(&tmpSystime, &tmpVt.date)) 
+						throw(E_FAIL);
+					activationExpirationTimeT = TimeHelper::VariantToTimeT(tmpVt, false);
+				}
+				if(bUseProdLicExpirationDate)
+				{
+					SYSTEMTIME tmpSystime;
+					if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pProdInfo->expirationDate)).c_str(), tmpSystime))
+						throw(E_FAIL);
+					_variant_t tmpVt(NULL);	
+					if (!SystemTimeToVariantTime(&tmpSystime, &tmpVt.date)) 
+						throw(E_FAIL);
+					prodLicExpirationTimeT = TimeHelper::VariantToTimeT(tmpVt, false);
 				}
 			}
+			catch(HRESULT &eHr)
+			{
+				hr = eHr;
+			}
+			catch(_com_error &e)
+			{
+				hr = e.Error();
+			}
+			catch (...)
+			{
+				hr = E_FAIL;
+			}
+			
+			if(SUCCEEDED(hr))
+			{
+				if(bUseActivationExpirationDate && bUseProdLicExpirationDate)
+					bAddToCache = (currentTimeDateTimeT < (min(prodLicExpirationTimeT, activationExpirationTimeT)));
+				else if(bUseProdLicExpirationDate)
+					bAddToCache = (currentTimeDateTimeT < prodLicExpirationTimeT);
+				else if(bUseActivationExpirationDate)
+					bAddToCache = (currentTimeDateTimeT < activationExpirationTimeT);
+			}
+			else
+				bAddToCache = false;
 		}
-		catch(HRESULT &eHr)
+	}
+
+	if(bAddToCache)
+	{
+		productMaxAppInstance += pProdInfo->productAppInstance;
+
+		//	Set to the lowest value seen.
+		//	To implment this option properly the version should really be set on the module itself, not
+		//		at the product.
+		//	Another option would be to have a list of these Lic_PackageAttribs::Lic_ProductInfoAttribs* all
+		//		at different versions, think about...
+		if((unsigned)productMajorVersion == 0 || 
+			(unsigned)productMajorVersion > pProdInfo->product_Major || 
+			((unsigned)productMajorVersion == pProdInfo->product_Major && (unsigned)productMinorVersion > pProdInfo->product_Minor))
 		{
-			hr = eHr;
-		}
-		catch (...)
-		{
-			hr = E_FAIL;
+			productMajorVersion = pProdInfo->product_Major;
+			productMinorVersion = pProdInfo->product_Minor;
 		}
 
-		
 
-
-		//modIt->moduleExpirationDate
-		if(SUCCEEDED(hr) && bAddToCache)
+		for(Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = pProdInfo->moduleList->begin();
+			modIt != pProdInfo->moduleList->end();
+			modIt++)
 		{
 			licensesTotalMap[modIt->moduleID] += modIt->moduleValue;
 			licensesAppInstanceTotalMap[modIt->moduleID] += modIt->moduleAppInstance;
@@ -369,6 +392,10 @@ HRESULT LicenseCacheByProduct::ModuleLicenseInUseByApp(BSTR licenseID, long modu
 	catch(HRESULT &eHr)
 	{
 		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
 	}
 	catch(...)
 	{
@@ -786,61 +813,15 @@ HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfo
 			licInfoAttribIt != pLicInfoList->end();
 			licInfoAttribIt++)
 	{
-		SYSTEMTIME activationExpirationDateSystime;
-		if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj((*licInfoAttribIt)->activationExpirationDate)).c_str(), activationExpirationDateSystime))
-			continue;
-		_variant_t vtActivationExpirationDate(NULL);	
-		if (!SystemTimeToVariantTime(&activationExpirationDateSystime, &vtActivationExpirationDate.date)) 
-			continue;
-		time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
-		time_t emptyExpiresDateTimeT = time_t(-1);
-
-		// if expiration date == 1900/1/1 && total == 0 && activation in days == 0, this is standard licensing, non licensing activation or expiring type
-		bool bExpiringLicense = (!((*licInfoAttribIt)->activationTotal == 0 && 
-			(*licInfoAttribIt)->activationAmountInDays == 0 &&
-			activationExpirationDateTimeT == emptyExpiresDateTimeT));
-
-		//If in bLicSvrClockViolation, only add product licenses to cache if the license info is a non-expiring type
-		if(!bLicSvrClockViolation || (bLicSvrClockViolation && !bExpiringLicense))
-		{
-			for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = (*licInfoAttribIt)->productList->begin();
+		for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = (*licInfoAttribIt)->productList->begin();
 				prodIt != (*licInfoAttribIt)->productList->end();
 				prodIt++)
-			{
-				//Add new item if needed.
-				if(productCacheMap.find((*prodIt).productID) == productCacheMap.end())
-					productCacheMap[(*prodIt).productID] = new LicenseCacheByProduct();
-					//productCacheMap.insert(std::map<int,LicenseCacheByProduct*>::value_type((*prodIt).productID), new LicenseCacheByProduct()));
+		{
+			if(productCacheMap.find((*prodIt).productID) == productCacheMap.end())	//Add new item if needed.
+				productCacheMap[(*prodIt).productID] = new LicenseCacheByProduct();
 
-				productCacheMap[(*prodIt).productID]->RefreshCache(&(*prodIt), bLicSvrClockViolation);
-				//productCacheMap[(*prodIt).productID].RefreshCache(&(*prodIt));
-
-				//LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find((*prodIt).productID);
-				//if(prodCacheMapIt != productCacheMap.end())	//Found existing product
-				//{
-				//	hr = prodCacheMapIt->second->RefreshCache(*prodIt);
-				//}
-				//else	//add new product
-				//{
-				//}
-				
-				//int x = (*prodIt).productID;
-				//productCacheMap[(*prodIt).productID].RefreshCache(*prodIt);
-			}
+			productCacheMap[(*prodIt).productID]->RefreshCache(&(*prodIt), bLicSvrClockViolation);
 		}
-
-		//Lic_LicenseInfoAttribs* pTmp = *licInfoAttribIt;
-		//pTmp->productList->size();
-		//pTmp->
-		//(*licInfoAttribIt)->productList
-		//for(TVector_Lic_ProductInfoAttribsList prodIt = (*licInfoAttribIt)->productList.begin();
-		//	prodIt != (*licInfoAttribIt)->productList.end();
-		//	prodIt++)
-		//{
-		//}
-		//RefreshCache
-		//look up (*licInfoAttribIt)->prodID in the map for the LicenseCacheByProduct,
-		//call [LicenseCacheByProduct]->RefreshCache(<Lic_ProductInfoAttribs*>)
 	}
 
 	return hr;
