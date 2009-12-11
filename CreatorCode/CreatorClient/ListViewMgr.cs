@@ -77,7 +77,7 @@ namespace Client.Creator
             if (columnIndex == _lvwColumnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.
-                if (_lvwColumnSorter.Order == SortOrder.Ascending)
+                if (_lvwColumnSorter.Order == SortOrder.Ascending )
                     _lvwColumnSorter.Order = SortOrder.Descending;
                 else if (_lvwColumnSorter.Order == SortOrder.Descending || _lvwColumnSorter.Order == SortOrder.None)
                     _lvwColumnSorter.Order = SortOrder.Ascending;                     

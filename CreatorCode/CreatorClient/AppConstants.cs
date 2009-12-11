@@ -13,6 +13,10 @@ namespace Client.Creator
         public static readonly String LocalConnectionFilePath = "\\Solimar\\LicenseCreator\\";
         public static readonly String LocalConnectionFile = "Reports.xml";
 
+        public static readonly int MaxActivations = 255;
+        public static readonly int MaxActivationAmountInDays = 170;
+        public static readonly int MaxProductLicenses = 20;
+
         public class ReportXMLTags
         {
             //ReportElement

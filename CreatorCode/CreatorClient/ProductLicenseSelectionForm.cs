@@ -44,16 +44,16 @@ namespace Client.Creator
                     {
                         //if order already exists apply check to checkbox and make greyed out? unselectable?
                         ListViewItem lvItem = new ListViewItem();
-                        if (licData.LicType == LicenseServerType.DisasterRecovery) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
-                        {
-                            if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "D"))))
-                                continue;
-                        }
-                        else if (licData.LicType == LicenseServerType.TestDevelopment) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
-                        {
-                            if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "T"))))
-                                continue;
-                        }
+                        //if (licData.LicType == LicenseServerType.DisasterRecovery) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
+                        //{
+                        //    if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "D"))))
+                        //        continue;
+                        //}
+                        //else if (licData.LicType == LicenseServerType.TestDevelopment) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
+                        //{
+                        //    if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "T"))))
+                        //        continue;
+                        //}
                         lvItem.Text = plRecord.plID;
                         lvItem.SubItems.Add(Enum.GetName(typeof(ProductLicenseState), plRecord.plState));
                         lvItem.SubItems.Add(_commLink.GetProductName((uint)plRecord.ProductID));

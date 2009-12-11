@@ -115,61 +115,75 @@ namespace Client.Creator
             List<string> productList = new List<string>();
             Service<ICreator>.Use((client) => 
             {
+                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                {
+                    bool bSkip = false;
+                    productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
+                    foreach (ProductLicenseTable pl in productLicenses)
+                    {
+                        //skip if client and not perm
+                        if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
+                           productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
+                            bSkip = true;
+                    }
+                    if (!bSkip)
+                        productList.Add(productSpec.productName);
+                }
                 //trial -> zero options : 1 order
                 //perm -> add-on available : 1 order
                 //perm, add-on -> zero available : 2 order    
-                if (plData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
-                {   //standard,failover,disaster             
-                    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                    {
-                        bool bSkip = false;
-                        if (!productSpec.productName.TVal.Contains("Test"))
-                        {
-                            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
-                            //0 order => product hasnt been added
-                            //if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
-                            //    productLicenses.Count > 0)
-                            foreach (ProductLicenseTable pl in productLicenses)
-                            {          
-                                //skip if client and not perm
-                                if(pl.plState.Equals((byte)ProductLicenseState.Trial) &&
-                                   productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
-                                    bSkip = true;
-                            }
-                            if(!bSkip)
-                                productList.Add(productSpec.productName);
-                        }
-                    }
-                }
-                else
-                {
-                    //only add products that can be added....
-                    //testdev
-                    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                    {
-                        if (productSpec.productName.TVal.Contains("Test"))
-                        {
-                            //should only add products that exist in the standard license
-                            //and haven't already been added.
-                            string licenseBase = "P";
-                            string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)plData.LicenseInfo.CustID, (int)plData.LicenseInfo.DestID, (int)plData.LicenseInfo.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
-                            LicenseTable baseLicRec = client.GetLicenseByName(licenseName, false);
-                            //LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
-                            if (baseLicRec == null) //subscription type                            
-                                licenseBase = "S";                                                           
-                            int pos = productSpec.productName.TVal.IndexOf("Test");
-                            //1) call twice, once with product, then product test
-                            //2) call once with product and add only when 1 order(standard) found
-                            productLicenses = client.GetProductLicensesByProduct(licenseBase, (int)productSpec.productID.TVal);
-                            if (productLicenses.Count == 1)
-                            {   //0 order => product hasnt been added                     
-                                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
-                                if (productLicenses.Count == 0)
-                                    productList.Add(productSpec.productName);
-                            }
-                        }
-                    }
-                }
+                //if (plData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
+                //{   //standard,failover,disaster             
+                //    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                //    {
+                //        bool bSkip = false;
+                //        if (!productSpec.productName.TVal.Contains("Test"))
+                //        {
+                //            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
+                //            //0 order => product hasnt been added
+                //            //if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
+                //            //    productLicenses.Count > 0)
+                //            foreach (ProductLicenseTable pl in productLicenses)
+                //            {          
+                //                //skip if client and not perm
+                //                if(pl.plState.Equals((byte)ProductLicenseState.Trial) &&
+                //                   productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
+                //                    bSkip = true;
+                //            }
+                //            if(!bSkip)
+                //                productList.Add(productSpec.productName);
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                //    //only add products that can be added....
+                //    //testdev
+                //    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                //    {
+                //        if (productSpec.productName.TVal.Contains("Test"))
+                //        {
+                //            //should only add products that exist in the standard license
+                //            //and haven't already been added.
+                //            string licenseBase = "P";
+                //            string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)plData.LicenseInfo.CustID, (int)plData.LicenseInfo.DestID, (int)plData.LicenseInfo.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
+                //            LicenseTable baseLicRec = client.GetLicenseByName(licenseName, false);
+                //            //LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
+                //            if (baseLicRec == null) //subscription type                            
+                //                licenseBase = "S";                                                           
+                //            int pos = productSpec.productName.TVal.IndexOf("Test");
+                //            //1) call twice, once with product, then product test
+                //            //2) call once with product and add only when 1 order(standard) found
+                //            productLicenses = client.GetProductLicensesByProduct(licenseBase, (int)productSpec.productID.TVal);
+                //            if (productLicenses.Count == 1)
+                //            {   //0 order => product hasnt been added                     
+                //                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
+                //                if (productLicenses.Count == 0)
+                //                    productList.Add(productSpec.productName);
+                //            }
+                //        }
+                //    }
+                //}
             });
             if (productList.Count == 0)
                 productList.Add("No Products Available");
@@ -177,7 +191,33 @@ namespace Client.Creator
             ProductLicenseProductComboBox.SelectedIndex = 0;
             expDateTextBox.Text = "30";
         }
-        
+
+        //fill product entity with default modules
+        //only trial/addon order types
+        private void SetProductEntity(ProductLicenseProperty plData)
+        {
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList;
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+            {
+                if (productSpec.productID.TVal == plData.Product.ID)
+                {
+                    moduleList = m_CommLink.GetModuleSpecList(productSpec.productID.TVal);
+                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
+                    {
+                        module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
+                        module.moduleID.TVal = moduleSpec.moduleID.TVal;
+                        if (plData.Status.Equals(ProductLicenseState.Trial))
+                        {
+                            module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
+                            module.moduleAppInstance.TVal = 1;
+                        }
+                        plData.Product.ModuleList.TVal.Add(module);
+                    }
+                }
+            }
+        }
+
         void SaveProductLicenseTabPage(ProductLicenseDialogData plData)
         {
             string[] splitStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
@@ -189,14 +229,15 @@ namespace Client.Creator
             }
             else
                 plData.ProductLicense.Status = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0]);
-
+            plData.ProductLicense.Product.Product.bUseExpirationDate.TVal = true;
             plData.ProductLicense.Product.ID = (uint)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
             plData.ProductLicense.ProductLicenseType = m_CommLink.GetProductSpec(plData.ProductLicense.Product.ID).productLicType.TVal;
             plData.ProductLicense.Product.AppInstance = (uint)((plData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
             string[] versionNum = productLicenseVersionMaskedTextBox.Text.Split(".".ToCharArray());
             plData.ProductLicense.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]), UInt32.Parse(versionNum[1]));
             plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
-            plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;            
+            plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;
+            SetProductEntity(plData.ProductLicense);
         }
         #endregion
 
@@ -211,8 +252,8 @@ namespace Client.Creator
             if (licData.LicInfo.IsStandardLicenseType)
             {               
                 destinationTextBox.Text = licData.LicInfo.DestName;
-                licTypeComboBox.Items.Add(LicenseServerType.Perpetual);
-                licTypeComboBox.Items.Add(LicenseServerType.Subscription);                
+                licTypeComboBox.Items.Add(LicenseServerType.Standard);
+                //licTypeComboBox.Items.Add(LicenseServerType.Subscription);                
                 licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
             }
             else
@@ -226,8 +267,6 @@ namespace Client.Creator
                 destinationTextBox.Text = licData.LicInfo.DestName;
                 licTypeComboBox.Items.Add(licData.LicInfo.LicType);                
                 licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
-                //licTypeComboBox.DropDownStyle = ComboBoxStyle.Simple;
-                //licTypeComboBox.Enabled = false;
             }
             //license name
             licNameTextBox.Text = licData.LicInfo.Name;
@@ -302,7 +341,6 @@ namespace Client.Creator
                 newToken.tokenType.TVal =  Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
                 newToken.tokenValue.TVal = tokenListView.SelectedItems[0].Text;
                 tokenData.TokenList.Add(newToken);
-               // tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
             }
             else
             {
@@ -311,8 +349,7 @@ namespace Client.Creator
                     newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     newToken.tokenType.TVal = GetTokenEnum(lvItem.Text);  
                     newToken.tokenValue.TVal = lvItem.SubItems[1].Text;
-                    tokenData.TokenList.Add(newToken);
-                    //tokenData.LicInfo.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken); 
+                    tokenData.TokenList.Add(newToken);                
                 }
             }
         }
@@ -347,9 +384,9 @@ namespace Client.Creator
             topPanel.Controls.Clear();
             moduleGroupBox.Parent = topPanel;
             //edit module
-            if (moduleData.ModuleNames.Count != 0)
-            {               
-                string moduleName = moduleData.ModuleNames[0];
+            if (moduleData.Module != null)
+            {
+                string moduleName = moduleData.Module.Name;
                 modNameTextBox.Text = moduleName;               
                 uint modID, unlimitedValue, totalValue = 0;
                 modID = (uint)m_CommLink.GetModuleID(moduleData.ProductLicense.Product.ID, moduleName);
@@ -415,149 +452,58 @@ namespace Client.Creator
         //if module is from add-on and std order & any add-on has appinst 0 then +1 appinst for add-on
         private void SaveModuleTabPage(ModuleDialogData moduleData)
         {
-            int modID, totalModAppInstance;
-            foreach (string modName in moduleData.ModuleNames)
+            int totalModAppInstance;
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
             {
-                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
+                if (storedMod.moduleID.TVal.Equals(moduleData.Module.ID))
                 {
-                    modID = m_CommLink.GetModuleID(moduleData.ProductLicense.Product.ID, modName);
-                    if(modID >= 0)
-                    {
-                        if (storedMod.contractNumber.TVal.Equals(moduleData.ProductLicense.ID))
+                    storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
+                    //if client type set product connections to total
+                    //call function to get product spec then check to see if it is a client
+                    totalModAppInstance = moduleData.ProductLicense.GetTotalModuleAppInstance(storedMod.moduleID.TVal);
+                    if (storedMod.moduleValue.TVal > 0)
+                    {                                       
+                        if (totalModAppInstance == 0)
+                            storedMod.moduleAppInstance.TVal = 1;
+                        else //>1
                         {
-                            if (storedMod.moduleID.TVal.Equals((uint)modID))
+                            if (totalModAppInstance > 1)
                             {
-                                storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
-                                //if client type set product connections to total
-                                //call function to get product spec then check to see if it is a client
-                                totalModAppInstance = GetTotalModuleAppInstance(moduleData, storedMod);
-                                if (storedMod.moduleValue.TVal > 0)
-                                {                                       
-                                    if (totalModAppInstance == 0)
-                                        storedMod.moduleAppInstance.TVal = 1;
-                                    else //>1
-                                    {
-                                        if (totalModAppInstance > 1)
-                                        {
-                                            if (IsClientType(moduleData.ProductLicense.ProductName) && storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                                storedMod.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;                                            
-                                            else
-                                                storedMod.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
-                                        }
-                                        else
-                                        {
-                                            if (storedMod.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                                storedMod.moduleAppInstance.TVal = 0;
-                                            else
-                                            {
-                                                storedMod.moduleAppInstance.TVal = 1;
-                                                DecrementAddOnModuleAppInstance(moduleData, storedMod);
-                                            }
-                                        }
-                                    }
-                                }
+                                if (IsClientType(moduleData.ProductLicense.ProductName) && storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                    storedMod.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;                                            
+                                else
+                                    storedMod.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
+                            }
+                            else
+                            {
+                                if (storedMod.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                    storedMod.moduleAppInstance.TVal = 0;
                                 else
                                 {
-                                    //if decrement std then increment add-on
-                                    //if decrement add-on don't decrement appinstance unless it is 1
-                                    storedMod.moduleAppInstance.TVal = 0;
-                                    if (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                    {
-                                        if (GetTotalAddOnModuleAppInstance(moduleData, storedMod) == 0)
-                                            IncrementAddOnModuleAppInstance(moduleData, storedMod);
-                                    }
+                                    storedMod.moduleAppInstance.TVal = 1;
+                                    moduleData.ProductLicense.DecrementAddOnModuleAppInstance(storedMod.moduleID.TVal);
                                 }
-                                break;
                             }
                         }
                     }
-                }
-            }
-        }
-
-        private uint GetTotalAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
-        {
-            uint totalValue = 0;
-            string stdProductLicense = "";
-            IList<string> addOnOrders = null;
-            Service<ICreator>.Use((client) =>
-            {
-                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.ProductLicense.ID : moduleData.ProductLicense.ParentID;
-                    addOnOrders = client.GetAddOnProductLicenses(stdProductLicense);
-            });
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.ProductLicense.Product.ModuleList.TVal)
-            {
-                if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal)))
-                    totalValue += modRec.moduleAppInstance.TVal;
-            }
-            return totalValue;
-        }
-
-        private int GetTotalModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod)
-        {
-            uint totalValue = 0;
-            string stdProductLicense = "";
-            IList<string> addOnOrders = null;
-            Service<ICreator>.Use((client) =>
-            {
-                stdProductLicense = (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn) ? moduleData.ProductLicense.ID : moduleData.ProductLicense.ParentID;
-                addOnOrders = client.GetAddOnProductLicenses(stdProductLicense);
-            });
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in moduleData.ProductLicense.Product.ModuleList.TVal)
-            {
-                if (modRec.moduleID.TVal.Equals(storedMod.moduleID.TVal) && (addOnOrders.Contains(modRec.contractNumber.TVal) || modRec.contractNumber.TVal.Equals(stdProductLicense)))
-                    totalValue += modRec.moduleAppInstance.TVal;
-            }
-            return (int)totalValue;
-        }
-
-        //standard order moduledata does not know add-on orders need to retrieve from database?
-        private void DecrementAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
-        {
-            IList<string> addOnOrders = null;
-            Service<ICreator>.Use((client) =>
-            {
-                addOnOrders = client.GetAddOnProductLicenses(module.contractNumber);
-            });
-            if(addOnOrders != null)
-            {
-                if(addOnOrders.Count > 0)
-                {
-                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
+                    else
                     {
-                        if (storedMod.moduleID.TVal == module.moduleID.TVal &&
-                            addOnOrders.Contains(storedMod.contractNumber.TVal))
-                            storedMod.moduleAppInstance.TVal = 0;                                                                          
-                    }
-                }
-            }
-        }
-
-        private void IncrementAddOnModuleAppInstance(ModuleDialogData moduleData, Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
-        {
-            //increment first add-on found
-            IList<string> addOnOrders = null;
-            Service<ICreator>.Use((client) =>
-            {
-                addOnOrders = client.GetAddOnProductLicenses(module.contractNumber);
-            });
-            if (addOnOrders != null)
-            {
-                if (addOnOrders.Count > 0)
-                {
-                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
-                    {
-                        if (storedMod.moduleID.TVal == module.moduleID.TVal &&
-                            addOnOrders.Contains(storedMod.contractNumber.TVal))
+                        //if decrement std then increment add-on
+                        //if decrement add-on don't decrement appinstance unless it is 1
+                        storedMod.moduleAppInstance.TVal = 0;
+                        if (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
                         {
-                            if(storedMod.moduleValue.TVal > 0)
-                                storedMod.moduleAppInstance.TVal = 1;
-                            break;
+                            if (moduleData.ProductLicense.GetTotalAddOnModuleAppInstance(storedMod.moduleID.TVal) == 0)
+                                moduleData.ProductLicense.IncrementAddOnModuleAppInstance(storedMod.moduleID.TVal);
                         }
                     }
+                    //need to set again because it may have been updated based on units change
+                    moduleData.Module.AppInstance = storedMod.moduleAppInstance.TVal;
+                    break;
                 }
             }
         }
+
         #endregion
 
         #region LicenseTabPage Events
@@ -644,7 +590,7 @@ namespace Client.Creator
                 List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
-                    if (productSpec.productName.TVal.Equals(selectedProduct) && !productSpec.productName.TVal.Contains("Test"))
+                    if (productSpec.productName.TVal.Equals(selectedProduct)) //&& !productSpec.productName.TVal.Contains("Test"))
                     {
                         productLicenses = client.GetProductLicensesByProduct(storedObject.ProductLicense.LicenseServer, (int)m_CommLink.GetProductID(productSpec.productName.TVal));
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
@@ -665,7 +611,8 @@ namespace Client.Creator
                     }               
                 }
                 ProductLicenseTypeComboBox.SelectedIndex = 0;
-                int productID = CreatorForm.s_CommLink.GetProductID(selectedProduct);
+                string baseProduct = (selectedProduct.Contains("Test")) ?  CreatorForm.s_CommLink.GetProductBaseName(selectedProduct) : selectedProduct;
+                int productID = CreatorForm.s_CommLink.GetProductID(baseProduct);
                 if (productID > 0)
                 {
                     int productVersion = client.GetProductVersionFromTable(productID);
@@ -703,9 +650,6 @@ namespace Client.Creator
 
         private bool IsValidTokenType(string tokenType)
         {
-            //if (tokenType == "Computer Name" ||
-            //   tokenType == "Bios Serial Number" ||
-            //   tokenType == "Mac Address")
             if(GetTokenEnum(tokenType) != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
                 return true;
             return false;
@@ -810,12 +754,6 @@ namespace Client.Creator
             tokenListView.Items.Clear();
             btnOk.Enabled = false;
         }
-
-        //private void keyNameListView_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    if(keyNameListView.SelectedItems.Count > 0)
-        //        tokenValueTextBox.Text = keyNameListView.SelectedItems[0].Text;
-        //}
     }
 
     #region LicenseDialogData class
@@ -917,23 +855,23 @@ namespace Client.Creator
     #region ModuleDialogData class
     public class ModuleDialogData : Shared.VisualComponents.DialogData
     {
-        private List<string> _moduleNames;
+        private ModuleProperty _module;
         private ProductLicenseProperty _plData;
         #region Constructors
 
-        public ModuleDialogData(List<string> moduleNames, ProductLicenseProperty plData)
+        public ModuleDialogData(ModuleProperty module, ProductLicenseProperty plData)
         {
-            _moduleNames = moduleNames;
+            _module = module;
             _plData = plData;
         }
         #endregion
 
         #region Properties
 
-        public List<string> ModuleNames
+        public ModuleProperty Module
         {
-            get { return this._moduleNames; }
-            set { this._moduleNames = value; }
+            get { return this._module; }
+            set { this._module = value; }
         }
         public ProductLicenseProperty ProductLicense
         {
@@ -948,14 +886,12 @@ namespace Client.Creator
     public class ProductLicenseDialogData : Shared.VisualComponents.DialogData
     {
         private ProductLicenseProperty _plInfo;
-        private LicenseServerProperty _LicenseInfo;
 
         #region Constructors
 
-        public ProductLicenseDialogData(ProductLicenseProperty plInfo, LicenseServerProperty licInfo)
+        public ProductLicenseDialogData(ProductLicenseProperty plInfo)
         {
             _plInfo = plInfo;
-            _LicenseInfo = licInfo;
         }
         #endregion
 
@@ -965,12 +901,6 @@ namespace Client.Creator
         {
             get { return this._plInfo; }
             set { this._plInfo = value; }
-        }
-
-        public LicenseServerProperty LicenseInfo
-        {
-            get { return this._LicenseInfo; }
-            set { this._LicenseInfo = value; }
         }
         #endregion
     }

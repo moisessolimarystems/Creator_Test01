@@ -55,15 +55,14 @@ namespace CreatorData
             }
         }
 
-        public static IList<string> GetDeactivateProductLicenses(string licenseServerName, int productID)
+        public static IList<string> GetDeactivateProductLicenses(string licenseServerName)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;                
                 var plDeactive = from c in db.ProductLicenseTables
                                  where c.LicenseID > 0  
-                                 where c.LicenseTable.LicenseName.Equals(licenseServerName)
-                                 where c.ProductID.Equals(productID)
+                                 where c.LicenseTable.LicenseName.Equals(licenseServerName)                                 
                                  where c.plState.Equals(3) //3 => deactive
                                  select c.plID;
                 return plDeactive.ToList();

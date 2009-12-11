@@ -39,10 +39,20 @@ namespace CreatorData
                         newTransaction.taPacketID = 0;
                         newTransaction.taType = trans.taType;
                         newTransaction.taUnits = trans.taUnits;
+                        newTransaction.taPreviousValue = trans.taPreviousValue;
                         newTransaction.taUser = trans.taUser;
                         CreateTransaction(newTransaction);
                     }
                 }
+            }
+        }
+
+        public static IList<TransactionTable> GetTransactionsByLicenseName(string licenseName)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                return db.TransactionTables.Where(c => c.LicenseTable.LicenseName.Equals(licenseName)).ToList();
             }
         }
 

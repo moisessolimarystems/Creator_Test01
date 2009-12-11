@@ -13,7 +13,7 @@ namespace Client.Creator
     public partial class ProductConfigurationDialog : Shared.VisualComponents.DialogBaseForm
     {
         private bool _validVersion;
-        public ProductConfigurationDialog()
+        public ProductConfigurationDialog(CommunicationLink commLink)
         {
             InitializeComponent();
             _validVersion = false;
@@ -23,7 +23,7 @@ namespace Client.Creator
                 IList<ProductTable> products = client.GetProducts();
                 foreach (ProductTable product in products)
                 {
-                    if(!product.pName.Contains("Test"))
+                    if(!product.pName.Contains("Test") && commLink.GetProductName((uint)product.pId) != "Unknown")
                         comboBox1.Items.Add(product.pName);                    
                 }
             });

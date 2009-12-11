@@ -61,6 +61,18 @@ namespace CreatorData
             }
         }
 
+        public static void DeleteAllDestinationNamesByCustomer(int custID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                IList<DestinationNameTable> dnRecords = (from d in db.DestinationNameTables
+                                                         where d.CustID.Equals(custID)
+                                                         select d).ToList();
+                db.DestinationNameTables.DeleteAllOnSubmit(dnRecords);
+                db.SubmitChanges();
+            }
+        }
+
         public static void CreateDestinationName(DestinationNameTable destName)
         {
             using (CreatorDataContext db = new CreatorDataContext())

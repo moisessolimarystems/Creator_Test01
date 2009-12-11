@@ -147,17 +147,6 @@ namespace Client.Creator
             }
         }
 
-        public void SoftwareLicenseDisasterRecoveryExtendTimeByLicense(String softwareLicense)
-        {
-            try
-            {
-                m_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicense(softwareLicense);
-            }
-            catch(COMException ex)
-            {
-                throw new COMException("SoftwareLicenseDisasterRecoveryExtendTimeByLicense Failed", ex);
-            }
-        }
         #endregion 
 
         #region ManagerWrapper Methods
@@ -271,6 +260,7 @@ namespace Client.Creator
             {
                 if (productSpec.productID == productID)
                     return productSpec.productName;
+
             }
             return "Unknown";
         }
@@ -294,7 +284,7 @@ namespace Client.Creator
         }
 
         public int GetProductID(String productName)
-        {
+        {            
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productName == productName)

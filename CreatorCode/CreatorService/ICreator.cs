@@ -21,25 +21,25 @@ namespace Service.Creator
         #region Customer OperationContracts
         // TODO: Add your service operations here
         [OperationContract]
-        IList<CustomerTable> GetAllCustomers(string searchString, bool enableLoadOptions);
+        IList<CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
 
         [OperationContract]
-        IList<string> GetAllCustomerNames(string searchString);
+        IList<string> GetAllCustomerNames(string searchStr);
 
         [OperationContract]
-        int GetCustomerCount(string searchString, bool enableLoadOptions);
+        int GetCustomerCount(string searchStr, bool enableLoadOptions);
 
         [OperationContract]
-        CustomerTable GetCustomer(string searchString, bool enableLoadOptions);
+        CustomerTable GetCustomer(string searchStr, bool enableLoadOptions);
 
         [OperationContract]
-        void CreateCustomer(CustomerTable custRecord);
+        void CreateCustomer(CustomerTable ct);
 
         [OperationContract]
-        void UpdateCustomer(CustomerTable custRecord);
+        void UpdateCustomer(CustomerTable ct);
 
         [OperationContract]
-        void DeleteCustomer(CustomerTable custRecord);
+        void DeleteCustomer(CustomerTable ct);
 
         [OperationContract]
         int GetLastCustomerID();
@@ -48,16 +48,16 @@ namespace Service.Creator
 
         #region License OperationContracts
         [OperationContract]
-        IList<LicenseTable> GetLicensesByCustomer(string custName, string searchString, bool enableLoadOptions);
+        IList<LicenseTable> GetLicensesByCustomer(string custName);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string searchString, bool enableLoadOptions);        
+        IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions);        
 
         [OperationContract]
-        LicenseTable GetLicenseByName(string licenseName, bool enableLoadOptions);
+        LicenseTable GetLicenseByName(string licName, bool bLoadOptions);
 
         [OperationContract]
-        LicenseTable GetLicenseByID(int licID, bool enableLoadOptions);
+        LicenseTable GetLicenseByID(int licID, bool bLoadOptions);
 
         [OperationContract]
         int GetLicenseCountByID(int custID, int destID, int groupID);
@@ -75,22 +75,16 @@ namespace Service.Creator
         uint GetLastDestinationID(uint custID);
 
         [OperationContract]
-        int GetLicenseType(string licenseName);
+        int GetLicenseType(string licName);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByConditions(IList<Condition> conditionList);
+        IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl);
 
         [OperationContract]
-        bool IsLicenseModified(string licenseName);
-
-        [OperationContract]
-        bool IsLicenseUpdated(string licenseName);
+        bool IsLicenseModified(string licName);
 
         [OperationContract]
         IList<string> GetModifiedLicensesByCustomer(string custName);
-
-        [OperationContract]
-        IList<string> GetUpdatedLicensesByCustomer(string custName); 
 
         [OperationContract]
         int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
@@ -102,7 +96,7 @@ namespace Service.Creator
         IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType);
 
         [OperationContract]
-        void GenerateLicensePacket(string packetName, LicenseTable licenseName, DateTime expDate, string comments, ref string verificationCode, ref Byte[] newByteArrayLicensePacket, string user);
+        void GenerateLicensePacket(string pktName, LicenseTable licName, DateTime expDate, string comments, ref string vCode, ref Byte[] newByteArrayLicensePacket, string user);
 
         [OperationContract]
         IList<SolimarLicenseProtectionKeyInfo> KeyEnumerate();
@@ -111,98 +105,101 @@ namespace Service.Creator
         string KeyFormat(string key);
 
         [OperationContract]
-        string KeyProgramVerification(string key, int customerNumber, int keyNumber);
+        string KeyProgramVerification(string key, int custNum, int keyNum);
 
         [OperationContract()]
-        void CreateLicense(LicenseTable license);
+        void CreateLicense(LicenseTable lt);
 
         [OperationContract()]
-        void UpdateLicense(LicenseTable license);
+        void UpdateLicense(LicenseTable lt, bool isDirty);
 
         [OperationContract()]
-        void DeleteLicense(LicenseTable license);
+        void DeleteLicense(LicenseTable lt);
 
         #endregion
 
         #region Packet OperationContracts
 
         [OperationContract]
-        IList<PacketTable> GetPacketsByLicenseName(string licenseName);
+        IList<PacketTable> GetPacketsByLicenseName(string ln);
 
         [OperationContract]
-        PacketTable GetPacketByVerificationCode(string verificationCode);
+        PacketTable GetPacketByVerificationCode(string vCode);
 
         [OperationContract]
-        bool ValidateVerificationCode(string packetName, string verificationCode);
+        bool ValidateVerificationCode(string pktName, string vCode);
 
         [OperationContract]
         string GenerateLicInfoByVerifyData(ref Byte[] byteVerifyData);
 
         [OperationContract()]
-        void CreatePacket(PacketTable packet);
+        void CreatePacket(PacketTable pt);
 
         [OperationContract()]
-        void UpdatePacket(PacketTable packet);
+        void UpdatePacket(PacketTable pt);
 
         [OperationContract()]
-        void DeletePacket(PacketTable packet);
+        void DeletePacket(PacketTable pt);
 
         #endregion
 
         #region Transaction OperationContracts
 
-        [OperationContract]
-        IList<TransactionTable> GetTransactionsByPacketID(int packetID);
+        //[OperationContract]
+        //IList<TransactionTable> GetTransactionsByLicenseName(string licenseName);
 
         [OperationContract]
-        IList<TransactionTable> GetNewTransactionsByLicenseName(string licenseName);
+        IList<TransactionTable> GetTransactionsByPacketID(int pktID);
+
+        [OperationContract]
+        IList<TransactionTable> GetNewTransactionsByLicenseName(string licName);
 
         [OperationContract]
         void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID);
 
         [OperationContract()]
-        void CreateTransaction(TransactionTable ta);
+        void CreateTransaction(TransactionTable tt);
 
         [OperationContract()]
-        void UpdateTransaction(TransactionTable ta);
+        void UpdateTransaction(TransactionTable tt);
 
         [OperationContract()]
-        void DeleteTransaction(TransactionTable ta);
+        void DeleteTransaction(TransactionTable tt);
         #endregion
 
         #region Product License OperationContracts
         [OperationContract]
-        IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> conditionList);
+        IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl);
 
         [OperationContract]
         IList<ProductLicenseTable> GetAllProductLicenses();
 
         [OperationContract]
-        IList<ProductLicenseTable> GetProductLicenses(string licenseServerID);
+        IList<ProductLicenseTable> GetProductLicenses(string lsID);
 
         [OperationContract]
-        IList<ProductLicenseTable> GetProductLicensesByProduct(string licenseServerID, int productID);
+        IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, int prodID);
 
         [OperationContract]
-        ProductLicenseTable GetProductLicense(string productLicenseID);
+        ProductLicenseTable GetProductLicense(string plID);
 
         [OperationContract]
-        IList<string> GetAddOnProductLicenses(string productLicenseID);
+        IList<string> GetAddOnProductLicenses(string plID);
 
         [OperationContract]
-        int GetNextProductLicenseIndex(string licenseServerID);
+        int GetNextProductLicenseIndex(string lsID);
 
         [OperationContract]
-        int GetProductVersionFromTable(int productID);
+        int GetProductVersionFromTable(int prodID);
 
         [OperationContract]
-        IList<string> GetDeactivatedProductLicenses(string licenseServerName, int productID);
+        IList<string> GetDeactivatedProductLicenses(string lsName);
 
         [OperationContract]
-        void DeactivateProductLicense(string productLicenseID);
+        void DeactivateProductLicense(string plID);
 
         [OperationContract]
-        void DeleteAllProductLicenses(string licenseServer);
+        void DeleteAllProductLicenses(string lsName);
 
         [OperationContract()]
         void CreateProductLicense(ProductLicenseTable ta);
@@ -223,7 +220,7 @@ namespace Service.Creator
         IList<TokenTable> GetAllTokensByCustomer(string searchString, string custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
 
         [OperationContract]
-        IList<TokenTable> GetTokensByLicenseName(string licenseName);
+        IList<TokenTable> GetTokensByLicenseName(string licName);
 
         [OperationContract]
         TokenTable GetHardwareTokenByKeyValue(string keyValue);
@@ -232,7 +229,7 @@ namespace Service.Creator
         IList<TokenTable> GetAvailableHardwareTokensByCustID(uint custID);
 
         [OperationContract]
-        TokenTable GetTokenByLicenseName(string licenseName, byte tokenType);
+        TokenTable GetTokenByLicenseName(string licName, byte tokenType);
 
         [OperationContract]
         bool TokenExists(uint custID, byte tokenType, string tokenValue);
@@ -244,13 +241,13 @@ namespace Service.Creator
         uint GetNextHardwareTokenValue(uint custID);
 
         [OperationContract]
-        void CreateToken(TokenTable ta);
+        void CreateToken(TokenTable tt);
 
         [OperationContract]
-        void UpdateToken(TokenTable ta);
+        void UpdateToken(TokenTable tt);
 
         [OperationContract]
-        void DeleteToken(TokenTable ta);
+        void DeleteToken(TokenTable tt);
 
         #endregion
 
@@ -262,19 +259,22 @@ namespace Service.Creator
         DestinationNameTable GetDestinationName(int custID, int destID);
 
         [OperationContract]
-        DestinationNameTable GetDestinationID(int custID, string destName);
+        DestinationNameTable GetDestinationID(int custID, string dn);
+
+        [OperationContract]
+        void DeleteAllDestinationNames(int custID);
 
         [OperationContract]
         uint GetNextDestinationID(uint custID);
 
         [OperationContract()]
-        void CreateDestinationName(DestinationNameTable destName);
+        void CreateDestinationName(DestinationNameTable dnt);
 
         [OperationContract()]
-        void UpdateDestinationName(DestinationNameTable destName);
+        void UpdateDestinationName(DestinationNameTable dnt);
 
         [OperationContract()]
-        void DeleteDestinationName(DestinationNameTable destName);
+        void DeleteDestinationName(DestinationNameTable dnt);
 
         #endregion
 
@@ -291,13 +291,13 @@ namespace Service.Creator
         ProductTable GetProduct(string product);
 
         [OperationContract]
-        void UpdateProductTable(ProductTable product);
+        void UpdateProductTable(ProductTable pt);
 
         #endregion
 
         #region SoftwareToken OperationContracts
         [OperationContract]
-        void UpdateSoftwareTokenTable(SoftwareTokenTable token);
+        void UpdateSoftwareTokenTable(SoftwareTokenTable stt);
         [OperationContract]
         SoftwareTokenTable GetSoftwareToken(string tokenType);
         [OperationContract]
