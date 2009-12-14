@@ -6,7 +6,7 @@
 
 /* accessCode[]
  *    The accessCode array tells the access code of each cell of the
- *    protection key.  */
+ *    protection key for key version 0.  */
 const RainbowDriver::AccessCode RainbowDriver::accessCode[] =
 {
 	// 0x00 -> 0x07   FIRST ROW OF CELLS (INACCESSIBLE)
@@ -27,7 +27,25 @@ const RainbowDriver::AccessCode RainbowDriver::accessCode[] =
 	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READONLY, READONLY,
 };
 
-
+const RainbowDriver::AccessCode RainbowDriver::accessCode_version1[] =
+{
+	// 0x00 -> 0x07   FIRST ROW OF CELLS (INACCESSIBLE)
+	READONLY,  READONLY,  ALGORITHM, ALGORITHM, ALGORITHM, ALGORITHM, ALGORITHM, ALGORITHM,
+	// 0x08 -> 0x0F   FIRST ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x10 -> 0x17   SECOND ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x18 -> 0x1F   THIRD ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x20 -> 0x27   FOURTH ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x28 -> 0x2F   FIFTH ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x30 -> 0x37   SIXTH ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE,
+	// 0x38 -> 0x3F   LAST ROW OF ACCESSABLE CELLS
+	READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READWRITE, READONLY, READONLY,
+};
 
 
 RainbowDriver::RainbowDriver() : 
@@ -89,6 +107,50 @@ HRESULT RainbowDriver::ComputeCurrentKeyIdent(_bstr_t key, BSTR *physical_key_id
 	return S_OK;
 }
 
+HRESULT RainbowDriver::GetSoftwareKeyCode(_bstr_t key, BSTR *key_code)
+{
+	SafeMutex mutex(keys_lock);	
+	HRESULT hr(E_INVALIDARG);
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		GUID key_guid;
+		hr = ReadKeyTempGUID(keyIT->second, key_guid);
+		if (SUCCEEDED(hr))
+		{
+			wchar_t tmp_code[128];
+			
+			StringFromGUID2(key_guid, tmp_code, 128);
+			tmp_code[127]=0;
+			*key_code = _bstr_t(tmp_code).Detach();
+		}
+	}
+	return hr;
+}
+
+HRESULT RainbowDriver::SetSoftwareKeyCode(_bstr_t key, BSTR key_code)
+{
+	SafeMutex mutex(keys_lock);	
+	HRESULT hr(E_INVALIDARG);
+	KeyList::iterator keyIT = keys.find(key);
+	if (keyIT!=keys.end())
+	{
+		GUID key_guid;
+		if (key_code[0] == L'{')
+			hr = CLSIDFromString(const_cast<LPWSTR> (key_code), &key_guid);
+		else
+			hr = CLSIDFromProgID(const_cast<LPWSTR> (key_code), &key_guid);
+        
+		if(SUCCEEDED(hr))
+			hr = WriteKeyTempGUID(keyIT->second, key_guid);
+	}
+	return hr;
+}
+
+HRESULT RainbowDriver::GetKeyVersion(_bstr_t key, unsigned short *key_version)
+{
+	return ReadCell(key, CELL_KEY_VERSION, key_version);
+}
 
 HRESULT RainbowDriver::RefreshKeyList()
 {
@@ -238,7 +300,7 @@ HRESULT RainbowDriver::RefreshKeyList()
 				// if key is programmed, use the key number and customer number as the key id
 				else
 				{
-					_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%03x-%02x", customer, keynumber);
+					_snwprintf_s(key_id, _countof(key_id), L"%04x-%04x", customer, keynumber);
 //wsprintf(tmpBuf, L"Key Found: %s", key_id);
 //OutputDebugStringW(tmpBuf);
 					key_id[127]=0;
@@ -334,14 +396,14 @@ HRESULT RainbowDriver::ReadCell(_bstr_t key, unsigned short cell, unsigned short
 	}
 }
 
-HRESULT RainbowDriver::WriteCell(_bstr_t key, unsigned short cell, unsigned short value)
+HRESULT RainbowDriver::WriteCell(_bstr_t key, unsigned short cell, unsigned short value, unsigned short keyLayoutVersion)
 {
 	SafeMutex mutex(keys_lock);	
 
 	KeyList::iterator k = keys.find(key);
 	if (k!=keys.end())
 	{
-		return TranslateRainbowError(RNBOsproWrite(k->second, WRITE_PASSWORD, cell, value, accessCode[cell]));
+		return TranslateRainbowError(RNBOsproWrite(k->second, WRITE_PASSWORD, cell, value, (keyLayoutVersion==0) ? accessCode[cell] : accessCode_version1[cell]));
 	}
 	else
 	{
@@ -577,8 +639,6 @@ HRESULT RainbowDriver::ClearKeyTempGUID(RBP_SPRO_APIPACKET packet)
 	}
 	return S_OK;
 }
-
-
 
 HRESULT RainbowDriver::TranslateRainbowError(unsigned short rnboError)
 {
