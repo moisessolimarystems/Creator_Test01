@@ -142,10 +142,11 @@ SoftwareServer::~SoftwareServer()
 	}
 }
 
-HRESULT SoftwareServer::Initialize(RainbowDriver* pDriver)
+HRESULT SoftwareServer::Initialize(KeyServer* _pKeyServer, RainbowDriver* _pDriver)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	pRainbowDriver = pDriver;
+	pRainbowDriver = _pDriver;
+	pKeyServer = _pKeyServer;
 	HRESULT hr(S_OK);
 
 	//hr = ResynchronizeSoftwareLicenses();
@@ -207,12 +208,13 @@ wchar_t tmpbuf[BUF_SIZE];
 			if(softwareLicMgrMap.find(_bstr_t(licSrvFileInfoListIt->LicFileName->c_str())) == softwareLicMgrMap.end())
 			{
 				pNewSwLicMgr = new SoftwareLicenseMgr();
-				hr = pNewSwLicMgr->Initialize(_bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), pRainbowDriver, &licServerDataMgr);
+				hr = pNewSwLicMgr->Initialize(_bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), pKeyServer, &licServerDataMgr);
 
 if(bFirstTime)
 {
-	swprintf_s(tmpbuf, _countof(tmpbuf), L"%s, %s, %s, %08x, %s, %d", (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileVerificationCode->c_str()), hr, std::wstring(SpdAttribs::WStringObj(licSrvFileInfoListIt->LicModifiedDate)).c_str(), (int)licSrvFileInfoListIt->LicCurrentActivations);
-	OutputDebugString(tmpbuf);
+	//YYY - Change Later
+	//swprintf_s(tmpbuf, _countof(tmpbuf), L"%s, %s, %s, %08x, %s, %d", (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileLicenseCode->c_str()), hr, std::wstring(SpdAttribs::WStringObj(licSrvFileInfoListIt->LicModifiedDate)).c_str(), (int)licSrvFileInfoListIt->LicCurrentActivations);
+	//OutputDebugString(tmpbuf);
 }
 				if(FAILED(hr))
 				{
@@ -453,6 +455,10 @@ HRESULT SoftwareServer::GetSoftwareLicenseStatus_ByProduct(long productID, BSTR 
 	{
 		hr = eHr;
 	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
 	catch (...)
 	{
 		hr = E_FAIL;
@@ -485,6 +491,10 @@ HRESULT SoftwareServer::GetSoftwareLicenseStatus_ByLicense(BSTR softwareLicense)
 	catch(HRESULT &eHr)
 	{
 		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
 	}
 	catch (...)
 	{
@@ -976,6 +986,7 @@ HRESULT SoftwareServer::GenerateVerifyDataWithLicInfo_ByLicense(BSTR softwareLic
 
 HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 {
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 	HRESULT hr(E_INVALIDARG);
 	try
 	{
@@ -983,74 +994,37 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 		
 		SpdAttribs::BufferObj bufObj;
 		ProtectionKey* pTmpProKey = NULL;
-		KeySpec keyspec;
+
+
+		//Scope for key accessing variables
 		{
-			SafeMutex mutex1(pRainbowDriver->keys_lock);
-			pRainbowDriver->RefreshKeyList();
-			
-			//wchar_t tmpbuf[1024];
-			unsigned short shortValue;
-			byte valueByte[16];
-			int arrayIdx = 0;
+			VARIANT vtKeyList;
+			VariantInit(&vtKeyList);
+			VARIANT* pVtKeyNameList;
 
-			// Cycle through all the protection keys
-			for (RainbowDriver::KeyList::iterator dkey = pRainbowDriver->keys.begin(); dkey!=pRainbowDriver->keys.end(); ++dkey)
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - pKeyServer->KeyEnumerate()");
+			hr = pKeyServer->KeyEnumerate(&vtKeyList);
+			if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pVtKeyNameList)))
 			{
-				Lic_KeyAttribs licKeyAttribs;
-
-
-				unsigned short curActivations;
-				hr = pRainbowDriver->GetSoftwareCurrentActivations(dkey->first, &curActivations);
-				licKeyAttribs.currentActivations = curActivations;
-
-				BSTR bstrKeyCode;
-				hr = pRainbowDriver->GetSoftwareKeyCode(dkey->first, &bstrKeyCode);
-				if(SUCCEEDED(hr))
+				for (int idx=0; idx<vtKeyList.parray->rgsabound[0].cElements; idx++)
 				{
-					licKeyAttribs.verificationCode = std::wstring(bstrKeyCode);
-					SysFreeString(bstrKeyCode);
-				}
+//OutputDebugString((wchar_t*)pVtKeyNameList[idx].bstrVal);
+					//keyValue = KeyHeaderQuery(pKeyNameList[idx].bstrVal, headerID);
+					Lic_KeyAttribs licKeyAttribs;
+					hr = pKeyServer->GetKeyInfoAttribs(pVtKeyNameList[idx].bstrVal, &licKeyAttribs);
 
-				//find modified date from key
-				time_t modifiedTimeT = -1;
-				pRainbowDriver->GetSoftwareModifiedDate(dkey->first, &modifiedTimeT);
-				if(SUCCEEDED(hr) && modifiedTimeT != -1)
-				{
-					SYSTEMTIME modifiedSystime;
-					VARIANT vtModified;
-					vtModified = TimeHelper::TimeTToVariant(modifiedTimeT);
-					VariantTimeToSystemTime(vtModified.date, &modifiedSystime);
-					wchar_t timestamp[256];
-					TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), modifiedSystime);
-					licKeyAttribs.modifiedDate = std::wstring(timestamp);
-				}
-				licKeyAttribs.keyName = std::wstring(dkey->first);
-
-				// Cycle through all the cells of a given key
-				for(unsigned short cell = 0; cell<64; cell++)
-				{
-					shortValue = 0;
-					hr = pRainbowDriver->ReadCell(dkey->first, cell, &shortValue);
-					arrayIdx = (2 * cell) % 16;
-
-					valueByte[arrayIdx] = SUCCEEDED(hr) ? shortValue>>8 : 0;
-					valueByte[arrayIdx+1] = SUCCEEDED(hr) ? (byte)shortValue : 0;
-
-//swprintf_s(tmpbuf, 1024, L" SoftwareServer::GenerateLicenseSystemData() - key: %s, cell: 0x%x, shortValue: 0x%x, valueByte[0x%x]: 0x%x, valueByte[0x%x]: 0x%x", (wchar_t*)dkey->first, cell, shortValue, arrayIdx, valueByte[arrayIdx], arrayIdx+1, valueByte[arrayIdx+1]);
-//OutputDebugString(tmpbuf);
-					if(cell % 8 == 7)
+					if(SUCCEEDED(hr))
 					{
-						SpdAttribs::CBuffer cBuffer;
-						cBuffer.SetBuffer((byte*)&valueByte, 16);
-						licKeyAttribs.layout->push_back(cBuffer);
+						//add key to list
+						licSystemAttribs.ListOfStreamed_KeyAttribs->push_back(licKeyAttribs.ToString());
 					}
 				}
-
-				//add key to list
-				licSystemAttribs.ListOfStreamed_KeyAttribs->push_back(licKeyAttribs.ToString());
+				SafeArrayUnaccessData(vtKeyList.parray);
 			}
-		}	// End of scope for SafeMutex mutex1(pRainbowDriver->keys_lock);
-		
+
+			VariantClear(&vtKeyList);
+		}
+	
 		{
 			// Add Server Data
 			BSTR bstrServerDataAttrbsStream = NULL;
@@ -1070,21 +1044,18 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 		TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), currentSystime);
 		licSystemAttribs.createdDate = std::wstring(timestamp);
 
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through all the Software Licenses");
 		// Cycle through all the Software Licenses
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs licInfoAttribs;
+		//ZZZ - Comment out to speed up conversion
 		for(SoftwareLicList::iterator swLicIt=softwareLicMgrMap.begin(); swLicIt!=softwareLicMgrMap.end(); swLicIt++)
 		{
 			hr = (*swLicIt).second->GetLicenseInfo(&licInfoAttribs);
-			BSTR bstrTmpAttribsStream = SysAllocString(licInfoAttribs.ToString().c_str());
-			SysFreeString(bstrTmpAttribsStream);
-
-			BSTR bstrSoftwareLicenseName;
-			hr = (*swLicIt).second->GetSoftwareLicenseName(&bstrSoftwareLicenseName);
 			if(SUCCEEDED(hr))
 				licSystemAttribs.ListOfStreamed_InfoAttribs->push_back(licInfoAttribs.ToString());
-			SysFreeString(bstrSoftwareLicenseName);
 		}
 		
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Info");
 		//
 		// Get System Info
 		Lic_SystemInfoAttribs sysInfoAttribs;
@@ -1231,7 +1202,7 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 						};
 						VARIANT* pvtTmp = &rList[idx][(wchar_t*)tmpByte];
 						if (pvtTmp->vt == VT_BOOL)
-							sysInfoAttribs.bPartOFDomain = (pvtTmp->boolVal == VARIANT_FALSE) ? true : false;
+							sysInfoAttribs.bPartOFDomain = (pvtTmp->boolVal == VARIANT_TRUE) ? true : false;
 					}
 					WMIHelper::Clear(rList);
 					rList.clear();
@@ -1376,10 +1347,13 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 			}
 		}	// End of scope of WMIHelper wmi
 
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString()");
 		licSystemAttribs.Streamed_SoftwareSpecAttribs = std::wstring(g_pSoftwareSpec->GetSoftwareSpec().ToString());
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - sysInfoAttribs.ToString()");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
-
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - end");
 //OutputDebugString(bstrLicAttribsStream);
 
 		_bstr_t bstr_license_verify_data_code;
@@ -1400,6 +1374,7 @@ HRESULT SoftwareServer::GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket)
 	{
 		hr = E_FAIL;
 	}
+//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Leave");
 	return hr;
 }
 HRESULT SoftwareServer::GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream)
@@ -1862,7 +1837,7 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 			StringFromGUID2(key_guid, tmp_code, 128);
 			tmp_code[127]=0;
 			newLicenseFile = _bstr_t(tmp_code).Detach();
-			pSoftwareLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, pRainbowDriver, &licServerDataMgr);
+			pSoftwareLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, pKeyServer, &licServerDataMgr);
 		}
 
 
@@ -1932,7 +1907,9 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 		// use licensePacketAttribsStream and pass to SolimarSoftwareLicenseMgr
 		Lic_PackageAttribs tmpLicPackageAttribs;
 		tmpLicPackageAttribs.InitFromString(bstrLicPackageAttribsStream);
-		
+		//YYY - Fake Data, CustomerID: 0xfffe
+		//tmpLicPackageAttribs.licLicenseInfoAttribs.customerID = 0xfffe;
+
 		// Make sure that the packet creation date is no more than 1 day behind the current system time.
 		// In truth, the current system time should always be greater that creation date, but allow 1 day window
 		SYSTEMTIME packetCreateDateSystime;
@@ -1943,10 +1920,7 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 			throw(E_FAIL);
 		time_t packetCreateDateTimeT = TimeHelper::VariantToTimeT(packetCreateDateVt, false);
 		time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-		static const time_t ONE_HOUR_IN_SECONDS = (time_t)(60*60);
-		static const time_t ONE_DAY_IN_SECONDS = (time_t)(24*ONE_HOUR_IN_SECONDS);
-
-		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -ONE_DAY_IN_SECONDS)
+		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -TimeHelper::ONE_DAY_IN_SECONDS)
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_PACKET;
 
 		SoftwareLicenseMgr* pSoftwareLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(_bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&tmpLicPackageAttribs.licLicenseInfoAttribs).c_str()));
@@ -1973,7 +1947,7 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 			tmp_code[127]=0;
 			newLicenseFile = _bstr_t(tmp_code).Detach();
 
-			pSoftwareLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, pRainbowDriver, &licServerDataMgr);
+			pSoftwareLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, pKeyServer, &licServerDataMgr);
 		}
 
 		//
@@ -2029,6 +2003,10 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 	catch(HRESULT &eHr)
 	{
 		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
 	}
 	catch (...)
 	{
@@ -2106,17 +2084,18 @@ HRESULT SoftwareServer::ValidateToken_ByLicense(BSTR softwareLicense, long valid
 
 
 
-HRESULT SoftwareServer::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR softwareLicense)
+HRESULT SoftwareServer::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR softwareLicense, BSTR contractNumber)
 {
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(SoftwareLicenseLock);
 	try
 	{
 		SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
+
 		if(!pSwLicMgr)
 			throw E_INVALIDARG;
 
-		hr = pSwLicMgr->UseActivationToExtendTime();
+		hr = pSwLicMgr->UseActivationToExtendTime(contractNumber);
 		if(FAILED(hr))
 			throw hr;
 
@@ -2165,19 +2144,37 @@ HRESULT SoftwareServer::SoftwareLicenseUseActivationToExtendTime_ByLicense(BSTR 
 		hr = pSwLicMgr->GetLicenseInfo(&tmpLicInfoAttribs);
 		if(FAILED(hr))
 			throw hr;
-		
-		swprintf_s(tmpbuf, 
-			L"Successfully applied License Activation. Expiration Date: %s, Current Activation: %d, Total Activations: %d, Activation Amount in Days: %d", 
-			std::wstring(SpdAttribs::WStringObj(tmpLicInfoAttribs.activationExpirationDate)).c_str(),
-			(int)tmpLicInfoAttribs.activationCurrent, 
-			(int)tmpLicInfoAttribs.activationTotal, 
-			(int)tmpLicInfoAttribs.activationAmountInDays);
 
-		g_licenseController.GenerateMessage((wchar_t*)softwareLicense, MT_INFO, S_OK, time(0), MessageGeneric, tmpbuf);
+		for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = tmpLicInfoAttribs.productList->begin();
+				prodIt != tmpLicInfoAttribs.productList->end();
+				prodIt++)
+		{
+			if(_wcsicmp(contractNumber, std::wstring(prodIt->contractNumber).c_str()) == 0)
+			{
+				swprintf_s(tmpbuf, 
+					L"Successfully applied License Activation. License Server: %s, Product License: %s. Used activation %d of %d and extended expiration date by %d day(s) to expire at %s (Universal Time).", 
+					(wchar_t*)softwareLicense,
+					(wchar_t*)contractNumber,
+					(int)prodIt->activationCurrent,
+					(int)prodIt->activationTotal, 
+					(int)prodIt->activationAmountInDays,
+					std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str()
+					);
+
+				g_licenseController.GenerateMessage((wchar_t*)softwareLicense, MT_INFO, S_OK, time(0), MessageGeneric, tmpbuf);
+
+				break;
+			}
+		}
+
 	}
 	catch(HRESULT &eHr)
 	{
 		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
 	}
 	catch (...)
 	{
@@ -2386,6 +2383,10 @@ HRESULT SoftwareServer::ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicen
 	catch(HRESULT eHr)
 	{
 		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
 	}
 	//pRainbowDriver->
 	//licInfo->
@@ -2722,6 +2723,10 @@ HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionK
 	{
 		hr = eHr;
 	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
 	return hr;
 }
 //
@@ -2911,15 +2916,90 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 }
 
 //Generates a Warning Message for all expiring modules.
+//Also decrement activations hours to expire counters
 HRESULT SoftwareServer::TimesUp()
 {
 	SafeMutex mutex(SoftwareLicenseLock);
 	HRESULT hr(S_OK);
 	try
 	{
-		static const time_t ONE_HOUR = (time_t)(60*60);
-		static const time_t ONE_DAY = (time_t)(24*ONE_HOUR);
-		time_t curTime = time(NULL);
+		time_t curTimeT = time(NULL);
+
+		VARIANT currentTimeVT = TimeHelper::TimeTToVariant(curTimeT, true);
+		SYSTEMTIME currentSystime;
+		VariantTimeToSystemTime(currentTimeVT.date, &currentSystime);
+		wchar_t currentTimestamp[256];
+		TimeHelper::SystemTimeToString(currentTimestamp, _countof(currentTimestamp), currentSystime);
+wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - currentTimestamp: %s", currentTimestamp);
+//OutputDebugStringW(debug_buf);
+
+		//Also decrement activations hours to expire counters
+		//licServerDataMgr.GetAllFileInfoList()
+		Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribsList tmpFileInfoList;
+		{
+		SafeMutex mutex(SoftwareLicenseLock);
+		// retrieve license files by looking in licServerDataMgr
+		hr = licServerDataMgr.GetAllFileInfoList(&tmpFileInfoList);
+		}
+		if(SUCCEEDED(hr))
+		{
+			SoftwareLicenseMgr* pNewSwLicMgr;
+			for(	Lic_ServerDataAttribs::TVector_Lic_ServerDataFileInfoAttribsList::iterator licSrvFileInfoListIt = tmpFileInfoList->begin();
+					licSrvFileInfoListIt != tmpFileInfoList->end();
+					licSrvFileInfoListIt++)
+			{
+				Lic_KeyAttribs keyAttribs;
+				keyAttribs.InitFromString(std::wstring(licSrvFileInfoListIt->Streamed_ActivationAttribs));
+
+				std::wstring wstrLastTouchDate = std::wstring(keyAttribs.currentDate);
+//_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() -    lastTouchTime: %s, licenseName: %s, ", wstrLastTouchDate.c_str(), std::wstring(keyAttribs.keyName).c_str());
+//OutputDebugStringW(debug_buf);
+				
+				if(_wcsicmp(wstrLastTouchDate.c_str(), L"1900-01-01 00:00:00.0000") != 0)
+				{
+					SYSTEMTIME lastTouchDateSystime;
+					if(!TimeHelper::StringToSystemTime(wstrLastTouchDate.c_str(), lastTouchDateSystime))
+						continue;
+					
+					_variant_t lastTouchDateVt(NULL);	
+					if (!SystemTimeToVariantTime(&lastTouchDateSystime, &lastTouchDateVt.date)) 
+						continue;
+					time_t lastTouchDateTimeT = TimeHelper::VariantToTimeT(lastTouchDateVt, false);
+					double timeDifferenceInSeconds = difftime(curTimeT/*endTime*/, lastTouchDateTimeT/*startTime*/);
+					int timeDifferenceInHours = int(timeDifferenceInSeconds / TimeHelper::ONE_HOUR_IN_SECONDS);
+_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - difftime(%d, %d) = timeDifferenceInSeconds: %f, inMinutes: %d, inHours: %d", curTimeT, lastTouchDateTimeT, timeDifferenceInSeconds, int(timeDifferenceInSeconds/60.0), int(timeDifferenceInSeconds/TimeHelper::ONE_HOUR_IN_SECONDS));
+OutputDebugStringW(debug_buf);
+					
+					if(timeDifferenceInHours > 0) // at least an hour has passed, update counters accordingly
+					{
+						for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actInfoIt = keyAttribs.activationInfoList->begin();
+							 actInfoIt != keyAttribs.activationInfoList->end();
+							 actInfoIt++)
+						{
+							actInfoIt->activationSlotHoursToExpire = max(int(actInfoIt->activationSlotHoursToExpire)-timeDifferenceInHours, 0);
+						}
+
+						//Increment CurrentDateTime by the number of hours that has passed since last time it was written to.
+						time_t tmpTimeT = lastTouchDateTimeT + (timeDifferenceInHours * TimeHelper::ONE_HOUR_IN_SECONDS);
+						SYSTEMTIME tmpSystime;
+						VARIANT tmpVt;
+						tmpVt = TimeHelper::TimeTToVariant(tmpTimeT);
+						VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+						wchar_t timestamp[256];
+						TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+						keyAttribs.currentDate = std::wstring(timestamp);
+						licSrvFileInfoListIt->Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
+
+						{
+						SafeMutex mutex(SoftwareLicenseLock);
+						licServerDataMgr.SetFileInfoFor(std::wstring(licSrvFileInfoListIt->LicName).c_str(), &(*licSrvFileInfoListIt));
+						}
+					}			
+				}
+			}
+		}
+		
 
 		//Cycle through all SoftwareLicenseManagers
 		for(	SoftwareLicList::iterator swLicMgrIt = softwareLicMgrMap.begin();
@@ -2945,7 +3025,7 @@ HRESULT SoftwareServer::TimesUp()
 				hr = PopulateProductReminderMap(&tmpLicInfoAttribs, &swLicReminderMap[wstrSoftwareLicenseName].prodReminderMap);
 				if(FAILED(hr))
 					continue;
-				swLicReminderMap[wstrSoftwareLicenseName].softwareLicReminderClassLastRefresh = curTime;
+				swLicReminderMap[wstrSoftwareLicenseName].softwareLicReminderClassLastRefresh = curTimeT;
 			}
 
 			const int TMP_BUFF_SIZE = 1024;
@@ -2960,20 +3040,20 @@ HRESULT SoftwareServer::TimesUp()
 
 				time_t sendReminderTimePeriod = 0;
 				if(prodReminderMapIt->second.closestExpDate == -1)
-					sendReminderTimePeriod = ONE_HOUR;
-				else if(prodReminderMapIt->second.closestExpDate < curTime)
-					sendReminderTimePeriod = ONE_HOUR;
-				else	//if(prodReminderMapIt->second.closestExpDate > curTime)
+					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				else if(prodReminderMapIt->second.closestExpDate < curTimeT)
+					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				else	//if(prodReminderMapIt->second.closestExpDate > curTimeT)
 				{
-					double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTime);
-					if(timeTillExpiration > ONE_DAY * 14)
+					double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTimeT);
+					if(timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 14)
 						sendReminderTimePeriod = 0;
-					else if(ONE_DAY * 14 >= timeTillExpiration && timeTillExpiration >ONE_DAY * 7)
-						sendReminderTimePeriod = ONE_HOUR * 12;
-					else if(ONE_DAY * 7 >= timeTillExpiration && timeTillExpiration >ONE_DAY * 3)
-						sendReminderTimePeriod = ONE_HOUR * 4;
-					else if(ONE_DAY * 3 >= timeTillExpiration && timeTillExpiration > 0)
-						sendReminderTimePeriod = ONE_HOUR;
+					else if(TimeHelper::ONE_DAY_IN_SECONDS * 14 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 7)
+						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 12;
+					else if(TimeHelper::ONE_DAY_IN_SECONDS * 7 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 3)
+						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 4;
+					else if(TimeHelper::ONE_DAY_IN_SECONDS * 3 >= timeTillExpiration && timeTillExpiration > 0)
+						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
 				}
 
 				bool bSendReminder = false;
@@ -2981,7 +3061,7 @@ HRESULT SoftwareServer::TimesUp()
 				if(!bSendReminder && sendReminderTimePeriod!=0)
 				{
 					//difftime returns the elapsed time in seconds, from timer0 to timer1 - double difftime(time_t timer1, time_t timer0 );
-					double timeSinceLastReminder = difftime(curTime, prodReminderMapIt->second.lastReminderSent);
+					double timeSinceLastReminder = difftime(curTimeT, prodReminderMapIt->second.lastReminderSent);
 					bSendReminder = timeSinceLastReminder >= sendReminderTimePeriod;
 				}
 
@@ -3054,7 +3134,7 @@ HRESULT SoftwareServer::TimesUp()
 						g_licenseController.GenerateSoftwareLicenseMessage(bstrTmpSoftwareLicense, prodReminderMapIt->first, MT_WARNING, S_OK, time(0), MessageSoftwareModuleExpiration , Lic_PackageAttribsHelper::GetProductName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first).c_str(), prodReminderMapIt->first, wMsg);
 						SysFreeString(bstrTmpSoftwareLicense);
 					}
-					prodReminderMapIt->second.lastReminderSent = curTime;
+					prodReminderMapIt->second.lastReminderSent = curTimeT;
 				}
 			}
 		}

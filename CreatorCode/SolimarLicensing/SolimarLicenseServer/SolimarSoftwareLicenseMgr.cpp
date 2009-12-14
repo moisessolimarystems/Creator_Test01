@@ -18,7 +18,7 @@ SoftwareLicenseMgr::SoftwareLicenseMgr():
 	softwareLicenseMgrLock(CreateMutex(0,0,0)),
 	m_bstrLicenseName(L""),
 	m_lastTimeCheck(0),
-	m_pRainbowKeyDriver(NULL)
+	m_pKeyServer(NULL)
 {
 	;
 }
@@ -32,14 +32,14 @@ SoftwareLicenseMgr::~SoftwareLicenseMgr()
 	}
 }
 
-HRESULT SoftwareLicenseMgr::Initialize(_bstr_t bstrLicenseFile, RainbowDriver* pRainbowKeyDriver, SoftwareServerDataMgr* pLicServerDataMgr)
+HRESULT SoftwareLicenseMgr::Initialize(_bstr_t bstrLicenseFile, KeyServer* pKeyServer, SoftwareServerDataMgr* pLicServerDataMgr)
 {
 	SafeMutex mutex(softwareLicenseMgrLock);
 	m_bstrLicenseFile = bstrLicenseFile;
 //wchar_t debug_buf[1024];
-//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::Initialize() m_bstrLicenseFile: %s, m_pRainbowKeyDriver: 0x%08x", (wchar_t*)m_bstrLicenseFile, m_pRainbowKeyDriver);
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::Initialize() m_bstrLicenseFile: %s", (wchar_t*)m_bstrLicenseFile);
 //OutputDebugStringW(debug_buf);
-	m_pRainbowKeyDriver = pRainbowKeyDriver;
+	m_pKeyServer = pKeyServer;
 	m_pLicServerDataMgr = pLicServerDataMgr;
 	return RefreshLicenseFileAttribs();
 }
@@ -170,25 +170,12 @@ HRESULT SoftwareLicenseMgr::ValidateHardwareKeyID(_bstr_t bstrValidationValue)
 {
 	HRESULT hr(LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID);
 	SafeMutex mutex(softwareLicenseMgrLock);
-//wchar_t debug_buf[1024];
-
-	if(m_pRainbowKeyDriver != NULL)
+	if(m_pKeyServer != NULL)
 	{
-		SafeMutex mutex1(m_pRainbowKeyDriver->keys_lock);
-		m_pRainbowKeyDriver->RefreshKeyList();
-
-		KeySpec keyspec;
-
-		for (RainbowDriver::KeyList::iterator keyIt = m_pRainbowKeyDriver->keys.begin(); keyIt!=m_pRainbowKeyDriver->keys.end(); keyIt++)
-		{
-//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::VerifyHardwareKeyID() keyIt->first: %s, bstrValidationValue: %s", (wchar_t*)keyIt->first, (wchar_t*)bstrValidationValue);
-//OutputDebugStringW(debug_buf);
-			if(_wcsicmp(keyIt->first, bstrValidationValue) == 0)
-			{
-				hr = S_OK;
-				break;
-			}
-		}
+		Lic_KeyAttribs licKeyAttribs;
+		hr = m_pKeyServer->GetKeyInfoAttribs(bstrValidationValue, &licKeyAttribs);
+		if(hr == E_INVALIDARG)	//No Key attached
+			hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
 	}
 	return hr;
 }
@@ -200,12 +187,15 @@ HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, boo
 
 	//Determine if the license code should be on the protection key, or on the system.
 	bool bVerifyOnProtectionKey(false);
+	_bstr_t keyID = L"";
+	
 	for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
 			valTokenIT != m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 			valTokenIT++)
 	{
 		if((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID)
 		{
+			keyID = _bstr_t(valTokenIT->tokenValue->c_str());
 			bVerifyOnProtectionKey = true;
 			break;
 		}
@@ -213,31 +203,22 @@ HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, boo
 
 	if(bVerifyOnProtectionKey || bCheckProtectionKey)	//Look for license code on protection key
 	{
-		if(m_pRainbowKeyDriver != NULL)
+		if(_wcsicmp(keyID, L"") == 0)
 		{
-			SafeMutex mutex1(m_pRainbowKeyDriver->keys_lock);
-			m_pRainbowKeyDriver->RefreshKeyList();
-
-			for (RainbowDriver::KeyList::iterator keyIt = m_pRainbowKeyDriver->keys.begin(); keyIt!=m_pRainbowKeyDriver->keys.end(); keyIt++)
+			hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
+		}
+		else if(m_pKeyServer != NULL)
+		{
+			Lic_KeyAttribs licKeyAttribs;
+			hr = m_pKeyServer->GetKeyInfoAttribs(keyID, &licKeyAttribs);
+			if(hr == E_INVALIDARG)	//No Key attached
+				hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID;
+			else
 			{
-				//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::VerifyLicenseCode() keyIt->first: %s", (wchar_t*)keyIt->first);
-				//OutputDebugStringW(debug_buf);
-
-				BSTR bstrKeyCode;
-				hr = m_pRainbowKeyDriver->GetSoftwareKeyCode(keyIt->first, &bstrKeyCode);
-				if(SUCCEEDED(hr))
-				{
-					//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::VerifyLicenseCode() bstrKeyCode: %s, bstrValidationValue: %s", (wchar_t*)bstrKeyCode, (wchar_t*)bstrValidationValue);
-					//OutputDebugStringW(debug_buf);
-					if(_wcsicmp(bstrKeyCode, bstrValidationValue) == 0)
-						hr = S_OK;
-					else
-						hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE;
-
-					SysFreeString(bstrKeyCode);
-				}
-				if(SUCCEEDED(hr))	//Found key code, leave...
-					break;
+				if(_wcsicmp(bstrValidationValue, std::wstring(licKeyAttribs.licenseCode).c_str()) == 0)
+					hr = S_OK;
+				else
+					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE;
 			}
 		}
 	}
@@ -249,7 +230,7 @@ HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, boo
 			hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs))).c_str(), &tmpFileInfo);
 			if(SUCCEEDED(hr))
 			{
-				if(_wcsicmp(bstr_t(tmpFileInfo.LicFileVerificationCode->c_str()), bstrValidationValue) == 0)
+				if(_wcsicmp(bstr_t(tmpFileInfo.LicFileLicenseCode->c_str()), bstrValidationValue) == 0)
 					hr = S_OK;
 				else
 					hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE;
@@ -730,7 +711,6 @@ Lic_PackageAttribs::Lic_ProductInfoAttribs SoftwareLicenseMgr::TestingOnly_Gener
 	tmpModAttribs3.moduleAppInstance = appInstance;
 	tmpProdAttribs.moduleList->push_back(tmpModAttribs3);
 
-static const time_t SECONDS_PER_DAY = (time_t)(24*60*60); //24hours * 60 mins * 60seconds
 Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribsAddOn1;
 tmpModAttribsAddOn1.moduleID = 400;	//ConcurrentOperator
 tmpModAttribsAddOn1.moduleValue = 10;	//Unlimited @ 255
@@ -749,7 +729,7 @@ tmpModAttribsAddOn2.moduleID = 400;	//ConcurrentOperator
 tmpModAttribsAddOn2.moduleValue = 100;	//Unlimited @ 255
 tmpModAttribsAddOn2.moduleAppInstance = 4;
 curTimeT = time(NULL);	//Retrieves Universal Time
-VARIANT vtAddOnTime = TimeHelper::TimeTToVariant(curTimeT+(1*SECONDS_PER_DAY));
+VARIANT vtAddOnTime = TimeHelper::TimeTToVariant(curTimeT+(1*TimeHelper::ONE_DAY_IN_SECONDS));
 SYSTEMTIME addOnTimeSystime;
 VariantTimeToSystemTime(vtAddOnTime.date, &addOnTimeSystime);
 wchar_t addOnTimeStamp[256];
@@ -989,11 +969,7 @@ HRESULT SoftwareLicenseMgr::GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAt
 	*pLicenseInfo = m_licenseFileAttribs.licLicenseInfoAttribs;
 	return S_OK;
 }
-HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate)
-{
-	SafeMutex mutex(softwareLicenseMgrLock);
-	return GetProtectionKeyModifiedDate(pTimeTModifiedDate, &m_licenseFileAttribs);
-}
+
 HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs)
 {
 //wchar_t debug_buf[1024];
@@ -1016,16 +992,28 @@ HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedD
 
 	if(_wcsicmp(keyID, L"") != 0)
 	{
-		//Find the key, query for the modified date
-		if(m_pRainbowKeyDriver != NULL)
+		if(m_pKeyServer != NULL)
 		{
-			hr = m_pRainbowKeyDriver->GetSoftwareModifiedDate(keyID, pTimeTModifiedDate);
+			Lic_KeyAttribs licKeyAttribs;
+			hr = m_pKeyServer->GetKeyInfoAttribs(keyID, &licKeyAttribs);
+			if(SUCCEEDED(hr))
+			{
+				SYSTEMTIME tmpDateSystime;
+				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(licKeyAttribs.packetCreationDate)).c_str(), tmpDateSystime))
+					throw(E_FAIL);
+
+				_variant_t tmpDateVt(NULL);	
+				if (!SystemTimeToVariantTime(&tmpDateSystime, &tmpDateVt.date)) 
+					throw(E_FAIL);
+
+				*pTimeTModifiedDate = TimeHelper::VariantToTimeT(tmpDateVt, false);
+			}
 		}
 	}
 	return hr;
 }
 
-HRESULT SoftwareLicenseMgr::GetProtectionKeyCurrentActivations(int* pCurrentActivations, Lic_PackageAttribs* pLicenseFileAttribs)
+HRESULT SoftwareLicenseMgr::GetKeyInfoAttribs_FromKey(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pLicenseFileAttribs)
 {
 	HRESULT hr(E_INVALIDARG);
 	//Determine if the Software License Manager has a protection key as a verification token
@@ -1040,20 +1028,17 @@ HRESULT SoftwareLicenseMgr::GetProtectionKeyCurrentActivations(int* pCurrentActi
 			break;
 		}
 	}
-
 	if(_wcsicmp(keyID, L"") != 0)
 	{
-		//Find the key, query for the modified date
-		if(m_pRainbowKeyDriver != NULL)
-		{
-			hr = m_pRainbowKeyDriver->GetSoftwareCurrentActivations(keyID, (unsigned short *)pCurrentActivations);
-		}
+		if(m_pKeyServer != NULL)
+			hr = m_pKeyServer->GetKeyInfoAttribs(keyID, pKeyAttribs);
 	}
-//wchar_t debug_buf[1024];
-//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::GetProtectionKeyCurrentActivations() - leave pCurrentActivations: %d, hr: 0x%08x, %s", *pCurrentActivations, hr, LicenseServerError::GetErrorMessage(hr).c_str());
-//OutputDebugStringW(debug_buf);
 	return hr;
 }
+//HRESULT SoftwareLicenseMgr::GetKeyInfoAttribs_FromSystem(Lic_KeyAttribs* pKeyAttribs)
+//{
+//	return m_pLicServerDataMgr->GetKeyInfoFor(m_bstrLicenseName, pKeyAttribs);
+//}
 HRESULT SoftwareLicenseMgr::DeleteLicenseFile()
 {
 	SafeMutex mutex(softwareLicenseMgrLock);
@@ -1144,7 +1129,7 @@ HRESULT SoftwareLicenseMgr::VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* 
 
 		if(!_bIgnoreModifiedDate)
 		{
-			//find modified date from key
+			//find packet creation date from key
 			time_t modifiedTimeT = -1;
 			hr = GetProtectionKeyModifiedDate(&modifiedTimeT, _pLicPackageAttribs);
 			if(FAILED(hr))
@@ -1197,81 +1182,402 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 	BSTR bstrLicPacketStream = SysAllocString(pLicPacket->ToString().c_str());	//Use a copy of...
 	try
 	{
-		Lic_PackageAttribs tmpLicenseFileAttribs;
-		tmpLicenseFileAttribs.InitFromString(bstrLicPacketStream);
+		Lic_PackageAttribs tmpPacketNewLicenseFileAttribs;
+		tmpPacketNewLicenseFileAttribs.InitFromString(bstrLicPacketStream);
 
-		hr = VerifyForSoftwareLicenseUpgrade(&tmpLicenseFileAttribs, true, false);
+		//
+		//YYY - HARD CODE PACKAGE INFORMATION - START
+		//{
+		//	bool bFoundHardwareKey = false;
+		//	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+		//	while(valTokenIT != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end())
+		//	{
+		//		switch((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType)
+		//		{
+		//			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID:
+		//				valTokenIT->tokenValue = std::wstring(L"0100-1001");
+		//				bFoundHardwareKey = true;
+		//				valTokenIT++;
+		//				break;
+		//			case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode:
+		//				valTokenIT++;
+		//				break;
+		//			default:
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->erase(valTokenIT);
+		//				valTokenIT = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+		//				break;
+		//		}
+		//	}
+		//	if(bFoundHardwareKey == false) //YYY - add verification token of usb key
+		//	{
+		//		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs valToken;
+		//		valToken.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID;
+		//		valToken.tokenValue = std::wstring(L"0100-1001");
+		//		tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->push_back(valToken);
+		//	}
+
+		//	//tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.customerID = 1;
+		//	//tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.destinationID = 1;
+		//	{
+		//	///*
+		//	//Step 1
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo0;
+		//	actSlotInfo0.activitySlotID = 0;
+		//	actSlotInfo0.contractNumber = std::wstring(L"100-00-00-T1-0");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo0);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo1;
+		//	actSlotInfo1.activitySlotID = 1;
+		//	actSlotInfo1.contractNumber = std::wstring(L"100-00-00-T1-1");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo1);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo2;
+		//	actSlotInfo2.activitySlotID = 2;
+		//	actSlotInfo2.contractNumber = std::wstring(L"100-00-00-T1-2");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo2);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo3;
+		//	actSlotInfo3.activitySlotID = 3;
+		//	actSlotInfo3.contractNumber = std::wstring(L"100-00-00-T1-3");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo3);
+		//	//*/
+
+		//	//History 1)
+		//	//add 100-00-00-T1-0 to slot 0
+		//	//add 100-00-00-T1-1 to slot 1
+		//	//add 100-00-00-T1-2 to slot 2
+		//	//add 100-00-00-T1-3 to slot 3
+		//	
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs slotHistoryAttribs;
+		//	slotHistoryAttribs.historyNumber = 1;
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo0Attribs;
+		//	changeInfo0Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd;
+		//	changeInfo0Attribs.contractNumber = std::wstring(L"100-00-00-T1-0");
+		//	changeInfo0Attribs.param1 = 0;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo0Attribs);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo1Attribs;
+		//	changeInfo1Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd;
+		//	changeInfo1Attribs.contractNumber = std::wstring(L"100-00-00-T1-1");
+		//	changeInfo1Attribs.param1 = 1;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo1Attribs);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo2Attribs;
+		//	changeInfo2Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd;
+		//	changeInfo2Attribs.contractNumber = std::wstring(L"100-00-00-T1-2");
+		//	changeInfo2Attribs.param1 = 2;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo2Attribs);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo3Attribs;
+		//	changeInfo3Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd;
+		//	changeInfo3Attribs.contractNumber = std::wstring(L"100-00-00-T1-3");
+		//	changeInfo3Attribs.param1 = 3;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo3Attribs);
+
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->push_back(slotHistoryAttribs);
+		//	}
+
+		//	/*
+		//	{
+		//	//Step 2
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo0;
+		//	actSlotInfo0.activitySlotID = 0;
+		//	actSlotInfo0.contractNumber = std::wstring(L"100-00-00-T1-0");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo0);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo3;
+		//	actSlotInfo3.activitySlotID = 1;
+		//	actSlotInfo3.contractNumber = std::wstring(L"100-00-00-T1-3");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo3);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs actSlotInfo2;
+		//	actSlotInfo2.activitySlotID = 2;
+		//	actSlotInfo2.contractNumber = std::wstring(L"100-00-00-T1-2");
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList->push_back(actSlotInfo2);
+
+		//	//YYY - remove L"100-00-00-T1-1"
+		//	//History, 2)
+		//	//delete 100-00-00-T1-1 from slot 1
+		//	//move contents of slot 3 to slot 1
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs slotHistoryAttribs;
+		//	slotHistoryAttribs.historyNumber = 2;
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo1Attribs;
+		//	changeInfo1Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaDelete;
+		//	changeInfo1Attribs.contractNumber = std::wstring(L"100-00-00-T1-1");
+		//	changeInfo1Attribs.param1 = 1;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo1Attribs);
+
+		//	Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs changeInfo2Attribs;
+		//	changeInfo2Attribs.actionType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaMove;
+		//	changeInfo2Attribs.contractNumber = std::wstring(L"100-00-00-T1-3");
+		//	changeInfo2Attribs.param1 = 3;
+		//	changeInfo2Attribs.param2 = 1;
+		//	slotHistoryAttribs.activitySlotChangeInfoList->push_back(changeInfo2Attribs);
+
+		//	tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->push_back(slotHistoryAttribs);
+		//	}
+		//	//*/
+
+		//	{
+		//		for(int idx = 0;
+		//			idx < tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->size();
+		//			idx++)
+		//		{
+		//			tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).productAppInstance = 1;
+		//			if(idx == 0)
+		//			{
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber = std::wstring(L"100-00-00-T1-0");
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationTotal = 15;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationAmountInDays = 2;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations = true;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseExpirationDate = true;
+		//			}
+		//			else if(idx == 1)
+		//			{
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber = std::wstring(L"100-00-00-T1-1");
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationTotal = 45;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationAmountInDays = 1;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations = true;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseExpirationDate = true;
+		//			}
+		//			else if(idx == 3)
+		//			{
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber = std::wstring(L"100-00-00-T1-2");
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationTotal = 3;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationAmountInDays = 20;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations = true;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseExpirationDate = true;
+		//			}
+		//			else if(idx == 2)
+		//			{
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber = std::wstring(L"100-00-00-T1-3");
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationTotal = 7;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationAmountInDays = 3;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations = true;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseExpirationDate = true;
+		//			}
+		//			else if(idx == 4)
+		//			{
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber = std::wstring(L"100-00-00-T1-4");
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations = false;
+		//				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseExpirationDate = true;
+		//			}
+
+		//			//Lic_PackageAttribs::Lic_ProductInfoAttribs::Lic_ModuleInfoAttribsList::iter
+		//			std::vector<Lic_PackageAttribs::Lic_ModuleInfoAttribs>::iterator modIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).moduleList->begin();
+		//			while(modIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).moduleList->end())
+		//			{
+		//				if(_wcsicmp(std::wstring(modIt->contractNumber).c_str(), std::wstring(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber).c_str()) != 0)
+		//				{
+		//					tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).moduleList->erase(modIt);
+		//					modIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).moduleList->begin();
+		//				}
+		//				else
+		//				{
+		//					tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).expirationDate = modIt->moduleExpirationDate;
+		//					modIt++;
+		//				}
+		//			}
+		//		}
+
+		//		//YYY - remove L"100-00-00-T1-1", assuming is 1 spot from begin()
+		//		//Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->begin();
+		//		//prodIt++; //go to first item
+		//		//tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->erase(prodIt);
+		//	}
+		//}
+		//YYY - HARD CODE PACKAGE INFORMATION - END
+		
+		hr = VerifyForSoftwareLicenseUpgrade(&tmpPacketNewLicenseFileAttribs, true, false);
 		if(FAILED(hr))
 			throw hr;
 
-		unsigned short currentActivations(0);
+		//
+		//For the incoming license package, for "Current Activations" & "Current Activation Expiration Date" use current values from the 
+		//system unless override is specified.
+		//To determine correct values to get:
+		//	If there is a existing file info on system, get values from key or system in that order
+		// Else look at package and retrieve values from its key
+		// This will satisfy case where package has a different validation token key then the system
 
-		currentActivations = (int)tmpLicenseFileAttribs.licLicenseInfoAttribs.activationCurrent;
-
-		//If the license packet current activations override is not set, use value from the current system.
-		if(tmpLicenseFileAttribs.licLicenseInfoAttribs.bActivationCurrentOverride == false)
+		//YYY check for override later
+		Lic_KeyAttribs keyAttrib;
+		//customerID==0 && destinationID==0 for uninitialize LicenseFileAttribs
+		bool bInitializedLicenseFileAttribs = (m_licenseFileAttribs.licLicenseInfoAttribs.customerID!=0) || (m_licenseFileAttribs.licLicenseInfoAttribs.destinationID!=0);
+		bool bFoundKeyInfo(false);
+		hr = InternalGetKeyAttribs(&keyAttrib, &m_licenseFileAttribs, &bFoundKeyInfo);
+		if(FAILED(hr) || bFoundKeyInfo == false)
 		{
-			hr = GetProtectionKeyCurrentActivations((int*)&currentActivations, &tmpLicenseFileAttribs);
-
-			//hr == E_INVALIDARG happens if there is no protection key in verification tokens, use activations from license server data mgr
-			if(hr == E_INVALIDARG)
-			{
-				Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
-				hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs))).c_str(), &tmpFileInfo);
-				if(SUCCEEDED(hr))
-					currentActivations = (int)tmpFileInfo.LicCurrentActivations;
-			}
+			hr = InternalGetKeyAttribs(&keyAttrib, &tmpPacketNewLicenseFileAttribs, &bFoundKeyInfo);
+			if(FAILED(hr))
+				throw hr;
 		}
-
-		// CR.FIX.11869.Item12 - Check to see what expiration date is
-		Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
-		hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs))).c_str(), &tmpFileInfo);
-		if(SUCCEEDED(hr))	// Will fail if this is a new license
+		//if keyAttrib is initialized, convert activity slots to product license expiration.
+		if(bFoundKeyInfo)
 		{
-			SYSTEMTIME activationExpirationDateSystime;
-			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(tmpLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate)).c_str(), activationExpirationDateSystime))
-				throw(E_FAIL);
-			
-			_variant_t vtActivationExpirationDate(NULL);	
-			if (!SystemTimeToVariantTime(&activationExpirationDateSystime, &vtActivationExpirationDate.date)) 
-				throw(E_FAIL);
-			time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
-			time_t emptyExpiresDateTimeT = time_t(-1);
-			// CR.FIX.11869.Item12 - If the new package has an empty expiration date, see if there is a current expiration date
-			if(activationExpirationDateTimeT == emptyExpiresDateTimeT)	
+			Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribsList* pActivitySlotList = NULL;
+			Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribsList tmpList;
+
+			if(bInitializedLicenseFileAttribs)
 			{
-				BSTR tmpBstrSoftwareStream;	
-				hr = SoftwareLicenseFile::LoadFromLicenseFile(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicFileName)).c_str(), &tmpBstrSoftwareStream);
-				if(SUCCEEDED(hr))
+OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From Existing System");
+				//Can look to m_licenseFileAttribs for activationSlot to productLicenseNumber relationship
+				pActivitySlotList = &m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList;
+			}
+			else
+			{
+				//Cannot look to m_licenseFileAttribs for activationSlot to productLicenseNumber relationship.  Have to do the hard way.
+				//Regenerate activationSlot to productLicenseNumber relationship by looking at history.
+				//If the keyHistoryNumber and packageHistoryNumber are the same, can use slot relationship from package
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"SoftwareLicenseMgr::ApplyLicensePacket() - bInitializedLicenseFileAttribs: false, keyAttrib.historyNumber:%d, tmpPacketNewLicenseFileAttribs.historyNumber: %d", int(keyAttrib.historyNumber), int(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size()));
+//OutputDebugString(tmpbuf);
+
+				if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
 				{
-					Lic_PackageAttribs tmpOrigLicenseFileAttribs;
-					tmpOrigLicenseFileAttribs.InitFromString(tmpBstrSoftwareStream);
-					SysFreeString(tmpBstrSoftwareStream);
-					// CR.FIX.11869.Item12 - Use expiration date of existing package
-					tmpLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate = tmpOrigLicenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate;
+OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From New Package");
+					pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList;
+				}
+				else
+				{
+					//recreate activitySlotList from using tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList
+					//going from 0 to keyAttrib.historyNumber
+					//*pActivitySlotList = tmpList;
+OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Recreate from Key and New Package");
+
+					//tmpList->insert
+					for(int slotNumber=0; slotNumber<20; slotNumber++)
+					{
+						Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotInfoAttribs slotInfo;
+						slotInfo.activitySlotID = slotNumber;
+						tmpList->push_back(slotInfo);
+					}
+
+					unsigned short keyHistoryNumber = unsigned short(keyAttrib.historyNumber);
+					for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotHistoryInfoAttribsList::iterator histSlotInfoIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->begin();
+							histSlotInfoIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->end();
+							histSlotInfoIt++)
+					{
+						unsigned short slotHistoryNumber = unsigned short(histSlotInfoIt->historyNumber);
+						if(slotHistoryNumber <= keyHistoryNumber)
+						{
+							for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs::TVector_Lic_ActivitySlotChangeInfoAttribsList::iterator actSlotChangeIt = histSlotInfoIt->activitySlotChangeInfoList->begin();
+								actSlotChangeIt != histSlotInfoIt->activitySlotChangeInfoList->end();
+								actSlotChangeIt++)
+							{
+								switch(actSlotChangeIt->actionType)
+								{
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd:
+									//Param 1 == activity slot for action ascaAdd
+									tmpList->at(int(actSlotChangeIt->param1)).contractNumber = std::wstring(actSlotChangeIt->contractNumber);
+									break;
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaDelete:
+									//Param 1 == activity slot for action ascaDelete
+									tmpList->at(int(actSlotChangeIt->param1)).contractNumber = std::wstring(L"");
+									break;
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaMove:
+									//Param 1 == old activity slot
+									//Param 2 == new activity slot
+									//Transfer values from old activity slot to the new activity slot
+									tmpList->at(int(actSlotChangeIt->param2)).contractNumber = tmpList->at(int(actSlotChangeIt->param1)).contractNumber;
+									tmpList->at(int(actSlotChangeIt->param1)).contractNumber = std::wstring(L"");
+									break;
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:	//Don't implement
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire://Don't implement
+								case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaIgnore:
+								default:
+									break;
+								}
+							}
+							keyAttrib.historyNumber = slotHistoryNumber;
+						}
+					}
+
+					pActivitySlotList = &tmpList;
 				}
 			}
-		}
 
-		tmpLicenseFileAttribs.licLicenseInfoAttribs.activationCurrent = currentActivations;
-		tmpLicenseFileAttribs.licLicenseInfoAttribs.bActivationCurrentOverride = false;
+//YYY - For test, print out list
+//			if(pActivitySlotList != NULL)
+//			{
+//wchar_t tmpbuf[1024];
+//				for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotInfoAttribsList::iterator slotIt = (*pActivitySlotList)->begin();
+//					slotIt != (*pActivitySlotList)->end();
+//					slotIt++)
+//				{
+//swprintf_s(tmpbuf, 1024, L"SoftwareLicenseMgr::ApplyLicensePacket() - slot: %d, contractNumber: %s", int(slotIt->activitySlotID), std::wstring(slotIt->contractNumber).c_str());
+//OutputDebugString(tmpbuf);
+//				}
+//			}
 
+			if(pActivitySlotList != NULL)
+			{
+				//walk through all the product licenses in tmpPacketNewLicenseFileAttribs
+				//	find all that are using activations and set the activations current and activation expiration date based on slot info.
+				SYSTEMTIME tmpSystime;
+				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttrib.currentDate)).c_str(), tmpSystime))
+					throw(E_FAIL);
+				_variant_t tmpVt(NULL);	
+				if (!SystemTimeToVariantTime(&tmpSystime, &tmpVt.date)) 
+					throw(E_FAIL);
+				time_t keyCurrentTimeT = TimeHelper::VariantToTimeT(tmpVt, false);
+
+				for(int idx = 0;
+						idx < tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->size();
+						idx++)
+				{
+					if(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bUseActivations == true)
+					{
+						std::wstring wstrProdLicNum = std::wstring(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).contractNumber);
+						for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotInfoAttribsList::iterator aSlotIt = (*pActivitySlotList)->begin();
+							aSlotIt != (*pActivitySlotList)->end();
+							aSlotIt++)
+						{
+							if(_wcsicmp(wstrProdLicNum.c_str(), std::wstring(aSlotIt->contractNumber).c_str()) == 0)
+							{
+								if(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bActivationCurrentOverride == false)
+									tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationCurrent = unsigned short(keyAttrib.activationInfoList->at(aSlotIt->activitySlotID).activationSlotCurrentActivation);
+
+								time_t newExpDateTimeT = keyCurrentTimeT + (keyAttrib.activationInfoList->at(aSlotIt->activitySlotID).activationSlotHoursToExpire * TimeHelper::ONE_HOUR_IN_SECONDS);
+								SYSTEMTIME tmpSystime;
+								VARIANT tmpVt;
+								tmpVt = TimeHelper::TimeTToVariant(newExpDateTimeT);
+								VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+								wchar_t timestamp[256];
+								TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+								tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationCurrentExpirationDate = std::wstring(timestamp);
+								break;
+							}
+						}
+					}
+				}
+			}	//end if(pActivitySlotList != NULL)
+		} //end if(bFoundKeyInfo)
+
+		//if(bFoundKeyInfo)
+
+//YYY - hard break
+//throw E_NOTIMPL;		
+
+		
 		_bstr_t bstrHardwareKeyID = _bstr_t(L"");
 		_bstr_t bstrLicenseCode = _bstr_t(L"");
+
 		//Remove the Validation Token:ttTypePackageOnly
-		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
-				valTokenIT != tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
+		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+				valTokenIT != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 				valTokenIT++)
 		{
 			if(valTokenIT->tokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttTypePackageOnly)
 			{
-				tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->erase(valTokenIT);
+				tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->erase(valTokenIT);
 				break;
 			}
 		}
 
-		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
-				valTokenIT != tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
+		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+				valTokenIT != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 				valTokenIT++)
 		{
 			switch((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType)
@@ -1299,7 +1605,6 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		if(FAILED(hr))
 			throw hr;
 
-		
 		//_snwprintf_s(debug_buf, _countof(debug_buf), L"SoftwareLicenseMgr::ApplyLicensePacket(), GetProtectionKeyModifiedDate(), hr: %s", LicenseServerError::GetErrorMessage(hr).c_str());
 		//OutputDebugStringW(debug_buf);
 		
@@ -1323,7 +1628,7 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 			throw hr;
 
 		//Add verficationCode history from current instance to this new one.
-		tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList = m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList;
+		tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList = m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList;
 
 		//Add new verification code to history
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationCodeAttribs verCode;
@@ -1335,17 +1640,16 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		wchar_t curTimeStamp[256];
 		TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
 		verCode.verificationDate = std::wstring(curTimeStamp);
-		tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList->push_back(verCode);
+		tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.verificationCodeHistoryList->push_back(verCode);
 
 		//SysFreeString(bstrLicPacketStream);
-		//bstrLicPacketStream = SysAllocString(tmpLicenseFileAttribs.ToString().c_str());
-
+		//bstrLicPacketStream = SysAllocString(tmpPacketNewLicenseFileAttribs.ToString().c_str());
 
 		//if there is a newGUID, set it in the verification tokens before saving to file
 		if(_wcsicmp(newLicenseGUID, L"")!=0)
 		{
-			for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
-					valTokenIT != tmpLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
+			for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+					valTokenIT != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 					valTokenIT++)
 			{
 				if(valTokenIT->tokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode)
@@ -1357,12 +1661,15 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		}
 
 		SysFreeString(bstrLicPacketStream);
-		bstrLicPacketStream = SysAllocString(tmpLicenseFileAttribs.ToString().c_str());
+		bstrLicPacketStream = SysAllocString(tmpPacketNewLicenseFileAttribs.ToString().c_str());
 		
 //wchar_t debug_buf[1024];		
 //_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::ApplyLicensePacket() - %x-%x, %d", cI, sL, (int)pLicPacket->licLicenseInfoAttribs.softwareLicType);
 //OutputDebugStringW(debug_buf);
-		
+
+//YYY - hard break
+//throw E_NOTIMPL;	
+		//Replace on disk
 		hr = SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrLicPacketStream);
 		if(FAILED(hr))
 			throw hr;
@@ -1370,31 +1677,84 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		//On success, see if there is a hardware key, if so find right one and update its ttLicenseCode & Modified Date
 		if(_wcsicmp(newLicenseGUID, L"")!=0)
 		{
-			SafeMutex mutex1(m_pRainbowKeyDriver->keys_lock);
-			m_pRainbowKeyDriver->RefreshKeyList();
-			for (RainbowDriver::KeyList::iterator keyIt = m_pRainbowKeyDriver->keys.begin(); keyIt!=m_pRainbowKeyDriver->keys.end(); keyIt++)
+			// Configure keyAttrib to have all the right info
+			if(!bFoundKeyInfo)	//New license, make key info
 			{
-				if(_wcsicmp(keyIt->first, bstrHardwareKeyID) == 0)
+				//must create keyAttrib
+				keyAttrib.historyNumber = 0;
+				keyAttrib.keyVersion = 1;
+				for(unsigned short idx=0; idx<20; idx++)
 				{
-					hr = m_pRainbowKeyDriver->SetSoftwareKeyCode(keyIt->first, newLicenseGUID);
-
-					if(SUCCEEDED(hr))
-					{
-						SYSTEMTIME modifiedDateSystime;
-						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(tmpLicenseFileAttribs.licLicenseInfoAttribs.modifiedDate)).c_str(), modifiedDateSystime))
-							throw(E_FAIL);
-
-						_variant_t vtModifiedDate(NULL);	
-						if (!SystemTimeToVariantTime(&modifiedDateSystime, &vtModifiedDate.date)) 
-							throw(E_FAIL);
-
-						time_t modTimeT = TimeHelper::VariantToTimeT(vtModifiedDate, false);
-						hr = m_pRainbowKeyDriver->SetSoftwareModifiedDate(keyIt->first, modTimeT);
-
-						hr = m_pRainbowKeyDriver->SetSoftwareCurrentActivations(keyIt->first, (unsigned short)tmpLicenseFileAttribs.licLicenseInfoAttribs.activationCurrent);
-					}
-					break;
+					Lic_KeyAttribs::Lic_ActivationInfoAttribs newLicInfoAttribs;
+					newLicInfoAttribs.activationSlotId = idx;
+					newLicInfoAttribs.activationSlotCurrentActivation = 0;
+					newLicInfoAttribs.activationSlotHoursToExpire = 0;
+					keyAttrib.activationInfoList->push_back(newLicInfoAttribs);
 				}
+			}
+
+			{
+			keyAttrib.licenseCode = std::wstring(newLicenseGUID);
+			keyAttrib.packetCreationDate = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
+
+			unsigned short keyHistoryNumber = unsigned short(keyAttrib.historyNumber);
+			//Process history number changes to key  -- if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
+			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotHistoryInfoAttribsList::iterator histSlotInfoIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->begin();
+					histSlotInfoIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->end();
+					histSlotInfoIt++)
+			{
+				unsigned short packageHistoryNumber = unsigned short(histSlotInfoIt->historyNumber);
+				if(keyHistoryNumber < packageHistoryNumber)
+				{
+					//apply history change to keyAttrib
+					for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs::TVector_Lic_ActivitySlotChangeInfoAttribsList::iterator actSlotChangeIt = histSlotInfoIt->activitySlotChangeInfoList->begin();
+						actSlotChangeIt != histSlotInfoIt->activitySlotChangeInfoList->end();
+						actSlotChangeIt++)
+					{
+						switch(actSlotChangeIt->actionType)
+						{
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd:
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaDelete:
+							//Param 1 == activity slot for action ascaAdd or ascaDelete
+							//Clear out activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaMove:
+							//Param 1 == old activity slot
+							//Param 2 == new activity slot
+							//Transfer values from old activity slot to the new activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotCurrentActivation = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotHoursToExpire = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire;
+							//Clear out old activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:	//Don't implement
+							//Param 1 == activity slot
+							//Param 2 == new activations
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = int(actSlotChangeIt->param2);
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire://Don't implement
+							//Param 1 == activity slot
+							//Param 2 == new hours to expire
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = int(actSlotChangeIt->param2);
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaIgnore:
+						default:
+							break;
+						}
+					}
+					keyAttrib.historyNumber = packageHistoryNumber;
+				}
+			}
+
+			//Update the USB Key
+			if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )
+			{
+				m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, keyAttrib);
+			}
+
 			}
 		}
 		if(FAILED(hr))
@@ -1402,14 +1762,20 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 	
 		m_licenseFileAttribs.InitFromString(bstrLicPacketStream);
 		m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
+
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - m_bstrLicenseName: %s", (wchar_t*)m_bstrLicenseName);
+//OutputDebugString(tmpbuf);
+
 		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
 		{
 			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
 			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
-			tmpFileInfo.LicFileVerificationCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+			tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
 			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
 			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			tmpFileInfo.LicCurrentActivations = m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent;
+			keyAttrib.keyName = std::wstring(m_bstrLicenseName);
+			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttrib.ToString());
 			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			if(FAILED(hr))
 				throw hr;
@@ -1424,6 +1790,42 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		hr = E_FAIL;
 	}
 	SysFreeString(bstrLicPacketStream);
+	return hr;
+}
+
+// Private - Populates the pKeyAttribs either from the USB key or the System info, uses m_licenseFileAttribs
+HRESULT SoftwareLicenseMgr::InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pPackageAttribs, bool* pBFoundKey)
+{
+	*pBFoundKey = false;
+	HRESULT hr = E_FAIL;
+	try
+	{
+		bool bInitializedLicenseFileAttribs = (pPackageAttribs->licLicenseInfoAttribs.customerID!=0) || (pPackageAttribs->licLicenseInfoAttribs.destinationID!=0);
+		bool bFoundKeyInfo(false);
+		if(bInitializedLicenseFileAttribs/*m_licenseFileAttribs is INITIALIZED*/)
+		{
+			//There is file info on system, see if there is a key
+			hr = GetKeyInfoAttribs_FromKey(pKeyAttribs, pPackageAttribs);
+			//hr == E_INVALIDARG happens if there is no protection key in verification tokens, use info from file info
+			*pBFoundKey = SUCCEEDED(hr);
+			if(*pBFoundKey == false)
+			{
+				Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
+				hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&(pPackageAttribs->licLicenseInfoAttribs)))).c_str(), &tmpFileInfo);
+				*pBFoundKey = SUCCEEDED(hr);
+				if(*pBFoundKey == true)
+					pKeyAttribs->InitFromString(tmpFileInfo.Streamed_ActivationAttribs);
+			}
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
 	return hr;
 }
 
@@ -1452,15 +1854,20 @@ HRESULT SoftwareLicenseMgr::EnterLicenseArchive(Lic_PackageAttribs* pLicPacket)
 			throw(E_FAIL);
 		time_t packetCreateDateTimeT = TimeHelper::VariantToTimeT(packetCreateDateVt, false);
 		time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-		static const time_t ONE_HOUR_IN_SECONDS = (time_t)(60*60);
-		static const time_t ONE_DAY_IN_SECONDS = (time_t)(24*ONE_HOUR_IN_SECONDS);
-
-		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -ONE_DAY_IN_SECONDS)
+		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -TimeHelper::ONE_DAY_IN_SECONDS)
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_ARCHIVE;
 
 		hr = VerifyForSoftwareLicenseUpgrade(&tmpLicPacket, true, false);
 		if(FAILED(hr))
 			throw hr;
+
+		Lic_KeyAttribs keyAttrib;
+		//customerID==0 && destinationID==0 for uninitialize LicenseFileAttribs
+		bool bInitializedLicenseFileAttribs = (tmpLicPacket.licLicenseInfoAttribs.customerID!=0) || (tmpLicPacket.licLicenseInfoAttribs.destinationID!=0);
+		bool bFoundKeyInfo(false);
+		
+		hr = InternalGetKeyAttribs(&keyAttrib, &tmpLicPacket, &bFoundKeyInfo);
+
 
 		//Remove the Validation Token:ttArchiveOnly
 		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = tmpLicPacket.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
@@ -1474,7 +1881,6 @@ HRESULT SoftwareLicenseMgr::EnterLicenseArchive(Lic_PackageAttribs* pLicPacket)
 			}
 		}
 		
-		//
 		bstrLicStream = SysAllocString(tmpLicPacket.ToString().c_str());
 		hr = SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrLicStream);
 
@@ -1491,10 +1897,13 @@ HRESULT SoftwareLicenseMgr::EnterLicenseArchive(Lic_PackageAttribs* pLicPacket)
 			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
 			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
 			std::wstring tmpLicCode = Lic_PackageAttribsHelper::GetValidationValue(&(m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
-			tmpFileInfo.LicFileVerificationCode = tmpLicCode;
+			tmpFileInfo.LicFileLicenseCode = tmpLicCode;
 			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
 			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			tmpFileInfo.LicCurrentActivations = m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent;
+
+			keyAttrib.keyName = std::wstring(m_bstrLicenseName);
+			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttrib.ToString());
+
 			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			if(FAILED(hr))
 				throw hr;
@@ -1552,10 +1961,13 @@ HRESULT SoftwareLicenseMgr::InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, 
 		{
 			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
 			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
-			tmpFileInfo.LicFileVerificationCode = std::wstring(SpdAttribs::WStringObj(_newLicenseGUID));
+			tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(_newLicenseGUID));
 			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
 			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			tmpFileInfo.LicCurrentActivations = m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent;
+			Lic_KeyAttribs keyAttribs;
+			keyAttribs.InitFromString(std::wstring(tmpFileInfo.Streamed_ActivationAttribs));
+			keyAttribs.licenseCode = std::wstring(_newLicenseGUID);
+			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(SpdAttribs::WStringObj(_newLicenseGUID));
 			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			if(FAILED(hr))
 				throw hr;
@@ -1574,9 +1986,9 @@ HRESULT SoftwareLicenseMgr::InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, 
 	return hr;
 }
 
-HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
+HRESULT SoftwareLicenseMgr::UseActivationToExtendTime(_bstr_t bstrContractNumber)
 {
-//wchar_t debug_buf[1024];		
+wchar_t debug_buf[1024];		
 //_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::UseActivationToExtendTime() - Enter");
 //OutputDebugStringW(debug_buf);
 	SafeMutex mutex(softwareLicenseMgrLock);
@@ -1584,18 +1996,58 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 	
 	try
 	{
+		bool bInitializedLicenseFileAttribs = (m_licenseFileAttribs.licLicenseInfoAttribs.customerID!=0) || (m_licenseFileAttribs.licLicenseInfoAttribs.destinationID!=0);
+		bool bFoundKeyInfo(false);
+		Lic_KeyAttribs keyAttribs;
+		//Get Keyinfo from the usb key or system
+		hr = InternalGetKeyAttribs(&keyAttribs, &m_licenseFileAttribs, &bFoundKeyInfo);
+		if(FAILED(hr))
+			throw hr;
+		if(!bFoundKeyInfo)
+			throw E_INVALIDARG;
+
 		//Removed restriction of ActivationTimes only for Licenses of type sltDisasterRecovery or sltTestDev
 		//if((m_licenseFileAttribs.licLicenseInfoAttribs.softwareLicType != Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery)
 		//	&& (m_licenseFileAttribs.licLicenseInfoAttribs.softwareLicType != Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev))
 		//	throw E_INVALIDARG;	//Can only call this function on Licenses of type sltDisasterRecovery or sltTestDev
 
-		if((int)m_licenseFileAttribs.licLicenseInfoAttribs.activationTotal <= (int)m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent)
+		Lic_PackageAttribs::Lic_ProductInfoAttribs* pTmpProdInfo = NULL;	//Product License that matches the contract number
+		for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = m_licenseFileAttribs.licLicenseInfoAttribs.productList->begin();
+				prodIt != m_licenseFileAttribs.licLicenseInfoAttribs.productList->end();
+				prodIt++)
+		{
+			if(_wcsicmp(bstrContractNumber, std::wstring(prodIt->contractNumber).c_str()) == 0)
+			{
+				pTmpProdInfo = &(*prodIt);
+				break;
+			}
+		}
+		if(pTmpProdInfo == NULL || (bool)pTmpProdInfo->bUseActivations == false)	//contract number not found, or not using activations
+			throw E_INVALIDARG;
+		if((int)pTmpProdInfo->activationTotal <= (int)pTmpProdInfo->activationCurrent)
 			throw LicenseServerError::EHR_LICENSE_INSUFFICIENT;	//Not enough licenses
-
 
 		hr = VerifyForSoftwareLicenseUpgrade(&m_licenseFileAttribs, false, true);
 		if(FAILED(hr))
 			throw hr;
+
+		//find activity slot number for contract number
+		unsigned short activitySlot = 0;
+		bool bFoundActivitySlot(false);
+		for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotInfoAttribsList::iterator aSlotIt = m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList->begin();
+				aSlotIt != m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList->end();
+				aSlotIt++)
+		{
+			if(_wcsicmp(bstrContractNumber, std::wstring(aSlotIt->contractNumber).c_str()) == 0)
+			{
+				activitySlot = unsigned short (aSlotIt->activitySlotID);
+				bFoundActivitySlot = true;
+				break;
+			}
+		}
+		if(!bFoundActivitySlot)
+			throw E_INVALIDARG;
+		
 
 		//
 		//Added activation time to activationExpirationDate if it hasn't expired yet, else add to current time
@@ -1611,32 +2063,48 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 //				currentSystime.wMilliseconds);
 //OutputDebugStringW(debug_buf);
 
-		time_t curTimeT = time(NULL);	//Retrieves Universal Time
+		Lic_KeyAttribs::Lic_ActivationInfoAttribs* pActInfoAttribs = NULL;
+		for(	Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actSlotIt = keyAttribs.activationInfoList->begin();
+				actSlotIt != keyAttribs.activationInfoList->end();
+				actSlotIt++)
+		{
+			if(actSlotIt->activationSlotId == activitySlot)
+			{
+				pActInfoAttribs = &(*actSlotIt);
+				break;
+			}
+		}
 
+		if(pActInfoAttribs == NULL)
+			throw E_INVALIDARG;
+
+		// Base new expiration date off the keys expiration date only, think about giving an hour
+		unsigned short activationSlotHoursToExpire = unsigned short(pActInfoAttribs->activationSlotHoursToExpire);
+
+		time_t curTimeT = time(NULL);	//Retrieves Universal Time
 		SYSTEMTIME currentExpiresDateSystime;
-		if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(m_licenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate)).c_str(), currentExpiresDateSystime))
+		if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.currentDate)).c_str(), currentExpiresDateSystime))
 			throw(E_FAIL);
 
 //_snwprintf_s(debug_buf, 1024, L"       CurrentExpirationDate: %04d-%02d-%02d %02d:%02d:%02d.%04d", 
-//				currentExpiresDateSystime.wYear, 
-//				currentExpiresDateSystime.wMonth, 
-//				currentExpiresDateSystime.wDay, 
-//				currentExpiresDateSystime.wHour, 
-//				currentExpiresDateSystime.wMinute,
-//				currentExpiresDateSystime.wSecond, 
-//				currentExpiresDateSystime.wMilliseconds);
+//		currentExpiresDateSystime.wYear, 
+//		currentExpiresDateSystime.wMonth, 
+//		currentExpiresDateSystime.wDay, 
+//		currentExpiresDateSystime.wHour, 
+//		currentExpiresDateSystime.wMinute,
+//		currentExpiresDateSystime.wSecond, 
+//		currentExpiresDateSystime.wMilliseconds);
 //OutputDebugStringW(debug_buf);
 
 		_variant_t vtCurrentExpiresDate(NULL);	
 		if (!SystemTimeToVariantTime(&currentExpiresDateSystime, &vtCurrentExpiresDate.date)) 
 			throw(E_FAIL);
 		time_t curExpiresDateTimeT = TimeHelper::VariantToTimeT(vtCurrentExpiresDate, false);
+		time_t newExpiresDateTimeT = curExpiresDateTimeT + (activationSlotHoursToExpire * TimeHelper::ONE_HOUR_IN_SECONDS);
 
-		// Base new expiration date off of the larger or newExpiresDateTimeT & curTimeT
-		time_t newExpiresDateTimeT = (difftime(curExpiresDateTimeT, curTimeT) > 0) ? curExpiresDateTimeT : curTimeT;
-
-		static const time_t SECONDS_PER_DAY = (time_t)(24*60*60); //24hours * 60 mins * 60seconds
-		newExpiresDateTimeT += (int)m_licenseFileAttribs.licLicenseInfoAttribs.activationAmountInDays * SECONDS_PER_DAY;
+		//if activating for the first time, give an hour
+		newExpiresDateTimeT += ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_SECONDS) + ((activationSlotHoursToExpire==0) ? TimeHelper::ONE_HOUR_IN_SECONDS : 0);
+		pActInfoAttribs->activationSlotHoursToExpire = activationSlotHoursToExpire + ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_HOURS) + ((activationSlotHoursToExpire==0) ? 1 : 0);
 
 		VARIANT vtNewExpireTime = TimeHelper::TimeTToVariant(newExpiresDateTimeT);
 		SYSTEMTIME newExpireSystime;
@@ -1654,27 +2122,19 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 		//	newExpireSystime.wSecond, 
 		//	newExpireSystime.wMilliseconds);
 
-		
-		//SystemTime is in universal time, change to local before writing to file...
-		//struct tm localTimeTM;
-		//errno_t err = _localtime64_s( &localTimeTM, &newExpiresDateTimeT ); 
-		//if (err)
-		//	throw(E_FAIL);
-	
-		//wchar_t timestamp[256];
-		//_snwprintf(timestamp, sizeof(timestamp)/sizeof(wchar_t),
-		//	L"%04d-%02d-%02d %02d:%02d:%02d.%04d",
-		//	localTimeTM.tm_year + 1900, 
-		//	localTimeTM.tm_mon + 1, 
-		//	localTimeTM.tm_mday, 
-		//	localTimeTM.tm_hour, 
-		//	localTimeTM.tm_min,
-		//	localTimeTM.tm_sec, 
-		//	0000);
-
-		
-//_snwprintf_s(debug_buf, 1024, L"    NewExpirationDate: %s", (wchar_t*)timestamp);
+//_snwprintf_s(debug_buf, 1024, L"            newExpireSystime: %04d-%02d-%02d %02d:%02d:%02d.%04d", 
+//				newExpireSystime.wYear, 
+//				newExpireSystime.wMonth, 
+//				newExpireSystime.wDay, 
+//				newExpireSystime.wHour, 
+//				newExpireSystime.wMinute,
+//				newExpireSystime.wSecond, 
+//				newExpireSystime.wMilliseconds);
 //OutputDebugStringW(debug_buf);
+
+		pTmpProdInfo->activationCurrentExpirationDate = std::wstring(timestamp);
+		pActInfoAttribs->activationSlotCurrentActivation = (unsigned short)pActInfoAttribs->activationSlotCurrentActivation + 1;
+		pTmpProdInfo->activationCurrent = (unsigned short)pActInfoAttribs->activationSlotCurrentActivation;
 
 		// always make a newLicenseGUID
 		_bstr_t newLicenseGUID = _bstr_t(L"");
@@ -1687,10 +2147,8 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 		StringFromGUID2(key_guid, tmp_code, 128);
 		tmp_code[127]=0;
 		newLicenseGUID = _bstr_t(tmp_code).Detach();
-
 		
 		std::wstring wstrHardwareKeyID = Lic_PackageAttribsHelper::GetValidationValue(&(m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID);
-
 
 		//if there is a newGUID, set it in the verification tokens before saving to file
 		if(_wcsicmp(newLicenseGUID, L"")!=0)
@@ -1707,10 +2165,6 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 			}
 		}
 
-
-		m_licenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate = std::wstring(timestamp);
-		m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent = (int)m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent + 1;
-
 		//Update the modified date
 		wchar_t wchCurrentTimestamp[256];
 		TimeHelper::SystemTimeToString(wchCurrentTimestamp, _countof(wchCurrentTimestamp), currentSystime);
@@ -1722,51 +2176,25 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 		if(FAILED(hr))
 			throw hr;
 
-		//On success, see if there is a hardware key, if so find right one and update its ttLicenseCode.
-		if(_wcsicmp(wstrHardwareKeyID.c_str(), L"")!=0)
+		//Update the USB Key
+		if(_wcsicmp(wstrHardwareKeyID.c_str(), L"") != 0 )
 		{
-			SafeMutex mutex1(m_pRainbowKeyDriver->keys_lock);
-			m_pRainbowKeyDriver->RefreshKeyList();
-			for (RainbowDriver::KeyList::iterator keyIt = m_pRainbowKeyDriver->keys.begin(); keyIt!=m_pRainbowKeyDriver->keys.end(); keyIt++)
-			{
-				if(_wcsicmp(keyIt->first, wstrHardwareKeyID.c_str()) == 0)
-				{
-					hr = m_pRainbowKeyDriver->SetSoftwareKeyCode(keyIt->first, newLicenseGUID);
-					if(SUCCEEDED(hr))
-					{
-						SYSTEMTIME modifiedDateSystime;
-						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate)).c_str(), modifiedDateSystime))
-							throw(E_FAIL);
-
-						_variant_t vtModifiedDate(NULL);	
-						if (!SystemTimeToVariantTime(&modifiedDateSystime, &vtModifiedDate.date)) 
-							throw(E_FAIL);
-
-						time_t modTimeT = TimeHelper::VariantToTimeT(vtModifiedDate, false);
-						hr = m_pRainbowKeyDriver->SetSoftwareModifiedDate(keyIt->first, modTimeT);
-
-						hr = m_pRainbowKeyDriver->SetSoftwareCurrentActivations(keyIt->first, (unsigned short)m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent);
-					}
-					break;
-				}
-			}
+			keyAttribs.licenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+			m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), keyAttribs, true/*force activity slot update*/);
 		}
-		if(FAILED(hr))
-			throw hr;
 
 		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
 		{
 			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
 			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
-			tmpFileInfo.LicFileVerificationCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+			tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
 			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
 			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			tmpFileInfo.LicCurrentActivations = m_licenseFileAttribs.licLicenseInfoAttribs.activationCurrent;
+			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
 			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			if(FAILED(hr))
 				throw hr;
 		}
-	
 	}
 	catch(HRESULT &eHr)
 	{
@@ -1781,28 +2209,3 @@ HRESULT SoftwareLicenseMgr::UseActivationToExtendTime()
 //OutputDebugStringW(debug_buf);
 	return hr;
 }
-/*
-HRESULT SoftwareLicenseMgr::GetLicenseStream(BSTR* bstrLicenseStream)
-{
-	return E_NOTIMPL;
-}
-HRESULT SoftwareLicenseMgr::GetSoftwareSpecStream(BSTR* bstrSoftwareStream)
-{
-	return E_NOTIMPL;
-}
-
-
-HRESULT ApplyLicensePacket(LicensePacket* pLicPacket, BSTR *pBstrVerificationCode)
-{
-	return E_NOTIMPL;
-}
-*/
-
-
-//static
-//HANDLE SoftwareLicenseMgr::SoftwareLicenseFile::softwareLicenseFileLock = CreateMutex(0,0,0);
-//static
-
-
-
-

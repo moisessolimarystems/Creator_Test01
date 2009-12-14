@@ -1,6 +1,7 @@
 #pragma once
 #include <comdef.h>
-#include "RainbowDriver.h"
+//#include "RainbowDriver.h"
+#include "KeyServer.h"
 #include "..\Common\Version.h"
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\Common\SoftwareSpecInstance.h"	//For GlobalSoftwareSpec::GlobalSoftwareSpec g_pSoftwareSpec
@@ -18,16 +19,17 @@ class SoftwareLicenseMgr
 		//	1) There is no License File for the Key
 		//	2) LicenseFile and Key don't have matching "special codes"
 		//
-		HRESULT Initialize(_bstr_t bstrLicenseFile, RainbowDriver* pRainbowKeyDriver, SoftwareServerDataMgr* pLicServerDataMgr);
+		HRESULT Initialize(_bstr_t bstrLicenseFile, KeyServer* pKeyServer, SoftwareServerDataMgr* pLicServerDataMgr);
 		HRESULT Verify(bool* pBValid, bool bForceRefresh);
 
 		HRESULT GetSoftwareLicenseName(BSTR *pBstrLicenseName);
 		HRESULT GetVerificationAttribs(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs* pVerificationAttrib);
 		HRESULT GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAttribs* pLicenseInfo);
 
-		HRESULT GetProtectionKeyModifiedDate(time_t* pVtModifiedDate);
 		HRESULT GetProtectionKeyModifiedDate(time_t* pVtModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs);
-		HRESULT GetProtectionKeyCurrentActivations(int* pCurrentActivations, Lic_PackageAttribs* pLicenseFileAttribs);
+		HRESULT GetKeyInfoAttribs_FromKey(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pLicenseFileAttribs);
+		//HRESULT GetKeyInfoAttribs_FromSystem(Lic_KeyAttribs* pKeyAttribs);
+		//HRESULT GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs);
 
 		HRESULT DeleteLicenseFile();
 		HRESULT ContainsLicenseForProduct(long _productID);
@@ -38,7 +40,7 @@ class SoftwareLicenseMgr
 		HRESULT SetVerificationAttribs(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs* pVerificationAttrib);
 		HRESULT UpdateLicenseCode( _bstr_t bstrLicenseCode);
 
-		HRESULT UseActivationToExtendTime();
+		HRESULT UseActivationToExtendTime(_bstr_t bstrContractNumber);
 
 		//HRESULT EnterLicensePacket(VARIANT vtPasswordPacket, BSTR *pBstrVerificationCode);
 		/*
@@ -65,7 +67,7 @@ class SoftwareLicenseMgr
 		HRESULT ValidateHardwareSystemUUID(_bstr_t bstrValidationValue);
 	private:
 		time_t m_lastTimeCheck;
-		RainbowDriver* m_pRainbowKeyDriver;
+		KeyServer* m_pKeyServer;
 		SoftwareServerDataMgr* m_pLicServerDataMgr;
 		_bstr_t m_bstrLicenseFile;
 		_bstr_t m_bstrLicenseName;
@@ -77,6 +79,9 @@ class SoftwareLicenseMgr
 		HANDLE softwareLicenseMgrLock;
 
 		HRESULT InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, _bstr_t _newLicenseGUID);
+
+		//Populates the pKeyAttribs either from the USB key or the System info, uses m_licenseFileAttribs
+		HRESULT InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pNewPackageAttribs, bool* pBFoundKey);
 
 		HRESULT VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* _pLicPackageAttribs, bool _bIgnoreLicenseCode, bool _bIgnoreModifiedDate);
 		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, _bstr_t _bstrValue);
