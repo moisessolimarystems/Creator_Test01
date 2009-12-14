@@ -23,6 +23,7 @@ namespace Client.Creator
         Solimar.Licensing.GlobalSoftwareSpec globalSwSpec;
         DateTime _currentExpirationDate;
         ProductLicenseState _plStatus;
+        int _productLicenseDataBaseID;
 
         public enum ProductLicenseAttributes
         {
@@ -53,7 +54,131 @@ namespace Client.Creator
             _plRec = plData;
             _product = product;
             _plStatus = (ProductLicenseState)plData.plState;
+            _productLicenseDataBaseID = plData.ID;
             ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;  
+        }
+
+        public uint GetTotalAddOnModuleAppInstance(uint modID)
+        {
+            uint totalValue = 0;
+            string stdProductLicense = "";
+            IList<string> addOnOrders = null;
+            LicenseTable lt = null;
+            Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
+            Service<ICreator>.Use((client) =>
+            {
+                lt = client.GetLicenseByName(LicenseServer, false);
+                licPackage.Stream = lt.LicenseInfo;
+                stdProductLicense = (_product.Product.productState.TVal != Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psAddOn) ? ID : ParentID;
+                addOnOrders = client.GetAddOnProductLicenses(stdProductLicense);
+            });
+            foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+            {
+                if (addOnOrders.Contains(product.contractNumber.TVal))
+                {
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
+                    {
+                        if (modRec.moduleID.TVal.Equals(modID))
+                            totalValue += modRec.moduleAppInstance.TVal;
+                    }
+                }
+            }
+            return totalValue;
+        }
+
+        public int GetTotalModuleAppInstance(uint modID)
+        {
+            uint totalValue = 0;
+            LicenseTable lt = null;
+            Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
+            Service<ICreator>.Use((client) =>
+            {
+                lt = client.GetLicenseByName(LicenseServer, false);
+                licPackage.Stream = lt.LicenseInfo;
+            });
+            foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+            {
+                if (product.productID.TVal == _product.Product.productID.TVal)
+                {
+                    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
+                    {
+                        if (modRec.moduleID.TVal.Equals(modID))
+                            totalValue += modRec.moduleAppInstance.TVal;
+                    }
+                }
+            }
+            return (int)totalValue;
+        }
+
+        //standard order moduledata does not know add-on orders need to retrieve from database?
+        public void DecrementAddOnModuleAppInstance(uint modID)
+        {
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                addOnOrders = client.GetAddOnProductLicenses(ID);
+                if (addOnOrders != null)
+                {
+                    if (addOnOrders.Count > 0)
+                    {
+                        LicenseTable lt = null;
+                        Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
+                        lt = client.GetLicenseByName(LicenseServer, false);
+                        licPackage.Stream = lt.LicenseInfo;
+                        foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+                        {
+                            if (addOnOrders.Contains(product.contractNumber.TVal))
+                            {
+                                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in product.moduleList.TVal)
+                                {
+                                    if (storedMod.moduleID.TVal == modID)
+                                        storedMod.moduleAppInstance.TVal = 0;
+                                }
+                            }
+                        }
+                        lt.LicenseInfo = licPackage.Stream;
+                        client.UpdateLicense(lt, true);
+                    }
+                }
+            });
+        }
+
+        public void IncrementAddOnModuleAppInstance(uint modID)
+        {
+            //increment first add-on found
+            IList<string> addOnOrders = null;
+            Service<ICreator>.Use((client) =>
+            {
+                addOnOrders = client.GetAddOnProductLicenses(ID);
+                if (addOnOrders != null)
+                {
+                    if (addOnOrders.Count > 0)
+                    {
+                        LicenseTable lt = null;
+                        Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
+                        lt = client.GetLicenseByName(LicenseServer, false);
+                        licPackage.Stream = lt.LicenseInfo;
+                        foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+                        {
+                            if (addOnOrders.Contains(product.contractNumber.TVal))
+                            {
+                                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in product.moduleList.TVal)
+                                {
+                                    if (storedMod.moduleID.TVal == modID)
+                                    {
+                                        if (storedMod.moduleValue.TVal > 0)
+                                            storedMod.moduleAppInstance.TVal = 1;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        lt.LicenseInfo = licPackage.Stream;
+                        client.UpdateLicense(lt, true);
+                    }
+                }
+            });
         }
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetProductSpec(uint productID)
@@ -87,6 +212,13 @@ namespace Client.Creator
         #region Properties
 
         #region NonBrowsable Properties
+        [Browsable(false)]
+        public int ProductLicenseDatabaseID
+        {
+            get { return _productLicenseDataBaseID; }
+            set { _productLicenseDataBaseID = value; }
+        }
+
         [Browsable(false)]
         public DateTime CurrentExpirationDate
         {
@@ -131,6 +263,13 @@ namespace Client.Creator
         }
 
         [Browsable(false)]
+        public string ParentID
+        {
+            get { return _plRec.ParentProductLicenseID;  }
+            set { _plRec.ParentProductLicenseID = value; }
+        }
+
+        [Browsable(false)]
         public ProductProperty Product
         {
             get { return _product; }
@@ -159,16 +298,84 @@ namespace Client.Creator
 
         #region Browsable Properties
         [Category("Product License"), PropertyOrder(1)]
-        [DisplayName("Product License Number")]
+        [DisplayName("Number")]
+        [Description("Unique identifier for a product license.")]
         [ReadOnly(true)]
         public string ID
         {
             get { return Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(LicenseServer, Index); }
-            set { _plRec.plID = value; }
+            set
+            {
+                _plRec.plID = value;
+                _product.Product.contractNumber.TVal = value;
+            }
         }
 
         [Category("Product License"), PropertyOrder(2)]
+        [DisplayName("Product")]
+        [Description("Name of Solimar product associated with product license.")]
+        public String ProductName
+        {
+            get { return _product.Name; }
+        }
+
+        [Category("Product License"), PropertyOrder(3)]
+        [DisplayName("Version")]
+        [Description("Solimar product version associated with product license.")]
+        [TypeConverter(typeof(VersionConverter))]
+        [ReadOnly(true)]
+        public LicenseVersion ProductVersion
+        {
+            get
+            {
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_permanent_pwd.Value);
+                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
+                {
+                    if (_permissions.pt_permanent_pwd.Value)
+                        SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, true);
+                }
+                return _product.Version;
+            }
+            set { _product.Version = value; }
+        }
+
+        [Browsable(false)]
+        [Category("Product License"), PropertyOrder(4)]
+        [DisplayName("Product Connections")]
+        [Description("Number of possible products able to use product license.")]
+        public uint AppInstance
+        {
+            get
+            {
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, !_permissions.pt_permanent_pwd.Value);
+                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
+                {
+                    if (_permissions.pt_permanent_pwd.Value)
+                        SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, true);
+                }
+                return _product.Product.productAppInstance.TVal;
+            }
+            set
+            {
+                //need appinstance to be set for each product license
+                //non-client modules - 1
+                //add-on modules - always 0 unless total is 0 then 1
+                //client modules - matches product
+                //add-on modules - always 0 unless total is 0 then 1
+                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.Product.moduleList.TVal)
+                {
+                    if (_product.Product.productState.TVal != Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psAddOn)
+                        module.moduleAppInstance.TVal = value;
+                    else
+                        module.moduleAppInstance.TVal = 0;
+                }
+                _product.Product.productAppInstance.TVal = value;
+            }
+        }
+
+        [Category("Product License"), PropertyOrder(5)]
         [DisplayName("Status")]
+        [Description("State of product license.")]
         [ReadOnly(true)]
         public ProductLicenseState Status
         {
@@ -186,81 +393,71 @@ namespace Client.Creator
             {
                 //be able to change status to deactivated 
                 DateTime? setDate = null;
-                LicenseServerType lsType = LicenseServerType.Deactivated;
-                Service<ICreator>.Use((client) =>
-                {
-                    lsType = (LicenseServerType)client.GetLicenseType(LicenseServer);
-                });
                 //only set if value changed.
                 if (!_plStatus.Equals(value))
-                {   
-                    switch (value)
-                    {             
-                        case ProductLicenseState.Licensed:
-                            //was trial now licensed
-                            //clear modules of non-defaults and set defaults           
-                            //plstate is stored in terms of enums.productlicensestate
-                            if (_plRec.plState == (byte)ProductLicenseState.Trial)
-                                _product.SetTrialToLicensed(ID, lsType);
-                            else if (_plRec.plState == (byte)ProductLicenseState.AddOn)
-                                _product.SetAddOnToLicensed(ID, ParentID);
-                            else
-                                throw new Exception("invalid conversion");
-                            setDate = (lsType != LicenseServerType.Subscription) ? null : ExpirationDate;
-                            break;
-                        case ProductLicenseState.Trial:
-                            //was perm now trial
-                            if (_plRec.plState == (byte)ProductLicenseState.Licensed)
-                                _product.SetLicensedToTrial(ID);                                     
-                            else
-                                throw new Exception("Invalid Conversion");
-                            setDate = CurrentExpirationDate;
-                            break;
-                        case ProductLicenseState.AddOn:
-                            //need to allow for initial case and exclude changing from perm->addon, trial->addon
-                            //initial case is always 0 -> perm
-                            if (((!_plRec.ExpirationDate.HasValue &&
-                                  _plRec.plState == (byte)ProductLicenseState.Licensed &&
-                                  _plRec.plID != null)) ||
-                               ((_plRec.ExpirationDate.HasValue &&
-                                 _plRec.plState == (byte)ProductLicenseState.Trial)))
-                                throw new Exception("Invalid Conversion");
-                            setDate = CurrentExpirationDate;
-                            break;                        
-                        default:
-                            break;
-                    }
-                    _plStatus = value;
-                    if (_plStatus != ProductLicenseState.Deactivated)
+                {
+                    System.Windows.Forms.DialogResult dlgResult = System.Windows.Forms.DialogResult.No;
+                    if(value != ProductLicenseState.AddOn)
+                        dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please confirm product license status change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
+                    if(dlgResult == System.Windows.Forms.DialogResult.Yes || value == ProductLicenseState.AddOn)
                     {
-                        _plRec.plState = (byte)_plStatus;
-                        ExpirationDate = setDate;
+                        LicenseServerType lsType = LicenseServerType.Deactivated;
+                        Service<ICreator>.Use((client) =>
+                        {
+                            lsType = (LicenseServerType)client.GetLicenseType(LicenseServer);
+                        });
+                        switch (value)
+                        {
+                            case ProductLicenseState.Licensed:
+                                //was trial now licensed
+                                //clear modules of non-defaults and set defaults           
+                                //plstate is stored in terms of enums.productlicensestate
+                                if (_plRec.plState == (byte)ProductLicenseState.Trial)
+                                    _product.SetTrialToLicensed();
+                                else if (_plRec.plState != (byte)ProductLicenseState.AddOn)
+                                    throw new Exception("invalid conversion");
+                                setDate = (!(Product.Name.Contains("Test"))) ? null : ExpirationDate;
+                                break;
+                            case ProductLicenseState.Trial:
+                                //was perm now trial
+                                if (_plRec.plState == (byte)ProductLicenseState.Licensed)
+                                    _product.SetLicensedToTrial();
+                                else
+                                    throw new Exception("Invalid Conversion");
+                                setDate = CurrentExpirationDate;
+                                break;
+                            case ProductLicenseState.AddOn:
+                                //need to allow for initial case and exclude changing from perm->addon, trial->addon
+                                //initial case is always 0 -> perm
+                                if (((!_plRec.ExpirationDate.HasValue &&
+                                      _plRec.plState == (byte)ProductLicenseState.Licensed &&
+                                      _plRec.plID != null)) ||
+                                   ((_plRec.ExpirationDate.HasValue &&
+                                     _plRec.plState == (byte)ProductLicenseState.Trial)))
+                                    throw new Exception("Invalid Conversion");
+                                setDate = CurrentExpirationDate;
+                                break;
+                            default:
+                                break;
+                        }
+                        _plStatus = value;
+                        if (value != ProductLicenseState.Deactivated)
+                            _product.Product.productState.TVal = Enums.GetProductState(value);
+                        if (_plStatus != ProductLicenseState.Deactivated)
+                        {
+                            _plRec.plState = (byte)_plStatus;
+                            ExpirationDate = setDate;
+                        }
                     }
                 }
             }
         }
 
-        [Browsable(false)]
-        [Category("Product License"), PropertyOrder(3)]
-        [DisplayName("Parent Product License Number")]
-        [ReadOnly(true)]
-        public string ParentID
-        {
-            get 
-            {
-                if (_plRec.ParentProductLicenseID != null)
-                    SetBrowsableAttribStatus(ProductLicenseAttributes.ParentID, true);
-                else
-                    SetBrowsableAttribStatus(ProductLicenseAttributes.ParentID, false);
-                return _plRec.ParentProductLicenseID; 
-            }
-            set { _plRec.ParentProductLicenseID = value; }
-        }
-
         [EditorAttribute(typeof(DateTimeEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(DateTimeConverter))]
-        [Category("Product License"), PropertyOrder(4)]
+        [Category("Product License"), PropertyOrder(6)]
         [DisplayName("Expiration Date")]
+        [Description("The date the product license will expire. The maximum allowed expiration date is one year.")]
         [ReadOnly(true)]
         public DateTime? ExpirationDate
         {
@@ -281,88 +478,67 @@ namespace Client.Creator
                 if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
                     !_plRec.ExpirationDate.HasValue)
                     throw new Exception("Can't set expiration date for permanent type");
-                if ((LicenseServer.Contains("T") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
+                if ((Product.Name.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
                     throw new Exception("Please set a valid expiration date");
                 if (value.HasValue)
                 {
-                    _product.SetAllModulesExpDate(ID, new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime());
+                    if (value.Value.CompareTo(DateTime.Today.AddYears(1)) > 0)
+                        throw new Exception(string.Format("{0} exceeds the expiration date limit of one year.", value.Value));
                     _plRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                    _product.Product.expirationDate.TVal = _plRec.ExpirationDate.Value;
+                    _product.Product.bUseExpirationDate.TVal = true;
                 }
                 else
                 {
-                    _product.SetAllModulesExpDate(ID, value);
                     _plRec.ExpirationDate = value;
+                    _product.Product.expirationDate.TVal = new DateTime(1900, 1, 1);
+                    _product.Product.bUseExpirationDate.TVal = false;
                 }
             }
         }
 
+        [Category("Product License Activations"), PropertyOrder(1)]
+        [DisplayName("Total")]
+        [Description("The number of activations for the product license. The max value allowed for the activation total is 254.")]
+        public uint ActivationTotal
+        {
+            get { return _product.Product.activationTotal.TVal; }
+            set 
+            {
+                if (value >= AppConstants.MaxActivations)
+                    throw new Exception(string.Format("{0} exceeds the max value for activation total", value));
+                _product.Product.activationTotal.TVal = value;
+                //set to force license to use activation exp date instead of regular exp date.
+                if(value > 0)
+                    _product.Product.bUseActivations.TVal = true;
+            }
+        }
+
+        [Category("Product License Activations"), PropertyOrder(2)]
+        [DisplayName("Amount In Days")]
+        [Description("The amount in days per activation for the product license. The max value allowed for the amount in days is 170.")]
+        public uint ActivationAmountInDays
+        {
+            get { return _product.Product.activationAmountInDays.TVal; }
+            set 
+            {
+                if (value >= AppConstants.MaxActivationAmountInDays)
+                    throw new Exception(string.Format("{0} exceeds the max value for the amount in days value per activation.", value));
+                _product.Product.activationAmountInDays.TVal = value; 
+            }
+        }
+
         [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
-        [Category("Product License"), PropertyOrder(5)]
+        [Category("Product License Notes"), PropertyOrder(1)]
         [DisplayName("Notes")]
+        [Description("User notes for product license.")]
         public string Description
         {
             get { return _plRec.Description; }
             set { _plRec.Description = value; }
         }
+        
 
-        [Category("Product"), PropertyOrder(1)]
-        [DisplayName("Name")]
-        public String ProductName
-        {
-            get { return _product.Name; }
-        }
-
-        [Category("Product"), PropertyOrder(2)]
-        [DisplayName("Version")]
-        [TypeConverter(typeof(VersionConverter))]
-        [ReadOnly(true)]
-        public LicenseVersion ProductVersion
-        {
-            get 
-            {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, true);
-                }    
-                return _product.Version; 
-            }
-            set { _product.Version = value; }
-        }
-
-        [Browsable(false)]
-        [Category("Product"), PropertyOrder(3)]
-        [DisplayName("Product Connections")]
-        public uint AppInstance
-        {
-            get 
-            {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, true);
-                }   
-                return _product.Product.productAppInstance.TVal;
-            }
-            set
-            {
-                //need appinstance to be set for each product license
-                //non-client modules - 1
-                //add-on modules - always 0 unless total is 0 then 1
-                //client modules - matches product
-                //add-on modules - always 0 unless total is 0 then 1
-                foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.Product.moduleList.TVal)
-                {
-                    if (module.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                        module.moduleAppInstance.TVal = value;
-                    else
-                        module.moduleAppInstance.TVal = 0;
-                }
-                _product.Product.productAppInstance.TVal = value;
-            }
-        }
         #endregion
 
         #endregion
