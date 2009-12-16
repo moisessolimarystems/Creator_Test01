@@ -772,7 +772,10 @@ namespace Solimar
 					public AttribsMemberDWORD activationTotal = new AttribsMemberDWORD("aT", 0);
 					public AttribsMemberDWORD activationCurrent = new AttribsMemberDWORD("aC", 0);
 					public AttribsMemberDWORD activationAmountInDays = new AttribsMemberDWORD("aA", 0);
-					public AttribsMemberBOOL bActivationCurrentOverride = new AttribsMemberBOOL("bAC", false);
+					public AttribsMemberDWORD activationOverrideCurrent = new AttribsMemberDWORD("aOC", 0);
+					public AttribsMemberDWORD activationOverrideCurrentHoursToExpire = new AttribsMemberDWORD("aOE", 0);
+					public AttribsMemberBOOL bActivationOverrideCurrent = new AttribsMemberBOOL("bAC", false);
+					public AttribsMemberBOOL bActivationOverrideCurrentHoursToExpire = new AttribsMemberBOOL("bAO", false);
 					public AttribsMemberBOOL bUseActivations = new AttribsMemberBOOL("bUA", false);
 					public AttribsMemberBOOL bUseExpirationDate = new AttribsMemberBOOL("bUE", true);
 					public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");

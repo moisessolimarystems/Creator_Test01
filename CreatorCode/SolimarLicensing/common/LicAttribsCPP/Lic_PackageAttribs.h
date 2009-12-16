@@ -685,7 +685,10 @@ public:
 		SpdAttribs::DwordAttrib activationTotal;
 		SpdAttribs::DwordAttrib activationCurrent;
 		SpdAttribs::DwordAttrib activationAmountInDays;
-		SpdAttribs::BoolAttrib bActivationCurrentOverride;
+		SpdAttribs::DwordAttrib activationOverrideCurrent;
+		SpdAttribs::DwordAttrib activationOverrideCurrentHoursToExpire;
+		SpdAttribs::BoolAttrib bActivationOverrideCurrent;
+		SpdAttribs::BoolAttrib bActivationOverrideCurrentHoursToExpire;
 		SpdAttribs::BoolAttrib bUseActivations;
 		SpdAttribs::BoolAttrib bUseExpirationDate;
 		SpdAttribs::WStringAttrib contractNumber;
@@ -707,7 +710,10 @@ public:
 			activationTotal = c.activationTotal;
 			activationCurrent = c.activationCurrent;
 			activationAmountInDays = c.activationAmountInDays;
-			bActivationCurrentOverride = c.bActivationCurrentOverride;
+			activationOverrideCurrent = c.activationOverrideCurrent;
+			activationOverrideCurrentHoursToExpire = c.activationOverrideCurrentHoursToExpire;
+			bActivationOverrideCurrent = c.bActivationOverrideCurrent;
+			bActivationOverrideCurrentHoursToExpire = c.bActivationOverrideCurrentHoursToExpire;
 			bUseActivations = c.bUseActivations;
 			bUseExpirationDate = c.bUseExpirationDate;
 			contractNumber = c.contractNumber;
@@ -729,7 +735,10 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", 0),
 			activationCurrent(m_mapAttribObjs, L"aC", 0),
 			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
+			activationOverrideCurrent(m_mapAttribObjs, L"aOC", 0),
+			activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", 0),
+			bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", false),
+			bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", false),
 			bUseActivations(m_mapAttribObjs, L"bUA", false),
 			bUseExpirationDate(m_mapAttribObjs, L"bUE", true),
 			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
@@ -749,7 +758,10 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
 			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
 			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
+			activationOverrideCurrent(m_mapAttribObjs, L"aOC", c.activationOverrideCurrent),
+			activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", c.activationOverrideCurrentHoursToExpire),
+			bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", c.bActivationOverrideCurrent),
+			bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", c.bActivationOverrideCurrentHoursToExpire),
 			bUseActivations(m_mapAttribObjs, L"bUA", c.bUseActivations),
 			bUseExpirationDate(m_mapAttribObjs, L"bUE", c.bUseExpirationDate),
 			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
@@ -769,7 +781,10 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", 0),
 			activationCurrent(m_mapAttribObjs, L"aC", 0),
 			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
+			activationOverrideCurrent(m_mapAttribObjs, L"aOC", 0),
+			activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", 0),
+			bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", false),
+			bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", false),
 			bUseActivations(m_mapAttribObjs, L"bUA", false),
 			bUseExpirationDate(m_mapAttribObjs, L"bUE", true),
 			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
@@ -789,7 +804,10 @@ public:
 			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
 			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
 			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
+			activationOverrideCurrent(m_mapAttribObjs, L"aOC", c.activationOverrideCurrent),
+			activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", c.activationOverrideCurrentHoursToExpire),
+			bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", c.bActivationOverrideCurrent),
+			bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", c.bActivationOverrideCurrentHoursToExpire),
 			bUseActivations(m_mapAttribObjs, L"bUA", c.bUseActivations),
 			bUseExpirationDate(m_mapAttribObjs, L"bUE", c.bUseExpirationDate),
 			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
@@ -808,7 +826,10 @@ public:
 			const SpdAttribs::DwordAttrib &param_activationTotal,
 			const SpdAttribs::DwordAttrib &param_activationCurrent,
 			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
-			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
+			const SpdAttribs::DwordAttrib &param_activationOverrideCurrent,
+			const SpdAttribs::DwordAttrib &param_activationOverrideCurrentHoursToExpire,
+			const SpdAttribs::BoolAttrib &param_bActivationOverrideCurrent,
+			const SpdAttribs::BoolAttrib &param_bActivationOverrideCurrentHoursToExpire,
 			const SpdAttribs::BoolAttrib &param_bUseActivations,
 			const SpdAttribs::BoolAttrib &param_bUseExpirationDate,
 			const SpdAttribs::WStringAttrib &param_contractNumber,
@@ -826,7 +847,10 @@ public:
 				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
 				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
 				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
-				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
+				activationOverrideCurrent(m_mapAttribObjs, L"aOC", param_activationOverrideCurrent),
+				activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", param_activationOverrideCurrentHoursToExpire),
+				bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", param_bActivationOverrideCurrent),
+				bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", param_bActivationOverrideCurrentHoursToExpire),
 				bUseActivations(m_mapAttribObjs, L"bUA", param_bUseActivations),
 				bUseExpirationDate(m_mapAttribObjs, L"bUE", param_bUseExpirationDate),
 				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
@@ -845,7 +869,10 @@ public:
 			const SpdAttribs::DwordAttrib &param_activationTotal,
 			const SpdAttribs::DwordAttrib &param_activationCurrent,
 			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
-			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
+			const SpdAttribs::DwordAttrib &param_activationOverrideCurrent,
+			const SpdAttribs::DwordAttrib &param_activationOverrideCurrentHoursToExpire,
+			const SpdAttribs::BoolAttrib &param_bActivationOverrideCurrent,
+			const SpdAttribs::BoolAttrib &param_bActivationOverrideCurrentHoursToExpire,
 			const SpdAttribs::BoolAttrib &param_bUseActivations,
 			const SpdAttribs::BoolAttrib &param_bUseExpirationDate,
 			const SpdAttribs::WStringAttrib &param_contractNumber,
@@ -863,7 +890,10 @@ public:
 				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
 				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
 				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
-				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
+				activationOverrideCurrent(m_mapAttribObjs, L"aOC", param_activationOverrideCurrent),
+				activationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"aOE", param_activationOverrideCurrentHoursToExpire),
+				bActivationOverrideCurrent(m_mapAttribObjs, L"bAC", param_bActivationOverrideCurrent),
+				bActivationOverrideCurrentHoursToExpire(m_mapAttribObjs, L"bAO", param_bActivationOverrideCurrentHoursToExpire),
 				bUseActivations(m_mapAttribObjs, L"bUA", param_bUseActivations),
 				bUseExpirationDate(m_mapAttribObjs, L"bUE", param_bUseExpirationDate),
 				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
