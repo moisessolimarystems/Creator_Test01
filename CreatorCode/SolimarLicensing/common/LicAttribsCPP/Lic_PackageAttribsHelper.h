@@ -13,31 +13,31 @@ class Lic_PackageAttribsHelper
 		wchar_t wcstrSwGroupID[5];
 		if(_pLicInfoAttribs)
 		{
-			wchar_t wLetter = L'U';
-			switch(_pLicInfoAttribs->softwareLicType)
-			{
-				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover:
-					wLetter = L'F';
-					break;
-				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery:
-				//	wLetter = L'D';
-				//	break;
-				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual:
-				//	wLetter = L'P';
-				//	break;
-				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltSubscription:
-				//	wLetter = L'S';
-				//	break;
-				//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev:
-				//	wLetter = L'T';
-				//	break;
-				//default:
-				//	wLetter = L'U';
-				//	break;
-				default:
-					wLetter = L'S';
-					break;
-			}
+			//wchar_t wLetter = L'U';
+			//switch(_pLicInfoAttribs->softwareLicType)
+			//{
+			//	case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover:
+			//		wLetter = L'F';
+			//		break;
+			//	//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltDisasterRecovery:
+			//	//	wLetter = L'D';
+			//	//	break;
+			//	//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual:
+			//	//	wLetter = L'P';
+			//	//	break;
+			//	//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltSubscription:
+			//	//	wLetter = L'S';
+			//	//	break;
+			//	//case Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev:
+			//	//	wLetter = L'T';
+			//	//	break;
+			//	//default:
+			//	//	wLetter = L'U';
+			//	//	break;
+			//	default:
+			//		wLetter = L'S';
+			//		break;
+			//}
 
 			_itow_s(_pLicInfoAttribs->destinationID, wcstrDestinationID, 36);
 			_itow_s(_pLicInfoAttribs->softwareGroupLicenseID, wcstrSwGroupID, 36);
@@ -45,17 +45,25 @@ class Lic_PackageAttribsHelper
 				wcstrDestinationID[idx] = towupper(wcstrDestinationID[idx]);
 			for(int idx=0;idx<_countof(wcstrSwGroupID);idx++)
 				wcstrSwGroupID[idx] = towupper(wcstrSwGroupID[idx]);
-			
 			_snwprintf_s(
 				wcstrDiplayLabel,
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
 				sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
-				L"%03x-%02s-%02s-%c",
+				L"%03x-%02s-%03s",
 				(int)_pLicInfoAttribs->customerID,
 				wcstrDestinationID,
-				wcstrSwGroupID,
-				wLetter
-				);
+				wcstrSwGroupID
+				);			
+			//_snwprintf_s(
+			//	wcstrDiplayLabel,
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
+			//	L"%03x-%02s-%02s-%c",
+			//	(int)_pLicInfoAttribs->customerID,
+			//	wcstrDestinationID,
+			//	wcstrSwGroupID,
+			//	wLetter
+			//	);
 			//_snwprintf_s(
 			//	wcstrDiplayLabel,
 			//	sizeof(wcstrDiplayLabel)/sizeof(wchar_t),
