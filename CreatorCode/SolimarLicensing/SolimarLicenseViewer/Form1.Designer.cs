@@ -78,6 +78,10 @@ namespace SolimarLicenseViewer
             this.remoteConnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteConnectToolStripMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.diagnosticDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadDiagnosticDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.diagnosticDataToolStripMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.statusStrip1.SuspendLayout();
             this.formSplitContainer.Panel1.SuspendLayout();
             this.formSplitContainer.Panel2.SuspendLayout();
@@ -350,7 +354,7 @@ namespace SolimarLicenseViewer
             // refreshToolStripMenuItem
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripButton_Click);
             // 
@@ -375,6 +379,7 @@ namespace SolimarLicenseViewer
             this.FileMenu,
             this.fileLicenseToolStripMenuItem,
             this.viewToolStripMenuItem,
+            this.diagnosticDataToolStripMenuItem,
             this.remoteServerToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -456,18 +461,21 @@ namespace SolimarLicenseViewer
             this.genVerificationOnLicenseDropDownMenuItem.Name = "genVerificationOnLicenseDropDownMenuItem";
             this.genVerificationOnLicenseDropDownMenuItem.Size = new System.Drawing.Size(319, 22);
             this.genVerificationOnLicenseDropDownMenuItem.Text = "Generate Verification Data for Solimar...";
+            this.genVerificationOnLicenseDropDownMenuItem.Visible = false;
             // 
             // genDiagnosticDataDropDownMenuItem
             // 
             this.genDiagnosticDataDropDownMenuItem.Name = "genDiagnosticDataDropDownMenuItem";
             this.genDiagnosticDataDropDownMenuItem.Size = new System.Drawing.Size(319, 22);
             this.genDiagnosticDataDropDownMenuItem.Text = "Generate License Diagnostic Data for Solimar...";
+            this.genDiagnosticDataDropDownMenuItem.Visible = false;
             this.genDiagnosticDataDropDownMenuItem.Click += new System.EventHandler(this.genDiagnosticDataDropDownMenuItem_Click);
             // 
             // sep2ToolStripMenuItem
             // 
             this.sep2ToolStripMenuItem.Name = "sep2ToolStripMenuItem";
             this.sep2ToolStripMenuItem.Size = new System.Drawing.Size(316, 6);
+            this.sep2ToolStripMenuItem.Visible = false;
             // 
             // sep3ToolStripMenuItem
             // 
@@ -501,7 +509,7 @@ namespace SolimarLicenseViewer
             // remoteConnectToolStripMenuItem
             // 
             this.remoteConnectToolStripMenuItem.Name = "remoteConnectToolStripMenuItem";
-            this.remoteConnectToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
+            this.remoteConnectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.remoteConnectToolStripMenuItem.Text = "Connect...";
             this.remoteConnectToolStripMenuItem.ToolTipText = "Connect to a Remote License Server";
             this.remoteConnectToolStripMenuItem.Click += new System.EventHandler(this.remoteConnectToolStripMenuItem_Click);
@@ -509,8 +517,38 @@ namespace SolimarLicenseViewer
             // remoteConnectToolStripMenuSeparator
             // 
             this.remoteConnectToolStripMenuSeparator.Name = "remoteConnectToolStripMenuSeparator";
-            this.remoteConnectToolStripMenuSeparator.Size = new System.Drawing.Size(125, 6);
+            this.remoteConnectToolStripMenuSeparator.Size = new System.Drawing.Size(149, 6);
             this.remoteConnectToolStripMenuSeparator.Visible = false;
+            // 
+            // diagnosticDataToolStripMenuItem
+            // 
+            this.diagnosticDataToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem,
+            this.loadDiagnosticDataToolStripMenuItem,
+            this.diagnosticDataToolStripMenuSeparator});
+            this.diagnosticDataToolStripMenuItem.Name = "diagnosticDataToolStripMenuItem";
+            this.diagnosticDataToolStripMenuItem.Size = new System.Drawing.Size(102, 20);
+            this.diagnosticDataToolStripMenuItem.Text = "Diagnostic Data";
+            // 
+            // generateLicenseDiagnosticDataForSolimarToolStripMenuItem
+            // 
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem.Name = "generateLicenseDiagnosticDataForSolimarToolStripMenuItem";
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem.Size = new System.Drawing.Size(319, 22);
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem.Text = "Generate License Diagnostic Data for Solimar...";
+            this.generateLicenseDiagnosticDataForSolimarToolStripMenuItem.Click += new System.EventHandler(this.genDiagnosticDataDropDownMenuItem_Click);
+            // 
+            // loadDiagnosticDataToolStripMenuItem
+            // 
+            this.loadDiagnosticDataToolStripMenuItem.Name = "loadDiagnosticDataToolStripMenuItem";
+            this.loadDiagnosticDataToolStripMenuItem.Size = new System.Drawing.Size(319, 22);
+            this.loadDiagnosticDataToolStripMenuItem.Text = "Load Diagnostic Data...";
+            this.loadDiagnosticDataToolStripMenuItem.Click += new System.EventHandler(this.loadDiagnosticDataToolStripMenuItem_Click);
+            // 
+            // diagnosticDataToolStripMenuSeparator
+            // 
+            this.diagnosticDataToolStripMenuSeparator.Name = "diagnosticDataToolStripMenuSeparator";
+            this.diagnosticDataToolStripMenuSeparator.Size = new System.Drawing.Size(316, 6);
+            this.diagnosticDataToolStripMenuSeparator.Visible = false;
             // 
             // Form1
             // 
@@ -596,6 +634,10 @@ namespace SolimarLicenseViewer
         private System.Windows.Forms.ToolStripMenuItem testConnToAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator remoteConnectToolStripMenuSeparator;
         private System.Windows.Forms.ToolStrip bottomLvToolStrip;
+        private System.Windows.Forms.ToolStripMenuItem diagnosticDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem generateLicenseDiagnosticDataForSolimarToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadDiagnosticDataToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator diagnosticDataToolStripMenuSeparator;
 
     }
 }

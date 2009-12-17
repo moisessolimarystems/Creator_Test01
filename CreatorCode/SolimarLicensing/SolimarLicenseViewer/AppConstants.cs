@@ -19,6 +19,7 @@ namespace SolimarLicenseViewer
         public static readonly String LicenseView = "License";
         public static readonly String UsageView = "Usage";
         public static readonly String FormTitle = "Solimar License Viewer";
+        public static readonly String DiagnosticDataTitle = "Solimar License Diagnostic Data Viewer";
         public static readonly String UnlimitedValue = "Unlimited";
 
 
