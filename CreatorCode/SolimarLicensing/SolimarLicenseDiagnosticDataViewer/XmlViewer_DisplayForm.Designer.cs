@@ -117,6 +117,7 @@
             this.Controls.Add(this.toolStrip1);
             this.DoubleBuffered = true;
             this.Name = "XmlViewer_DisplayForm";
+            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "Raw XML";
             this.toolStrip1.ResumeLayout(false);
