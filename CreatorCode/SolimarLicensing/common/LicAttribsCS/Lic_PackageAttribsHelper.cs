@@ -6,35 +6,33 @@ namespace Solimar.Licensing.Attribs
 {
 	public class Lic_LicenseInfoAttribsHelper
 	{
-		public static string GenerateLicenseServerName(int _customerNumber, int _destinationNumber, int _groupNumber, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType _eSWLType, int _typeIndex)
+		public static string GenerateLicenseServerName(int _customerNumber, int _destinationNumber, int _groupNumber/*, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType _eSWLType, int _typeIndex*/)
 		{
 			string displayLabel = "";
-			string licType = "U";
-			switch (_eSWLType)
-			{
-				case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
-					licType = "F";
-					break;
-				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
-				//    licType = "D";
-				//    break;
-				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
-				//    licType = "P";
-				//    break;
-				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
-				//    licType = "S";
-				//    break;
-				//case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
-				//    licType = "T";
-				//    break;
-				default:
-					//All other types 
-					licType = "S";
-					break;
-			};
+			//string licType = "U";
+			//switch (_eSWLType)
+			//{
+			//    case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover:
+			//        licType = "F";
+			//        break;
+			//    case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery:
+			//        licType = "D";
+			//        break;
+			//    case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual:
+			//        licType = "P";
+			//        break;
+			//    case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription:
+			//        licType = "S";
+			//        break;
+			//    case Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev:
+			//        licType = "T";
+			//        break;
+			//    default:
+			//        //All other types 
+			//        licType = "S";
+			//        break;
+			//};
 			//displayLabel = string.Format("{0:x4}-{1:x4}-{2}{3:d2}", _licInfoAttribs.customerID.TVal, _licInfoAttribs.softwareGroupLicenseID.TVal, licType, _licInfoAttribs.softwareLicTypeIndex.TVal);
-			string destId_Base36 = ConvertToBase36(_destinationNumber);
-			string swGrpId_Base36 = ConvertToBase36(_groupNumber);
 			/*
 			displayLabel = string.Format("{0:x3}-{1}-{2}-{3}{4}",
 				_customerNumber,
@@ -43,17 +41,30 @@ namespace Solimar.Licensing.Attribs
 				(licType==string.Empty) ? "" : licType + "-",
 				_typeIndex);
 			*/
-			displayLabel = string.Format("{0:x3}-{1}-{2}-{3}",
+			//displayLabel = string.Format("{0:x3}-{1}-{2}-{3}",
+			//    _customerNumber,
+			//    (destId_Base36.Length == 1) ? "0" + destId_Base36 : destId_Base36,
+			//    (swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
+			//    licType);
+			string destId_Base36 = ConvertToBase36(_destinationNumber);
+			string swGrpId_Base36 = ConvertToBase36(_groupNumber);
+			if (swGrpId_Base36.Length == 1)
+				swGrpId_Base36 = "00" + swGrpId_Base36;
+			else if (swGrpId_Base36.Length == 2)
+				swGrpId_Base36 = "0" + swGrpId_Base36;
+
+			displayLabel = string.Format("{0:x3}-{1}-{2}",
 				_customerNumber,
 				(destId_Base36.Length == 1) ? "0" + destId_Base36 : destId_Base36,
-				(swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
-				licType);
+				swGrpId_Base36);
+			//(swGrpId_Base36.Length == 1) ? "0" + swGrpId_Base36 : swGrpId_Base36,
+			//licType);
 
 			return displayLabel;
 		}
 		public static string GetDisplayLabel(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs)
 		{
-			return (_licInfoAttribs == null) ? "" : GenerateLicenseServerName((int)_licInfoAttribs.customerID.TVal, (int)_licInfoAttribs.destinationID.TVal, (int)_licInfoAttribs.softwareGroupLicenseID.TVal, _licInfoAttribs.softwareLicType.TVal, (int)_licInfoAttribs.softwareLicTypeIndex.TVal);
+			return (_licInfoAttribs == null) ? "" : GenerateLicenseServerName((int)_licInfoAttribs.customerID.TVal, (int)_licInfoAttribs.destinationID.TVal, (int)_licInfoAttribs.softwareGroupLicenseID.TVal/*, _licInfoAttribs.softwareLicType.TVal, (int)_licInfoAttribs.softwareLicTypeIndex.TVal*/);
 		}
 		public static string GenerateProductLicenseName(string _name, int _productLicenseIndex)
 		{
@@ -364,13 +375,54 @@ namespace Solimar.Licensing.Attribs
             #region add all override changes
             foreach (KeyValuePair<string/*contractNumber*/, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs> kvPair in contractNumberToProdInfo)
             {
-                if (kvPair.Value.bActivationCurrentOverride.TVal == true)
+                if (kvPair.Value.bActivationOverrideCurrent.TVal == true || kvPair.Value.bActivationOverrideCurrentHoursToExpire.TVal == true)
                 {
-                    slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
-                    slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaSetActivations;
-                    slotChangesInfo.contractNumber.TVal = kvPair.Key;
-                    slotChangesInfo.param1.TVal = (ushort)kvPair.Value.activationCurrent.TVal;
-                    activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+                    #region Find Activation Slot for contract number
+                    int activationSlot = -1;
+                    foreach (KeyValuePair<ushort, string> newActivitySlotIdToContractNumberPair in newActivitySlotIdToContractNumber)
+                    {
+                        if (string.Compare(kvPair.Key, newActivitySlotIdToContractNumberPair.Value, true) == 0)
+                        {
+                            activationSlot = (int)newActivitySlotIdToContractNumberPair.Key;
+                            break;
+                        }
+                    }
+                    #endregion
+                    if (activationSlot != -1)
+                    {
+                        if (kvPair.Value.bActivationOverrideCurrent.TVal == true)
+                        {
+                            //For new ContactNumbers just added, don't add command to set to 0, it is automatically 0
+                            if (!((ushort)kvPair.Value.activationOverrideCurrent.TVal == 0 && previousContractNumberToActivitySlotId.ContainsKey(kvPair.Key) == false))
+                            {
+                                slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                                slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaSetActivations;
+                                slotChangesInfo.contractNumber.TVal = kvPair.Key;
+                                slotChangesInfo.param1.TVal = (ushort)activationSlot;
+                                slotChangesInfo.param2.TVal = (ushort)kvPair.Value.activationOverrideCurrent.TVal;
+                                activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+                            }
+
+                            kvPair.Value.activationOverrideCurrent.TVal = 0;
+                            kvPair.Value.bActivationOverrideCurrent.TVal = false;
+                        }
+                        if (kvPair.Value.bActivationOverrideCurrentHoursToExpire.TVal == true)
+                        {
+                            //For new ContactNumbers just added, don't add command to set to 0, it is automatically 0
+                            if (!((ushort)kvPair.Value.activationOverrideCurrentHoursToExpire.TVal == 0 && previousContractNumberToActivitySlotId.ContainsKey(kvPair.Key) == false))
+                            {
+                                slotChangesInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs();
+                                slotChangesInfo.actionType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs.TActivitySlotChangeActionType.ascaSetHoursToExpire;
+                                slotChangesInfo.contractNumber.TVal = kvPair.Key;
+                                slotChangesInfo.param1.TVal = (ushort)activationSlot;
+                                slotChangesInfo.param2.TVal = (ushort)kvPair.Value.activationOverrideCurrentHoursToExpire.TVal;
+                                activitySlotHistInfo.activitySlotChangeInfoList.TVal.Add(slotChangesInfo);
+                            }
+
+                            kvPair.Value.activationOverrideCurrentHoursToExpire.TVal = 0;
+                            kvPair.Value.bActivationOverrideCurrentHoursToExpire.TVal = false;
+                        }
+                    }
                 }
             }
             #endregion
@@ -392,6 +444,34 @@ namespace Solimar.Licensing.Attribs
 //System.Diagnostics.Trace.WriteLine(string.Format("Slot: {0}, ContractNumber {1}", tmpSlotAttribs.activitySlotID.TVal, tmpSlotAttribs.contractNumber.TVal));
             }
             bSuccess = true;
+            return bSuccess;
+        }
+        public static bool RemoveUnusedExcess(ref Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs1)
+        {
+            bool bSuccess = false;
+            try
+            {
+                foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in _licInfoAttribs1.productList.TVal)
+                {
+                    //Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal
+                    int modIdx = 0;
+                    while (modIdx < prodInfo.moduleList.TVal.Count)
+                    {
+                        Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo = (Lic_PackageAttribs.Lic_ModuleInfoAttribs)prodInfo.moduleList.TVal[modIdx];
+                        if (modInfo.moduleValue.TVal == 0)
+                        {
+                            prodInfo.moduleList.TVal.RemoveAt(modIdx);
+                            modIdx = 0;
+                        }
+                        else
+                            modIdx++;
+                    }
+                }
+                bSuccess = true;
+            }
+            catch (Exception)
+            {
+            }
             return bSuccess;
         }
         private static bool InitializeDate(DateTime _dateTime)

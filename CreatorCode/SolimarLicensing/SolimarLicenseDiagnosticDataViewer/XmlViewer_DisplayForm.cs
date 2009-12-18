@@ -23,6 +23,7 @@ namespace SolimarLicenseDiagnosticDataViewer
                 textBox1.Text = _data;
                 textBox1.SelectionStart = 0;
                 textBox1.SelectionLength = 0;
+                TSSLabel1.Text = textBox1.Text.Length.ToString();
             }
         }
 

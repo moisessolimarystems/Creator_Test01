@@ -33,7 +33,11 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.findTSButton = new System.Windows.Forms.ToolStripButton();
             this.findTSTextBox = new System.Windows.Forms.ToolStripTextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.TSSTitleLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TSSLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox1
@@ -48,7 +52,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(284, 239);
+            this.textBox1.Size = new System.Drawing.Size(284, 217);
             this.textBox1.TabIndex = 0;
             this.textBox1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox1_KeyDown);
             // 
@@ -80,19 +84,46 @@
             this.findTSTextBox.Size = new System.Drawing.Size(200, 25);
             this.findTSTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.findTSTextBox_KeyDown);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TSSTitleLabel1,
+            this.TSSLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 242);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(284, 22);
+            this.statusStrip1.TabIndex = 3;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // TSSTitleLabel1
+            // 
+            this.TSSTitleLabel1.Name = "TSSTitleLabel1";
+            this.TSSTitleLabel1.Size = new System.Drawing.Size(50, 17);
+            this.TSSTitleLabel1.Text = "nb char:";
+            // 
+            // TSSLabel1
+            // 
+            this.TSSLabel1.Name = "TSSLabel1";
+            this.TSSLabel1.Size = new System.Drawing.Size(15, 17);
+            this.TSSLabel1.Text = "[]";
+            // 
             // XmlViewer_DisplayForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 264);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);
+            this.DoubleBuffered = true;
             this.Name = "XmlViewer_DisplayForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = "Raw XML";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -104,5 +135,8 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton findTSButton;
         private System.Windows.Forms.ToolStripTextBox findTSTextBox;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel TSSTitleLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel TSSLabel1;
     }
 }
