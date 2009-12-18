@@ -91,7 +91,8 @@ namespace SolimarLicenseViewer
             // If is a child form, then prompt for server to connect to
             // If not a child form, connect to local host by default.  Handle case when no license
             // server is on local machine
-            if (m_bIsChildForm)
+            #region if (!bViewDiagnosticData && m_bIsChildForm)
+            if (!m_bViewDiagnosticData && m_bIsChildForm)
             {
                 //using keyword forces scope onto object, so it will be disposed after it is done.
                 DisconnectServer();
@@ -118,7 +119,7 @@ namespace SolimarLicenseViewer
                         }
 
                         if (this.parentForm is SolimarLicenseViewer.Form1)
-                            (this.parentForm as SolimarLicenseViewer.Form1).setChildInformation(this, m_CommLink.ServerName);
+                            (this.parentForm as SolimarLicenseViewer.Form1).setChildInformation(this, m_CommLink.ServerName, true);
                     }
                     else
                     {
@@ -127,11 +128,25 @@ namespace SolimarLicenseViewer
                     }
                 }
             }
-            else //connect to local host
+            #endregion
+            #region else //connect machine
+            else
             {
-                string machineName = System.Environment.MachineName.ToLower();
-                ConnectionStatusLabel.Text = "Connecting";
-                this.Text = string.Format("Connecting to [{0}]...", machineName);
+                string machineName = "";
+                if (m_bViewDiagnosticData)
+                {
+                    machineName = m_CommLink.ServerName;
+                    ConnectionStatusLabel.Text = "Loading Diagnostic Data";
+                    this.Text = string.Format("Loading Diagnostic Data[{0}]...", m_diagnosticDataFileName);
+                    if (this.parentForm is SolimarLicenseViewer.Form1)
+                        (this.parentForm as SolimarLicenseViewer.Form1).setChildInformation(this, string.Format("Diagnostic Data - {0}", this.m_diagnosticDataFileName), false);
+                }
+                else
+                {
+                    machineName = System.Environment.MachineName.ToLower();
+                    ConnectionStatusLabel.Text = "Connecting";
+                    this.Text = string.Format("Connecting to [{0}]...", machineName);
+                }
                 try
                 {
                     m_CommLink.Connect(machineName, false);
@@ -141,10 +156,14 @@ namespace SolimarLicenseViewer
                     m_CommLink.ServerName = machineName;
                 }
             }
+            #endregion
 
             try
             {
-                this.Text = string.Format("Connecting to [{0}]...", m_CommLink.ServerName);
+                if (m_bViewDiagnosticData)
+                    this.Text = string.Format("Loading Diagnostic Data[{0}]...", m_diagnosticDataFileName);
+                else
+                    this.Text = string.Format("Connecting to [{0}]...", m_CommLink.ServerName);
 
                 //create treeview manager
                 m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, this.bottomLvToolStrip, m_CommLink);
@@ -174,11 +193,23 @@ namespace SolimarLicenseViewer
                     licSvrVer = "";
                 }
 
-                this.Text = string.Format("{0} [{1}]{2}{3}",
-                    AppConstants.FormTitle,
-                    m_CommLink.ServerName,
-                    licSvrVer.Length == 0 ? "" : " - version: ",
-                    licSvrVer.Length == 0 ? "" : licSvrVer);
+                if (!m_bViewDiagnosticData)
+                {
+                    this.Text = string.Format("{0} [{1}]{2}{3}",
+                        AppConstants.FormTitle,
+                        m_CommLink.ServerName,
+                        licSvrVer.Length == 0 ? "" : " - version: ",
+                        licSvrVer.Length == 0 ? "" : licSvrVer);
+                }
+                else
+                {
+                    this.Text = string.Format("{0} [{1}] - created date: {2}",
+                        AppConstants.DiagnosticDataTitle,
+                        m_diagnosticDataFileName,
+                        m_CommLink.diagnosticDateCreatedDate.Value.ToLocalTime().ToString()
+                        );
+
+                }
 
                 if (m_CommLink.Exception != null)
                 {
@@ -201,6 +232,7 @@ namespace SolimarLicenseViewer
         {
             fileLicenseToolStripMenuItem.Enabled = status;
             viewToolStripMenuItem.Enabled = status;
+            diagnosticDataToolStripMenuItem.Enabled = status;
         }
 
         private void EnterProtectionKeyPacket()
@@ -401,6 +433,11 @@ namespace SolimarLicenseViewer
                 bSelectedItem = (this.noFlickerListView.SelectedItems.Count > 0);
             }
 
+            if (m_CommLink.bDiagnosticDateView)//for diagnostic view, hide ability to extend
+            {
+                bDisplayExtendOption = false;
+                extendToolStripMenuItem.Visible = false;
+            }
             extendToolStripMenuItem.Visible = bDisplayExtendOption;
             extendToolStripSeparator.Visible = bDisplayExtendOption;
             if (bDisplayExtendOption)
@@ -462,7 +499,10 @@ namespace SolimarLicenseViewer
                     this.noFlickerListView.SelectedItems[0].Text, //product license number
                     (int)objArray[1], //activationCurrent
                     (int)objArray[2], //activationTotal
-                    (int)objArray[3]);//activationAmountInDays
+                    (int)objArray[3], //activationAmountInDays
+                    (DateTime)objArray[4],
+                    (DateTime)objArray[5]
+                    );
 
 
                 //useActivationInternal(tmpToolStripItem.Text, objArray[0], objArray[1], objArray[2], objArray[3]);
@@ -706,14 +746,15 @@ namespace SolimarLicenseViewer
                 genLicArchiveOnLicenseDropDownMenuItem.DropDownItems.Add(genLicArchiveSortedList[swLic]);
 
             updateLicToolStripMenuItem.Visible = bAtleastOneSoftwareServer;
-            genVerificationOnLicenseDropDownMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
-            sep2ToolStripMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
+            //genVerificationOnLicenseDropDownMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
+            //sep2ToolStripMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
 
             genLicArchiveOnLicenseDropDownMenuItem.Visible = genLicArchiveOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
 
             useActivationOnLicenseDropDownMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
             sep3ToolStripMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
         }
+
 
         void tsGenLicArchiveMenuItem_Click(object sender, EventArgs e)
         {
@@ -872,28 +913,67 @@ namespace SolimarLicenseViewer
                     tmpToolStripItem.Text, //software license
                     (int)objArray[1], //activationCurrent
                     (int)objArray[2], //activationTotal
-                    (int)objArray[3]);//activationAmountInDays
+                    (int)objArray[3], //activationAmountInDays
+                    (DateTime)objArray[4],
+                    (DateTime)objArray[5]
+                    );
             }
         }
-        private void useActivationInternal(string _softwareLicense, string _productLicenseNumber, int _activationCurrent, int _activationTotal, int _activationAmountInDays)
+        private void useActivationInternal(string _softwareLicense, string _productLicenseNumber, int _activationCurrent, int _activationTotal, int _activationAmountInDays, DateTime _activationCurrentExpirationDate, DateTime _activationOverallExpirationDate)
         {
-            string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _productLicenseNumber, _activationAmountInDays);
-            if (MessageBox.Show(this, message, "Activate Product License: " + _productLicenseNumber, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            //string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _productLicenseNumber, _activationAmountInDays);
+            DateTime origDateTime = DateTime.Now.ToUniversalTime();
+            DateTime currDateTime = new DateTime(origDateTime.Year, origDateTime.Month, origDateTime.Day, origDateTime.Hour+1, 0, 0);
+            //string message = string.Format(
+            //    "[{0}] - [{1}] - [{2}] - [{3}] - [{4}] - [{5}] - [{6}] - [{7}]",
+            //    _softwareLicense,
+            //    _productLicenseNumber, 
+            //    _activationCurrent, 
+            //    _activationTotal, 
+            //    _activationAmountInDays, 
+            //    _activationCurrentExpirationDate.ToLocalTime().ToString(),
+            //    _activationOverallExpirationDate.ToLocalTime().ToString(),
+            //    currDateTime.ToLocalTime().ToString()
+            //    );
+            
+            if (currDateTime.CompareTo(_activationCurrentExpirationDate) < 0)
+                currDateTime = _activationCurrentExpirationDate;
+            DateTime newExpDate = currDateTime.AddDays(_activationAmountInDays);
+            if (_activationOverallExpirationDate.CompareTo(newExpDate) < 0)
+                newExpDate = _activationOverallExpirationDate;
+
+            string message = "";
+            if (_activationCurrentExpirationDate.CompareTo(newExpDate) >= 0)
             {
-                try
+                message = "The Current Activation Expiration Date cannot exceed the Product License Expiration Date.";
+                MessageBox.Show(this, message, "Activate Product License: " + _productLicenseNumber, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                message = string.Format(
+                        "You are on activation {0} of {1} for Product License: {2}. The Current Activation will be valid until: {3}. Are you sure you want to use an Activation?",
+                        _activationCurrent,
+                        _activationTotal,
+                        _productLicenseNumber,
+                        newExpDate.ToLocalTime().ToString()
+                    );
+                if (MessageBox.Show(this, message, "Activate Product License: " + _productLicenseNumber, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    //throw new COMException(message);
-                    this.Cursor = Cursors.WaitCursor;
-                    m_CommLink.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(_softwareLicense, _productLicenseNumber);
-                    refreshToolStripButton_Click(null, new EventArgs());
-                }
-                catch (Exception ex)
-                {
-                    HandleExceptions.DisplayException(this, ex, "Failed to Activate License!", "Activate License");
-                }
-                finally
-                {
-                    this.Cursor = Cursors.Default;
+                    try
+                    {
+                        //throw new COMException(message);
+                        this.Cursor = Cursors.WaitCursor;
+                        m_CommLink.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(_softwareLicense, _productLicenseNumber);
+                        refreshToolStripButton_Click(null, new EventArgs());
+                    }
+                    catch (Exception ex)
+                    {
+                        HandleExceptions.DisplayException(this, ex, "Failed to Activate License!", "Activate License");
+                    }
+                    finally
+                    {
+                        this.Cursor = Cursors.Default;
+                    }
                 }
             }
         }
@@ -935,10 +1015,34 @@ namespace SolimarLicenseViewer
             newForm.setAsChildForm(true, this);
             newForm.Show();
         }
+        private void loadDiagnosticDataToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //OpenFileDialog
+            this.importPktDialog.DefaultExt = "lsData";
+            this.importPktDialog.Filter = "License System Data|*.lsData";
+            this.importPktDialog.Title = "License System Data";
+            this.importPktDialog.InitialDirectory = m_selectedDirectory;
+            if (importPktDialog.ShowDialog() == DialogResult.OK)
+            {
+                m_selectedDirectory = System.IO.Path.GetDirectoryName(this.importPktDialog.FileName);
+                SolimarLicenseViewer.Form1 newForm = new Form1();
+                //Extract all the bytes out of this.importPktDialog.FileName
+                newForm.setDiagnosticData(m_CommLink.ServerName, System.IO.File.ReadAllBytes(this.importPktDialog.FileName), this.importPktDialog.FileName);
+                newForm.setAsChildForm(true, this);
+                newForm.Show();
+            }
+        }
         public void setAsChildForm(bool _bTreatAsChildForm, object _sender)
         {
             m_bIsChildForm = _bTreatAsChildForm;
+            if (m_CommLink.bDiagnosticDateView)
+            {
+                fileLicenseToolStripMenuItem.Visible = false;
+                viewToolStripMenuItem.Visible = false;
+                diagnosticDataToolStripMenuItem.Visible = false;
 
+            }
+            loadDiagnosticDataToolStripMenuItem.Visible = !m_bIsChildForm;
             remoteServerToolStripMenuItem.Visible = !m_bIsChildForm;
             this.ShowInTaskbar = !m_bIsChildForm;
             this.parentForm = _sender as Form;
@@ -946,15 +1050,22 @@ namespace SolimarLicenseViewer
             this.MaximizeBox = false;
             //this.Shown += new System.EventHandler(this.ConnectMenuItem_Click);
         }
-        public void setChildInformation(object _sender, string _serverName)
+        public void setChildInformation(object _sender, string _serverName, bool bRemoteServer)
         {
             ToolStripMenuItem tsItem = new ToolStripMenuItem(_serverName);
             tsItem.Tag = _sender;
             tsItem.Name = tsItem.Text;
             tsItem.Click += new EventHandler(FindRemoteLicenseViewUI_Click);
-            remoteServerToolStripMenuItem.DropDownItems.Add(tsItem);
-
-            remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
+            if (bRemoteServer)
+            {
+                remoteServerToolStripMenuItem.DropDownItems.Add(tsItem);
+                remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
+            }
+            else
+            {
+                diagnosticDataToolStripMenuItem.DropDownItems.Add(tsItem);
+                diagnosticDataToolStripMenuSeparator.Visible = diagnosticDataToolStripMenuItem.DropDownItems.Count > 3;
+            }
         }
         public void childFormClose(object _sender, string _serverName)
         {
@@ -971,8 +1082,35 @@ namespace SolimarLicenseViewer
             if (removeTsItem != null)
                 remoteServerToolStripMenuItem.DropDownItems.Remove(removeTsItem);
 
+            if (removeTsItem == null)
+            {
+                for (int idx = 0; idx < diagnosticDataToolStripMenuItem.DropDownItems.Count; idx++)
+                {
+                    if (diagnosticDataToolStripMenuItem.DropDownItems[idx] is ToolStripMenuItem &&
+                        diagnosticDataToolStripMenuItem.DropDownItems[idx].Tag == _sender)
+                    {
+                        removeTsItem = diagnosticDataToolStripMenuItem.DropDownItems[idx] as ToolStripMenuItem;
+                        break;
+                    }
+                }
+                if (removeTsItem != null)
+                    diagnosticDataToolStripMenuItem.DropDownItems.Remove(removeTsItem);
+            }
+
             remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
+            diagnosticDataToolStripMenuSeparator.Visible = diagnosticDataToolStripMenuItem.DropDownItems.Count > 3;
         }
+
+        //Use this to view the license info diagnostic data
+        public void setDiagnosticData(string _serverName, Byte[] _diagnosticDataByteArray, string _diagnosticDataFileName)
+        {
+            m_CommLink.ServerName = _serverName;
+            m_CommLink.SetData(_diagnosticDataByteArray);
+            m_diagnosticDataFileName = _diagnosticDataFileName;
+            m_bViewDiagnosticData = true;
+        }
+        private bool m_bViewDiagnosticData = false;
+        private string m_diagnosticDataFileName = "";
 
         void FindRemoteLicenseViewUI_Click(object sender, EventArgs e)
         {
@@ -984,7 +1122,6 @@ namespace SolimarLicenseViewer
             }
         }
         private Form parentForm = null;
-
     }
 
     //Was lazy, this should be in it's own file - JWL... 
