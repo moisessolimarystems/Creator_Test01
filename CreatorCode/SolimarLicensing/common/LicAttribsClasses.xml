@@ -199,11 +199,13 @@
 			<attrib type="DateTime" name="expirationDate" tagname="eDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="unsigned __int32" name="activationTotal" tagname="aT" default="0"/>  
 			<attrib type="unsigned __int32" name="activationCurrent" tagname="aC" default="0"/>  
-			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/>  
-			<attrib type="bool" name="bActivationCurrentOverride" tagname="bAC" default="false"/> 
+			<attrib type="unsigned __int32" name="activationAmountInDays" tagname="aA" default="0"/> 
+			<attrib type="unsigned __int32" name="activationOverrideCurrent" tagname="aOC" default="0"/>  
+			<attrib type="unsigned __int32" name="activationOverrideCurrentHoursToExpire" tagname="aOE" default="0"/> 
+			<attrib type="bool" name="bActivationOverrideCurrent" tagname="bAC" default="false"/> 
+			<attrib type="bool" name="bActivationOverrideCurrentHoursToExpire" tagname="bAO" default="false"/> 
 			<attrib type="bool" name="bUseActivations" tagname="bUA" default="false"/> 
 			<attrib type="bool" name="bUseExpirationDate" tagname="bUE" default="true"/> 
-			<!--<attrib type="bool" name="bActivationCurrentExpirationDateOverride" tagname="bACE" default="false"/> -->
 			<attrib type="string" name="contractNumber" tagname="cN" default=""/>
 			<typedef type="enum" name="TProductState">
 				<enum name="psLicensed" value="0" alias="Licensed"/>
@@ -443,11 +445,46 @@
 		<attrib type="list(string)" name="systemUuidList" tagname="sULt" default="" />
 	</AttribsClass>
 
+	<AttribsClass code_class_name="Lic_UsageInfoAttribs" name="L_UsInA" descriptive_name="License Usage Info Attributes" base="" filename="Lic_UsageInfoAttribs">
+		<typedef type="class" name="Lic_UsModuleInfoAttribs">
+		<AttribsClass code_class_name="Lic_UsModuleInfoAttribs" name="L_UMA" descriptive_name="License Information - Usage Module Attributes" base="">
+			<attrib type="unsigned __int32" name="moduleID" tagname="mI" default="0"/>
+			<attrib type="unsigned __int32" name="moduleUsage" tagname="mU" default="0"/>
+			<attrib type="unsigned __int32" name="moduleTotal" tagname="mT" default="0"/>
+		</AttribsClass>
+		</typedef>
+		
+		<typedef type="class" name="Lic_UsAppInstanceInfoAttribs">
+		<AttribsClass code_class_name="Lic_UsAppInstanceInfoAttribs" name="L_UAA" descriptive_name="License Information - Usage App Instance Attributes" base="">
+			<attrib type="string" name="applicationInstance" tagname="aI" default=""/>
+			<typedef type="collection" name="Lic_UsModuleInfoAttribsList">
+				<List value_type="Lic_UsModuleInfoAttribs"/>
+			</typedef>
+			<attrib type="Lic_UsModuleInfoAttribsList" name="moduleList" tagname="mLt" default="" />
+		</AttribsClass>
+		</typedef>
+		
+		<typedef type="class" name="Lic_UsProductInfoAttribs">
+		<AttribsClass code_class_name="Lic_UsProductInfoAttribs" name="L_UPA" descriptive_name="License Information - Usage Product Attributes" base="">
+			<attrib type="unsigned __int32" name="productID" tagname="pI" default="0"/>
+			<typedef type="collection" name="Lic_UsAppInstanceInfoAttribsList">
+				<List value_type="Lic_UsAppInstanceInfoAttribs"/>
+			</typedef>
+			<attrib type="Lic_UsAppInstanceInfoAttribsList" name="appInstanceList" tagname="aLt" default="" />
+		</AttribsClass>
+		</typedef>
+		
+		<typedef type="collection" name="Lic_UsProductInfoAttribsList">
+			<List value_type="Lic_UsProductInfoAttribs"/>
+		</typedef>
+		<attrib type="Lic_UsProductInfoAttribsList" name="productList" tagname="pLt" default="" />
+	</AttribsClass>
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
 		<attrib type="string" name="Streamed_ServerDataAttribs" tagname="sD" default="" />
 		<attrib type="string" name="Streamed_SystemInfoAttribs" tagname="sI" default="" />
 		<attrib type="string" name="Streamed_SoftwareSpecAttribs" tagname="sS" default="" />
+		<attrib type="string" name="Streamed_UsageInfoAttribs" tagname="sU" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>

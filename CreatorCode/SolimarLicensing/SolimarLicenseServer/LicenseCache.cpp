@@ -59,9 +59,59 @@ HRESULT LicenseCacheByProduct::GetCache(Lic_PackageAttribs::Lic_ProductInfoAttri
 			licModAttrib.moduleAppInstance = licensesAppInstanceTotalMap[modLicMapIt->first];
 			pProdInfo->moduleList->push_back(licModAttrib);
 		}
-		
+ 	}
+	return hr;
+}
+HRESULT LicenseCacheByProduct::GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs* pProdUsageInfo)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(licenseUseCacheByProductLock);
+	pProdUsageInfo->productID = productID;
 
-	//pProdInfo.moduleList
+	Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs::TVector_Lic_UsAppInstanceInfoAttribsList::iterator usAppInIt = pProdUsageInfo->appInstanceList->begin();
+	for(LicenseToModuleUseList::iterator licenseToModUseListIt = licenseToModUseList.begin();
+		licenseToModUseListIt != licenseToModUseList.end();
+		licenseToModUseListIt++)
+	{
+		while(usAppInIt != pProdUsageInfo->appInstanceList->end())
+		{
+			if(_wcsicmp(licenseToAppInstList[licenseToModUseListIt->first], std::wstring(usAppInIt->applicationInstance).c_str()) == 0)
+				break;
+			usAppInIt++;
+		}
+
+		if(usAppInIt == pProdUsageInfo->appInstanceList->end())	//Object not found, add
+		{
+			Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInInfo;
+			usAppInInfo.applicationInstance = std::wstring(licenseToAppInstList[licenseToModUseListIt->first]);
+			pProdUsageInfo->appInstanceList->push_back(usAppInInfo);
+			usAppInIt = pProdUsageInfo->appInstanceList->end();
+			usAppInIt--;
+		}
+
+		for(ModuleLicenseMap::iterator modUseListIt = licenseToModUseListIt->second.begin();
+			modUseListIt != licenseToModUseListIt->second.end();
+			modUseListIt++)
+		{
+			Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::TVector_Lic_UsModuleInfoAttribsList::iterator modIt = usAppInIt->moduleList->begin();
+			while(modIt != usAppInIt->moduleList->end())
+			{
+				if(int(modUseListIt->first) == int(modIt->moduleID))
+					break;
+				modIt++;
+			}
+			if(modIt == usAppInIt->moduleList->end())
+			{
+				Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs modUsInfo;
+				modUsInfo.moduleID = int(modUseListIt->first);
+				modUsInfo.moduleUsage = 0;
+				usAppInIt->moduleList->push_back(modUsInfo);
+				modIt = usAppInIt->moduleList->end();
+				modIt--;
+			}
+			modIt->moduleUsage = int(modIt->moduleUsage) + int(modUseListIt->second);
+		}
+		
 
 	}
 	return hr;
@@ -481,7 +531,7 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 			}
 		}
 
-				int licObtainAmount = licenseCount;
+		int licObtainAmount = licenseCount;
 
 		//if module has an unlimited amount
 		int modSpecUnlimitedValue = 0;
@@ -817,10 +867,10 @@ HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfo
 				prodIt != (*licInfoAttribIt)->productList->end();
 				prodIt++)
 		{
-			if(productCacheMap.find((*prodIt).productID) == productCacheMap.end())	//Add new item if needed.
-				productCacheMap[(*prodIt).productID] = new LicenseCacheByProduct();
+			if(productCacheMap.find(int((*prodIt).productID)) == productCacheMap.end())	//Add new item if needed.
+				productCacheMap[int((*prodIt).productID)] = new LicenseCacheByProduct();
 
-			productCacheMap[(*prodIt).productID]->RefreshCache(&(*prodIt), bLicSvrClockViolation);
+			productCacheMap[int((*prodIt).productID)]->RefreshCache(&(*prodIt), bLicSvrClockViolation);
 		}
 	}
 
@@ -852,7 +902,27 @@ HRESULT LicenseCache::GetCache(Lic_PackageAttribs::Lic_LicenseInfoAttribs* pLicI
 		hr = prodCacheMapIt->second->GetCache(&prodInfoAttibs);
 		if(FAILED(hr))
 			continue;
-		pLicInfo->productList->push_back(prodInfoAttibs);
+		if(int(prodInfoAttibs.productID) != 0)
+			pLicInfo->productList->push_back(prodInfoAttibs);
+	}
+	return hr;
+}
+
+HRESULT LicenseCache::GetUsage(Lic_UsageInfoAttribs* pLicUsageInfo)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(licenseUseCacheLock);
+	for(LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.begin();
+		prodCacheMapIt != productCacheMap.end();
+		prodCacheMapIt++)
+	{
+		Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs usProdInfoAttibs;
+		hr = prodCacheMapIt->second->GetUsage(&usProdInfoAttibs);
+		if(FAILED(hr))
+			continue;
+		
+		if(int(usProdInfoAttibs.productID) != 0 && usProdInfoAttibs.appInstanceList->size() != 0)
+			pLicUsageInfo->productList->push_back(usProdInfoAttibs);
 	}
 	return hr;
 }

@@ -388,6 +388,19 @@ namespace SolimarLicenseDiagnosticDataViewer
                     m_guidToFormMap.Add(childNode.Tag as string, licSysInfoAttribsForm);
                     rootNode.Nodes.Add(childNode);
 
+                    //Lic_UsageInfoAttribs_DisplayForm
+                    childNode = new TreeNode("Lic_UsageInfoAttribs");
+                    childNode.Tag = Guid.NewGuid().ToString();
+                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    Lic_UsageInfoAttribs tmpUsaInfoAttrib = new Lic_UsageInfoAttribs();
+                    tmpUsaInfoAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_UsageInfoAttribs);
+                    Lic_UsageInfoAttribs_DisplayForm licUsageInfoAttribsForm = new Lic_UsageInfoAttribs_DisplayForm();
+                    licUsageInfoAttribsForm.SetData(tmpUsaInfoAttrib, m_loadedLicSysAttribs.createdDate.TVal);
+                    licUsageInfoAttribsForm.MdiParent = this;
+                    licUsageInfoAttribsForm.Show();
+                    m_guidToFormMap.Add(childNode.Tag as string, licUsageInfoAttribsForm);
+                    rootNode.Nodes.Add(childNode);
+
                     childNode = new TreeNode("Lic_SoftwareSpecAttribs");
                     childNode.Tag = Guid.NewGuid().ToString();
                     childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
@@ -399,7 +412,6 @@ namespace SolimarLicenseDiagnosticDataViewer
                     licSoftwareSpecAttribsForm.Show();
                     m_guidToFormMap.Add(childNode.Tag as string, licSoftwareSpecAttribsForm);
                     rootNode.Nodes.Add(childNode);
-
 
                     childNode = new TreeNode("List of Lic_KeyAttribs");
                     toolTipBuilder.Append(string.Format("\r\nList of Lic_KeyAttribs: {0}", m_loadedLicSysAttribs.ListOfStreamed_KeyAttribs.TVal.Count));
@@ -431,6 +443,7 @@ namespace SolimarLicenseDiagnosticDataViewer
                     {
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfoAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
                         tmpLicInfoAttribs.AssignMembersFromStream(streamedLicInfoAttrib);
+
                         string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicInfoAttribs);
                         TreeNode tmpNode = new TreeNode(softwareLicense);
                         tmpNode.Tag = Guid.NewGuid().ToString();
@@ -447,8 +460,6 @@ namespace SolimarLicenseDiagnosticDataViewer
                         //tmpLicInfoAttribs.
                     }
                     rootNode.Nodes.Add(childNode);
-
-
 
                     childNode = new TreeNode("Raw XML");
                     childNode.Tag = Guid.NewGuid().ToString();
@@ -513,6 +524,69 @@ namespace SolimarLicenseDiagnosticDataViewer
 
                 if (tmpLicPackage != null)
                 {
+                    //YYY For testing, set override activations here
+                    //int tmpInt = 0;
+                    //foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in tmpLicPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+                    //{
+                    //    if (prodInfo.bUseActivations.TVal == true)
+                    //    {
+                    //        if (tmpInt++ == 2)
+                    //        {
+                    //            prodInfo.bActivationOverrideCurrent.TVal = true;
+                    //            prodInfo.activationOverrideCurrent.TVal = 99;
+                    //            prodInfo.bActivationOverrideCurrentHoursToExpire.TVal = true;
+                    //            prodInfo.activationOverrideCurrentHoursToExpire.TVal = 24;
+                    //            break;
+                    //        }
+                    //    }
+                    //}
+                    //Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs tmpProdInfo = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
+                    //tmpProdInfo.activationAmountInDays.TVal = 1;
+                    //tmpProdInfo.bUseActivations.TVal = true;
+                    //tmpProdInfo.activationTotal.TVal = 5;
+                    //tmpProdInfo.contractNumber.TVal = "Q1";
+                    //tmpProdInfo.bActivationOverrideCurrent.TVal = true;
+                    //tmpProdInfo.activationOverrideCurrent.TVal = 123;
+                    //tmpProdInfo.bActivationOverrideCurrentHoursToExpire.TVal = true;
+                    //tmpProdInfo.activationOverrideCurrentHoursToExpire.TVal = 24;
+                    //tmpProdInfo.productID.TVal = 10;
+                    //tmpLicPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(tmpProdInfo);
+
+                    //tmpProdInfo = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
+                    //tmpProdInfo.productID.TVal = 10;
+                    //tmpProdInfo.activationAmountInDays.TVal = 2;
+                    //tmpProdInfo.bUseActivations.TVal = true;
+                    //tmpProdInfo.activationTotal.TVal = 0;
+                    //tmpProdInfo.bActivationOverrideCurrentHoursToExpire.TVal = true;
+                    //tmpProdInfo.activationOverrideCurrentHoursToExpire.TVal = 0;
+                    //tmpProdInfo.contractNumber.TVal = "Q2";
+                    //tmpProdInfo.bActivationOverrideCurrent.TVal = true;
+                    //tmpProdInfo.activationOverrideCurrent.TVal = 0;
+                    //tmpLicPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(tmpProdInfo);
+                    //Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfo = tmpLicPackage.licLicenseInfoAttribs.TVal;
+                    //Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref tmpLicInfo);
+                    //tmpLicPackage.licLicenseInfoAttribs.TVal = tmpLicInfo;
+
+                    //Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfo = tmpLicPackage.licLicenseInfoAttribs.TVal;
+                    //{
+                    //    XmlViewer_DisplayForm xmlForm3 = new XmlViewer_DisplayForm();
+                    //    xmlForm3.SetData(tmpLicInfo.Stream);
+                    //    xmlForm3.MdiParent = this;
+                    //    xmlForm3.Show();
+                    //    xmlForm3.WindowState = FormWindowState.Minimized;
+                    //}
+                    //Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.RemoveUnusedExcess(ref tmpLicInfo);
+                    //{
+                    //    XmlViewer_DisplayForm xmlForm2 = new XmlViewer_DisplayForm();
+                    //    xmlForm2.SetData(tmpLicInfo.Stream);
+                    //    xmlForm2.MdiParent = this;
+                    //    xmlForm2.Show();
+                    //    xmlForm2.WindowState = FormWindowState.Minimized;
+                    //}
+                    
+                    ////YYY End
+                    
+
                     //Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfoAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
                     //tmpLicInfoAttribs.AssignMembersFromStream(streamedLicInfoAttrib);
                     string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicPackage.licLicenseInfoAttribs);

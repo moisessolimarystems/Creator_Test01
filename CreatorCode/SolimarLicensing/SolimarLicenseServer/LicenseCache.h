@@ -4,7 +4,7 @@
 #include <list>
 #include "..\Common\SafeMutex.h"
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
-
+#include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
 
 class LicenseCacheByProduct
 {
@@ -13,6 +13,7 @@ class LicenseCacheByProduct
 		~LicenseCacheByProduct();
 
 		HRESULT GetCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
+		HRESULT GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs* pProdUsageInfo);
 
 		// bLicSvrClockViolation is true when the current system time is before the last touch time, user has set their system clock backwards in time.
 		HRESULT RefreshCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo, bool bLicSvrClockViolation);
@@ -96,6 +97,7 @@ class LicenseCache
 		HRESULT RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation);
 		HRESULT GetCache_ByProduct(long productID, Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
 		HRESULT GetCache(Lic_PackageAttribs::Lic_LicenseInfoAttribs* pLicInfo);
+		HRESULT GetUsage(Lic_UsageInfoAttribs* pLicUsageInfo);
 		HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec);
 
 		HRESULT ModuleEnumerate(long productID, VARIANT *pvtModuleList);

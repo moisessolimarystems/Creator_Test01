@@ -892,6 +892,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
+				>
+			</File>
+			<File
 				RelativePath="..\common\LicAttribsCPP\LicAttribsBase.h"
 				>
 			</File>
