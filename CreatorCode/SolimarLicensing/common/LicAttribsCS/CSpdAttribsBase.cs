@@ -620,9 +620,12 @@ namespace Solimar
 				{
 					((ArrayList)m_tVal).Clear();
 					//foreach (System.Xml.XmlNode child in node.ChildNodes)
-					foreach (System.Xml.XmlNode child in node.FirstChild.ChildNodes)
+					if (node.FirstChild != null)
 					{
-						((ArrayList)m_tVal).Add(child.InnerText);
+						foreach (System.Xml.XmlNode child in node.FirstChild.ChildNodes)
+						{
+							((ArrayList)m_tVal).Add(child.InnerText);
+						}
 					}
 				}
                 protected override void AssignFromObject(object ovalue)
