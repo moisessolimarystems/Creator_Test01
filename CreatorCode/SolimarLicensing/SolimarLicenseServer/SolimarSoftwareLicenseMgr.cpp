@@ -179,29 +179,32 @@ HRESULT SoftwareLicenseMgr::ValidateHardwareKeyID(_bstr_t bstrValidationValue)
 	}
 	return hr;
 }
-HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, bool bCheckProtectionKey)
+HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID)
 {
 	HRESULT hr(LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE);
 //wchar_t debug_buf[1024];
 	SafeMutex mutex(softwareLicenseMgrLock);
 
 	//Determine if the license code should be on the protection key, or on the system.
-	bool bVerifyOnProtectionKey(false);
-	_bstr_t keyID = L"";
+	bool bVerifyOnProtectionKey = _wcsicmp(bstrKeyID, L"") != 0;
+	_bstr_t keyID = bstrKeyID;
 	
-	for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
-			valTokenIT != m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
-			valTokenIT++)
+	if(bVerifyOnProtectionKey == false)
 	{
-		if((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID)
+		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->begin();
+				valTokenIT != m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
+				valTokenIT++)
 		{
-			keyID = _bstr_t(valTokenIT->tokenValue->c_str());
-			bVerifyOnProtectionKey = true;
-			break;
+			if((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID)
+			{
+				keyID = _bstr_t(valTokenIT->tokenValue->c_str());
+				bVerifyOnProtectionKey = true;
+				break;
+			}
 		}
 	}
 
-	if(bVerifyOnProtectionKey || bCheckProtectionKey)	//Look for license code on protection key
+	if(bVerifyOnProtectionKey)	//Look for license code on protection key
 	{
 		if(_wcsicmp(keyID, L"") == 0)
 		{
@@ -1536,9 +1539,6 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 						{
 							if(_wcsicmp(wstrProdLicNum.c_str(), std::wstring(aSlotIt->contractNumber).c_str()) == 0)
 							{
-								if(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bActivationCurrentOverride == false)
-									tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationCurrent = unsigned short(keyAttrib.activationInfoList->at(aSlotIt->activitySlotID).activationSlotCurrentActivation);
-
 								time_t newExpDateTimeT = keyCurrentTimeT + (keyAttrib.activationInfoList->at(aSlotIt->activitySlotID).activationSlotHoursToExpire * TimeHelper::ONE_HOUR_IN_SECONDS);
 								SYSTEMTIME tmpSystime;
 								VARIANT tmpVt;
@@ -1546,6 +1546,9 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 								VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
 								wchar_t timestamp[256];
 								TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+								if(bool(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).bActivationOverrideCurrent) == false)
+									tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationCurrent = keyAttrib.activationInfoList->at(aSlotIt->activitySlotID).activationSlotCurrentActivation;
+
 								tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.productList->at(idx).activationCurrentExpirationDate = std::wstring(timestamp);
 								break;
 							}
@@ -1730,12 +1733,12 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
 							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
 							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:	//Don't implement
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:
 							//Param 1 == activity slot
 							//Param 2 == new activations
 							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = int(actSlotChangeIt->param2);
 							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire://Don't implement
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire:
 							//Param 1 == activity slot
 							//Param 2 == new hours to expire
 							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = int(actSlotChangeIt->param2);
@@ -2078,9 +2081,8 @@ wchar_t debug_buf[1024];
 		if(pActInfoAttribs == NULL)
 			throw E_INVALIDARG;
 
-		// Base new expiration date off the keys expiration date only, think about giving an hour
+		// Base new expiration date off the keys expiration date only
 		unsigned short activationSlotHoursToExpire = unsigned short(pActInfoAttribs->activationSlotHoursToExpire);
-
 		time_t curTimeT = time(NULL);	//Retrieves Universal Time
 		SYSTEMTIME currentExpiresDateSystime;
 		if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.currentDate)).c_str(), currentExpiresDateSystime))
@@ -2103,8 +2105,32 @@ wchar_t debug_buf[1024];
 		time_t newExpiresDateTimeT = curExpiresDateTimeT + (activationSlotHoursToExpire * TimeHelper::ONE_HOUR_IN_SECONDS);
 
 		//if activating for the first time, give an hour
-		newExpiresDateTimeT += ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_SECONDS) + ((activationSlotHoursToExpire==0) ? TimeHelper::ONE_HOUR_IN_SECONDS : 0);
-		pActInfoAttribs->activationSlotHoursToExpire = activationSlotHoursToExpire + ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_HOURS) + ((activationSlotHoursToExpire==0) ? 1 : 0);
+		time_t newKeyExpireDateTimeT = newExpiresDateTimeT + ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_SECONDS) + ((activationSlotHoursToExpire==0) ? TimeHelper::ONE_HOUR_IN_SECONDS : 0);
+		unsigned short newKeyHoursToExpire = activationSlotHoursToExpire + ((int)pTmpProdInfo->activationAmountInDays * TimeHelper::ONE_DAY_IN_HOURS) + ((activationSlotHoursToExpire==0) ? 1 : 0);
+
+		//Don't let the activation expiration date go beyond the expiration date of the product license.  Calulate the difference in hours of expiration date and 
+		//current date, and take the minimum between that and pActInfoAttribs->activationSlotHoursToExpire, use that for activationSlotHoursToExpire
+		if(pTmpProdInfo->bUseExpirationDate == true)
+		{
+			SYSTEMTIME tmpSystime;
+			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pTmpProdInfo->expirationDate)).c_str(), tmpSystime))
+				throw(E_FAIL);
+			_variant_t tmpVt(NULL);	
+			if (!SystemTimeToVariantTime(&tmpSystime, &tmpVt.date)) 
+				throw(E_FAIL);
+			time_t expirationDateInSeconds_TimeT = TimeHelper::VariantToTimeT(tmpVt, false);
+			if(curExpiresDateTimeT > expirationDateInSeconds_TimeT)
+				throw E_FAIL; //Throw expired error
+
+			//product license will expire before activations, force activation to expire at the same time
+			if(expirationDateInSeconds_TimeT < newKeyExpireDateTimeT)
+			{
+				newKeyExpireDateTimeT = expirationDateInSeconds_TimeT;
+				newKeyHoursToExpire = (expirationDateInSeconds_TimeT-curExpiresDateTimeT) / TimeHelper::ONE_HOUR_IN_SECONDS;
+			}
+		}
+		newExpiresDateTimeT = newKeyExpireDateTimeT;
+		pActInfoAttribs->activationSlotHoursToExpire = newKeyHoursToExpire;
 
 		VARIANT vtNewExpireTime = TimeHelper::TimeTToVariant(newExpiresDateTimeT);
 		SYSTEMTIME newExpireSystime;

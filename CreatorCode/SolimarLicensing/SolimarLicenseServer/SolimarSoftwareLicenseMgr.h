@@ -54,7 +54,7 @@ class SoftwareLicenseMgr
 		*/
 
 		HRESULT ValidateHardwareKeyID(_bstr_t bstrValidationValue);
-		HRESULT ValidateLicenseCode(_bstr_t bstrValidationValue, bool bCheckProtectionKey = false);
+		HRESULT ValidateLicenseCode(_bstr_t bstrValidationValue, _bstr_t bstrKeyID = L"");
 		HRESULT ValidateHardwareBiosSerialNumber(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareMacAddress(_bstr_t bstrValidationValue);
 		HRESULT ValidateHardwareCompuerName(_bstr_t bstrValidationValue);
