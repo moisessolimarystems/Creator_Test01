@@ -107,18 +107,56 @@ namespace Client.Creator
         public void SetTrialToLicensed()
         {
             _product.productState.TVal = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psLicensed;
+            List<Lic_PackageAttribs.Lic_ModuleInfoAttribs> removeModuleList = new List<Lic_PackageAttribs.Lic_ModuleInfoAttribs>();
             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
             {
                 if (CreatorForm.s_CommLink.IsDefaultModule(ID, module.moduleID.TVal))
-                {
                     module.moduleValue.TVal = (uint)CreatorForm.s_CommLink.GetDefaultModuleValue(ID, module.moduleID.TVal);
-                }
                 else
+                    removeModuleList.Add(module);
+            }
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs removeModule in removeModuleList)
+            {
+                _product.moduleList.TVal.Remove(removeModule);
+            }
+        }
+
+        public bool Contains(uint moduleID)
+        {
+            bool bRetVal = false;
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
+            {
+                if (module.moduleID.TVal == moduleID)
                 {
-                    module.moduleValue.TVal = 0;
-                    module.moduleAppInstance.TVal = 0;
+                    bRetVal = true;
+                    break;
                 }
-            }                
+            }
+            return bRetVal;
+        }
+
+        public Lic_PackageAttribs.Lic_ModuleInfoAttribs GetModule(uint moduleID)
+        {
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs storedModule = null;
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
+            {
+                if (module.moduleID.TVal == moduleID)
+                    storedModule = module;
+            }
+            return storedModule;
+        }
+
+        public bool RemoveModule(uint moduleID)
+        {
+            bool bRetVal = false;
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs module = null;
+            module = GetModule(moduleID);
+            if (module != null)
+            {
+                _product.moduleList.TVal.Remove(module);
+                bRetVal = true;
+            }
+            return bRetVal;
         }
 
         //1) set add-on modules to perm

@@ -75,9 +75,6 @@ namespace Service.Creator
         uint GetLastDestinationID(uint custID);
 
         [OperationContract]
-        int GetLicenseType(string licName);
-
-        [OperationContract]
         IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl);
 
         [OperationContract]
@@ -85,15 +82,6 @@ namespace Service.Creator
 
         [OperationContract]
         IList<string> GetModifiedLicensesByCustomer(string custName);
-
-        [OperationContract]
-        int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
-
-        [OperationContract]
-        int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType);
-
-        [OperationContract]
-        IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType);
 
         [OperationContract]
         void GenerateLicensePacket(string pktName, LicenseTable licName, DateTime expDate, string comments, ref string vCode, ref Byte[] newByteArrayLicensePacket, string user);
@@ -191,6 +179,9 @@ namespace Service.Creator
 
         [OperationContract]
         int GetProductVersionFromTable(int prodID);
+
+        [OperationContract]
+        ProductLicenseTable GetProductLicenseByID(int productLicenseID);
 
         [OperationContract]
         IList<string> GetDeactivatedProductLicenses(string lsName);

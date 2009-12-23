@@ -36,19 +36,7 @@ namespace Client.Creator
         public string Name
         {
             get { return _customer.SCRname; }
-            set 
-            {
-                //if(!(value.Length > 0))                    
-                //    throw new Exception("Please enter a customer name!");
-                //CustomerTable custRec = null;
-                //Service<ICreator>.Use((client) =>
-                //{
-                //    custRec = client.GetCustomer(value, false);
-                //});
-                //if(custRec != null)
-                //    throw new Exception(string.Format("{0} already exists!",value));                 
-                _customer.SCRname = value; 
-            }
+            set { _customer.SCRname = value;}
         }
 
 

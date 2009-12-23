@@ -22,8 +22,7 @@ namespace Client.Creator
         PermissionsTable _permissions;
         Solimar.Licensing.GlobalSoftwareSpec globalSwSpec;
         DateTime _currentExpirationDate;
-        ProductLicenseState _plStatus;
-        int _productLicenseDataBaseID;
+        int _productLicenseDataBaseID;        
 
         public enum ProductLicenseAttributes
         {
@@ -31,7 +30,9 @@ namespace Client.Creator
             ExpirationDate,
             ProductVersion,
             ParentID,
-            AppInstance
+            AppInstance,
+            ActivationTotal,
+            ActivationAmountInDays
         }
 
         public ProductLicenseProperty()
@@ -53,9 +54,8 @@ namespace Client.Creator
             });           
             _plRec = plData;
             _product = product;
-            _plStatus = (ProductLicenseState)plData.plState;
             _productLicenseDataBaseID = plData.ID;
-            ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;  
+            ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;
         }
 
         public uint GetTotalAddOnModuleAppInstance(uint modID)
@@ -79,13 +79,15 @@ namespace Client.Creator
                     foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
                     {
                         if (modRec.moduleID.TVal.Equals(modID))
+                        {
                             totalValue += modRec.moduleAppInstance.TVal;
+                            break;
+                        }
                     }
                 }
             }
             return totalValue;
         }
-
         public int GetTotalModuleAppInstance(uint modID)
         {
             uint totalValue = 0;
@@ -103,13 +105,15 @@ namespace Client.Creator
                     foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
                     {
                         if (modRec.moduleID.TVal.Equals(modID))
+                        {
                             totalValue += modRec.moduleAppInstance.TVal;
+                            break;
+                        }
                     }
                 }
             }
             return (int)totalValue;
         }
-
         //standard order moduledata does not know add-on orders need to retrieve from database?
         public void DecrementAddOnModuleAppInstance(uint modID)
         {
@@ -142,7 +146,6 @@ namespace Client.Creator
                 }
             });
         }
-
         public void IncrementAddOnModuleAppInstance(uint modID)
         {
             //increment first add-on found
@@ -180,7 +183,6 @@ namespace Client.Creator
                 }
             });
         }
-
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetProductSpec(uint productID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in globalSwSpec.softwareSpec.productSpecMap.TVal.Values)
@@ -275,11 +277,16 @@ namespace Client.Creator
             get { return _product; }
             set { _product = value; }
         }
+        [Browsable(false)]
+        public string FullDescription
+        {
+            get { return _plRec.Description; }
+        }
 
         [Browsable(false)]
         public bool IsActive
         {
-            get { return (Status != ProductLicenseState.Deactivated) ? true : false; }
+            get { return _plRec.IsActive; }
         }
         [Browsable(false)]
         public bool IsExpired
@@ -294,6 +301,7 @@ namespace Client.Creator
                 return false; 
             }
         }
+        
         #endregion
 
         #region Browsable Properties
@@ -316,7 +324,12 @@ namespace Client.Creator
         [Description("Name of Solimar product associated with product license.")]
         public String ProductName
         {
-            get { return _product.Name; }
+            get 
+            {
+                //SetBrowsableAttribStatus(ProductLicenseAttributes.ActivationTotal, _product.Name.Contains("Test"));
+                //SetBrowsableAttribStatus(ProductLicenseAttributes.ActivationAmountInDays, _product.Name.Contains("Test"));
+                return _product.Name; 
+            }
         }
 
         [Category("Product License"), PropertyOrder(3)]
@@ -329,11 +342,6 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, true);
-                }
                 return _product.Version;
             }
             set { _product.Version = value; }
@@ -348,11 +356,6 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.AppInstance, true);
-                }
                 return _product.Product.productAppInstance.TVal;
             }
             set
@@ -376,36 +379,27 @@ namespace Client.Creator
         [Category("Product License"), PropertyOrder(5)]
         [DisplayName("Status")]
         [Description("State of product license.")]
-        [ReadOnly(true)]
+        [ReadOnly(true)]        
         public ProductLicenseState Status
         {
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("T") || LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, true);
-                }
-                return _plStatus;
+                return (ProductLicenseState)_plRec.plState;
             }
             set
             {
                 //be able to change status to deactivated 
                 DateTime? setDate = null;
                 //only set if value changed.
-                if (!_plStatus.Equals(value))
+                if (!(_plRec.plState == (byte)value))
                 {
                     System.Windows.Forms.DialogResult dlgResult = System.Windows.Forms.DialogResult.No;
                     if(value != ProductLicenseState.AddOn)
-                        dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please confirm product license status change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
+                        dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
                     if(dlgResult == System.Windows.Forms.DialogResult.Yes || value == ProductLicenseState.AddOn)
                     {
-                        LicenseServerType lsType = LicenseServerType.Deactivated;
-                        Service<ICreator>.Use((client) =>
-                        {
-                            lsType = (LicenseServerType)client.GetLicenseType(LicenseServer);
-                        });
+                        string errorMsg = "";
                         switch (value)
                         {
                             case ProductLicenseState.Licensed:
@@ -415,16 +409,14 @@ namespace Client.Creator
                                 if (_plRec.plState == (byte)ProductLicenseState.Trial)
                                     _product.SetTrialToLicensed();
                                 else if (_plRec.plState != (byte)ProductLicenseState.AddOn)
-                                    throw new Exception("invalid conversion");
-                                setDate = (!(Product.Name.Contains("Test"))) ? null : ExpirationDate;
+                                    errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
                             case ProductLicenseState.Trial:
                                 //was perm now trial
                                 if (_plRec.plState == (byte)ProductLicenseState.Licensed)
                                     _product.SetLicensedToTrial();
                                 else
-                                    throw new Exception("Invalid Conversion");
-                                setDate = CurrentExpirationDate;
+                                    errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
                             case ProductLicenseState.AddOn:
                                 //need to allow for initial case and exclude changing from perm->addon, trial->addon
@@ -434,20 +426,22 @@ namespace Client.Creator
                                       _plRec.plID != null)) ||
                                    ((_plRec.ExpirationDate.HasValue &&
                                      _plRec.plState == (byte)ProductLicenseState.Trial)))
-                                    throw new Exception("Invalid Conversion");
-                                setDate = CurrentExpirationDate;
+                                    errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
                             default:
                                 break;
                         }
-                        _plStatus = value;
-                        if (value != ProductLicenseState.Deactivated)
-                            _product.Product.productState.TVal = Enums.GetProductState(value);
-                        if (_plStatus != ProductLicenseState.Deactivated)
+                        if (errorMsg.Length == 0)
                         {
-                            _plRec.plState = (byte)_plStatus;
-                            ExpirationDate = setDate;
+                            _plRec.plState = (byte)value;
+                            if(value == ProductLicenseState.Licensed)
+                                ExpirationDate = (!(Product.Name.Contains("Test"))) ? null : ExpirationDate;
+                            else
+                                ExpirationDate = CurrentExpirationDate;
                         }
+                        else
+                            throw new Exception(errorMsg);
+                            //System.Windows.Forms.MessageBox.Show(errorMsg, "Status Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                     }
                 }
             }
@@ -463,68 +457,109 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_permanent_pwd.Value);
-                if (LicenseServer.Contains("D") || LicenseServer.Contains("F"))
-                {
-                    if (_permissions.pt_permanent_pwd.Value)
-                        SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, true);
-                }                
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_permanent_pwd.Value);             
                 if(_plRec.ExpirationDate.HasValue)
                     return _plRec.ExpirationDate.Value.ToLocalTime();
                 return null;
             }
             set 
             {
+                string errorMsg = "";
                 if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
                     !_plRec.ExpirationDate.HasValue)
-                    throw new Exception("Can't set expiration date for permanent type");
+                    errorMsg = "Can't set expiration date for permanent type";
                 if ((Product.Name.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
-                    throw new Exception("Please set a valid expiration date");
-                if (value.HasValue)
+                    errorMsg = "Please set a valid expiration date";
+                if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddYears(1)) > 0)
+                    errorMsg = string.Format("{0} exceeds the expiration date limit of one year.", value.Value);
+                if (errorMsg.Length == 0)
                 {
-                    if (value.Value.CompareTo(DateTime.Today.AddYears(1)) > 0)
-                        throw new Exception(string.Format("{0} exceeds the expiration date limit of one year.", value.Value));
-                    _plRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
-                    _product.Product.expirationDate.TVal = _plRec.ExpirationDate.Value;
-                    _product.Product.bUseExpirationDate.TVal = true;
+                    if (ActivationTotal > 0)
+                    {
+                        if (value != _plRec.ExpirationDate)
+                            _product.Product.bActivationOverrideCurrent.TVal = true;
+                        _product.Product.bUseActivations.TVal = true;
+                    }
+                    if (value.HasValue)
+                    {
+                        _plRec.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                        _product.Product.expirationDate.TVal = _plRec.ExpirationDate.Value;
+                        _product.Product.bUseExpirationDate.TVal = true;
+                    }
+                    else
+                    {
+                        _plRec.ExpirationDate = value;
+                        _product.Product.expirationDate.TVal = new DateTime(1900, 1, 1);
+                        _product.Product.bUseExpirationDate.TVal = false;
+                    }
                 }
                 else
                 {
-                    _plRec.ExpirationDate = value;
-                    _product.Product.expirationDate.TVal = new DateTime(1900, 1, 1);
-                    _product.Product.bUseExpirationDate.TVal = false;
+                    throw new Exception(errorMsg);
                 }
             }
+        }
+
+        [Category("Product License"), PropertyOrder(7)]
+        [DisplayName("Extensions")]
+        [Description("The number of extensions given.")]
+        [ReadOnly(true)]
+        public byte Extension
+        {
+            get { return _plRec.Extensions; }
         }
 
         [Category("Product License Activations"), PropertyOrder(1)]
         [DisplayName("Total")]
         [Description("The number of activations for the product license. The max value allowed for the activation total is 254.")]
+        [RefreshProperties(RefreshProperties.All)]
         public uint ActivationTotal
         {
-            get { return _product.Product.activationTotal.TVal; }
+            get             
+            {
+                return _product.Product.activationTotal.TVal; 
+            }
             set 
             {
                 if (value >= AppConstants.MaxActivations)
-                    throw new Exception(string.Format("{0} exceeds the max value for activation total", value));
-                _product.Product.activationTotal.TVal = value;
-                //set to force license to use activation exp date instead of regular exp date.
-                if(value > 0)
-                    _product.Product.bUseActivations.TVal = true;
+                    throw new Exception(string.Format("{0} exceeds the max value for activation total"));
+                    //System.Windows.Forms.MessageBox.Show(string.Format("{0} exceeds the max value for activation total", value), "Extension Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                else
+                {
+                    if (value > 0)                    
+                        _product.Product.bUseActivations.TVal = true;
+                    if(value != _product.Product.activationTotal.TVal)
+                        _product.Product.bActivationOverrideCurrent.TVal = true;
+                    _product.Product.activationTotal.TVal = value;
+                    //set to force license to use activation exp date instead of regular exp date.
+                }
             }
         }
-
         [Category("Product License Activations"), PropertyOrder(2)]
         [DisplayName("Amount In Days")]
         [Description("The amount in days per activation for the product license. The max value allowed for the amount in days is 170.")]
+        [RefreshProperties(RefreshProperties.All)]
         public uint ActivationAmountInDays
         {
-            get { return _product.Product.activationAmountInDays.TVal; }
+            get 
+            {
+                return _product.Product.activationAmountInDays.TVal; 
+            }
             set 
             {
                 if (value >= AppConstants.MaxActivationAmountInDays)
+                {
                     throw new Exception(string.Format("{0} exceeds the max value for the amount in days value per activation.", value));
-                _product.Product.activationAmountInDays.TVal = value; 
+                    //System.Windows.Forms.MessageBox.Show(string.Format("{0} exceeds the max value for the amount in days value per activation.", value), "Extension Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                }
+                else
+                {
+                    if (value != _product.Product.activationTotal.TVal)
+                        _product.Product.bActivationOverrideCurrent.TVal = true;
+                    _product.Product.activationAmountInDays.TVal = value;
+                    if (value > 0)
+                        _product.Product.bUseActivations.TVal = true;
+                }
             }
         }
 
@@ -534,11 +569,61 @@ namespace Client.Creator
         [Description("User notes for product license.")]
         public string Description
         {
-            get { return _plRec.Description; }
-            set { _plRec.Description = value; }
+            get 
+            {                 
+                if(_plRec.Description.Contains("|"))
+                {
+                    //split return first half
+                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    return notes[0];
+                }
+                return _plRec.Description;                
+            }
+            set 
+            {
+                if (_plRec.Description.Contains("|"))
+                {
+                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    notes[0] = value;
+                    _plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]) ;
+                }
+                else
+                    _plRec.Description = value; 
+            }
         }
-        
-
+        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+        [Category("Product License Notes"), PropertyOrder(2)]
+        [DisplayName("Additional Notes")]
+        [Description("User notes for product license.")]
+        public string AdditionalDescription
+        {
+            get 
+            {
+                if (_plRec.Description.Contains("|"))
+                {
+                    //split return first half
+                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    return notes[1];
+                }
+                return "";         
+            }
+            set 
+            {
+                if (_plRec.Description.Contains("|"))
+                {
+                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    notes[1] = value;
+                    _plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]);
+                }
+                else
+                {
+                    if (value.Length > 0)
+                    {
+                        _plRec.Description = string.Format("{0}|{1}",_plRec.Description,value);
+                    }
+                }
+            }
+        }     
         #endregion
 
         #endregion

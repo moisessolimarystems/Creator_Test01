@@ -411,6 +411,8 @@ namespace CreatorData
 		
 		private bool _IsDirty;
 		
+		private bool _IsActive;
+		
 		private EntitySet<TokenTable> _TokenTables;
 		
 		private EntitySet<PacketTable> _PacketTables;
@@ -447,6 +449,8 @@ namespace CreatorData
     partial void OnOrderIndexChanged();
     partial void OnIsDirtyChanging(bool value);
     partial void OnIsDirtyChanged();
+    partial void OnIsActiveChanging(bool value);
+    partial void OnIsActiveChanged();
     #endregion
 		
 		public LicenseTable()
@@ -668,8 +672,29 @@ namespace CreatorData
 			}
 		}
 		
+		[Column(Storage="_IsActive", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=11)]
+		public bool IsActive
+		{
+			get
+			{
+				return this._IsActive;
+			}
+			set
+			{
+				if ((this._IsActive != value))
+				{
+					this.OnIsActiveChanging(value);
+					this.SendPropertyChanging();
+					this._IsActive = value;
+					this.SendPropertyChanged("IsActive");
+					this.OnIsActiveChanged();
+				}
+			}
+		}
+		
 		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=11, EmitDefaultValue=false)]
+		[DataMember(Order=12, EmitDefaultValue=false)]
 		public EntitySet<TokenTable> TokenTables
 		{
 			get
@@ -688,7 +713,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_PacketTable", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=12, EmitDefaultValue=false)]
+		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<PacketTable> PacketTables
 		{
 			get
@@ -707,7 +732,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=13, EmitDefaultValue=false)]
+		[DataMember(Order=14, EmitDefaultValue=false)]
 		public EntitySet<ProductLicenseTable> ProductLicenseTables
 		{
 			get
@@ -726,7 +751,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TransactionTable", Storage="_TransactionTables", ThisKey="ID", OtherKey="taLicenseID")]
-		[DataMember(Order=14, EmitDefaultValue=false)]
+		[DataMember(Order=15, EmitDefaultValue=false)]
 		public EntitySet<TransactionTable> TransactionTables
 		{
 			get
@@ -2002,11 +2027,19 @@ namespace CreatorData
 		
 		private string _Description;
 		
-		private short _ProductID;
+		private byte _ProductID;
 		
 		private string _ProductVersion;
 		
 		private string _ParentProductLicenseID;
+		
+		private bool _IsActive;
+		
+		private byte _Activations;
+		
+		private byte _ActivationAmount;
+		
+		private byte _Extensions;
 		
 		private EntityRef<LicenseTable> _LicenseTable;
 		
@@ -2028,12 +2061,20 @@ namespace CreatorData
     partial void OnExpirationDateChanged();
     partial void OnDescriptionChanging(string value);
     partial void OnDescriptionChanged();
-    partial void OnProductIDChanging(short value);
+    partial void OnProductIDChanging(byte value);
     partial void OnProductIDChanged();
     partial void OnProductVersionChanging(string value);
     partial void OnProductVersionChanged();
     partial void OnParentProductLicenseIDChanging(string value);
     partial void OnParentProductLicenseIDChanged();
+    partial void OnIsActiveChanging(bool value);
+    partial void OnIsActiveChanged();
+    partial void OnActivationsChanging(byte value);
+    partial void OnActivationsChanged();
+    partial void OnActivationAmountChanging(byte value);
+    partial void OnActivationAmountChanged();
+    partial void OnExtensionsChanging(byte value);
+    partial void OnExtensionsChanged();
     #endregion
 		
 		public ProductLicenseTable()
@@ -2192,9 +2233,9 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_ProductID", DbType="SmallInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[Column(Storage="_ProductID", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=8)]
-		public short ProductID
+		public byte ProductID
 		{
 			get
 			{
@@ -2251,6 +2292,90 @@ namespace CreatorData
 					this._ParentProductLicenseID = value;
 					this.SendPropertyChanged("ParentProductLicenseID");
 					this.OnParentProductLicenseIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_IsActive", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=11)]
+		public bool IsActive
+		{
+			get
+			{
+				return this._IsActive;
+			}
+			set
+			{
+				if ((this._IsActive != value))
+				{
+					this.OnIsActiveChanging(value);
+					this.SendPropertyChanging();
+					this._IsActive = value;
+					this.SendPropertyChanged("IsActive");
+					this.OnIsActiveChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_Activations", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=12)]
+		public byte Activations
+		{
+			get
+			{
+				return this._Activations;
+			}
+			set
+			{
+				if ((this._Activations != value))
+				{
+					this.OnActivationsChanging(value);
+					this.SendPropertyChanging();
+					this._Activations = value;
+					this.SendPropertyChanged("Activations");
+					this.OnActivationsChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_ActivationAmount", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=13)]
+		public byte ActivationAmount
+		{
+			get
+			{
+				return this._ActivationAmount;
+			}
+			set
+			{
+				if ((this._ActivationAmount != value))
+				{
+					this.OnActivationAmountChanging(value);
+					this.SendPropertyChanging();
+					this._ActivationAmount = value;
+					this.SendPropertyChanged("ActivationAmount");
+					this.OnActivationAmountChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_Extensions", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=14)]
+		public byte Extensions
+		{
+			get
+			{
+				return this._Extensions;
+			}
+			set
+			{
+				if ((this._Extensions != value))
+				{
+					this.OnExtensionsChanging(value);
+					this.SendPropertyChanging();
+					this._Extensions = value;
+					this.SendPropertyChanged("Extensions");
+					this.OnExtensionsChanged();
 				}
 			}
 		}

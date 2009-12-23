@@ -19,7 +19,7 @@ namespace Client.Creator
         private string _destinationName;
         private string _comments;
         private PermissionsTable _permissions;
-        private LicenseServerType _licType;
+        private bool _isActive;
 
         #endregion
 
@@ -34,8 +34,8 @@ namespace Client.Creator
             _licInfo.Stream = license.LicInfo.Stream;
             _comments = license.Comments;
             _permissions = license.Permissions;
+            _isActive = license.IsActive;
             _destinationName = license.DestName;
-            _licType = license.LicType;
         }
 
         //requires a licPackage stream for licStream not just licLicenseInfoAttribs.
@@ -44,10 +44,10 @@ namespace Client.Creator
             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
             licPackage.Stream = license.LicenseInfo;            
             _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
-            _licInfo = licPackage.licLicenseInfoAttribs;           
+            _licInfo = licPackage.licLicenseInfoAttribs;
+            _isActive = license.IsActive;
             _comments = license.LicenseComments;
             Permissions = permissions;
-            _licType = (LicenseServerType)license.LicenseType;
             Service<ICreator>.Use((client) => 
             {
                 DestinationNameTable dest = client.GetDestinationName((int)CustID, (int)DestID);
@@ -95,44 +95,12 @@ namespace Client.Creator
                 return bValue;
             }
         }
-
+        //Deactivation sets to false otherwise retrieve value from database.
         [Browsable(false)]
-        public bool IsStandardLicenseType
+        public bool IsActive
         {
-            get
-            {
-                if (_licInfo != null)
-                {
-                    if (_licInfo.softwareLicType.TVal != Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
-                        return true;
-                }
-                return false;
-            }
-        }
-
-        [Browsable(false)]
-        public bool IsFailoverLicenseType
-        {
-            get
-            {
-                if (_licInfo != null)
-                {
-                    if (_licInfo.softwareLicType.TVal == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover)
-                        return true;
-                }
-                return false;
-            }
-        }
-
-        [Browsable(false)]
-        public bool IsDeactivated
-        {
-            get
-            {
-                if (LicType == LicenseServerType.Deactivated)
-                    return true;
-                return false;
-            }
+            get { return _isActive; }
+            set { _isActive = value; }
         }
 
         [Browsable(false)]
@@ -160,20 +128,6 @@ namespace Client.Creator
                         bEnabled = false;
                 });
                 return bEnabled;
-            }
-        }
-
-        [Browsable(false)]
-        public int FailoverLicenseCount
-        {
-            get
-            {
-                int count = 0;
-                Service<ICreator>.Use((client) =>
-                {
-                    count = client.GetLicenseCountByType(CustID, DestID, GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover);
-                });
-                return count;
             }
         }
 
@@ -220,30 +174,74 @@ namespace Client.Creator
             set { _destinationName = value; }
         }
 
-        [Category("License Server"), PropertyOrder(3)]
-        [DisplayName("Type")]
-        [Description("The type of license server. Perpetual, Subscription, Failover, Disaster Recover, Test Development are the available options.")]
-        [ReadOnly(true)]
-        public LicenseServerType LicType
-        {
-            get { return _licType; }
-            set
-            {                
-                _licType = value;
-                if(_licType != LicenseServerType.Deactivated)
-                    LicInfo.softwareLicType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(value);                
-            }
-        }
-
-        [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        [Category("License Server Notes"), PropertyOrder(1)]
-        [DisplayName("Notes")]
-        [Description("Notes")]
+        [Browsable(false)]
         public string Comments
         {
             get { return _comments; }
             set { _comments = value; }
         }
+
+        [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [Category("License Server Notes"), PropertyOrder(1)]
+        [DisplayName("Notes")]
+        [Description("User notes for license server.")]
+        public string Description
+        {
+            get
+            {
+                if (_comments.Contains("|"))
+                {
+                    //split return first half
+                    string[] notes = _comments.Split("|".ToCharArray());
+                    return notes[0];
+                }
+                return _comments;
+            }
+            set
+            {
+                if (_comments.Contains("|"))
+                {
+                    string[] notes = _comments.Split("|".ToCharArray());
+                    notes[0] = value;
+                    _comments = string.Format("{0}|{1}", notes[0], notes[1]);
+                }
+                else
+                    _comments = value;
+            }
+        }
+        [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
+        [Category("License Server Notes"), PropertyOrder(2)]
+        [DisplayName("Additional Notes")]
+        [Description("User notes for license server.")]
+        public string AdditionalDescription
+        {
+            get
+            {
+                if (_comments.Contains("|"))
+                {
+                    //split return first half
+                    string[] notes = _comments.Split("|".ToCharArray());
+                    return notes[1];
+                }
+                return "";
+            }
+            set
+            {
+                if (_comments.Contains("|"))
+                {
+                    string[] notes = _comments.Split("|".ToCharArray());
+                    notes[1] = value;
+                    _comments = string.Format("{0}|{1}", notes[0], notes[1]);
+                }
+                else
+                {
+                    if (value.Length > 0)
+                    {
+                        _comments = string.Format("{0}|{1}", _comments, value);
+                    }
+                }
+            }
+        }    
         #endregion
 
     }

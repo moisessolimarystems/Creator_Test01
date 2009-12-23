@@ -54,7 +54,6 @@ namespace Client.Creator
                         ProductTable productRec = client.GetProduct(comboBox1.SelectedItem.ToString());
                         if (!productRec.pVersion.Equals(newVersion))
                         {
-                            //string oldVersion = productRec.pVersion;
                             productRec.pVersion = newVersion;
                             client.UpdateProductTable(productRec);
                             //MessageBox.Show(string.Format("{0} version updated from {1} to {2}", comboBox1.SelectedItem.ToString().Trim(), oldVersion, newVersion),

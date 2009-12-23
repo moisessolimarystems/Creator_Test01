@@ -45,6 +45,15 @@ namespace CreatorData
             }
         }
 
+        public static ProductLicenseTable GetProductLicenseByID(int productLicenseID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && c.ID.Equals(productLicenseID)).SingleOrDefault();
+            }
+        }
+
         public static IList<ProductLicenseTable> GetProductLicenses(string licenseServerName, int productID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -63,7 +72,7 @@ namespace CreatorData
                 var plDeactive = from c in db.ProductLicenseTables
                                  where c.LicenseID > 0  
                                  where c.LicenseTable.LicenseName.Equals(licenseServerName)                                 
-                                 where c.plState.Equals(3) //3 => deactive
+                                 where !c.IsActive  
                                  select c.plID;
                 return plDeactive.ToList();
             }

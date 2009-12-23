@@ -154,34 +154,9 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetLicenseType(string licName)
-        {
-            return LicenseTable.GetLicenseType(licName);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<string> GetModifiedLicensesByCustomer(string custName)
         {
             return LicenseTable.GetModifiedLicenseNamesByCustomer(custName);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetLicenseCountByType(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType)
-        {
-            //TODO : try not to cast. Performance issues and might truncate and bad practice
-            return LicenseTable.GetLicCountByType(custID, destID, groupID, (Byte)licType);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType)
-        {
-            return LicenseTable.GetDerivedLicenseCount(custID, destID, groupID, (Byte)licType);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType)
-        {
-            return LicenseTable.GetDerivedLicenseNames(custID, destID, groupID, licType);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -433,6 +408,12 @@ namespace Service.Creator
         public ProductLicenseTable GetProductLicense(string plID)
         {
             return ProductLicenseTable.GetProductLicense(plID);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public ProductLicenseTable GetProductLicenseByID(int productLicenseID)
+        {
+            return ProductLicenseTable.GetProductLicenseByID(productLicenseID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

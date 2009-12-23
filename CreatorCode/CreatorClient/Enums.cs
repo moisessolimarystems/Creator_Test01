@@ -7,13 +7,7 @@ using Solimar.Licensing.Attribs;
 namespace Client.Creator
 {
         #region Enums
-
-        enum ViewState
-        {
-            Customer,
-            LicenseServer
-        }
-             
+            
         enum TokenStatus
         {
             Reserved,
@@ -30,16 +24,16 @@ namespace Client.Creator
 
         enum TransactionType
         {
-            Token                = 0,           //License Server Transaction Types
-            LicenseServerStatus  = 1,
-            ProductLicense       = 2,             
-            PacketVerification   = 3,
-            Version              = 10, //Product License Transaction Types
-            ExpirationDate       = 11, 
-            Module               = 12,
-            ProductLicenseStatus = 13,
-            ApplicationInstance  = 14,
-            Activation           = 15
+            Token                    = 0,           //License Server Transaction Types
+            LicenseServer            = 1,          
+            PacketVerification       = 2,
+            Version                  = 10,          //Product License Transaction Types
+            Module                   = 11,
+            Status                   = 12,
+            ExpirationDate           = 13,
+            ActivationTotal          = 14,
+            ActivationAmount         = 15,
+            Extension                = 16,
         }
 
         enum DetailTreeViewIconList
@@ -62,7 +56,6 @@ namespace Client.Creator
             LICENSE,
             LICENSEUPDATE,
             LICENSEDISABLED,
-            LICENSERESYNC,
             LICENSEDEACTIVATED,
             ORDER,
             ADDONORDER,
@@ -88,7 +81,6 @@ namespace Client.Creator
         public enum LicenseServerType
         {
             Standard,
-            Failover,
             Deactivated
         }
 
@@ -97,7 +89,6 @@ namespace Client.Creator
             Trial,
             Licensed,
             AddOn,
-            Deactivated
         }
 
         public enum LicenseLimitation
@@ -137,31 +128,6 @@ namespace Client.Creator
                 return (int)iconIndex;
             }
 
-            public static int GetLicenseServerType(LicenseServerType lsType)
-            {
-                int licenseType;
-                switch (lsType)
-                {
-                    //case LicenseServerType.DisasterRecovery:
-                    //    licenseType = (int)Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery;
-                    //    break;
-                    case LicenseServerType.Failover:
-                        licenseType = (int)Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover;
-                        break;
-                    case LicenseServerType.Standard:
-                        licenseType = (int)Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual;
-                        break;
-                    //case LicenseServerType.Subscription:
-                    //    licenseType = (int)Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription;
-                    //    break;
-                    //case LicenseServerType.TestDevelopment:
-                    //    licenseType = (int)Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev;
-                    //    break;
-                    default: licenseType = -1; break;
-                }
-                return licenseType;
-            }
-
             public static Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState GetProductState(ProductLicenseState plState)
             {
                 Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState productLicenseState = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psTrial;
@@ -175,24 +141,6 @@ namespace Client.Creator
                         break;
                     case ProductLicenseState.Licensed:
                         productLicenseState = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psLicensed;
-                        break;
-                }
-                return productLicenseState;
-            }
-
-            public static ProductLicenseState GetProductLicenseState(Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState plState)
-            {
-                ProductLicenseState productLicenseState = ProductLicenseState.Deactivated;
-                switch (plState)
-                {
-                    case Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psTrial:
-                        productLicenseState = ProductLicenseState.Licensed;
-                        break;
-                    case Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psAddOn:
-                        productLicenseState = ProductLicenseState.AddOn;
-                        break;
-                    case Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psLicensed:
-                        productLicenseState = ProductLicenseState.Licensed;
                         break;
                 }
                 return productLicenseState;

@@ -170,54 +170,6 @@ namespace CreatorData
             return destinationID;
         }
 
-        public static int GetLicCountByType(uint custID, uint destID, uint groupID, Byte licType)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-
-                var licenses = from l in db.LicenseTables
-                               where l.GroupID.Equals(groupID) &&
-                                     l.DestinationID.Equals(destID)  &&
-                                     l.SCRnumber.Equals(custID) &&
-                                     l.LicenseType.Equals(licType)
-                               select l;
-                return licenses.Count();
-            }
-        }
-
-        public static int GetDerivedLicenseCount(uint custID, uint destID, uint groupID, Byte licType)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                string prefix = (licType == 0) ? "-P" : "-S";
-                var licenses = from l in db.LicenseTables
-                               where l.GroupID.Equals(groupID) &&
-                                     l.DestinationID.Equals(destID) &&
-                                     l.SCRnumber.Equals(custID) &&
-                                     !l.LicenseName.Contains(prefix)
-                               select l;
-                return licenses.Count();
-            }
-        }
-
-        public static IList<string> GetDerivedLicenseNames(uint custID, uint destID, uint groupID, Byte licType)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                string prefix = (licType == 0) ? "-P" : "-S";
-                var licenses = from l in db.LicenseTables
-                               where l.GroupID.Equals(groupID) &&
-                                     l.DestinationID.Equals(destID) &&
-                                     l.SCRnumber.Equals(custID) &&
-                                     !l.LicenseName.Contains(prefix)
-                               select l.LicenseName;
-                return licenses.ToList();
-            }
-        }
-
         public static int GetLicenseCountByDestName(uint custID, uint destID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -230,27 +182,6 @@ namespace CreatorData
                 return licenses.Count();
             }
         }
-
-        //public static bool IsLicenseModified(string licenseName)
-        //{
-        //    using (CreatorDataContext db = new CreatorDataContext())
-        //    {
-        //        db.ObjectTrackingEnabled = false;
-        //        var license = db.LicenseTables.Where(c => c.LicenseName.Equals(licenseName)).FirstOrDefault();
-        //        if (license != null)
-        //        {
-        //            var licenses = db.LicenseTables.Where(c => c.SCRnumber.Equals(license.SCRnumber) &&
-        //                                                  c.DestinationID.Equals(license.DestinationID) &&
-        //                                                  c.GroupID.Equals(license.GroupID) &&
-        //                                                  c.LicenseType.Equals(license.LicenseType) &&
-        //                                                  c.TransactionTables.Where(t => t.taPacketID.HasValue != true).Count() > 0).ToList();
-
-        //            if (licenses.Count > 0)
-        //                return true;
-        //        }
-        //        return false;
-        //    }
-        //}
 
         public static bool IsLicenseModified(string licenseName)
         {
@@ -281,19 +212,6 @@ namespace CreatorData
                 return licenses.ToList();
             }
         }      
-
-        public static int GetLicenseType(string licenseName)
-        {
-            int lsType = -1;
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                var license = db.LicenseTables.Where(c => c.LicenseName.Equals(licenseName)).FirstOrDefault();
-                if (license != null)
-                    lsType = (int)license.LicenseType;
-            }
-            return lsType;
-        }
 
         public static void CreateLicense(LicenseTable license)
         {

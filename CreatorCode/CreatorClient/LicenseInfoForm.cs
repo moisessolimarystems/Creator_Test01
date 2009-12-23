@@ -129,61 +129,6 @@ namespace Client.Creator
                     if (!bSkip)
                         productList.Add(productSpec.productName);
                 }
-                //trial -> zero options : 1 order
-                //perm -> add-on available : 1 order
-                //perm, add-on -> zero available : 2 order    
-                //if (plData.LicenseInfo.LicType != LicenseServerType.TestDevelopment)
-                //{   //standard,failover,disaster             
-                //    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                //    {
-                //        bool bSkip = false;
-                //        if (!productSpec.productName.TVal.Contains("Test"))
-                //        {
-                //            productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
-                //            //0 order => product hasnt been added
-                //            //if (productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
-                //            //    productLicenses.Count > 0)
-                //            foreach (ProductLicenseTable pl in productLicenses)
-                //            {          
-                //                //skip if client and not perm
-                //                if(pl.plState.Equals((byte)ProductLicenseState.Trial) &&
-                //                   productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
-                //                    bSkip = true;
-                //            }
-                //            if(!bSkip)
-                //                productList.Add(productSpec.productName);
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    //only add products that can be added....
-                //    //testdev
-                //    foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                //    {
-                //        if (productSpec.productName.TVal.Contains("Test"))
-                //        {
-                //            //should only add products that exist in the standard license
-                //            //and haven't already been added.
-                //            string licenseBase = "P";
-                //            string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)plData.LicenseInfo.CustID, (int)plData.LicenseInfo.DestID, (int)plData.LicenseInfo.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
-                //            LicenseTable baseLicRec = client.GetLicenseByName(licenseName, false);
-                //            //LicenseTable baseLicRec = client.GetLicenseByName(string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", plData.LicenseInfo.CustID, plData.LicenseInfo.DestID, plData.LicenseInfo.GroupID, licenseBase), false);
-                //            if (baseLicRec == null) //subscription type                            
-                //                licenseBase = "S";                                                           
-                //            int pos = productSpec.productName.TVal.IndexOf("Test");
-                //            //1) call twice, once with product, then product test
-                //            //2) call once with product and add only when 1 order(standard) found
-                //            productLicenses = client.GetProductLicensesByProduct(licenseBase, (int)productSpec.productID.TVal);
-                //            if (productLicenses.Count == 1)
-                //            {   //0 order => product hasnt been added                     
-                //                productLicenses = client.GetProductLicensesByProduct(plData.ProductLicense.LicenseServer, (int)productSpec.productID.TVal);
-                //                if (productLicenses.Count == 0)
-                //                    productList.Add(productSpec.productName);
-                //            }
-                //        }
-                //    }
-                //}
             });
             if (productList.Count == 0)
                 productList.Add("No Products Available");
@@ -212,7 +157,8 @@ namespace Client.Creator
                             module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
                             module.moduleAppInstance.TVal = 1;
                         }
-                        plData.Product.ModuleList.TVal.Add(module);
+                        if(module.moduleValue.TVal > 0)
+                            plData.Product.ModuleList.TVal.Add(module);
                     }
                 }
             }
@@ -248,26 +194,8 @@ namespace Client.Creator
             topPanel.Controls.Clear();
             licenseGroupBox.Parent = topPanel;
             //need to get next available value from DB for destination ID and group ID.
-            selectedObject = licData.LicInfo as Object;
-            if (licData.LicInfo.IsStandardLicenseType)
-            {               
-                destinationTextBox.Text = licData.LicInfo.DestName;
-                licTypeComboBox.Items.Add(LicenseServerType.Standard);
-                //licTypeComboBox.Items.Add(LicenseServerType.Subscription);                
-                licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
-            }
-            else
-            {   //secondary keys only allow comment
-                Service<ICreator>.Use((client) =>
-                {   
-                    //increment index for test/dev and disaster recovery
-                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(licData.LicInfo.LicType);
-                    licData.LicInfo.LicInfo.softwareLicTypeIndex.TVal = (uint)client.GetLicenseCountByType(licData.LicInfo.CustID, licData.LicInfo.DestID, licData.LicInfo.GroupID, licType) + 1;
-                });
-                destinationTextBox.Text = licData.LicInfo.DestName;
-                licTypeComboBox.Items.Add(licData.LicInfo.LicType);                
-                licTypeComboBox.SelectedItem = licData.LicInfo.LicType;
-            }
+            selectedObject = licData.LicInfo as Object;         
+            destinationTextBox.Text = licData.LicInfo.DestName;
             //license name
             licNameTextBox.Text = licData.LicInfo.Name;
         }
@@ -275,7 +203,6 @@ namespace Client.Creator
         private void SaveLicenseTabPage(LicenseDialogData licData)
         {
             //TODO : validate that the license does not already exist
-            licData.LicInfo.LicType = (LicenseServerType)Enum.Parse(typeof(LicenseServerType), licTypeComboBox.SelectedItem.ToString());
             licData.LicInfo.Comments = licDescriptTextBox.Text;
         }
         #endregion
@@ -453,35 +380,47 @@ namespace Client.Creator
         private void SaveModuleTabPage(ModuleDialogData moduleData)
         {
             int totalModAppInstance;
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in moduleData.ProductLicense.Product.ModuleList.TVal)
+            //change has been made.
+            if (modValueNumericUpDown.Value != moduleData.Module.Units)
             {
-                if (storedMod.moduleID.TVal.Equals(moduleData.Module.ID))
+                if (modValueNumericUpDown.Value > 0)
                 {
-                    storedMod.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
+                    Lic_PackageAttribs.Lic_ModuleInfoAttribs editModule = null;
+                    if (!moduleData.ProductLicense.Product.Contains(moduleData.Module.ID))
+                    {
+                        editModule = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
+                        editModule.moduleID.TVal = moduleData.Module.ID;                        
+                        moduleData.ProductLicense.Product.ModuleList.TVal.Add(editModule);
+                    }
+                    else
+                    {
+                        editModule = moduleData.ProductLicense.Product.GetModule(moduleData.Module.ID);
+                    }
+                    editModule.moduleValue.TVal = (uint)modValueNumericUpDown.Value;
                     //if client type set product connections to total
                     //call function to get product spec then check to see if it is a client
-                    totalModAppInstance = moduleData.ProductLicense.GetTotalModuleAppInstance(storedMod.moduleID.TVal);
-                    if (storedMod.moduleValue.TVal > 0)
-                    {                                       
+                    totalModAppInstance = moduleData.ProductLicense.GetTotalModuleAppInstance(editModule.moduleID.TVal);
+                    if (editModule.moduleValue.TVal > 0)
+                    {
                         if (totalModAppInstance == 0)
-                            storedMod.moduleAppInstance.TVal = 1;
+                            editModule.moduleAppInstance.TVal = 1;
                         else //>1
                         {
                             if (totalModAppInstance > 1)
                             {
-                                if (IsClientType(moduleData.ProductLicense.ProductName) && storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                    storedMod.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;                                            
+                                if (IsClientType(moduleData.ProductLicense.ProductName) && editModule.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                    editModule.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;
                                 else
-                                    storedMod.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
+                                    editModule.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);
                             }
                             else
                             {
-                                if (storedMod.moduleState.TVal == Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
-                                    storedMod.moduleAppInstance.TVal = 0;
+                                if (moduleData.ProductLicense.Status == ProductLicenseState.AddOn)
+                                    editModule.moduleAppInstance.TVal = 0;
                                 else
                                 {
-                                    storedMod.moduleAppInstance.TVal = 1;
-                                    moduleData.ProductLicense.DecrementAddOnModuleAppInstance(storedMod.moduleID.TVal);
+                                    editModule.moduleAppInstance.TVal = 1;
+                                    moduleData.ProductLicense.DecrementAddOnModuleAppInstance(editModule.moduleID.TVal);
                                 }
                             }
                         }
@@ -490,36 +429,26 @@ namespace Client.Creator
                     {
                         //if decrement std then increment add-on
                         //if decrement add-on don't decrement appinstance unless it is 1
-                        storedMod.moduleAppInstance.TVal = 0;
-                        if (storedMod.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                        editModule.moduleAppInstance.TVal = 0;
+                        if (moduleData.ProductLicense.Status != ProductLicenseState.AddOn)
                         {
-                            if (moduleData.ProductLicense.GetTotalAddOnModuleAppInstance(storedMod.moduleID.TVal) == 0)
-                                moduleData.ProductLicense.IncrementAddOnModuleAppInstance(storedMod.moduleID.TVal);
+                            if (moduleData.ProductLicense.GetTotalAddOnModuleAppInstance(editModule.moduleID.TVal) == 0)
+                                moduleData.ProductLicense.IncrementAddOnModuleAppInstance(editModule.moduleID.TVal);
                         }
                     }
                     //need to set again because it may have been updated based on units change
-                    moduleData.Module.AppInstance = storedMod.moduleAppInstance.TVal;
-                    break;
+                    moduleData.Module.AppInstance = editModule.moduleAppInstance.TVal;
+                    moduleData.Module.Units = editModule.moduleValue.TVal;
+                    //if exist update
+                    //else add
+                }
+                else
+                {   //remove from product list if exist
+                    moduleData.Module.AppInstance = 0;
+                    moduleData.Module.Units = 0;
+                    moduleData.ProductLicense.Product.RemoveModule(moduleData.Module.ID);
                 }
             }
-        }
-
-        #endregion
-
-        #region LicenseTabPage Events
-
-        private void licTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {            
-            LicenseServerProperty licInfo = selectedObject as LicenseServerProperty;
-            licInfo.LicType = (LicenseServerType)Enum.Parse(typeof(LicenseServerType), licTypeComboBox.SelectedItem.ToString());
-            Service<ICreator>.Use((client) => 
-            {
-                if (licInfo.IsStandardLicenseType)                   
-                    licInfo.GroupID = client.GetNextGroupID(licInfo.CustID, licInfo.DestID);
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType licType = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType)Enums.GetLicenseServerType(licInfo.LicType);                
-                licInfo.LicInfo.softwareLicTypeIndex.TVal = (uint)(client.GetLicenseCountByType(licInfo.CustID, licInfo.DestID, licInfo.GroupID, licType) + 1);
-            });
-            licNameTextBox.Text = licInfo.Name;            
         }
 
         #endregion

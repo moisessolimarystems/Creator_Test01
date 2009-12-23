@@ -258,8 +258,13 @@ namespace Client.Creator
             //{
                 listviewX = (ListViewItem)x;
                 listviewY = (ListViewItem)y;
-                if(IsDate(listviewX.SubItems[ColumnToSort].Text))
-                    compareResult = DateTime.Compare(DateTime.Parse(listviewX.SubItems[ColumnToSort].Text), DateTime.Parse(listviewY.SubItems[ColumnToSort].Text));
+                if (IsDate(listviewX.SubItems[ColumnToSort].Text))
+                {
+                    if(IsDate(listviewY.SubItems[ColumnToSort].Text))
+                        compareResult = DateTime.Compare(DateTime.Parse(listviewX.SubItems[ColumnToSort].Text), DateTime.Parse(listviewY.SubItems[ColumnToSort].Text));
+                    else
+                        compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+                }
                 else
                     // Compare the two items           
                     compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);

@@ -16,11 +16,6 @@ namespace Client.Creator
         private Lic_PackageAttribs.Lic_ModuleInfoAttribs _module;
         public static uint _productID;
 
-        public ModuleProperty()
-        {
-            //_module.moduleExpirationDate.TVal = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); //DateTime.Today;
-        }
-
         public ModuleProperty(Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
         {
             _module = module;                      

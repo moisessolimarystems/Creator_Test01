@@ -116,9 +116,13 @@
       <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
       <xs:element minOccurs="0" name="ExpirationDate" nillable="true" type="xs:dateTime" />
       <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ProductID" type="xs:short" />
+      <xs:element minOccurs="0" name="ProductID" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="ProductVersion" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="ParentProductLicenseID" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsActive" type="xs:boolean" />
+      <xs:element minOccurs="0" name="Activations" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="ActivationAmount" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Extensions" type="xs:unsignedByte" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ProductLicenseTable" nillable="true" type="tns:ProductLicenseTable" />
@@ -176,6 +180,7 @@
       <xs:element minOccurs="0" name="LicenseComments" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="OrderIndex" type="xs:int" />
       <xs:element minOccurs="0" name="IsDirty" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsActive" type="xs:boolean" />
       <xs:element minOccurs="0" name="TokenTables" nillable="true" type="tns:ArrayOfTokenTable">
         <xs:annotation>
           <xs:appinfo>

@@ -28,32 +28,15 @@ namespace Client.Creator
             LicenseServerProperty licData = (e.Data as ProductLicenseSelectionData).SelectedLicense;
             Service<ICreator>.Use((client) =>
             {
-                string licenseBase = "P";
-                string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltPerpetual, 1);
-                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(licenseName);//string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
-                if (productLicenses.Count == 0) //subscription type
-                {
-                    licenseBase = "S";
-                    licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltSubscription, 1);
-                    productLicenses = client.GetProductLicenses(licenseName);//string.Format("{0:x4}-{1:x3}-{2:x4}-{3}01", licData.CustID, licData.DestID, licData.GroupID, licenseBase));
-                }
+                string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID);
+                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(licenseName);
                 List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
                 foreach (ProductLicenseTable plRecord in productLicenses)
                 {
-                    if (plRecord.plState != (byte)ProductLicenseState.AddOn && plRecord.plState != (byte)ProductLicenseState.Deactivated)
+                    if (plRecord.plState != (byte)ProductLicenseState.AddOn && plRecord.IsActive)
                     {
                         //if order already exists apply check to checkbox and make greyed out? unselectable?
                         ListViewItem lvItem = new ListViewItem();
-                        //if (licData.LicType == LicenseServerType.DisasterRecovery) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
-                        //{
-                        //    if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "D"))))
-                        //        continue;
-                        //}
-                        //else if (licData.LicType == LicenseServerType.TestDevelopment) //Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev)
-                        //{
-                        //    if (subProductLicenses.Exists(c => c.plID.Equals(plRecord.plID.Replace(licenseBase, "T"))))
-                        //        continue;
-                        //}
                         lvItem.Text = plRecord.plID;
                         lvItem.SubItems.Add(Enum.GetName(typeof(ProductLicenseState), plRecord.plState));
                         lvItem.SubItems.Add(_commLink.GetProductName((uint)plRecord.ProductID));
