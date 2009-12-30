@@ -110,8 +110,8 @@ namespace SolimarLicenseManagerWrapper
 			HRESULT GenerateLicPackage_BySoftwareLicArchive(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
 			HRESULT GenerateLicPackage_BySoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
 			HRESULT GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket);
+			HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
 			HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
-
 
 			HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR softwareLicense, BSTR contractNumber);
 

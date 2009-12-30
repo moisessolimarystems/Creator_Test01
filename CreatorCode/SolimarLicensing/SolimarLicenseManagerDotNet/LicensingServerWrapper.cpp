@@ -354,6 +354,15 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateLicenseSys
 	}
 	return hr;
 }
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GenerateStreamData_ByLicenseSystemData, (vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrLicInfoDataAttribsListStream), hr);
+	}
+	return hr;
+}
 HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream)
 {
 	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);

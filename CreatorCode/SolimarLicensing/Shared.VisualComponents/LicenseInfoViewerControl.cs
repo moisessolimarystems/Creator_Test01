@@ -183,6 +183,19 @@ namespace Shared.VisualComponents
 
             nodeText = "ActivationCurrentExpirationDate: " + param_prodInfoAttribs.activationCurrentExpirationDate.TVal.ToLocalTime().ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n"); 
+
+            nodeText = "bActivationOverrideCurrent: " + param_prodInfoAttribs.bActivationOverrideCurrent.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+            nodeText = "activationOverrideCurrent: " + param_prodInfoAttribs.activationOverrideCurrent.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+            nodeText = "bActivationOverrideCurrentHoursToExpire: " + param_prodInfoAttribs.bActivationOverrideCurrentHoursToExpire.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
+            toolTipBuilder.Append(nodeText + "\r\n");
+            nodeText = "activationOverrideCurrentHoursToExpire: " + param_prodInfoAttribs.activationOverrideCurrentHoursToExpire.TVal.ToString();
+            prodNode.Nodes.Add(new TreeNode(nodeText));
             toolTipBuilder.Append(nodeText);
 
             TreeNode modNode = new TreeNode("ModuleList");
@@ -201,7 +214,7 @@ namespace Shared.VisualComponents
             StringBuilder toolTipBuilder = new StringBuilder();
             string nodeText;
 
-            nodeText = "Module: " + System.Convert.ToInt32(param_modInfoAttribs.moduleID.ToString(), 16).ToString() + " {" + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleName(g_softwareSpec, param_prodID, param_modInfoAttribs.moduleID.TVal) + "}";
+            nodeText = "Module: " + System.Convert.ToInt32(param_modInfoAttribs.moduleID.ToString(), 16).ToString() + " (" + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleName(g_softwareSpec, param_prodID, param_modInfoAttribs.moduleID.TVal) + ")";
             toolTipBuilder.Append(nodeText);
 
             TreeNode modNode = new TreeNode();

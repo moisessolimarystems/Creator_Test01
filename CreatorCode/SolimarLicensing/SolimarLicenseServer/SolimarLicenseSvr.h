@@ -177,6 +177,7 @@ __interface ISolimarSoftwareLicenseSvr : IDispatch
 	[id(110),helpstring("method EnterSoftwareLicArchive")] HRESULT EnterSoftwareLicArchive([in] VARIANT vtLicenseArchive);
 	[id(111),helpstring("method GenerateLicenseSystemData")] HRESULT GenerateLicenseSystemData([out,retval] VARIANT* pVtLicSysDataPacket);
 	[id(112),helpstring("method GenerateStream_ByLicenseSystemData")] HRESULT GenerateStream_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out,retval] BSTR *pBstrLicSysDataAttribsStream);
+	[id(113),helpstring("method GenerateStreamData_ByLicenseSystemData")] HRESULT GenerateStreamData_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out] BSTR *pBstrCreatedDateStreamed, [out] BSTR *pBstrKeyAttribsListStream, [out] BSTR *pBstrLicUsageDataAttribsStream, [out] BSTR *pBstrConnectionAttribsListStream, [out,retval] BSTR *pBstrLicInfoDataAttribsListStream);
 };
 
 [
@@ -433,6 +434,7 @@ public:
 	STDMETHOD(GenerateLicPackage_BySoftwareLicArchive)(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
 	STDMETHOD(GenerateLicPackage_BySoftwareLicPacket)(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
 	STDMETHOD(GenerateLicenseSystemData)(VARIANT* pVtLicSysDataPacket);
+	STDMETHOD(GenerateStreamData_ByLicenseSystemData)(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
 	STDMETHOD(GenerateStream_ByLicenseSystemData)(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);	// Only for Interal License Servers
 
 	STDMETHOD(ValidateToken_ByLicense)(BSTR softwareLicense, long validationTokenType, BSTR validationValue);

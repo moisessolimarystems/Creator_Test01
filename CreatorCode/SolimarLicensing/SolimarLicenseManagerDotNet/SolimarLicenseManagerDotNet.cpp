@@ -1598,9 +1598,70 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 	}
 
 	//throws an exception on a failure, 
+	String^ SolimarLicenseServerWrapper::GenerateStreamData_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refConnectionAttribsListStream)
+	{
+		String^ retLicInfoAttribsListStream = "";
+		HRESULT hrResult = S_OK;
+		BSTR bstrLicInfoAttribsListStream;
+		BSTR bstrModifiedDateStreamedStream;
+		BSTR bstrKeyAttribsListStream;
+		BSTR bstrLicUsageDataAttribsStream;
+		BSTR bstrConnectionAttribsListStream;
+
+		_variant_t vtLicInfoAttribsListPacket;
+		VariantInit(&vtLicInfoAttribsListPacket);
+
+		try
+		{
+			// package the string in to a variant
+			vtLicInfoAttribsListPacket.vt = VT_ARRAY | VT_UI1;
+			vtLicInfoAttribsListPacket.parray = SafeArrayCreateVector(VT_UI1, 0, (byteLicSysDataPacket->Length+1)*sizeof(wchar_t));
+
+			BYTE *pPacket = 0;
+			hrResult = SafeArrayAccessData(vtLicInfoAttribsListPacket.parray, (void**)&pPacket);
+			if (FAILED(hrResult)) 
+				throw hrResult;
+
+			{
+			pin_ptr<Byte> pSrcPinned = &byteLicSysDataPacket[0];
+			memcpy(pPacket, pSrcPinned, (byteLicSysDataPacket->Length+1)*sizeof(wchar_t));
+			}
+
+			SafeArrayUnaccessData(vtLicInfoAttribsListPacket.parray);
+			
+			hrResult = m_pLicenseServerWrapper->GenerateStreamData_ByLicenseSystemData(vtLicInfoAttribsListPacket, &bstrModifiedDateStreamedStream, &bstrKeyAttribsListStream, &bstrLicUsageDataAttribsStream, &bstrConnectionAttribsListStream, &bstrLicInfoAttribsListStream);
+			if(FAILED(hrResult)) 
+				throw hrResult;
+			
+			retLicInfoAttribsListStream = gcnew String(bstrLicInfoAttribsListStream);
+			refKeyAttribsListStream = gcnew String(bstrKeyAttribsListStream);
+			refLicUsageDataAttribsStream = gcnew String(bstrLicUsageDataAttribsStream);
+			refConnectionAttribsListStream = gcnew String(bstrConnectionAttribsListStream);
+			refModifiedDateStreamed = gcnew String(bstrModifiedDateStreamedStream);
+		}
+		catch(HRESULT &ehr)
+		{
+			hrResult = ehr;
+		}
+
+		// cleanup section
+		VariantClear(&vtLicInfoAttribsListPacket);
+		SysFreeString(bstrConnectionAttribsListStream);
+		SysFreeString(bstrKeyAttribsListStream);
+		SysFreeString(bstrLicUsageDataAttribsStream);
+		SysFreeString(bstrLicInfoAttribsListStream);
+		SysFreeString(bstrModifiedDateStreamedStream);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return retLicInfoAttribsListStream;
+	}
+
+	//throws an exception on a failure, 
 	String^ SolimarLicenseServerWrapper::GenerateStream_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket)
 	{
-		String^ retLicSysDataAttribsStream = "";;
+		String^ retLicSysDataAttribsStream = "";
 		HRESULT hrResult = S_OK;
 		BSTR bstrLicSysDataAttribsStream;
 

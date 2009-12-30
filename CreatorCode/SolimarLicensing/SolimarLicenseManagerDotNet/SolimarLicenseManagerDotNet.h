@@ -318,6 +318,9 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			void GenerateLicenseSystemData(array<Byte>^% refByteLicSysDataPacket);
 			
 			//throws an exception on a failure, returns licenseInfoAttribsStream on success.
+			String^ GenerateStreamData_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refConnectionAttribsListStream);
+
+			//throws an exception on a failure, returns licenseInfoAttribsStream on success.
 			String^ GenerateStream_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket);
 
 			void SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber);

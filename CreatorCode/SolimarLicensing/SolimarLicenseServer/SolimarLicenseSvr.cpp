@@ -623,6 +623,12 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateStream_ByLicenseSystemData(VARIANT vtLi
 	return g_licenseController.softwareServer.GenerateStream_ByLicenseSystemData(vtLicSysDataPacket, pBstrLicSysDataAttribsStream);
 }
 
+STDMETHODIMP CSolimarLicenseSvr::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed,	BSTR *pBstrKeyAttribsListStream,	BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GenerateStreamData_ByLicenseSystemData(vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrLicInfoDataAttribsListStream);
+}
+
 STDMETHODIMP CSolimarLicenseSvr::ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue)
 {
 	CHECK_CLIENT_AUTHENTICATION;
