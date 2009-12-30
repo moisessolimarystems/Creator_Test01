@@ -11,6 +11,8 @@
 #include "..\common\LicAttribsCPP\Lic_KeyAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_LicenseSystemAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_SystemInfoAttribs.h"
+#include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
+
 
 #include <shlobj.h> //For SHGetFolderPath
 #include <shlwapi.h> //For PathAppend
@@ -201,6 +203,7 @@ wchar_t tmpbuf[BUF_SIZE];
 		SoftwareLicenseMgr* pNewSwLicMgr;
 //		if(bFirstTime)
 //			OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses()");
+
 		for(	Lic_ServerDataAttribs::TVector_Lic_ServerDataFileInfoAttribsList::iterator licSrvFileInfoListIt = tmpFileInfoList->begin();
 				licSrvFileInfoListIt != tmpFileInfoList->end();
 				licSrvFileInfoListIt++)
@@ -210,12 +213,17 @@ wchar_t tmpbuf[BUF_SIZE];
 				pNewSwLicMgr = new SoftwareLicenseMgr();
 				hr = pNewSwLicMgr->Initialize(_bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), pKeyServer, &licServerDataMgr);
 
-if(bFirstTime)
-{
-	//YYY - Change Later
-	//swprintf_s(tmpbuf, _countof(tmpbuf), L"%s, %s, %s, %08x, %s, %d", (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicName->c_str()), (wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileLicenseCode->c_str()), hr, std::wstring(SpdAttribs::WStringObj(licSrvFileInfoListIt->LicModifiedDate)).c_str(), (int)licSrvFileInfoListIt->LicCurrentActivations);
-	//OutputDebugString(tmpbuf);
-}
+//if(bFirstTime)
+//{
+//	//YYY - Change Later
+//	swprintf_s(tmpbuf, _countof(tmpbuf), L"%s, %s, %s, %08x, %s", 
+//		(wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileName->c_str()), 
+//		(wchar_t*)bstr_t(licSrvFileInfoListIt->LicName->c_str()), 
+//		(wchar_t*)bstr_t(licSrvFileInfoListIt->LicFileLicenseCode->c_str()), 
+//		hr, 
+//		std::wstring(SpdAttribs::WStringObj(licSrvFileInfoListIt->LicModifiedDate)).c_str());
+//	OutputDebugString(tmpbuf);
+//}
 				if(FAILED(hr))
 				{
 					delete pNewSwLicMgr;
@@ -417,9 +425,8 @@ HRESULT SoftwareServer::GetSoftwareLicenseInfo_ByLicense(BSTR softwareLicense, B
 			tmpLicInfoAttribs.bLicClockViolation = swLicClockViolationMap[softwareLicense];
 			swLicStreamedCacheMap[softwareLicense].second = tmpLicInfoAttribs.ToString().c_str();	//This call will take a long time when the License Info object is big.
 		}
+		*pBstrLicenseInfoAttribsStream = SysAllocString(swLicStreamedCacheMap.find(softwareLicense)->second.second.c_str());
 	}
-	*pBstrLicenseInfoAttribsStream = SysAllocString(swLicStreamedCacheMap.find(softwareLicense)->second.second.c_str());
-
 	return hr;
 }
 
@@ -1347,10 +1354,142 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			}
 		}	// End of scope of WMIHelper wmi
 
+
+		//YYY - Obtain modules for testing...
+		{
+			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID1"), _bstr_t(L"TestAppInstance1"));
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 3, 25);
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 2, 10);
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 2, 10);
+			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID4"), _bstr_t(L"TestAppInstance1"));
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID4"), 1, 5);
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID4"), 3, 25);
+			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID5"), _bstr_t(L"TestAppInstance5"));
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID5"), 3, 4);
+			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestAppInstance6"));
+			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID6"), 3, 60);
+
+			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID2"), _bstr_t(L"TestAppInstance2"));
+			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID2"), 1, 1);
+			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID2"), 2, 1);
+
+			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID3"), _bstr_t(L"TestAppInstance3"));
+			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID3"), 0, 1);
+			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestAppInstance6"));
+			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID6"), 1, 6);
+
+		}
+
+		//Generate Usage Info
+		Lic_UsageInfoAttribs usageInfoAttribs;
+		{
+			Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
+			{
+			SafeMutex mutex(SoftwareLicenseLock);
+			hr = licCache.GetUsage(&usageInfoAttribs);
+			}
+		}
+
+
+		//YYY - Release modules for testing...
+		{
+			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID1"), _bstr_t(L"TestAppInstance1"));
+			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID4"), _bstr_t(L"TestAppInstance1"));
+			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID5"), _bstr_t(L"TestLicenseID5"));
+			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestLicenseID6"));
+
+			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID2"), _bstr_t(L"TestAppInstance2"));
+			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID3"), _bstr_t(L"TestAppInstance3"));
+			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestLicenseID6"));
+		}
+		//{
+		//	//YYY put fake data in
+		//	Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs usProdInfoAttribs;
+		//	usProdInfoAttribs.productID = 14;
+		//	{
+		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
+		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance1>");
+		//	
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
+		//	usModInfoAttribs1.moduleID = 0;
+		//	usModInfoAttribs1.moduleUsage = 1;
+		//	usModInfoAttribs1.moduleTotal = 5;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
+
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
+		//	usModInfoAttribs2.moduleID = 1;
+		//	usModInfoAttribs2.moduleUsage = 2;
+		//	usModInfoAttribs2.moduleTotal = 10;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
+		//	usProdInfoAttribs.appInstanceList->push_back(usAppInstInfoAttribs1);
+		//	}
+
+		//	{
+		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs2;
+		//	usAppInstInfoAttribs2.applicationInstance = std::wstring(L"<AppInstance2>");
+
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
+		//	usModInfoAttribs1.moduleID = 5;
+		//	usModInfoAttribs1.moduleUsage = 2;
+		//	usModInfoAttribs1.moduleTotal = 3;
+		//	usAppInstInfoAttribs2.moduleList->push_back(usModInfoAttribs1);
+
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
+		//	usModInfoAttribs2.moduleID = 4;
+		//	usModInfoAttribs2.moduleUsage = 5;
+		//	usModInfoAttribs2.moduleTotal = 6;
+		//	usAppInstInfoAttribs2.moduleList->push_back(usModInfoAttribs2);
+		//	usProdInfoAttribs.appInstanceList->push_back(usAppInstInfoAttribs2);
+		//	}
+
+		//	usageInfoAttribs.productList->push_back(usProdInfoAttribs);
+
+		//	Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs usProdInfoAttribs2;
+		//	usProdInfoAttribs2.productID = 10;
+		//	{
+		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
+		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance1>");
+		//	
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
+		//	usModInfoAttribs1.moduleID = 0;
+		//	usModInfoAttribs1.moduleUsage = 1;
+		//	usModInfoAttribs1.moduleTotal = 2;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
+
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
+		//	usModInfoAttribs2.moduleID = 1;
+		//	usModInfoAttribs2.moduleUsage = 99;
+		//	usModInfoAttribs2.moduleTotal = 100;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
+		//	usProdInfoAttribs2.appInstanceList->push_back(usAppInstInfoAttribs1);
+		//	}
+		//	{
+		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
+		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance5>");
+		//	
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
+		//	usModInfoAttribs1.moduleID = 2;
+		//	usModInfoAttribs1.moduleUsage = 1;
+		//	usModInfoAttribs1.moduleTotal = 255;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
+
+		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
+		//	usModInfoAttribs2.moduleID = 3;
+		//	usModInfoAttribs2.moduleUsage = 2;
+		//	usModInfoAttribs2.moduleTotal = 4;
+		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
+		//	usProdInfoAttribs2.appInstanceList->push_back(usAppInstInfoAttribs1);
+		//	}
+		//	usageInfoAttribs.productList->push_back(usProdInfoAttribs2);
+		//	
+		//}
+
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString()");
 		licSystemAttribs.Streamed_SoftwareSpecAttribs = std::wstring(g_pSoftwareSpec->GetSoftwareSpec().ToString());
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - sysInfoAttribs.ToString()");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
+
+		licSystemAttribs.Streamed_UsageInfoAttribs = std::wstring(usageInfoAttribs.ToString());
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - end");
@@ -1375,6 +1514,82 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 		hr = E_FAIL;
 	}
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Leave");
+	return hr;
+}
+
+
+HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
+	VARIANT vtLicSysDataPacket, 
+	BSTR *pBstrCreatedDateStreamed, 
+	BSTR *pBstrKeyAttribsListStream,
+	BSTR *pBstrLicUsageDataAttribsStream,
+	BSTR *pBstrConnectionAttribsListStream, 
+	BSTR *pBstrLicInfoDataAttribsListStream)
+{
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Enter");
+	HRESULT hr(E_INVALIDARG);
+	try
+	{
+		SafeMutex mutex(SoftwareLicenseLock);
+		BSTR bstrTmpStream;
+		hr = GenerateStream_ByLicenseSystemData(vtLicSysDataPacket, &bstrTmpStream);
+		if(SUCCEEDED(hr))
+		{
+			Lic_LicenseSystemAttribs tmpLicSysAttribs;
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - tmpLicSysAttribs.InitFromString(bstrTmpStream);");
+			tmpLicSysAttribs.InitFromString(bstrTmpStream);
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());");
+			*pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrKeyAttribsListStream = tmpLicSysAttribs.ListOfStreamed_KeyAttribs - pre");
+			//strip out the key byte array before sending...
+			//*pBstrKeyAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_KeyAttribs.ToString().c_str());
+			*pBstrKeyAttribsListStream = SysAllocString(L"");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrKeyAttribsListStream = tmpLicSysAttribs.ListOfStreamed_KeyAttribs - post");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrLicUsageDataAttribsStream = tmpLicSysAttribs.Streamed_UsageInfoAttribs - pre");
+			*pBstrLicUsageDataAttribsStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_UsageInfoAttribs.ToString()).c_str());
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrLicUsageDataAttribsStream = tmpLicSysAttribs.Streamed_UsageInfoAttribs - post");
+			*pBstrConnectionAttribsListStream = SysAllocString(L"");
+
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Erase empty modules;");
+//			//yyy - testing start
+//			Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfoAttribs;
+//			tmpLicInfoAttribs.InitFromString(std::wstring(*tmpLicSysAttribs.ListOfStreamed_InfoAttribs->begin()));
+//			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = tmpLicInfoAttribs.productList->begin();
+//					prodIt != tmpLicInfoAttribs.productList->end();
+//					prodIt++)
+//			{
+//				Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = prodIt->moduleList->begin();
+//				while(modIt != prodIt->moduleList->end())
+//				{
+//					if((int)modIt->moduleValue == 0)
+//					{
+//						prodIt->moduleList->erase(modIt);
+//						modIt = prodIt->moduleList->begin();
+//					}
+//					else
+//						modIt++;
+//				}
+//			}
+//			tmpLicSysAttribs.ListOfStreamed_InfoAttribs->erase(tmpLicSysAttribs.ListOfStreamed_InfoAttribs->begin());
+//			tmpLicSysAttribs.ListOfStreamed_InfoAttribs->push_back(SysAllocString(tmpLicInfoAttribs.ToString().c_str()));
+			//yyy - testing end
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - pre");
+			*pBstrLicInfoDataAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_InfoAttribs.ToString().c_str());
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - post");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - SysFreeString(bstrTmpStream);");
+			SysFreeString(bstrTmpStream);
+		}
+
+	}
+	catch (HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Leave");
 	return hr;
 }
 HRESULT SoftwareServer::GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream)
@@ -1855,7 +2070,7 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 		
 		//The License Code in the License Archive must match the License Code from the Protection Key
 		std::wstring tmpLicCode = Lic_PackageAttribsHelper::GetValidationValue(&(licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
-		hr = pSoftwareLicMgr->ValidateLicenseCode(tmpLicCode.c_str(), true/*bCheckProtectionKey*/);
+		hr = pSoftwareLicMgr->ValidateLicenseCode(tmpLicCode.c_str(), tmpKeyID.c_str());
 		if(FAILED(hr))
 		{
 			if(hr == LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE)
