@@ -130,6 +130,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 			{
 				displayButton.Tag = "1";
 				displayButton.Text = "Hide Key Cells";
+				keyListView.Visible = true;
 				this.Height += m_heightPanel;
 				this.FormBorderStyle = FormBorderStyle.Sizable;
 			}
@@ -138,6 +139,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 				displayButton.Tag = "0";
 				displayButton.Text = "Show Key Cells";
 				m_heightPanel = keyListView.Height;
+				keyListView.Visible = false;
 				this.Height -= m_heightPanel;
 				this.FormBorderStyle = FormBorderStyle.FixedSingle;
 			}

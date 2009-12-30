@@ -219,28 +219,28 @@ namespace SolimarLicenseViewer
                 switch (SelectedNode.Level)
                 {
                     case 0:
-                        if (SelectedNode.Text == AppConstants.LicenseRootNode)
+                        if (SelectedNode.Name == AppConstants.LicenseRootNode)
                             LoadPackageData();
-                        else if (SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
+                        else if (SelectedNode.Name == AppConstants.ProtectionKeyRootNode)
                             LoadProtectionKeysData();
-                        else if (SelectedNode.Text == AppConstants.UsageRootNode)
+                        else if (SelectedNode.Name == AppConstants.UsageRootNode)
                             LoadUsageData();
-                        else if (SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
+                        else if (SelectedNode.Name == AppConstants.ProductConnectionSettingsRootNode)
                             LoadProductConnectionData();
                         break;
                     case 1:
-                        if (SelectedNode.Text == AppConstants.HistoryNode)
+                        if (SelectedNode.Name == AppConstants.HistoryNode)
                             LoadHistoryData();
-                        else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
+                        else if (SelectedNode.Parent.Name == AppConstants.LicenseRootNode)
                             LoadProductData();
-                        else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
+                        else if (SelectedNode.Parent.Name == AppConstants.UsageRootNode)
                             LoadAppInstData();
                         break;
                     case 2:
-                        if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)  //load modules
+                        if (SelectedNode.Parent.Parent.Name == AppConstants.LicenseRootNode)  //load modules
                             LoadProductLicenseInfo();
                         //LoadModuleData();
-                        else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)    //used app instance
+                        else if (SelectedNode.Parent.Parent.Name == AppConstants.UsageRootNode)    //used app instance
                             LoadUsedModuleData(SelectedNode.Parent.Name);
                         break;
                     default:
@@ -281,7 +281,7 @@ namespace SolimarLicenseViewer
             {
                 case 0:
                     #region if (SelectedNode.Text == AppConstants.LicenseRootNode)
-                    if (SelectedNode.Text == AppConstants.LicenseRootNode)
+                    if (SelectedNode.Name == AppConstants.LicenseRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
                         TheListView.Columns.Add(AppConstants.LicenceTypeHeader);
@@ -313,8 +313,8 @@ namespace SolimarLicenseViewer
 
                     }
                     #endregion
-                    #region else if(SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
-                    else if (SelectedNode.Text == AppConstants.ProtectionKeyRootNode)
+                    #region else if(SelectedNode.Name == AppConstants.ProtectionKeyRootNode)
+                    else if (SelectedNode.Name == AppConstants.ProtectionKeyRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.KeyTypeHeader);
                         TheListView.Columns.Add(AppConstants.KeyNameHeader);
@@ -338,14 +338,14 @@ namespace SolimarLicenseViewer
 
                     }
                     #endregion
-                    #region else if(SelectedNode.Text == AppConstants.UsageRootNode)
-                    else if (SelectedNode.Text == AppConstants.UsageRootNode)
+                    #region else if(SelectedNode.Name == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Name == AppConstants.UsageRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.UsageProductHeader);
                     }
                     #endregion
-                    #region else if(SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
-                    else if (SelectedNode.Text == AppConstants.ProductConnectionSettingsRootNode)
+                    #region else if(SelectedNode.Name == AppConstants.ProductConnectionSettingsRootNode)
+                    else if (SelectedNode.Name == AppConstants.ProductConnectionSettingsRootNode)
                     {
                         if (IsLocalMachine(m_CommLink.ServerName))
                         {
@@ -363,8 +363,8 @@ namespace SolimarLicenseViewer
                     #endregion
                     break;
                 case 1:
-                    #region if (SelectedNode.Text == AppConstants.HistoryNode)
-                    if (SelectedNode.Text == AppConstants.HistoryNode)
+                    #region if (SelectedNode.Name == AppConstants.HistoryNode)
+                    if (SelectedNode.Name == AppConstants.HistoryNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
                         TheListView.Columns.Add(AppConstants.VerificationCodeHeader);
@@ -374,8 +374,8 @@ namespace SolimarLicenseViewer
                         TheListView.Columns.Add(colHeader);
                     }
                     #endregion
-                    #region else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
-                    else if (SelectedNode.Parent.Text == AppConstants.LicenseRootNode)
+                    #region else if (SelectedNode.Parent.Name == AppConstants.LicenseRootNode)
+                    else if (SelectedNode.Parent.Name == AppConstants.LicenseRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
                         TheListView.Columns.Add(AppConstants.VersionHeader);
@@ -385,17 +385,17 @@ namespace SolimarLicenseViewer
                         TheListView.Columns.Add(colHeader);
                     }
                     #endregion
-                    #region else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
-                    else if (SelectedNode.Parent.Text == AppConstants.UsageRootNode)
+                    #region else if (SelectedNode.Parent.Name == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Parent.Name == AppConstants.UsageRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.UsageAppInstanceHeader);
                     }
                     #endregion
                     break;
                 case 2:
-                    #region if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)
+                    #region if (SelectedNode.Parent.Parent.Name == AppConstants.LicenseRootNode)
 
-                    if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)
+                    if (SelectedNode.Parent.Parent.Name == AppConstants.LicenseRootNode)
                     {
                         //ProdLicNumHeader
 
@@ -490,8 +490,8 @@ namespace SolimarLicenseViewer
                         #endregion
                     }
                     #endregion
-                    #region else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)
-                    else if (SelectedNode.Parent.Parent.Text == AppConstants.UsageRootNode)
+                    #region else if (SelectedNode.Parent.Parent.Name == AppConstants.UsageRootNode)
+                    else if (SelectedNode.Parent.Parent.Name == AppConstants.UsageRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.UsageModuleHeader);
                         colHeader = new ColumnHeader();
@@ -735,7 +735,7 @@ namespace SolimarLicenseViewer
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                 {
                     //
-                    string productName = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
+                    string productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                     ListViewItem lvItem = FindListViewItem(this.TheListView.Items, productName);
                     if (lvItem == null)
                         lvItem = FindListViewItem(lviList, productName);
@@ -757,7 +757,15 @@ namespace SolimarLicenseViewer
                             strBuilder.Append(prodInfo.product_SubMinor.TVal.ToString());
                         }
                         lvItem.SubItems.Add(strBuilder.ToString());
-                        lvItem.SubItems.Add(prodInfo.productAppInstance.TVal.ToString());
+
+                        bool bExpired = false;
+                        if (prodInfo.bUseExpirationDate.TVal == true)
+                            bExpired = DateTime.Compare(DateTime.Now, prodInfo.expirationDate.TVal.ToLocalTime()) > 0;
+
+                        if (!bExpired && prodInfo.bUseActivations.TVal == true)
+                            bExpired = DateTime.Compare(DateTime.Now, prodInfo.activationCurrentExpirationDate.TVal.ToLocalTime()) > 0;
+
+                        lvItem.SubItems.Add(bExpired ? "0" : prodInfo.productAppInstance.TVal.ToString());
                         lvItem.ForeColor = m_TreeNode.ForeColor;
                         //lvItem.SubItems.Add(prodInfo.productExpirationDate.TVal.ToLocalTime().ToString());
 
@@ -768,8 +776,19 @@ namespace SolimarLicenseViewer
                         //Update existing item - subitem 2 has the prodAppInstance, update.
                         try
                         {
-                            int appInstance = Convert.ToInt32(lvItem.SubItems[2].Text);
-                            lvItem.SubItems[2].Text = (appInstance + prodInfo.productAppInstance.TVal).ToString();
+                            bool bExpired = false;
+                            if (prodInfo.bUseExpirationDate.TVal == true)
+                                bExpired = DateTime.Compare(DateTime.Now, prodInfo.expirationDate.TVal.ToLocalTime()) > 0;
+
+                            if (!bExpired && prodInfo.bUseActivations.TVal == true)
+                                bExpired = DateTime.Compare(DateTime.Now, prodInfo.activationCurrentExpirationDate.TVal.ToLocalTime()) > 0;
+
+                            Int64 appInstance = Convert.ToInt64(lvItem.SubItems[2].Text);
+                            if (!bExpired)
+                                appInstance += prodInfo.productAppInstance.TVal;
+                            lvItem.SubItems[2].Text = appInstance.ToString();
+                            //lvItem.SubItems[2].Text = string.Format("0x{0:x}", appInstance + prodInfo.productAppInstance.TVal);
+
                         }
                         catch (Exception)
                         { }
@@ -778,8 +797,9 @@ namespace SolimarLicenseViewer
 
                 this.TheListView.Items.AddRange(lviList.ToArray());
             }
-            catch (COMException)
+            catch (COMException ex)
             {
+                this.TheListView.NoItemsMessage = ex.ToString();
             }
         }
 
@@ -822,7 +842,7 @@ namespace SolimarLicenseViewer
 
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                 {
-                    productID = System.Convert.ToInt32(prodInfo.productID.ToString(), 16);
+                    productID = (int)prodInfo.productID.TVal;
                     if (string.Equals(m_CommLink.GetProductName(productID), m_TreeNode.Text))
                     {
                         bool bExpired = false;
@@ -836,8 +856,15 @@ namespace SolimarLicenseViewer
                         string activationCurrentExpirationDate = SolimarLicenseViewer.AppConstants.NotUsedStatus;
                         enableActivationExtByProductLicense[prodInfo.contractNumber] = prodInfo.bUseActivations;
 
-
-                        lvi.Tag = new object[] { m_TreeNode.Parent.Name, (int)prodInfo.activationCurrent.TVal, (int)prodInfo.activationTotal.TVal, (int)prodInfo.activationAmountInDays.TVal };
+                        lvi.Tag = new object[] 
+                        { 
+                            m_TreeNode.Parent.Name, 
+                            (int)prodInfo.activationCurrent.TVal, 
+                            (int)prodInfo.activationTotal.TVal, 
+                            (int)prodInfo.activationAmountInDays.TVal,
+                            prodInfo.activationCurrentExpirationDate.TVal,
+                            prodInfo.expirationDate.TVal
+                        };
 
                         if (prodInfo.bUseExpirationDate.TVal == true || prodInfo.bUseActivations.TVal == true)
                         {
@@ -850,7 +877,7 @@ namespace SolimarLicenseViewer
                                 activationTotal = prodInfo.activationTotal.TVal.ToString();
                                 activationAmountInDays = prodInfo.activationAmountInDays.TVal.ToString();
                                 bExpired = DateTime.Compare(DateTime.Now, prodInfo.activationCurrentExpirationDate.TVal.ToLocalTime()) > 0;
-                                activationCurrentExpirationDate = prodInfo.activationCurrentExpirationDate.TVal.ToLocalTime().ToString();
+                                activationCurrentExpirationDate = !bExpired ? prodInfo.activationCurrentExpirationDate.TVal.ToLocalTime().ToString() : SolimarLicenseViewer.AppConstants.ExpiredStatus;
                             }
 
                             if (!bExpired && prodInfo.bUseExpirationDate.TVal == true)
@@ -864,7 +891,6 @@ namespace SolimarLicenseViewer
                         lvi.SubItems.Add(activationCurrentExpirationDate);
                         if (bExpired == true)
                             lvi.ForeColor = System.Drawing.Color.Red;
-                        //bExpired
                         this.TheListView.Items.Add(lvi);
                     }
                 }
@@ -979,7 +1005,7 @@ namespace SolimarLicenseViewer
                     prodLicNumberToLvGroupMap = new SortedDictionary<string, ListViewGroup>();
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                 {
-                    int tmpProductID = System.Convert.ToInt32(prodInfo.productID.ToString(), 16);
+                    int tmpProductID = (int)prodInfo.productID.TVal;
                     if (string.Equals(m_CommLink.GetProductName(tmpProductID), m_TreeNode.Text) &&
                         (bDisplayAllModuleInfo || string.Equals(_prodLicNumber, prodInfo.contractNumber)))
                     //string.Equals(_prodLicNumber, prodInfo.contractNumber))
@@ -1009,6 +1035,7 @@ namespace SolimarLicenseViewer
 
                             if (bUseActivationExpiration != null)
                             {
+                                //Use to display Activation Expired
                                 expirationDate = bUseActivationExpiration.Value ? activationExpirationDate.Value : prodLicNumberExpirationDate.Value;
                                 bExpired = (expirationDate != null) && (DateTime.Compare(DateTime.Now, expirationDate.Value.ToLocalTime()) > 0);
                                 expirationDateText = (bExpired && bUseActivationExpiration.Value) ? SolimarLicenseViewer.AppConstants.ExpiredStatus : expirationDate.Value.ToLocalTime().ToString();
@@ -1030,7 +1057,7 @@ namespace SolimarLicenseViewer
                             {
                                 if (modInfo.moduleAppInstance != 0 || modInfo.moduleValue != 0)
                                 {
-                                    moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
+                                    moduleID = (int)modInfo.moduleID.TVal;
                                     if (!sumModInfoList.ContainsKey(moduleID))
                                         sumModInfoList.Add(moduleID, new int[3]);
 
@@ -1043,17 +1070,17 @@ namespace SolimarLicenseViewer
 
                                         if (!modExpirationDateList[moduleID].ContainsKey(expirationDate.Value))
                                             modExpirationDateList[moduleID].Add(expirationDate.Value, 0);
-                                        modExpirationDateList[moduleID][expirationDate.Value] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                        modExpirationDateList[moduleID][expirationDate.Value] += (int)modInfo.moduleAppInstance.TVal;
                                     }
 
                                     if (bExpired)
                                     {
-                                        sumModInfoList[moduleID][2] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                        sumModInfoList[moduleID][2] += (int)modInfo.moduleAppInstance.TVal;
                                     }
                                     else //Not Expired
                                     {
-                                        sumModInfoList[moduleID][0] += System.Convert.ToInt32(modInfo.moduleValue.ToString(), 16);
-                                        sumModInfoList[moduleID][1] += System.Convert.ToInt32(modInfo.moduleAppInstance.ToString(), 16);
+                                        sumModInfoList[moduleID][0] += (int)modInfo.moduleValue.TVal;
+                                        sumModInfoList[moduleID][1] += (int)modInfo.moduleAppInstance.TVal;
                                     }
                                 }
                             }
@@ -1068,7 +1095,7 @@ namespace SolimarLicenseViewer
                                 {
                                     //Get Module Info using product id and module id
                                     ListViewItem lvItem = new ListViewItem();
-                                    moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
+                                    moduleID = (int)modInfo.moduleID.TVal;
                                     lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
                                     if (bExpired)
                                         lvItem.ForeColor = System.Drawing.Color.Red;
@@ -1374,7 +1401,7 @@ namespace SolimarLicenseViewer
                             else
                             {
                                 LoadModuleData("");
-                                TheSplitControl.Panel2Collapsed = true;
+                                //TheSplitControl.Panel2Collapsed = true;
                             }
                         }
                         #endregion
@@ -1480,12 +1507,12 @@ namespace SolimarLicenseViewer
                     //add a product node if there are app instances
                     if (prodInfo.productID.ToString() != "0")
                     {
-                        m_CommLink.SoftwareGetApplicationInstanceListByProduct(System.Convert.ToInt32(prodInfo.productID.ToString(), 16), ref generalStream);
+                        m_CommLink.SoftwareGetApplicationInstanceListByProduct((int)prodInfo.productID.TVal, ref generalStream);
                         Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                         appList.SVal = generalStream;
                         if (appList.TVal.Count > 0)
                         {
-                            productName = m_CommLink.GetProductName(System.Convert.ToInt32(prodInfo.productID.ToString(), 16));
+                            productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                             this.TheListView.Items.Add(productName);
                         }
                     }
@@ -1574,31 +1601,64 @@ namespace SolimarLicenseViewer
                 }
                 m_CommLink.GetSoftwareLicenseInfoForAll(ref generalStream);
                 licInfoAttrib.AssignMembersFromStream(generalStream);
-                foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
-                {   //found matching prodinfo attriblist
-                    productID = System.Convert.ToInt32(prodInfo.productID.ToString(), 16);
-                    if (string.Equals(m_CommLink.GetProductName(productID), _productName))
+                #region if (m_CommLink.bDiagnosticDateView == true)
+                if (m_CommLink.bDiagnosticDateView == true)
+                {
+                    foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs prodInfo in m_CommLink.diagnosticUsageAttribs.productList.TVal)
                     {
-                        m_CommLink.InitializeWrapper(m_TreeNode.Text, productID, System.Convert.ToInt32(prodInfo.product_Major.ToString(), 16), System.Convert.ToInt32(prodInfo.product_Minor.ToString(), 16));
-                        foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
+                        productID = (int)prodInfo.productID.TVal;
+                        if (string.Equals(m_CommLink.GetProductName(productID), _productName))
                         {
-                            moduleID = System.Convert.ToInt32(modInfo.moduleID.ToString(), 16);
-
-                            m_CommLink.ModuleLicenseInUse_ByApp(moduleID, ref licenseCount);
-                            if (licenseCount > 0)
+                            foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs appInstInfo in prodInfo.appInstanceList.TVal)
                             {
-                                ListViewItem lvItem = new ListViewItem();
-                                lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
-                                lvItem.SubItems.Add(licenseCount.ToString());
-                                m_CommLink.ModuleLicenseTotal(moduleID, ref licenseCount);
-                                lvItem.SubItems.Add(licenseCount.ToString());
-                                this.TheListView.Items.Add(lvItem);
+                                if (string.Compare(appInstInfo.applicationInstance.TVal, m_TreeNode.Text, true) == 0)
+                                {
+                                    foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsModuleInfoAttribs modInfo in appInstInfo.moduleList.TVal)
+                                    {
+                                        ListViewItem lvItem = new ListViewItem();
+                                        lvItem.Text = m_CommLink.GetModuleName(productID, (int)modInfo.moduleID.TVal);
+                                        lvItem.SubItems.Add(modInfo.moduleUsage.TVal.ToString());
+                                        lvItem.SubItems.Add("-");
+                                        //m_CommLink.ModuleLicenseTotal(moduleID, ref licenseCount);
+                                        //lvItem.SubItems.Add(licenseCount.ToString());
+                                        this.TheListView.Items.Add(lvItem);
+                                    }
+                                }
                             }
                         }
-                        //found product, no need to continue searching productlist
-                        break;
                     }
                 }
+                #endregion
+                #region else //if (m_CommLink.bDiagnosticDateView == false)
+                else //if (m_CommLink.bDiagnosticDateView == false)
+                {
+                    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
+                    {   //found matching prodinfo attriblist
+                        productID = (int)prodInfo.productID.TVal;
+                        if (string.Equals(m_CommLink.GetProductName(productID), _productName))
+                        {
+                            m_CommLink.InitializeWrapper(m_TreeNode.Text, productID, (int)prodInfo.product_Major.TVal, (int)prodInfo.product_Minor.TVal);
+                            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
+                            {
+                                moduleID = (int)modInfo.moduleID.TVal;
+
+                                m_CommLink.ModuleLicenseInUse_ByApp(moduleID, ref licenseCount);
+                                if (licenseCount > 0)
+                                {
+                                    ListViewItem lvItem = new ListViewItem();
+                                    lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
+                                    lvItem.SubItems.Add(licenseCount.ToString());
+                                    m_CommLink.ModuleLicenseTotal(moduleID, ref licenseCount);
+                                    lvItem.SubItems.Add(licenseCount.ToString());
+                                    this.TheListView.Items.Add(lvItem);
+                                }
+                            }
+                            //found product, no need to continue searching productlist
+                            break;
+                        }
+                    }
+                }
+                #endregion
             }
             catch (COMException) { }
         }
