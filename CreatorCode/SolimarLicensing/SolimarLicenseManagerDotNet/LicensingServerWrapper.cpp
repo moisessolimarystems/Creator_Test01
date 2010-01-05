@@ -243,25 +243,6 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SoftwareGetApplica
 	}
 	return hr;
 }
-HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SoftwareGetApplicationInstanceListByProduct2(long productID, BSTR *pBstrListUsAppInstInfoAttribs)
-{
-	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
-	if(bConnected)
-	{
-		ISolimarSoftwareLicenseSvr2* pLocalInterface;
-		hr = licenseSoftwareServer->QueryInterface(__uuidof(ISolimarSoftwareLicenseSvr2), (void**)&pLocalInterface);
-		if(SUCCEEDED(hr))
-		{
-			LIC_SSLSERVER_FTCALL_HR(pLocalInterface, SoftwareGetApplicationInstanceListByProduct2, (productID, pBstrListUsAppInstInfoAttribs), hr);
-			if(pLocalInterface != NULL)
-			{
-				pLocalInterface->Release();
-				pLocalInterface = NULL;
-			}
-		}
-	}
-	return hr;
-}
 
 HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStream, VARIANT vtExpires, BSTR *pBstrVerificationCode, VARIANT* pVtLicensePacket)
 {

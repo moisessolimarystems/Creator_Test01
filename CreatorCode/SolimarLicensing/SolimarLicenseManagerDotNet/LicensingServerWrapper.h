@@ -96,7 +96,6 @@ namespace SolimarLicenseManagerWrapper
 			HRESULT GetSoftwareSpecByProduct(long productID, BSTR *pBstrProductSoftwareSpecAttribs);
 			HRESULT GetSoftwareSpec(BSTR *pBstrSoftwareSpecAttribsStream);
 			HRESULT SoftwareGetApplicationInstanceListByProduct(long productID, BSTR *pBstrListAppInstStream);
-			HRESULT SoftwareGetApplicationInstanceListByProduct2(long productID, BSTR *pBstrListUsAppInstInfoAttribs);
 
 			HRESULT GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStream, VARIANT vtExpires, BSTR *pBstrVerificationCode, VARIANT* pVtLicensePacket);
 			HRESULT EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrVerificationCode);
