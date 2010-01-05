@@ -314,7 +314,15 @@ namespace Service.Creator
         [EnumMember]
         ProductVersion,
         [EnumMember]
-        State
+        State,
+        [EnumMember]
+        Extension,
+        [EnumMember]
+        Activation,
+        [EnumMember]
+        ActivationAmount,
+        [EnumMember]
+        Active
     }
 
     [DataContract]

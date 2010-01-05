@@ -10,6 +10,7 @@ using System.Configuration;
 using System.ComponentModel;
 using CreatorData;
 using Solimar.Licensing.LicenseManagerWrapper;
+using Client.Creator;
 
 namespace Service.Creator
 {
@@ -23,8 +24,7 @@ namespace Service.Creator
                 {            
                     {"Customer", "CustomerTable.SCRname"},
                     {"LicenseServer", "LicenseName"},
-                    {"LicenseType", "LicenseType"},
-                    {"ExpirationDate", "ExpirationDate"},
+                    {"Active", "IsActive"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -35,7 +35,11 @@ namespace Service.Creator
                     {"ExpirationDate", "ExpirationDate"},
                     {"Product", "ProductID"},
                     {"ProductVersion", "ProductVersion"},
-                    {"State", "plState"}
+                    {"State", "plState"},
+                    {"Active", "IsActive"},
+                    {"Extension","Extensions"},
+                    {"Activation","Activations"},
+                    {"ActivationAmount","ActivationAmount"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -45,9 +49,10 @@ namespace Service.Creator
                     {"NotEqual", "!="},
                     {"LessThan", "<"},
                     {"GreaterThan", ">"},
-                    {"Contains", "Contains"}
+                    {"Contains", "Contains"},
                 };
         public static SolimarLicenseServerWrapper m_licServer = new SolimarLicenseServerWrapper();
+        public static CommunicationLink m_CommLink = new CommunicationLink();
 
         #region ICreator Members
 
@@ -195,7 +200,7 @@ namespace Service.Creator
                     }
                     conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
                     conditionString.Append(value);
-                }
+                }                
             }
             return LicenseTable.GetLicensesByConditions(conditionString.ToString());
         }
@@ -212,7 +217,6 @@ namespace Service.Creator
             m_licServer.Connect("localhost");
             //}
             //LicenseTable licRecord = LicenseTable.GetLicenseByName(licenseName, false);
-
             m_licServer.GenerateSoftwareLicPacket(lt.LicenseInfo, expDate, ref vCode, ref newByteArrayLicensePacket);
             PacketTable newPacket = new PacketTable()
             {
@@ -358,16 +362,17 @@ namespace Service.Creator
             int result;
             DateTime date;
             StringBuilder conditionString = new StringBuilder();
+            
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
                     conditionString.Append(" and ");
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);
-                value = userCondition.Value;                
+                value = userCondition.Value;
                 if (DateTime.TryParse(value, out date))
                 {
-                    value = string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day);
+                    value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18,0,0);
                 }
                 if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
                 {
@@ -375,9 +380,16 @@ namespace Service.Creator
                 }
                 else
                 {
+                    if (userCondition.Name == ConditionName.Product)
+                    {   //translate if necessary to product id
+                        if (!Int32.TryParse(value, out  result))
+                            value = m_CommLink.GetProductID(value).ToString();
+
+                    }
                     if(!Int32.TryParse(value, out result))
                     {
-                        value = "\"" + value + "\"";
+                        if(!value.Contains("DateTime"))
+                            value = "\"" + value + "\"";
                     }
                     conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
                     conditionString.Append(value);

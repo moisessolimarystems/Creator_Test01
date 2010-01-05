@@ -19,7 +19,7 @@ using Client.Creator.Properties;
 using Solimar.Licensing.LicenseManagerWrapper;
 
 /*
- * TODO : - Apply rules to license types - std,bkup,dr,testdev
+ * TODO : 
  *        - Create custom filters to retrieve lists.
  *        - Add license comment attribute to license table
  *        - Improve look of interface
@@ -47,6 +47,7 @@ namespace Client.Creator
         private DestinationNameTable _selectedDestination;
         private DateTime _currentExpirationDate;
         private ReportManager _reportManager;
+        private string _copyName;
 
         #region Properties
 
@@ -872,6 +873,26 @@ namespace Client.Creator
 
         #region DetailTreeView Events
 
+        private void nextFindToolStripButton_Click(object sender, EventArgs e)
+        {
+            findSearchString(findToolStripTextBox.Text);
+        }
+
+        private void closeFindToolStripButton_Click(object sender, EventArgs e)
+        {
+            //hide find toolstrip
+            findToolStrip.Visible = false;
+            findToolStripTextBox.Text = "";
+        }
+
+        private void findToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
+            {
+                findSearchString(findToolStripTextBox.Text);
+            }
+        }
+
         private void DetailTreeView_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode.ToString() == "F")
@@ -1437,6 +1458,7 @@ namespace Client.Creator
             ShowTransactionListView(transactionToolStripComboBox.SelectedItem.ToString(), "");
         }
         #endregion
+
         #region HardwareKeyListView Events
         private void HardwareKeyListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
@@ -1462,7 +1484,7 @@ namespace Client.Creator
 
                     if (item.Equals(hitInfo.Item))
                     {
-                        _selectedHardwareKeyCustomer = item.Text;
+                        _selectedHardwareKeyCustomer = item.SubItems[1].Text;
                         //launch edit dialog
                         LoadHardwareKeyListView("", _selectedHardwareKeyCustomer);
                         EnableHardwareKeyView();
@@ -1671,7 +1693,7 @@ namespace Client.Creator
 
         private void lsReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ReportDlg dlg = new ReportDlg())
+            using (ReportDlg dlg = new ReportDlg(s_CommLink))
             {
                 ReportDlgData data = new ReportDlgData();
                 int untitledCount = 0;
@@ -1695,7 +1717,7 @@ namespace Client.Creator
         }
         private void plReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ReportDlg dlg = new ReportDlg())
+            using (ReportDlg dlg = new ReportDlg(s_CommLink))
             {
                 ReportDlgData data = new ReportDlgData();
                 int untitledCount = 0;
@@ -1731,7 +1753,7 @@ namespace Client.Creator
         private void editReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode selectedNode = null;
-            using (ReportDlg dlg = new ReportDlg())
+            using (ReportDlg dlg = new ReportDlg(s_CommLink))
             {
                 ReportDlgData data = new ReportDlgData();
                 selectedNode = reportsTreeView.SelectedNode;
@@ -4222,6 +4244,7 @@ namespace Client.Creator
                 licenses = client.GetProductLicensesByConditions(conditionList);
                 customers = client.GetAllCustomers("", false);
             });
+
             PopulateReportListViewColumns(ReportProperty.ReportType.ProductLicense);
             ReportListView.BeginUpdate();
             ReportListView.Items.Clear();
@@ -4237,13 +4260,20 @@ namespace Client.Creator
                         newItem.Text = customer.SCRname;
                     else
                         newItem.Text = "Unknown";
+                    //1. id 2) product 3) version 4) state 5) expdate - extension 6)activation 7) activation amount 8) active 9) description
                     newItem.SubItems.Add(licenses[index].plID);
                     newItem.SubItems.Add(s_CommLink.GetProductName((uint)licenses[index].ProductID));
+                    newItem.SubItems.Add(licenses[index].ProductVersion);
                     newItem.SubItems.Add(((ProductLicenseState)(licenses[index].plState)).ToString());
                     if (licenses[index].ExpirationDate.HasValue)
                         newItem.SubItems.Add(licenses[index].ExpirationDate.Value.ToShortDateString());
                     else
                         newItem.SubItems.Add("");
+                    newItem.SubItems.Add(licenses[index].Extensions.ToString());
+                    newItem.SubItems.Add(licenses[index].Activations.ToString());
+                    newItem.SubItems.Add(licenses[index].ActivationAmount.ToString());
+                    newItem.SubItems.Add(licenses[index].IsActive.ToString());
+                    newItem.SubItems.Add(licenses[index].Description);
                     lvItems[index] = newItem;
                 }
                 ReportListView.Items.AddRange(lvItems);
@@ -4279,6 +4309,7 @@ namespace Client.Creator
                         newItem.Text = "Unknown";
                     newItem.SubItems.Add(licenses[index].LicenseName);
                     newItem.SubItems.Add(licenses[index].IsActive.ToString());
+                    newItem.SubItems.Add(licenses[index].LicenseComments);
                     lvItems[index] = newItem;
                 }
                 ReportListView.Items.AddRange(lvItems);
@@ -4305,17 +4336,25 @@ namespace Client.Creator
             ReportListView.Columns.Clear();
             if (_reportType == ReportProperty.ReportType.ProductLicense)
             {
+                //1. id 2) product 3) version 4) state 5) extension 6)activation 7) activation amount 8) active 9) description
                 ReportListView.Columns.Add("Customer");
-                ReportListView.Columns.Add("Product License");
+                ReportListView.Columns.Add("ID");
                 ReportListView.Columns.Add("Product");
+                ReportListView.Columns.Add("Version");
                 ReportListView.Columns.Add("State");
                 ReportListView.Columns.Add("Expiration Date");
+                ReportListView.Columns.Add("Extension");
+                ReportListView.Columns.Add("Activations");
+                ReportListView.Columns.Add("Activation Amount");
+                ReportListView.Columns.Add("Active");
+                ReportListView.Columns.Add("Notes");
             }
             else
             {
                 ReportListView.Columns.Add("Customer");
                 ReportListView.Columns.Add("License Server");
                 ReportListView.Columns.Add("Active");
+                ReportListView.Columns.Add("Notes");
             }
             _lvManager.ResetListViewColumnSorter(ReportListView);
         }
@@ -4587,12 +4626,37 @@ namespace Client.Creator
         }
         #endregion
 
+        //copy
+        private void copyNode()
+        {
+            //verify it is a LS or PL
+            //save name in memory   
+            //
+        }
+        //paste
+        private void pasteNode(string nodeName)
+        {
+
+            //capture position of mouse
+            //use name saved to determine what to create
+            //if pl create under 
+            //if ls just create
+            //if (DetailTreeView.SelectedNode != null)
+            //{
+            //    if(DetailTreeView.SelectedNode.Level == 0) //LS
+            //    if(DetailTreeView.SelectedNode.Level > 1) //addon or PL
+
+            //}
+        }
+        
         private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //only display on product licenses
             //get product license information from currently selected tag
             //launch pl dialog? disallow modification
         }
+
+
 
         private void findSearchString(string findString)
         {
@@ -4640,25 +4704,7 @@ namespace Client.Creator
                 MessageBox.Show("Failed to find " + findToolStripTextBox.Text, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void nextFindToolStripButton_Click(object sender, EventArgs e)
-        {
-            findSearchString(findToolStripTextBox.Text);
-        }
 
-        private void closeFindToolStripButton_Click(object sender, EventArgs e)
-        {
-            //hide find toolstrip
-            findToolStrip.Visible = false;
-            findToolStripTextBox.Text = "";
-        }
-
-        private void findToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
-            {
-                findSearchString(findToolStripTextBox.Text);
-            }
-        }
     }
     // Implements the manual sorting of items by columns.
 }

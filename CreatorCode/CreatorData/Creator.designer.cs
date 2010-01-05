@@ -401,8 +401,6 @@ namespace CreatorData
 		
 		private string _LicenseName;
 		
-		private byte _LicenseType;
-		
 		private string _LicenseInfo;
 		
 		private string _LicenseComments;
@@ -439,8 +437,6 @@ namespace CreatorData
     partial void OnGroupIDChanged();
     partial void OnLicenseNameChanging(string value);
     partial void OnLicenseNameChanged();
-    partial void OnLicenseTypeChanging(byte value);
-    partial void OnLicenseTypeChanged();
     partial void OnLicenseInfoChanging(string value);
     partial void OnLicenseInfoChanged();
     partial void OnLicenseCommentsChanging(string value);
@@ -567,29 +563,8 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_LicenseType", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=6)]
-		public byte LicenseType
-		{
-			get
-			{
-				return this._LicenseType;
-			}
-			set
-			{
-				if ((this._LicenseType != value))
-				{
-					this.OnLicenseTypeChanging(value);
-					this.SendPropertyChanging();
-					this._LicenseType = value;
-					this.SendPropertyChanged("LicenseType");
-					this.OnLicenseTypeChanged();
-				}
-			}
-		}
-		
 		[Column(Storage="_LicenseInfo", DbType="Text NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=7)]
+		[DataMember(Order=6)]
 		public string LicenseInfo
 		{
 			get
@@ -610,7 +585,7 @@ namespace CreatorData
 		}
 		
 		[Column(Storage="_LicenseComments", DbType="VarChar(255)", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=8)]
+		[DataMember(Order=7)]
 		public string LicenseComments
 		{
 			get
@@ -631,7 +606,7 @@ namespace CreatorData
 		}
 		
 		[Column(Storage="_OrderIndex", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=9)]
+		[DataMember(Order=8)]
 		public int OrderIndex
 		{
 			get
@@ -652,7 +627,7 @@ namespace CreatorData
 		}
 		
 		[Column(Storage="_IsDirty", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=10)]
+		[DataMember(Order=9)]
 		public bool IsDirty
 		{
 			get
@@ -673,7 +648,7 @@ namespace CreatorData
 		}
 		
 		[Column(Storage="_IsActive", DbType="Bit NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=11)]
+		[DataMember(Order=10)]
 		public bool IsActive
 		{
 			get
@@ -694,7 +669,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=12, EmitDefaultValue=false)]
+		[DataMember(Order=11, EmitDefaultValue=false)]
 		public EntitySet<TokenTable> TokenTables
 		{
 			get
@@ -713,7 +688,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_PacketTable", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=13, EmitDefaultValue=false)]
+		[DataMember(Order=12, EmitDefaultValue=false)]
 		public EntitySet<PacketTable> PacketTables
 		{
 			get
@@ -732,7 +707,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=14, EmitDefaultValue=false)]
+		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<ProductLicenseTable> ProductLicenseTables
 		{
 			get
@@ -751,7 +726,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TransactionTable", Storage="_TransactionTables", ThisKey="ID", OtherKey="taLicenseID")]
-		[DataMember(Order=15, EmitDefaultValue=false)]
+		[DataMember(Order=14, EmitDefaultValue=false)]
 		public EntitySet<TransactionTable> TransactionTables
 		{
 			get

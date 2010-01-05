@@ -51,9 +51,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Creator.cs">
-      <DependentUpon>Creator.dbml</DependentUpon>
-    </Compile>
     <Compile Include="DestinationNameTable.cs" />
     <Compile Include="ProductLicenseTable.cs" />
     <Compile Include="Creator.designer.cs">

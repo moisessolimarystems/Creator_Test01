@@ -992,6 +992,18 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         State = 7,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Extension = 8,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Activation = 9,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ActivationAmount = 10,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Active = 11,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
@@ -1401,9 +1413,6 @@ namespace Client.Creator.CreatorService {
         private string LicenseNameField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private byte LicenseTypeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string LicenseInfoField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1506,19 +1515,6 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public byte LicenseType {
-            get {
-                return this.LicenseTypeField;
-            }
-            set {
-                if ((this.LicenseTypeField.Equals(value) != true)) {
-                    this.LicenseTypeField = value;
-                    this.RaisePropertyChanged("LicenseType");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
         public string LicenseInfo {
             get {
                 return this.LicenseInfoField;
@@ -1531,7 +1527,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
         public string LicenseComments {
             get {
                 return this.LicenseCommentsField;
@@ -1544,7 +1540,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
         public int OrderIndex {
             get {
                 return this.OrderIndexField;
@@ -1557,7 +1553,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
         public bool IsDirty {
             get {
                 return this.IsDirtyField;
@@ -1570,7 +1566,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
         public bool IsActive {
             get {
                 return this.IsActiveField;
@@ -1583,7 +1579,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTables {
             get {
                 return this.TokenTablesField;
@@ -1596,7 +1592,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTables {
             get {
                 return this.PacketTablesField;
@@ -1609,7 +1605,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> ProductLicenseTables {
             get {
                 return this.ProductLicenseTablesField;
@@ -1622,7 +1618,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=14)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> TransactionTables {
             get {
                 return this.TransactionTablesField;

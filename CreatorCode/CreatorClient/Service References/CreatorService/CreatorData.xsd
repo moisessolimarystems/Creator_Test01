@@ -175,7 +175,6 @@
       <xs:element minOccurs="0" name="DestinationID" type="xs:int" />
       <xs:element minOccurs="0" name="GroupID" type="xs:int" />
       <xs:element minOccurs="0" name="LicenseName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="LicenseType" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="LicenseInfo" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="LicenseComments" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="OrderIndex" type="xs:int" />

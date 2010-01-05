@@ -8,16 +8,25 @@ namespace Client.Creator
 {
     public class ReportProperty
     {
-        //dictionary to translate enums to ls enums
         public static readonly IDictionary<string, ConditionName>
-        _filterNames = new Dictionary<string, ConditionName>
-                {        
-                    {"Customer", ConditionName.Customer},
+            _filterLSNames = new Dictionary<string, ConditionName>
+                {  
+                    {"Active", ConditionName.Active},
+                    {"Customer", ConditionName.Customer},        
                     {"License Server", ConditionName.LicenseServer},
-                    {"License Type", ConditionName.LicenseType},
-                    {"Product License", ConditionName.ProductLicense},
+                };
+
+        public static readonly IDictionary<string, ConditionName>
+            _filterPLNames = new Dictionary<string, ConditionName>
+                {  
+                    {"Activation Amount",ConditionName.ActivationAmount}, 
+                    {"Activation Total", ConditionName.Activation},
+                    {"Active", ConditionName.Active},        
+                    {"Customer", ConditionName.Customer},  
+                    {"Extension Count", ConditionName.Extension},
                     {"Expiration Date", ConditionName.ExpirationDate},
                     {"Product", ConditionName.Product},
+                    {"Product License", ConditionName.ProductLicense},
                     {"Product Version", ConditionName.ProductVersion},
                     {"State", ConditionName.State}
                 };
@@ -65,9 +74,31 @@ namespace Client.Creator
             set { _conditions = value; }
         }
 
-        public string GetConditionsString()
+        public string GetFilterKey(CreatorService.Condition userCondition)
         {
             string conditionString = "";
+            if (Type == ReportType.LicenseServer)
+            {
+                foreach (KeyValuePair<string, ConditionName> kvp in _filterLSNames)
+                {
+                    if (kvp.Value == userCondition.Name)
+                    {
+                        conditionString = kvp.Key;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, ConditionName> kvp in _filterPLNames)
+                {
+                    if (kvp.Value == userCondition.Name)
+                    {
+                        conditionString = kvp.Key;
+                        break;
+                    }
+                }
+            }            
             return conditionString;
         }
     }

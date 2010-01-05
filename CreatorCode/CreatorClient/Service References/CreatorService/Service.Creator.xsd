@@ -24,6 +24,10 @@
       <xs:enumeration value="Product" />
       <xs:enumeration value="ProductVersion" />
       <xs:enumeration value="State" />
+      <xs:enumeration value="Extension" />
+      <xs:enumeration value="Activation" />
+      <xs:enumeration value="ActivationAmount" />
+      <xs:enumeration value="Active" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ConditionName" nillable="true" type="tns:ConditionName" />
