@@ -68,7 +68,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT GenerateLicPackage_BySoftwareLicArchive(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
 		HRESULT GenerateLicPackage_BySoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
 		HRESULT GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket);
-		HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed,	BSTR *pBstrKeyAttribsListStream,	BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
+		HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
 		// Only for Interal License Servers
 		HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
 

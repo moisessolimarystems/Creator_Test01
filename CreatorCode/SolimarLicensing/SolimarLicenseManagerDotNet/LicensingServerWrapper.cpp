@@ -354,12 +354,12 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateLicenseSys
 	}
 	return hr;
 }
-HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
 {
 	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
 	if(bConnected)
 	{
-		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GenerateStreamData_ByLicenseSystemData, (vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrLicInfoDataAttribsListStream), hr);
+		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GenerateStreamData_ByLicenseSystemData, (vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrEventLogAttribsListStream, pBstrLicInfoDataAttribsListStream), hr);
 	}
 	return hr;
 }
@@ -369,6 +369,16 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStream_ByL
 	if(bConnected)
 	{
 		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GenerateStream_ByLicenseSystemData, (vtLicSysDataPacket, pBstrLicSysDataAttribsStream), hr);
+	}
+	return hr;
+}
+
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GetEventLogList_ForLicenseServer, (pBstrEventLogAttribsListStream), hr);
 	}
 	return hr;
 }

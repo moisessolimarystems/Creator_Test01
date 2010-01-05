@@ -623,10 +623,16 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateStream_ByLicenseSystemData(VARIANT vtLi
 	return g_licenseController.softwareServer.GenerateStream_ByLicenseSystemData(vtLicSysDataPacket, pBstrLicSysDataAttribsStream);
 }
 
-STDMETHODIMP CSolimarLicenseSvr::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed,	BSTR *pBstrKeyAttribsListStream,	BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
+STDMETHODIMP CSolimarLicenseSvr::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed,	BSTR *pBstrKeyAttribsListStream,	BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.GenerateStreamData_ByLicenseSystemData(vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrLicInfoDataAttribsListStream);
+	return g_licenseController.softwareServer.GenerateStreamData_ByLicenseSystemData(vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrEventLogAttribsListStream, pBstrLicInfoDataAttribsListStream);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP CSolimarLicenseSvr::ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue)
