@@ -196,21 +196,17 @@ namespace Shared.VisualComponents
             if(m.Msg == WM_PAINT)
             {
                 #region Handle drawing of "no items" message
-                if (Items.Count == 0 && Columns.Count > 0)
+                if (Items.Count == 0)
                 {
                     if (this.GridLines)
                     {
                         base.GridLines = false;
                     }
 
-                    int w = 0;
-                    foreach (ColumnHeader h in this.Columns)
-                        w += h.Width;
-
                     StringFormat sf = new StringFormat();
                     sf.Alignment = StringAlignment.Center;
 
-                    Rectangle rc = new Rectangle(0, (int)(this.Font.Height * 2), w, this.Height);
+                    Rectangle rc = new Rectangle(0, (int)(this.Font.Height * 2), this.Width, this.Height);
 
                     using (Graphics g = this.CreateGraphics())
                     {
