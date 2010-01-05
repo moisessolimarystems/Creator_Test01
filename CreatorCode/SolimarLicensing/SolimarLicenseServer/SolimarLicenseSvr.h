@@ -6,9 +6,13 @@
 #include "resource.h"       // main symbols
 #include "..\common\IObjectAuthentication.h"
 #include "..\common\ILicensingMessage.h"
+#include "..\common\ISoftwareLicensingMessage.h"
 #include "..\common\ChallengeResponseHelper.h"
 #include "KeyServer.h"
-#include "KeyServerInstance.h"
+#include "KeyServerInstance.h"	// creates a global keyserver
+#include "SoftwareServer.h"
+#include "SoftwareServerInstance.h"	// creates a global softwareServer
+#include "..\common\WMIHelper.h"	//For WMIHelper
 #include <comutil.h>
 
 // ISolimarLicenseSvr
@@ -121,6 +125,76 @@ __interface ISolimarLicenseSvr4 : ISolimarLicenseSvr3
 {
 	[id(79),helpstring("method KeyModuleLicenseInUse_ByApp")] HRESULT KeyModuleLicenseInUse_ByApp([in] BSTR key_ident, [in] long module_ident, [out,retval] long* license_count);
 };
+
+// ISolimarSoftwareLicenseSvr
+[
+	object,
+	uuid("7FFD4EEB-DC7A-43f0-9117-667D77EF93A2"),
+	dual,	helpstring("ISolimarSoftwareLicenseSvr Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarSoftwareLicenseSvr : IDispatch
+{
+	[id(80),helpstring("method SoftwareModuleLicenseTotalForAll_ByProduct")] HRESULT SoftwareModuleLicenseTotalForAll_ByProduct([in] long productID, [in] long moduleIdent, [out,retval] long* pLicenseCount);
+	[id(81),helpstring("method SoftwareModuleLicenseInUseForAll_ByProduct")] HRESULT SoftwareModuleLicenseInUseForAll_ByProduct([in] long productID, [in] long moduleIdent, [out,retval] long* pLicenseCount);
+	[id(82),helpstring("method SoftwareValidateLicenseApp_ByProduct")] HRESULT SoftwareValidateLicenseApp_ByProduct([in] long productID, [out,retval] VARIANT_BOOL *pbLicenseValid);
+	[id(83),helpstring("method SoftwareModuleLicenseInUseByApp_ByProduct")] HRESULT SoftwareModuleLicenseInUseByApp_ByProduct([in] long productID, [in] long moduleIdent, [out,retval] long* pLicenseCount);
+	[id(84),helpstring("method SoftwareModuleLicenseInUseByConnection_ByProduct")] HRESULT SoftwareModuleLicenseInUseByConnection_ByProduct([in] long productID, [in] long moduleIdent, [out,retval] long* pLicenseCount);
+	[id(85),helpstring("method SoftwareModuleLicenseObtainByApp_ByProduct")] HRESULT SoftwareModuleLicenseObtainByApp_ByProduct([in] long productID, [in] long moduleIdent, [in] long licenseCount);
+	[id(86),helpstring("method SoftwareModuleLicenseReleaseByApp_ByProduct")] HRESULT SoftwareModuleLicenseReleaseByApp_ByProduct([in] long productID, [in] long moduleIdent, [in] long licenseCount);
+	[id(87),helpstring("method SoftwareModuleLicenseCounterDecrementByApp_ByProduct")] HRESULT SoftwareModuleLicenseCounterDecrementByApp_ByProduct([in] long productID, [in] long moduleIdent, [in] long licenseCount);
+
+	[id(88),helpstring("method GetSoftwareLicenseInfoByProduct_ForAll")] HRESULT GetSoftwareLicenseInfoByProduct_ForAll([in] long productID, [out,retval] BSTR *pBstrProductInfoAttribsStream);
+	[id(89),helpstring("method GetSoftwareLicenseInfo_ForAll")] HRESULT GetSoftwareLicenseInfo_ForAll([out,retval] BSTR *pBstrLicenseInfoAttribsStream);
+
+	[id(90),helpstring("method GetAllSoftwareLicenses")] HRESULT GetAllSoftwareLicenses([out,retval] BSTR *pBstrListAllLicensesStream);
+	[id(91),helpstring("method GetSoftwareLicenseInfoByProduct_ByLicense")] HRESULT GetSoftwareLicenseInfoByProduct_ByLicense([in] BSTR softwareLicense, [in] long productID, [out,retval] BSTR *pBstrProductInfoAttribsStream);
+	[id(92),helpstring("method GetSoftwareLicenseInfo_ByLicense")] HRESULT GetSoftwareLicenseInfo_ByLicense([in] BSTR softwareLicense, [out,retval] BSTR *pBstrLicenseInfoAttribsStream);
+
+	[id(93),helpstring("method GetSoftwareLicenseStatus_ByProduct")] HRESULT GetSoftwareLicenseStatus_ByProduct([in] long productID, [out,retval] BSTR *pBstrStringToDwordMap);
+	[id(94),helpstring("method GetSoftwareLicenseStatus_ByLicense")] HRESULT GetSoftwareLicenseStatus_ByLicense([in] BSTR softwareLicense);
+
+	[id(95),helpstring("method GetSoftwareSpecByProduct")] HRESULT GetSoftwareSpecByProduct([in] long productID, [out,retval] BSTR *pBstrProductSoftwareSpecAttribs);
+	[id(96),helpstring("method GetSoftwareSpec")] HRESULT GetSoftwareSpec([out,retval] BSTR *pBstrSoftwareSpecAttribsStream);
+
+	[id(97),helpstring("method SoftwareAddApplicationInstanceByProduct")] HRESULT SoftwareAddApplicationInstanceByProduct([in] long productID, [in] BSTR applicationInstance);
+	[id(98),helpstring("method SoftwareRemoveApplicationInstanceByProduct")] HRESULT SoftwareRemoveApplicationInstanceByProduct([in] long productID, [in] BSTR applicationInstance);
+	[id(99),helpstring("method SoftwareGetApplicationInstanceListByProduct")] HRESULT SoftwareGetApplicationInstanceListByProduct([in] long productID, [out,retval] BSTR *pBstrListAppInstStream);
+
+	[id(100),helpstring("method GenerateSoftwareLicPacket")] HRESULT GenerateSoftwareLicPacket([in] BSTR bstrLicPackageAttribsStream, [in] VARIANT vtExpires, [out] BSTR *pBstrVerificationCode, [out,retval] VARIANT* pVtLicensePacket);
+	[id(101),helpstring("method EnterSoftwareLicPacket")] HRESULT EnterSoftwareLicPacket([in] VARIANT vtLicensePacket, [out,retval] BSTR *pBstrVerificationCode);
+
+	[id(102),helpstring("method ValidateToken_ByLicense")] HRESULT ValidateToken_ByLicense([in] BSTR softwareLicense, [in] long validationTokenType, [in] BSTR validationValue);
+
+	[id(103),helpstring("method SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber")] HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber([in] BSTR softwareLicense, [in] BSTR contractNumber);
+
+	[id(104),helpstring("method GenerateVerifyDataWithVerCode_ByLicense")] HRESULT GenerateVerifyDataWithVerCode_ByLicense([in] BSTR softwareLicense, [out,retval] VARIANT* pVtLicensePacket);
+	[id(105),helpstring("method GenerateVerifyDataWithLicInfo_ByLicense")] HRESULT GenerateVerifyDataWithLicInfo_ByLicense([in] BSTR softwareLicense, [out,retval] VARIANT* pVtLicensePacket);
+	[id(106),helpstring("method GenerateSoftwareLicArchive_ByLicense")] HRESULT GenerateSoftwareLicArchive_ByLicense([in] BSTR softwareLicense, [out,retval] VARIANT* pVtLicenseArchive);
+	[id(107),helpstring("method GenerateLicPackage_ByVerifyData")] HRESULT GenerateLicPackage_ByVerifyData([in] VARIANT vtLicensePacket, [out,retval] BSTR *pBstrLicensePackageAttribsStream);
+	[id(108),helpstring("method GenerateLicPackage_BySoftwareLicArchive")] HRESULT GenerateLicPackage_BySoftwareLicArchive([in] VARIANT vtLicenseArchive, [out,retval] BSTR *pBstrLicensePackageAttribsStream);
+	[id(109),helpstring("method GenerateLicPackage_BySoftwareLicPacket")] HRESULT GenerateLicPackage_BySoftwareLicPacket([in] VARIANT vtLicensePacket, [out,retval] BSTR *pBstrLicensePackageAttribsStream);
+	[id(110),helpstring("method EnterSoftwareLicArchive")] HRESULT EnterSoftwareLicArchive([in] VARIANT vtLicenseArchive);
+	[id(111),helpstring("method GenerateLicenseSystemData")] HRESULT GenerateLicenseSystemData([out,retval] VARIANT* pVtLicSysDataPacket);
+	[id(112),helpstring("method GenerateStream_ByLicenseSystemData")] HRESULT GenerateStream_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out,retval] BSTR *pBstrLicSysDataAttribsStream);
+	[id(113),helpstring("method GenerateStreamData_ByLicenseSystemData")] HRESULT GenerateStreamData_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out] BSTR *pBstrCreatedDateStreamed, [out] BSTR *pBstrKeyAttribsListStream, [out] BSTR *pBstrLicUsageDataAttribsStream, [out] BSTR *pBstrConnectionAttribsListStream, [out] BSTR *pBstrEventLogAttribsListStream, [out,retval] BSTR *pBstrLicInfoDataAttribsListStream);
+	[id(114),helpstring("method GetEventLogEntries_ForLicenseServer")] HRESULT GetEventLogList_ForLicenseServer([out,retval] BSTR *pBstrEventLogAttribsListStream);
+
+
+};
+
+[
+	object,
+	uuid("A275E4D8-B8D6-4fd7-A11A-CE3340F1E0DF"),
+	dual,	helpstring("ISolimarConversionToSoftwareLicenseSvr Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarConversionToSoftwareLicenseSvr : IDispatch
+{
+	[id(113),helpstring("method ConvertProtectionKeyToSoftwareLicense")] HRESULT ConvertProtectionKeyToSoftwareLicense([in] BSTR softwareLicense, [in] BSTR keyIdent);
+};
+
+
 // CSolimarLicenseSvr
 
 [
@@ -135,8 +209,11 @@ __interface ISolimarLicenseSvr4 : ISolimarLicenseSvr3
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
 	public ISolimarLicenseSvr4, 
+	public ISolimarSoftwareLicenseSvr,
+	public ISolimarConversionToSoftwareLicenseSvr,
 	public IObjectAuthentication,
 	public ILicensingMessage,
+	public ISoftwareLicensingMessage,
 	public ChallengeResponseHelper
 {
 public:
@@ -148,6 +225,10 @@ public:
 
 	HRESULT FinalConstruct()
 	{
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseSvr::FinalConstruct() ThreadID: %d", GetCurrentThreadId());
+//OutputDebugStringW(debug_buf);
+
 		OLECHAR buffer[128];
 		GUID guid;
 		HRESULT hr = CoCreateGuid(&guid);
@@ -158,17 +239,89 @@ public:
 		StringFromGUID2(guid, buffer, 128);
 		m_licenseId = buffer;
 
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::FinalConstruct() m_licenseId: %s", (wchar_t*)m_licenseId);
+//OutputDebugStringW(debug_buf);
 		//keyserver.LicenseSessionInitialize(m_licenseId);
 
 		//No longer start heart beat requirement until a key or license is obtained.
 		//keyserver.Heartbeat(m_licenseId);
-		
-		return S_OK;
+
+		//Internal License Server, only allow to run if there is a domain, and it is called corp.solimarsystems.com
+		#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
+		{
+			// Hide the string so it doesn't appear in the strings of the image - "\\localhost\root\cimv2"
+			BYTE wmiLocation_Byte[] = {
+				0x5c, 0x00, 0x5c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x63, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x68, 0x00, 0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x72, 0x00,
+				0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x63, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x76, 0x00, 0x32, 0x00, 0x00, 0x00
+			};
+			WMIHelper wmi((wchar_t*)wmiLocation_Byte);
+			hr = wmi.Connect();
+
+			// gather part of domain information
+			WMIHelper::ResultsType rList;
+			// Hide the string so it doesn't appear in the strings of the image - "SELECT * FROM Win32_ComputerSystem"
+			BYTE wmiQuery_Byte[] = {
+				0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x2a, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 
+				0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x70, 0x00, 0x75, 0x00, 0x74, 0x00, 0x65, 0x00, 0x72, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 
+				0x65, 0x00, 0x6d, 0x00, 0x00, 0x00
+			};
+			hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_Byte, rList);
+			if(SUCCEEDED(hr) && rList.size()>0)
+			{
+				for (unsigned int idx=0; idx<rList.size(); ++idx)
+				{
+					// Hide the string so it doesn't appear in the strings of the image - "PartOfDomain"
+					BYTE partOfDomainByte[] = {
+						0x50, 0x00, 0x61, 0x00, 0x72, 0x00, 0x74, 0x00, 0x4f, 0x00, 0x66, 0x00, 0x44, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x00, 0x00
+					};
+
+					VARIANT* pvtPartOfDomain = &rList[idx][(wchar_t*)partOfDomainByte];
+					if ((pvtPartOfDomain->vt == VT_BOOL) && (pvtPartOfDomain->boolVal == VARIANT_TRUE))
+						hr = S_OK;
+					else
+						hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED);
+
+					if(FAILED(hr))
+						break;
+
+					
+					// Hide the string so it doesn't appear in the strings of the image - "Domain"
+					BYTE domainByte[] = {
+						0x44, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x00, 0x00
+					};
+
+					// Hide the string so it doesn't appear in the strings of the image - "Corp.Solimarsystems.com"
+					BYTE solimarByte[] = {
+						0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x70, 0x00, 0x2e, 0x00, 0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x73, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 
+						0x65, 0x00, 0x6d, 0x00, 0x73, 0x00, 0x2e, 0x00, 0x63, 0x00, 0x6f, 0x00, 0x6d, 0x00, 0x00, 0x00
+					};
+					VARIANT* pvtDomain = &rList[idx][(wchar_t*)domainByte];
+					if ((pvtDomain->vt == VT_BSTR) && 
+						(_wcsicmp(std::wstring(pvtDomain->bstrVal).c_str(), (wchar_t*)solimarByte) == 0))
+						hr = S_OK;
+					else
+						hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED);
+
+					if(FAILED(hr))
+						break;
+				}
+				WMIHelper::Clear(rList);
+				rList.clear();
+			}
+		}
+		#endif
+
+		return hr;
+		//return E_FAIL;
+		//return S_OK;
 	}
 	
 	void FinalRelease() 
 	{
-		//keyserver.LicenseSessionUninitialize(m_licenseId);
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"CSolimarLicenseSvr::FinalRelease() m_licenseId: %s", (wchar_t*)m_licenseId);
+//OutputDebugStringW(debug_buf);
 	}
 public:
 	// IObjectAuthentication
@@ -201,7 +354,7 @@ public:
 	STDMETHOD(PasswordPacketFinalize)();
 	STDMETHOD(PasswordPacketGetPacket)(VARIANT *pvtPacketData);
 	STDMETHOD(PasswordPacketGetVerificationCode)(BSTR *verification_code);
-	
+
 	// Key specific functions
 	STDMETHOD(KeyTrialExpires)(BSTR key_ident, VARIANT *expire_date);
 	STDMETHOD(KeyTrialHours)(BSTR key_ident, long *trial_hours);
@@ -244,9 +397,58 @@ public:
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
 
+	// ISoftwareLicensingMessage
+	STDMETHOD(GetSoftwareLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
+	STDMETHOD(DispatchSoftwareLicenseMessageList)(VARIANT_BOOL clear_messages);
+
+	// ISolimarSoftwareLicenseSvr
+	STDMETHOD(SoftwareModuleLicenseTotalForAll_ByProduct)(long productID, long moduleIdent, long* pLicenseCount);
+	STDMETHOD(SoftwareModuleLicenseInUseForAll_ByProduct)(long productID, long moduleIdent, long* pLicenseCount);
+	STDMETHOD(SoftwareValidateLicenseApp_ByProduct)(long productID, VARIANT_BOOL *pbLicenseValid);
+	STDMETHOD(SoftwareModuleLicenseInUseByApp_ByProduct)(long productID, long moduleIdent, long* pLicenseCount);
+	STDMETHOD(SoftwareModuleLicenseInUseByConnection_ByProduct)(long productID, long moduleIdent, long* pLicenseCount);
+	STDMETHOD(SoftwareModuleLicenseObtainByApp_ByProduct)(long productID, long moduleIdent, long licenseCount);
+	STDMETHOD(SoftwareModuleLicenseReleaseByApp_ByProduct)(long productID, long moduleIdent, long licenseCount);
+	STDMETHOD(SoftwareModuleLicenseCounterDecrementByApp_ByProduct)(long productID, long moduleIdent, long licenseCount);
+
+	STDMETHOD(GetSoftwareLicenseInfoByProduct_ForAll)(long productID, BSTR *pBstrProductInfoAttribsStream);
+	STDMETHOD(GetSoftwareLicenseInfo_ForAll)(BSTR *pBstrLicenseInfoAttribsStream);
 	
+	STDMETHOD(GetAllSoftwareLicenses)(BSTR *pBstrLicenseListStream);
+	STDMETHOD(GetSoftwareLicenseInfoByProduct_ByLicense)(BSTR bstrSoftwareLicense, long productID, BSTR *pBstrProductInfoAttribsStream);
+	STDMETHOD(GetSoftwareLicenseInfo_ByLicense)(BSTR bstrSoftwareLicense, BSTR *pBstrLicenseInfoAttribsStream);
+
+	STDMETHOD(GetSoftwareLicenseStatus_ByProduct)(long productID, BSTR *pBstrStringToDwordMap);
+	STDMETHOD(GetSoftwareLicenseStatus_ByLicense)(BSTR softwareLicense);
+
+	STDMETHOD(GetSoftwareSpecByProduct)(long productID, BSTR *pBstrProductSoftwareSpecAttribs);
+	STDMETHOD(GetSoftwareSpec)(BSTR *pBstrSoftwareSpecAttribsStream);
+	STDMETHOD(SoftwareAddApplicationInstanceByProduct)(long productID, BSTR applicationInstance);
+	STDMETHOD(SoftwareRemoveApplicationInstanceByProduct)(long productID, BSTR applicationInstance);
+	STDMETHOD(SoftwareGetApplicationInstanceListByProduct)(long productID, BSTR *pBstrListAppInstStream);
 	
-	
+	STDMETHOD(GenerateSoftwareLicPacket)(BSTR bstrLicPackageAttribsStream, VARIANT vtExpires, BSTR *pBstrVerificationCode, VARIANT* pVtLicensePacket);
+	STDMETHOD(EnterSoftwareLicPacket)(VARIANT vtLicensePacket, BSTR *pBstrVerificationCode);
+	STDMETHOD(GenerateSoftwareLicArchive_ByLicense)(BSTR softwareLicense, VARIANT* pVtLicenseArchive);
+	STDMETHOD(EnterSoftwareLicArchive)(VARIANT vtLicenseArchive);
+	STDMETHOD(GenerateVerifyDataWithVerCode_ByLicense)(BSTR softwareLicense, VARIANT* pVtLicensePacket);
+	STDMETHOD(GenerateVerifyDataWithLicInfo_ByLicense)(BSTR softwareLicense, VARIANT* pVtLicensePacket);
+	STDMETHOD(GenerateLicPackage_ByVerifyData)(VARIANT vtVerifyData, BSTR *pBstrLicensePackageAttribsStream);
+	STDMETHOD(GenerateLicPackage_BySoftwareLicArchive)(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
+	STDMETHOD(GenerateLicPackage_BySoftwareLicPacket)(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
+	STDMETHOD(GenerateLicenseSystemData)(VARIANT* pVtLicSysDataPacket);
+	STDMETHOD(GenerateStreamData_ByLicenseSystemData)(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
+	STDMETHOD(GenerateStream_ByLicenseSystemData)(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);	// Only for Interal License Servers
+
+	STDMETHOD(ValidateToken_ByLicense)(BSTR softwareLicense, long validationTokenType, BSTR validationValue);
+
+	STDMETHOD(GetEventLogList_ForLicenseServer)(BSTR *pBstrEventLogAttribsListStream);
+
+	STDMETHOD(SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber)(BSTR softwareLicense, BSTR contractNumber);
+
+	// ISolimarConversionToSoftwareLicenseSvr
+	//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one then will create new license file.
+	STDMETHOD(ConvertProtectionKeyToSoftwareLicense)(BSTR softwareLicense, BSTR keyIdent);
 private:
 	_bstr_t m_licenseId;
 	static BYTE challenge_key_server_thisauthuser_public[];
