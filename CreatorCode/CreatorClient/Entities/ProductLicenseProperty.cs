@@ -581,7 +581,7 @@ namespace Client.Creator
             }
             set 
             {
-                if (_plRec.Description.Contains("|"))
+                if (_plRec.Description != null && _plRec.Description.Contains("|"))
                 {
                     string[] notes = _plRec.Description.Split("|".ToCharArray());
                     notes[0] = value;
