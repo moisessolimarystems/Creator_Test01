@@ -54,7 +54,6 @@ namespace SolimarLicenseViewer
 
         //License Node Column Headers
         public static readonly String NameHeader = "Name";
-        public static readonly String LicenceTypeHeader = "License Type";
         public static readonly String VerificationStatusHeader = "Verification Status";
         public static readonly String ExpirationHeader = "Expiration Date";
         //public static readonly String CurrentActivationHeader = "Current Activation";

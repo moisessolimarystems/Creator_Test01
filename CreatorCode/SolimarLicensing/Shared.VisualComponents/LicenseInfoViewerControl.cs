@@ -88,21 +88,6 @@ namespace Shared.VisualComponents
                 //param_refRootNode.Nodes.Add(new TreeNode("SoftwareID: " + param_licInfoAttribs.softwareGroupLicenseID));
                 param_refRootNode.Nodes.Add(new TreeNode(String.Format("SoftwareID: {0:X4}", param_licInfoAttribs.softwareGroupLicenseID.TVal)));
                 param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                param_refRootNode.Nodes.Add(new TreeNode("SoftwareLicenseType: " + param_licInfoAttribs.softwareLicType.GetAlias() + " (" + param_licInfoAttribs.softwareLicType.ToString() + ")"));
-                param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                //if ((param_licInfoAttribs.softwareLicType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
-                //    || (param_licInfoAttribs.softwareLicType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev))
-                if (param_licInfoAttribs.activationTotal.TVal != 0)
-                {
-                    param_refRootNode.Nodes.Add(new TreeNode("Activations Total: " + param_licInfoAttribs.activationTotal.TVal));
-                    param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                    param_refRootNode.Nodes.Add(new TreeNode("Activations Current: " + param_licInfoAttribs.activationCurrent.TVal));
-                    param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                    param_refRootNode.Nodes.Add(new TreeNode("Activation Expiration Date: " + param_licInfoAttribs.activationExpirationDate.TVal.ToLocalTime()));
-                    param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                    param_refRootNode.Nodes.Add(new TreeNode("Activation Amount in Days: " + param_licInfoAttribs.activationAmountInDays.TVal));
-                    param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-                }
                 param_refRootNode.Nodes.Add(new TreeNode("Modified Date: " + param_licInfoAttribs.modifiedDate.TVal.ToLocalTime()));
                 param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
 
@@ -219,17 +204,17 @@ namespace Shared.VisualComponents
 
             TreeNode modNode = new TreeNode();
             TreeNode childNode = null;
-            if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
-            {
-                nodeText += " [Addon Module Expires: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString() + "]";
-                if (DateTime.Now.ToUniversalTime().CompareTo(param_modInfoAttribs.moduleExpirationDate.TVal) > 0)
-                {
-                    modNode.ForeColor = System.Drawing.Color.Red;
-                }
-            }
+            //if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
+            //{
+            //    nodeText += " [Addon Module Expires: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString() + "]";
+            //    if (DateTime.Now.ToUniversalTime().CompareTo(param_modInfoAttribs.moduleExpirationDate.TVal) > 0)
+            //    {
+            //        modNode.ForeColor = System.Drawing.Color.Red;
+            //    }
+            //}
 
             modNode.Text = nodeText;
-            modNode.Tag = new System.Collections.Generic.KeyValuePair<uint, DateTime>(param_modInfoAttribs.moduleID.TVal, param_modInfoAttribs.moduleExpirationDate.TVal);
+            //modNode.Tag = new System.Collections.Generic.KeyValuePair<uint, DateTime>(param_modInfoAttribs.moduleID.TVal, param_modInfoAttribs.moduleExpirationDate.TVal);
 
             toolTipBuilder.Append("\r\nModuleName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleName(g_softwareSpec, param_prodID, param_modInfoAttribs.moduleID.TVal));
 
@@ -251,20 +236,20 @@ namespace Shared.VisualComponents
             childNode.ForeColor = modNode.ForeColor;
             modNode.Nodes.Add(childNode);
 
-            if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
-            {
-                nodeText = "ModuleExpirationDate: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString();
-                toolTipBuilder.Append("\r\n" + nodeText);
-                childNode = new TreeNode(nodeText);
-                childNode.ForeColor = modNode.ForeColor;
-                modNode.Nodes.Add(childNode);
-            }
+            //if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
+            //{
+            //    nodeText = "ModuleExpirationDate: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString();
+            //    toolTipBuilder.Append("\r\n" + nodeText);
+            //    childNode = new TreeNode(nodeText);
+            //    childNode.ForeColor = modNode.ForeColor;
+            //    modNode.Nodes.Add(childNode);
+            //}
 
-            nodeText = "ProductLicense: " + param_modInfoAttribs.contractNumber.TVal;
-            toolTipBuilder.Append("\r\n" + nodeText);
-            childNode = new TreeNode(nodeText);
-            childNode.ForeColor = modNode.ForeColor;
-            modNode.Nodes.Add(childNode);
+            //nodeText = "ProductLicense: " + param_modInfoAttribs.contractNumber.TVal;
+            //toolTipBuilder.Append("\r\n" + nodeText);
+            //childNode = new TreeNode(nodeText);
+            //childNode.ForeColor = modNode.ForeColor;
+            //modNode.Nodes.Add(childNode);
 
             modNode.ToolTipText = toolTipBuilder.ToString();
             AlphaAdd_ModuleInfoTreeNode(ref param_refRootNode, modNode);

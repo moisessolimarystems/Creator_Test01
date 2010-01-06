@@ -900,13 +900,8 @@ HRESULT SoftwareServer::GenerateVerifyDataWithVerCode_ByLicense(BSTR softwareLic
 		licensePackageAttribs.licLicenseInfoAttribs.customerID = origLicenseInfoAttribs.customerID;
 		licensePackageAttribs.licLicenseInfoAttribs.destinationID = origLicenseInfoAttribs.destinationID;
 		licensePackageAttribs.licLicenseInfoAttribs.softwareGroupLicenseID = origLicenseInfoAttribs.softwareGroupLicenseID;
-		licensePackageAttribs.licLicenseInfoAttribs.softwareLicType = origLicenseInfoAttribs.softwareLicType;
-		licensePackageAttribs.licLicenseInfoAttribs.softwareLicTypeIndex = origLicenseInfoAttribs.softwareLicTypeIndex;
-		licensePackageAttribs.licLicenseInfoAttribs.activationAmountInDays = origLicenseInfoAttribs.activationAmountInDays;
-		licensePackageAttribs.licLicenseInfoAttribs.activationCurrent = origLicenseInfoAttribs.activationCurrent;
-		licensePackageAttribs.licLicenseInfoAttribs.bActivationCurrentOverride = origLicenseInfoAttribs.bActivationCurrentOverride;
-		licensePackageAttribs.licLicenseInfoAttribs.activationExpirationDate = origLicenseInfoAttribs.activationExpirationDate;
-		licensePackageAttribs.licLicenseInfoAttribs.activationTotal = origLicenseInfoAttribs.activationTotal;
+		licensePackageAttribs.licLicenseInfoAttribs.modifiedDate = origLicenseInfoAttribs.modifiedDate;
+		licensePackageAttribs.licLicenseInfoAttribs.bLicClockViolation = origLicenseInfoAttribs.bLicClockViolation;
 
 		// Set a variable in licenseInfoAttribs to customer copy
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpValTokenAttribs;
@@ -1354,32 +1349,6 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			}
 		}	// End of scope of WMIHelper wmi
 
-
-		//YYY - Obtain modules for testing...
-		{
-			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID1"), _bstr_t(L"TestAppInstance1"));
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 3, 25);
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 2, 10);
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID1"), 2, 10);
-			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID4"), _bstr_t(L"TestAppInstance1"));
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID4"), 1, 5);
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID4"), 3, 25);
-			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID5"), _bstr_t(L"TestAppInstance5"));
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID5"), 3, 4);
-			//licCache.AddApplicationInstance(14, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestAppInstance6"));
-			//licCache.ModuleLicenseObtainByApp(14, _bstr_t(L"TestLicenseID6"), 3, 60);
-
-			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID2"), _bstr_t(L"TestAppInstance2"));
-			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID2"), 1, 1);
-			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID2"), 2, 1);
-
-			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID3"), _bstr_t(L"TestAppInstance3"));
-			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID3"), 0, 1);
-			//licCache.AddApplicationInstance(0x72, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestAppInstance6"));
-			//licCache.ModuleLicenseObtainByApp(0x72, _bstr_t(L"TestLicenseID6"), 1, 6);
-
-		}
-
 		//Generate Usage Info
 		Lic_UsageInfoAttribs usageInfoAttribs;
 		{
@@ -1389,100 +1358,6 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			hr = licCache.GetUsage(&usageInfoAttribs);
 			}
 		}
-
-
-		//YYY - Release modules for testing...
-		{
-			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID1"), _bstr_t(L"TestAppInstance1"));
-			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID4"), _bstr_t(L"TestAppInstance1"));
-			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID5"), _bstr_t(L"TestLicenseID5"));
-			//licCache.RemoveApplicationInstance(14, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestLicenseID6"));
-
-			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID2"), _bstr_t(L"TestAppInstance2"));
-			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID3"), _bstr_t(L"TestAppInstance3"));
-			//licCache.RemoveApplicationInstance(0x72, _bstr_t(L"TestLicenseID6"), _bstr_t(L"TestLicenseID6"));
-		}
-		//{
-		//	//YYY put fake data in
-		//	Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs usProdInfoAttribs;
-		//	usProdInfoAttribs.productID = 14;
-		//	{
-		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
-		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance1>");
-		//	
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
-		//	usModInfoAttribs1.moduleID = 0;
-		//	usModInfoAttribs1.moduleUsage = 1;
-		//	usModInfoAttribs1.moduleTotal = 5;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
-
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
-		//	usModInfoAttribs2.moduleID = 1;
-		//	usModInfoAttribs2.moduleUsage = 2;
-		//	usModInfoAttribs2.moduleTotal = 10;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
-		//	usProdInfoAttribs.appInstanceList->push_back(usAppInstInfoAttribs1);
-		//	}
-
-		//	{
-		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs2;
-		//	usAppInstInfoAttribs2.applicationInstance = std::wstring(L"<AppInstance2>");
-
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
-		//	usModInfoAttribs1.moduleID = 5;
-		//	usModInfoAttribs1.moduleUsage = 2;
-		//	usModInfoAttribs1.moduleTotal = 3;
-		//	usAppInstInfoAttribs2.moduleList->push_back(usModInfoAttribs1);
-
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
-		//	usModInfoAttribs2.moduleID = 4;
-		//	usModInfoAttribs2.moduleUsage = 5;
-		//	usModInfoAttribs2.moduleTotal = 6;
-		//	usAppInstInfoAttribs2.moduleList->push_back(usModInfoAttribs2);
-		//	usProdInfoAttribs.appInstanceList->push_back(usAppInstInfoAttribs2);
-		//	}
-
-		//	usageInfoAttribs.productList->push_back(usProdInfoAttribs);
-
-		//	Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs usProdInfoAttribs2;
-		//	usProdInfoAttribs2.productID = 10;
-		//	{
-		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
-		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance1>");
-		//	
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
-		//	usModInfoAttribs1.moduleID = 0;
-		//	usModInfoAttribs1.moduleUsage = 1;
-		//	usModInfoAttribs1.moduleTotal = 2;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
-
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
-		//	usModInfoAttribs2.moduleID = 1;
-		//	usModInfoAttribs2.moduleUsage = 99;
-		//	usModInfoAttribs2.moduleTotal = 100;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
-		//	usProdInfoAttribs2.appInstanceList->push_back(usAppInstInfoAttribs1);
-		//	}
-		//	{
-		//	Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInstInfoAttribs1;
-		//	usAppInstInfoAttribs1.applicationInstance = std::wstring(L"<AppInstance5>");
-		//	
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs1;
-		//	usModInfoAttribs1.moduleID = 2;
-		//	usModInfoAttribs1.moduleUsage = 1;
-		//	usModInfoAttribs1.moduleTotal = 255;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs1);
-
-		//	Lic_UsageInfoAttribs::Lic_UsModuleInfoAttribs usModInfoAttribs2;
-		//	usModInfoAttribs2.moduleID = 3;
-		//	usModInfoAttribs2.moduleUsage = 2;
-		//	usModInfoAttribs2.moduleTotal = 4;
-		//	usAppInstInfoAttribs1.moduleList->push_back(usModInfoAttribs2);
-		//	usProdInfoAttribs2.appInstanceList->push_back(usAppInstInfoAttribs1);
-		//	}
-		//	usageInfoAttribs.productList->push_back(usProdInfoAttribs2);
-		//	
-		//}
 
 //OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString()");
 		licSystemAttribs.Streamed_SoftwareSpecAttribs = std::wstring(g_pSoftwareSpec->GetSoftwareSpec().ToString());
@@ -1523,7 +1398,8 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 	BSTR *pBstrCreatedDateStreamed, 
 	BSTR *pBstrKeyAttribsListStream,
 	BSTR *pBstrLicUsageDataAttribsStream,
-	BSTR *pBstrConnectionAttribsListStream, 
+	BSTR *pBstrConnectionAttribsListStream,
+	BSTR *pBstrEventLogAttribsListStream,
 	BSTR *pBstrLicInfoDataAttribsListStream)
 {
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Enter");
@@ -1538,17 +1414,46 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 			Lic_LicenseSystemAttribs tmpLicSysAttribs;
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - tmpLicSysAttribs.InitFromString(bstrTmpStream);");
 			tmpLicSysAttribs.InitFromString(bstrTmpStream);
-//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = tmpLicSysAttribs.createdDate - pre");
 			*pBstrCreatedDateStreamed = SysAllocString(std::wstring(tmpLicSysAttribs.createdDate).c_str());
-//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrKeyAttribsListStream = tmpLicSysAttribs.ListOfStreamed_KeyAttribs - pre");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrCreatedDateStreamed = tmpLicSysAttribs.createdDate - post");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - remove excess KeyAttribs - pre");
 			//strip out the key byte array before sending...
-			//*pBstrKeyAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_KeyAttribs.ToString().c_str());
-			*pBstrKeyAttribsListStream = SysAllocString(L"");
+			int idx = 0;
+			SpdAttribs::CStreamableString tmpStreamableString;
+			PBYTE pbBuf(NULL) ;
+			pbBuf = new BYTE[16] ;
+			memset(pbBuf, 0, 16);
+			while(idx < tmpLicSysAttribs.ListOfStreamed_KeyAttribs->size())
+			{
+				std::wstring streamedVal = L"";
+				tmpStreamableString.StringToValue(tmpLicSysAttribs.ListOfStreamed_KeyAttribs->at(idx), streamedVal);
+				Lic_KeyAttribs licKeyAttribs;
+				licKeyAttribs.InitFromString(streamedVal);
+				licKeyAttribs.layout->at(0) = SpdAttribs::CBuffer(pbBuf, 16);	//clear out these items
+				licKeyAttribs.layout->at(6) = SpdAttribs::CBuffer(pbBuf, 16);	//clear out these items
+				licKeyAttribs.licenseCode = std::wstring(L"");	//Remove License Code
+				tmpLicSysAttribs.ListOfStreamed_KeyAttribs->at(idx) = licKeyAttribs.ToString();
+				idx++;
+			}
+			// Now delete the temporary buffer.
+			delete[] (pbBuf);
+
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - remove excess KeyAttribs - post");
+//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrKeyAttribsListStream = tmpLicSysAttribs.ListOfStreamed_KeyAttribs - pre");
+			*pBstrKeyAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_KeyAttribs.ToString().c_str());
+			
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrKeyAttribsListStream = tmpLicSysAttribs.ListOfStreamed_KeyAttribs - post");
+
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrLicUsageDataAttribsStream = tmpLicSysAttribs.Streamed_UsageInfoAttribs - pre");
 			*pBstrLicUsageDataAttribsStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_UsageInfoAttribs.ToString()).c_str());
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *pBstrLicUsageDataAttribsStream = tmpLicSysAttribs.Streamed_UsageInfoAttribs - post");
+
+			//Do not implement returning connection settings
 			*pBstrConnectionAttribsListStream = SysAllocString(L"");
+
+			//Do not implement returning event log list for License Server Entries
+			*pBstrEventLogAttribsListStream = SysAllocString(L"");
 
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Erase empty modules;");
 //			//yyy - testing start
@@ -1576,7 +1481,6 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - pre");
 			*pBstrLicInfoDataAttribsListStream = SysAllocString(tmpLicSysAttribs.ListOfStreamed_InfoAttribs.ToString().c_str());
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - *SoftwareServer = tmpLicSysAttribs.ListOfStreamed_InfoAttribs - post");
-//OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - SysFreeString(bstrTmpStream);");
 			SysFreeString(bstrTmpStream);
 		}
 
@@ -2468,44 +2372,6 @@ HRESULT SoftwareServer::ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicen
 //OutputDebugString(tmpbuf);
 
 	SafeMutex mutex(SoftwareLicenseLock);
-	//bool bFoundMatchingLicense(false);
-	//bool bFoundAnyLicense(softwareLicMgrMap.size > 0);
-
-	//SoftwareLicenseMgr* pTmpSoftwareLicMgr = NULL;
-
-	//if(_wcsicmp(softwareLicense, BSTR(L"") != 0)
-	//{
-	//	//Indexed by license filename, not be softwareLicense
-	//	for(SoftwareLicList::iterator swLicMgrIt = softwareLicMgrMap.begin();
-	//		swLicMgrIt != softwareLicMgrMap.end();
-	//		swLicMgrIt++)
-	//	{
-	//		BSTR tmpBstrLicName;
-	//		hr = swLicMgrIt->second->GetSoftwareLicenseName(&tmpBstrLicName);
-	//		if(SUCCEEDED(hr))
-	//		{
-	//			//Find License File
-	//			if(_wcsicmp(tmpBstrLicName, softwareLicense) == 0)
-	//			{
-	//				pTmpSoftwareLicMgr = swLicMgrIt->second;
-	//				//bFoundMatchingLicense = true;
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
-	//
-
-	////if matching license is not founs, and there are any licenses, use first one found.
-	//if((pTmpSoftwareLicMgr == NULL) && (softwareLicMgrMap.size > 0))
-	//{
-	//	pTmpSoftwareLicMgr = *(softwareLicMgrMap.begin());
-	//}
-	//else	//none found, use a new one...
-	//{
-	//	pTmpSoftwareLicMgr = new SoftwareLicenseMgr();
-	//}
-
 	try
 	{
 		ProtectionKey* pTmpProKey = NULL;
@@ -2550,9 +2416,6 @@ HRESULT SoftwareServer::ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicen
 
 
 		BSTR bstrLicPackageStream;
-		//hr = ConvertProtectionKeyToLicPackageAttribsStreamInternal(softwareLicense, pTmpProKey, &bstrLicPackageStream);
-		//if(FAILED(hr))
-		//	throw hr;
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpNewLicInfoAttribs;
 		hr = ConvertProtectionKeyToLicInfoAttribsInternal(pTmpProKey, softwareLicense, &tmpNewLicInfoAttribs);
 		if(FAILED(hr))
@@ -2603,421 +2466,419 @@ HRESULT SoftwareServer::ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicen
 	{
 		hr = e.Error();
 	}
-	//pRainbowDriver->
-	//licInfo->
-	
-
-	//bFoundAnyLicense
-
-
-	//if(SUCCEEDED(hr) && !bFoundMatchingLicense)
-	//	hr = E_INVALIDARG;
 	return hr;
 }
 
 
 HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionKey* pKey, _bstr_t bstrValidationKey, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pLicenseInfoAttribs)
 {
-	HRESULT hr(E_INVALIDARG);
-
-	try
-	{
-		if(pKey == NULL)
-			throw E_INVALIDARG;
-
-		KeySpec keyspec;
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs *pTmpLicenseInfoAttribs = new Lic_PackageAttribs::Lic_LicenseInfoAttribs();
-
-		//If the key is a base key on trial, or an add-on key, have the module be add-on modules that expire at the expiration date of the key
-
-		//If the key is a testDev key, change the Product to the Test/Dev version of the product
-
-		//If the key is a backup key, maybe don't convert, think about this case some more
-
-		//If the key is a base key that has become permanent, give it a permanent module
-
-		//Get Key Type
-		VARIANT vtKeyType;
-		hr = pKey->HeaderQuery(keyspec.headers[L"Key Type"].id, &vtKeyType);
-		if (FAILED(hr)) 
-			throw hr;
-		unsigned short key_type = vtKeyType.uiVal;
-		VariantClear(&vtKeyType);
-		//typedef enum 
-		//{
-		//		KEYNone			=0x00000000,  //reserved state
-		//		KEYAddon		   =1,
-		//		KEYBase			=2,
-		//		KEYReplacement	=3,
-		//		KEYRelicense	=4,
-		//		KEYInventory	=5,
-		//		KEYBackup		=6,
-		//		KEYEmergency	=7,
-		//		//KEYSolimar	=8,
-		//		KEYCustom		=9,
-		//		KEYLoan			=10,
-		//		KEYDemo			=11,
-		//		KEYRental		=12,
-		//		KEYDevelopment	=13,
-		//		KEYReserved		=14,
-		//		KEYVerification=0xff,
-		//} KeyTypeFlagX;
-		bool bCalculateExpirationDate (false);
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs::TSoftwareLicenseType tLicType;
-		if(key_type == 1)	//KEYAddon
-		{
-			bCalculateExpirationDate = true;
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
-		}
-		else if(key_type == 2)	//KEYBase
-		{
-			enum KeyStatuses
-			{
-				UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
-				EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
-				EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11, EXTENDED_TRIAL6=12,
-				EXTENDED_TRIAL7=13, EXTENDED_TRIAL8=14, EXTENDED_TRIAL9=15, EXTENDED_TRIAL10=16,
-				EXTENDED_TRIAL11=17, EXTENDED_TRIAL12=18, EXTENDED_TRIAL13=19, EXTENDED_TRIAL14=20,
-				EXTENDED_TRIAL15=21, EXTENDED_TRIAL16=22
-			};
-
-			//Get Key Status
-			VARIANT vtKeyStatus;
-			VariantInit(&vtKeyStatus);
-			hr = pKey->HeaderQuery(keyspec.headers[L"Status"].id, &vtKeyStatus);
-			if (FAILED(hr)) 
-				throw hr;
-			KeyStatuses keyStatus = (KeyStatuses)vtKeyStatus.uiVal;
-			VariantClear(&vtKeyStatus);
-			bCalculateExpirationDate = (
-				keyStatus == INITIAL_TRIAL ||
-				keyStatus == EXTENDED_TRIAL ||
-				keyStatus == EXTENDED_TRIAL2 ||
-				keyStatus == EXTENDED_TRIAL3 ||
-				keyStatus == EXTENDED_TRIAL4 ||
-				keyStatus == EXTENDED_TRIAL5 ||
-				keyStatus == EXTENDED_TRIAL6 ||
-				keyStatus == EXTENDED_TRIAL7 ||
-				keyStatus == EXTENDED_TRIAL8 ||
-				keyStatus == EXTENDED_TRIAL9 ||
-				keyStatus == EXTENDED_TRIAL10 ||
-				keyStatus == EXTENDED_TRIAL11 ||
-				keyStatus == EXTENDED_TRIAL12 ||
-				keyStatus == EXTENDED_TRIAL13 ||
-				keyStatus == EXTENDED_TRIAL14 ||
-				keyStatus == EXTENDED_TRIAL15 ||
-				keyStatus == EXTENDED_TRIAL16 ||
-				keyStatus == UNINITIALIZED_TRIAL
-			);
-
-
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
-			//Determine if key is permanent or not
-//hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Status"].id, &vtKeyStatus);
-
+	return E_NOTIMPL;
+// Commented out code does not take into account the license changes of moving activations to product info level
+// Think this code will never be used, 
+//	HRESULT hr(E_INVALIDARG);
 //
-//KeyIsTrial = 
-
-			//if key is not permanent
-			//bCalculateExpirationDate = true;
-			//else if key is permanent
-			//bCalculateExpirationDate = false;
-		}
-		else if(key_type == 13)	//KEYDevelopment
-		{
-			bCalculateExpirationDate = true;
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev;
-		}
-		else if(key_type == 6)	//KEYBackup
-		{
-			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover;
-		}
-		else	//All other
-		{
-			//Don't convert these unknown key type, throw error
-			throw E_INVALIDARG;
-		}
-		pTmpLicenseInfoAttribs->softwareLicType = tLicType;
-
-		SYSTEMTIME expTimeSystime;
-		if(bCalculateExpirationDate)
-		{
-			VARIANT vtRawExpirationDate;
-			VariantInit(&vtRawExpirationDate);
-			hr = pKey->HeaderQuery(keyspec.headers[L"Expiration Date"].id, &vtRawExpirationDate);
-			time_t expirationDateTimeT = (time_t)vtRawExpirationDate.ulVal;
-			
-			VARIANT vtExpirationDate;
-			vtExpirationDate = TimeHelper::TimeTToVariant(expirationDateTimeT);
-
-			VariantTimeToSystemTime(vtExpirationDate.date, &expTimeSystime);
-			if (FAILED(hr)) 
-				throw hr;
-
-			VariantClear(&vtExpirationDate);
-			VariantClear(&vtRawExpirationDate);
-		}
-
-
-		//Get Key Number
-		VARIANT vtKeyNum;
-		VariantInit(&vtKeyNum);
-		hr = pKey->HeaderQuery(keyspec.headers[L"Key Number"].id, &vtKeyNum);
-		if (FAILED(hr)) 
-			throw hr;
-		pTmpLicenseInfoAttribs->softwareGroupLicenseID = vtKeyNum.uiVal;
-		VariantClear(&vtKeyNum);
-
-		//Get Customer Number
-		VARIANT vtCustNum;
-		VariantInit(&vtCustNum);
-		hr = pKey->HeaderQuery(keyspec.headers[L"Customer Number"].id, &vtCustNum);
-		if (FAILED(hr)) 
-			throw hr;
-		pTmpLicenseInfoAttribs->customerID = vtCustNum.uiVal;
-		VariantClear(&vtCustNum);
-
-
-		//Get the Product Number
-		VARIANT vtProductID;
-		VariantInit(&vtCustNum);
-		hr = pKey->HeaderQuery(keyspec.headers[L"Product ID"].id, &vtProductID);
-		if (FAILED(hr)) 
-			throw hr;
-		int origProductID = vtProductID.uiVal;
-		VariantClear(&vtProductID);
-		
-		//Some Products from protection keys get changed to be multiple products
-		std::map<int, bool> newProductList; //map<ProductID(int), UseSharedLicensing(bool)
-		switch(origProductID)
-		{
-			case Lic_PackageAttribs::pid_Spde:
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_Spde, false));
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SpdeQueueManager, true));
-				break;
-			case Lic_PackageAttribs::pid_Rubika:
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_Rubika, false));
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_RubikaProcessBuilder, true));
-				break;
-			case Lic_PackageAttribs::pid_SolIndexer:
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SolIndexer, false));
-				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SdxDesigner, true));
-				break;
-			default:
-				newProductList.insert(std::map<int, bool>::value_type(origProductID, false));
-				break;
-		}
-
-		for(	std::map<int, bool>::iterator newProductListIt = newProductList.begin();
-				newProductListIt != newProductList.end();
-				newProductListIt++)
-		{
-			int productID = newProductListIt->first;
-			if(key_type == 13)	//KEYDevelopment
-			{
-				//Recalculate ProductID for test/dev to new productIDs
-				switch(newProductListIt->first)
-				{
-					case Lic_PackageAttribs::pid_Spde:
-						productID = Lic_PackageAttribs::pid_TestDevSpde;
-						break;
-					case Lic_PackageAttribs::pid_Iconvert:
-						productID = Lic_PackageAttribs::pid_TestDevIconvert;
-						break;
-					case Lic_PackageAttribs::pid_SolsearcherEnt:
-						productID = Lic_PackageAttribs::pid_TestDevSolsearcherEp;
-						break;
-					case Lic_PackageAttribs::pid_SolsearcherSp:
-						productID = Lic_PackageAttribs::pid_TestDevSseSp;
-						break;
-					case Lic_PackageAttribs::pid_Rubika:
-						productID = Lic_PackageAttribs::pid_TestDevRubika;
-						break;
-					case Lic_PackageAttribs::pid_SolScript:
-						productID = Lic_PackageAttribs::pid_TestDevSolScript;
-						break;
-					case Lic_PackageAttribs::pid_SolIndexer:
-						productID = Lic_PackageAttribs::pid_TestDevSolIndexer;
-						break;
-					case Lic_PackageAttribs::pid_SolFusion:
-						productID = Lic_PackageAttribs::pid_TestDevSolfusionSp;
-						break;
-					case Lic_PackageAttribs::pid_SpdeQueueManager:
-						productID = Lic_PackageAttribs::pid_TestDevSpdeQueueManager;
-						break;
-					case Lic_PackageAttribs::pid_RubikaProcessBuilder:
-						productID = Lic_PackageAttribs::pid_TestDevRubikaProcessBuilder;
-						break;
-					case Lic_PackageAttribs::pid_SdxDesigner:
-						productID = Lic_PackageAttribs::pid_TestDevSdxDesigner;
-						break;
-					default:
-						productID = newProductListIt->first;
-						break;
-				}
-			}
-			Lic_PackageAttribs::Lic_ProductInfoAttribs tmpProdAttribs;
-			tmpProdAttribs.productID = productID;
-			
-			
-
-			//Get the Version
-			VARIANT vtProductVersion;
-			VariantInit(&vtProductVersion);
-			hr = pKey->HeaderQuery(keyspec.headers[L"Product Version"].id, &vtProductVersion);
-			if (FAILED(hr)) 
-				throw hr;
-			tmpProdAttribs.product_Major = vtProductVersion.uintVal>>12;
-			wchar_t tmpBuf[32];
-			_snwprintf_s(tmpBuf, sizeof(tmpBuf)/sizeof(wchar_t), L"%x", (vtProductVersion.uintVal & 0x0FFF) >> 4);
-			tmpBuf[31]=0;
-			tmpProdAttribs.product_Minor = _wtoi(tmpBuf);
-			VariantClear(&vtProductVersion);
-
-			//Get the Application Instance
-			VARIANT vtApplicationInstance;
-			VariantInit(&vtProductVersion);
-			hr = pKey->HeaderQuery(keyspec.headers[L"Application Instances"].id, &vtApplicationInstance);
-			if (FAILED(hr)) 
-				throw hr;
-			if(key_type == 1)	//Is an add-on key, don't increment product application instance
-				tmpProdAttribs.productAppInstance = 0;
-			else					//Use whatever application instance is on the key, 0&1 are both 1...
-				tmpProdAttribs.productAppInstance = vtApplicationInstance.uiVal<=1 ? 1 : vtApplicationInstance.uiVal;
-			VariantClear(&vtProductID);
-
-			KeySpec::Product &keyProductSpec(keyspec.products[origProductID]);
-			for (KeySpec::Product::data_list_t::iterator keyModuleSpecIt = keyProductSpec.data.begin(); keyModuleSpecIt != keyProductSpec.data.end(); keyModuleSpecIt++)
-			{
-				//newProductListIt->first	//Use SharedLicensing
-				//Only add sharable Modules to sharable ProductIDs
-				if(keyModuleSpecIt->isSharable == newProductListIt->second)
-				{
-					VARIANT vtModuleValue;
-					VariantInit(&vtModuleValue);
-					hr = pKey->ModuleQuery(keyModuleSpecIt->id, &vtModuleValue);
-					if(FAILED(hr))
-						continue;	//Skip and go to next module
-					int moduleValue = vtModuleValue.uiVal;
-					VariantClear(&vtModuleValue);
-					if(moduleValue != 0)
-					{
-						Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribs;
-						tmpModAttribs.moduleID = keyModuleSpecIt->id;
-						tmpModAttribs.moduleValue = moduleValue;
-						tmpModAttribs.moduleAppInstance = vtApplicationInstance.uiVal<=1 ? 1 : vtApplicationInstance.uiVal;
-						if(bCalculateExpirationDate == true)
-						{
-							wchar_t wcharExpTimeStamp[256];
-							TimeHelper::SystemTimeToString(wcharExpTimeStamp, sizeof(wcharExpTimeStamp)/sizeof(wchar_t), expTimeSystime);
-							tmpModAttribs.moduleExpirationDate = std::wstring(wcharExpTimeStamp);
-						}
-						tmpProdAttribs.moduleList->push_back(tmpModAttribs);
-					}
-				}
-			}
-			pTmpLicenseInfoAttribs->productList->push_back(tmpProdAttribs);
-		}
-
-		//Generate Validation Token based on [Customer Number]-[Key Number]
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs tmpVerAttribs;
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpValTokenAttribs;
-		tmpValTokenAttribs.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID;
-		tmpValTokenAttribs.tokenValue = std::wstring(bstrValidationKey);
-		pTmpLicenseInfoAttribs->licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs);
-
-		//Generate a place for the keyCode
-		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpValTokenAttribs2;
-		tmpValTokenAttribs2.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode;
-		tmpValTokenAttribs2.tokenValue = std::wstring(L"");
-		pTmpLicenseInfoAttribs->licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs2);
-
-		*pLicenseInfoAttribs = *pTmpLicenseInfoAttribs;
-	}
-	catch(HRESULT eHr)
-	{
-		hr = eHr;
-	}
-	catch(_com_error &e)
-	{
-		hr = e.Error();
-	}
-	return hr;
+//	try
+//	{
+//		if(pKey == NULL)
+//			throw E_INVALIDARG;
+//
+//		KeySpec keyspec;
+//		Lic_PackageAttribs::Lic_LicenseInfoAttribs *pTmpLicenseInfoAttribs = new Lic_PackageAttribs::Lic_LicenseInfoAttribs();
+//
+//		//If the key is a base key on trial, or an add-on key, have the module be add-on modules that expire at the expiration date of the key
+//
+//		//If the key is a testDev key, change the Product to the Test/Dev version of the product
+//
+//		//If the key is a backup key, maybe don't convert, think about this case some more
+//
+//		//If the key is a base key that has become permanent, give it a permanent module
+//
+//		//Get Key Type
+//		VARIANT vtKeyType;
+//		hr = pKey->HeaderQuery(keyspec.headers[L"Key Type"].id, &vtKeyType);
+//		if (FAILED(hr)) 
+//			throw hr;
+//		unsigned short key_type = vtKeyType.uiVal;
+//		VariantClear(&vtKeyType);
+//		//typedef enum 
+//		//{
+//		//		KEYNone			=0x00000000,  //reserved state
+//		//		KEYAddon		   =1,
+//		//		KEYBase			=2,
+//		//		KEYReplacement	=3,
+//		//		KEYRelicense	=4,
+//		//		KEYInventory	=5,
+//		//		KEYBackup		=6,
+//		//		KEYEmergency	=7,
+//		//		//KEYSolimar	=8,
+//		//		KEYCustom		=9,
+//		//		KEYLoan			=10,
+//		//		KEYDemo			=11,
+//		//		KEYRental		=12,
+//		//		KEYDevelopment	=13,
+//		//		KEYReserved		=14,
+//		//		KEYVerification=0xff,
+//		//} KeyTypeFlagX;
+//		bool bCalculateExpirationDate (false);
+//		Lic_PackageAttribs::Lic_LicenseInfoAttribs::TSoftwareLicenseType tLicType;
+//		if(key_type == 1)	//KEYAddon
+//		{
+//			bCalculateExpirationDate = true;
+//			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
+//		}
+//		else if(key_type == 2)	//KEYBase
+//		{
+//			enum KeyStatuses
+//			{
+//				UNINITIALIZED_TRIAL=3, INITIAL_TRIAL=0, EXTENDED_TRIAL=1,
+//				EXTENDED_TRIAL2=4, EXTENDED_TRIAL3=5, EXTENDED_TRIAL4=6,
+//				EXTENDED_TRIAL5=7, BASE=2, UNUSED=10, DEACTIVATED=11, EXTENDED_TRIAL6=12,
+//				EXTENDED_TRIAL7=13, EXTENDED_TRIAL8=14, EXTENDED_TRIAL9=15, EXTENDED_TRIAL10=16,
+//				EXTENDED_TRIAL11=17, EXTENDED_TRIAL12=18, EXTENDED_TRIAL13=19, EXTENDED_TRIAL14=20,
+//				EXTENDED_TRIAL15=21, EXTENDED_TRIAL16=22
+//			};
+//
+//			//Get Key Status
+//			VARIANT vtKeyStatus;
+//			VariantInit(&vtKeyStatus);
+//			hr = pKey->HeaderQuery(keyspec.headers[L"Status"].id, &vtKeyStatus);
+//			if (FAILED(hr)) 
+//				throw hr;
+//			KeyStatuses keyStatus = (KeyStatuses)vtKeyStatus.uiVal;
+//			VariantClear(&vtKeyStatus);
+//			bCalculateExpirationDate = (
+//				keyStatus == INITIAL_TRIAL ||
+//				keyStatus == EXTENDED_TRIAL ||
+//				keyStatus == EXTENDED_TRIAL2 ||
+//				keyStatus == EXTENDED_TRIAL3 ||
+//				keyStatus == EXTENDED_TRIAL4 ||
+//				keyStatus == EXTENDED_TRIAL5 ||
+//				keyStatus == EXTENDED_TRIAL6 ||
+//				keyStatus == EXTENDED_TRIAL7 ||
+//				keyStatus == EXTENDED_TRIAL8 ||
+//				keyStatus == EXTENDED_TRIAL9 ||
+//				keyStatus == EXTENDED_TRIAL10 ||
+//				keyStatus == EXTENDED_TRIAL11 ||
+//				keyStatus == EXTENDED_TRIAL12 ||
+//				keyStatus == EXTENDED_TRIAL13 ||
+//				keyStatus == EXTENDED_TRIAL14 ||
+//				keyStatus == EXTENDED_TRIAL15 ||
+//				keyStatus == EXTENDED_TRIAL16 ||
+//				keyStatus == UNINITIALIZED_TRIAL
+//			);
+//
+//
+//			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltPerpetual;
+//			//Determine if key is permanent or not
+////hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Status"].id, &vtKeyStatus);
+//
+////
+////KeyIsTrial = 
+//
+//			//if key is not permanent
+//			//bCalculateExpirationDate = true;
+//			//else if key is permanent
+//			//bCalculateExpirationDate = false;
+//		}
+//		else if(key_type == 13)	//KEYDevelopment
+//		{
+//			bCalculateExpirationDate = true;
+//			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltTestDev;
+//		}
+//		else if(key_type == 6)	//KEYBackup
+//		{
+//			tLicType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover;
+//		}
+//		else	//All other
+//		{
+//			//Don't convert these unknown key type, throw error
+//			throw E_INVALIDARG;
+//		}
+//		pTmpLicenseInfoAttribs->softwareLicType = tLicType;
+//
+//		SYSTEMTIME expTimeSystime;
+//		if(bCalculateExpirationDate)
+//		{
+//			VARIANT vtRawExpirationDate;
+//			VariantInit(&vtRawExpirationDate);
+//			hr = pKey->HeaderQuery(keyspec.headers[L"Expiration Date"].id, &vtRawExpirationDate);
+//			time_t expirationDateTimeT = (time_t)vtRawExpirationDate.ulVal;
+//			
+//			VARIANT vtExpirationDate;
+//			vtExpirationDate = TimeHelper::TimeTToVariant(expirationDateTimeT);
+//
+//			VariantTimeToSystemTime(vtExpirationDate.date, &expTimeSystime);
+//			if (FAILED(hr)) 
+//				throw hr;
+//
+//			VariantClear(&vtExpirationDate);
+//			VariantClear(&vtRawExpirationDate);
+//		}
+//
+//
+//		//Get Key Number
+//		VARIANT vtKeyNum;
+//		VariantInit(&vtKeyNum);
+//		hr = pKey->HeaderQuery(keyspec.headers[L"Key Number"].id, &vtKeyNum);
+//		if (FAILED(hr)) 
+//			throw hr;
+//		pTmpLicenseInfoAttribs->softwareGroupLicenseID = vtKeyNum.uiVal;
+//		VariantClear(&vtKeyNum);
+//
+//		//Get Customer Number
+//		VARIANT vtCustNum;
+//		VariantInit(&vtCustNum);
+//		hr = pKey->HeaderQuery(keyspec.headers[L"Customer Number"].id, &vtCustNum);
+//		if (FAILED(hr)) 
+//			throw hr;
+//		pTmpLicenseInfoAttribs->customerID = vtCustNum.uiVal;
+//		VariantClear(&vtCustNum);
+//
+//
+//		//Get the Product Number
+//		VARIANT vtProductID;
+//		VariantInit(&vtCustNum);
+//		hr = pKey->HeaderQuery(keyspec.headers[L"Product ID"].id, &vtProductID);
+//		if (FAILED(hr)) 
+//			throw hr;
+//		int origProductID = vtProductID.uiVal;
+//		VariantClear(&vtProductID);
+//		
+//		//Some Products from protection keys get changed to be multiple products
+//		std::map<int, bool> newProductList; //map<ProductID(int), UseSharedLicensing(bool)
+//		switch(origProductID)
+//		{
+//			case Lic_PackageAttribs::pid_Spde:
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_Spde, false));
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SpdeQueueManager, true));
+//				break;
+//			case Lic_PackageAttribs::pid_Rubika:
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_Rubika, false));
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_RubikaProcessBuilder, true));
+//				break;
+//			case Lic_PackageAttribs::pid_SolIndexer:
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SolIndexer, false));
+//				newProductList.insert(std::map<int, bool>::value_type(Lic_PackageAttribs::pid_SdxDesigner, true));
+//				break;
+//			default:
+//				newProductList.insert(std::map<int, bool>::value_type(origProductID, false));
+//				break;
+//		}
+//
+//		for(	std::map<int, bool>::iterator newProductListIt = newProductList.begin();
+//				newProductListIt != newProductList.end();
+//				newProductListIt++)
+//		{
+//			int productID = newProductListIt->first;
+//			if(key_type == 13)	//KEYDevelopment
+//			{
+//				//Recalculate ProductID for test/dev to new productIDs
+//				switch(newProductListIt->first)
+//				{
+//					case Lic_PackageAttribs::pid_Spde:
+//						productID = Lic_PackageAttribs::pid_TestDevSpde;
+//						break;
+//					case Lic_PackageAttribs::pid_Iconvert:
+//						productID = Lic_PackageAttribs::pid_TestDevIconvert;
+//						break;
+//					case Lic_PackageAttribs::pid_SolsearcherEnt:
+//						productID = Lic_PackageAttribs::pid_TestDevSolsearcherEp;
+//						break;
+//					case Lic_PackageAttribs::pid_SolsearcherSp:
+//						productID = Lic_PackageAttribs::pid_TestDevSseSp;
+//						break;
+//					case Lic_PackageAttribs::pid_Rubika:
+//						productID = Lic_PackageAttribs::pid_TestDevRubika;
+//						break;
+//					case Lic_PackageAttribs::pid_SolScript:
+//						productID = Lic_PackageAttribs::pid_TestDevSolScript;
+//						break;
+//					case Lic_PackageAttribs::pid_SolIndexer:
+//						productID = Lic_PackageAttribs::pid_TestDevSolIndexer;
+//						break;
+//					case Lic_PackageAttribs::pid_SolFusion:
+//						productID = Lic_PackageAttribs::pid_TestDevSolfusionSp;
+//						break;
+//					case Lic_PackageAttribs::pid_SpdeQueueManager:
+//						productID = Lic_PackageAttribs::pid_TestDevSpdeQueueManager;
+//						break;
+//					case Lic_PackageAttribs::pid_RubikaProcessBuilder:
+//						productID = Lic_PackageAttribs::pid_TestDevRubikaProcessBuilder;
+//						break;
+//					case Lic_PackageAttribs::pid_SdxDesigner:
+//						productID = Lic_PackageAttribs::pid_TestDevSdxDesigner;
+//						break;
+//					default:
+//						productID = newProductListIt->first;
+//						break;
+//				}
+//			}
+//			Lic_PackageAttribs::Lic_ProductInfoAttribs tmpProdAttribs;
+//			tmpProdAttribs.productID = productID;
+//			
+//			
+//
+//			//Get the Version
+//			VARIANT vtProductVersion;
+//			VariantInit(&vtProductVersion);
+//			hr = pKey->HeaderQuery(keyspec.headers[L"Product Version"].id, &vtProductVersion);
+//			if (FAILED(hr)) 
+//				throw hr;
+//			tmpProdAttribs.product_Major = vtProductVersion.uintVal>>12;
+//			wchar_t tmpBuf[32];
+//			_snwprintf_s(tmpBuf, sizeof(tmpBuf)/sizeof(wchar_t), L"%x", (vtProductVersion.uintVal & 0x0FFF) >> 4);
+//			tmpBuf[31]=0;
+//			tmpProdAttribs.product_Minor = _wtoi(tmpBuf);
+//			VariantClear(&vtProductVersion);
+//
+//			//Get the Application Instance
+//			VARIANT vtApplicationInstance;
+//			VariantInit(&vtProductVersion);
+//			hr = pKey->HeaderQuery(keyspec.headers[L"Application Instances"].id, &vtApplicationInstance);
+//			if (FAILED(hr)) 
+//				throw hr;
+//			if(key_type == 1)	//Is an add-on key, don't increment product application instance
+//				tmpProdAttribs.productAppInstance = 0;
+//			else					//Use whatever application instance is on the key, 0&1 are both 1...
+//				tmpProdAttribs.productAppInstance = vtApplicationInstance.uiVal<=1 ? 1 : vtApplicationInstance.uiVal;
+//			VariantClear(&vtProductID);
+//
+//			KeySpec::Product &keyProductSpec(keyspec.products[origProductID]);
+//			for (KeySpec::Product::data_list_t::iterator keyModuleSpecIt = keyProductSpec.data.begin(); keyModuleSpecIt != keyProductSpec.data.end(); keyModuleSpecIt++)
+//			{
+//				//newProductListIt->first	//Use SharedLicensing
+//				//Only add sharable Modules to sharable ProductIDs
+//				if(keyModuleSpecIt->isSharable == newProductListIt->second)
+//				{
+//					VARIANT vtModuleValue;
+//					VariantInit(&vtModuleValue);
+//					hr = pKey->ModuleQuery(keyModuleSpecIt->id, &vtModuleValue);
+//					if(FAILED(hr))
+//						continue;	//Skip and go to next module
+//					int moduleValue = vtModuleValue.uiVal;
+//					VariantClear(&vtModuleValue);
+//					if(moduleValue != 0)
+//					{
+//						Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribs;
+//						tmpModAttribs.moduleID = keyModuleSpecIt->id;
+//						tmpModAttribs.moduleValue = moduleValue;
+//						tmpModAttribs.moduleAppInstance = vtApplicationInstance.uiVal<=1 ? 1 : vtApplicationInstance.uiVal;
+//						if(bCalculateExpirationDate == true)
+//						{
+//							wchar_t wcharExpTimeStamp[256];
+//							TimeHelper::SystemTimeToString(wcharExpTimeStamp, sizeof(wcharExpTimeStamp)/sizeof(wchar_t), expTimeSystime);
+//							tmpModAttribs.moduleExpirationDate = std::wstring(wcharExpTimeStamp);
+//						}
+//						tmpProdAttribs.moduleList->push_back(tmpModAttribs);
+//					}
+//				}
+//			}
+//			pTmpLicenseInfoAttribs->productList->push_back(tmpProdAttribs);
+//		}
+//
+//		//Generate Validation Token based on [Customer Number]-[Key Number]
+//		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs tmpVerAttribs;
+//		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpValTokenAttribs;
+//		tmpValTokenAttribs.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID;
+//		tmpValTokenAttribs.tokenValue = std::wstring(bstrValidationKey);
+//		pTmpLicenseInfoAttribs->licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs);
+//
+//		//Generate a place for the keyCode
+//		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpValTokenAttribs2;
+//		tmpValTokenAttribs2.tokenType = Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode;
+//		tmpValTokenAttribs2.tokenValue = std::wstring(L"");
+//		pTmpLicenseInfoAttribs->licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs2);
+//
+//		*pLicenseInfoAttribs = *pTmpLicenseInfoAttribs;
+//	}
+//	catch(HRESULT eHr)
+//	{
+//		hr = eHr;
+//	}
+//	catch(_com_error &e)
+//	{
+//		hr = e.Error();
+//	}
+//	return hr;
 }
 //
 HRESULT SoftwareServer::MergeLicInfoAttribsInternal(Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeFromLicenseInfoAttribs, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeToLicenseInfoAttribs)
 {
-	HRESULT hr(S_OK);
-	Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpMergeToLicenseInfoAttribs = *pMergeToLicenseInfoAttribs;
-	for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodMergeFromIt = pMergeFromLicenseInfoAttribs->productList->begin();
-			prodMergeFromIt != pMergeFromLicenseInfoAttribs->productList->end();
-			prodMergeFromIt++)
-	{
-		bool bMergedProduct = false;
-		for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodMergeToIt = tmpMergeToLicenseInfoAttribs.productList->begin();
-				prodMergeToIt != tmpMergeToLicenseInfoAttribs.productList->end();
-				prodMergeToIt++)
-		{
-			//Find matching product
-			if((int)prodMergeFromIt->productID == (int)prodMergeToIt->productID)
-			{
-				bMergedProduct = true;
+	return E_NOTIMPL;
+// Commented out code does not take into account the license changes of moving activations to product info level
+// Think this code will never be used, 
 
-				//Update the Application Instance
-				prodMergeToIt->productAppInstance = (int)prodMergeToIt->productAppInstance + (int)prodMergeFromIt->productAppInstance;
+	//HRESULT hr(S_OK);
+	//Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpMergeToLicenseInfoAttribs = *pMergeToLicenseInfoAttribs;
+	//for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodMergeFromIt = pMergeFromLicenseInfoAttribs->productList->begin();
+	//		prodMergeFromIt != pMergeFromLicenseInfoAttribs->productList->end();
+	//		prodMergeFromIt++)
+	//{
+	//	bool bMergedProduct = false;
+	//	for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodMergeToIt = tmpMergeToLicenseInfoAttribs.productList->begin();
+	//			prodMergeToIt != tmpMergeToLicenseInfoAttribs.productList->end();
+	//			prodMergeToIt++)
+	//	{
+	//		//Find matching product
+	//		if((int)prodMergeFromIt->productID == (int)prodMergeToIt->productID)
+	//		{
+	//			bMergedProduct = true;
 
-				//Set product version to the largest version.
-				if(((int)prodMergeFromIt->product_Major > (int)prodMergeToIt->product_Major) ||
-					(((int)prodMergeFromIt->product_Major == (int)prodMergeToIt->product_Major) && ((int)prodMergeFromIt->product_Minor > (int)prodMergeToIt->product_Minor)))
-				{
-					prodMergeToIt->product_Major = (int)prodMergeFromIt->product_Major;
-					prodMergeToIt->product_Minor = (int)prodMergeFromIt->product_Minor;
-					prodMergeToIt->product_SubMajor = (int)prodMergeFromIt->product_SubMajor;
-					prodMergeToIt->product_SubMinor = (int)prodMergeFromIt->product_SubMinor;
-				}
+	//			//Update the Application Instance
+	//			prodMergeToIt->productAppInstance = (int)prodMergeToIt->productAppInstance + (int)prodMergeFromIt->productAppInstance;
 
-				//Merge module
-				for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modMergeFromIt = prodMergeFromIt->moduleList->begin();
-						modMergeFromIt != prodMergeFromIt->moduleList->end();
-						modMergeFromIt++)
-				{
-					bool bUpdatedModule = false;
+	//			//Set product version to the largest version.
+	//			if(((int)prodMergeFromIt->product_Major > (int)prodMergeToIt->product_Major) ||
+	//				(((int)prodMergeFromIt->product_Major == (int)prodMergeToIt->product_Major) && ((int)prodMergeFromIt->product_Minor > (int)prodMergeToIt->product_Minor)))
+	//			{
+	//				prodMergeToIt->product_Major = (int)prodMergeFromIt->product_Major;
+	//				prodMergeToIt->product_Minor = (int)prodMergeFromIt->product_Minor;
+	//				prodMergeToIt->product_SubMajor = (int)prodMergeFromIt->product_SubMajor;
+	//				prodMergeToIt->product_SubMinor = (int)prodMergeFromIt->product_SubMinor;
+	//			}
 
-					//Only try to merge if the from module is not an add-on
-					if(_wcsicmp(modMergeFromIt->moduleExpirationDate->c_str(), L"1900-01-01 00:00:00.0000") == 0)
-					{
-						for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modMergeToIt = prodMergeToIt->moduleList->begin();
-								modMergeToIt != prodMergeToIt->moduleList->end();
-								modMergeToIt++)
-						{
-							//Find matching module and both are permanent modules...
-							if(((int)modMergeFromIt->moduleID == (int)modMergeToIt->moduleID) && 
-								(_wcsicmp(modMergeToIt->moduleExpirationDate->c_str(), L"1900-01-01 00:00:00.0000") == 0))
-							{
-								//TODO: check and make sure expiration day is not set
-								modMergeToIt->moduleAppInstance = (int)modMergeToIt->moduleAppInstance + (int)modMergeFromIt->moduleAppInstance;
-								modMergeToIt->moduleValue = (int)modMergeToIt->moduleValue + (int)modMergeFromIt->moduleValue;
-								bUpdatedModule = true;
-								break;
-							}
-						}
-					}
-					if(bUpdatedModule == false)	//Didn't find module to update, add it...
-					{
-						prodMergeToIt->moduleList->push_back(*modMergeFromIt);
-					}
-				}
-			}
-		}
+	//			//Merge module
+	//			for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modMergeFromIt = prodMergeFromIt->moduleList->begin();
+	//					modMergeFromIt != prodMergeFromIt->moduleList->end();
+	//					modMergeFromIt++)
+	//			{
+	//				bool bUpdatedModule = false;
 
-		if(bMergedProduct == false)
-		{
-			tmpMergeToLicenseInfoAttribs.productList->push_back(*prodMergeFromIt);
-		}
-	}
-	*pMergeToLicenseInfoAttribs = tmpMergeToLicenseInfoAttribs;
+	//				//Only try to merge if the from module is not an add-on
+	//				if(_wcsicmp(modMergeFromIt->moduleExpirationDate->c_str(), L"1900-01-01 00:00:00.0000") == 0)
+	//				{
+	//					for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modMergeToIt = prodMergeToIt->moduleList->begin();
+	//							modMergeToIt != prodMergeToIt->moduleList->end();
+	//							modMergeToIt++)
+	//					{
+	//						//Find matching module and both are permanent modules...
+	//						if(((int)modMergeFromIt->moduleID == (int)modMergeToIt->moduleID) && 
+	//							(_wcsicmp(modMergeToIt->moduleExpirationDate->c_str(), L"1900-01-01 00:00:00.0000") == 0))
+	//						{
+	//							//TODO: check and make sure expiration day is not set
+	//							modMergeToIt->moduleAppInstance = (int)modMergeToIt->moduleAppInstance + (int)modMergeFromIt->moduleAppInstance;
+	//							modMergeToIt->moduleValue = (int)modMergeToIt->moduleValue + (int)modMergeFromIt->moduleValue;
+	//							bUpdatedModule = true;
+	//							break;
+	//						}
+	//					}
+	//				}
+	//				if(bUpdatedModule == false)	//Didn't find module to update, add it...
+	//				{
+	//					prodMergeToIt->moduleList->push_back(*modMergeFromIt);
+	//				}
+	//			}
+	//		}
+	//	}
 
-	return hr;
+	//	if(bMergedProduct == false)
+	//	{
+	//		tmpMergeToLicenseInfoAttribs.productList->push_back(*prodMergeFromIt);
+	//	}
+	//}
+	//*pMergeToLicenseInfoAttribs = tmpMergeToLicenseInfoAttribs;
+
+	//return hr;
 }
 
 //Convert 100-055 to 2 ints each having 100 and 55 as its value
@@ -3069,53 +2930,33 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 		(*pProdReminderMap).clear();
 		if(pLicInfoAttribs != NULL)
 		{
-			//Convert SoftwareLicense ExpirationDate to time_t
-			SYSTEMTIME swLicExpiresDateSystime;
-			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(pLicInfoAttribs->activationExpirationDate)).c_str(), swLicExpiresDateSystime))
-				throw E_FAIL;
-			_variant_t vtSwLicExpiresDate(NULL);	
-			if (!SystemTimeToVariantTime(&swLicExpiresDateSystime, &vtSwLicExpiresDate.date)) 
-				throw E_FAIL;
-			time_t swLicExpiresDateTimeT = TimeHelper::VariantToTimeT(vtSwLicExpiresDate, false);
-
 			//Cycle through all Products
 			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ProductInfoAttribsList::iterator prodIt = pLicInfoAttribs->productList->begin();
 					prodIt != pLicInfoAttribs->productList->end();
 					prodIt++)
 			{
-				//Set the lowest expiration date...
-				if(swLicExpiresDateTimeT != time_t(-1) && ((*pProdReminderMap)[(*prodIt).productID].closestExpDate == -1 || swLicExpiresDateTimeT < (*pProdReminderMap)[(*prodIt).productID].closestExpDate))
-					(*pProdReminderMap)[(*prodIt).productID].closestExpDate = swLicExpiresDateTimeT;
-
-				if(swLicExpiresDateTimeT != time_t(-1))
-					(*pProdReminderMap)[(*prodIt).productID].swExpDate = swLicExpiresDateTimeT;
-
-				ModuleIdToExpirationDateList tmpModToExpDateList = (*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList;
-				for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = prodIt->moduleList->begin();
-						modIt != prodIt->moduleList->end();
-						modIt++)
+				if(prodIt->bUseExpirationDate)
 				{
-					SYSTEMTIME moduleExpiresDateSystime;
-					if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(modIt->moduleExpirationDate)).c_str(), moduleExpiresDateSystime))
-						continue;
-					
-					_variant_t vtModuleExpiresDate(NULL);	
-					if (!SystemTimeToVariantTime(&moduleExpiresDateSystime, &vtModuleExpiresDate.date)) 
-						continue;
-					time_t moduleExpiresDateTimeT = TimeHelper::VariantToTimeT(vtModuleExpiresDate, false);
-					time_t emptyExpiresDateTimeT = time_t(-1);
+					//Convert SoftwareLicense ExpirationDate to time_t
+					SYSTEMTIME swProdLicExpiresDateSystime;
+					if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str(), swProdLicExpiresDateSystime))
+						throw E_FAIL;
+					_variant_t vtSwProdLicExpiresDate(NULL);	
+					if (!SystemTimeToVariantTime(&swProdLicExpiresDateSystime, &vtSwProdLicExpiresDate.date)) 
+						throw E_FAIL;
+					time_t swProdLicExpiresDateTimeT = TimeHelper::VariantToTimeT(vtSwProdLicExpiresDate, false);
+					(*pProdReminderMap)[(*prodIt).productID].closestExpDate = swProdLicExpiresDateTimeT;
 
-					// ignore expiration date if it equals 1900/1/1
-					if(moduleExpiresDateTimeT != emptyExpiresDateTimeT)
+					ModuleIdToExpirationDateList tmpModToExpDateList = (*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList;
+					for(	Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = prodIt->moduleList->begin();
+							modIt != prodIt->moduleList->end();
+							modIt++)
 					{
-						tmpModToExpDateList.push_back(ModuleIdToExpirationDate(modIt->moduleID, moduleExpiresDateTimeT));
-
-						//Set the lowest expiration date...
-						if((*pProdReminderMap)[(*prodIt).productID].closestExpDate == -1 || moduleExpiresDateTimeT < (*pProdReminderMap)[(*prodIt).productID].closestExpDate)
-							(*pProdReminderMap)[(*prodIt).productID].closestExpDate = moduleExpiresDateTimeT;
+						tmpModToExpDateList.push_back(ModuleIdToExpirationDate(modIt->moduleID, swProdLicExpiresDateTimeT));
 					}
+					(*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList = tmpModToExpDateList;
 				}
-				(*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList = tmpModToExpDateList;
+				
 			}
 		}
 	}

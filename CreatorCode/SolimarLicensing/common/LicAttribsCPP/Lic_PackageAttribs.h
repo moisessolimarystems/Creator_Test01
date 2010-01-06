@@ -541,19 +541,10 @@ public:
 			InitFromString(wsData);
 			return *this ;
 		}
-		typedef enum {
-			msLicensed = 0,
-			msTrial = 1,
-			msAddOn = 2,
-		} TModuleState;
-		
 			
 		SpdAttribs::DwordAttrib moduleID;
 		SpdAttribs::DwordAttrib moduleValue;
 		SpdAttribs::DwordAttrib moduleAppInstance;
-		SpdAttribs::WStringAttrib moduleExpirationDate;
-		SpdAttribs::WStringAttrib contractNumber;
-		SpdAttribs::AttribEnumTypeMember<TModuleState> moduleState;
 	
 		
 	
@@ -562,9 +553,6 @@ public:
 			moduleID = c.moduleID;
 			moduleValue = c.moduleValue;
 			moduleAppInstance = c.moduleAppInstance;
-			moduleExpirationDate = c.moduleExpirationDate;
-			contractNumber = c.contractNumber;
-			moduleState = c.moduleState;
 			return *this ;
 		}
 	
@@ -572,67 +560,43 @@ public:
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			moduleID(m_mapAttribObjs, L"mI", 0),
 			moduleValue(m_mapAttribObjs, L"mV", 0),
-			moduleAppInstance(m_mapAttribObjs, L"mAI", 0),
-			moduleExpirationDate(m_mapAttribObjs, L"exDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
-			moduleState(m_mapAttribObjs, L"mSt", msTrial){;}
+			moduleAppInstance(m_mapAttribObjs, L"mAI", 0){;}
 		
 		Lic_ModuleInfoAttribs(const Lic_ModuleInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			moduleID(m_mapAttribObjs, L"mI", c.moduleID),
 			moduleValue(m_mapAttribObjs, L"mV", c.moduleValue),
-			moduleAppInstance(m_mapAttribObjs, L"mAI", c.moduleAppInstance),
-			moduleExpirationDate(m_mapAttribObjs, L"exDt", c.moduleExpirationDate),
-			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
-			moduleState(m_mapAttribObjs, L"mSt", c.moduleState){;}
+			moduleAppInstance(m_mapAttribObjs, L"mAI", c.moduleAppInstance){;}
 		
 		Lic_ModuleInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			moduleID(m_mapAttribObjs, L"mI", 0),
 			moduleValue(m_mapAttribObjs, L"mV", 0),
-			moduleAppInstance(m_mapAttribObjs, L"mAI", 0),
-			moduleExpirationDate(m_mapAttribObjs, L"exDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			contractNumber(m_mapAttribObjs, L"cN", SpdAttribs::WStringObj(L"")),
-			moduleState(m_mapAttribObjs, L"mSt", msTrial){;}
+			moduleAppInstance(m_mapAttribObjs, L"mAI", 0){;}
 		
 		Lic_ModuleInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ModuleInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			moduleID(m_mapAttribObjs, L"mI", c.moduleID),
 			moduleValue(m_mapAttribObjs, L"mV", c.moduleValue),
-			moduleAppInstance(m_mapAttribObjs, L"mAI", c.moduleAppInstance),
-			moduleExpirationDate(m_mapAttribObjs, L"exDt", c.moduleExpirationDate),
-			contractNumber(m_mapAttribObjs, L"cN", c.contractNumber),
-			moduleState(m_mapAttribObjs, L"mSt", c.moduleState){;}
+			moduleAppInstance(m_mapAttribObjs, L"mAI", c.moduleAppInstance){;}
 		
 		Lic_ModuleInfoAttribs(const CWStringStream &wsAttribsClassName,
 			const SpdAttribs::DwordAttrib &param_moduleID,
 			const SpdAttribs::DwordAttrib &param_moduleValue,
-			const SpdAttribs::DwordAttrib &param_moduleAppInstance,
-			const SpdAttribs::WStringAttrib &param_moduleExpirationDate,
-			const SpdAttribs::WStringAttrib &param_contractNumber,
-			const TModuleState &param_moduleState) : 
+			const SpdAttribs::DwordAttrib &param_moduleAppInstance) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
 				moduleID(m_mapAttribObjs, L"mI", param_moduleID),
 				moduleValue(m_mapAttribObjs, L"mV", param_moduleValue),
-				moduleAppInstance(m_mapAttribObjs, L"mAI", param_moduleAppInstance),
-				moduleExpirationDate(m_mapAttribObjs, L"exDt", param_moduleExpirationDate),
-				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
-				moduleState(m_mapAttribObjs, L"mSt", param_moduleState){;}
+				moduleAppInstance(m_mapAttribObjs, L"mAI", param_moduleAppInstance){;}
 		
 		Lic_ModuleInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 			const SpdAttribs::DwordAttrib &param_moduleID,
 			const SpdAttribs::DwordAttrib &param_moduleValue,
-			const SpdAttribs::DwordAttrib &param_moduleAppInstance,
-			const SpdAttribs::WStringAttrib &param_moduleExpirationDate,
-			const SpdAttribs::WStringAttrib &param_contractNumber,
-			const TModuleState &param_moduleState) : 
+			const SpdAttribs::DwordAttrib &param_moduleAppInstance) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 				moduleID(m_mapAttribObjs, L"mI", param_moduleID),
 				moduleValue(m_mapAttribObjs, L"mV", param_moduleValue),
-				moduleAppInstance(m_mapAttribObjs, L"mAI", param_moduleAppInstance),
-				moduleExpirationDate(m_mapAttribObjs, L"exDt", param_moduleExpirationDate),
-				contractNumber(m_mapAttribObjs, L"cN", param_contractNumber),
-				moduleState(m_mapAttribObjs, L"mSt", param_moduleState){;}
+				moduleAppInstance(m_mapAttribObjs, L"mAI", param_moduleAppInstance){;}
 		
 	
 	};
@@ -927,14 +891,6 @@ public:
 			InitFromString(wsData);
 			return *this ;
 		}
-		typedef enum {
-			sltPerpetual = 0,
-			sltFailover = 1,
-			sltDisasterRecovery = 2,
-			sltTestDev = 3,
-			sltSubscription = 4,
-		} TSoftwareLicenseType;
-		
 		class Lic_ActivitySlotInfoAttribs : public SpdAttribs::CAttribsBase
 		{
 		public:
@@ -1449,13 +1405,6 @@ public:
 		SpdAttribs::DwordAttrib customerID;
 		SpdAttribs::DwordAttrib destinationID;
 		SpdAttribs::DwordAttrib softwareGroupLicenseID;
-		SpdAttribs::AttribEnumTypeMember<TSoftwareLicenseType> softwareLicType;
-		SpdAttribs::DwordAttrib softwareLicTypeIndex;
-		SpdAttribs::WStringAttrib activationExpirationDate;
-		SpdAttribs::DwordAttrib activationTotal;
-		SpdAttribs::DwordAttrib activationCurrent;
-		SpdAttribs::DwordAttrib activationAmountInDays;
-		SpdAttribs::BoolAttrib bActivationCurrentOverride;
 		SpdAttribs::WStringAttrib modifiedDate;
 		SpdAttribs::BoolAttrib bLicClockViolation;
 		Lic_ActivitySlotInfoAttribsList activitySlotList;
@@ -1470,13 +1419,6 @@ public:
 			customerID = c.customerID;
 			destinationID = c.destinationID;
 			softwareGroupLicenseID = c.softwareGroupLicenseID;
-			softwareLicType = c.softwareLicType;
-			softwareLicTypeIndex = c.softwareLicTypeIndex;
-			activationExpirationDate = c.activationExpirationDate;
-			activationTotal = c.activationTotal;
-			activationCurrent = c.activationCurrent;
-			activationAmountInDays = c.activationAmountInDays;
-			bActivationCurrentOverride = c.bActivationCurrentOverride;
 			modifiedDate = c.modifiedDate;
 			bLicClockViolation = c.bLicClockViolation;
 			activitySlotList = c.activitySlotList;
@@ -1491,13 +1433,6 @@ public:
 			customerID(m_mapAttribObjs, L"cI", 0),
 			destinationID(m_mapAttribObjs, L"dI", 0),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
-			softwareLicType(m_mapAttribObjs, L"lT", sltPerpetual),
-			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", 1),
-			activationExpirationDate(m_mapAttribObjs, L"aEDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			activationTotal(m_mapAttribObjs, L"aT", 0),
-			activationCurrent(m_mapAttribObjs, L"aC", 0),
-			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
 			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
@@ -1510,13 +1445,6 @@ public:
 			customerID(m_mapAttribObjs, L"cI", c.customerID),
 			destinationID(m_mapAttribObjs, L"dI", c.destinationID),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", c.softwareGroupLicenseID),
-			softwareLicType(m_mapAttribObjs, L"lT", c.softwareLicType),
-			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", c.softwareLicTypeIndex),
-			activationExpirationDate(m_mapAttribObjs, L"aEDt", c.activationExpirationDate),
-			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
-			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
-			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
 			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
@@ -1529,13 +1457,6 @@ public:
 			customerID(m_mapAttribObjs, L"cI", 0),
 			destinationID(m_mapAttribObjs, L"dI", 0),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
-			softwareLicType(m_mapAttribObjs, L"lT", sltPerpetual),
-			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", 1),
-			activationExpirationDate(m_mapAttribObjs, L"aEDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
-			activationTotal(m_mapAttribObjs, L"aT", 0),
-			activationCurrent(m_mapAttribObjs, L"aC", 0),
-			activationAmountInDays(m_mapAttribObjs, L"aA", 0),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", false),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
 			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
@@ -1548,13 +1469,6 @@ public:
 			customerID(m_mapAttribObjs, L"cI", c.customerID),
 			destinationID(m_mapAttribObjs, L"dI", c.destinationID),
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", c.softwareGroupLicenseID),
-			softwareLicType(m_mapAttribObjs, L"lT", c.softwareLicType),
-			softwareLicTypeIndex(m_mapAttribObjs, L"lTI", c.softwareLicTypeIndex),
-			activationExpirationDate(m_mapAttribObjs, L"aEDt", c.activationExpirationDate),
-			activationTotal(m_mapAttribObjs, L"aT", c.activationTotal),
-			activationCurrent(m_mapAttribObjs, L"aC", c.activationCurrent),
-			activationAmountInDays(m_mapAttribObjs, L"aA", c.activationAmountInDays),
-			bActivationCurrentOverride(m_mapAttribObjs, L"bAC", c.bActivationCurrentOverride),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
 			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
@@ -1566,13 +1480,6 @@ public:
 			const SpdAttribs::DwordAttrib &param_customerID,
 			const SpdAttribs::DwordAttrib &param_destinationID,
 			const SpdAttribs::DwordAttrib &param_softwareGroupLicenseID,
-			const TSoftwareLicenseType &param_softwareLicType,
-			const SpdAttribs::DwordAttrib &param_softwareLicTypeIndex,
-			const SpdAttribs::WStringAttrib &param_activationExpirationDate,
-			const SpdAttribs::DwordAttrib &param_activationTotal,
-			const SpdAttribs::DwordAttrib &param_activationCurrent,
-			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
-			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
 			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
@@ -1583,13 +1490,6 @@ public:
 				customerID(m_mapAttribObjs, L"cI", param_customerID),
 				destinationID(m_mapAttribObjs, L"dI", param_destinationID),
 				softwareGroupLicenseID(m_mapAttribObjs, L"swI", param_softwareGroupLicenseID),
-				softwareLicType(m_mapAttribObjs, L"lT", param_softwareLicType),
-				softwareLicTypeIndex(m_mapAttribObjs, L"lTI", param_softwareLicTypeIndex),
-				activationExpirationDate(m_mapAttribObjs, L"aEDt", param_activationExpirationDate),
-				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
-				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
-				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
-				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
 				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),
@@ -1601,13 +1501,6 @@ public:
 			const SpdAttribs::DwordAttrib &param_customerID,
 			const SpdAttribs::DwordAttrib &param_destinationID,
 			const SpdAttribs::DwordAttrib &param_softwareGroupLicenseID,
-			const TSoftwareLicenseType &param_softwareLicType,
-			const SpdAttribs::DwordAttrib &param_softwareLicTypeIndex,
-			const SpdAttribs::WStringAttrib &param_activationExpirationDate,
-			const SpdAttribs::DwordAttrib &param_activationTotal,
-			const SpdAttribs::DwordAttrib &param_activationCurrent,
-			const SpdAttribs::DwordAttrib &param_activationAmountInDays,
-			const SpdAttribs::BoolAttrib &param_bActivationCurrentOverride,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
 			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
@@ -1618,13 +1511,6 @@ public:
 				customerID(m_mapAttribObjs, L"cI", param_customerID),
 				destinationID(m_mapAttribObjs, L"dI", param_destinationID),
 				softwareGroupLicenseID(m_mapAttribObjs, L"swI", param_softwareGroupLicenseID),
-				softwareLicType(m_mapAttribObjs, L"lT", param_softwareLicType),
-				softwareLicTypeIndex(m_mapAttribObjs, L"lTI", param_softwareLicTypeIndex),
-				activationExpirationDate(m_mapAttribObjs, L"aEDt", param_activationExpirationDate),
-				activationTotal(m_mapAttribObjs, L"aT", param_activationTotal),
-				activationCurrent(m_mapAttribObjs, L"aC", param_activationCurrent),
-				activationAmountInDays(m_mapAttribObjs, L"aA", param_activationAmountInDays),
-				bActivationCurrentOverride(m_mapAttribObjs, L"bAC", param_bActivationCurrentOverride),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
 				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),

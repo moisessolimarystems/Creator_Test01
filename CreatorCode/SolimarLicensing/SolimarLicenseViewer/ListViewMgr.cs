@@ -284,7 +284,6 @@ namespace SolimarLicenseViewer
                     if (SelectedNode.Name == AppConstants.LicenseRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.LicenceTypeHeader);
                         TheListView.Columns.Add(AppConstants.VerificationStatusHeader);
                         //{
                         //    colHeader = new ColumnHeader();
@@ -607,7 +606,6 @@ namespace SolimarLicenseViewer
                     licInfoAttrib.AssignMembersFromStream(generalStream);
                     ListViewItem lvItem = new ListViewItem();
                     lvItem.Text = softwareLicense;
-                    lvItem.SubItems.Add(licInfoAttrib.softwareLicType.GetAlias());
                     StringBuilder toolTipBuilder = new StringBuilder();
                     try
                     {
@@ -1295,7 +1293,7 @@ namespace SolimarLicenseViewer
 
                         if (keyInfo.applicationInstance > 0)
                             lvItem.ForeColor = System.Drawing.Color.SteelBlue;
-                        if (!keyInfo.bIsActive && !keyInfo.IsKeyTypeVerification() && !keyInfo.IsKeyTypeUninitialized())
+                        if (!keyInfo.bIsActive && !keyInfo.IsKeyTypeVerification() && !keyInfo.IsKeyTypeUninitialized() && !m_CommLink.bDiagnosticDateView)
                         {
                             lvItem.Font = new System.Drawing.Font(lvItem.Font, System.Drawing.FontStyle.Italic);
                             lvItem.ForeColor = System.Drawing.Color.Red;
@@ -1358,7 +1356,7 @@ namespace SolimarLicenseViewer
                             if (lView.SelectedItems.Count > 0 && lView.SelectedItems[0].Tag is string)
                             {
                                 Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo = m_CommLink.KeyFindByName(lView.SelectedItems[0].Tag as string);
-                                if (keyInfo != null && !keyInfo.IsKeyTypeUninitialized() && !keyInfo.IsKeyTypeVerification())
+                                if (keyInfo != null && !keyInfo.IsKeyTypeUninitialized() && !keyInfo.IsKeyTypeVerification() && !m_CommLink.bDiagnosticDateView)
                                 {
                                     TheSplitControl.Panel2Collapsed = false;
                                     LoadProtectionKeyModulesData(lView.SelectedItems[0].Tag as string);

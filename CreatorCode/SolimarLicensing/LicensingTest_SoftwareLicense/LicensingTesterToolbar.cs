@@ -96,79 +96,84 @@ namespace LicensingTest_SoftwareLicense
 
 		void tActTotalMenuItem_Click(object sender, EventArgs e)
 		{
+			int modID = 0;
 			try
 			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
+				modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
 				int licenseCount = 0;
 				licenseCount = m_licWrapper.ModuleLicenseTotalEx(modID);
 				LogMessage("Success m_licWrapper.ModuleLicenseTotalEx(" + modID.ToString() + ") licenseInUse = " + licenseCount.ToString());
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ModuleLicenseTotalEx(" + modID.ToString() + "), Exception: " + ex.Message);
 			}
 			//throw new Exception("The method or operation is not implemented.");
 		}
 
 		void tActInuseMenuItem_Click(object sender, EventArgs e)
 		{
+			int modID = 0;
 			try
 			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
+				modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
 				int licenseCount = 0;
 				licenseCount = m_licWrapper.ModuleLicenseInUseEx(modID);
 				LogMessage("Success m_licWrapper.ModuleLicenseInUseEx(" + modID.ToString() + ") licenseInUse = " + licenseCount.ToString());
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ModuleLicenseInUseEx(" + modID.ToString() + "), Exception: " + ex.Message);
 			}
 		}
 		void tActInuseByAppMenuItem_Click(object sender, EventArgs e)
 		{
+			int modID = 0;
 			try
 			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
+				modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
 				int licenseCount = 0;
 				licenseCount = m_licWrapper.ModuleLicenseInUse_ByAppEx(modID);
 				LogMessage("Success m_licWrapper.ModuleLicenseInUse_ByAppEx(" + modID.ToString() + ") licenseInUse = " + licenseCount.ToString());
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ModuleLicenseInUse_ByAppEx(" + modID.ToString() + "), Exception: " + ex.Message);
 			}
 		}
-		
+
 
 		void tActReleaseMenuItem_Click(object sender, EventArgs e)
 		{
+			int modID = 0;
 			try
 			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
+				modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
 				int amount = System.Convert.ToInt32(tModAmountTextbox.TextBox.Text);
 				m_licWrapper.ModuleLicenseReleaseEx(modID, amount);
-				
+
 				LogMessage("Success m_licWrapper.ModuleLicenseReleaseEx(" + modID.ToString() + ", " + amount.ToString() + ")");
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ModuleLicenseReleaseEx(" + modID.ToString() + "), Exception: " + ex.Message);
 			}
 			//throw new Exception("The method or operation is not implemented.");
 		}
 
 		void tActObtainMenuItem_Click(object sender, EventArgs e)
 		{
+			int modID = 0;
 			try
 			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
+				modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
 				int amount = System.Convert.ToInt32(tModAmountTextbox.TextBox.Text);
 				m_licWrapper.ModuleLicenseObtainEx(modID, amount);
 				LogMessage("Success m_licWrapper.ModuleLicenseObtainEx(" + modID.ToString() + ", " + amount.ToString() + ")");
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ModuleLicenseObtainEx(" + modID.ToString() + "), Exception: " + ex.Message);
 			}
 		}
 
@@ -197,7 +202,7 @@ namespace LicensingTest_SoftwareLicense
 			}
 			catch (COMException ex)
 			{
-				LogMessage(ex.Message);
+				LogMessage("Failed m_licWrapper.ValidateLicenseEx(), Exception: " + ex.Message);
 			}
 			//throw new Exception("The method or operation is not implemented.");
 		}
@@ -219,7 +224,7 @@ namespace LicensingTest_SoftwareLicense
 		{
 			if (delWriteMessage != null)
 				delWriteMessage(m_appInstance + " - " + m_productID.ToString() + " - " + message);
-				
+
 		}
 	}
 }

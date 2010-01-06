@@ -41,7 +41,7 @@ namespace LicensingTest_SoftwareLicense
 			//    Application.ProductName,
 			//    false);
 
-//			Solimar.Performance.PerformanceCreator pC = new Solimar.Performance.PerformanceCreator();
+			//			Solimar.Performance.PerformanceCreator pC = new Solimar.Performance.PerformanceCreator();
 
 			//System.Diagnostics.Stopwatch.GetTimestamp()
 			long startTime, endTime;
@@ -126,7 +126,7 @@ namespace LicensingTest_SoftwareLicense
 		private Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs g_licInfoAttrib;
 		private Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseServerWrapper g_licServer = null;
 		private Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper g_licenseWrapper = null;
-		
+
 
 		void SetRawKeySpec(string rawKeySpec)
 		{
@@ -155,7 +155,7 @@ namespace LicensingTest_SoftwareLicense
 			rootNode.Nodes.Add(productMapNode);
 			rootNode.Expand();
 			param_refRootNode.Nodes.Add(rootNode);
-			
+
 		}
 		void Tree_Add_Lic_ProductSoftwareSpecAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs param_prodSoftwareSpec)
 		{
@@ -174,7 +174,7 @@ namespace LicensingTest_SoftwareLicense
 
 			nodeText = "SameModSpecProductID: " + System.Convert.ToInt32(param_prodSoftwareSpec.sameModSpecProductID.ToString(), 16).ToString();
 			productNode.Nodes.Add(new TreeNode(nodeText));
-			if(param_prodSoftwareSpec.sameModSpecProductID != 0)
+			if (param_prodSoftwareSpec.sameModSpecProductID != 0)
 				toolTipBuilder.Append("\r\n" + nodeText);
 
 			nodeText = "PrevSharedProductID: " + System.Convert.ToInt32(param_prodSoftwareSpec.prevSharedProductID.ToString(), 16).ToString();
@@ -183,7 +183,7 @@ namespace LicensingTest_SoftwareLicense
 				toolTipBuilder.Append("\r\n" + nodeText);
 
 			TreeNode modNode = new TreeNode("ModuleMap");
-			
+
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecMap = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleList(g_softwareSpec, param_prodSoftwareSpec.productID);
 			if (moduleSpecMap != null)
 			{
@@ -196,7 +196,7 @@ namespace LicensingTest_SoftwareLicense
 
 			param_refRootNode.Nodes.Add(productNode);
 
-			
+
 		}
 
 		void Tree_Add_Lic_VerificationAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationAttribs param_verificationAttribs)
@@ -230,7 +230,7 @@ namespace LicensingTest_SoftwareLicense
 			TreeNode verificationTokenNode = new TreeNode(ValidateToken(param_verificationTokenAttribs, ref bSuccess));
 			TreeNode childNode = null;
 
-			if(!bSuccess)
+			if (!bSuccess)
 				verificationTokenNode.ForeColor = System.Drawing.Color.Red;
 
 			nodeText = "TokenType: " + param_verificationTokenAttribs.tokenType.EVal + " (" + param_verificationTokenAttribs.tokenType + ")";
@@ -339,21 +339,6 @@ namespace LicensingTest_SoftwareLicense
 				//param_refRootNode.Nodes.Add(new TreeNode("SoftwareID: " + param_licInfoAttribs.softwareGroupLicenseID));
 				param_refRootNode.Nodes.Add(new TreeNode(String.Format("SoftwareID: {0:X4}", param_licInfoAttribs.softwareGroupLicenseID.TVal)));
 				param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-				param_refRootNode.Nodes.Add(new TreeNode("SoftwareLicenseType: " + param_licInfoAttribs.softwareLicType.GetAlias() + " (" + param_licInfoAttribs.softwareLicType.ToString() + ")"));
-				param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-				//if ((param_licInfoAttribs.softwareLicType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery)
-				//    || (param_licInfoAttribs.softwareLicType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev))
-				if(param_licInfoAttribs.activationTotal.TVal != 0 )
-				{
-					param_refRootNode.Nodes.Add(new TreeNode("Activations Total: " + param_licInfoAttribs.activationTotal.TVal));
-					param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-					param_refRootNode.Nodes.Add(new TreeNode("Activations Current: " + param_licInfoAttribs.activationCurrent.TVal));
-					param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-					param_refRootNode.Nodes.Add(new TreeNode("Activation Expiration Date: " + param_licInfoAttribs.activationExpirationDate.TVal.ToLocalTime()));
-					param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-					param_refRootNode.Nodes.Add(new TreeNode("Activation Amount in Days: " + param_licInfoAttribs.activationAmountInDays.TVal));
-					param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
-				}
 				param_refRootNode.Nodes.Add(new TreeNode("Modified Date: " + param_licInfoAttribs.modifiedDate.TVal.ToLocalTime()));
 				param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
 
@@ -378,7 +363,7 @@ namespace LicensingTest_SoftwareLicense
 
 			nodeText = "Product: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal) + " (" + System.Convert.ToInt32(param_prodInfoAttribs.productID.ToString(), 16).ToString() + ")";
 			toolTipBuilder.Append("ProductName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal) + "\r\n");
-			
+
 			//nodeText = "Product " + System.Convert.ToInt32(param_prodInfoAttribs.productID.ToString(), 16).ToString();
 			TreeNode prodNode = new TreeNode(nodeText);
 
@@ -423,14 +408,6 @@ namespace LicensingTest_SoftwareLicense
 
 			TreeNode modNode = new TreeNode();
 			TreeNode childNode = null;
-			if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
-			{
-				nodeText += " [Addon Module Expires: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString() + "]";
-				if (DateTime.Now.ToUniversalTime().CompareTo(param_modInfoAttribs.moduleExpirationDate.TVal) > 0)
-				{
-					modNode.ForeColor = System.Drawing.Color.Red;
-				}
-			}
 
 			modNode.Text = nodeText;
 
@@ -454,28 +431,6 @@ namespace LicensingTest_SoftwareLicense
 			childNode.ForeColor = modNode.ForeColor;
 			modNode.Nodes.Add(childNode);
 
-			//nodeText = "ModuleAppInstance: " + System.Convert.ToInt32(param_modInfoAttribs.moduleState.ToString(), 16).ToString();
-			//nodeText = "ModuleState: " + param_modInfoAttribs.moduleState.EVal.ToString();
-			nodeText = "ModuleState: " + param_modInfoAttribs.moduleState.GetAlias();
-			toolTipBuilder.Append("\r\n" + nodeText);
-			childNode = new TreeNode(nodeText);
-			childNode.ForeColor = modNode.ForeColor;
-			modNode.Nodes.Add(childNode);
-
-			nodeText = "ContractNumber: " + param_modInfoAttribs.contractNumber.TVal.ToString();
-			toolTipBuilder.Append("\r\n" + nodeText);
-			childNode = new TreeNode(nodeText);
-			childNode.ForeColor = modNode.ForeColor;
-			modNode.Nodes.Add(childNode);
-
-			if (DateTime.Compare(new DateTime(1900, 1, 1), param_modInfoAttribs.moduleExpirationDate.TVal) != 0)
-			{
-				nodeText = "ModuleExpirationDate: " + param_modInfoAttribs.moduleExpirationDate.TVal.ToLocalTime().ToString();
-				toolTipBuilder.Append("\r\n" + nodeText);
-				childNode = new TreeNode(nodeText);
-				childNode.ForeColor = modNode.ForeColor;
-				modNode.Nodes.Add(childNode);
-			}
 			modNode.ToolTipText = toolTipBuilder.ToString();
 			param_refRootNode.Nodes.Add(modNode);
 
@@ -487,7 +442,7 @@ namespace LicensingTest_SoftwareLicense
 			//string softwareLicense = String.Format("{0}-{1}", System.Convert.ToInt32(g_licInfoAttrib.customerID, 16), g_licInfoAttrib.softwareLicenseID);
 			//string softwareLicense = String.Format("{0}-{1}", g_licInfoAttrib.customerID, g_licInfoAttrib.softwareGroupLicenseID);
 			string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(g_licInfoAttrib);
-			
+
 			retVal.Append(param_verificationTokenAttribs.tokenType.EVal.ToString());
 			try
 			{
@@ -623,7 +578,7 @@ namespace LicensingTest_SoftwareLicense
 					{
 						//long startTime, endTime;
 						//startTime = System.Diagnostics.Stopwatch.GetTimestamp();
-						
+
 						generalStream = g_licServer.GetSoftwareLicenseInfo_ByLicense(softwareLicense);
 
 						//endTime = System.Diagnostics.Stopwatch.GetTimestamp();
@@ -641,10 +596,10 @@ namespace LicensingTest_SoftwareLicense
 							populateLicenseInfo(softwareLicense, g_licInfoAttrib, bFirstTime);
 							bFirstTime = false;
 							//licenseInfoTreeView.ExpandAll();
-							
+
 						}
 					}
-					
+
 				}
 			}
 			catch (COMException ex)
@@ -659,6 +614,7 @@ namespace LicensingTest_SoftwareLicense
 			try
 			{
 				licenseInfoViewerControl1.SetData(g_softwareSpec, _paramLicInfoAttribs, _paramClearAll);
+				licenseInfoViewerControl2.SetData(g_softwareSpec, _paramLicInfoAttribs, _paramClearAll);
 
 				licenseInfoTreeView.BeginUpdate();
 				if (_paramClearAll == true)
@@ -686,7 +642,7 @@ namespace LicensingTest_SoftwareLicense
 			}
 		}
 
-		
+
 
 		private void ts_lmgrInitButton_Click(object sender, EventArgs e)
 		{
@@ -698,9 +654,9 @@ namespace LicensingTest_SoftwareLicense
 				LogMessage("Successfully called g_licenseWrapper.ConnectEx(jlan5)");
 
 
-				bool bInitialized = g_licenseWrapper.InitializeEx(ts_lmgrAppInstanceTextBox.Text, 14, 1, 1, false, "", false, Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL, 0, false, false);
+				bool bInitialized = g_licenseWrapper.InitializeEx(ts_lmgrAppInstanceTextBox.Text, 14, 1, 1, false, "", false, Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG, 0, false, false);
 				if (bInitialized)
-					LogMessage("Successfully called g_licenseWrapper.InitializeEx(" + ts_lmgrAppInstanceTextBox.Text+ ")");
+					LogMessage("Successfully called g_licenseWrapper.InitializeEx(" + ts_lmgrAppInstanceTextBox.Text + ")");
 				if (hrValue != 0)
 					LogMessage("Failed called g_licenseWrapper.InitializeEx(" + ts_lmgrAppInstanceTextBox.Text + ")");
 
@@ -718,14 +674,14 @@ namespace LicensingTest_SoftwareLicense
 				bool bValid = g_licenseWrapper.ValidateLicenseEx();
 				if (bValid)
 					LogMessage("Successfully called g_licenseWrapper.ValidateLicenseEx()");
-				if(bValid == false)
+				if (bValid == false)
 					LogMessage("Successfully called g_licenseWrapper.ValidateLicenseEx(), but licensing is invalid");
 			}
 			catch (COMException ex)
 			{
 				LogMessage(ex.Message);
 			}
-			
+
 		}
 		private void ts_lmgrObtainModButton_Click(object sender, EventArgs e)
 		{
@@ -782,7 +738,7 @@ namespace LicensingTest_SoftwareLicense
 		{
 			try
 			{
-				if(g_licenseWrapper != null)
+				if (g_licenseWrapper != null)
 					g_licenseWrapper.Dispose();
 				LogMessage("Destroy g_licenseWrapper");
 			}
@@ -914,30 +870,6 @@ namespace LicensingTest_SoftwareLicense
 					verToken.tokenType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
 					verToken.tokenValue.TVal = "";
 					licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(verToken);
-				}
-
-				//licPackage.licSoftwareSpecAttribs.TVal = g_softwareSpec;
-				//licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover;
-				if (eGenType == generateLicType.eGenerateDisasterRecovery)
-					licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltDisasterRecovery;
-				else if (eGenType == generateLicType.eGenerateBackup)
-					licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover;
-				else if (eGenType == generateLicType.eGenerateTestDev)
-					licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev;
-
-				//licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard;
-
-				//licPackage.licLicenseInfoAttribs.TVal.softwareLicType.TVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltTestDev;
-				licPackage.licLicenseInfoAttribs.TVal.productList.TVal = g_licInfoAttrib.productList;
-				if (eGenType == generateLicType.eGenerateDisasterRecovery || eGenType == generateLicType.eGenerateTestDev)
-				{
-					licPackage.licLicenseInfoAttribs.TVal.activationTotal.TVal = 10;
-					licPackage.licLicenseInfoAttribs.TVal.activationCurrent.TVal = 0;
-					licPackage.licLicenseInfoAttribs.TVal.activationAmountInDays.TVal = 6;
-					licPackage.licLicenseInfoAttribs.TVal.activationExpirationDate.TVal = (DateTime.Now.ToUniversalTime());
-				}
-				else if (eGenType == generateLicType.eGenerateBackup)
-				{
 				}
 
 				//Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs newVerCode = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs();
@@ -1182,7 +1114,7 @@ namespace LicensingTest_SoftwareLicense
 		byte[] g_byteLicPacket = null;
 		private string g_licenseVerificationFile = "lic.ver";
 		private string g_licenseArchiveFile = "lic.arc";
-		
+
 		private void ts_applyLicPacButton_Click(object sender, EventArgs e)
 		{
 			try
@@ -1230,7 +1162,7 @@ namespace LicensingTest_SoftwareLicense
 						if (sBuilder.Length % 8 == 0)
 							sBuilder.Append("\r\n");
 						//if (x % 2 == 0)
-							asAsciiBuilder.Append((char)by);
+						asAsciiBuilder.Append((char)by);
 
 						x++;
 					}
@@ -1289,7 +1221,7 @@ namespace LicensingTest_SoftwareLicense
 							sBuilder.Append("\r\n");
 						//if (x % 2 == 0)
 						asAsciiBuilder.Append((char)by);
-						
+
 						x++;
 					}
 					//LogMessage("   newByteArrayLicensePacket: " + sBuilder.ToString());
@@ -1344,9 +1276,9 @@ namespace LicensingTest_SoftwareLicense
 		{
 			//ts_DrLicenseTextBox
 			try
-		 	{
-				LogMessage("Try to call SoftwareLicenseUseActivationToExtendTime_ByLicense(License: " + ts_DrLicenseTextBox.Text + ")");
-				g_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicense(ts_DrLicenseTextBox.Text);
+			{
+				LogMessage("Try to call SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(License: " + ts_DrLicenseTextBox.Text + ")");
+				g_licServer.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(ts_DrLicenseTextBox.Text, "");
 			}
 			catch (COMException ex)
 			{
@@ -1499,7 +1431,7 @@ namespace LicensingTest_SoftwareLicense
 			//    LogMessage(ex);
 			//}
 		}
-		
+
 		private void ts_viewLicArchiveButton_Click(object sender, EventArgs e)
 		{
 			try
@@ -1687,6 +1619,7 @@ namespace LicensingTest_SoftwareLicense
 				else
 				{
 					tmpLicWrapper.ConnectEx(_licServer, _bUseSharedLicensing, false);
+					//tmpLicWrapper.ConnectLicenseViewerEx(_licServer);
 					LogMessage("Successfully called tmpLicWrapper.ConnectEx(" + _licServer + ", " + _bUseSharedLicensing.ToString() + ", false)");
 				}
 
@@ -1700,7 +1633,8 @@ namespace LicensingTest_SoftwareLicense
 					false,
 					"",
 					false,
-					Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG,
+					//Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_DIALOG,
+					Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL | Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_STYLE_EVENT_LOG,
 					0,
 					false,
 					false);
@@ -1715,7 +1649,7 @@ namespace LicensingTest_SoftwareLicense
 			}
 			catch (COMException ex)
 			{
-				MessageBox.Show(ex.Message);
+				//MessageBox.Show(ex.Message);
 				LogMessage(ex.Message);
 			}
 			finally

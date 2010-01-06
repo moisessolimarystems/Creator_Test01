@@ -85,25 +85,6 @@ namespace Shared.VisualComponents
                 _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs, toolTip2, diffType2));
                 lineNumber++;
 
-                #region Software Lic Type:
-                if (_licInfoAttribs1.softwareLicType.EVal.CompareTo(_licInfoAttribs2.softwareLicType.EVal) == 0)
-                {
-                    diffType1 = ItemDifference.DiffType.dtSame;
-                    diffType2 = ItemDifference.DiffType.dtSame;
-                }
-                else
-                {
-                    diffType1 = ItemDifference.DiffType.dtModified;
-                    diffType2 = ItemDifference.DiffType.dtModified;
-                }
-                sBuilder1 = new StringBuilder();
-                sBuilder2 = new StringBuilder();
-                title = "Software Lic Type: ";
-                sBuilder1.Append(title);
-                sBuilder1.Append(_licInfoAttribs1.softwareLicType.EVal.ToString());
-                sBuilder2.Append(title);
-                sBuilder2.Append(_licInfoAttribs2.softwareLicType.EVal.ToString());
-                #endregion
                 _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
                 _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
                 lineNumber++;
@@ -131,150 +112,150 @@ namespace Shared.VisualComponents
                 _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
                 lineNumber++;
 
-                #region Activations:
-                bool pktHasAct1 = _licInfoAttribs1.activationTotal.TVal > 0;
-                bool pktHasAct2 = _licInfoAttribs2.activationTotal.TVal > 0;
-                if (pktHasAct1 == true || pktHasAct2 == true)
-                {
-                    #region Calculate Activation difference
-                    if (pktHasAct1 == false)
-                    {
-                        diffType1 = ItemDifference.DiffType.dtSpace;
-                        diffType2 = ItemDifference.DiffType.dtAdded;
-                    }
-                    else if (pktHasAct2 == false)
-                    {
-                        diffType1 = ItemDifference.DiffType.dtRemoved;
-                        diffType2 = ItemDifference.DiffType.dtSpace;
-                    }
-                    else if (_licInfoAttribs1.activationTotal.TVal != _licInfoAttribs2.activationTotal.TVal)
-                    {
-                        diffType1 = ItemDifference.DiffType.dtModified;
-                        diffType2 = ItemDifference.DiffType.dtModified;
-                    }
-                    else
-                    {
-                        diffType1 = ItemDifference.DiffType.dtSame;
-                        diffType2 = ItemDifference.DiffType.dtSame;
-                    }
-                    #endregion
+                //#region Activations:
+                //bool pktHasAct1 = _licInfoAttribs1.activationTotal.TVal > 0;
+                //bool pktHasAct2 = _licInfoAttribs2.activationTotal.TVal > 0;
+                //if (pktHasAct1 == true || pktHasAct2 == true)
+                //{
+                //    #region Calculate Activation difference
+                //    if (pktHasAct1 == false)
+                //    {
+                //        diffType1 = ItemDifference.DiffType.dtSpace;
+                //        diffType2 = ItemDifference.DiffType.dtAdded;
+                //    }
+                //    else if (pktHasAct2 == false)
+                //    {
+                //        diffType1 = ItemDifference.DiffType.dtRemoved;
+                //        diffType2 = ItemDifference.DiffType.dtSpace;
+                //    }
+                //    else if (_licInfoAttribs1.activationTotal.TVal != _licInfoAttribs2.activationTotal.TVal)
+                //    {
+                //        diffType1 = ItemDifference.DiffType.dtModified;
+                //        diffType2 = ItemDifference.DiffType.dtModified;
+                //    }
+                //    else
+                //    {
+                //        diffType1 = ItemDifference.DiffType.dtSame;
+                //        diffType2 = ItemDifference.DiffType.dtSame;
+                //    }
+                //    #endregion
 
-                    #region Activations Total:
-                    sBuilder1 = new StringBuilder();
-                    sBuilder2 = new StringBuilder();
-                    title = "Activations Total: ";
-                    if (diffType1 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder1.Append(title);
-                        sBuilder1.Append(_licInfoAttribs1.activationTotal.TVal.ToString());
-                    }
-                    if (diffType2 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder2.Append(title);
-                        sBuilder2.Append(_licInfoAttribs2.activationTotal.TVal.ToString());
-                    }
-                    #endregion
-                    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
-                    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
-                    lineNumber++;
+                //    #region Activations Total:
+                //    sBuilder1 = new StringBuilder();
+                //    sBuilder2 = new StringBuilder();
+                //    title = "Activations Total: ";
+                //    if (diffType1 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder1.Append(title);
+                //        sBuilder1.Append(_licInfoAttribs1.activationTotal.TVal.ToString());
+                //    }
+                //    if (diffType2 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder2.Append(title);
+                //        sBuilder2.Append(_licInfoAttribs2.activationTotal.TVal.ToString());
+                //    }
+                //    #endregion
+                //    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
+                //    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
+                //    lineNumber++;
 
-                    #region Activation Amount in Days:
-                    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
-                    {
-                        if (_licInfoAttribs1.activationAmountInDays.TVal != _licInfoAttribs2.activationAmountInDays.TVal)
-                        {
-                            diffType1 = ItemDifference.DiffType.dtModified;
-                            diffType2 = ItemDifference.DiffType.dtModified;
-                        }
-                        else
-                        {
-                            diffType1 = ItemDifference.DiffType.dtSame;
-                            diffType2 = ItemDifference.DiffType.dtSame;
-                        }
-                    }
-                    sBuilder1 = new StringBuilder();
-                    sBuilder2 = new StringBuilder();
-                    title = "Activation Amount in Days: ";
-                    if (diffType1 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder1.Append(title);
-                        sBuilder1.Append(_licInfoAttribs1.activationAmountInDays.TVal.ToString());
-                    }
-                    if (diffType2 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder2.Append(title);
-                        sBuilder2.Append(_licInfoAttribs2.activationAmountInDays.TVal.ToString());
-                    }
-                    #endregion
-                    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
-                    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
-                    lineNumber++;
+                //    #region Activation Amount in Days:
+                //    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
+                //    {
+                //        if (_licInfoAttribs1.activationAmountInDays.TVal != _licInfoAttribs2.activationAmountInDays.TVal)
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtModified;
+                //            diffType2 = ItemDifference.DiffType.dtModified;
+                //        }
+                //        else
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtSame;
+                //            diffType2 = ItemDifference.DiffType.dtSame;
+                //        }
+                //    }
+                //    sBuilder1 = new StringBuilder();
+                //    sBuilder2 = new StringBuilder();
+                //    title = "Activation Amount in Days: ";
+                //    if (diffType1 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder1.Append(title);
+                //        sBuilder1.Append(_licInfoAttribs1.activationAmountInDays.TVal.ToString());
+                //    }
+                //    if (diffType2 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder2.Append(title);
+                //        sBuilder2.Append(_licInfoAttribs2.activationAmountInDays.TVal.ToString());
+                //    }
+                //    #endregion
+                //    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
+                //    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
+                //    lineNumber++;
 
-                    #region Activations Current:
-                    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
-                    {
-                        if (_licInfoAttribs1.activationCurrent.TVal != _licInfoAttribs2.activationCurrent.TVal)
-                        {
-                            diffType1 = ItemDifference.DiffType.dtModified;
-                            diffType2 = ItemDifference.DiffType.dtModified;
-                        }
-                        else
-                        {
-                            diffType1 = ItemDifference.DiffType.dtSame;
-                            diffType2 = ItemDifference.DiffType.dtSame;
-                        }
-                    }
-                    sBuilder1 = new StringBuilder();
-                    sBuilder2 = new StringBuilder();
-                    title = "Activations Current: ";
-                    if (diffType1 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder1.Append(title);
-                        sBuilder1.Append(_licInfoAttribs1.activationCurrent.TVal.ToString());
-                    }
-                    if (diffType2 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder2.Append(title);
-                        sBuilder2.Append(_licInfoAttribs2.activationCurrent.TVal.ToString());
-                    }
-                    #endregion
-                    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
-                    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
-                    lineNumber++;
+                //    #region Activations Current:
+                //    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
+                //    {
+                //        if (_licInfoAttribs1.activationCurrent.TVal != _licInfoAttribs2.activationCurrent.TVal)
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtModified;
+                //            diffType2 = ItemDifference.DiffType.dtModified;
+                //        }
+                //        else
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtSame;
+                //            diffType2 = ItemDifference.DiffType.dtSame;
+                //        }
+                //    }
+                //    sBuilder1 = new StringBuilder();
+                //    sBuilder2 = new StringBuilder();
+                //    title = "Activations Current: ";
+                //    if (diffType1 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder1.Append(title);
+                //        sBuilder1.Append(_licInfoAttribs1.activationCurrent.TVal.ToString());
+                //    }
+                //    if (diffType2 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder2.Append(title);
+                //        sBuilder2.Append(_licInfoAttribs2.activationCurrent.TVal.ToString());
+                //    }
+                //    #endregion
+                //    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
+                //    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
+                //    lineNumber++;
 
-                    #region Activation Expiration Date:
-                    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
-                    {
-                        if (_licInfoAttribs1.activationExpirationDate.TVal.CompareTo(_licInfoAttribs2.activationExpirationDate.TVal) != 0)
-                        {
-                            diffType1 = ItemDifference.DiffType.dtModified;
-                            diffType2 = ItemDifference.DiffType.dtModified;
-                        }
-                        else
-                        {
-                            diffType1 = ItemDifference.DiffType.dtSame;
-                            diffType2 = ItemDifference.DiffType.dtSame;
-                        }
-                    }
-                    sBuilder1 = new StringBuilder();
-                    sBuilder2 = new StringBuilder();
-                    title = "Activation Expiration Date:";
-                    if (diffType1 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder1.Append(title);
-                        sBuilder1.Append(_licInfoAttribs1.activationExpirationDate.TVal.ToLocalTime());
-                    }
-                    if (diffType2 != ItemDifference.DiffType.dtSpace)
-                    {
-                        sBuilder2.Append(title);
-                        sBuilder2.Append(_licInfoAttribs2.activationExpirationDate.TVal.ToLocalTime());
-                    }
-                    #endregion
-                    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
-                    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
-                    lineNumber++;
-                }
-                #endregion
+                //    #region Activation Expiration Date:
+                //    if (diffType1 == ItemDifference.DiffType.dtSame || diffType1 == ItemDifference.DiffType.dtModified)
+                //    {
+                //        if (_licInfoAttribs1.activationExpirationDate.TVal.CompareTo(_licInfoAttribs2.activationExpirationDate.TVal) != 0)
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtModified;
+                //            diffType2 = ItemDifference.DiffType.dtModified;
+                //        }
+                //        else
+                //        {
+                //            diffType1 = ItemDifference.DiffType.dtSame;
+                //            diffType2 = ItemDifference.DiffType.dtSame;
+                //        }
+                //    }
+                //    sBuilder1 = new StringBuilder();
+                //    sBuilder2 = new StringBuilder();
+                //    title = "Activation Expiration Date:";
+                //    if (diffType1 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder1.Append(title);
+                //        sBuilder1.Append(_licInfoAttribs1.activationExpirationDate.TVal.ToLocalTime());
+                //    }
+                //    if (diffType2 != ItemDifference.DiffType.dtSpace)
+                //    {
+                //        sBuilder2.Append(title);
+                //        sBuilder2.Append(_licInfoAttribs2.activationExpirationDate.TVal.ToLocalTime());
+                //    }
+                //    #endregion
+                //    _refDiffList1.Add(new ItemDifference(lineNumber, sBuilder1.ToString(), tabs + 1, toolTip1, diffType1));
+                //    _refDiffList2.Add(new ItemDifference(lineNumber, sBuilder2.ToString(), tabs + 1, toolTip2, diffType2));
+                //    lineNumber++;
+                //}
+                //#endregion
 
                 #region Product List:
                 title = "Product List:";
@@ -699,114 +680,114 @@ namespace Shared.VisualComponents
                             _refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
                             _refLineNumber++;
 
-                            #region Module ModState:
-                            diffInternalType1 = diffType1;
-                            diffInternalType2 = diffType2;
-                            if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
-                            {
-                                if (keyPair.modInfo1.moduleState.EVal.CompareTo(keyPair.modInfo2.moduleState.EVal) != 0)
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtModified;
-                                    diffInternalType2 = ItemDifference.DiffType.dtModified;
-                                }
-                                else
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtSame;
-                                    diffInternalType2 = ItemDifference.DiffType.dtSame;
-                                }
-                            }
+                            //#region Module ModState:
+                            //diffInternalType1 = diffType1;
+                            //diffInternalType2 = diffType2;
+                            //if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
+                            //{
+                            //    if (keyPair.modInfo1.moduleState.EVal.CompareTo(keyPair.modInfo2.moduleState.EVal) != 0)
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtModified;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtModified;
+                            //    }
+                            //    else
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtSame;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtSame;
+                            //    }
+                            //}
 
-                            title = "Module State: ";
-                            sBuilder1 = new StringBuilder();
-                            if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
-                            {
-                                sBuilder1.Append(title);
-                                sBuilder1.Append(keyPair.modInfo1.moduleState.GetAlias());
-                            }
-                            sBuilder2 = new StringBuilder();
-                            if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
-                            {
-                                sBuilder2.Append(title);
-                                sBuilder2.Append(keyPair.modInfo2.moduleState.GetAlias());
-                            }
-                            #endregion
-                            _refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
-                            _refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
-                            _refLineNumber++;
+                            //title = "Module State: ";
+                            //sBuilder1 = new StringBuilder();
+                            //if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
+                            //{
+                            //    sBuilder1.Append(title);
+                            //    sBuilder1.Append(keyPair.modInfo1.moduleState.GetAlias());
+                            //}
+                            //sBuilder2 = new StringBuilder();
+                            //if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
+                            //{
+                            //    sBuilder2.Append(title);
+                            //    sBuilder2.Append(keyPair.modInfo2.moduleState.GetAlias());
+                            //}
+                            //#endregion
+                            //_refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
+                            //_refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
+                            //_refLineNumber++;
 
-                            #region Module ModExpirationDate:
-                            diffInternalType1 = diffType1;
-                            diffInternalType2 = diffType2;
-                            if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
-                            {
-                                if (keyPair.modInfo1.moduleExpirationDate.TVal.CompareTo(keyPair.modInfo2.moduleExpirationDate.TVal) != 0)
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtModified;
-                                    diffInternalType2 = ItemDifference.DiffType.dtModified;
-                                }
-                                else
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtSame;
-                                    diffInternalType2 = ItemDifference.DiffType.dtSame;
-                                }
-                            }
+                            //#region Module ModExpirationDate:
+                            //diffInternalType1 = diffType1;
+                            //diffInternalType2 = diffType2;
+                            //if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
+                            //{
+                            //    if (keyPair.modInfo1.moduleExpirationDate.TVal.CompareTo(keyPair.modInfo2.moduleExpirationDate.TVal) != 0)
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtModified;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtModified;
+                            //    }
+                            //    else
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtSame;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtSame;
+                            //    }
+                            //}
 
-                            if ((keyPair.modInfo1 != null && (keyPair.modInfo1.moduleExpirationDate.TVal.CompareTo(new DateTime(1900, 1, 1)) != 0)) ||
-                                (keyPair.modInfo2 != null && (keyPair.modInfo2.moduleExpirationDate.TVal.CompareTo(new DateTime(1900, 1, 1)) != 0)))
-                            {
-                                title = "Module Expiration Date: ";
-                                sBuilder1 = new StringBuilder();
-                                if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
-                                {
-                                    sBuilder1.Append(title);
-                                    sBuilder1.Append(keyPair.modInfo1.moduleExpirationDate.TVal.ToLocalTime());
-                                }
-                                sBuilder2 = new StringBuilder();
-                                if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
-                                {
-                                    sBuilder2.Append(title);
-                                    sBuilder2.Append(keyPair.modInfo2.moduleExpirationDate.TVal.ToLocalTime());
-                                }
-                                _refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
-                                _refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
-                                _refLineNumber++;
-                            }
-                            #endregion
+                            //if ((keyPair.modInfo1 != null && (keyPair.modInfo1.moduleExpirationDate.TVal.CompareTo(new DateTime(1900, 1, 1)) != 0)) ||
+                            //    (keyPair.modInfo2 != null && (keyPair.modInfo2.moduleExpirationDate.TVal.CompareTo(new DateTime(1900, 1, 1)) != 0)))
+                            //{
+                            //    title = "Module Expiration Date: ";
+                            //    sBuilder1 = new StringBuilder();
+                            //    if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
+                            //    {
+                            //        sBuilder1.Append(title);
+                            //        sBuilder1.Append(keyPair.modInfo1.moduleExpirationDate.TVal.ToLocalTime());
+                            //    }
+                            //    sBuilder2 = new StringBuilder();
+                            //    if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
+                            //    {
+                            //        sBuilder2.Append(title);
+                            //        sBuilder2.Append(keyPair.modInfo2.moduleExpirationDate.TVal.ToLocalTime());
+                            //    }
+                            //    _refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
+                            //    _refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
+                            //    _refLineNumber++;
+                            //}
+                            //#endregion
 
-                            #region Order Number:
-                            diffInternalType1 = diffType1;
-                            diffInternalType2 = diffType2;
-                            if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
-                            {
-                                if(string.Compare(keyPair.modInfo1.contractNumber.TVal, keyPair.modInfo2.contractNumber.TVal) != 0)
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtModified;
-                                    diffInternalType2 = ItemDifference.DiffType.dtModified;
-                                }
-                                else
-                                {
-                                    diffInternalType1 = ItemDifference.DiffType.dtSame;
-                                    diffInternalType2 = ItemDifference.DiffType.dtSame;
-                                }
-                            }
+                            //#region Order Number:
+                            //diffInternalType1 = diffType1;
+                            //diffInternalType2 = diffType2;
+                            //if (diffType1 == ItemDifference.DiffType.dtSame && diffType2 == ItemDifference.DiffType.dtSame)
+                            //{
+                            //    if(string.Compare(keyPair.modInfo1.contractNumber.TVal, keyPair.modInfo2.contractNumber.TVal) != 0)
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtModified;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtModified;
+                            //    }
+                            //    else
+                            //    {
+                            //        diffInternalType1 = ItemDifference.DiffType.dtSame;
+                            //        diffInternalType2 = ItemDifference.DiffType.dtSame;
+                            //    }
+                            //}
 
-                            title = "Order Number: ";
-                            sBuilder1 = new StringBuilder();
-                            if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
-                            {
-                                sBuilder1.Append(title);
-                                sBuilder1.Append(keyPair.modInfo1.contractNumber.TVal);
-                            }
-                            sBuilder2 = new StringBuilder();
-                            if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
-                            {
-                                sBuilder2.Append(title);
-                                sBuilder2.Append(keyPair.modInfo2.contractNumber.TVal);
-                            }
-                            #endregion
-                            _refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
-                            _refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
-                            _refLineNumber++;
+                            //title = "Order Number: ";
+                            //sBuilder1 = new StringBuilder();
+                            //if (diffInternalType1 != ItemDifference.DiffType.dtSpace)
+                            //{
+                            //    sBuilder1.Append(title);
+                            //    sBuilder1.Append(keyPair.modInfo1.contractNumber.TVal);
+                            //}
+                            //sBuilder2 = new StringBuilder();
+                            //if (diffInternalType2 != ItemDifference.DiffType.dtSpace)
+                            //{
+                            //    sBuilder2.Append(title);
+                            //    sBuilder2.Append(keyPair.modInfo2.contractNumber.TVal);
+                            //}
+                            //#endregion
+                            //_refDiffList1.Add(new ItemDifference(_refLineNumber, sBuilder1.ToString(), _tabs + 1, toolTip1, diffInternalType1));
+                            //_refDiffList2.Add(new ItemDifference(_refLineNumber, sBuilder2.ToString(), _tabs + 1, toolTip2, diffInternalType2));
+                            //_refLineNumber++;
                         }
                     }
                 }

@@ -72,30 +72,6 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 			hr = RefreshLicenseFileAttribs();
 			if(SUCCEEDED(hr))
 			{
-				SYSTEMTIME activationExpirationDateSystime;
-				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(m_licenseFileAttribs.licLicenseInfoAttribs.activationExpirationDate)).c_str(), activationExpirationDateSystime))
-					throw(E_FAIL);
-				
-				_variant_t vtActivationExpirationDate(NULL);	
-				if (!SystemTimeToVariantTime(&activationExpirationDateSystime, &vtActivationExpirationDate.date)) 
-					throw(E_FAIL);
-				time_t activationExpirationDateTimeT = TimeHelper::VariantToTimeT(vtActivationExpirationDate, false);
-				time_t emptyExpiresDateTimeT = time_t(-1);
-
-				// ignore if expiration date == 1900/1/1 && total == 0 && activation in days == 0, this is standard licensing, non licensing activation
-				if(!(m_licenseFileAttribs.licLicenseInfoAttribs.activationTotal == 0 && 
-					m_licenseFileAttribs.licLicenseInfoAttribs.activationAmountInDays == 0 &&
-					activationExpirationDateTimeT == emptyExpiresDateTimeT))
-				{
-					// only add licensing to cache if the current date is below the expiration date
-					time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-					if(currentTimeDateTimeT > activationExpirationDateTimeT)
-					{
-						throw(LicenseServerError::EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED);
-					}
-				}
-
-
 				//maybe only really look in file if it is dirty, or some time period has
 				//passed, such as 5 minutes
 
@@ -106,7 +82,6 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 						valTokenIT != m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 						valTokenIT++)
 				{
-
 	//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::Verify() - TokenType:%d, TokenValue:%s", (int)valTokenIT->tokenType, valTokenIT->tokenValue->c_str());
 	//OutputDebugStringW(debug_buf);
 					switch((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType)
@@ -714,31 +689,31 @@ Lic_PackageAttribs::Lic_ProductInfoAttribs SoftwareLicenseMgr::TestingOnly_Gener
 	tmpModAttribs3.moduleAppInstance = appInstance;
 	tmpProdAttribs.moduleList->push_back(tmpModAttribs3);
 
-Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribsAddOn1;
-tmpModAttribsAddOn1.moduleID = 400;	//ConcurrentOperator
-tmpModAttribsAddOn1.moduleValue = 10;	//Unlimited @ 255
-tmpModAttribsAddOn1.moduleAppInstance = 4;
-time_t curTimeT = time(NULL);	//Retrieves Universal Time
-VARIANT vtCurTime = TimeHelper::TimeTToVariant(curTimeT);
-SYSTEMTIME curTimeSystime;
-VariantTimeToSystemTime(vtCurTime.date, &curTimeSystime);
-wchar_t curTimeStamp[256];
-TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
-tmpModAttribsAddOn1.moduleExpirationDate = std::wstring(curTimeStamp);
-tmpProdAttribs.moduleList->push_back(tmpModAttribsAddOn1);
-
-Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribsAddOn2;
-tmpModAttribsAddOn2.moduleID = 400;	//ConcurrentOperator
-tmpModAttribsAddOn2.moduleValue = 100;	//Unlimited @ 255
-tmpModAttribsAddOn2.moduleAppInstance = 4;
-curTimeT = time(NULL);	//Retrieves Universal Time
-VARIANT vtAddOnTime = TimeHelper::TimeTToVariant(curTimeT+(1*TimeHelper::ONE_DAY_IN_SECONDS));
-SYSTEMTIME addOnTimeSystime;
-VariantTimeToSystemTime(vtAddOnTime.date, &addOnTimeSystime);
-wchar_t addOnTimeStamp[256];
-TimeHelper::SystemTimeToString(addOnTimeStamp, sizeof(addOnTimeStamp)/sizeof(wchar_t), addOnTimeSystime);
-tmpModAttribsAddOn2.moduleExpirationDate = std::wstring(addOnTimeStamp);
-tmpProdAttribs.moduleList->push_back(tmpModAttribsAddOn2);
+//Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribsAddOn1;
+//tmpModAttribsAddOn1.moduleID = 400;	//ConcurrentOperator
+//tmpModAttribsAddOn1.moduleValue = 10;	//Unlimited @ 255
+//tmpModAttribsAddOn1.moduleAppInstance = 4;
+//time_t curTimeT = time(NULL);	//Retrieves Universal Time
+//VARIANT vtCurTime = TimeHelper::TimeTToVariant(curTimeT);
+//SYSTEMTIME curTimeSystime;
+//VariantTimeToSystemTime(vtCurTime.date, &curTimeSystime);
+//wchar_t curTimeStamp[256];
+//TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
+//tmpModAttribsAddOn1.moduleExpirationDate = std::wstring(curTimeStamp);
+//tmpProdAttribs.moduleList->push_back(tmpModAttribsAddOn1);
+//
+//Lic_PackageAttribs::Lic_ModuleInfoAttribs tmpModAttribsAddOn2;
+//tmpModAttribsAddOn2.moduleID = 400;	//ConcurrentOperator
+//tmpModAttribsAddOn2.moduleValue = 100;	//Unlimited @ 255
+//tmpModAttribsAddOn2.moduleAppInstance = 4;
+//curTimeT = time(NULL);	//Retrieves Universal Time
+//VARIANT vtAddOnTime = TimeHelper::TimeTToVariant(curTimeT+(1*TimeHelper::ONE_DAY_IN_SECONDS));
+//SYSTEMTIME addOnTimeSystime;
+//VariantTimeToSystemTime(vtAddOnTime.date, &addOnTimeSystime);
+//wchar_t addOnTimeStamp[256];
+//TimeHelper::SystemTimeToString(addOnTimeStamp, sizeof(addOnTimeStamp)/sizeof(wchar_t), addOnTimeSystime);
+//tmpModAttribsAddOn2.moduleExpirationDate = std::wstring(addOnTimeStamp);
+//tmpProdAttribs.moduleList->push_back(tmpModAttribsAddOn2);
 
 
 
@@ -1514,6 +1489,59 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 //				}
 //			}
 
+			unsigned short keyHistoryNumber = unsigned short(keyAttrib.historyNumber);
+			//Process history number changes to key  -- if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
+			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotHistoryInfoAttribsList::iterator histSlotInfoIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->begin();
+					histSlotInfoIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->end();
+					histSlotInfoIt++)
+			{
+				unsigned short packageHistoryNumber = unsigned short(histSlotInfoIt->historyNumber);
+				if(keyHistoryNumber < packageHistoryNumber)
+				{
+					//apply history change to keyAttrib
+					for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs::TVector_Lic_ActivitySlotChangeInfoAttribsList::iterator actSlotChangeIt = histSlotInfoIt->activitySlotChangeInfoList->begin();
+						actSlotChangeIt != histSlotInfoIt->activitySlotChangeInfoList->end();
+						actSlotChangeIt++)
+					{
+						switch(actSlotChangeIt->actionType)
+						{
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd:
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaDelete:
+							//Param 1 == activity slot for action ascaAdd or ascaDelete
+							//Clear out activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaMove:
+							//Param 1 == old activity slot
+							//Param 2 == new activity slot
+							//Transfer values from old activity slot to the new activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotCurrentActivation = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotHoursToExpire = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire;
+							//Clear out old activity slot
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:
+							//Param 1 == activity slot
+							//Param 2 == new activations
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = int(actSlotChangeIt->param2);
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire:
+							//Param 1 == activity slot
+							//Param 2 == new hours to expire
+							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = int(actSlotChangeIt->param2);
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaIgnore:
+						default:
+							break;
+						}
+					}
+					keyAttrib.historyNumber = packageHistoryNumber;
+				}
+			}
+
+
 			if(pActivitySlotList != NULL)
 			{
 				//walk through all the product licenses in tmpPacketNewLicenseFileAttribs
@@ -1699,58 +1727,6 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 			{
 			keyAttrib.licenseCode = std::wstring(newLicenseGUID);
 			keyAttrib.packetCreationDate = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-
-			unsigned short keyHistoryNumber = unsigned short(keyAttrib.historyNumber);
-			//Process history number changes to key  -- if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
-			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotHistoryInfoAttribsList::iterator histSlotInfoIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->begin();
-					histSlotInfoIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->end();
-					histSlotInfoIt++)
-			{
-				unsigned short packageHistoryNumber = unsigned short(histSlotInfoIt->historyNumber);
-				if(keyHistoryNumber < packageHistoryNumber)
-				{
-					//apply history change to keyAttrib
-					for(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotHistoryInfoAttribs::TVector_Lic_ActivitySlotChangeInfoAttribsList::iterator actSlotChangeIt = histSlotInfoIt->activitySlotChangeInfoList->begin();
-						actSlotChangeIt != histSlotInfoIt->activitySlotChangeInfoList->end();
-						actSlotChangeIt++)
-					{
-						switch(actSlotChangeIt->actionType)
-						{
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaAdd:
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaDelete:
-							//Param 1 == activity slot for action ascaAdd or ascaDelete
-							//Clear out activity slot
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
-							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaMove:
-							//Param 1 == old activity slot
-							//Param 2 == new activity slot
-							//Transfer values from old activity slot to the new activity slot
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotCurrentActivation = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation;
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param2)).activationSlotHoursToExpire = keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire;
-							//Clear out old activity slot
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = 0;
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = 0;
-							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetActivations:
-							//Param 1 == activity slot
-							//Param 2 == new activations
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotCurrentActivation = int(actSlotChangeIt->param2);
-							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaSetHoursToExpire:
-							//Param 1 == activity slot
-							//Param 2 == new hours to expire
-							keyAttrib.activationInfoList->at(int(actSlotChangeIt->param1)).activationSlotHoursToExpire = int(actSlotChangeIt->param2);
-							break;
-						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ActivitySlotChangeInfoAttribs::ascaIgnore:
-						default:
-							break;
-						}
-					}
-					keyAttrib.historyNumber = packageHistoryNumber;
-				}
-			}
 
 			//Update the USB Key
 			if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )

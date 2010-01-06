@@ -530,106 +530,10 @@ namespace Solimar
 						;
 					}
 					
-					[FlagsAttribute]
-					public enum TModuleState : uint
-					{
-						msLicensed = 0,
-						msTrial = 1,
-						msAddOn = 2,
-					};
 					
-					public class AttribsMemberEnum_TModuleState : AttribsMemberEnum
-					{
-						public AttribsMemberEnum_TModuleState(string keyName, TModuleState defaultVal) :
-							base(keyName, defaultVal, typeof(TModuleState))
-						{
-							;
-						}
-						
-						protected static SortedList m_MapAliasToEnum;
-						protected static SortedList m_MapEnumToAlias;
-						protected static SortedList m_MapOrderingIndexToAlias;
-						protected static SortedList m_MapAliasToIndex;
-						protected static SortedList m_MapEnumToIndex;
-						static AttribsMemberEnum_TModuleState()
-						{
-							m_MapAliasToEnum = new SortedList();
-							m_MapEnumToAlias = new SortedList();
-							m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
-							m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapAliasToEnum.Add("Licensed",TModuleState.msLicensed);
-							m_MapEnumToAlias.Add(TModuleState.msLicensed,"Licensed");
-							m_MapOrderingIndexToAlias.Add(1,"Licensed");
-							m_MapAliasToEnum.Add("Trial",TModuleState.msTrial);
-							m_MapEnumToAlias.Add(TModuleState.msTrial,"Trial");
-							m_MapOrderingIndexToAlias.Add(2,"Trial");
-							m_MapAliasToEnum.Add("AddOn",TModuleState.msAddOn);
-							m_MapEnumToAlias.Add(TModuleState.msAddOn,"AddOn");
-							m_MapOrderingIndexToAlias.Add(3,"AddOn");
-							m_MapAliasToIndex.Add("Licensed",0);
-							m_MapAliasToIndex.Add("Trial",1);
-							m_MapAliasToIndex.Add("AddOn",2);
-							m_MapEnumToIndex.Add(TModuleState.msLicensed,0);
-							m_MapEnumToIndex.Add(TModuleState.msTrial,1);
-							m_MapEnumToIndex.Add(TModuleState.msAddOn,2);
-						}
-						
-					
-						public static string GetAlias(System.Enum enum_value)
-						{
-							return (string)m_MapEnumToAlias[enum_value];
-						}
-						public static StringCollection GetAliases()
-						{
-							StringCollection alias_list = new StringCollection();
-							foreach (string alias in m_MapOrderingIndexToAlias.Values)
-							{
-								alias_list.Add(alias);
-							}
-							return alias_list;
-						}
-						public static System.Enum GetEnumValueFromAlias(string alias)
-						{
-							return (System.Enum)m_MapAliasToEnum[alias];
-						}
-						public static int GetIndexFromAlias(string alias)
-						{
-							return (int)m_MapAliasToIndex[alias];
-						}
-						public static int GetIndexFromEnum(System.Enum enum_value)
-						{
-							return (int)m_MapEnumToIndex[enum_value];
-						}
-						
-						public string GetAlias()
-						{
-							return GetAlias(EVal);
-						}
-						public void SetEnumValueFromAlias(string alias)
-						{
-							EVal = GetEnumValueFromAlias(alias);
-						}
-					
-						public static implicit operator TModuleState(AttribsMemberEnum_TModuleState t)
-						{
-							return (TModuleState)t.m_tVal;
-						}
-						
-						public TModuleState TVal
-						{
-							get {return this;}
-							set {m_tVal = (Object)value;}
-						}
-					}
-					
-						
 					public AttribsMemberDWORD moduleID = new AttribsMemberDWORD("mI", 0);
 					public AttribsMemberDWORD moduleValue = new AttribsMemberDWORD("mV", 0);
 					public AttribsMemberDWORD moduleAppInstance = new AttribsMemberDWORD("mAI", 0);
-					public AttribsMemberDateTime moduleExpirationDate = new AttribsMemberDateTime("exDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
-					public AttribsMemberString contractNumber = new AttribsMemberString("cN", "");
-					public AttribsMemberEnum_TModuleState moduleState = new AttribsMemberEnum_TModuleState("mSt", TModuleState.msTrial);
 				
 				};
 				
@@ -813,112 +717,7 @@ namespace Solimar
 						;
 					}
 					
-					[FlagsAttribute]
-					public enum TSoftwareLicenseType : uint
-					{
-						sltPerpetual = 0,
-						sltFailover = 1,
-						sltDisasterRecovery = 2,
-						sltTestDev = 3,
-						sltSubscription = 4,
-					};
-					
-					public class AttribsMemberEnum_TSoftwareLicenseType : AttribsMemberEnum
-					{
-						public AttribsMemberEnum_TSoftwareLicenseType(string keyName, TSoftwareLicenseType defaultVal) :
-							base(keyName, defaultVal, typeof(TSoftwareLicenseType))
-						{
-							;
-						}
-						
-						protected static SortedList m_MapAliasToEnum;
-						protected static SortedList m_MapEnumToAlias;
-						protected static SortedList m_MapOrderingIndexToAlias;
-						protected static SortedList m_MapAliasToIndex;
-						protected static SortedList m_MapEnumToIndex;
-						static AttribsMemberEnum_TSoftwareLicenseType()
-						{
-							m_MapAliasToEnum = new SortedList();
-							m_MapEnumToAlias = new SortedList();
-							m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
-							m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
-							m_MapAliasToEnum.Add("Perpetual",TSoftwareLicenseType.sltPerpetual);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltPerpetual,"Perpetual");
-							m_MapOrderingIndexToAlias.Add(1,"Perpetual");
-							m_MapAliasToEnum.Add("Failover",TSoftwareLicenseType.sltFailover);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltFailover,"Failover");
-							m_MapOrderingIndexToAlias.Add(2,"Failover");
-							m_MapAliasToEnum.Add("Disaster Recovery",TSoftwareLicenseType.sltDisasterRecovery);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltDisasterRecovery,"Disaster Recovery");
-							m_MapOrderingIndexToAlias.Add(3,"Disaster Recovery");
-							m_MapAliasToEnum.Add("Test / Development",TSoftwareLicenseType.sltTestDev);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltTestDev,"Test / Development");
-							m_MapOrderingIndexToAlias.Add(4,"Test / Development");
-							m_MapAliasToEnum.Add("Subscription",TSoftwareLicenseType.sltSubscription);
-							m_MapEnumToAlias.Add(TSoftwareLicenseType.sltSubscription,"Subscription");
-							m_MapOrderingIndexToAlias.Add(5,"Subscription");
-							m_MapAliasToIndex.Add("Perpetual",0);
-							m_MapAliasToIndex.Add("Failover",1);
-							m_MapAliasToIndex.Add("Disaster Recovery",2);
-							m_MapAliasToIndex.Add("Test / Development",3);
-							m_MapAliasToIndex.Add("Subscription",4);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltPerpetual,0);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltFailover,1);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltDisasterRecovery,2);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltTestDev,3);
-							m_MapEnumToIndex.Add(TSoftwareLicenseType.sltSubscription,4);
-						}
-						
-					
-						public static string GetAlias(System.Enum enum_value)
-						{
-							return (string)m_MapEnumToAlias[enum_value];
-						}
-						public static StringCollection GetAliases()
-						{
-							StringCollection alias_list = new StringCollection();
-							foreach (string alias in m_MapOrderingIndexToAlias.Values)
-							{
-								alias_list.Add(alias);
-							}
-							return alias_list;
-						}
-						public static System.Enum GetEnumValueFromAlias(string alias)
-						{
-							return (System.Enum)m_MapAliasToEnum[alias];
-						}
-						public static int GetIndexFromAlias(string alias)
-						{
-							return (int)m_MapAliasToIndex[alias];
-						}
-						public static int GetIndexFromEnum(System.Enum enum_value)
-						{
-							return (int)m_MapEnumToIndex[enum_value];
-						}
-						
-						public string GetAlias()
-						{
-							return GetAlias(EVal);
-						}
-						public void SetEnumValueFromAlias(string alias)
-						{
-							EVal = GetEnumValueFromAlias(alias);
-						}
-					
-						public static implicit operator TSoftwareLicenseType(AttribsMemberEnum_TSoftwareLicenseType t)
-						{
-							return (TSoftwareLicenseType)t.m_tVal;
-						}
-						
-						public TSoftwareLicenseType TVal
-						{
-							get {return this;}
-							set {m_tVal = (Object)value;}
-						}
-					}
-					
-						public class Lic_ActivitySlotInfoAttribs : LicensingAttribsBase
+					public class Lic_ActivitySlotInfoAttribs : LicensingAttribsBase
 					{
 						public static string ClassName = "L_aSA";
 						
@@ -1428,13 +1227,6 @@ namespace Solimar
 					public AttribsMemberDWORD customerID = new AttribsMemberDWORD("cI", 0);
 					public AttribsMemberDWORD destinationID = new AttribsMemberDWORD("dI", 0);
 					public AttribsMemberDWORD softwareGroupLicenseID = new AttribsMemberDWORD("swI", 0);
-					public AttribsMemberEnum_TSoftwareLicenseType softwareLicType = new AttribsMemberEnum_TSoftwareLicenseType("lT", TSoftwareLicenseType.sltPerpetual);
-					public AttribsMemberDWORD softwareLicTypeIndex = new AttribsMemberDWORD("lTI", 1);
-					public AttribsMemberDateTime activationExpirationDate = new AttribsMemberDateTime("aEDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
-					public AttribsMemberDWORD activationTotal = new AttribsMemberDWORD("aT", 0);
-					public AttribsMemberDWORD activationCurrent = new AttribsMemberDWORD("aC", 0);
-					public AttribsMemberDWORD activationAmountInDays = new AttribsMemberDWORD("aA", 0);
-					public AttribsMemberBOOL bActivationCurrentOverride = new AttribsMemberBOOL("bAC", false);
 					public AttribsMemberDateTime modifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberBOOL bLicClockViolation = new AttribsMemberBOOL("lv", false);
 					public Lic_ActivitySlotInfoAttribsList activitySlotList = new Lic_ActivitySlotInfoAttribsList("aSLt", new ArrayList());

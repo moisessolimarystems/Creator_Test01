@@ -710,16 +710,6 @@ namespace SolimarLicenseViewer
                 m_CommLink.GetSoftwareLicenseInfoByLicense(softwareLicense, ref generalStream, false);
                 licInfoAttrib.AssignMembersFromStream(generalStream);
 
-                if (!(licInfoAttrib.activationAmountInDays.TVal == 0 && licInfoAttrib.activationCurrent.TVal == 0 && licInfoAttrib.activationTotal.TVal == 0) && (licInfoAttrib.activationCurrent.TVal != licInfoAttrib.activationTotal.TVal))
-                {
-                    tsMenuItem = new ToolStripMenuItem(softwareLicense);
-                    tsMenuItem.Click += new EventHandler(tsUseActivationMenuItem_Click);
-                    //tsMenuItem.Tag = new int[] { (int)licInfoAttrib.activationCurrent.TVal, (int)licInfoAttrib.activationTotal.TVal, (int)licInfoAttrib.activationAmountInDays.TVal };
-                    tsMenuItem.Tag = new object[] { softwareLicense, (int)licInfoAttrib.activationCurrent.TVal, (int)licInfoAttrib.activationTotal.TVal, (int)licInfoAttrib.activationAmountInDays.TVal };
-                    useLicArchiveSortedList.Add(softwareLicense, tsMenuItem);
-                }
-                //
-
                 tsMenuItem = new ToolStripMenuItem(softwareLicense);
                 tsMenuItem.ToolTipText = "Generate Verification Data of License: " + softwareLicense + " for Solimar";
                 tsMenuItem.Click += new EventHandler(tsGenCopyForSolimarMenuItem_Click);
@@ -923,7 +913,7 @@ namespace SolimarLicenseViewer
         {
             //string message = string.Format("You are on activation {0} of {1} for License {2}. An activation will give you {3} more days. Are you sure you want to use an Activation?", _activationCurrent, _activationTotal, _productLicenseNumber, _activationAmountInDays);
             DateTime origDateTime = DateTime.Now.ToUniversalTime();
-            DateTime currDateTime = new DateTime(origDateTime.Year, origDateTime.Month, origDateTime.Day, origDateTime.Hour+1, 0, 0);
+            DateTime currDateTime = new DateTime(origDateTime.Year, origDateTime.Month, origDateTime.Day, origDateTime.Hour, 0, 0).AddHours(1);
             //string message = string.Format(
             //    "[{0}] - [{1}] - [{2}] - [{3}] - [{4}] - [{5}] - [{6}] - [{7}]",
             //    _softwareLicense,

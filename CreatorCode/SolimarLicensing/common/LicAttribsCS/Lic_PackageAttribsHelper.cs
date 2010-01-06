@@ -217,29 +217,29 @@ namespace Solimar.Licensing.Attribs
 		}
 
 
-        // C# only function
-        public static string[] GetContractNumbers(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs _prodInfoAttribs)
-        {
-            System.Collections.Generic.List<string> contractNumberList = new List<string>();
-            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs moduleInfo in _prodInfoAttribs.moduleList.TVal)
-            {
-                if (moduleInfo.contractNumber.TVal.Length!=0 && contractNumberList.Contains(moduleInfo.contractNumber.TVal) == false)
-                    contractNumberList.Add(moduleInfo.contractNumber.TVal);
-            }
-            return contractNumberList.ToArray();
-        }
+        //// C# only function
+        //public static string[] GetContractNumbers(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs _prodInfoAttribs)
+        //{
+        //    System.Collections.Generic.List<string> contractNumberList = new List<string>();
+        //    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs moduleInfo in _prodInfoAttribs.moduleList.TVal)
+        //    {
+        //        if (moduleInfo.contractNumber.TVal.Length!=0 && contractNumberList.Contains(moduleInfo.contractNumber.TVal) == false)
+        //            contractNumberList.Add(moduleInfo.contractNumber.TVal);
+        //    }
+        //    return contractNumberList.ToArray();
+        //}
 
-        // C# only function
-        public static Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList GetModuleList_ByContractNumber(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs _prodInfoAttribs, string _contractNumber)
-        {
-            Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList moduleList = new Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList("modList", new System.Collections.ArrayList());
-            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs moduleInfo in _prodInfoAttribs.moduleList.TVal)
-            {
-                if (string.Compare(moduleInfo.contractNumber.TVal, _contractNumber, true) == 0)
-                    moduleList.TVal.Add(moduleInfo);
-            }
-            return moduleList;
-        }
+        //// C# only function
+        //public static Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList GetModuleList_ByContractNumber(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs _prodInfoAttribs, string _contractNumber)
+        //{
+        //    Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList moduleList = new Lic_PackageAttribs.Lic_ProductInfoAttribs.Lic_ModuleInfoAttribsList("modList", new System.Collections.ArrayList());
+        //    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs moduleInfo in _prodInfoAttribs.moduleList.TVal)
+        //    {
+        //        if (string.Compare(moduleInfo.contractNumber.TVal, _contractNumber, true) == 0)
+        //            moduleList.TVal.Add(moduleInfo);
+        //    }
+        //    return moduleList;
+        //}
 
 
         public static bool IsEqual(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs1, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfoAttribs2)

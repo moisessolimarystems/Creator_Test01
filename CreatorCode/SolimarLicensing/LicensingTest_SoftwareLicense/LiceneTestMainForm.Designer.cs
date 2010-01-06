@@ -108,6 +108,7 @@ namespace LicensingTest_SoftwareLicense
 			this.ts_viewLicArchiveButton = new System.Windows.Forms.ToolStripButton();
 			this.ts_diffLicPackageButton = new System.Windows.Forms.ToolStripButton();
 			this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
+			this.licenseInfoViewerControl2 = new Shared.VisualComponents.LicenseInfoViewerControl();
 			this.menuStrip1.SuspendLayout();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
 			this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -279,6 +280,7 @@ namespace LicensingTest_SoftwareLicense
 			// 
 			// licenseInfoTabPage
 			// 
+			this.licenseInfoTabPage.Controls.Add(this.licenseInfoViewerControl2);
 			this.licenseInfoTabPage.Controls.Add(this.licenseInfoTreeView);
 			this.licenseInfoTabPage.Controls.Add(this.licenseInfoPanel);
 			this.licenseInfoTabPage.Location = new System.Drawing.Point(4, 22);
@@ -291,12 +293,13 @@ namespace LicensingTest_SoftwareLicense
 			// 
 			// licenseInfoTreeView
 			// 
-			this.licenseInfoTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.licenseInfoTreeView.Location = new System.Drawing.Point(3, 28);
+			this.licenseInfoTreeView.Dock = System.Windows.Forms.DockStyle.Right;
+			this.licenseInfoTreeView.Location = new System.Drawing.Point(563, 28);
 			this.licenseInfoTreeView.Name = "licenseInfoTreeView";
 			this.licenseInfoTreeView.ShowNodeToolTips = true;
-			this.licenseInfoTreeView.Size = new System.Drawing.Size(1086, 195);
+			this.licenseInfoTreeView.Size = new System.Drawing.Size(526, 195);
 			this.licenseInfoTreeView.TabIndex = 1;
+			this.licenseInfoTreeView.Visible = false;
 			this.licenseInfoTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView_KeyDown);
 			// 
 			// licenseInfoPanel
@@ -916,6 +919,14 @@ namespace LicensingTest_SoftwareLicense
 			this.ts_diffLicPackageButton.ToolTipText = "Difference between 2 Packages";
 			this.ts_diffLicPackageButton.Click += new System.EventHandler(this.ts_diffLicPackageButton_Click);
 			// 
+			// licenseInfoViewerControl2
+			// 
+			this.licenseInfoViewerControl2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.licenseInfoViewerControl2.Location = new System.Drawing.Point(3, 28);
+			this.licenseInfoViewerControl2.Name = "licenseInfoViewerControl2";
+			this.licenseInfoViewerControl2.Size = new System.Drawing.Size(560, 195);
+			this.licenseInfoViewerControl2.TabIndex = 2;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1042,6 +1053,7 @@ namespace LicensingTest_SoftwareLicense
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
 		private System.Windows.Forms.ContextMenuStrip messageListViewContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+		private Shared.VisualComponents.LicenseInfoViewerControl licenseInfoViewerControl2;
 	}
 }
 

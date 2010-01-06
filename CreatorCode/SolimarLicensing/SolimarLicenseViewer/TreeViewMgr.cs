@@ -190,11 +190,6 @@ namespace SolimarLicenseViewer
                         toolTipBuilder.Append("License: ");
                         toolTipBuilder.Append(softwareLicense);
 
-                        toolTipBuilder.Append("\n");
-                        toolTipBuilder.Append(SolimarLicenseViewer.AppConstants.LicenceTypeHeader);
-                        toolTipBuilder.Append(": ");
-                        toolTipBuilder.Append(licInfoAttrib.softwareLicType.GetAlias());
-
                         //toolTipBuilder.Append("\n");
                         //toolTipBuilder.Append(SolimarLicenseViewer.AppConstants.VerificationStatusHeader);
                         //toolTipBuilder.Append(": ");
@@ -347,12 +342,9 @@ namespace SolimarLicenseViewer
             if (tmpNode != null)
                 this.TheTreeView.Nodes.Add(tmpNode);
 
-            if (!m_CommLink.bDiagnosticDateView)
-            {
-                tmpNode = GenerateProtectionKeyNode();
-                if (tmpNode != null)
-                    this.TheTreeView.Nodes.Add(tmpNode);
-            }
+            tmpNode = GenerateProtectionKeyNode();
+            if (tmpNode != null)
+                this.TheTreeView.Nodes.Add(tmpNode);
 
             tmpNode = GenerateUsageNode();
             if (tmpNode != null)

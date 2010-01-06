@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="LicAttribsCS\ClassTypeInfo.cs" />
     <Compile Include="LicAttribsCS\CSpdAttribsBase.cs" />
+    <Compile Include="LicAttribsCS\Lic_KeyAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribsHelper.cs" />
     <Compile Include="LicAttribsCS\Lic_UsageInfoAttribs.cs" />

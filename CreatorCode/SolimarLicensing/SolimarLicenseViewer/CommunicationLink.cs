@@ -107,8 +107,56 @@ namespace SolimarLicenseViewer
                             string modifiedDateStreamed = "";
                             string keyAttribsListStreamed = "";
                             string usageInfoStreamed = "";
+                            string eventLogListStreamed = "";
                             string connectionInfoListStreamed = "";
-                            licInfoListStreamed = m_licServer.GenerateStreamData_ByLicenseSystemData(m_DiagnosticDateByteArray, ref modifiedDateStreamed, ref keyAttribsListStreamed, ref usageInfoStreamed, ref connectionInfoListStreamed);
+                            licInfoListStreamed = m_licServer.GenerateStreamData_ByLicenseSystemData(m_DiagnosticDateByteArray, ref modifiedDateStreamed, ref keyAttribsListStreamed, ref usageInfoStreamed, ref eventLogListStreamed, ref connectionInfoListStreamed);
+
+                            Solimar.Licensing.Attribs.AttribsMemberStringList streamedKeyInfoList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                            streamedKeyInfoList.SVal = keyAttribsListStreamed;
+                            //Populate m_protectionKeyCache
+                            foreach (string streamedInfo in streamedKeyInfoList.TVal)
+                            {
+                                Solimar.Licensing.Attribs.Lic_KeyAttribs keyAttrib = new Solimar.Licensing.Attribs.Lic_KeyAttribs();
+                                keyAttrib.AssignMembersFromStream(streamedInfo);
+                                Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo wrapperKeyInfo = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo();
+                                wrapperKeyInfo.keyName = keyAttrib.keyName;
+
+                                //The last row contains info about key
+                                System.Collections.ArrayList layoutList = keyAttrib.layout.TVal;
+                                Solimar.Licensing.Attribs.AttribsMemberBuffer tmpBuffer = (layoutList.Count >= 8) ? (Solimar.Licensing.Attribs.AttribsMemberBuffer)layoutList[7] : null;
+                                int[] intArray = new int[8];
+                                for(int idx=0; idx<tmpBuffer.TVal.Length/2; idx++)
+                                    intArray[idx] = Convert.ToInt32(tmpBuffer.TVal[2*idx] * 0x100 + tmpBuffer.TVal[2*idx + 1]);
+
+                                wrapperKeyInfo.keyTypeID = intArray[0];
+                                wrapperKeyInfo.productID = intArray[1];
+                                wrapperKeyInfo.version = string.Format("{0:x}.{1:x}", ((intArray[2] & 0xf000) >> 12), ((intArray[2] & 0x0ff0) >> 4));
+                                wrapperKeyInfo.keyTypeName = wrapperKeyInfo.GetKeyTypeString();
+                                wrapperKeyInfo.productName = GetProductName(wrapperKeyInfo.productID);
+                                if (wrapperKeyInfo.productName == string.Empty && wrapperKeyInfo.productID == 0xff)
+                                    wrapperKeyInfo.productName = "Software Verification Key"; //hardcode
+                                wrapperKeyInfo.applicationInstance = intArray[4];
+                                if (wrapperKeyInfo.productID != 0xff)
+                                {
+                                    tmpBuffer = (Solimar.Licensing.Attribs.AttribsMemberBuffer)layoutList[3];
+                                    intArray = new int[8];
+                                    for (int idx = 0; idx < tmpBuffer.TVal.Length / 2; idx++)
+                                        intArray[idx] = Convert.ToInt32(tmpBuffer.TVal[2 * idx] * 0x100 + tmpBuffer.TVal[2 * idx + 1]);
+                                    wrapperKeyInfo.hoursLeft = intArray[2];
+
+                                    tmpBuffer = (Solimar.Licensing.Attribs.AttribsMemberBuffer)layoutList[4];
+                                    intArray = new int[8];
+                                    for (int idx = 0; idx < tmpBuffer.TVal.Length / 2; idx++)
+                                        intArray[idx] = Convert.ToInt32(tmpBuffer.TVal[2 * idx] * 0x100 + tmpBuffer.TVal[2 * idx + 1]);
+
+                                    wrapperKeyInfo.expirationDate = new DateTime(1970, 1, 1); //time(NULL)
+                                    wrapperKeyInfo.expirationDate = (wrapperKeyInfo.expirationDate.AddSeconds((intArray[1] * 0x10000) + intArray[0])).ToLocalTime();
+                                }
+                                if (m_protectionKeyCache == null)
+                                    m_protectionKeyCache = new List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo>();
+                                m_protectionKeyCache.Add(wrapperKeyInfo);
+                            }
+
                             Solimar.Licensing.Attribs.AttribsMemberStringList streamedInfoList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                             streamedInfoList.SVal = licInfoListStreamed;
                             Solimar.Licensing.Attribs.AttribsMemberStringList softwareLicNameList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
@@ -285,7 +333,7 @@ namespace SolimarLicenseViewer
                     retVal = "Diagnostic Data";
                 }
                 else
-                    m_licServer.GetSoftwareLicenseStatus_ByLicense(softwareLicense, ref softwareLicenseValid);
+                    retVal = m_licServer.GetSoftwareLicenseStatus_ByLicense(softwareLicense, ref softwareLicenseValid);
                 return retVal;
             }
             catch (COMException ex)
@@ -445,7 +493,10 @@ namespace SolimarLicenseViewer
             try
             {
                 //Don't check for keys when using diagnostic data
-                if (!m_bDiagnosticDateView)
+                if (m_bDiagnosticDateView)
+                {
+                }
+                else if (!m_bDiagnosticDateView)
                 {
                     if (m_protectionKeyCache == null || bForceRefresh == true)
                         m_protectionKeyCache = m_licServer.KeyEnumerate();
