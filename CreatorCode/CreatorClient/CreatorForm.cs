@@ -3719,7 +3719,6 @@ namespace Client.Creator
                             {   //create module to be added
                                 Lic_PackageAttribs.Lic_ModuleInfoAttribs module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
                                 module.moduleID.TVal = moduleSpec.moduleID.TVal;
-                                module.contractNumber.TVal = product.Product.contractNumber.TVal;
                                 ListViewItem lvItem = CreateModuleListViewItem(module, productData.ProductID, true);
                                 if (DetailListView.Items.Find(lvItem.Name, false).Count() == 0)
                                     DetailListView.Items.Add(lvItem);
@@ -3763,7 +3762,6 @@ namespace Client.Creator
                     {   //create module to be added
                         Lic_PackageAttribs.Lic_ModuleInfoAttribs module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
                         module.moduleID.TVal = moduleSpec.moduleID.TVal;
-                        module.contractNumber.TVal = plData.ID;
                         ListViewItem lvItem = CreateModuleListViewItem(module, plData.Product.ID, true);
                         if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
                             storageListView.Items.Add(lvItem);

@@ -330,7 +330,7 @@ namespace Client.Creator
                         {
                             foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs modRec in product.moduleList.TVal)
                             {
-                                if (modRec.moduleID.TVal.Equals(modID) && (modRec.contractNumber.TVal.Equals(moduleData.ProductLicense.ID) || modRec.contractNumber.TVal.Equals(moduleData.ProductLicense.ParentID)))
+                                if (modRec.moduleID.TVal.Equals(modID))
                                 {
                                     totalValue += modRec.moduleValue.TVal;
                                     break;
@@ -408,7 +408,7 @@ namespace Client.Creator
                         {
                             if (totalModAppInstance > 1)
                             {
-                                if (IsClientType(moduleData.ProductLicense.ProductName) && editModule.moduleState.TVal != Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn)
+                                if (IsClientType(moduleData.ProductLicense.ProductName) && moduleData.ProductLicense.Status != ProductLicenseState.AddOn)
                                     editModule.moduleAppInstance.TVal = moduleData.ProductLicense.Product.AppInstance;
                                 else
                                     editModule.moduleAppInstance.TVal = (uint)((moduleData.ProductLicense.Status == ProductLicenseState.AddOn) ? 0 : 1);

@@ -76,13 +76,6 @@ namespace Client.Creator
         }
 
         [Browsable(false)]
-        public Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType SoftwareLicenseType
-        {
-            get { return _licInfo.softwareLicType.TVal; }
-            set { _licInfo.softwareLicType.TVal = value; }
-        }     
-
-        [Browsable(false)]
         public bool IsModified
         {
             get
