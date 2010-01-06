@@ -237,7 +237,9 @@ void CSolimarLicenseMgr::HeartbeatThreadFunction(void* pvThis)
 {
 	HRESULT hr = S_OK;
 	CSolimarLicenseMgr *pThis = (CSolimarLicenseMgr*)pvThis;
+//OutputDebugString(L"CSolimarLicenseMgr::HeartbeatThreadFunction() - Enter");
 	pThis->SendHeartbeat();
+//OutputDebugString(L"CSolimarLicenseMgr::HeartbeatThreadFunction() - Leave");
 }
 
 
@@ -360,56 +362,6 @@ OutputDebugString(tmpbuf);
 					hr = pILicenseServer->QueryInterface(__uuidof(ISolimarSoftwareLicenseSvr), (void**)&pLocalSoftwareLicSvr);
 					if(SUCCEEDED(hr))
 					{
-						BSTR bstrStream;
-						hr = pLocalSoftwareLicSvr->GetAllSoftwareLicenses(&bstrStream);
-						if(SUCCEEDED(hr))
-						{
-							SpdAttribs::VectorStringObj strList;
-							SpdAttribs::TVectorString strVector;
-							strList.StringToValue(bstrStream, strVector);
-							int x = 0;
-							for(	SpdAttribs::TVectorString::iterator strVectorIt = strVector.begin();
-									strVectorIt != strVector.end();
-									strVectorIt++)
-							{
-								if(SUCCEEDED(hr))
-								{
-									_bstr_t bstrTmpSoftwareLicense = std::wstring(SpdAttribs::WStringObj(*strVectorIt)).c_str();
-									BSTR bstrSwLicInfoStream;
-									hr = pLocalSoftwareLicSvr->GetSoftwareLicenseInfo_ByLicense(bstrTmpSoftwareLicense, &bstrSwLicInfoStream);
-									if(SUCCEEDED(hr))
-									{
-
-										Lic_PackageAttribs::Lic_LicenseInfoAttribs tmpLicInfo;// = new ;
-										tmpLicInfo.InitFromString(bstrSwLicInfoStream);
-
-										// This assumes that all the licensing on a given machine is all backup, or all not backup, will
-										// not correctly work if there is a mixture of both.
-										if(((int)tmpLicInfo.softwareLicType == Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover && 
-											(connectionFlags & CF_BACKUP_SERVER) == 0)) /*||
-											(tmpLicInfo.softwareLicType != Lic_PackageAttribs::Lic_LicenseInfoAttribs::sltFailover && 
-											(connectionFlags & CF_BACKUP_SERVER) != 0))
-											*/
-											//)
-										{
-											hr = LicenseServerError::EHR_LIC_SOFTWARE_CONNECT_FAILOVER_ONLY;
-
-											//Bad case, have standard licensing configuration trying to use a failover licensing server.
-											//Currently allow backup licensing configuration trying to use a standard licensing server.
-										}
-
-										//x++;
-										//x+=10;
-										//x+=5;
-										SysFreeString(bstrSwLicInfoStream);
-									}
-								}
-							}
-							
-
-							SysFreeString(bstrStream);
-						}
-
 						pLocalSoftwareLicSvr->Release();
 					}
 					//else
@@ -1555,6 +1507,13 @@ HRESULT CSolimarLicenseMgr::ModuleLicenseTotalInternal(long module_id, long *cou
 			
 			if(prodSpecIt != m_softwareSpec.productSpecMap->end())
 			{
+				if(prodSpecIt->second.sameModSpecProductID != 0)	//Test/Dev's share the same mod spec
+				{
+					Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator  tmpProdSpecIt = m_softwareSpec.productSpecMap->find((int)prodSpecIt->second.sameModSpecProductID);
+					if(tmpProdSpecIt != m_softwareSpec.productSpecMap->end())
+						prodSpecIt = tmpProdSpecIt;
+				}
+
 				Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::iterator modSpecIt = prodSpecIt->second.moduleSpecMap->find(module_id);
 				if(modSpecIt != prodSpecIt->second.moduleSpecMap->end())
 				{
