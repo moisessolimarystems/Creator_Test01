@@ -42,6 +42,18 @@ namespace Client.Creator
             globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
         }
 
+        public bool HasHardwareToken()
+        {
+            bool bRetVal = false;
+            Service<ICreator>.Use((client) =>
+            {
+                TokenTable tt = client.GetTokenByLicenseName(_licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                if (tt != null)
+                    bRetVal = true;
+            });
+            return bRetVal;
+        }
+
         public ProductLicenseProperty(ProductLicenseTable plData, ProductProperty product, PermissionsTable permissions)
         {
             Permissions = permissions;
@@ -434,8 +446,12 @@ namespace Client.Creator
                         if (errorMsg.Length == 0)
                         {
                             _plRec.plState = (byte)value;
-                            if(value == ProductLicenseState.Licensed)
-                                ExpirationDate = (!(Product.Name.Contains("Test"))) ? null : ExpirationDate;
+                            if (value == ProductLicenseState.Licensed)
+                            {
+                                if(!(Product.Name.Contains("Test")) && HasHardwareToken())
+                                    if (System.Windows.Forms.MessageBox.Show("Clear Expiration Date?", "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                                        ExpirationDate = null;
+                            }
                             else
                                 ExpirationDate = CurrentExpirationDate;
                         }
@@ -466,8 +482,8 @@ namespace Client.Creator
             {
                 string errorMsg = "";
                 if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
-                    !_plRec.ExpirationDate.HasValue)
-                    errorMsg = "Can't set expiration date for permanent type";
+                    !value.HasValue && !HasHardwareToken()) 
+                    errorMsg = "Can't remove expiration date for non-hardware token validation.";
                 if ((Product.Name.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
                     errorMsg = "Please set a valid expiration date";
                 if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddYears(1)) > 0)
