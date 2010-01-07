@@ -1435,7 +1435,7 @@ namespace Client.Creator
             //changes for license property and order property
             //if property value changed want to mark license as modified
             //save object back to database            
-            if (!e.OldValue.Equals(e.ChangedItem.Value))
+            if (!(e.OldValue == e.ChangedItem.Value))
                 SaveLicense();
         }
         #endregion
@@ -1481,7 +1481,6 @@ namespace Client.Creator
                 {
                     // Do a hit test for the current mouse position
                     // Test to see if the selected item and the hit test item are the same.
-
                     if (item.Equals(hitInfo.Item))
                     {
                         _selectedHardwareKeyCustomer = item.SubItems[1].Text;
@@ -3768,10 +3767,8 @@ namespace Client.Creator
                     }
                 }
 
-                if (moduleFilterToolStripComboBox.SelectedItem != null)
-                {                
+                if (moduleFilterToolStripComboBox.SelectedItem != null)               
                     ShowModuleListView(moduleFilterToolStripComboBox.Text);
-                }
                 else
                 {
                     moduleFilterToolStripComboBox.SelectedIndex = 0;
