@@ -525,7 +525,6 @@ private:
 	bool m_bBypassRemoteKeyRestrictions;
 	bool m_bUsingBackupServers;	// Licensing is using Backup License Servers for its licensing needs
 	bool m_bInViolationPeriod;		// Licensing is in violation
-	bool m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized;	// Primary License Server has been successfully initialized
 	std::list<std::wstring> m_licenseMsgEventLogCache;				// Cache of license messages written to the event log, so event log will not get flooded with the same message
 	KeyIdentList m_productkeys;
 
