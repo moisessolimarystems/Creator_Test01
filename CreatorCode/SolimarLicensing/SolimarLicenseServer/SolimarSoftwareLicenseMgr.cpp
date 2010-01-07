@@ -1382,14 +1382,15 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		//YYY check for override later
 		Lic_KeyAttribs keyAttrib;
 		//customerID==0 && destinationID==0 for uninitialize LicenseFileAttribs
-		bool bInitializedLicenseFileAttribs = (m_licenseFileAttribs.licLicenseInfoAttribs.customerID!=0) || (m_licenseFileAttribs.licLicenseInfoAttribs.destinationID!=0);
+		
+		bool bInitializedLicenseFileAttribs = (int(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.customerID)!=0) || (int(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
 		hr = InternalGetKeyAttribs(&keyAttrib, &m_licenseFileAttribs, &bFoundKeyInfo);
 		if(FAILED(hr) || bFoundKeyInfo == false)
 		{
 			hr = InternalGetKeyAttribs(&keyAttrib, &tmpPacketNewLicenseFileAttribs, &bFoundKeyInfo);
 			if(FAILED(hr))
-				throw hr;
+				bFoundKeyInfo = false;
 		}
 		//if keyAttrib is initialized, convert activity slots to product license expiration.
 		if(bFoundKeyInfo)
@@ -1779,7 +1780,7 @@ HRESULT SoftwareLicenseMgr::InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, L
 	HRESULT hr = E_FAIL;
 	try
 	{
-		bool bInitializedLicenseFileAttribs = (pPackageAttribs->licLicenseInfoAttribs.customerID!=0) || (pPackageAttribs->licLicenseInfoAttribs.destinationID!=0);
+		bool bInitializedLicenseFileAttribs = (int(pPackageAttribs->licLicenseInfoAttribs.customerID)!=0) || (int(pPackageAttribs->licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
 		if(bInitializedLicenseFileAttribs/*m_licenseFileAttribs is INITIALIZED*/)
 		{
@@ -1842,7 +1843,7 @@ HRESULT SoftwareLicenseMgr::EnterLicenseArchive(Lic_PackageAttribs* pLicPacket)
 
 		Lic_KeyAttribs keyAttrib;
 		//customerID==0 && destinationID==0 for uninitialize LicenseFileAttribs
-		bool bInitializedLicenseFileAttribs = (tmpLicPacket.licLicenseInfoAttribs.customerID!=0) || (tmpLicPacket.licLicenseInfoAttribs.destinationID!=0);
+		bool bInitializedLicenseFileAttribs = (int(tmpLicPacket.licLicenseInfoAttribs.customerID)!=0) || (int(tmpLicPacket.licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
 		
 		hr = InternalGetKeyAttribs(&keyAttrib, &tmpLicPacket, &bFoundKeyInfo);
@@ -1975,7 +1976,7 @@ wchar_t debug_buf[1024];
 	
 	try
 	{
-		bool bInitializedLicenseFileAttribs = (m_licenseFileAttribs.licLicenseInfoAttribs.customerID!=0) || (m_licenseFileAttribs.licLicenseInfoAttribs.destinationID!=0);
+		bool bInitializedLicenseFileAttribs = (int(m_licenseFileAttribs.licLicenseInfoAttribs.customerID)!=0) || (int(m_licenseFileAttribs.licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
 		Lic_KeyAttribs keyAttribs;
 		//Get Keyinfo from the usb key or system
