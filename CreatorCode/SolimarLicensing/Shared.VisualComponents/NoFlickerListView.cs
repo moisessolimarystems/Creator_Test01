@@ -196,7 +196,7 @@ namespace Shared.VisualComponents
             if(m.Msg == WM_PAINT)
             {
                 #region Handle drawing of "no items" message
-                if (Items.Count == 0)
+                if (Items.Count == 0 && Columns.Count > 0)
                 {
                     if (this.GridLines)
                     {

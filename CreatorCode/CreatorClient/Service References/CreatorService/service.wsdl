@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_GetNextHardwareTokenValue_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValue" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetNextHardwareTokenValue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValueResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_CreateToken_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateToken" />
   </wsdl:message>
@@ -267,6 +273,12 @@
   <wsdl:message name="ICreator_DeleteProductLicense_OutputMessage">
     <wsdl:part name="parameters" element="tns:DeleteProductLicenseResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetHardwareTokensByConditions_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetHardwareTokensByConditions" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetHardwareTokensByConditions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetHardwareTokensByConditionsResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetAllTokens_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllTokens" />
   </wsdl:message>
@@ -314,12 +326,6 @@
   </wsdl:message>
   <wsdl:message name="ICreator_IsHardwareTokenActive_OutputMessage">
     <wsdl:part name="parameters" element="tns:IsHardwareTokenActiveResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetNextHardwareTokenValue_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValue" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetNextHardwareTokenValue_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValueResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
@@ -514,6 +520,10 @@
     <wsdl:part name="parameters" element="tns:CreatePacketResponse" />
   </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="GetNextHardwareTokenValue">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue" message="tns:ICreator_GetNextHardwareTokenValue_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse" message="tns:ICreator_GetNextHardwareTokenValue_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="CreateToken">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
@@ -678,6 +688,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteProductLicense" message="tns:ICreator_DeleteProductLicense_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteProductLicenseResponse" message="tns:ICreator_DeleteProductLicense_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetHardwareTokensByConditions">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetHardwareTokensByConditions" message="tns:ICreator_GetHardwareTokensByConditions_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetHardwareTokensByConditionsResponse" message="tns:ICreator_GetHardwareTokensByConditions_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetAllTokens">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllTokens" message="tns:ICreator_GetAllTokens_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllTokensResponse" message="tns:ICreator_GetAllTokens_OutputMessage" />
@@ -709,10 +723,6 @@
     <wsdl:operation name="IsHardwareTokenActive">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/IsHardwareTokenActive" message="tns:ICreator_IsHardwareTokenActive_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse" message="tns:ICreator_IsHardwareTokenActive_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetNextHardwareTokenValue">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue" message="tns:ICreator_GetNextHardwareTokenValue_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse" message="tns:ICreator_GetNextHardwareTokenValue_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
@@ -847,6 +857,15 @@
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="GetNextHardwareTokenValue">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextHardwareTokenValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="CreateToken">
       <soap12:operation soapAction="http://tempuri.org/ICreator/CreateToken" style="document" />
       <wsdl:input>
@@ -1216,6 +1235,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetHardwareTokensByConditions">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetHardwareTokensByConditions" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetAllTokens">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllTokens" style="document" />
       <wsdl:input>
@@ -1281,15 +1309,6 @@
     </wsdl:operation>
     <wsdl:operation name="IsHardwareTokenActive">
       <soap12:operation soapAction="http://tempuri.org/ICreator/IsHardwareTokenActive" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="GetNextHardwareTokenValue">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextHardwareTokenValue" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

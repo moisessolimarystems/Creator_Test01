@@ -36,9 +36,11 @@
             this.licenseGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.licDescriptLabel = new System.Windows.Forms.Label();
+            this.licDestIDLabel = new System.Windows.Forms.Label();
             this.licDescriptTextBox = new System.Windows.Forms.TextBox();
             this.licNameTextBox = new System.Windows.Forms.TextBox();
             this.licNameLabel = new System.Windows.Forms.Label();
+            this.destinationTextBox = new System.Windows.Forms.TextBox();
             this.TokenTabPage = new System.Windows.Forms.TabPage();
             this.tokenGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -94,8 +96,6 @@
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.destinationTextBox = new System.Windows.Forms.TextBox();
-            this.licDestIDLabel = new System.Windows.Forms.Label();
             this.topPanel.SuspendLayout();
             this.licInfoTabControl.SuspendLayout();
             this.LicenseTabPage.SuspendLayout();
@@ -215,6 +215,18 @@
             this.licDescriptLabel.TabIndex = 8;
             this.licDescriptLabel.Text = "Description:";
             // 
+            // licDestIDLabel
+            // 
+            this.licDestIDLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.licDestIDLabel.AutoSize = true;
+            this.licDestIDLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.licDestIDLabel.Location = new System.Drawing.Point(3, 40);
+            this.licDestIDLabel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.licDestIDLabel.Name = "licDestIDLabel";
+            this.licDestIDLabel.Size = new System.Drawing.Size(75, 13);
+            this.licDestIDLabel.TabIndex = 3;
+            this.licDestIDLabel.Text = "Destination:";
+            // 
             // licDescriptTextBox
             // 
             this.licDescriptTextBox.BackColor = System.Drawing.SystemColors.Window;
@@ -249,6 +261,16 @@
             this.licNameLabel.Size = new System.Drawing.Size(55, 13);
             this.licNameLabel.TabIndex = 0;
             this.licNameLabel.Text = "License:";
+            // 
+            // destinationTextBox
+            // 
+            this.destinationTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.destinationTextBox.Location = new System.Drawing.Point(135, 35);
+            this.destinationTextBox.Margin = new System.Windows.Forms.Padding(5);
+            this.destinationTextBox.Name = "destinationTextBox";
+            this.destinationTextBox.ReadOnly = true;
+            this.destinationTextBox.Size = new System.Drawing.Size(188, 20);
+            this.destinationTextBox.TabIndex = 10;
             // 
             // TokenTabPage
             // 
@@ -497,7 +519,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 87F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 89F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -533,7 +555,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(319, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(317, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -549,7 +571,7 @@
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(215, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(213, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
@@ -559,7 +581,7 @@
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(215, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(213, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -591,7 +613,7 @@
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(215, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(213, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -613,7 +635,7 @@
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(215, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(213, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -883,28 +905,6 @@
             // 
             this.browseCSVOpenFileDialog.DefaultExt = "csv";
             this.browseCSVOpenFileDialog.Filter = "CSV Files|*.csv";
-            // 
-            // destinationTextBox
-            // 
-            this.destinationTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.destinationTextBox.Location = new System.Drawing.Point(135, 35);
-            this.destinationTextBox.Margin = new System.Windows.Forms.Padding(5);
-            this.destinationTextBox.Name = "destinationTextBox";
-            this.destinationTextBox.ReadOnly = true;
-            this.destinationTextBox.Size = new System.Drawing.Size(188, 20);
-            this.destinationTextBox.TabIndex = 10;
-            // 
-            // licDestIDLabel
-            // 
-            this.licDestIDLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.licDestIDLabel.AutoSize = true;
-            this.licDestIDLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licDestIDLabel.Location = new System.Drawing.Point(3, 40);
-            this.licDestIDLabel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
-            this.licDestIDLabel.Name = "licDestIDLabel";
-            this.licDestIDLabel.Size = new System.Drawing.Size(75, 13);
-            this.licDestIDLabel.TabIndex = 3;
-            this.licDestIDLabel.Text = "Destination:";
             // 
             // LicenseInfoForm
             // 

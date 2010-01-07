@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Linq;
+using System.Linq.Dynamic;
 
 namespace CreatorData
 {
     public partial class TokenTable
     {
+        public static IList<TokenTable> GetHardwareTokensByConditions(string conditionStrings)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var tokens = db.TokenTables.Where(conditionStrings).ToList();
+                return tokens.Where(c => c.TokenType == 1).ToList();
+            }
+        }
+
         public static IList<TokenTable> GetAllTokens(string searchString, Byte token)
         {
             IList<TokenTable> list;
@@ -96,9 +107,9 @@ namespace CreatorData
             {
                 db.ObjectTrackingEnabled = false;
 
-                IList<TokenTable> tokenList = db.TokenTables.Where(c => c.LicenseTable.SCRnumber.Equals(custID) &&
-                                                              c.TokenType.Equals(tokenType) &&
-                                                              c.TokenValue.Equals(tokenValue)).ToList();
+                IList<TokenTable> tokenList = db.TokenTables.Where(c => c.LicenseTable.SCRnumber.Equals(custID) &&  
+                                                                        c.TokenType.Equals(tokenType) &&
+                                                                        c.TokenValue.Equals(tokenValue)).ToList();
                 if (tokenList.Count > 0)
                     bExists = true;                
             }

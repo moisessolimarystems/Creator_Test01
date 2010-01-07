@@ -22,10 +22,10 @@
       <Column Name="OrderIndex" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="IsDirty" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="IsActive" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Association Name="LicenseTable_TokenTable" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
       <Association Name="LicenseTable_PacketTable" Member="PacketTables" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
       <Association Name="LicenseTable_ProductLicenseTable" Member="ProductLicenseTables" ThisKey="ID" OtherKey="LicenseID" Type="ProductLicenseTable" />
       <Association Name="LicenseTable_TransactionTable" Member="TransactionTables" ThisKey="ID" OtherKey="taLicenseID" Type="TransactionTable" />
+      <Association Name="LicenseTable_Token" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
       <Association Name="CustomerTable_LicenseTable" Member="CustomerTable" Storage="_SCustomerRecord" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
     </Type>
   </Table>
@@ -44,17 +44,6 @@
       <Column Name="pt_version_pwd" Type="System.Boolean" DbType="Bit" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="pt_module_pwd" Type="System.Boolean" DbType="Bit" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="pt_permanent_pwd" Type="System.Boolean" DbType="Bit" CanBeNull="true" UpdateCheck="Never" />
-    </Type>
-  </Table>
-  <Table Name="[CORP\AChou].Token" Member="TokenTables">
-    <Type Name="TokenTable">
-      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="TokenType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="TokenValue" Type="System.String" DbType="VarChar(128) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Column Name="TokenStatus" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
-      <Association Name="LicenseTable_TokenTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
   <Table Name="[CORP\AChou].Packet" Member="PacketTables">
@@ -120,6 +109,19 @@
       <Column Name="taLicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="taOrderID" Type="System.Int32" DbType="Int" CanBeNull="true" UpdateCheck="Never" />
       <Association Name="LicenseTable_TransactionTable" Member="LicenseTable" ThisKey="taLicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].Token" Member="TokenTables">
+    <Type Name="TokenTable">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TokenType" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TokenValue" Type="System.String" DbType="VarChar(128) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="CustID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="TokenStatus" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Column Name="ActivatedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="DeactivatedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
+      <Association Name="LicenseTable_Token" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

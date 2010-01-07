@@ -31,7 +31,7 @@ namespace Client.Creator
             _reportData = e.Data as ReportDlgData;
             if (_reportData != null)
             {
-                this.Text = _reportData.Report.ID;
+                this.Text = string.Format("{0} - {1}", _reportData.Report.Type.ToString(),_reportData.Report.ID);
                 if (_reportData.Report.Conditions.Count == 0)
                 {
                     createConditionInput(new CreatorService.Condition());
@@ -40,6 +40,7 @@ namespace Client.Creator
                 {
                     foreach (CreatorService.Condition userCondition in _reportData.Report.Conditions)
                     {
+                        //translate from db to user value
                         createConditionInput(userCondition);
                     }
                 }
@@ -68,18 +69,16 @@ namespace Client.Creator
                     cb = (ComboBox)control;
                     string index = control.Name.Substring(control.Name.Length - 1, 1);
                     CreatorService.Condition newCondition = new CreatorService.Condition();
-                    if (_reportData.Report.Type == ReportProperty.ReportType.LicenseServer)
-                        newCondition.Name = ReportProperty._filterLSNames[cb.SelectedItem.ToString()];
-                    else
-                        newCondition.Name = ReportProperty._filterPLNames[cb.SelectedItem.ToString()];
+                    newCondition.Name = _reportData.Report.GetFilterName(cb.SelectedItem.ToString()); 
                     //Eval Operator
                     controlIndex = groupBox1.Controls.IndexOfKey(string.Format("evalComboBox{0}", index));
                     cb = (ComboBox)groupBox1.Controls[controlIndex];
                     newCondition.Operator = ReportProperty._filterOperators[cb.SelectedItem.ToString()];
-                    //Value TextBox
+                    //Value TextBox translate from user to db value
                     controlIndex = groupBox1.Controls.IndexOfKey(string.Format("valueTextBox{0}", index));
                     tb = (TextBox)groupBox1.Controls[controlIndex];                                    
-                    newCondition.Value = tb.Text;                    
+                    newCondition.Value = tb.Text;
+                    newCondition.Value = GetDatabaseValue(newCondition);
                     d.Report.Conditions.Add(newCondition);
                 }
             }
@@ -108,6 +107,88 @@ namespace Client.Creator
             removeConditionInput(conditionIndex, selectedButton.Location.Y);
         }
 
+        private string GetUserValue(CreatorService.Condition userCondition)
+        {
+            string strVal = userCondition.Value;
+            if(_reportData.Report.Type == ReportProperty.ReportType.LicenseServer)
+            {
+            }
+            else if (_reportData.Report.Type == ReportProperty.ReportType.ProductLicense)
+            {
+                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                {
+                    int stateValue;
+                    if(int.TryParse(userCondition.Value, out stateValue));
+                        strVal = ((ProductLicenseState)stateValue).ToString();
+                }
+                else if(userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
+                {
+                    int productID;
+                    Int32.TryParse(userCondition.Value, out productID);
+                    strVal = _commLink.GetProductName((uint)productID);
+                }
+            }
+            else
+            {
+                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
+                {
+                    ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
+                    {
+                        CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
+                        if(dbCustomer != null)
+                            strVal = dbCustomer.SCRname;
+                    });
+                }
+                else if(userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                {
+                    int stateVal;
+                    if(int.TryParse(userCondition.Value, out stateVal));
+                        strVal = ((TokenStatus)stateVal).ToString();
+                }
+            }
+            return strVal;
+        }
+        //user value to database value which is digits
+        private string GetDatabaseValue(CreatorService.Condition userCondition)
+        {
+            string strVal = userCondition.Value;
+            if (_reportData.Report.Type == ReportProperty.ReportType.LicenseServer)
+            {
+            }
+            else if (_reportData.Report.Type == ReportProperty.ReportType.ProductLicense)
+            {
+                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                {
+                    try
+                    {
+                        strVal = ((int)Enum.Parse(typeof(ProductLicenseState), userCondition.Value)).ToString();
+                    }
+                    catch (Exception) { }
+                }
+                else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
+                    strVal = _commLink.GetProductID(userCondition.Value).ToString();
+            }
+            else
+            {
+                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
+                {
+                    ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
+                    {
+                        CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
+                        strVal = dbCustomer.SCRnumber.ToString();
+                    });
+                }
+                else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                {
+                    try
+                    {
+                        strVal = ((int)Enum.Parse(typeof(TokenStatus), userCondition.Value)).ToString();
+                    }
+                    catch (Exception) { }
+                }
+            }
+            return strVal;
+        }
         private void createConditionInput(CreatorService.Condition userCondition)
         {
             //increase form size
@@ -130,6 +211,13 @@ namespace Client.Creator
                     conditionComboBox.Items.Add(key);
                 }
             }
+            else if (_reportData.Report.Type == ReportProperty.ReportType.HardwareToken)
+            {
+                foreach (string key in ReportProperty._filterHTNames.Keys)
+                {
+                    conditionComboBox.Items.Add(key);
+                }
+            }
             else
             {
                 foreach (string key in ReportProperty._filterPLNames.Keys)
@@ -139,8 +227,8 @@ namespace Client.Creator
             }
             //conditionComboBox has _filter Keys 
             conditionComboBox.SelectedItem = _reportData.Report.GetFilterKey(userCondition);
+            if (conditionComboBox.SelectedItem == null) conditionComboBox.SelectedItem = "Customer";
             groupBox1.Controls.Add(conditionComboBox);
-
             ComboBox evalComboBox = new ComboBox();
             evalComboBox.Name = string.Format("evalComboBox{0}", m_CondtionIndex);
             evalComboBox.Location = new Point(conditionOperatorComboBox.Location.X, conditionOperatorComboBox.Location.Y + (m_ConditionCount * 25));
@@ -157,7 +245,7 @@ namespace Client.Creator
             valueTextBox.Name = string.Format("valueTextBox{0}", m_CondtionIndex);
             valueTextBox.Location = new Point(conditionValueTextBox.Location.X, conditionValueTextBox.Location.Y + (m_ConditionCount * 25));
             valueTextBox.Size = conditionValueTextBox.Size;
-            valueTextBox.Text = userCondition.Value;
+            valueTextBox.Text = GetUserValue(userCondition);
             groupBox1.Controls.Add(valueTextBox);
 
             Button minusButton = new Button();

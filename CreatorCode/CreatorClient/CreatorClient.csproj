@@ -105,6 +105,7 @@
     <Compile Include="Entities\Transaction.cs" />
     <Compile Include="Entities\TransactionManager.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="ExportListViewManager.cs" />
     <Compile Include="ItemNameDialog.cs">
       <SubType>Form</SubType>
     </Compile>

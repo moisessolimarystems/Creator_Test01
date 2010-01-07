@@ -40,6 +40,12 @@ namespace Client.Creator.CreatorService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private byte TokenStatusField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> ActivatedDateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Nullable<System.DateTime> DeactivatedDateField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -124,6 +130,32 @@ namespace Client.Creator.CreatorService {
                 if ((this.TokenStatusField.Equals(value) != true)) {
                     this.TokenStatusField = value;
                     this.RaisePropertyChanged("TokenStatus");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        public System.Nullable<System.DateTime> ActivatedDate {
+            get {
+                return this.ActivatedDateField;
+            }
+            set {
+                if ((this.ActivatedDateField.Equals(value) != true)) {
+                    this.ActivatedDateField = value;
+                    this.RaisePropertyChanged("ActivatedDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        public System.Nullable<System.DateTime> DeactivatedDate {
+            get {
+                return this.DeactivatedDateField;
+            }
+            set {
+                if ((this.DeactivatedDateField.Equals(value) != true)) {
+                    this.DeactivatedDateField = value;
+                    this.RaisePropertyChanged("DeactivatedDate");
                 }
             }
         }
@@ -970,40 +1002,52 @@ namespace Client.Creator.CreatorService {
     public enum ConditionName : int {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Customer = 0,
+        UnKnown = 0,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        LicenseServer = 1,
+        Customer = 1,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        LicenseType = 2,
+        LicenseServer = 2,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ProductLicense = 3,
+        LicenseType = 3,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ExpirationDate = 4,
+        ProductLicense = 4,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Product = 5,
+        ExpirationDate = 5,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ProductVersion = 6,
+        Product = 6,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        State = 7,
+        ProductVersion = 7,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Extension = 8,
+        State = 8,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Activation = 9,
+        Extension = 9,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ActivationAmount = 10,
+        Activation = 10,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Active = 11,
+        ActivationAmount = 11,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Active = 12,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        HardwareID = 13,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ActivatedDate = 14,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        DeactivatedDate = 15,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
@@ -1428,9 +1472,6 @@ namespace Client.Creator.CreatorService {
         private bool IsActiveField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTablesField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTablesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1438,6 +1479,9 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> TransactionTablesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTablesField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1580,19 +1624,6 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTables {
-            get {
-                return this.TokenTablesField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.TokenTablesField, value) != true)) {
-                    this.TokenTablesField = value;
-                    this.RaisePropertyChanged("TokenTables");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTables {
             get {
                 return this.PacketTablesField;
@@ -1605,7 +1636,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> ProductLicenseTables {
             get {
                 return this.ProductLicenseTablesField;
@@ -1618,7 +1649,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> TransactionTables {
             get {
                 return this.TransactionTablesField;
@@ -1627,6 +1658,19 @@ namespace Client.Creator.CreatorService {
                 if ((object.ReferenceEquals(this.TransactionTablesField, value) != true)) {
                     this.TransactionTablesField = value;
                     this.RaisePropertyChanged("TransactionTables");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTables {
+            get {
+                return this.TokenTablesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TokenTablesField, value) != true)) {
+                    this.TokenTablesField = value;
+                    this.RaisePropertyChanged("TokenTables");
                 }
             }
         }
@@ -1644,6 +1688,9 @@ namespace Client.Creator.CreatorService {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
+        uint GetNextHardwareTokenValue(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
         void CreateToken(Client.Creator.CreatorService.TokenTable tt);
@@ -1768,6 +1815,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteProductLicense", ReplyAction="http://tempuri.org/ICreator/DeleteProductLicenseResponse")]
         void DeleteProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetHardwareTokensByConditions", ReplyAction="http://tempuri.org/ICreator/GetHardwareTokensByConditionsResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllTokens", ReplyAction="http://tempuri.org/ICreator/GetAllTokensResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
         
@@ -1791,9 +1841,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
         bool IsHardwareTokenActive(uint custID, string tokenValue);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
-        uint GetNextHardwareTokenValue(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
@@ -1917,6 +1964,10 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public uint GetNextHardwareTokenValue(uint custID) {
+            return base.Channel.GetNextHardwareTokenValue(custID);
         }
         
         public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
@@ -2083,6 +2134,10 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteProductLicense(ta);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl) {
+            return base.Channel.GetHardwareTokensByConditions(cl);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token) {
             return base.Channel.GetAllTokens(searchString, token);
         }
@@ -2113,10 +2168,6 @@ namespace Client.Creator.CreatorService {
         
         public bool IsHardwareTokenActive(uint custID, string tokenValue) {
             return base.Channel.IsHardwareTokenActive(custID, tokenValue);
-        }
-        
-        public uint GetNextHardwareTokenValue(uint custID) {
-            return base.Channel.GetNextHardwareTokenValue(custID);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions) {

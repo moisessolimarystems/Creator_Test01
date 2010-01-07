@@ -247,7 +247,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                     return productSpec;
             }
             //need to return a valid bad value
@@ -258,7 +258,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                     return productSpec.productName;
 
             }
@@ -277,7 +277,7 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
             foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
             {
-                if (moduleSpec.moduleID == moduleID)
+                if (moduleSpec.moduleID.TVal == moduleID)
                     return moduleSpec.moduleName;
             }
             return "Unknown";
@@ -287,7 +287,7 @@ namespace Client.Creator
         {            
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productName == productName)
+                if (productSpec.productName.TVal.ToLower() == productName.ToLower())
                     return (int)productSpec.productID.TVal;
             }
             //need to return a valid bad value
@@ -299,7 +299,7 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
             foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
             {
-                if (moduleSpec.moduleName == moduleName)                            
+                if (moduleSpec.moduleName.TVal == moduleName)                            
                     return (int)moduleSpec.moduleID.TVal;                        
             }                   
             //need to return a valid bad value
@@ -310,7 +310,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                 {
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {
@@ -330,7 +330,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                 {
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {
@@ -350,7 +350,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                 {
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {
@@ -369,7 +369,7 @@ namespace Client.Creator
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productID == productID)
+                if (productSpec.productID.TVal == productID)
                 {
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {

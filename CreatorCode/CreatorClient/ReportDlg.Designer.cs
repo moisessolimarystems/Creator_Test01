@@ -50,13 +50,13 @@
             this.groupBox1.Controls.Add(this.conditionNameComboBox);
             this.groupBox1.Location = new System.Drawing.Point(12, 14);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(425, 41);
+            this.groupBox1.Size = new System.Drawing.Size(501, 41);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             // 
             // conditionPlusButton
             // 
-            this.conditionPlusButton.Location = new System.Drawing.Point(398, 15);
+            this.conditionPlusButton.Location = new System.Drawing.Point(474, 15);
             this.conditionPlusButton.Name = "conditionPlusButton";
             this.conditionPlusButton.Size = new System.Drawing.Size(21, 20);
             this.conditionPlusButton.TabIndex = 4;
@@ -68,7 +68,7 @@
             // conditionMinusButton
             // 
             this.conditionMinusButton.Enabled = false;
-            this.conditionMinusButton.Location = new System.Drawing.Point(376, 15);
+            this.conditionMinusButton.Location = new System.Drawing.Point(452, 15);
             this.conditionMinusButton.Name = "conditionMinusButton";
             this.conditionMinusButton.Size = new System.Drawing.Size(21, 20);
             this.conditionMinusButton.TabIndex = 3;
@@ -79,9 +79,9 @@
             // 
             // conditionValueTextBox
             // 
-            this.conditionValueTextBox.Location = new System.Drawing.Point(242, 15);
+            this.conditionValueTextBox.Location = new System.Drawing.Point(251, 15);
             this.conditionValueTextBox.Name = "conditionValueTextBox";
-            this.conditionValueTextBox.Size = new System.Drawing.Size(128, 20);
+            this.conditionValueTextBox.Size = new System.Drawing.Size(195, 20);
             this.conditionValueTextBox.TabIndex = 2;
             this.conditionValueTextBox.Visible = false;
             // 
@@ -91,7 +91,7 @@
             this.conditionOperatorComboBox.FormattingEnabled = true;
             this.conditionOperatorComboBox.Location = new System.Drawing.Point(133, 14);
             this.conditionOperatorComboBox.Name = "conditionOperatorComboBox";
-            this.conditionOperatorComboBox.Size = new System.Drawing.Size(103, 21);
+            this.conditionOperatorComboBox.Size = new System.Drawing.Size(112, 21);
             this.conditionOperatorComboBox.TabIndex = 1;
             this.conditionOperatorComboBox.Visible = false;
             // 
@@ -109,7 +109,7 @@
             // ReportDlg
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(449, 103);
+            this.ClientSize = new System.Drawing.Size(525, 103);
             this.Controls.Add(this.groupBox1);
             this.Name = "ReportDlg";
             this.Text = "Report";

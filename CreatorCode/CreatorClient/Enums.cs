@@ -12,7 +12,8 @@ namespace Client.Creator
         {
             Reserved,
             Active,
-            Deactivated
+            Deactivated,
+            Lost
         }
 
         enum PacketListViewState

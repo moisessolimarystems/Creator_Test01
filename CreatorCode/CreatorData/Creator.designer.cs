@@ -43,9 +43,6 @@ namespace CreatorData
     partial void InsertPermissionsTable(PermissionsTable instance);
     partial void UpdatePermissionsTable(PermissionsTable instance);
     partial void DeletePermissionsTable(PermissionsTable instance);
-    partial void InsertTokenTable(TokenTable instance);
-    partial void UpdateTokenTable(TokenTable instance);
-    partial void DeleteTokenTable(TokenTable instance);
     partial void InsertPacketTable(PacketTable instance);
     partial void UpdatePacketTable(PacketTable instance);
     partial void DeletePacketTable(PacketTable instance);
@@ -61,6 +58,9 @@ namespace CreatorData
     partial void InsertTransactionTable(TransactionTable instance);
     partial void UpdateTransactionTable(TransactionTable instance);
     partial void DeleteTransactionTable(TransactionTable instance);
+    partial void InsertTokenTable(TokenTable instance);
+    partial void UpdateTokenTable(TokenTable instance);
+    partial void DeleteTokenTable(TokenTable instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -125,14 +125,6 @@ namespace CreatorData
 			}
 		}
 		
-		public System.Data.Linq.Table<TokenTable> TokenTables
-		{
-			get
-			{
-				return this.GetTable<TokenTable>();
-			}
-		}
-		
 		public System.Data.Linq.Table<PacketTable> PacketTables
 		{
 			get
@@ -170,6 +162,14 @@ namespace CreatorData
 			get
 			{
 				return this.GetTable<TransactionTable>();
+			}
+		}
+		
+		public System.Data.Linq.Table<TokenTable> TokenTables
+		{
+			get
+			{
+				return this.GetTable<TokenTable>();
 			}
 		}
 	}
@@ -411,13 +411,13 @@ namespace CreatorData
 		
 		private bool _IsActive;
 		
-		private EntitySet<TokenTable> _TokenTables;
-		
 		private EntitySet<PacketTable> _PacketTables;
 		
 		private EntitySet<ProductLicenseTable> _ProductLicenseTables;
 		
 		private EntitySet<TransactionTable> _TransactionTables;
+		
+		private EntitySet<TokenTable> _TokenTables;
 		
 		private EntityRef<CustomerTable> _SCustomerRecord;
 		
@@ -668,27 +668,8 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=11, EmitDefaultValue=false)]
-		public EntitySet<TokenTable> TokenTables
-		{
-			get
-			{
-				if ((this.serializing 
-							&& (this._TokenTables.HasLoadedOrAssignedValues == false)))
-				{
-					return null;
-				}
-				return this._TokenTables;
-			}
-			set
-			{
-				this._TokenTables.Assign(value);
-			}
-		}
-		
 		[Association(Name="LicenseTable_PacketTable", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=12, EmitDefaultValue=false)]
+		[DataMember(Order=11, EmitDefaultValue=false)]
 		public EntitySet<PacketTable> PacketTables
 		{
 			get
@@ -707,7 +688,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=13, EmitDefaultValue=false)]
+		[DataMember(Order=12, EmitDefaultValue=false)]
 		public EntitySet<ProductLicenseTable> ProductLicenseTables
 		{
 			get
@@ -726,7 +707,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TransactionTable", Storage="_TransactionTables", ThisKey="ID", OtherKey="taLicenseID")]
-		[DataMember(Order=14, EmitDefaultValue=false)]
+		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<TransactionTable> TransactionTables
 		{
 			get
@@ -741,6 +722,25 @@ namespace CreatorData
 			set
 			{
 				this._TransactionTables.Assign(value);
+			}
+		}
+		
+		[Association(Name="LicenseTable_Token", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
+		[DataMember(Order=14, EmitDefaultValue=false)]
+		public EntitySet<TokenTable> TokenTables
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._TokenTables.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._TokenTables;
+			}
+			set
+			{
+				this._TokenTables.Assign(value);
 			}
 		}
 		
@@ -798,18 +798,6 @@ namespace CreatorData
 			}
 		}
 		
-		private void attach_TokenTables(TokenTable entity)
-		{
-			this.SendPropertyChanging();
-			entity.LicenseTable = this;
-		}
-		
-		private void detach_TokenTables(TokenTable entity)
-		{
-			this.SendPropertyChanging();
-			entity.LicenseTable = null;
-		}
-		
 		private void attach_PacketTables(PacketTable entity)
 		{
 			this.SendPropertyChanging();
@@ -846,12 +834,24 @@ namespace CreatorData
 			entity.LicenseTable = null;
 		}
 		
+		private void attach_TokenTables(TokenTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.LicenseTable = this;
+		}
+		
+		private void detach_TokenTables(TokenTable entity)
+		{
+			this.SendPropertyChanging();
+			entity.LicenseTable = null;
+		}
+		
 		private void Initialize()
 		{
-			this._TokenTables = new EntitySet<TokenTable>(new Action<TokenTable>(this.attach_TokenTables), new Action<TokenTable>(this.detach_TokenTables));
 			this._PacketTables = new EntitySet<PacketTable>(new Action<PacketTable>(this.attach_PacketTables), new Action<PacketTable>(this.detach_PacketTables));
 			this._ProductLicenseTables = new EntitySet<ProductLicenseTable>(new Action<ProductLicenseTable>(this.attach_ProductLicenseTables), new Action<ProductLicenseTable>(this.detach_ProductLicenseTables));
 			this._TransactionTables = new EntitySet<TransactionTable>(new Action<TransactionTable>(this.attach_TransactionTables), new Action<TransactionTable>(this.detach_TransactionTables));
+			this._TokenTables = new EntitySet<TokenTable>(new Action<TokenTable>(this.attach_TokenTables), new Action<TokenTable>(this.detach_TokenTables));
 			this._SCustomerRecord = default(EntityRef<CustomerTable>);
 			OnCreated();
 		}
@@ -1194,248 +1194,6 @@ namespace CreatorData
 		
 		private void Initialize()
 		{
-			OnCreated();
-		}
-		
-		[OnDeserializing()]
-		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
-		public void OnDeserializing(StreamingContext context)
-		{
-			this.Initialize();
-		}
-	}
-	
-	[Table(Name="[CORP\\AChou].Token")]
-	[DataContract()]
-	public partial class TokenTable : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _ID;
-		
-		private int _LicenseID;
-		
-		private byte _TokenType;
-		
-		private string _TokenValue;
-		
-		private int _CustID;
-		
-		private byte _TokenStatus;
-		
-		private EntityRef<LicenseTable> _LicenseTable;
-		
-    #region Extensibility Method Definitions
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnIDChanging(int value);
-    partial void OnIDChanged();
-    partial void OnLicenseIDChanging(int value);
-    partial void OnLicenseIDChanged();
-    partial void OnTokenTypeChanging(byte value);
-    partial void OnTokenTypeChanged();
-    partial void OnTokenValueChanging(string value);
-    partial void OnTokenValueChanged();
-    partial void OnCustIDChanging(int value);
-    partial void OnCustIDChanged();
-    partial void OnTokenStatusChanging(byte value);
-    partial void OnTokenStatusChanged();
-    #endregion
-		
-		public TokenTable()
-		{
-			this.Initialize();
-		}
-		
-		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=1)]
-		public int ID
-		{
-			get
-			{
-				return this._ID;
-			}
-			set
-			{
-				if ((this._ID != value))
-				{
-					this.OnIDChanging(value);
-					this.SendPropertyChanging();
-					this._ID = value;
-					this.SendPropertyChanged("ID");
-					this.OnIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_LicenseID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=2)]
-		public int LicenseID
-		{
-			get
-			{
-				return this._LicenseID;
-			}
-			set
-			{
-				if ((this._LicenseID != value))
-				{
-					if (this._LicenseTable.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.OnLicenseIDChanging(value);
-					this.SendPropertyChanging();
-					this._LicenseID = value;
-					this.SendPropertyChanged("LicenseID");
-					this.OnLicenseIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_TokenType", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=3)]
-		public byte TokenType
-		{
-			get
-			{
-				return this._TokenType;
-			}
-			set
-			{
-				if ((this._TokenType != value))
-				{
-					this.OnTokenTypeChanging(value);
-					this.SendPropertyChanging();
-					this._TokenType = value;
-					this.SendPropertyChanged("TokenType");
-					this.OnTokenTypeChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_TokenValue", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=4)]
-		public string TokenValue
-		{
-			get
-			{
-				return this._TokenValue;
-			}
-			set
-			{
-				if ((this._TokenValue != value))
-				{
-					this.OnTokenValueChanging(value);
-					this.SendPropertyChanging();
-					this._TokenValue = value;
-					this.SendPropertyChanged("TokenValue");
-					this.OnTokenValueChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_CustID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=5)]
-		public int CustID
-		{
-			get
-			{
-				return this._CustID;
-			}
-			set
-			{
-				if ((this._CustID != value))
-				{
-					this.OnCustIDChanging(value);
-					this.SendPropertyChanging();
-					this._CustID = value;
-					this.SendPropertyChanged("CustID");
-					this.OnCustIDChanged();
-				}
-			}
-		}
-		
-		[Column(Storage="_TokenStatus", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
-		[DataMember(Order=6)]
-		public byte TokenStatus
-		{
-			get
-			{
-				return this._TokenStatus;
-			}
-			set
-			{
-				if ((this._TokenStatus != value))
-				{
-					this.OnTokenStatusChanging(value);
-					this.SendPropertyChanging();
-					this._TokenStatus = value;
-					this.SendPropertyChanged("TokenStatus");
-					this.OnTokenStatusChanged();
-				}
-			}
-		}
-		
-		[Association(Name="LicenseTable_TokenTable", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
-		public LicenseTable LicenseTable
-		{
-			get
-			{
-				return this._LicenseTable.Entity;
-			}
-			set
-			{
-				LicenseTable previousValue = this._LicenseTable.Entity;
-				if (((previousValue != value) 
-							|| (this._LicenseTable.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._LicenseTable.Entity = null;
-						previousValue.TokenTables.Remove(this);
-					}
-					this._LicenseTable.Entity = value;
-					if ((value != null))
-					{
-						value.TokenTables.Add(this);
-						this._LicenseID = value.ID;
-					}
-					else
-					{
-						this._LicenseID = default(int);
-					}
-					this.SendPropertyChanged("LicenseTable");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void Initialize()
-		{
-			this._LicenseTable = default(EntityRef<LicenseTable>);
 			OnCreated();
 		}
 		
@@ -2851,6 +2609,298 @@ namespace CreatorData
 					else
 					{
 						this._taLicenseID = default(int);
+					}
+					this.SendPropertyChanged("LicenseTable");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
+			this._LicenseTable = default(EntityRef<LicenseTable>);
+			OnCreated();
+		}
+		
+		[OnDeserializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[Table(Name="[CORP\\AChou].Token")]
+	[DataContract()]
+	public partial class TokenTable : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private int _LicenseID;
+		
+		private byte _TokenType;
+		
+		private string _TokenValue;
+		
+		private int _CustID;
+		
+		private byte _TokenStatus;
+		
+		private System.Nullable<System.DateTime> _ActivatedDate;
+		
+		private System.Nullable<System.DateTime> _DeactivatedDate;
+		
+		private EntityRef<LicenseTable> _LicenseTable;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnLicenseIDChanging(int value);
+    partial void OnLicenseIDChanged();
+    partial void OnTokenTypeChanging(byte value);
+    partial void OnTokenTypeChanged();
+    partial void OnTokenValueChanging(string value);
+    partial void OnTokenValueChanged();
+    partial void OnCustIDChanging(int value);
+    partial void OnCustIDChanged();
+    partial void OnTokenStatusChanging(byte value);
+    partial void OnTokenStatusChanged();
+    partial void OnActivatedDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnActivatedDateChanged();
+    partial void OnDeactivatedDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnDeactivatedDateChanged();
+    #endregion
+		
+		public TokenTable()
+		{
+			this.Initialize();
+		}
+		
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=1)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_LicenseID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=2)]
+		public int LicenseID
+		{
+			get
+			{
+				return this._LicenseID;
+			}
+			set
+			{
+				if ((this._LicenseID != value))
+				{
+					if (this._LicenseTable.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnLicenseIDChanging(value);
+					this.SendPropertyChanging();
+					this._LicenseID = value;
+					this.SendPropertyChanged("LicenseID");
+					this.OnLicenseIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_TokenType", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=3)]
+		public byte TokenType
+		{
+			get
+			{
+				return this._TokenType;
+			}
+			set
+			{
+				if ((this._TokenType != value))
+				{
+					this.OnTokenTypeChanging(value);
+					this.SendPropertyChanging();
+					this._TokenType = value;
+					this.SendPropertyChanged("TokenType");
+					this.OnTokenTypeChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_TokenValue", DbType="VarChar(128) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=4)]
+		public string TokenValue
+		{
+			get
+			{
+				return this._TokenValue;
+			}
+			set
+			{
+				if ((this._TokenValue != value))
+				{
+					this.OnTokenValueChanging(value);
+					this.SendPropertyChanging();
+					this._TokenValue = value;
+					this.SendPropertyChanged("TokenValue");
+					this.OnTokenValueChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_CustID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=5)]
+		public int CustID
+		{
+			get
+			{
+				return this._CustID;
+			}
+			set
+			{
+				if ((this._CustID != value))
+				{
+					this.OnCustIDChanging(value);
+					this.SendPropertyChanging();
+					this._CustID = value;
+					this.SendPropertyChanged("CustID");
+					this.OnCustIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_TokenStatus", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=6)]
+		public byte TokenStatus
+		{
+			get
+			{
+				return this._TokenStatus;
+			}
+			set
+			{
+				if ((this._TokenStatus != value))
+				{
+					this.OnTokenStatusChanging(value);
+					this.SendPropertyChanging();
+					this._TokenStatus = value;
+					this.SendPropertyChanged("TokenStatus");
+					this.OnTokenStatusChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_ActivatedDate", DbType="DateTime", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=7)]
+		public System.Nullable<System.DateTime> ActivatedDate
+		{
+			get
+			{
+				return this._ActivatedDate;
+			}
+			set
+			{
+				if ((this._ActivatedDate != value))
+				{
+					this.OnActivatedDateChanging(value);
+					this.SendPropertyChanging();
+					this._ActivatedDate = value;
+					this.SendPropertyChanged("ActivatedDate");
+					this.OnActivatedDateChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_DeactivatedDate", DbType="DateTime", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=8)]
+		public System.Nullable<System.DateTime> DeactivatedDate
+		{
+			get
+			{
+				return this._DeactivatedDate;
+			}
+			set
+			{
+				if ((this._DeactivatedDate != value))
+				{
+					this.OnDeactivatedDateChanging(value);
+					this.SendPropertyChanging();
+					this._DeactivatedDate = value;
+					this.SendPropertyChanged("DeactivatedDate");
+					this.OnDeactivatedDateChanged();
+				}
+			}
+		}
+		
+		[Association(Name="LicenseTable_Token", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
+		public LicenseTable LicenseTable
+		{
+			get
+			{
+				return this._LicenseTable.Entity;
+			}
+			set
+			{
+				LicenseTable previousValue = this._LicenseTable.Entity;
+				if (((previousValue != value) 
+							|| (this._LicenseTable.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._LicenseTable.Entity = null;
+						previousValue.TokenTables.Remove(this);
+					}
+					this._LicenseTable.Entity = value;
+					if ((value != null))
+					{
+						value.TokenTables.Add(this);
+						this._LicenseID = value.ID;
+					}
+					else
+					{
+						this._LicenseID = default(int);
 					}
 					this.SendPropertyChanged("LicenseTable");
 				}

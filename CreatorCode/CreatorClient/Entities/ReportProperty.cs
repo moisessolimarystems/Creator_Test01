@@ -9,6 +9,17 @@ namespace Client.Creator
     public class ReportProperty
     {
         public static readonly IDictionary<string, ConditionName>
+        _filterHTNames = new Dictionary<string, ConditionName>
+                {  
+                    {"Activated Date", ConditionName.ActivatedDate},
+                    {"Customer", ConditionName.Customer},       
+                    {"Deactivated Date", ConditionName.DeactivatedDate},
+                    {"Hardware ID", ConditionName.HardwareID},
+                    {"License Server", ConditionName.LicenseServer},
+                    {"State", ConditionName.State}
+                };
+
+        public static readonly IDictionary<string, ConditionName>
             _filterLSNames = new Dictionary<string, ConditionName>
                 {  
                     {"Active", ConditionName.Active},
@@ -41,10 +52,42 @@ namespace Client.Creator
                     {"contains", ConditionOperator.Contains}
                 };
 
+        public static readonly IDictionary<string, ConditionOperator>
+            _filterDateOperators = new Dictionary<string, ConditionOperator>
+                {
+                    {"is", ConditionOperator.Equal},
+                    {"is not", ConditionOperator.NotEqual},
+                    {"is after", ConditionOperator.LessThan},
+                    {"is before", ConditionOperator.GreaterThan},
+                    {"is in the last", ConditionOperator.Contains},
+                    {"is not in the last", ConditionOperator.Contains},
+                    {"is in the next", ConditionOperator.Contains},
+                    {"is in the range of", ConditionOperator.Contains}
+                };
+
+        public static readonly IDictionary<string, ConditionOperator>
+            _filterStringOperators = new Dictionary<string, ConditionOperator>
+                {
+                    {"contains", ConditionOperator.Equal},
+                    {"does not contain", ConditionOperator.NotEqual},
+                    {"is", ConditionOperator.LessThan},
+                    {"is not", ConditionOperator.GreaterThan},
+                    {"starts with", ConditionOperator.Contains},
+                    {"ends with", ConditionOperator.Contains}
+                };
+
+        public static readonly IDictionary<string, ConditionOperator>
+            _filterBoolOperators = new Dictionary<string, ConditionOperator>
+                {
+                    {"is true", ConditionOperator.Equal},
+                    {"is false", ConditionOperator.NotEqual},
+                };
+
         public enum ReportType
         {
             LicenseServer,
-            ProductLicense
+            ProductLicense,
+            HardwareToken
         }
 
         private string  _id;
@@ -74,31 +117,43 @@ namespace Client.Creator
             set { _conditions = value; }
         }
 
+        public ConditionName GetFilterName(string filterName)
+        {
+            ConditionName conditionName = ConditionName.UnKnown;
+            switch (Type)
+            {
+                case ReportType.LicenseServer:
+                    conditionName = _filterLSNames[filterName];
+                    break;
+                case ReportType.ProductLicense:
+                    conditionName = _filterPLNames[filterName];
+                     break;
+                case ReportType.HardwareToken:
+                    conditionName = _filterHTNames[filterName];
+                     break;
+                default: break;
+            }
+            return conditionName;
+        }
+
         public string GetFilterKey(CreatorService.Condition userCondition)
         {
             string conditionString = "";
+            IDictionary<string, ConditionName> filterNames = null;
             if (Type == ReportType.LicenseServer)
+                filterNames = _filterLSNames;
+            else if (Type == ReportType.ProductLicense)
+                filterNames = _filterPLNames;
+            else
+                filterNames = _filterHTNames;
+            foreach (KeyValuePair<string, ConditionName> kvp in filterNames)
             {
-                foreach (KeyValuePair<string, ConditionName> kvp in _filterLSNames)
+                if (kvp.Value == userCondition.Name)
                 {
-                    if (kvp.Value == userCondition.Name)
-                    {
-                        conditionString = kvp.Key;
-                        break;
-                    }
+                    conditionString = kvp.Key;
+                    break;
                 }
             }
-            else
-            {
-                foreach (KeyValuePair<string, ConditionName> kvp in _filterPLNames)
-                {
-                    if (kvp.Value == userCondition.Name)
-                    {
-                        conditionString = kvp.Key;
-                        break;
-                    }
-                }
-            }            
             return conditionString;
         }
     }
