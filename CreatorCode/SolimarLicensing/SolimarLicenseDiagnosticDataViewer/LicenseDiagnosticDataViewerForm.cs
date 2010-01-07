@@ -319,20 +319,20 @@ namespace SolimarLicenseDiagnosticDataViewer
         {
             this.Cursor = Cursors.WaitCursor;
             leftTreeView.BeginUpdate();
+            leftTreeView.Nodes.Clear();
+            TreeNode rootNode = new TreeNode(System.IO.Path.GetFileName(_fileName));
+            leftTreeView.Nodes.Add(rootNode);
             try
             {
                 m_loadedLicSysAttribs = new Lic_LicenseSystemAttribs();
                 m_loadedLicSysAttribs.AssignMembersFromStream(_licSysAttribsStreamed);
 
-                leftTreeView.Nodes.Clear();
+                
                 foreach (Form mdiChild in this.MdiChildren)
                 {
                     //if(!(mdiChild is TestForm))
                     mdiChild.Close();
                 }
-
-                TreeNode rootNode = new TreeNode(System.IO.Path.GetFileName(_fileName));
-                leftTreeView.Nodes.Add(rootNode);
 
                 if (m_loadedLicSysAttribs != null)
                 {
@@ -366,12 +366,19 @@ namespace SolimarLicenseDiagnosticDataViewer
                     childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
 
                     Lic_ServerDataAttribs tmpSvrDataAttrib = new Lic_ServerDataAttribs();
-                    tmpSvrDataAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_ServerDataAttribs);
-                    Lic_ServerDataAttribs_DisplayForm licSvrDataAttribsForm = new Lic_ServerDataAttribs_DisplayForm();
-                    licSvrDataAttribsForm.SetData(tmpSvrDataAttrib);
-                    licSvrDataAttribsForm.MdiParent = this;
-                    licSvrDataAttribsForm.Show();
-                    m_guidToFormMap.Add(childNode.Tag as string, licSvrDataAttribsForm);
+                    try
+                    {
+                        tmpSvrDataAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_ServerDataAttribs);
+                        Lic_ServerDataAttribs_DisplayForm licSvrDataAttribsForm = new Lic_ServerDataAttribs_DisplayForm();
+                        licSvrDataAttribsForm.SetData(tmpSvrDataAttrib);
+                        licSvrDataAttribsForm.MdiParent = this;
+                        licSvrDataAttribsForm.Show();
+                        m_guidToFormMap.Add(childNode.Tag as string, licSvrDataAttribsForm);
+                    }
+                    catch (Exception)
+                    {
+                        childNode.Text = m_loadedLicSysAttribs.Streamed_ServerDataAttribs + " - " + childNode.Text;
+                    }
                     rootNode.Nodes.Add(childNode);
 
 
@@ -461,18 +468,18 @@ namespace SolimarLicenseDiagnosticDataViewer
                     }
                     rootNode.Nodes.Add(childNode);
 
-                    childNode = new TreeNode("Raw XML");
-                    childNode.Tag = Guid.NewGuid().ToString();
-                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
-                    //Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSoftwareSpecAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
-                    //tmpSoftwareSpecAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_SoftwareSpecAttribs);
-                    XmlViewer_DisplayForm xmlForm = new XmlViewer_DisplayForm();
-                    xmlForm.SetData(_licSysAttribsStreamed);
-                    xmlForm.MdiParent = this;
-                    xmlForm.Show();
-                    xmlForm.WindowState = FormWindowState.Minimized;
-                    m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
-                    rootNode.Nodes.Add(childNode);
+                    //childNode = new TreeNode("Raw XML");
+                    //childNode.Tag = Guid.NewGuid().ToString();
+                    //childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    ////Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSoftwareSpecAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
+                    ////tmpSoftwareSpecAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_SoftwareSpecAttribs);
+                    //XmlViewer_DisplayForm xmlForm = new XmlViewer_DisplayForm();
+                    //xmlForm.SetData(_licSysAttribsStreamed);
+                    //xmlForm.MdiParent = this;
+                    //xmlForm.Show();
+                    //xmlForm.WindowState = FormWindowState.Minimized;
+                    //m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
+                    //rootNode.Nodes.Add(childNode);
 
                     rootNode.ToolTipText = toolTipBuilder.ToString();
                     rootNode.ExpandAll();
@@ -484,6 +491,18 @@ namespace SolimarLicenseDiagnosticDataViewer
             }
             finally
             {
+                TreeNode childNode = new TreeNode("Raw XML");
+                childNode.Tag = Guid.NewGuid().ToString();
+                childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                //Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSoftwareSpecAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
+                //tmpSoftwareSpecAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_SoftwareSpecAttribs);
+                XmlViewer_DisplayForm xmlForm = new XmlViewer_DisplayForm();
+                xmlForm.SetData(_licSysAttribsStreamed);
+                xmlForm.MdiParent = this;
+                xmlForm.Show();
+                xmlForm.WindowState = FormWindowState.Minimized;
+                m_guidToFormMap.Add(childNode.Tag as string, xmlForm);
+                rootNode.Nodes.Add(childNode);
                 this.Cursor = Cursors.Default;
             }
             leftTreeView.EndUpdate();

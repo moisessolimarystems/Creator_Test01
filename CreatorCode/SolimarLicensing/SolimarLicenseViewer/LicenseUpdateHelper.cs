@@ -349,6 +349,7 @@ namespace SolimarLicenseViewer
                     finally
                     {
                         licSelectionListView.EndUpdate();
+                        Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(licSelectionListView);
                     }
                 }
             }

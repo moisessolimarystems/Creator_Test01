@@ -333,7 +333,11 @@ HRESULT SoftwareServerDataMgr::GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareS
 	try
 	{
 		SafeMutex mutex(softwareServerDataMgrLock);
-		*pBstrSoftwareStream = SysAllocString(pServerDataAttribs->ToString().c_str());
+		if(pServerDataAttribs != NULL)
+			*pBstrSoftwareStream = SysAllocString(pServerDataAttribs->ToString().c_str());
+		else
+			*pBstrSoftwareStream = SysAllocString(L"File not Found");
+
 	}
 	catch(HRESULT &eHr)
 	{
