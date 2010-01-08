@@ -25,7 +25,6 @@ class SoftwareLicenseMgr
 		HRESULT GetSoftwareLicenseName(BSTR *pBstrLicenseName);
 		HRESULT GetVerificationAttribs(Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs* pVerificationAttrib);
 		HRESULT GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAttribs* pLicenseInfo);
-		HRESULT GetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec);
 
 		HRESULT GetProtectionKeyModifiedDate(time_t* pVtModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs);
 		HRESULT GetKeyInfoAttribs_FromKey(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pLicenseFileAttribs);
