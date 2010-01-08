@@ -568,7 +568,10 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateSoftwareLicPacket(BSTR bstrLicPackageAt
 STDMETHODIMP CSolimarLicenseSvr::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrVerificationCode)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.EnterSoftwareLicPacket(vtLicensePacket, pBstrVerificationCode);
+	HRESULT hr = g_licenseController.softwareServer.EnterSoftwareLicPacket(vtLicensePacket, pBstrVerificationCode);
+	if(SUCCEEDED(hr))
+		g_licenseController.TimesUp();
+	return hr;
 }
 STDMETHODIMP CSolimarLicenseSvr::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicense, VARIANT* pVtLicenseArchive)
 {
@@ -579,7 +582,10 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateSoftwareLicArchive_ByLicense(BSTR softw
 STDMETHODIMP CSolimarLicenseSvr::EnterSoftwareLicArchive(VARIANT vtLicenseArchive)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.EnterSoftwareLicArchive(vtLicenseArchive);
+	HRESULT hr = g_licenseController.softwareServer.EnterSoftwareLicArchive(vtLicenseArchive);
+	if(SUCCEEDED(hr))
+		g_licenseController.TimesUp();
+	return hr;
 }
 
 

@@ -47,6 +47,8 @@ public:
 	//Maybe implement something like
 	void GenerateMessageInternal(const wchar_t* license_source, bool bGenerateSoftwareLicMsg, long productID, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
 
+	// called periodically by the TimesUpThread
+	HRESULT TimesUp();
 private:
 
 	HRESULT RemoveFromNotification(BSTR license_id);
@@ -98,8 +100,6 @@ private:
 	static void TimesUpThreadFunction(void* pvThis);
 	typedef struct {time_t last_decrement; bool key_obtained;} TrialTimeInfo;
 	typedef std::map<_bstr_t, TrialTimeInfo> TrialTimeInfoList;
-	// called periodically by the TimesUpThread
-	HRESULT TimesUp();
 
 	// called periodically by the UpdateKeysThread
 	HRESULT UpdateKeys();
