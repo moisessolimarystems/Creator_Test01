@@ -3012,46 +3012,45 @@ wchar_t debug_buf[1024];
 //_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() -    lastTouchTime: %s, licenseName: %s, ", wstrLastTouchDate.c_str(), std::wstring(keyAttribs.keyName).c_str());
 //OutputDebugStringW(debug_buf);
 				
-				if(_wcsicmp(wstrLastTouchDate.c_str(), L"1900-01-01 00:00:00.0000") != 0)
-				{
-					SYSTEMTIME lastTouchDateSystime;
-					if(!TimeHelper::StringToSystemTime(wstrLastTouchDate.c_str(), lastTouchDateSystime))
-						continue;
-					
-					_variant_t lastTouchDateVt(NULL);	
-					if (!SystemTimeToVariantTime(&lastTouchDateSystime, &lastTouchDateVt.date)) 
-						continue;
-					time_t lastTouchDateTimeT = TimeHelper::VariantToTimeT(lastTouchDateVt, false);
-					double timeDifferenceInSeconds = difftime(curTimeT/*endTime*/, lastTouchDateTimeT/*startTime*/);
-					int timeDifferenceInHours = int(timeDifferenceInSeconds / TimeHelper::ONE_HOUR_IN_SECONDS);
+				SYSTEMTIME lastTouchDateSystime;
+				if(!TimeHelper::StringToSystemTime(wstrLastTouchDate.c_str(), lastTouchDateSystime))
+					continue;
+				
+				_variant_t lastTouchDateVt(NULL);	
+				if (!SystemTimeToVariantTime(&lastTouchDateSystime, &lastTouchDateVt.date)) 
+					continue;
+				time_t lastTouchDateTimeT = TimeHelper::VariantToTimeT(lastTouchDateVt, false);
+				if(lastTouchDateTimeT == -1)
+					lastTouchDateTimeT = 0;
+				double timeDifferenceInSeconds = difftime(curTimeT/*endTime*/, lastTouchDateTimeT/*startTime*/);
+				int timeDifferenceInHours = int(timeDifferenceInSeconds / TimeHelper::ONE_HOUR_IN_SECONDS);
 _snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - difftime(%d, %d) = timeDifferenceInSeconds: %f, inMinutes: %d, inHours: %d", curTimeT, lastTouchDateTimeT, timeDifferenceInSeconds, int(timeDifferenceInSeconds/60.0), int(timeDifferenceInSeconds/TimeHelper::ONE_HOUR_IN_SECONDS));
 OutputDebugStringW(debug_buf);
-					
-					if(timeDifferenceInHours > 0) // at least an hour has passed, update counters accordingly
+				
+				if(timeDifferenceInHours > 0) // at least an hour has passed, update counters accordingly
+				{
+					for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actInfoIt = keyAttribs.activationInfoList->begin();
+						 actInfoIt != keyAttribs.activationInfoList->end();
+						 actInfoIt++)
 					{
-						for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actInfoIt = keyAttribs.activationInfoList->begin();
-							 actInfoIt != keyAttribs.activationInfoList->end();
-							 actInfoIt++)
-						{
-							actInfoIt->activationSlotHoursToExpire = max(int(actInfoIt->activationSlotHoursToExpire)-timeDifferenceInHours, 0);
-						}
+						actInfoIt->activationSlotHoursToExpire = max(int(actInfoIt->activationSlotHoursToExpire)-timeDifferenceInHours, 0);
+					}
 
-						//Increment CurrentDateTime by the number of hours that has passed since last time it was written to.
-						time_t tmpTimeT = lastTouchDateTimeT + (timeDifferenceInHours * TimeHelper::ONE_HOUR_IN_SECONDS);
-						SYSTEMTIME tmpSystime;
-						VARIANT tmpVt;
-						tmpVt = TimeHelper::TimeTToVariant(tmpTimeT);
-						VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
-						wchar_t timestamp[256];
-						TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
-						keyAttribs.currentDate = std::wstring(timestamp);
-						licSrvFileInfoListIt->Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
+					//Increment CurrentDateTime by the number of hours that has passed since last time it was written to.
+					time_t tmpTimeT = lastTouchDateTimeT + (timeDifferenceInHours * TimeHelper::ONE_HOUR_IN_SECONDS);
+					SYSTEMTIME tmpSystime;
+					VARIANT tmpVt;
+					tmpVt = TimeHelper::TimeTToVariant(tmpTimeT);
+					VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+					wchar_t timestamp[256];
+					TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+					keyAttribs.currentDate = std::wstring(timestamp);
+					licSrvFileInfoListIt->Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
 
-						{
-						SafeMutex mutex(SoftwareLicenseLock);
-						licServerDataMgr.SetFileInfoFor(std::wstring(licSrvFileInfoListIt->LicName).c_str(), &(*licSrvFileInfoListIt));
-						}
-					}			
+					{
+					SafeMutex mutex(SoftwareLicenseLock);
+					licServerDataMgr.SetFileInfoFor(std::wstring(licSrvFileInfoListIt->LicName).c_str(), &(*licSrvFileInfoListIt));
+					}
 				}
 			}
 		}

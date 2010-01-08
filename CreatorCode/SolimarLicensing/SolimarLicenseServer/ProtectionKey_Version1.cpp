@@ -89,7 +89,7 @@ wchar_t debug_buf[1024];
 		if(FAILED(hr)) throw hr;
 
 
-		VARIANT currentTimeVT = TimeHelper::TimeTToVariant(currentTimeT, true);
+		VARIANT currentTimeVT = TimeHelper::TimeTToVariant(currentTimeT, false);
 		SYSTEMTIME currentSystime;
 		VariantTimeToSystemTime(currentTimeVT.date, &currentSystime);
 		wchar_t currentTimestamp[256];
@@ -97,13 +97,15 @@ wchar_t debug_buf[1024];
 //_snwprintf_s(debug_buf, 1024, L"ProtectionKey_Version1::DecrementTrialHours() - currentTimestamp: %s", currentTimestamp);
 //OutputDebugStringW(debug_buf);
 
-		VARIANT keyTimeVT = TimeHelper::TimeTToVariant(keyTimeT, true);
-		SYSTEMTIME keySystime;
-		VariantTimeToSystemTime(keyTimeVT.date, &keySystime);
-		wchar_t keyTimestamp[256];
-		TimeHelper::SystemTimeToString(keyTimestamp, _countof(keyTimestamp), keySystime);
+		VARIANT keyTimeVT = TimeHelper::TimeTToVariant(keyTimeT, false);
+		//SYSTEMTIME keySystime;
+		//VariantTimeToSystemTime(keyTimeVT.date, &keySystime);
+		//wchar_t keyTimestamp[256];
+		//TimeHelper::SystemTimeToString(keyTimestamp, _countof(keyTimestamp), keySystime);
 //_snwprintf_s(debug_buf, 1024, L"ProtectionKey_Version1::DecrementTrialHours() -     keyTimestamp: %s, keyTimeT: 0x%x == %d", keyTimestamp, keyTimeT, keyTimeT);
 //OutputDebugStringW(debug_buf);
+		if(keyTimeT == -1)
+			keyTimeT = 0;
 
 		double timeDifferenceInSeconds = difftime(currentTimeT/*endTime*/, keyTimeT/*startTime*/);
 		if(timeDifferenceInSeconds == 0)
