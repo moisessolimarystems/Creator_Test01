@@ -80,8 +80,10 @@ class SoftwareLicenseMgr
 
 		HRESULT InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, _bstr_t _newLicenseGUID);
 
-		//Populates the pKeyAttribs either from the USB key or the System info, uses m_licenseFileAttribs
+		//Populates the pKeyAttribs either from the USB key or the System info, uses pNewPackageAttribs
 		HRESULT InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pNewPackageAttribs, bool* pBFoundKey);
+		//Populates the pKeyAttribs either from the USB key or the System info, uses licenseName
+		HRESULT InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, _bstr_t bstrLicense, bool* pBFoundKey);
 
 		HRESULT VerifyForSoftwareLicenseUpgrade(Lic_PackageAttribs* _pLicPackageAttribs, bool _bIgnoreLicenseCode, bool _bIgnoreModifiedDate);
 		HRESULT WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wColumn, _bstr_t _bstrValue);
