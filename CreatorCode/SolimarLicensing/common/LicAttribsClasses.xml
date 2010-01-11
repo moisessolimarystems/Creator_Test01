@@ -146,10 +146,6 @@
 			<attrib type="unsigned __int32" name="sameModSpecProductID" tagname="sMSpPI" default="0"/>
 			<attrib type="unsigned __int32" name="prevSharedProductID" tagname="pSPI" default="0"/>
 			<attrib type="string" name="productName" tagname="pN" default=""/>
-			<attrib type="unsigned __int32" name="softwareSpec_Major" tagname="vMj" default="0"/>
-			<attrib type="unsigned __int32" name="softwareSpec_Minor" tagname="vMn" default="0"/>
-			<attrib type="unsigned __int32" name="softwareSpec_SubMajor" tagname="vSMj" default="0"/>
-			<attrib type="unsigned __int32" name="softwareSpec_SubMinor" tagname="vSMn" default="0"/>
 			<typedef type="collection" name="Lic_ModuleSoftwareSpecAttribsMap">
 			<Map key_type="unsigned __int32" value_type="Lic_ModuleSoftwareSpecAttribs"/>
 			</typedef>
