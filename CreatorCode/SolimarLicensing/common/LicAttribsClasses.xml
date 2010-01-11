@@ -348,7 +348,6 @@
 				<attrib type="string" name="LicFileLicenseCode" tagname="fV" default=""/>
 				<attrib type="string" name="LicName" tagname="lB" default=""/>
 				<attrib type="DateTime" name="LicModifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
-				<!--<attrib type="unsigned __int32" name="LicCurrentActivations" tagname="cA" default="0"/>-->
 
 				<attrib type="DateTime" name="LicCurrentDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 				<typedef type="class" name="Lic_ActivationInfoAttribs">
@@ -359,12 +358,7 @@
 						<attrib type="unsigned __int16" name="activationSlotHoursToExpire" tagname="aE" default="0"/>
 					</AttribsClass>
 				</typedef>
-				<typedef type="collection" name="Lic_ActivationInfoAttribsList">
-					<List value_type="Lic_ActivationInfoAttribs"/>
-				</typedef>
-				<attrib type="Lic_ActivationInfoAttribsList" name="activationInfoList" tagname="aiLt" default="" />
 				<attrib type="string" name="Streamed_ActivationAttribs" tagname="saA" default=""/>
-				
 			</AttribsClass>
 		</typedef>	
 		

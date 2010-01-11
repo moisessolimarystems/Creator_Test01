@@ -101,14 +101,11 @@ namespace Solimar
 						}
 					}
 						
-					public class Lic_ActivationInfoAttribsList : AttribsMemberGenericList {public Lic_ActivationInfoAttribsList(string keyName, ArrayList defaultVal) : base(keyName, typeof(Lic_ActivationInfoAttribs), defaultVal){;} }
-						
 					public AttribsMemberString LicFileName = new AttribsMemberString("fN", "");
 					public AttribsMemberString LicFileLicenseCode = new AttribsMemberString("fV", "");
 					public AttribsMemberString LicName = new AttribsMemberString("lB", "");
 					public AttribsMemberDateTime LicModifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberDateTime LicCurrentDate = new AttribsMemberDateTime("cDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
-					public Lic_ActivationInfoAttribsList activationInfoList = new Lic_ActivationInfoAttribsList("aiLt", new ArrayList());
 					public AttribsMemberString Streamed_ActivationAttribs = new AttribsMemberString("saA", "");
 				
 				};
