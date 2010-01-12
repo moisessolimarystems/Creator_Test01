@@ -28,6 +28,17 @@ namespace Service.Creator
                 };
 
         private static readonly IDictionary<string, string>
+            _filterHTNames = new Dictionary<string, string>
+                {            
+                    {"Customer", "CustID"},
+                    {"HardwareID", "ID"},
+                    {"LicenseServer", "LicenseTable.LicenseName"},
+                    {"State", "TokenStatus"},
+                    {"ActivatedDate", "ActivatedDate"},
+                    {"DeactivatedDate", "DeactivatedDate"}
+                };
+
+        private static readonly IDictionary<string, string>
             _filterPLNames = new Dictionary<string, string>
                 {            
                     {"Customer", "LicenseTable.CustomerTable.SCRname"},
@@ -380,12 +391,6 @@ namespace Service.Creator
                 }
                 else
                 {
-                    if (userCondition.Name == ConditionName.Product)
-                    {   //translate if necessary to product id
-                        if (!Int32.TryParse(value, out  result))
-                            value = m_CommLink.GetProductID(value).ToString();
-
-                    }
                     if(!Int32.TryParse(value, out result))
                     {
                         if(!value.Contains("DateTime"))
@@ -484,6 +489,42 @@ namespace Service.Creator
         #endregion
 
         #region Token Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl)
+        {
+            String value;
+            int result;
+            DateTime date;
+            StringBuilder conditionString = new StringBuilder();
+            foreach (Condition userCondition in cl)
+            {
+                if (conditionString.Length != 0)
+                    conditionString.Append(" and ");
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                conditionString.Append(_filterHTNames[userCondition.Name.ToString()]);
+                value = userCondition.Value;
+                if (DateTime.TryParse(value, out date))
+                {
+                    value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0);
+                }
+                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                {
+                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                }
+                else
+                {                  
+                    if (!Int32.TryParse(value, out result))
+                    {
+                        if (!value.Contains("DateTime"))
+                            value = "\"" + value + "\"";
+                    }
+                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                    conditionString.Append(value);
+                }
+            }
+            return TokenTable.GetHardwareTokensByConditions(conditionString.ToString());
+        }
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token)
         {

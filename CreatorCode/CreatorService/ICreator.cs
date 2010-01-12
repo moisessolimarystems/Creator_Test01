@@ -205,6 +205,9 @@ namespace Service.Creator
 
         #region Token TokenContracts
         [OperationContract]
+        IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl);
+
+        [OperationContract]
         IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
         
         [OperationContract]
@@ -300,6 +303,8 @@ namespace Service.Creator
     public enum ConditionName
     {
         [EnumMember]
+        UnKnown,
+        [EnumMember]
         Customer,
         [EnumMember]
         LicenseServer,
@@ -322,7 +327,13 @@ namespace Service.Creator
         [EnumMember]
         ActivationAmount,
         [EnumMember]
-        Active
+        Active,
+        [EnumMember]
+        HardwareID,
+        [EnumMember]
+        ActivatedDate,
+        [EnumMember]
+        DeactivatedDate
     }
 
     [DataContract]
