@@ -82,8 +82,8 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 						valTokenIT != m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->end();
 						valTokenIT++)
 				{
-	//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::Verify() - TokenType:%d, TokenValue:%s", (int)valTokenIT->tokenType, valTokenIT->tokenValue->c_str());
-	//OutputDebugStringW(debug_buf);
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::Verify() - TokenType:%d, TokenValue:%s", (int)valTokenIT->tokenType, valTokenIT->tokenValue->c_str());
+//OutputDebugStringW(debug_buf);
 					switch((Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::TTokenType)valTokenIT->tokenType)
 					{
 						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID:
@@ -105,6 +105,34 @@ HRESULT SoftwareLicenseMgr::Verify(bool* pBValid, bool bForceRefresh)
 						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
 							//OutputDebugStringW(L"    Validate - ttComputerName");
 							hr = ValidateHardwareCompuerName(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttDomainName:
+							//OutputDebugStringW(L"    Validate - ttDomainName");
+							hr = ValidateHardwareDomainName(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttPartOfDomain:
+							//OutputDebugStringW(L"    Validate - ttPartOfDomain");
+							hr = ValidateHardwarePartOfDomain(_wcsicmp(valTokenIT->tokenValue->c_str(), L"true") == 0);
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttOperatingSystem:
+							//OutputDebugStringW(L"    Validate - ttOperatingSystem");
+							hr = ValidateHardwareOperatingSystem(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemManufacturer:
+							//OutputDebugStringW(L"    Validate - ttSystemManufacturer");
+							hr = ValidateHardwareSystemManufacturer(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemModel:
+							//OutputDebugStringW(L"    Validate - ttSystemModel");
+							hr = ValidateHardwareSystemModel(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemType:
+							//OutputDebugStringW(L"    Validate - ttSystemType");
+							hr = ValidateHardwareSystemType(_bstr_t(valTokenIT->tokenValue->c_str()));
+							break;
+						case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttSystemUuid:
+							//OutputDebugStringW(L"    Validate - ttSystemUuid");
+							hr = ValidateHardwareSystemUUID(_bstr_t(valTokenIT->tokenValue->c_str()));
 							break;
 						default:
 							//OutputDebugStringW(L"    Validate - Unknown");
@@ -230,14 +258,14 @@ HRESULT SoftwareLicenseMgr::ValidateLicenseCode(_bstr_t bstrValidationValue, _bs
 HRESULT SoftwareLicenseMgr::ValidateHardwareBiosSerialNumber(_bstr_t bstrValidationValue)
 {
 //wchar_t debug_buf[1024];
-//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::VerifyHardwareBiosSerialNumber() bstrValidationValue: %s, ThreadID: %d", (wchar_t*)bstrValidationValue, GetCurrentThreadId());
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::VerifyHardwareBiosSerialNumber() bstrValidationValue: %s", (wchar_t*)bstrValidationValue);
 //OutputDebugStringW(debug_buf);
 
 	// Hide the string so it doesn't appear in the strings of the image - "SELECT SerialNumber FROM Win32_BIOS"
 	BYTE wmiQuery_Byte[] = {
 		0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x4e, 0x00, 0x75, 0x00, 0x6d, 0x00,
 		0x62, 0x00, 0x65, 0x00, 0x72, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x42, 0x00,
-		0x49, 0x00, 0x4f, 0x00, 0x53, 0x00, 0x00
+		0x49, 0x00, 0x4f, 0x00, 0x53, 0x00, 0x00, 0x00
 	};
 	// Hide the string so it doesn't appear in the strings of the image - "SerialNumber"
 	BYTE fieldByte[] = {
@@ -437,7 +465,7 @@ HRESULT SoftwareLicenseMgr::WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wC
 			{
 				VARIANT* pvtTmp = &rList[idx][_wColumn];
 				if (pvtTmp->vt == VT_BOOL)
-					hr = (((pvtTmp->boolVal == VARIANT_TRUE) ? true : false) == _boolValue);
+					hr = (((pvtTmp->boolVal == VARIANT_TRUE) ? true : false) == _boolValue) ? S_OK : LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC;
 			}
 			WMIHelper::Clear(rList);
 			rList.clear();
@@ -1382,10 +1410,15 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 		//YYY check for override later
 		Lic_KeyAttribs keyAttrib;
 		//customerID==0 && destinationID==0 for uninitialize LicenseFileAttribs
-		
-		bool bInitializedLicenseFileAttribs = (int(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.customerID)!=0) || (int(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.destinationID)!=0);
+		bool bInitializedLicenseFileAttribs = (int(m_licenseFileAttribs.licLicenseInfoAttribs.customerID)!=0) || (int(m_licenseFileAttribs.licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
-		hr = InternalGetKeyAttribs(&keyAttrib, &m_licenseFileAttribs, &bFoundKeyInfo);
+
+		//try to get keyAttribs from the system
+		if(bInitializedLicenseFileAttribs)
+			hr = InternalGetKeyAttribs(&keyAttrib, &m_licenseFileAttribs, &bFoundKeyInfo);
+		else
+			hr = InternalGetKeyAttribs(&keyAttrib, bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs).c_str()), &bFoundKeyInfo);
+
 		if(FAILED(hr) || bFoundKeyInfo == false)
 		{
 			hr = InternalGetKeyAttribs(&keyAttrib, &tmpPacketNewLicenseFileAttribs, &bFoundKeyInfo);
@@ -1713,7 +1746,7 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 			if(!bFoundKeyInfo)	//New license, make key info
 			{
 				//must create keyAttrib
-				keyAttrib.historyNumber = 0;
+				keyAttrib.historyNumber = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size();
 				keyAttrib.keyVersion = 1;
 				for(unsigned short idx=0; idx<20; idx++)
 				{
@@ -1773,7 +1806,7 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 	return hr;
 }
 
-// Private - Populates the pKeyAttribs either from the USB key or the System info, uses m_licenseFileAttribs
+// Private - Populates the pKeyAttribs either from the USB key or the System info, uses pPackageAttribs
 HRESULT SoftwareLicenseMgr::InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, Lic_PackageAttribs* pPackageAttribs, bool* pBFoundKey)
 {
 	*pBFoundKey = false;
@@ -1782,21 +1815,39 @@ HRESULT SoftwareLicenseMgr::InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, L
 	{
 		bool bInitializedLicenseFileAttribs = (int(pPackageAttribs->licLicenseInfoAttribs.customerID)!=0) || (int(pPackageAttribs->licLicenseInfoAttribs.destinationID)!=0);
 		bool bFoundKeyInfo(false);
-		if(bInitializedLicenseFileAttribs/*m_licenseFileAttribs is INITIALIZED*/)
+		if(bInitializedLicenseFileAttribs/*pPackageAttribs is INITIALIZED*/)
 		{
 			//There is file info on system, see if there is a key
 			hr = GetKeyInfoAttribs_FromKey(pKeyAttribs, pPackageAttribs);
 			//hr == E_INVALIDARG happens if there is no protection key in verification tokens, use info from file info
 			*pBFoundKey = SUCCEEDED(hr);
 			if(*pBFoundKey == false)
-			{
-				Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
-				hr = m_pLicServerDataMgr->GetFileInfoFor(std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&(pPackageAttribs->licLicenseInfoAttribs)))).c_str(), &tmpFileInfo);
-				*pBFoundKey = SUCCEEDED(hr);
-				if(*pBFoundKey == true)
-					pKeyAttribs->InitFromString(tmpFileInfo.Streamed_ActivationAttribs);
-			}
+				hr = InternalGetKeyAttribs(pKeyAttribs, std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&(pPackageAttribs->licLicenseInfoAttribs)))).c_str(), pBFoundKey);
 		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+// Private - Populates the pKeyAttribs either from the USB key or the System info, uses pPackageAttribs
+HRESULT SoftwareLicenseMgr::InternalGetKeyAttribs(Lic_KeyAttribs* pKeyAttribs, _bstr_t bstrLicense, bool* pBFoundKey)
+{
+	*pBFoundKey = false;
+	HRESULT hr = E_FAIL;
+	try
+	{
+		Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
+		hr = m_pLicServerDataMgr->GetFileInfoFor(bstrLicense, &tmpFileInfo);
+		*pBFoundKey = SUCCEEDED(hr);
+		if(*pBFoundKey == true)
+			pKeyAttribs->InitFromString(std::wstring(tmpFileInfo.Streamed_ActivationAttribs));
 	}
 	catch(HRESULT &eHr)
 	{
@@ -1947,7 +1998,7 @@ HRESULT SoftwareLicenseMgr::InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, 
 			Lic_KeyAttribs keyAttribs;
 			keyAttribs.InitFromString(std::wstring(tmpFileInfo.Streamed_ActivationAttribs));
 			keyAttribs.licenseCode = std::wstring(_newLicenseGUID);
-			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(SpdAttribs::WStringObj(_newLicenseGUID));
+			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
 			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			if(FAILED(hr))
 				throw hr;
