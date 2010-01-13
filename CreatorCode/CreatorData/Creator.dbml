@@ -25,7 +25,7 @@
       <Association Name="LicenseTable_PacketTable" Member="PacketTables" ThisKey="ID" OtherKey="LicenseID" Type="PacketTable" />
       <Association Name="LicenseTable_ProductLicenseTable" Member="ProductLicenseTables" ThisKey="ID" OtherKey="LicenseID" Type="ProductLicenseTable" />
       <Association Name="LicenseTable_TransactionTable" Member="TransactionTables" ThisKey="ID" OtherKey="taLicenseID" Type="TransactionTable" />
-      <Association Name="LicenseTable_Token" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
+      <Association Name="LicenseTable_TokenTable" Member="TokenTables" ThisKey="ID" OtherKey="LicenseID" Type="TokenTable" />
       <Association Name="CustomerTable_LicenseTable" Member="CustomerTable" Storage="_SCustomerRecord" ThisKey="SCRnumber" OtherKey="SCRnumber" Type="CustomerTable" IsForeignKey="true" />
     </Type>
   </Table>
@@ -86,6 +86,7 @@
       <Column Name="Activations" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ActivationAmount" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="Extensions" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
+      <Association Name="ProductLicenseTable_Module" Member="Modules" ThisKey="ID" OtherKey="ProductLicenseID" Type="Module" />
       <Association Name="LicenseTable_ProductLicenseTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
     </Type>
   </Table>
@@ -121,7 +122,17 @@
       <Column Name="TokenStatus" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ActivatedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="DeactivatedDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
-      <Association Name="LicenseTable_Token" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
+      <Association Name="LicenseTable_TokenTable" Member="LicenseTable" ThisKey="LicenseID" OtherKey="ID" Type="LicenseTable" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="[CORP\AChou].Module" Member="Modules">
+    <Type Name="Module">
+      <Column Name="ID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ModID" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="Value" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="AppInstance" Type="System.Int16" DbType="SmallInt NOT NULL" CanBeNull="false" />
+      <Column Name="ProductLicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="ProductLicenseTable_Module" Member="ProductLicenseTable" ThisKey="ProductLicenseID" OtherKey="ID" Type="ProductLicenseTable" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

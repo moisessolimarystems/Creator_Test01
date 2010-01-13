@@ -1121,6 +1121,9 @@ namespace Client.Creator.CreatorService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private byte ExtensionsField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Collections.Generic.List<Client.Creator.CreatorService.Module> ModulesField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -1309,6 +1312,128 @@ namespace Client.Creator.CreatorService {
                 if ((this.ExtensionsField.Equals(value) != true)) {
                     this.ExtensionsField = value;
                     this.RaisePropertyChanged("Extensions");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=14)]
+        public System.Collections.Generic.List<Client.Creator.CreatorService.Module> Modules {
+            get {
+                return this.ModulesField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ModulesField, value) != true)) {
+                    this.ModulesField = value;
+                    this.RaisePropertyChanged("Modules");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Module", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class Module : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int IDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short ModIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short ValueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short AppInstanceField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int ProductLicenseIDField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public short ModID {
+            get {
+                return this.ModIDField;
+            }
+            set {
+                if ((this.ModIDField.Equals(value) != true)) {
+                    this.ModIDField = value;
+                    this.RaisePropertyChanged("ModID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public short Value {
+            get {
+                return this.ValueField;
+            }
+            set {
+                if ((this.ValueField.Equals(value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public short AppInstance {
+            get {
+                return this.AppInstanceField;
+            }
+            set {
+                if ((this.AppInstanceField.Equals(value) != true)) {
+                    this.AppInstanceField = value;
+                    this.RaisePropertyChanged("AppInstance");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public int ProductLicenseID {
+            get {
+                return this.ProductLicenseIDField;
+            }
+            set {
+                if ((this.ProductLicenseIDField.Equals(value) != true)) {
+                    this.ProductLicenseIDField = value;
+                    this.RaisePropertyChanged("ProductLicenseID");
                 }
             }
         }
@@ -1932,8 +2057,8 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/ValidateVerificationCode", ReplyAction="http://tempuri.org/ICreator/ValidateVerificationCodeResponse")]
         bool ValidateVerificationCode(string pktName, string vCode);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GenerateLicInfoByVerifyData", ReplyAction="http://tempuri.org/ICreator/GenerateLicInfoByVerifyDataResponse")]
-        string GenerateLicInfoByVerifyData(ref byte[] byteVerifyData);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemData", ReplyAction="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemDataResponse")]
+        string GenerateStreamByLicenseSystemData(ref byte[] byteVerifyData);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreatePacket", ReplyAction="http://tempuri.org/ICreator/CreatePacketResponse")]
         void CreatePacket(Client.Creator.CreatorService.PacketTable pt);
@@ -2290,8 +2415,8 @@ namespace Client.Creator.CreatorService {
             return base.Channel.ValidateVerificationCode(pktName, vCode);
         }
         
-        public string GenerateLicInfoByVerifyData(ref byte[] byteVerifyData) {
-            return base.Channel.GenerateLicInfoByVerifyData(ref byteVerifyData);
+        public string GenerateStreamByLicenseSystemData(ref byte[] byteVerifyData) {
+            return base.Channel.GenerateStreamByLicenseSystemData(ref byteVerifyData);
         }
         
         public void CreatePacket(Client.Creator.CreatorService.PacketTable pt) {

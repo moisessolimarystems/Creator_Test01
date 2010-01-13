@@ -61,6 +61,9 @@ namespace CreatorData
     partial void InsertTokenTable(TokenTable instance);
     partial void UpdateTokenTable(TokenTable instance);
     partial void DeleteTokenTable(TokenTable instance);
+    partial void InsertModule(Module instance);
+    partial void UpdateModule(Module instance);
+    partial void DeleteModule(Module instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -170,6 +173,14 @@ namespace CreatorData
 			get
 			{
 				return this.GetTable<TokenTable>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Module> Modules
+		{
+			get
+			{
+				return this.GetTable<Module>();
 			}
 		}
 	}
@@ -725,7 +736,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_Token", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
+		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
 		[DataMember(Order=14, EmitDefaultValue=false)]
 		public EntitySet<TokenTable> TokenTables
 		{
@@ -1774,7 +1785,11 @@ namespace CreatorData
 		
 		private byte _Extensions;
 		
+		private EntitySet<Module> _Modules;
+		
 		private EntityRef<LicenseTable> _LicenseTable;
+		
+		private bool serializing;
 		
     #region Extensibility Method Definitions
     partial void OnLoaded();
@@ -2113,6 +2128,25 @@ namespace CreatorData
 			}
 		}
 		
+		[Association(Name="ProductLicenseTable_Module", Storage="_Modules", ThisKey="ID", OtherKey="ProductLicenseID")]
+		[DataMember(Order=15, EmitDefaultValue=false)]
+		public EntitySet<Module> Modules
+		{
+			get
+			{
+				if ((this.serializing 
+							&& (this._Modules.HasLoadedOrAssignedValues == false)))
+				{
+					return null;
+				}
+				return this._Modules;
+			}
+			set
+			{
+				this._Modules.Assign(value);
+			}
+		}
+		
 		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
 		public LicenseTable LicenseTable
 		{
@@ -2167,8 +2201,21 @@ namespace CreatorData
 			}
 		}
 		
+		private void attach_Modules(Module entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductLicenseTable = this;
+		}
+		
+		private void detach_Modules(Module entity)
+		{
+			this.SendPropertyChanging();
+			entity.ProductLicenseTable = null;
+		}
+		
 		private void Initialize()
 		{
+			this._Modules = new EntitySet<Module>(new Action<Module>(this.attach_Modules), new Action<Module>(this.detach_Modules));
 			this._LicenseTable = default(EntityRef<LicenseTable>);
 			OnCreated();
 		}
@@ -2178,6 +2225,20 @@ namespace CreatorData
 		public void OnDeserializing(StreamingContext context)
 		{
 			this.Initialize();
+		}
+		
+		[OnSerializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerializing(StreamingContext context)
+		{
+			this.serializing = true;
+		}
+		
+		[OnSerialized()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnSerialized(StreamingContext context)
+		{
+			this.serializing = false;
 		}
 	}
 	
@@ -2873,7 +2934,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="LicenseTable_Token", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
+		[Association(Name="LicenseTable_TokenTable", Storage="_LicenseTable", ThisKey="LicenseID", OtherKey="ID", IsForeignKey=true)]
 		public LicenseTable LicenseTable
 		{
 			get
@@ -2930,6 +2991,223 @@ namespace CreatorData
 		private void Initialize()
 		{
 			this._LicenseTable = default(EntityRef<LicenseTable>);
+			OnCreated();
+		}
+		
+		[OnDeserializing()]
+		[System.ComponentModel.EditorBrowsableAttribute(EditorBrowsableState.Never)]
+		public void OnDeserializing(StreamingContext context)
+		{
+			this.Initialize();
+		}
+	}
+	
+	[Table(Name="[CORP\\AChou].Module")]
+	[DataContract()]
+	public partial class Module : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _ID;
+		
+		private short _ModID;
+		
+		private short _Value;
+		
+		private short _AppInstance;
+		
+		private int _ProductLicenseID;
+		
+		private EntityRef<ProductLicenseTable> _ProductLicenseTable;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIDChanging(int value);
+    partial void OnIDChanged();
+    partial void OnModIDChanging(short value);
+    partial void OnModIDChanged();
+    partial void OnValueChanging(short value);
+    partial void OnValueChanged();
+    partial void OnAppInstanceChanging(short value);
+    partial void OnAppInstanceChanged();
+    partial void OnProductLicenseIDChanging(int value);
+    partial void OnProductLicenseIDChanged();
+    #endregion
+		
+		public Module()
+		{
+			this.Initialize();
+		}
+		
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		[DataMember(Order=1)]
+		public int ID
+		{
+			get
+			{
+				return this._ID;
+			}
+			set
+			{
+				if ((this._ID != value))
+				{
+					this.OnIDChanging(value);
+					this.SendPropertyChanging();
+					this._ID = value;
+					this.SendPropertyChanged("ID");
+					this.OnIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_ModID", DbType="SmallInt NOT NULL")]
+		[DataMember(Order=2)]
+		public short ModID
+		{
+			get
+			{
+				return this._ModID;
+			}
+			set
+			{
+				if ((this._ModID != value))
+				{
+					this.OnModIDChanging(value);
+					this.SendPropertyChanging();
+					this._ModID = value;
+					this.SendPropertyChanged("ModID");
+					this.OnModIDChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_Value", DbType="SmallInt NOT NULL")]
+		[DataMember(Order=3)]
+		public short Value
+		{
+			get
+			{
+				return this._Value;
+			}
+			set
+			{
+				if ((this._Value != value))
+				{
+					this.OnValueChanging(value);
+					this.SendPropertyChanging();
+					this._Value = value;
+					this.SendPropertyChanged("Value");
+					this.OnValueChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_AppInstance", DbType="SmallInt NOT NULL")]
+		[DataMember(Order=4)]
+		public short AppInstance
+		{
+			get
+			{
+				return this._AppInstance;
+			}
+			set
+			{
+				if ((this._AppInstance != value))
+				{
+					this.OnAppInstanceChanging(value);
+					this.SendPropertyChanging();
+					this._AppInstance = value;
+					this.SendPropertyChanged("AppInstance");
+					this.OnAppInstanceChanged();
+				}
+			}
+		}
+		
+		[Column(Storage="_ProductLicenseID", DbType="Int NOT NULL")]
+		[DataMember(Order=5)]
+		public int ProductLicenseID
+		{
+			get
+			{
+				return this._ProductLicenseID;
+			}
+			set
+			{
+				if ((this._ProductLicenseID != value))
+				{
+					if (this._ProductLicenseTable.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnProductLicenseIDChanging(value);
+					this.SendPropertyChanging();
+					this._ProductLicenseID = value;
+					this.SendPropertyChanged("ProductLicenseID");
+					this.OnProductLicenseIDChanged();
+				}
+			}
+		}
+		
+		[Association(Name="ProductLicenseTable_Module", Storage="_ProductLicenseTable", ThisKey="ProductLicenseID", OtherKey="ID", IsForeignKey=true)]
+		public ProductLicenseTable ProductLicenseTable
+		{
+			get
+			{
+				return this._ProductLicenseTable.Entity;
+			}
+			set
+			{
+				ProductLicenseTable previousValue = this._ProductLicenseTable.Entity;
+				if (((previousValue != value) 
+							|| (this._ProductLicenseTable.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._ProductLicenseTable.Entity = null;
+						previousValue.Modules.Remove(this);
+					}
+					this._ProductLicenseTable.Entity = value;
+					if ((value != null))
+					{
+						value.Modules.Add(this);
+						this._ProductLicenseID = value.ID;
+					}
+					else
+					{
+						this._ProductLicenseID = default(int);
+					}
+					this.SendPropertyChanged("ProductLicenseTable");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void Initialize()
+		{
+			this._ProductLicenseTable = default(EntityRef<ProductLicenseTable>);
 			OnCreated();
 		}
 		

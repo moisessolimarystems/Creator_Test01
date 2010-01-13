@@ -1112,17 +1112,17 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GenerateLicInfoByVerifyData">
+  <xs:element name="GenerateStreamByLicenseSystemData">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="byteVerifyData" nillable="true" type="xs:base64Binary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GenerateLicInfoByVerifyDataResponse">
+  <xs:element name="GenerateStreamByLicenseSystemDataResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="GenerateLicInfoByVerifyDataResult" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="GenerateStreamByLicenseSystemDataResult" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="byteVerifyData" nillable="true" type="xs:base64Binary" />
       </xs:sequence>
     </xs:complexType>

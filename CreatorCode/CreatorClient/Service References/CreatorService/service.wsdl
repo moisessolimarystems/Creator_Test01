@@ -507,11 +507,11 @@
   <wsdl:message name="ICreator_ValidateVerificationCode_OutputMessage">
     <wsdl:part name="parameters" element="tns:ValidateVerificationCodeResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GenerateLicInfoByVerifyData_InputMessage">
-    <wsdl:part name="parameters" element="tns:GenerateLicInfoByVerifyData" />
+  <wsdl:message name="ICreator_GenerateStreamByLicenseSystemData_InputMessage">
+    <wsdl:part name="parameters" element="tns:GenerateStreamByLicenseSystemData" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GenerateLicInfoByVerifyData_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GenerateLicInfoByVerifyDataResponse" />
+  <wsdl:message name="ICreator_GenerateStreamByLicenseSystemData_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GenerateStreamByLicenseSystemDataResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_CreatePacket_InputMessage">
     <wsdl:part name="parameters" element="tns:CreatePacket" />
@@ -844,9 +844,9 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCode" message="tns:ICreator_ValidateVerificationCode_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/ValidateVerificationCodeResponse" message="tns:ICreator_ValidateVerificationCode_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GenerateLicInfoByVerifyData">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GenerateLicInfoByVerifyData" message="tns:ICreator_GenerateLicInfoByVerifyData_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GenerateLicInfoByVerifyDataResponse" message="tns:ICreator_GenerateLicInfoByVerifyData_OutputMessage" />
+    <wsdl:operation name="GenerateStreamByLicenseSystemData">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemData" message="tns:ICreator_GenerateStreamByLicenseSystemData_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemDataResponse" message="tns:ICreator_GenerateStreamByLicenseSystemData_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="CreatePacket">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreatePacket" message="tns:ICreator_CreatePacket_InputMessage" />
@@ -1586,8 +1586,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GenerateLicInfoByVerifyData">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GenerateLicInfoByVerifyData" style="document" />
+    <wsdl:operation name="GenerateStreamByLicenseSystemData">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemData" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
