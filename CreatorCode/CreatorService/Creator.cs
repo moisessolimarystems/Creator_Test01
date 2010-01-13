@@ -300,10 +300,10 @@ namespace Service.Creator
             return PacketTable.ValidateVerificationCode(pktName, vCode);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public string GenerateLicInfoByVerifyData(ref Byte[] byteVerifyData)
+        public string GenerateStreamByLicenseSystemData(ref Byte[] byteVerifyData)
         {
             m_licServer.Connect("localhost");
-            return m_licServer.GenerateLicInfo_ByVerifyData(byteVerifyData);
+            return m_licServer.GenerateStream_ByLicenseSystemData(byteVerifyData);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CreatePacket(PacketTable pt)

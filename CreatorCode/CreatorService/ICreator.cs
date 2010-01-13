@@ -118,7 +118,7 @@ namespace Service.Creator
         bool ValidateVerificationCode(string pktName, string vCode);
 
         [OperationContract]
-        string GenerateLicInfoByVerifyData(ref Byte[] byteVerifyData);
+        string GenerateStreamByLicenseSystemData(ref Byte[] byteVerifyData);
 
         [OperationContract()]
         void CreatePacket(PacketTable pt);
