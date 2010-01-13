@@ -17,14 +17,17 @@ namespace Client.Creator
         private bool _validVerificationCode;
         private string _selectedPacketName;
         private string _licenseName;
+        private PacketVerificationDialogData _pktData;
         public PacketVerification()
         {
             _validVerificationCode = false;
+            _pktData = null;
             InitializeComponent();
         }
 
         private void PacketVerification_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
-        {   
+        {
+            _pktData = e.Data as PacketVerificationDialogData;
             //_selectedPacketName = (e.Data as PacketVerificationDialogData).SelectedPacketName;
         }
 
@@ -89,15 +92,25 @@ namespace Client.Creator
                     string licStream = "";
                     Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
                     {
-                        licStream = client.GenerateLicInfoByVerifyData(ref licPktBytes);
+                        licStream = client.GenerateStreamByLicenseSystemData(ref licPktBytes);
                     });
-                    Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
-                    licPackage.Stream = licStream;
-                    int index = 0;
-                    if(licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0);
-                        index = licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
-                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[index];
-                    verificationCodeTextBox.Text = attrib.verificationValue;
+                    Lic_LicenseSystemAttribs loadedLicSysAttribs = new Lic_LicenseSystemAttribs();
+                    loadedLicSysAttribs.Stream = licStream;
+                    foreach (string keyInfo in loadedLicSysAttribs.ListOfStreamed_InfoAttribs.TVal)
+                    {
+                        Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfoAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
+                        tmpLicInfoAttribs.Stream = keyInfo;
+                        string licenseName = Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicInfoAttribs);
+                        if (licenseName == _pktData.LicenseName)
+                        {
+                            int index = 0;
+                            if (tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0) ;
+                            index = tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
+                            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[index];
+                            verificationCodeTextBox.Text = attrib.verificationValue;
+                            break;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {

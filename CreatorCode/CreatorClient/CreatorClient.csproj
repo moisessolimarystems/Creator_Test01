@@ -93,6 +93,9 @@
     <Compile Include="..\Common\VersionInfo.cs">
       <Link>VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="..\SolimarLicensing\common\LicAttribsCS\Lic_LicenseSystemAttribs.cs">
+      <Link>Lic_LicenseSystemAttribs.cs</Link>
+    </Compile>
     <Compile Include="AboutDialog.cs">
       <SubType>Form</SubType>
     </Compile>

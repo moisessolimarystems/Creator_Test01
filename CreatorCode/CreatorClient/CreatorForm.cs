@@ -1534,7 +1534,7 @@ namespace Client.Creator
             using (PacketVerification dlg = new PacketVerification())
             {   //selectedItem text will be packet name
                 PacketVerificationDialogData data = new PacketVerificationDialogData();
-                int selectedIndex = 0;
+                data.LicenseName = GetLicenseNameFromTreeView();
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     if (data.Verified)
@@ -1546,22 +1546,9 @@ namespace Client.Creator
                                           "Verified packet", 
                                           data.SelectedPacketName,
                                           "");
-                        //only valid verification code can get to this point
-                        foreach (ListViewItem item in storageListView.Items)
-                        {
-                            if (item.Text.Equals(data.SelectedPacketName))
-                            {
-                                item.ImageIndex = imageIndex;
-                                item.StateImageIndex = imageIndex;
-                                selectedIndex = item.Index;
-                                break;
-                            }
-                        }
-                        if (packetToolStripComboBox.SelectedItem.ToString().Equals("Unverified"))
-                            ShowPacketListView("UNVERIFIED");
-                        else if (packetToolStripComboBox.SelectedItem.ToString().Equals("All"))
-                            ShowPacketListView("");
-                        ListViewItem selectedItem = LicensePacketListView.Items[selectedIndex];
+                        //needs to refill storagelistview
+                        LoadPacketItems(data.LicenseName);
+                        ListViewItem selectedItem = LicensePacketListView.Items[LicensePacketListView.Items.IndexOfKey(data.SelectedPacketName)];
                         selectedItem.Selected = true;
                     }
                 }
@@ -1781,7 +1768,11 @@ namespace Client.Creator
             {   //type length > 0 filter otherwise all
                 if (lvItem.ImageIndex == Enums.GetListViewIconIndex(type) ||
                     type.Length == 0)
-                    LicensePacketListView.Items.Insert(0, lvItem.Clone() as ListViewItem);
+                {
+                    ListViewItem clonedItem = lvItem.Clone() as ListViewItem;
+                    clonedItem.Name = lvItem.Name;
+                    LicensePacketListView.Items.Insert(0, clonedItem);
+                }
             }
             _lvManager.AutoResizeColumns(LicensePacketListView);
             LicensePacketListView.EndUpdate();
@@ -2825,6 +2816,19 @@ namespace Client.Creator
             //expand selected license server then highlight product license
 
         }
+
+        private string GetLicenseNameFromTreeView()
+        {
+            string licenseName = "";
+            if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
+                licenseName = (DetailTreeView.SelectedNode.Tag as LicenseServerProperty).Name;
+            else if (DetailTreeView.SelectedNode.Tag is ProductCollectionProperty)
+                licenseName = (DetailTreeView.SelectedNode.Parent.Tag as LicenseServerProperty).Name;
+            else
+                licenseName = (DetailTreeView.SelectedNode.Tag as ProductLicenseProperty).LicenseServer;
+            return licenseName;
+        }
+
         private void CloneProductLicense(ProductLicenseProperty plp)
         {
             //show contract dialog
@@ -3078,6 +3082,7 @@ namespace Client.Creator
                 foreach (var packet in packets)
                 {
                     ListViewItem packetItem = new ListViewItem();
+                    packetItem.Name = packet.PacketName;
                     packetItem.Text = packet.DateCreated.ToString();
                     packetItem.Tag = packet;
                     packetItem.ImageIndex = Enums.GetListViewIconIndex((packet.IsVerified ? "VERIFIED" : "UNVERIFIED"));

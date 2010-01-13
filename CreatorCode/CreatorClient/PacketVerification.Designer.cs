@@ -45,7 +45,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40.57508F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 59.42492F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 31F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.verificationCodeTextBox, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.VerificationFileBrowseButton, 2, 0);
@@ -73,17 +73,17 @@
             // 
             this.verificationCodeTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.verificationCodeTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.verificationCodeTextBox.Location = new System.Drawing.Point(129, 16);
+            this.verificationCodeTextBox.Location = new System.Drawing.Point(128, 16);
             this.verificationCodeTextBox.Margin = new System.Windows.Forms.Padding(3, 10, 0, 3);
             this.verificationCodeTextBox.Name = "verificationCodeTextBox";
-            this.verificationCodeTextBox.Size = new System.Drawing.Size(182, 22);
+            this.verificationCodeTextBox.Size = new System.Drawing.Size(181, 22);
             this.verificationCodeTextBox.TabIndex = 1;
             // 
             // VerificationFileBrowseButton
             // 
             this.VerificationFileBrowseButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.VerificationFileBrowseButton.BackColor = System.Drawing.SystemColors.Control;
-            this.VerificationFileBrowseButton.Location = new System.Drawing.Point(311, 16);
+            this.VerificationFileBrowseButton.Location = new System.Drawing.Point(309, 16);
             this.VerificationFileBrowseButton.Margin = new System.Windows.Forms.Padding(0, 10, 3, 3);
             this.VerificationFileBrowseButton.Name = "VerificationFileBrowseButton";
             this.VerificationFileBrowseButton.Size = new System.Drawing.Size(25, 23);
@@ -94,8 +94,8 @@
             // 
             // openFileDialog
             // 
-            this.openFileDialog.DefaultExt = "vData";
-            this.openFileDialog.Filter = "License Verification Data|*.vData";
+            this.openFileDialog.DefaultExt = "lsData";
+            this.openFileDialog.Filter = "License Verification Data|*.lsData";
             // 
             // PacketVerification
             // 
