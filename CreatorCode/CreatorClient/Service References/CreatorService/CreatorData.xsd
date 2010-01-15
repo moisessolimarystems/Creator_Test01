@@ -67,6 +67,22 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfSoftwareTokenTable" nillable="true" type="tns:ArrayOfSoftwareTokenTable" />
+  <xs:complexType name="ModuleTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="ModID" type="xs:short" />
+      <xs:element minOccurs="0" name="Value" type="xs:short" />
+      <xs:element minOccurs="0" name="AppInstance" type="xs:short" />
+      <xs:element minOccurs="0" name="ProductLicenseID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ModuleTable" nillable="true" type="tns:ModuleTable" />
+  <xs:complexType name="ArrayOfModuleTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ModuleTable" nillable="true" type="tns:ModuleTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfModuleTable" nillable="true" type="tns:ArrayOfModuleTable" />
   <xs:complexType name="PacketTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -125,7 +141,7 @@
       <xs:element minOccurs="0" name="Activations" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="ActivationAmount" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="Extensions" type="xs:unsignedByte" />
-      <xs:element minOccurs="0" name="Modules" nillable="true" type="tns:ArrayOfModule">
+      <xs:element minOccurs="0" name="ModuleTables" nillable="true" type="tns:ArrayOfModuleTable">
         <xs:annotation>
           <xs:appinfo>
             <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
@@ -136,22 +152,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ProductLicenseTable" nillable="true" type="tns:ProductLicenseTable" />
-  <xs:complexType name="ArrayOfModule">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Module" nillable="true" type="tns:Module" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfModule" nillable="true" type="tns:ArrayOfModule" />
-  <xs:complexType name="Module">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="ModID" type="xs:short" />
-      <xs:element minOccurs="0" name="Value" type="xs:short" />
-      <xs:element minOccurs="0" name="AppInstance" type="xs:short" />
-      <xs:element minOccurs="0" name="ProductLicenseID" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="Module" nillable="true" type="tns:Module" />
   <xs:complexType name="ArrayOfTokenTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="TokenTable" nillable="true" type="tns:TokenTable" />

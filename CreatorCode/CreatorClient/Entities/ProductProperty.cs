@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Drawing.Design;
 using System.Reflection;
+using Client.Creator.ServiceProxy;
+using Client.Creator.CreatorService;
 
 namespace Client.Creator
 {
@@ -102,25 +104,6 @@ namespace Client.Creator
             return Name;
         }
 
-        //1) set trial modules to perm
-        //2) clean up trial order node and listview after saving license.
-        public void SetTrialToLicensed()
-        {
-            _product.productState.TVal = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psLicensed;
-            List<Lic_PackageAttribs.Lic_ModuleInfoAttribs> removeModuleList = new List<Lic_PackageAttribs.Lic_ModuleInfoAttribs>();
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
-            {
-                if (CreatorForm.s_CommLink.IsDefaultModule(ID, module.moduleID.TVal))
-                    module.moduleValue.TVal = (uint)CreatorForm.s_CommLink.GetDefaultModuleValue(ID, module.moduleID.TVal);
-                else
-                    removeModuleList.Add(module);
-            }
-            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs removeModule in removeModuleList)
-            {
-                _product.moduleList.TVal.Remove(removeModule);
-            }
-        }
-
         public bool Contains(uint moduleID)
         {
             bool bRetVal = false;
@@ -146,14 +129,39 @@ namespace Client.Creator
             return storedModule;
         }
 
-        public bool RemoveModule(uint moduleID)
+        public void SetModule(string productLicenseID, ModuleProperty module)
         {
-            bool bRetVal = false;
-            Lic_PackageAttribs.Lic_ModuleInfoAttribs module = null;
-            module = GetModule(moduleID);
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod = null;
+            storedMod = GetModule(module.ID);
             if (module != null)
             {
-                _product.moduleList.TVal.Remove(module);
+                storedMod.moduleValue.TVal = module.Units;
+                storedMod.moduleAppInstance.TVal = module.AppInstance;
+                Service<ICreator>.Use((client) =>
+                {
+                    ModuleTable mt = client.GetModule(productLicenseID, (int)module.ID);
+                    mt.Value = (short)module.Units;
+                    mt.AppInstance = (short)module.AppInstance;
+                    client.UpdateModule(mt);
+                });
+            }
+        }
+
+        public bool RemoveModule(string productLicenseID, ModuleProperty module)
+        {
+            bool bRetVal = false;
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod = null;
+            storedMod = GetModule(module.ID);
+            if (storedMod != null)
+            {
+                _product.moduleList.TVal.Remove(storedMod);
+                Service<ICreator>.Use((client) =>
+                {
+                    ModuleTable mt = client.GetModule(productLicenseID, (int)module.ID);
+                    mt.Value = 0;
+                    mt.AppInstance = 0;
+                    client.UpdateModule(mt);
+                });
                 bRetVal = true;
             }
             return bRetVal;
@@ -162,7 +170,7 @@ namespace Client.Creator
         //1) set add-on modules to perm
         //2) clean up add-on order node and listview after saving license.
         //public void SetAddOnToLicensed(string plNumber, string parentID)
-        //{            
+        //{
         //    foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
         //    {
         //        //remove any non default module
@@ -170,7 +178,7 @@ namespace Client.Creator
         //        {
         //            //module value, module app instance
         //            if (module.moduleState.TVal.Equals(Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msAddOn))
-        //            {                            
+        //            {
         //                module.moduleState.TVal = Lic_PackageAttribs.Lic_ModuleInfoAttribs.TModuleState.msLicensed;
         //                module.moduleExpirationDate.TVal = new DateTime(1900, 1, 1);
         //                module.contractNumber.TVal = parentID;
@@ -179,7 +187,39 @@ namespace Client.Creator
         //    }
         //}
 
-        public void SetLicensedToTrial()
+        //1) set trial modules to perm
+        //2) clean up trial order node and listview after saving license.
+        public void SetTrialToLicensed(string productLicenseID)
+        {
+            _product.productState.TVal = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psLicensed;
+            List<Lic_PackageAttribs.Lic_ModuleInfoAttribs> removeModuleList = new List<Lic_PackageAttribs.Lic_ModuleInfoAttribs>();
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in _product.moduleList.TVal)
+            {
+                uint moduleValue;
+                if (CreatorForm.s_CommLink.IsDefaultModule(ID, module.moduleID.TVal))
+                {
+                    module.moduleValue.TVal = (uint)CreatorForm.s_CommLink.GetDefaultModuleValue(ID, module.moduleID.TVal);
+                    moduleValue = module.moduleValue.TVal;
+                }
+                else
+                {
+                    removeModuleList.Add(module);
+                    moduleValue = 0;
+                }
+                Service<ICreator>.Use((client) =>
+                {
+                    ModuleTable mt = client.GetModule(productLicenseID, (int)module.moduleID.TVal);
+                    mt.Value = (short)moduleValue;
+                    client.UpdateModule(mt);
+                });
+            }
+            foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs removeModule in removeModuleList)
+            {
+                _product.moduleList.TVal.Remove(removeModule);
+            }
+        }
+
+        public void SetLicensedToTrial(string productLicenseID)
         {
             Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
             //delete perm contract and any add-ons
@@ -196,6 +236,13 @@ namespace Client.Creator
                         module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;                       
                         module.moduleAppInstance.TVal = 1;
                         _product.moduleList.TVal.Add(module);
+                        Service<ICreator>.Use((client) =>
+                        {
+                            ModuleTable mt = client.GetModule(productLicenseID, (int) module.moduleID.TVal);
+                            mt.Value = (short)module.moduleValue.TVal;
+                            mt.AppInstance = (short)module.moduleAppInstance.TVal;
+                            client.UpdateModule(mt);
+                        });
                     }
                 }
             }
@@ -224,9 +271,6 @@ namespace Client.Creator
             return false;
         }
     }
-
-
-
 
     public class LicenseVersion
     {

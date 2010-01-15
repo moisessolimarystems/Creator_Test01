@@ -15,7 +15,7 @@ namespace Client.Creator
 
         public static readonly int MaxActivations = 255;
         public static readonly int MaxActivationAmountInDays = 170;
-        public static readonly int MaxProductLicenses = 20;
+        public static readonly int MaxProductLicenses = 2;
 
         public class ReportXMLTags
         {

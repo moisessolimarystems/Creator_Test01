@@ -42,18 +42,6 @@ namespace Client.Creator
             globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
         }
 
-        public bool HasHardwareToken()
-        {
-            bool bRetVal = false;
-            Service<ICreator>.Use((client) =>
-            {
-                TokenTable tt = client.GetTokenByLicenseName(_licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
-                if (tt != null)
-                    bRetVal = true;
-            });
-            return bRetVal;
-        }
-
         public ProductLicenseProperty(ProductLicenseTable plData, ProductProperty product, PermissionsTable permissions)
         {
             Permissions = permissions;
@@ -70,6 +58,45 @@ namespace Client.Creator
             ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;
         }
 
+        public bool HasHardwareToken()
+        {
+            bool bRetVal = false;
+            Service<ICreator>.Use((client) =>
+            {
+                TokenTable tt = client.GetTokenByLicenseName(_licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                if (tt != null)
+                    bRetVal = true;
+            });
+            return bRetVal;
+        }
+        //fill product entity with default modules
+        //only trial/addon order types
+        public void InitializeProductEntity()
+        {
+            Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec = GetProductSpec(Product.ID);
+            foreach(Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+            {
+                module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
+                module.moduleID.TVal = moduleSpec.moduleID.TVal;
+                if (Status == ProductLicenseState.Trial)
+                {
+                    module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
+                    module.moduleAppInstance.TVal = 1;
+                }
+                if (module.moduleValue.TVal > 0)
+                    Product.ModuleList.TVal.Add(module);
+                ModuleTable mt = new ModuleTable();
+                mt.ModID = (short)module.moduleID.TVal;
+                mt.Value = (short)module.moduleValue.TVal;
+                mt.AppInstance = (short)module.moduleAppInstance.TVal;
+                mt.ProductLicenseID = ProductLicenseDatabaseID;
+                Service<ICreator>.Use((client) =>
+                {
+                    client.CreateModule(mt);
+                });
+            }
+        }
         public uint GetTotalAddOnModuleAppInstance(uint modID)
         {
             uint totalValue = 0;
@@ -126,7 +153,6 @@ namespace Client.Creator
             }
             return (int)totalValue;
         }
-        //standard order moduledata does not know add-on orders need to retrieve from database?
         public void DecrementAddOnModuleAppInstance(uint modID)
         {
             IList<string> addOnOrders = null;
@@ -148,7 +174,12 @@ namespace Client.Creator
                                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs storedMod in product.moduleList.TVal)
                                 {
                                     if (storedMod.moduleID.TVal == modID)
+                                    {
                                         storedMod.moduleAppInstance.TVal = 0;
+                                        ModuleTable mt = client.GetModule(ID, (int)storedMod.moduleID.TVal);
+                                        mt.AppInstance = 0;
+                                        client.UpdateModule(mt);
+                                    }
                                 }
                             }
                         }
@@ -182,7 +213,12 @@ namespace Client.Creator
                                     if (storedMod.moduleID.TVal == modID)
                                     {
                                         if (storedMod.moduleValue.TVal > 0)
+                                        {
                                             storedMod.moduleAppInstance.TVal = 1;
+                                            ModuleTable mt = client.GetModule(ID, (int)storedMod.moduleID.TVal);
+                                            mt.AppInstance = 1;
+                                            client.UpdateModule(mt);
+                                        }
                                         break;
                                     }
                                 }
@@ -206,7 +242,14 @@ namespace Client.Creator
             }
             return null;
         }
-
+        public void SetModule(ModuleProperty module)
+        {
+            Product.SetModule(ID, module);
+        }
+        public bool RemoveModule(ModuleProperty module)
+        {
+            return Product.RemoveModule(ID, module);
+        }
         public void SetReadOnlyAttribStatus(ProductLicenseAttributes property, bool value)
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property.ToString()];
@@ -214,7 +257,6 @@ namespace Client.Creator
             FieldInfo isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
             isReadOnly.SetValue(attrib, value);
         }
-
         public void SetBrowsableAttribStatus(ProductLicenseAttributes property, bool value)
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property.ToString()];
@@ -227,10 +269,17 @@ namespace Client.Creator
 
         #region NonBrowsable Properties
         [Browsable(false)]
+        public ProductLicenseTable ProductLicenseData
+        {
+            get { return _plRec; }
+            set { _plRec = value; }
+        }
+
+        [Browsable(false)]
         public int ProductLicenseDatabaseID
         {
-            get { return _productLicenseDataBaseID; }
-            set { _productLicenseDataBaseID = value; }
+            get { return _plRec.ID; }
+            set { _plRec.ID = value; }
         }
 
         [Browsable(false)]
@@ -419,14 +468,14 @@ namespace Client.Creator
                                 //clear modules of non-defaults and set defaults           
                                 //plstate is stored in terms of enums.productlicensestate
                                 if (_plRec.plState == (byte)ProductLicenseState.Trial)
-                                    _product.SetTrialToLicensed();
+                                    _product.SetTrialToLicensed(ID);
                                 else if (_plRec.plState != (byte)ProductLicenseState.AddOn)
                                     errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
                             case ProductLicenseState.Trial:
                                 //was perm now trial
                                 if (_plRec.plState == (byte)ProductLicenseState.Licensed)
-                                    _product.SetLicensedToTrial();
+                                    _product.SetLicensedToTrial(ID);
                                 else
                                     errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
@@ -448,7 +497,7 @@ namespace Client.Creator
                             _plRec.plState = (byte)value;
                             if (value == ProductLicenseState.Licensed)
                             {
-                                if(!(Product.Name.Contains("Test")) && HasHardwareToken())
+                                if(!(Product.Name.Contains("Test")) && HasHardwareToken() && ParentID == "")
                                     if (System.Windows.Forms.MessageBox.Show("Clear Expiration Date?", "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                                         ExpirationDate = null;
                             }
@@ -486,7 +535,7 @@ namespace Client.Creator
                     errorMsg = "Can't remove expiration date for non-hardware token validation.";
                 if ((Product.Name.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)                   
                     errorMsg = "Please set a valid expiration date";
-                if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddYears(1)) > 0)
+                if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddYears(1)) > 0)
                     errorMsg = string.Format("{0} exceeds the expiration date limit of one year.", value.Value);
                 if (errorMsg.Length == 0)
                 {
@@ -542,9 +591,19 @@ namespace Client.Creator
                     //System.Windows.Forms.MessageBox.Show(string.Format("{0} exceeds the max value for activation total", value), "Extension Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 else
                 {
-                    if (value > 0)                    
+                    if (_product.Product.activationTotal.TVal == 0 && value > 0)
+                    {
+                        IList<ProductLicenseTable> plList = null;
+                        Service<ICreator>.Use((client) =>
+                        {
+                            plList = client.GetProductLicenses(LicenseServer);
+                        });
+                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                            throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                    }
+                    if (value > 0)
                         _product.Product.bUseActivations.TVal = true;
-                    if(value != _product.Product.activationTotal.TVal)
+                    if (value != _product.Product.activationTotal.TVal)
                         _product.Product.bActivationOverrideCurrent.TVal = true;
                     _product.Product.activationTotal.TVal = value;
                     //set to force license to use activation exp date instead of regular exp date.
@@ -570,6 +629,16 @@ namespace Client.Creator
                 }
                 else
                 {
+                    if (_product.Product.activationAmountInDays.TVal == 0 && value > 0)
+                    {
+                        IList<ProductLicenseTable> plList = null;
+                        Service<ICreator>.Use((client) =>
+                        {
+                            plList = client.GetProductLicenses(LicenseServer);
+                        });
+                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                            throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                    }
                     if (value != _product.Product.activationTotal.TVal)
                         _product.Product.bActivationOverrideCurrent.TVal = true;
                     _product.Product.activationAmountInDays.TVal = value;

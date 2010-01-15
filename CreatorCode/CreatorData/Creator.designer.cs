@@ -61,9 +61,9 @@ namespace CreatorData
     partial void InsertTokenTable(TokenTable instance);
     partial void UpdateTokenTable(TokenTable instance);
     partial void DeleteTokenTable(TokenTable instance);
-    partial void InsertModule(Module instance);
-    partial void UpdateModule(Module instance);
-    partial void DeleteModule(Module instance);
+    partial void InsertModuleTable(ModuleTable instance);
+    partial void UpdateModuleTable(ModuleTable instance);
+    partial void DeleteModuleTable(ModuleTable instance);
     #endregion
 		
 		public CreatorDataContext() : 
@@ -176,11 +176,11 @@ namespace CreatorData
 			}
 		}
 		
-		public System.Data.Linq.Table<Module> Modules
+		public System.Data.Linq.Table<ModuleTable> ModuleTables
 		{
 			get
 			{
-				return this.GetTable<Module>();
+				return this.GetTable<ModuleTable>();
 			}
 		}
 	}
@@ -1785,7 +1785,7 @@ namespace CreatorData
 		
 		private byte _Extensions;
 		
-		private EntitySet<Module> _Modules;
+		private EntitySet<ModuleTable> _ModuleTables;
 		
 		private EntityRef<LicenseTable> _LicenseTable;
 		
@@ -2128,22 +2128,22 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="ProductLicenseTable_Module", Storage="_Modules", ThisKey="ID", OtherKey="ProductLicenseID")]
+		[Association(Name="ProductLicenseTable_Module", Storage="_ModuleTables", ThisKey="ID", OtherKey="ProductLicenseID")]
 		[DataMember(Order=15, EmitDefaultValue=false)]
-		public EntitySet<Module> Modules
+		public EntitySet<ModuleTable> ModuleTables
 		{
 			get
 			{
 				if ((this.serializing 
-							&& (this._Modules.HasLoadedOrAssignedValues == false)))
+							&& (this._ModuleTables.HasLoadedOrAssignedValues == false)))
 				{
 					return null;
 				}
-				return this._Modules;
+				return this._ModuleTables;
 			}
 			set
 			{
-				this._Modules.Assign(value);
+				this._ModuleTables.Assign(value);
 			}
 		}
 		
@@ -2201,13 +2201,13 @@ namespace CreatorData
 			}
 		}
 		
-		private void attach_Modules(Module entity)
+		private void attach_ModuleTables(ModuleTable entity)
 		{
 			this.SendPropertyChanging();
 			entity.ProductLicenseTable = this;
 		}
 		
-		private void detach_Modules(Module entity)
+		private void detach_ModuleTables(ModuleTable entity)
 		{
 			this.SendPropertyChanging();
 			entity.ProductLicenseTable = null;
@@ -2215,7 +2215,7 @@ namespace CreatorData
 		
 		private void Initialize()
 		{
-			this._Modules = new EntitySet<Module>(new Action<Module>(this.attach_Modules), new Action<Module>(this.detach_Modules));
+			this._ModuleTables = new EntitySet<ModuleTable>(new Action<ModuleTable>(this.attach_ModuleTables), new Action<ModuleTable>(this.detach_ModuleTables));
 			this._LicenseTable = default(EntityRef<LicenseTable>);
 			OnCreated();
 		}
@@ -3004,7 +3004,7 @@ namespace CreatorData
 	
 	[Table(Name="[CORP\\AChou].Module")]
 	[DataContract()]
-	public partial class Module : INotifyPropertyChanging, INotifyPropertyChanged
+	public partial class ModuleTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
 		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
@@ -3037,12 +3037,12 @@ namespace CreatorData
     partial void OnProductLicenseIDChanged();
     #endregion
 		
-		public Module()
+		public ModuleTable()
 		{
 			this.Initialize();
 		}
 		
-		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		[Column(Storage="_ID", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true, UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=1)]
 		public int ID
 		{
@@ -3063,7 +3063,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_ModID", DbType="SmallInt NOT NULL")]
+		[Column(Storage="_ModID", DbType="SmallInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=2)]
 		public short ModID
 		{
@@ -3084,7 +3084,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_Value", DbType="SmallInt NOT NULL")]
+		[Column(Storage="_Value", DbType="SmallInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=3)]
 		public short Value
 		{
@@ -3105,7 +3105,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_AppInstance", DbType="SmallInt NOT NULL")]
+		[Column(Storage="_AppInstance", DbType="SmallInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=4)]
 		public short AppInstance
 		{
@@ -3126,7 +3126,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_ProductLicenseID", DbType="Int NOT NULL")]
+		[Column(Storage="_ProductLicenseID", DbType="Int NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=5)]
 		public int ProductLicenseID
 		{
@@ -3168,12 +3168,12 @@ namespace CreatorData
 					if ((previousValue != null))
 					{
 						this._ProductLicenseTable.Entity = null;
-						previousValue.Modules.Remove(this);
+						previousValue.ModuleTables.Remove(this);
 					}
 					this._ProductLicenseTable.Entity = value;
 					if ((value != null))
 					{
-						value.Modules.Add(this);
+						value.ModuleTables.Add(this);
 						this._ProductLicenseID = value.ID;
 					}
 					else

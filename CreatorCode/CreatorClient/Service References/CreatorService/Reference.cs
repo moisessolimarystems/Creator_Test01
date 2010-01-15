@@ -544,6 +544,115 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ModuleTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class ModuleTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int IDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short ModIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short ValueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private short AppInstanceField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int ProductLicenseIDField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public short ModID {
+            get {
+                return this.ModIDField;
+            }
+            set {
+                if ((this.ModIDField.Equals(value) != true)) {
+                    this.ModIDField = value;
+                    this.RaisePropertyChanged("ModID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public short Value {
+            get {
+                return this.ValueField;
+            }
+            set {
+                if ((this.ValueField.Equals(value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public short AppInstance {
+            get {
+                return this.AppInstanceField;
+            }
+            set {
+                if ((this.AppInstanceField.Equals(value) != true)) {
+                    this.AppInstanceField = value;
+                    this.RaisePropertyChanged("AppInstance");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public int ProductLicenseID {
+            get {
+                return this.ProductLicenseIDField;
+            }
+            set {
+                if ((this.ProductLicenseIDField.Equals(value) != true)) {
+                    this.ProductLicenseIDField = value;
+                    this.RaisePropertyChanged("ProductLicenseID");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="PacketTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class PacketTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1122,7 +1231,7 @@ namespace Client.Creator.CreatorService {
         private byte ExtensionsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Collections.Generic.List<Client.Creator.CreatorService.Module> ModulesField;
+        private System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> ModuleTablesField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -1317,123 +1426,14 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=14)]
-        public System.Collections.Generic.List<Client.Creator.CreatorService.Module> Modules {
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> ModuleTables {
             get {
-                return this.ModulesField;
+                return this.ModuleTablesField;
             }
             set {
-                if ((object.ReferenceEquals(this.ModulesField, value) != true)) {
-                    this.ModulesField = value;
-                    this.RaisePropertyChanged("Modules");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Module", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
-    [System.SerializableAttribute()]
-    public partial class Module : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private short ModIDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private short ValueField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private short AppInstanceField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int ProductLicenseIDField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
-            get {
-                return this.IDField;
-            }
-            set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public short ModID {
-            get {
-                return this.ModIDField;
-            }
-            set {
-                if ((this.ModIDField.Equals(value) != true)) {
-                    this.ModIDField = value;
-                    this.RaisePropertyChanged("ModID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public short Value {
-            get {
-                return this.ValueField;
-            }
-            set {
-                if ((this.ValueField.Equals(value) != true)) {
-                    this.ValueField = value;
-                    this.RaisePropertyChanged("Value");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public short AppInstance {
-            get {
-                return this.AppInstanceField;
-            }
-            set {
-                if ((this.AppInstanceField.Equals(value) != true)) {
-                    this.AppInstanceField = value;
-                    this.RaisePropertyChanged("AppInstance");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public int ProductLicenseID {
-            get {
-                return this.ProductLicenseIDField;
-            }
-            set {
-                if ((this.ProductLicenseIDField.Equals(value) != true)) {
-                    this.ProductLicenseIDField = value;
-                    this.RaisePropertyChanged("ProductLicenseID");
+                if ((object.ReferenceEquals(this.ModuleTablesField, value) != true)) {
+                    this.ModuleTablesField = value;
+                    this.RaisePropertyChanged("ModuleTables");
                 }
             }
         }
@@ -1871,6 +1871,30 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllSoftwareTokens", ReplyAction="http://tempuri.org/ICreator/GetAllSoftwareTokensResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.SoftwareTokenTable> GetAllSoftwareTokens();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateModule", ReplyAction="http://tempuri.org/ICreator/CreateModuleResponse")]
+        void CreateModule(Client.Creator.CreatorService.ModuleTable module);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateModule", ReplyAction="http://tempuri.org/ICreator/UpdateModuleResponse")]
+        void UpdateModule(Client.Creator.CreatorService.ModuleTable module);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteModule", ReplyAction="http://tempuri.org/ICreator/DeleteModuleResponse")]
+        void DeleteModule(Client.Creator.CreatorService.ModuleTable module);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateAllModules", ReplyAction="http://tempuri.org/ICreator/CreateAllModulesResponse")]
+        void CreateAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateAllModules", ReplyAction="http://tempuri.org/ICreator/UpdateAllModulesResponse")]
+        void UpdateAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteAllModules", ReplyAction="http://tempuri.org/ICreator/DeleteAllModulesResponse")]
+        void DeleteAllModules(int productlicenseID);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetModule", ReplyAction="http://tempuri.org/ICreator/GetModuleResponse")]
+        Client.Creator.CreatorService.ModuleTable GetModule(string productLicenseName, int modID);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllModules", ReplyAction="http://tempuri.org/ICreator/GetAllModulesResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllModules(string productLicenseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdatePacket", ReplyAction="http://tempuri.org/ICreator/UpdatePacketResponse")]
         void UpdatePacket(Client.Creator.CreatorService.PacketTable pt);
         
@@ -2165,6 +2189,38 @@ namespace Client.Creator.CreatorService {
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.SoftwareTokenTable> GetAllSoftwareTokens() {
             return base.Channel.GetAllSoftwareTokens();
+        }
+        
+        public void CreateModule(Client.Creator.CreatorService.ModuleTable module) {
+            base.Channel.CreateModule(module);
+        }
+        
+        public void UpdateModule(Client.Creator.CreatorService.ModuleTable module) {
+            base.Channel.UpdateModule(module);
+        }
+        
+        public void DeleteModule(Client.Creator.CreatorService.ModuleTable module) {
+            base.Channel.DeleteModule(module);
+        }
+        
+        public void CreateAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules) {
+            base.Channel.CreateAllModules(modules);
+        }
+        
+        public void UpdateAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules) {
+            base.Channel.UpdateAllModules(modules);
+        }
+        
+        public void DeleteAllModules(int productlicenseID) {
+            base.Channel.DeleteAllModules(productlicenseID);
+        }
+        
+        public Client.Creator.CreatorService.ModuleTable GetModule(string productLicenseName, int modID) {
+            return base.Channel.GetModule(productLicenseName, modID);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllModules(string productLicenseName) {
+            return base.Channel.GetAllModules(productLicenseName);
         }
         
         public void UpdatePacket(Client.Creator.CreatorService.PacketTable pt) {

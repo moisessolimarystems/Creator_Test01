@@ -141,35 +141,41 @@ namespace CreatorData
                 IList<ProductLicenseTable> pltRecords = (from c in db.ProductLicenseTables
                                  where c.plID.Contains(licenseServer)
                                  select c).ToList();
+                //automatically delete associated modules
+                foreach (ProductLicenseTable plt in pltRecords)
+                {
+                    ModuleTable.DeleteAllModules(plt.ID);
+                }
                 db.ProductLicenseTables.DeleteAllOnSubmit(pltRecords);
                 db.SubmitChanges();
             }
         }
 
-        public static void CreateProductLicense(ProductLicenseTable contract)
+        public static void CreateProductLicense(ProductLicenseTable plt)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
-                db.ProductLicenseTables.InsertOnSubmit(contract);
+                db.ProductLicenseTables.InsertOnSubmit(plt);
                 db.SubmitChanges();
             }
         }
 
-        public static void UpdateProductLicense(ProductLicenseTable contract)
+        public static void UpdateProductLicense(ProductLicenseTable plt)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
-                db.ProductLicenseTables.Attach(contract, true);
+                db.ProductLicenseTables.Attach(plt, true);
                 db.SubmitChanges();
             }
         }
 
-        public static void DeleteProductLicense(ProductLicenseTable contract)
+        public static void DeleteProductLicense(ProductLicenseTable plt)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
-                db.ProductLicenseTables.Attach(contract);
-                db.ProductLicenseTables.DeleteOnSubmit(contract);
+                ModuleTable.DeleteAllModules(plt.ID);
+                db.ProductLicenseTables.Attach(plt);
+                db.ProductLicenseTables.DeleteOnSubmit(plt);
                 db.SubmitChanges();
             }
         }

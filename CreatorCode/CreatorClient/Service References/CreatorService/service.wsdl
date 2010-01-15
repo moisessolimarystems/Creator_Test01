@@ -135,6 +135,54 @@
   <wsdl:message name="ICreator_GetAllSoftwareTokens_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllSoftwareTokensResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_CreateModule_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateModule" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateModule_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateModuleResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateModule_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateModule" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateModule_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateModuleResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteModule_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteModule" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteModule_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteModuleResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateAllModules_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateAllModules" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateAllModules_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateAllModulesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateAllModules_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAllModules" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateAllModules_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateAllModulesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteAllModules_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteAllModules" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteAllModules_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteAllModulesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetModule_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetModule" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetModule_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetModuleResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllModules_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllModules" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllModules_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllModulesResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_UpdatePacket_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdatePacket" />
   </wsdl:message>
@@ -596,6 +644,38 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokens" message="tns:ICreator_GetAllSoftwareTokens_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokensResponse" message="tns:ICreator_GetAllSoftwareTokens_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="CreateModule">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateModule" message="tns:ICreator_CreateModule_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateModuleResponse" message="tns:ICreator_CreateModule_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateModule">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateModule" message="tns:ICreator_UpdateModule_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateModuleResponse" message="tns:ICreator_UpdateModule_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteModule">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteModule" message="tns:ICreator_DeleteModule_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteModuleResponse" message="tns:ICreator_DeleteModule_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateAllModules">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateAllModules" message="tns:ICreator_CreateAllModules_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateAllModulesResponse" message="tns:ICreator_CreateAllModules_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAllModules">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateAllModules" message="tns:ICreator_UpdateAllModules_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateAllModulesResponse" message="tns:ICreator_UpdateAllModules_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAllModules">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteAllModules" message="tns:ICreator_DeleteAllModules_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteAllModulesResponse" message="tns:ICreator_DeleteAllModules_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetModule">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetModule" message="tns:ICreator_GetModule_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetModuleResponse" message="tns:ICreator_GetModule_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAllModules">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllModules" message="tns:ICreator_GetAllModules_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllModulesResponse" message="tns:ICreator_GetAllModules_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="UpdatePacket">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdatePacket" message="tns:ICreator_UpdatePacket_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdatePacketResponse" message="tns:ICreator_UpdatePacket_OutputMessage" />
@@ -1021,6 +1101,78 @@
     </wsdl:operation>
     <wsdl:operation name="GetAllSoftwareTokens">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllSoftwareTokens" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateModule">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateModule" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateModule">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateModule" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteModule">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteModule" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateAllModules">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateAllModules" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateAllModules">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateAllModules" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAllModules">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteAllModules" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetModule">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetModule" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllModules">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllModules" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

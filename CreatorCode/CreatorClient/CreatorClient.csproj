@@ -317,6 +317,9 @@
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.LicenseTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\CreatorService\Client.Creator.CreatorService.ModuleTable.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.PacketTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

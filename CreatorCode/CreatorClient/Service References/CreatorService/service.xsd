@@ -251,10 +251,111 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="CreateModule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="module" nillable="true" type="q17:ModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateModuleResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateModule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="module" nillable="true" type="q18:ModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateModuleResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteModule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="module" nillable="true" type="q19:ModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteModuleResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateAllModules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="modules" nillable="true" type="q20:ArrayOfModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateAllModulesResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAllModules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="modules" nillable="true" type="q21:ArrayOfModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateAllModulesResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteAllModules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="productlicenseID" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteAllModulesResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetModule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="productLicenseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="modID" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetModuleResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetModuleResult" nillable="true" type="q22:ModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllModules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="productLicenseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAllModulesResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q23="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllModulesResult" nillable="true" type="q23:ArrayOfModuleTable" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="UpdatePacket">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q17:PacketTable" />
+        <xs:element xmlns:q24="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q24:PacketTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -266,7 +367,7 @@
   <xs:element name="DeletePacket">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q18:PacketTable" />
+        <xs:element xmlns:q25="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q25:PacketTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -285,7 +386,7 @@
   <xs:element name="GetTransactionsByPacketIDResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTransactionsByPacketIDResult" nillable="true" type="q19:ArrayOfTransactionTable" />
+        <xs:element xmlns:q26="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTransactionsByPacketIDResult" nillable="true" type="q26:ArrayOfTransactionTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -299,7 +400,7 @@
   <xs:element name="GetNewTransactionsByLicenseNameResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetNewTransactionsByLicenseNameResult" nillable="true" type="q20:ArrayOfTransactionTable" />
+        <xs:element xmlns:q27="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetNewTransactionsByLicenseNameResult" nillable="true" type="q27:ArrayOfTransactionTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -319,7 +420,7 @@
   <xs:element name="CreateTransaction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q21:TransactionTable" />
+        <xs:element xmlns:q28="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q28:TransactionTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -331,7 +432,7 @@
   <xs:element name="UpdateTransaction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q22:TransactionTable" />
+        <xs:element xmlns:q29="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q29:TransactionTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -343,7 +444,7 @@
   <xs:element name="DeleteTransaction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q23="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q23:TransactionTable" />
+        <xs:element xmlns:q30="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="tt" nillable="true" type="q30:TransactionTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -355,14 +456,14 @@
   <xs:element name="GetProductLicensesByConditions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q24="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q24:ArrayOfCondition" />
+        <xs:element xmlns:q31="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q31:ArrayOfCondition" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetProductLicensesByConditionsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q25="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesByConditionsResult" nillable="true" type="q25:ArrayOfProductLicenseTable" />
+        <xs:element xmlns:q32="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesByConditionsResult" nillable="true" type="q32:ArrayOfProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -374,7 +475,7 @@
   <xs:element name="GetAllProductLicensesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q26="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllProductLicensesResult" nillable="true" type="q26:ArrayOfProductLicenseTable" />
+        <xs:element xmlns:q33="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllProductLicensesResult" nillable="true" type="q33:ArrayOfProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -388,7 +489,7 @@
   <xs:element name="GetProductLicensesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q27="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesResult" nillable="true" type="q27:ArrayOfProductLicenseTable" />
+        <xs:element xmlns:q34="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesResult" nillable="true" type="q34:ArrayOfProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -403,7 +504,7 @@
   <xs:element name="GetProductLicensesByProductResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q28="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesByProductResult" nillable="true" type="q28:ArrayOfProductLicenseTable" />
+        <xs:element xmlns:q35="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicensesByProductResult" nillable="true" type="q35:ArrayOfProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -417,7 +518,7 @@
   <xs:element name="GetProductLicenseResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q29="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicenseResult" nillable="true" type="q29:ProductLicenseTable" />
+        <xs:element xmlns:q36="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicenseResult" nillable="true" type="q36:ProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -431,7 +532,7 @@
   <xs:element name="GetAddOnProductLicensesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q30="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetAddOnProductLicensesResult" nillable="true" type="q30:ArrayOfstring" />
+        <xs:element xmlns:q37="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetAddOnProductLicensesResult" nillable="true" type="q37:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -473,7 +574,7 @@
   <xs:element name="GetProductLicenseByIDResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q31="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicenseByIDResult" nillable="true" type="q31:ProductLicenseTable" />
+        <xs:element xmlns:q38="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetProductLicenseByIDResult" nillable="true" type="q38:ProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -487,7 +588,7 @@
   <xs:element name="GetDeactivatedProductLicensesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q32="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetDeactivatedProductLicensesResult" nillable="true" type="q32:ArrayOfstring" />
+        <xs:element xmlns:q39="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetDeactivatedProductLicensesResult" nillable="true" type="q39:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -518,7 +619,7 @@
   <xs:element name="CreateProductLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q33="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q33:ProductLicenseTable" />
+        <xs:element xmlns:q40="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q40:ProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -530,7 +631,7 @@
   <xs:element name="UpdateProductLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q34="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q34:ProductLicenseTable" />
+        <xs:element xmlns:q41="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q41:ProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -542,7 +643,7 @@
   <xs:element name="DeleteProductLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q35="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q35:ProductLicenseTable" />
+        <xs:element xmlns:q42="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ta" nillable="true" type="q42:ProductLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -554,14 +655,14 @@
   <xs:element name="GetHardwareTokensByConditions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q36="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q36:ArrayOfCondition" />
+        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q43:ArrayOfCondition" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetHardwareTokensByConditionsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q37="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetHardwareTokensByConditionsResult" nillable="true" type="q37:ArrayOfTokenTable" />
+        <xs:element xmlns:q44="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetHardwareTokensByConditionsResult" nillable="true" type="q44:ArrayOfTokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -569,14 +670,14 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="searchString" nillable="true" type="xs:string" />
-        <xs:element xmlns:q38="http://schemas.datacontract.org/2004/07/Solimar.Licensing.Attribs" minOccurs="0" name="token" type="q38:Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType" />
+        <xs:element xmlns:q45="http://schemas.datacontract.org/2004/07/Solimar.Licensing.Attribs" minOccurs="0" name="token" type="q45:Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetAllTokensResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q39="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllTokensResult" nillable="true" type="q39:ArrayOfTokenTable" />
+        <xs:element xmlns:q46="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllTokensResult" nillable="true" type="q46:ArrayOfTokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -585,14 +686,14 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="searchString" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="custName" nillable="true" type="xs:string" />
-        <xs:element xmlns:q40="http://schemas.datacontract.org/2004/07/Solimar.Licensing.Attribs" minOccurs="0" name="token" type="q40:Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType" />
+        <xs:element xmlns:q47="http://schemas.datacontract.org/2004/07/Solimar.Licensing.Attribs" minOccurs="0" name="token" type="q47:Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetAllTokensByCustomerResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q41="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllTokensByCustomerResult" nillable="true" type="q41:ArrayOfTokenTable" />
+        <xs:element xmlns:q48="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllTokensByCustomerResult" nillable="true" type="q48:ArrayOfTokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -606,7 +707,7 @@
   <xs:element name="GetTokensByLicenseNameResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q42="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTokensByLicenseNameResult" nillable="true" type="q42:ArrayOfTokenTable" />
+        <xs:element xmlns:q49="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTokensByLicenseNameResult" nillable="true" type="q49:ArrayOfTokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -620,7 +721,7 @@
   <xs:element name="GetHardwareTokenByKeyValueResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetHardwareTokenByKeyValueResult" nillable="true" type="q43:TokenTable" />
+        <xs:element xmlns:q50="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetHardwareTokenByKeyValueResult" nillable="true" type="q50:TokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -634,7 +735,7 @@
   <xs:element name="GetAvailableHardwareTokensByCustIDResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q44="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAvailableHardwareTokensByCustIDResult" nillable="true" type="q44:ArrayOfTokenTable" />
+        <xs:element xmlns:q51="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAvailableHardwareTokensByCustIDResult" nillable="true" type="q51:ArrayOfTokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -649,7 +750,7 @@
   <xs:element name="GetTokenByLicenseNameResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q45="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTokenByLicenseNameResult" nillable="true" type="q45:TokenTable" />
+        <xs:element xmlns:q52="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetTokenByLicenseNameResult" nillable="true" type="q52:TokenTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -695,7 +796,7 @@
   <xs:element name="GetAllCustomersResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q46="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllCustomersResult" nillable="true" type="q46:ArrayOfCustomerTable" />
+        <xs:element xmlns:q53="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetAllCustomersResult" nillable="true" type="q53:ArrayOfCustomerTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -709,7 +810,7 @@
   <xs:element name="GetAllCustomerNamesResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q47="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetAllCustomerNamesResult" nillable="true" type="q47:ArrayOfstring" />
+        <xs:element xmlns:q54="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetAllCustomerNamesResult" nillable="true" type="q54:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -739,14 +840,14 @@
   <xs:element name="GetCustomerResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q48="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetCustomerResult" nillable="true" type="q48:CustomerTable" />
+        <xs:element xmlns:q55="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetCustomerResult" nillable="true" type="q55:CustomerTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CreateCustomer">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q49="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q49:CustomerTable" />
+        <xs:element xmlns:q56="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q56:CustomerTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -758,7 +859,7 @@
   <xs:element name="UpdateCustomer">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q50="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q50:CustomerTable" />
+        <xs:element xmlns:q57="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q57:CustomerTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -770,7 +871,7 @@
   <xs:element name="DeleteCustomer">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q51="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q51:CustomerTable" />
+        <xs:element xmlns:q58="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="ct" nillable="true" type="q58:CustomerTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -801,7 +902,7 @@
   <xs:element name="GetLicensesByCustomerResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q52="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByCustomerResult" nillable="true" type="q52:ArrayOfLicenseTable" />
+        <xs:element xmlns:q59="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByCustomerResult" nillable="true" type="q59:ArrayOfLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -818,7 +919,7 @@
   <xs:element name="GetLicensesByDestinationResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q53="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByDestinationResult" nillable="true" type="q53:ArrayOfLicenseTable" />
+        <xs:element xmlns:q60="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByDestinationResult" nillable="true" type="q60:ArrayOfLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -833,7 +934,7 @@
   <xs:element name="GetLicenseByNameResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q54="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicenseByNameResult" nillable="true" type="q54:LicenseTable" />
+        <xs:element xmlns:q61="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicenseByNameResult" nillable="true" type="q61:LicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -848,7 +949,7 @@
   <xs:element name="GetLicenseByIDResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q55="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicenseByIDResult" nillable="true" type="q55:LicenseTable" />
+        <xs:element xmlns:q62="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicenseByIDResult" nillable="true" type="q62:LicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -930,14 +1031,14 @@
   <xs:element name="GetLicensesByConditions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q56="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q56:ArrayOfCondition" />
+        <xs:element xmlns:q63="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q63:ArrayOfCondition" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetLicensesByConditionsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q57="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByConditionsResult" nillable="true" type="q57:ArrayOfLicenseTable" />
+        <xs:element xmlns:q64="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetLicensesByConditionsResult" nillable="true" type="q64:ArrayOfLicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -965,7 +1066,7 @@
   <xs:element name="GetModifiedLicensesByCustomerResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q58="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetModifiedLicensesByCustomerResult" nillable="true" type="q58:ArrayOfstring" />
+        <xs:element xmlns:q65="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetModifiedLicensesByCustomerResult" nillable="true" type="q65:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -973,7 +1074,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="pktName" nillable="true" type="xs:string" />
-        <xs:element xmlns:q59="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="licName" nillable="true" type="q59:LicenseTable" />
+        <xs:element xmlns:q66="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="licName" nillable="true" type="q66:LicenseTable" />
         <xs:element minOccurs="0" name="expDate" type="xs:dateTime" />
         <xs:element minOccurs="0" name="comments" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="vCode" nillable="true" type="xs:string" />
@@ -998,7 +1099,7 @@
   <xs:element name="KeyEnumerateResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q60="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" minOccurs="0" name="KeyEnumerateResult" nillable="true" type="q60:ArrayOfSolimarLicenseProtectionKeyInfo" />
+        <xs:element xmlns:q67="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" minOccurs="0" name="KeyEnumerateResult" nillable="true" type="q67:ArrayOfSolimarLicenseProtectionKeyInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1035,7 +1136,7 @@
   <xs:element name="CreateLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q61="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q61:LicenseTable" />
+        <xs:element xmlns:q68="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q68:LicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1047,7 +1148,7 @@
   <xs:element name="UpdateLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q62="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q62:LicenseTable" />
+        <xs:element xmlns:q69="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q69:LicenseTable" />
         <xs:element minOccurs="0" name="isDirty" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
@@ -1060,7 +1161,7 @@
   <xs:element name="DeleteLicense">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q63="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q63:LicenseTable" />
+        <xs:element xmlns:q70="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="lt" nillable="true" type="q70:LicenseTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1079,7 +1180,7 @@
   <xs:element name="GetPacketsByLicenseNameResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q64="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetPacketsByLicenseNameResult" nillable="true" type="q64:ArrayOfPacketTable" />
+        <xs:element xmlns:q71="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetPacketsByLicenseNameResult" nillable="true" type="q71:ArrayOfPacketTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1093,7 +1194,7 @@
   <xs:element name="GetPacketByVerificationCodeResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q65="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetPacketByVerificationCodeResult" nillable="true" type="q65:PacketTable" />
+        <xs:element xmlns:q72="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="GetPacketByVerificationCodeResult" nillable="true" type="q72:PacketTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1130,7 +1231,7 @@
   <xs:element name="CreatePacket">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q66="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q66:PacketTable" />
+        <xs:element xmlns:q73="http://schemas.datacontract.org/2004/07/CreatorData" minOccurs="0" name="pt" nillable="true" type="q73:PacketTable" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

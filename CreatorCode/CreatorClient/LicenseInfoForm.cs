@@ -137,33 +137,6 @@ namespace Client.Creator
             expDateTextBox.Text = "30";
         }
 
-        //fill product entity with default modules
-        //only trial/addon order types
-        private void SetProductEntity(ProductLicenseProperty plData)
-        {
-            Lic_PackageAttribs.Lic_ModuleInfoAttribs module;
-            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList;
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-            {
-                if (productSpec.productID.TVal == plData.Product.ID)
-                {
-                    moduleList = m_CommLink.GetModuleSpecList(productSpec.productID.TVal);
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
-                    {
-                        module = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
-                        module.moduleID.TVal = moduleSpec.moduleID.TVal;
-                        if (plData.Status.Equals(ProductLicenseState.Trial))
-                        {
-                            module.moduleValue.TVal = moduleSpec.moduleTrialLicense.TVal;
-                            module.moduleAppInstance.TVal = 1;
-                        }
-                        if(module.moduleValue.TVal > 0)
-                            plData.Product.ModuleList.TVal.Add(module);
-                    }
-                }
-            }
-        }
-
         void SaveProductLicenseTabPage(ProductLicenseDialogData plData)
         {
             string[] splitStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
@@ -183,7 +156,6 @@ namespace Client.Creator
             plData.ProductLicense.Product.Version = new LicenseVersion(UInt32.Parse(versionNum[0]), UInt32.Parse(versionNum[1]));
             plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
             plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;
-            SetProductEntity(plData.ProductLicense);
         }
         #endregion
 
@@ -439,14 +411,12 @@ namespace Client.Creator
                     //need to set again because it may have been updated based on units change
                     moduleData.Module.AppInstance = editModule.moduleAppInstance.TVal;
                     moduleData.Module.Units = editModule.moduleValue.TVal;
-                    //if exist update
-                    //else add
+                    moduleData.ProductLicense.SetModule(moduleData.Module);
                 }
                 else
                 {   //remove from product list if exist
-                    moduleData.Module.AppInstance = 0;
                     moduleData.Module.Units = 0;
-                    moduleData.ProductLicense.Product.RemoveModule(moduleData.Module.ID);
+                    moduleData.ProductLicense.RemoveModule(moduleData.Module);
                 }
             }
         }
