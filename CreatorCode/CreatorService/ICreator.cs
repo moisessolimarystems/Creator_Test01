@@ -206,40 +206,28 @@ namespace Service.Creator
         #region Token TokenContracts
         [OperationContract]
         IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl);
-
         [OperationContract]
-        IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
-        
+        IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);    
         [OperationContract]
         IList<TokenTable> GetAllTokensByCustomer(string searchString, string custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
-
         [OperationContract]
         IList<TokenTable> GetTokensByLicenseName(string licName);
-
         [OperationContract]
         TokenTable GetHardwareTokenByKeyValue(string keyValue);
-
         [OperationContract]
         IList<TokenTable> GetAvailableHardwareTokensByCustID(uint custID);
-
         [OperationContract]
         TokenTable GetTokenByLicenseName(string licName, byte tokenType);
-
         [OperationContract]
         bool TokenExists(uint custID, byte tokenType, string tokenValue);
-
         [OperationContract]
         bool IsHardwareTokenActive(uint custID, string tokenValue);
-
         [OperationContract]
         uint GetNextHardwareTokenValue(uint custID);
-
         [OperationContract]
         void CreateToken(TokenTable tt);
-
         [OperationContract]
         void UpdateToken(TokenTable tt);
-
         [OperationContract]
         void DeleteToken(TokenTable tt);
 
@@ -296,6 +284,25 @@ namespace Service.Creator
         SoftwareTokenTable GetSoftwareToken(string tokenType);
         [OperationContract]
         IList<SoftwareTokenTable> GetAllSoftwareTokens();
+        #endregion
+
+        #region Module OperationContracts
+        [OperationContract]
+        void CreateModule(ModuleTable module);
+        [OperationContract]
+        void UpdateModule(ModuleTable module);
+        [OperationContract]
+        void DeleteModule(ModuleTable module);
+        [OperationContract]
+        void CreateAllModules(IList<ModuleTable> modules);
+        [OperationContract]
+        void UpdateAllModules(IList<ModuleTable> modules);
+        [OperationContract]
+        void DeleteAllModules(int productlicenseID);
+        [OperationContract]
+        ModuleTable GetModule(string productLicenseName, int modID);
+        [OperationContract]
+        IList<ModuleTable> GetAllModules(string productLicenseName);
         #endregion
     }
 

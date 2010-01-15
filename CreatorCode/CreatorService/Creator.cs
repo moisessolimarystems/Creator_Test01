@@ -688,6 +688,33 @@ namespace Service.Creator
             return SoftwareTokenTable.GetAllSoftwareTokens();
         }
         #endregion
+
+        #region Module Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void CreateModule(ModuleTable module)
+        { ModuleTable.CreateModule(module); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateModule(ModuleTable module)
+        { ModuleTable.UpdateModule(module); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void DeleteModule(ModuleTable module)
+        { ModuleTable.DeleteModule(module); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void CreateAllModules(IList<ModuleTable> modules)
+        { ModuleTable.CreateAllModules(modules); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateAllModules(IList<ModuleTable> modules)
+        { ModuleTable.UpdateAllModules(modules); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void DeleteAllModules(int productlicenseID)
+        { ModuleTable.DeleteAllModules(productlicenseID); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public ModuleTable GetModule(string productLicenseName, int modID)
+        { return ModuleTable.GetModule(productLicenseName, modID); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<ModuleTable> GetAllModules(string productLicenseName)
+        { return ModuleTable.GetAllModules(productLicenseName); }
+        #endregion
         #endregion
     }
 }
