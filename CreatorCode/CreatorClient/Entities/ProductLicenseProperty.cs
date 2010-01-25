@@ -237,6 +237,8 @@ namespace Client.Creator
             {
                 if (productSpec.productID.TVal.Equals(productID))
                 {
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return GetProductSpec(productSpec.sameModSpecProductID.TVal);
                     return productSpec;
                 }
             }
@@ -451,7 +453,6 @@ namespace Client.Creator
             set
             {
                 //be able to change status to deactivated 
-                DateTime? setDate = null;
                 //only set if value changed.
                 if (!(_plRec.plState == (byte)value))
                 {
@@ -468,14 +469,20 @@ namespace Client.Creator
                                 //clear modules of non-defaults and set defaults           
                                 //plstate is stored in terms of enums.productlicensestate
                                 if (_plRec.plState == (byte)ProductLicenseState.Trial)
-                                    _product.SetTrialToLicensed(ID);
+                                {
+                                    if (!_product.SetTrialToLicensed(ID))
+                                        errorMsg = "Failed to change status from trial to licensed";
+                                }
                                 else if (_plRec.plState != (byte)ProductLicenseState.AddOn)
                                     errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
                             case ProductLicenseState.Trial:
                                 //was perm now trial
                                 if (_plRec.plState == (byte)ProductLicenseState.Licensed)
-                                    _product.SetLicensedToTrial(ID);
+                                {
+                                    if (!_product.SetLicensedToTrial(ID))
+                                        errorMsg = "Failed to change status from license";
+                                }
                                 else
                                     errorMsg = string.Format("{0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
                                 break;
@@ -636,7 +643,7 @@ namespace Client.Creator
                         {
                             plList = client.GetProductLicenses(LicenseServer);
                         });
-                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
                             throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                     }
                     if (value != _product.Product.activationTotal.TVal)
