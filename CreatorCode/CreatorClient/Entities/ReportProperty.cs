@@ -36,10 +36,13 @@ namespace Client.Creator
                     {"Customer", ConditionName.Customer},  
                     {"Extension Count", ConditionName.Extension},
                     {"Expiration Date", ConditionName.ExpirationDate},
+                    {"Module", ConditionName.Module},
+                    {"Module Value", ConditionName.ModuleValue},
+                    {"Notes", ConditionName.Notes},
                     {"Product", ConditionName.Product},
                     {"Product License", ConditionName.ProductLicense},
                     {"Product Version", ConditionName.ProductVersion},
-                    {"State", ConditionName.State}
+                    {"State", ConditionName.State},
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
@@ -93,10 +96,14 @@ namespace Client.Creator
         private string  _id;
         private ReportType _type;
         private List<Condition> _conditions;
+        private CommunicationLink _commLink;
+        private bool _matchAll;
 
-        public ReportProperty()
+        public ReportProperty(CommunicationLink commLink)
         {
             _conditions = new List<Condition>();
+            _commLink = commLink;
+            _matchAll = true;
         }
 
         public string ID
@@ -115,6 +122,77 @@ namespace Client.Creator
         {
             get { return _conditions; }
             set { _conditions = value; }
+        }
+
+        public List<Condition> DatabaseConditions
+        {
+            get { return GetDatabaseConditions(); }
+        }
+
+        public bool MatchAll
+        {
+            get { return _matchAll; }
+            set { _matchAll = value; }
+        }
+
+        //user value to database value which is digits
+        private List<Condition> GetDatabaseConditions()
+        {
+            List<Condition> dbConditionList = new List<Condition>();
+            foreach (Condition userCondition in Conditions)
+            {
+                Condition dbCondition = new Condition();
+                string strVal = userCondition.Value;
+                if (_type == ReportProperty.ReportType.LicenseServer)
+                {
+                }
+                else if (_type == ReportProperty.ReportType.ProductLicense)
+                {
+                    if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                    {
+                        try
+                        {
+                            strVal = ((int)Enum.Parse(typeof(ProductLicenseState), userCondition.Value)).ToString();
+                        }
+                        catch (Exception) { }
+                    }
+                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
+                    {
+                        strVal = _commLink.GetProductID(userCondition.Value).ToString();
+                    }
+                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Module)
+                    {
+                        //module = productid, modid
+                        //issue don't know the product the module is associated with by knowning just the modID
+                        uint productID = _commLink.GetProductIDByModuleName(userCondition.Value);
+                        strVal = string.Format("{0},{1}",productID, _commLink.GetModuleID(productID, userCondition.Value));
+                    }
+                }
+                else
+                {
+                    if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
+                    {
+                        ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
+                        {
+                            CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
+                            strVal = dbCustomer.SCRnumber.ToString();
+                        });
+                    }
+                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                    {
+                        try
+                        {
+                            strVal = ((int)Enum.Parse(typeof(TokenStatus), userCondition.Value)).ToString();
+                        }
+                        catch (Exception) { }
+                    }
+                }
+                dbCondition.Name = userCondition.Name;
+                dbCondition.Operator = userCondition.Operator;
+                dbCondition.Value = strVal;
+                dbConditionList.Add(dbCondition);
+            }
+            return dbConditionList;
         }
 
         public ConditionName GetFilterName(string filterName)
