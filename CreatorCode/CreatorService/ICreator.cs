@@ -75,7 +75,7 @@ namespace Service.Creator
         uint GetLastDestinationID(uint custID);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl);
+        IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll);
 
         [OperationContract]
         bool IsLicenseModified(string licName);
@@ -157,7 +157,7 @@ namespace Service.Creator
 
         #region Product License OperationContracts
         [OperationContract]
-        IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl);
+        IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl, bool matchAll);
 
         [OperationContract]
         IList<ProductLicenseTable> GetAllProductLicenses();
@@ -205,7 +205,7 @@ namespace Service.Creator
 
         #region Token TokenContracts
         [OperationContract]
-        IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl);
+        IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl, bool matchAll);
         [OperationContract]
         IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);    
         [OperationContract]
@@ -340,7 +340,13 @@ namespace Service.Creator
         [EnumMember]
         ActivatedDate,
         [EnumMember]
-        DeactivatedDate
+        DeactivatedDate,
+        [EnumMember]
+        Module,
+        [EnumMember]
+        ModuleValue,
+        [EnumMember]
+        Notes
     }
 
     [DataContract]
@@ -363,7 +369,7 @@ namespace Service.Creator
     {
         private ConditionName _name;
         private ConditionOperator _operator;
-        private string _value;
+        private string _value;   
 
         [DataMember]
         public ConditionName Name
@@ -371,7 +377,6 @@ namespace Service.Creator
             get { return _name; }
             set { _name = value; }
         }
-
         //numeric operators - =, >, <
         //string operators - is, contains, is not, does not contain
         [DataMember]
@@ -388,5 +393,5 @@ namespace Service.Creator
             get { return _value; }
             set { _value = value; }
         }
-    }
+   }
 }

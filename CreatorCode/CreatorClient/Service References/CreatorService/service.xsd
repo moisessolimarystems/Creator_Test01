@@ -457,6 +457,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q31="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q31:ArrayOfCondition" />
+        <xs:element minOccurs="0" name="matchAll" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -656,6 +657,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q43="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q43:ArrayOfCondition" />
+        <xs:element minOccurs="0" name="matchAll" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1032,6 +1034,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q63="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q63:ArrayOfCondition" />
+        <xs:element minOccurs="0" name="matchAll" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

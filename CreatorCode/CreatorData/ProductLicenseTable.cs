@@ -18,7 +18,7 @@ namespace CreatorData
             }
         }
 
-        public static IList<ProductLicenseTable> GetAllProductLicenses()
+         public static IList<ProductLicenseTable> GetAllProductLicenses()
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
@@ -32,7 +32,8 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && c.LicenseTable.LicenseName.Equals(licenseServerName)).ToList();
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&                                                                                                                 
+                                                          c.LicenseTable.LicenseName.Equals(licenseServerName)).ToList();
             }
         }
 

@@ -1157,6 +1157,15 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         DeactivatedDate = 15,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Module = 16,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        ModuleValue = 17,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Notes = 18,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
@@ -1920,7 +1929,7 @@ namespace Client.Creator.CreatorService {
         void DeleteTransaction(Client.Creator.CreatorService.TransactionTable tt);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetProductLicensesByConditions", ReplyAction="http://tempuri.org/ICreator/GetProductLicensesByConditionsResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl);
+        System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllProductLicenses", ReplyAction="http://tempuri.org/ICreator/GetAllProductLicensesResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses();
@@ -1965,7 +1974,7 @@ namespace Client.Creator.CreatorService {
         void DeleteProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetHardwareTokensByConditions", ReplyAction="http://tempuri.org/ICreator/GetHardwareTokensByConditionsResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl);
+        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllTokens", ReplyAction="http://tempuri.org/ICreator/GetAllTokensResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);
@@ -2043,7 +2052,7 @@ namespace Client.Creator.CreatorService {
         uint GetLastDestinationID(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicensesByConditions", ReplyAction="http://tempuri.org/ICreator/GetLicensesByConditionsResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl);
+        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsLicenseModified", ReplyAction="http://tempuri.org/ICreator/IsLicenseModifiedResponse")]
         bool IsLicenseModified(string licName);
@@ -2255,8 +2264,8 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteTransaction(tt);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl) {
-            return base.Channel.GetProductLicensesByConditions(cl);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetProductLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
+            return base.Channel.GetProductLicensesByConditions(cl, matchAll);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> GetAllProductLicenses() {
@@ -2315,8 +2324,8 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteProductLicense(ta);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl) {
-            return base.Channel.GetHardwareTokensByConditions(cl);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
+            return base.Channel.GetHardwareTokensByConditions(cl, matchAll);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetAllTokens(string searchString, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token) {
@@ -2419,8 +2428,8 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetLastDestinationID(custID);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl) {
-            return base.Channel.GetLicensesByConditions(cl);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
+            return base.Channel.GetLicensesByConditions(cl, matchAll);
         }
         
         public bool IsLicenseModified(string licName) {

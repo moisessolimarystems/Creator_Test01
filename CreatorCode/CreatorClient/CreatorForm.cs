@@ -37,17 +37,14 @@ namespace Client.Creator
         private PermissionsTable m_Permissions;
         private string m_selectedDirectory;
         private List<String> m_ServerList;
-        private List<LicenseServerProperty> _storedLicenseServers;
         private string m_searchString = "";
         private string m_CurrentLicenseName = "";        
         //used by hardware key view
         private string _selectedHardwareKeyCustomer = "";
         private CustomerProperty _selectedLicenseCustomer;
         private string _selectedTreeNodeKey = "";
-        private DestinationNameTable _selectedDestination;
-        private DateTime _currentExpirationDate;
         private ReportManager _reportManager;
-        private string _copyName;
+        private TreeNode _copyNode;
 
         #region Properties
 
@@ -70,7 +67,7 @@ namespace Client.Creator
             s_CommLink = new CommunicationLink();
             storageListView = new ListView();
             _selectedLicenseCustomer = new CustomerProperty();
-            _reportManager = new ReportManager();
+            _reportManager = new ReportManager(s_CommLink);
             _lvManager = new ListViewMgr();
             _lvManager.SetListViewColumnSorter(DetailListView);
             _lvManager.SetListViewColumnSorter(TransactionListView);
@@ -85,17 +82,17 @@ namespace Client.Creator
 
         #region Enable/Disable ContextMenu
 
-        private void ResetContextMenu()
+        private void ResetContextMenu(ToolStripItemCollection items)
         {
-            foreach (ToolStripItem tsm in LicenseContextMenuStrip.Items)
+            foreach (ToolStripItem tsm in items)//LicenseContextMenuStrip.Items)
             {
                 tsm.Visible = false;
             }
         }
 
-        private void ResetLicenseTypeContextMenu()
+        private void DisableContextMenu(ToolStripItemCollection items)
         {
-            foreach (ToolStripItem tsm in newLicenseToolStripMenuItem.DropDownItems)
+            foreach (ToolStripItem tsm in items) //newLicenseToolStripMenuItem.DropDownItems)
             {
                 tsm.Enabled = false;                
             }
@@ -107,15 +104,17 @@ namespace Client.Creator
             {
                 if(!(tsm.Tag is ToolStripSeparator))
                     tsm.Enabled = false;
-            }
-            foreach (ToolStripItem tsm in addLicMainToolStripBtn.DropDownItems)
-            {
-                tsm.Enabled = false;
-            }
-            foreach (ToolStripItem tsm in addProductLicenseMainToolStripDropDownBtn.DropDownItems)
-            {
-                tsm.Enabled = false;
-            }
+            }            
+            DisableContextMenu(addLicMainToolStripBtn.DropDownItems);
+            DisableContextMenu(addProductLicenseMainToolStripDropDownBtn.DropDownItems);
+            //foreach (ToolStripItem tsm in addLicMainToolStripBtn.DropDownItems)
+            //{
+            //    tsm.Enabled = false;
+            //}
+            //foreach (ToolStripItem tsm in addProductLicenseMainToolStripDropDownBtn.DropDownItems)
+            //{
+            //    tsm.Enabled = false;
+            //}
         }
 
          private void EnableLicenseMainToolStripDropDownMenuItems()
@@ -150,7 +149,8 @@ namespace Client.Creator
             collapseToolStripMenuItem.Visible = DetailTreeView.SelectedNode.IsExpanded;
             //add license items
             newLicenseToolStripMenuItem.Visible = true;
-            newProductLicenseToolStripMenuItem.Visible = true;
+            newLicenseToolStripMenuItem.Enabled = (DestNameComboBox.Items.Count > 2); //options are <create>, <edit>
+            newProductLicenseToolStripMenuItem.Visible = true; 
             newProductLicenseToolStripMenuItem.Enabled = false;
             lcmToolStripSeparator3.Visible = true;
             //find item
@@ -877,7 +877,8 @@ namespace Client.Creator
                             DestNameComboBox.Items.Add("<Create...>");
                             DestNameComboBox.Items.Add("<Edit...>");
                         }
-                        DestNameComboBox.SelectedItem = dlg.SelectedDestinationName;
+                        if(dlg.SelectedDestinationName != null)
+                            DestNameComboBox.SelectedItem = dlg.SelectedDestinationName;
                     }
                 }
                 else
@@ -1018,23 +1019,15 @@ namespace Client.Creator
             {
                 // Point where mouse is clicked
                 Point p = new Point(e.X, e.Y);
-                // Go to the node that the user clicked
-                TreeNode node = DetailTreeView.SelectedNode;
-                ResetContextMenu();
+                TreeNode node = DetailTreeView.GetNodeAt(p);
                 if (node != null)
                 {
-                    // Highlight the node that the user clicked.
-                    // The node is highlighted until the Menu is displayed on the screen
-                    DetailTreeView.SelectedNode = node;
-                    // Find the appropriate ContextMenu based on the highlighted node
-                    if (node.Level == 0)
-                        EnableLicenseContextMenu(true);
-                    else
-                        EnableProductLicenseContextMenu();                    
-                }
-                else
-                {                    //create standard license
-                    EnableLicenseContextMenu(true);
+                    if (node.Bounds.Contains(p))
+                    {
+                        //DetailTreeView.find
+                        //// Go to the node that the user clicked
+                        DetailTreeView.SelectedNode = node;
+                    }
                 }
                 LicenseContextMenuStrip.Show(DetailTreeView, p);
             }
@@ -1175,7 +1168,8 @@ namespace Client.Creator
                             }
                         }
                     }
-                    information = information.Remove(information.Length - 1, 1);
+                    if(information.Length > 0)
+                        information = information.Remove(information.Length - 1, 1);
                     e.Item.ToolTipText = information;
                     break;
                 case 2: //Product License, Add On License
@@ -1601,9 +1595,9 @@ namespace Client.Creator
 
         private void lsReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ReportDlg dlg = new ReportDlg(s_CommLink))
+            using (ReportDlg dlg = new ReportDlg())
             {
-                ReportDlgData data = new ReportDlgData();
+                ReportDlgData data = new ReportDlgData(s_CommLink);
                 int untitledCount = 0;
                 foreach (TreeNode node in reportsTreeView.Nodes[0].Nodes)
                 {
@@ -1625,9 +1619,9 @@ namespace Client.Creator
         }
         private void plReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ReportDlg dlg = new ReportDlg(s_CommLink))
+            using (ReportDlg dlg = new ReportDlg())
             {
-                ReportDlgData data = new ReportDlgData();
+                ReportDlgData data = new ReportDlgData(s_CommLink);
                 int untitledCount = 0;
                 foreach (TreeNode node in reportsTreeView.Nodes[0].Nodes)
                 {
@@ -1653,17 +1647,29 @@ namespace Client.Creator
             {
                 if (reportsTreeView.SelectedNode.Level != 0)
                 {
-                    _reportManager.DeleteReport(reportsTreeView.SelectedNode.Tag as ReportProperty);
-                    reportsTreeView.Nodes.Remove(reportsTreeView.SelectedNode);
+
+                    ReportProperty selectedReport = reportsTreeView.SelectedNode.Tag as ReportProperty;
+                    DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of report: {0}.", selectedReport.ID), "Delete Report Confirmation",
+                                  MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                    if (result == DialogResult.OK)
+                    {
+                        TreeNode nextNode = null;
+                        int index = reportsTreeView.SelectedNode.Index;
+                        if(index > 0 && reportsTreeView.SelectedNode.Parent.Nodes.Count > 0)
+                            nextNode = reportsTreeView.SelectedNode.Parent.Nodes[index - 1];
+                        _reportManager.DeleteReport(selectedReport);
+                        reportsTreeView.Nodes.Remove(reportsTreeView.SelectedNode);
+                        if(nextNode != null) reportsTreeView.SelectedNode = nextNode;
+                    }
                 }
             }
         }
         private void editReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode selectedNode = null;
-            using (ReportDlg dlg = new ReportDlg(s_CommLink))
+            using (ReportDlg dlg = new ReportDlg())
             {
-                ReportDlgData data = new ReportDlgData();
+                ReportDlgData data = new ReportDlgData(s_CommLink);
                 selectedNode = reportsTreeView.SelectedNode;
                 data.Report = (reportsTreeView.SelectedNode.Tag as ReportProperty);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
@@ -2361,13 +2367,26 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 List<DestinationNameTable> destNames = client.GetDestNamesByCustID(custID);
+                //if (destNames.Count == 0)
+                //{
+                //    CustomerTable dbCust = client.GetCustomer(custID.ToString(), false);
+                //    DestinationNameTable dnt = new DestinationNameTable();
+                //    dnt.DestID = 0;
+                //    dnt.CustID = dbCust.SCRnumber;
+                //    dnt.DestName = dbCust.SCRname;
+                //    client.CreateDestinationName(dnt);
+                //    destNames = client.GetDestNamesByCustID(custID);
+                //}
                 foreach (DestinationNameTable dnt in destNames)
                 {
                     DestNameComboBox.Items.Add(dnt.DestName);
                 }
                 DestNameComboBox.Items.Add("<Create...>");
                 DestNameComboBox.Items.Add("<Edit...>");
-                DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(destNames.Where(c => c.DestID.Equals(0)).FirstOrDefault().DestName);
+                if (destNames.Count > 0)
+                    DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(destNames.Where(c => c.DestID.Equals(0)).FirstOrDefault().DestName);
+                else
+                    LoadDBLicenses("", "", "", false);
             });
         }
         private void LoadDestinationNameComboBox(int custID, int destID)
@@ -2377,6 +2396,16 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 destNames = client.GetDestNamesByCustID(custID);
+                //if (destNames.Count == 0)
+                //{
+                //    CustomerTable dbCust = client.GetCustomer(custID.ToString(), false);
+                //    DestinationNameTable dnt = new DestinationNameTable();
+                //    dnt.DestID = 0;
+                //    dnt.CustID = dbCust.SCRnumber;
+                //    dnt.DestName = dbCust.SCRname;
+                //    client.CreateDestinationName(dnt);
+                //    destNames = client.GetDestNamesByCustID(custID);
+                //}
             });
             foreach (DestinationNameTable dnt in destNames)
             {
@@ -2384,7 +2413,10 @@ namespace Client.Creator
             }
             DestNameComboBox.Items.Add("<Create...>");
             DestNameComboBox.Items.Add("<Edit...>");
-            DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(destNames.Where(c => c.DestID.Equals(destID)).FirstOrDefault().DestName);
+            if (destNames.Count() > 0)
+                DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(destNames.Where(c => c.DestID.Equals(destID)).FirstOrDefault().DestName);
+            else
+                LoadDBLicenses("", "", "", false);
         }
 
         private void SetLicenseServerState(TreeNode currentNode, bool bAllLicenseServers)
@@ -4211,7 +4243,7 @@ namespace Client.Creator
 
         #region Reporting
 
-        private void LoadProductLicenseReport(List<Condition> conditionList)
+        private void LoadProductLicenseReport(ReportProperty rp) //List<Condition> conditionList)
         {
             IList<ProductLicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
@@ -4219,7 +4251,8 @@ namespace Client.Creator
             string[] plSplit;
             Service<ICreator>.Use((client) =>
             {
-                licenses = client.GetProductLicensesByConditions(conditionList);
+                //function to make values database friendly?
+                licenses = client.GetProductLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);//conditionList, );
                 customers = client.GetAllCustomers("", false);
             });
 
@@ -4260,7 +4293,7 @@ namespace Client.Creator
             ReportListView.EndUpdate();
         }
 
-        private void LoadLicenseServerReport(List<Condition> conditionList)
+        private void LoadLicenseServerReport(ReportProperty rp) //List<Condition> conditionList)
         {
             IList<LicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
@@ -4268,7 +4301,7 @@ namespace Client.Creator
             string[] plSplit;
             Service<ICreator>.Use((client) =>
             {
-                licenses = client.GetLicensesByConditions(conditionList);
+                licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
                 customers = client.GetAllCustomers("", false);
             });
             PopulateReportListViewColumns(ReportProperty.ReportType.LicenseServer);
@@ -4297,7 +4330,7 @@ namespace Client.Creator
             ReportListView.EndUpdate();
         }
 
-        private void LoadHardwareTokenReport(List<Condition> conditionList)
+        private void LoadHardwareTokenReport(ReportProperty rp)//List<Condition> conditionList)
         {
             IList<TokenTable> tokens = null;
             IList<CustomerTable> customers = null;
@@ -4308,7 +4341,7 @@ namespace Client.Creator
             ReportListView.Items.Clear();            
             Service<ICreator>.Use((client) =>
             {
-                tokens = client.GetHardwareTokensByConditions(conditionList);
+                tokens = client.GetHardwareTokensByConditions(rp.DatabaseConditions, rp.MatchAll);//conditionList);
                 customers = client.GetAllCustomers("", false);
                 if (tokens != null)
                 {
@@ -4348,12 +4381,14 @@ namespace Client.Creator
             if (rp != null)
             {
                 if (rp.Type == ReportProperty.ReportType.LicenseServer)
-                    LoadLicenseServerReport(rp.Conditions);
+                    LoadLicenseServerReport(rp);
                 else if (rp.Type == ReportProperty.ReportType.ProductLicense)
-                    LoadProductLicenseReport(rp.Conditions);
+                    LoadProductLicenseReport(rp);
                 else
-                    LoadHardwareTokenReport(rp.Conditions);
+                    LoadHardwareTokenReport(rp);
             }
+            else
+                ReportListView.Items.Clear();
         }
         /// <summary>
         /// Populates the ListView column headers based upon the selected TreeNode of the License view.
@@ -4662,28 +4697,6 @@ namespace Client.Creator
         }
         #endregion
 
-        //copy
-        private void copyNode()
-        {
-            //verify it is a LS or PL
-            //save name in memory   
-            //
-        }
-        //paste
-        private void pasteNode(string nodeName)
-        {
-
-            //capture position of mouse
-            //use name saved to determine what to create
-            //if pl create under 
-            //if ls just create
-            //if (DetailTreeView.SelectedNode != null)
-            //{
-            //    if(DetailTreeView.SelectedNode.Level == 0) //LS
-            //    if(DetailTreeView.SelectedNode.Level > 1) //addon or PL
-
-            //}
-        }
         
         private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -4947,18 +4960,24 @@ namespace Client.Creator
         }
 
         private void ReportTreeViewContextMenuStrip_Opening(object sender, CancelEventArgs e)
-        {            
+        {
             bool isReportSelected = ((reportsTreeView.SelectedNode.Tag as ReportProperty)!= null);
             editReportToolStripMenuItem.Enabled = isReportSelected;
             deleteReportToolStripMenuItem.Enabled = isReportSelected;
-            exportToolStripMenuItem.Enabled = isReportSelected;
+            exportReportToolStripMenuItem.Enabled = isReportSelected;
+            copyReportToolStripMenuItem.Enabled = isReportSelected;
+            pasteReportToolStripMenuItem.Visible = false;   
+            if (_copyNode != null)
+                if (_copyNode.Tag is ReportProperty)
+                    pasteReportToolStripMenuItem.Visible = true;                       
+            renameReportToolStripMenuItem.Enabled = isReportSelected;
         }
 
         private void hardwareTokenReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ReportDlg dlg = new ReportDlg(s_CommLink))
+            using (ReportDlg dlg = new ReportDlg())
             {
-                ReportDlgData data = new ReportDlgData();
+                ReportDlgData data = new ReportDlgData(s_CommLink);
                 int untitledCount = 0;
                 foreach (TreeNode node in reportsTreeView.Nodes[0].Nodes)
                 {
@@ -5002,6 +5021,82 @@ namespace Client.Creator
         private void xmlToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void reportsTreeView_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                // Point where mouse is clicked
+                Point p = new Point(e.X, e.Y);
+                TreeNode node = reportsTreeView.GetNodeAt(p);
+                if (node != null)
+                {
+                    if (node.Bounds.Contains(p))
+                    {
+                        //DetailTreeView.find
+                        //// Go to the node that the user clicked
+                        reportsTreeView.SelectedNode = node;
+
+                    }
+                }
+                ReportTreeViewContextMenuStrip.Show(reportsTreeView, p);
+            }
+        }
+
+        private void renameReportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            reportsTreeView.SelectedNode.BeginEdit();
+        }
+
+        private void pasteReportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //create new report based off saved report 
+            //set new report to be edited
+            //option will only be available if a reportnode has been set to copy
+            ReportProperty copiedReport = _copyNode.Tag as ReportProperty;
+            ReportProperty newReport = new ReportProperty(s_CommLink);
+            int untitledCount = 0;
+            foreach (TreeNode node in reportsTreeView.Nodes[0].Nodes)
+            {
+                if (node.Text.Contains("Untitled Report"))
+                    untitledCount++;
+            }
+            newReport.Conditions.AddRange(copiedReport.Conditions);
+            newReport.ID = string.Format("Untitled Report {0}", untitledCount);
+            newReport.Type = copiedReport.Type;
+            TreeNode newReportNode = new TreeNode();
+            newReportNode.Text = newReport.ID;
+            newReportNode.Tag = newReport;
+            reportsTreeView.Nodes[0].Nodes.Add(newReportNode);
+            reportsTreeView.SelectedNode = newReportNode;
+            reportsTreeView.SelectedNode.BeginEdit();
+            _copyNode = null;
+        }
+
+        private void copyReportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //save report name to copy
+            _copyNode = reportsTreeView.SelectedNode;
+        }
+
+        private void LicenseContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            ResetContextMenu(LicenseContextMenuStrip.Items);
+            if (DetailTreeView.SelectedNode != null)
+            {
+                // Highlight the node that the user clicked.
+                // The node is highlighted until the Menu is displayed on the screen
+                // Find the appropriate ContextMenu based on the highlighted node
+                if (DetailTreeView.SelectedNode.Level == 0)
+                    EnableLicenseContextMenu(true);
+                else
+                    EnableProductLicenseContextMenu();
+            }
+            else
+            {                    //create standard license
+                EnableLicenseContextMenu(true);
+            }
         }
     }
     // Implements the manual sorting of items by columns.

@@ -32,6 +32,9 @@
       <xs:enumeration value="HardwareID" />
       <xs:enumeration value="ActivatedDate" />
       <xs:enumeration value="DeactivatedDate" />
+      <xs:enumeration value="Module" />
+      <xs:enumeration value="ModuleValue" />
+      <xs:enumeration value="Notes" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ConditionName" nillable="true" type="tns:ConditionName" />

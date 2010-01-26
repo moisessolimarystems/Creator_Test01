@@ -50,7 +50,10 @@ namespace Service.Creator
                     {"Active", "IsActive"},
                     {"Extension","Extensions"},
                     {"Activation","Activations"},
-                    {"ActivationAmount","ActivationAmount"}
+                    {"ActivationAmount","ActivationAmount"},
+                    {"Module", "Module"},
+                    {"ModuleValue", "ModuleValue"},
+                    {"Notes", "Description"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -182,7 +185,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl)
+        public IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll)
         {
             String value;
             int result;
@@ -191,7 +194,12 @@ namespace Service.Creator
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
-                    conditionString.Append(" and ");
+                {
+                    if (matchAll)
+                        conditionString.Append(" and ");
+                    else
+                        conditionString.Append(" or ");
+                }
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
                 value = userCondition.Value;
@@ -207,7 +215,14 @@ namespace Service.Creator
                 {
                     if (!Int32.TryParse(value, out result))
                     {
-                        value = "\"" + value + "\"";
+                        if (userCondition.Name == ConditionName.Active)
+                        {
+                            bool bValue;
+                            if (bool.TryParse(userCondition.Value, out bValue))
+                                value = (bValue) ? bool.TrueString : bool.FalseString;
+                        }
+                        else
+                            value = "\"" + value + "\"";
                     }
                     conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
                     conditionString.Append(value);
@@ -367,7 +382,7 @@ namespace Service.Creator
         #region Product License Implementation
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl)
+        public IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl, bool matchAll)
         {
             String value;
             int result;
@@ -377,27 +392,56 @@ namespace Service.Creator
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
-                    conditionString.Append(" and ");
-                //create a condition string from condition list using dictionary to translate condition to conditionstring
-                conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);
-                value = userCondition.Value;
-                if (DateTime.TryParse(value, out date))
                 {
-                    value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18,0,0);
+                    if (matchAll)
+                        conditionString.Append(" and ");
+                    else
+                        conditionString.Append(" or ");
                 }
-                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                if (userCondition.Name == ConditionName.Module)
                 {
-                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                    int productID = 0, moduleID = 0;
+                    string[] moduleValue = userCondition.Value.Split(",".ToCharArray());
+                    if (moduleValue.Count() == 2)
+                    {
+                        Int32.TryParse(moduleValue[0], out productID);
+                        Int32.TryParse(moduleValue[1], out moduleID);
+                    }
+                    conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID == {1}).Count() > 0", productID, moduleID));
+                }
+                else if (userCondition.Name == ConditionName.ModuleValue)
+                {
+                    conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
                 }
                 else
                 {
-                    if(!Int32.TryParse(value, out result))
+                    conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);
+                    value = userCondition.Value;
+                    if (DateTime.TryParse(value, out date))
                     {
-                        if(!value.Contains("DateTime"))
-                            value = "\"" + value + "\"";
+                        value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0);
                     }
-                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                    conditionString.Append(value);
+                    if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                    {
+                        conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                    }
+                    else
+                    {
+                        if (!Int32.TryParse(value, out result))
+                        {
+                            if (userCondition.Name == ConditionName.Active)
+                            {
+                                bool bValue;
+                                if (bool.TryParse(userCondition.Value, out bValue))
+                                    value = (bValue) ? bool.TrueString : bool.FalseString;
+                            }
+                            else
+                                value = "\"" + value + "\"";
+                        }
+                        conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                        conditionString.Append(value);
+                    }
                 }
             }
             return ProductLicenseTable.GetProductLicensesByConditions(conditionString.ToString());
@@ -490,7 +534,7 @@ namespace Service.Creator
 
         #region Token Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl)
+        public IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl, bool matchAll)
         {
             String value;
             int result;
@@ -499,7 +543,12 @@ namespace Service.Creator
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
-                    conditionString.Append(" and ");
+                {
+                    if (matchAll)
+                        conditionString.Append(" and ");
+                    else
+                        conditionString.Append(" or ");
+                }
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 conditionString.Append(_filterHTNames[userCondition.Name.ToString()]);
                 value = userCondition.Value;

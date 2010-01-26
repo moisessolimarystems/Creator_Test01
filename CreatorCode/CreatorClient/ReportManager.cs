@@ -12,8 +12,11 @@ namespace Client.Creator
 {
     class ReportManager
     {
-        public ReportManager()
+        private CommunicationLink _commLink;
+
+        public ReportManager(CommunicationLink commLink)
         {
+            _commLink = commLink;
         }
 
         public void DeleteReport(ReportProperty report)
@@ -90,12 +93,17 @@ namespace Client.Creator
                         tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.IdAttrib);
                         if (tmpString == null)
                             continue;
-                        ReportProperty newReport = new ReportProperty();
+                        ReportProperty newReport = new ReportProperty(_commLink);
                         newReport.ID = tmpString;
                         tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.TypeAttrib);
                         if (tmpString == null)
                             continue;
                         newReport.Type = (ReportProperty.ReportType)Enum.Parse(typeof(ReportProperty.ReportType), tmpString);
+                        tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.MatchAttrib);
+                        if (tmpString == null)
+                            newReport.MatchAll = true;
+                        else
+                            newReport.MatchAll = (tmpString == bool.TrueString) ? true : false;
                         reader.ReadToFollowing(AppConstants.ReportXMLTags.ConditionElement);
                         if (!bXmlNodeFound)
                             continue;
@@ -160,6 +168,7 @@ namespace Client.Creator
                     writer.WriteStartElement(AppConstants.ReportXMLTags.ReportElement);   //Report Element
                     writer.WriteAttributeString(AppConstants.ReportXMLTags.IdAttrib, rp.ID);
                     writer.WriteAttributeString(AppConstants.ReportXMLTags.TypeAttrib, rp.Type.ToString());
+                    writer.WriteAttributeString(AppConstants.ReportXMLTags.MatchAttrib, rp.MatchAll.ToString());
                     foreach (Condition c in rp.Conditions)
                     {
                         writer.WriteStartElement(AppConstants.ReportXMLTags.ConditionElement);    //Condition Element

@@ -313,19 +313,23 @@ namespace Client.Creator
                 });
                 int availableUnits = (int)(unlimitedValue - totalValue);
                 //need to set max to 0 if availability is 0
+                modValueNumericUpDown.Value = moduleData.Module.Units;
+                modValueNumericUpDown.Maximum = (unlimitedValue == 0) ? 65536 : availableUnits;
                 foreach (Lic_PackageAttribs.Lic_ModuleInfoAttribs module in moduleData.ProductLicense.Product.ModuleList.TVal)
                 {                        
                     if (module.moduleID.TVal.Equals(modID))
                     {
-                        //unlimited = 0 or 1 or > 1
+                        //unlimited = 0 or 1 or > 1 
+                        // 0 -> max = 653409
+                        // 1 => max = 1
+                        // >1 => max = >1
                         // -> unlimited 
                         //available units = 0, -1, or > 0
                         modValueNumericUpDown.Value = 0;                            
-                        if (unlimitedValue == 0 || availableUnits < 0)
+                        if (unlimitedValue == 0)
                         {
                             modValueNumericUpDown.Value = module.moduleValue.TVal;
                             modValueNumericUpDown.Maximum = 65536;
-                            break;
                         }
                         else
                         {
@@ -339,8 +343,8 @@ namespace Client.Creator
                                 modValueNumericUpDown.Value = 0;
                                 modValueNumericUpDown.Maximum = 0;
                             }
-                            break;
                         }
+                        break;
                     }                        
                 }                
             }

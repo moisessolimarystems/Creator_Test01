@@ -117,7 +117,6 @@
     </Compile>
     <Compile Include="Entities\BaseGridItem.cs" />
     <Compile Include="Collections\GenericCollectionPropertyDescriptor.cs" />
-    <Compile Include="Entities\ConditionProperty.cs" />
     <Compile Include="Entities\ModuleProperty.cs" />
     <Compile Include="Collections\PropertySorterTypeConverter.cs" />
     <Compile Include="ConnectDialog.cs">

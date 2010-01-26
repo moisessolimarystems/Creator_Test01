@@ -14,15 +14,15 @@ namespace Client.Creator
         private int m_CondtionIndex;
         private bool m_Validated;
         private ReportDlgData _reportData;
-        private CommunicationLink _commLink;
         private const int MAXIMUM_CONDITIONS = 9;
 
-        public ReportDlg(CommunicationLink commLink)
+        public ReportDlg()
         {
             InitializeComponent();
             m_ConditionCount = m_CondtionIndex = 0;
+            //initialize selected item in matchComboBox to be "all"
+            matchComboBox.SelectedIndex = 0;
             m_Validated = false;
-            _commLink = commLink;
             _reportData = null;
         }
 
@@ -32,6 +32,7 @@ namespace Client.Creator
             if (_reportData != null)
             {
                 this.Text = string.Format("{0} - {1}", _reportData.Report.Type.ToString(),_reportData.Report.ID);
+                matchComboBox.SelectedIndex = (_reportData.Report.MatchAll) ? 0 : 1;
                 if (_reportData.Report.Conditions.Count == 0)
                 {
                     createConditionInput(new CreatorService.Condition());
@@ -78,16 +79,22 @@ namespace Client.Creator
                     controlIndex = groupBox1.Controls.IndexOfKey(string.Format("valueTextBox{0}", index));
                     tb = (TextBox)groupBox1.Controls[controlIndex];                                    
                     newCondition.Value = tb.Text;
-                    newCondition.Value = GetDatabaseValue(newCondition);
                     d.Report.Conditions.Add(newCondition);
                 }
             }
-            
+            d.Report.MatchAll = (matchComboBox.SelectedIndex == 0);
         }
 
         private void conditionNameComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             //change operator values to corresponding type
+            //set operator combobox with 
+
+        }
+
+        private void conditionOperatorComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
         private void conditionPlusButton_Click(object sender, EventArgs e)
@@ -107,92 +114,13 @@ namespace Client.Creator
             removeConditionInput(conditionIndex, selectedButton.Location.Y);
         }
 
-        private string GetUserValue(CreatorService.Condition userCondition)
-        {
-            string strVal = userCondition.Value;
-            if(_reportData.Report.Type == ReportProperty.ReportType.LicenseServer)
-            {
-            }
-            else if (_reportData.Report.Type == ReportProperty.ReportType.ProductLicense)
-            {
-                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
-                {
-                    int stateValue;
-                    if(int.TryParse(userCondition.Value, out stateValue));
-                        strVal = ((ProductLicenseState)stateValue).ToString();
-                }
-                else if(userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
-                {
-                    int productID;
-                    Int32.TryParse(userCondition.Value, out productID);
-                    strVal = _commLink.GetProductName((uint)productID);
-                }
-            }
-            else
-            {
-                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
-                {
-                    ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
-                    {
-                        CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
-                        if(dbCustomer != null)
-                            strVal = dbCustomer.SCRname;
-                    });
-                }
-                else if(userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
-                {
-                    int stateVal;
-                    if(int.TryParse(userCondition.Value, out stateVal));
-                        strVal = ((TokenStatus)stateVal).ToString();
-                }
-            }
-            return strVal;
-        }
-        //user value to database value which is digits
-        private string GetDatabaseValue(CreatorService.Condition userCondition)
-        {
-            string strVal = userCondition.Value;
-            if (_reportData.Report.Type == ReportProperty.ReportType.LicenseServer)
-            {
-            }
-            else if (_reportData.Report.Type == ReportProperty.ReportType.ProductLicense)
-            {
-                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
-                {
-                    try
-                    {
-                        strVal = ((int)Enum.Parse(typeof(ProductLicenseState), userCondition.Value)).ToString();
-                    }
-                    catch (Exception) { }
-                }
-                else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
-                    strVal = _commLink.GetProductID(userCondition.Value).ToString();
-            }
-            else
-            {
-                if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
-                {
-                    ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
-                    {
-                        CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
-                        strVal = dbCustomer.SCRnumber.ToString();
-                    });
-                }
-                else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
-                {
-                    try
-                    {
-                        strVal = ((int)Enum.Parse(typeof(TokenStatus), userCondition.Value)).ToString();
-                    }
-                    catch (Exception) { }
-                }
-            }
-            return strVal;
-        }
         private void createConditionInput(CreatorService.Condition userCondition)
         {
             //increase form size
             //increase group size
+            matchComboBox.Visible = (m_ConditionCount > 0);
+            matchSingleLabel.Visible = (m_ConditionCount == 0);
+            matchMultipleLabel.Visible = (m_ConditionCount > 0);
             if (m_ConditionCount > 0)
             {
                 groupBox1.Size = new Size(groupBox1.Size.Width, groupBox1.Height + 25);
@@ -245,7 +173,7 @@ namespace Client.Creator
             valueTextBox.Name = string.Format("valueTextBox{0}", m_CondtionIndex);
             valueTextBox.Location = new Point(conditionValueTextBox.Location.X, conditionValueTextBox.Location.Y + (m_ConditionCount * 25));
             valueTextBox.Size = conditionValueTextBox.Size;
-            valueTextBox.Text = GetUserValue(userCondition);
+            valueTextBox.Text = userCondition.Value;
             groupBox1.Controls.Add(valueTextBox);
 
             Button minusButton = new Button();
@@ -273,6 +201,7 @@ namespace Client.Creator
             groupBox1.Controls.Add(plusButton);            
             m_ConditionCount++;
             m_CondtionIndex++;
+
         }
 
         private void removeConditionInput(string conditionIndex, int yPos)
@@ -301,7 +230,10 @@ namespace Client.Creator
                     control.Enabled = (m_ConditionCount > 1);
                     break;
                 }
-            }  
+            }
+            matchComboBox.Visible = (m_ConditionCount > 1);
+            matchSingleLabel.Visible = (m_ConditionCount == 1);
+            matchMultipleLabel.Visible = (m_ConditionCount > 1);
         }
 
         private void ReportDlg_FormClosing(object sender, FormClosingEventArgs e)
@@ -315,23 +247,40 @@ namespace Client.Creator
         {
             m_Validated = true;
         }
+
+        private void matchCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            btnOk.Enabled = matchCheckBox.Checked;
+            foreach (Control control in groupBox1.Controls)
+            {
+                control.Enabled = matchCheckBox.Checked;
+            }
+        }
+
+
     }
 
     #region ReportDlgData class
     public class ReportDlgData : Shared.VisualComponents.DialogData
     {
         private ReportProperty _report;
+        private CommunicationLink _commLink;
 
         #region Constructors
-
         public ReportDlgData()
         {
-            _report = new ReportProperty();            
+            _commLink = new CommunicationLink();
+            _report = new ReportProperty(_commLink);
         }
 
-        public ReportDlgData(ReportProperty newReport)
+        public ReportDlgData(CommunicationLink commLink)
         {
-            _report = new ReportProperty();
+            _report = new ReportProperty(commLink);            
+        }
+
+        public ReportDlgData(ReportProperty newReport, CommunicationLink commLink)
+        {
+            _report = new ReportProperty(commLink);
             _report.ID = newReport.ID;
             _report.Conditions = newReport.Conditions;            
         }
@@ -343,6 +292,11 @@ namespace Client.Creator
         {
             get { return _report; }
             set { _report = value; }
+        }
+
+        public CommunicationLink CommLink
+        {
+            get { return _commLink; }
         }
         #endregion
     }
