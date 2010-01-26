@@ -41,10 +41,14 @@ namespace Client.Creator
         public string SelectedDestinationName
         {
             get 
-            { 
-                if(destNameListView.SelectedItems.Count > 0)
-                    return destNameListView.SelectedItems[0].Text;
-                return destNameListView.Items[0].Text;
+            {
+                if (destNameListView.Items.Count > 0)
+                {
+                    if (destNameListView.SelectedItems.Count > 0)
+                        return destNameListView.SelectedItems[0].Text;
+                    return destNameListView.Items[0].Text;
+                }
+                return null;
             }
         }
 
@@ -55,7 +59,9 @@ namespace Client.Creator
             _custID = custID;
             Service<ICreator>.Use((client) =>
             {
-                _baseDestination = client.GetDestinationName(_custID, 0).DestName;
+                DestinationNameTable dnt = client.GetDestinationName(_custID, 0);
+                if(dnt != null)
+                    _baseDestination = dnt.DestName;
             });
             foreach (string item in destNameCollection)
             {
@@ -66,7 +72,10 @@ namespace Client.Creator
                     destNameListView.Items.Add(item);
                 }
             }
-            destNameListView.TopItem.Selected = true;
+            if (destNameListView.Items.Count > 0)
+                destNameListView.TopItem.Selected = true;
+            else
+               renameDestNameButton.Enabled = removeDestNameButton.Enabled = false;                 
         }
 
         //need to disallow removal of any destination names being used.
