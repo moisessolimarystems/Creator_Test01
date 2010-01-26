@@ -472,6 +472,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="22" offset="0x120" bits="1" name="Assembly" unlimited="1"/>   
+				<Module id="23" offset="0x121" bits="1" name="Barcode Reader" unlimited="1"/>  
+				<Module id="24" offset="0x122" bits="1" name="XPIF Input" unlimited="1"/>  
 				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
        	<Module id="31" offset="0x0F4" bits="4" name="Process Builders" isSharable="true"/>				
 			</ModuleList>
@@ -500,6 +502,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
           <ModuleInclude id="20" default="0"/>
 					<ModuleInclude id="21" default="0"/>
 					<ModuleInclude id="22" default="0"/>
+					<ModuleInclude id="23" default="0"/>
+					<ModuleInclude id="24" default="0"/>
 					<ModuleInclude id="30" default="1"/>
 					<ModuleInclude id="31" default="1"/>
 				</Product>
@@ -663,7 +667,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="2"	offset="0x0a0" bits="16" name="Monitor Instances"/>
       </ModuleList>
       <ProductList>
-        <Product id="15" name="SOLitrack">
+        <Product id="16" name="SOLitrack">
 				<ModuleInclude id="0" default="0"/>
 				<ModuleInclude id="1" default="0"/>
 				<ModuleInclude id="2" default="0"/>
