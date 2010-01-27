@@ -1074,12 +1074,19 @@ namespace Client.Creator
             {
                 if (parentNode != null)
                 {
-                    if (parentNode.Nodes.Count > 0)
+                    if (parentNode.Nodes.Count > 1)
                     {
-                        if (parentNode.Nodes.Count == 1)
-                            DetailTreeView.SelectedNode = parentNode;
-                        else
-                            DetailTreeView.SelectedNode = parentNode.Nodes[selectedIndex - 1];
+                        selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
+                        DetailTreeView.SelectedNode = parentNode.Nodes[selectedIndex];
+                        //if (parentNode.Nodes.Count == 1)
+                        //    DetailTreeView.SelectedNode = parentNode;
+                        //else
+                        //{
+                        //    if (selectedIndex > 0)
+                        //        DetailTreeView.SelectedNode = parentNode.Nodes[selectedIndex - 1];
+                        //    else
+                        //        DetailTreeView.SelectedNode = parentNode.Node[0];
+                        //}
                     }
                 }
                 else
