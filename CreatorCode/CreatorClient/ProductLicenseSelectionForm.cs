@@ -39,7 +39,7 @@ namespace Client.Creator
                         ListViewItem lvItem = new ListViewItem();
                         lvItem.Text = plRecord.plID;
                         lvItem.SubItems.Add(Enum.GetName(typeof(ProductLicenseState), plRecord.plState));
-                        lvItem.SubItems.Add(_commLink.GetProductName((uint)plRecord.ProductID));
+                        lvItem.SubItems.Add(_commLink.GetProductName(plRecord.ProductID));
                         if (plRecord.ExpirationDate.HasValue)
                             lvItem.SubItems.Add(plRecord.ExpirationDate.Value.ToLocalTime().ToShortDateString());
                         else

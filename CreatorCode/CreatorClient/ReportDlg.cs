@@ -89,7 +89,7 @@ namespace Client.Creator
         {
             //change operator values to corresponding type
             //set operator combobox with 
-
+            //if(conditionNameComboBox.SelectedItem 
         }
 
         private void conditionOperatorComboBox_SelectedIndexChanged(object sender, EventArgs e)

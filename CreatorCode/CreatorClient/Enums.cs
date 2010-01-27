@@ -23,7 +23,7 @@ namespace Client.Creator
             UNVERIFIED
         }
 
-        enum TransactionType
+        public enum TransactionType
         {
             Token                    = 0,           //License Server Transaction Types
             LicenseServer            = 1,          

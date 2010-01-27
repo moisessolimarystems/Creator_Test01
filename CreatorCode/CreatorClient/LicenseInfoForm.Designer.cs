@@ -52,13 +52,6 @@
             this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
             this.TokenDescriptionLabel = new System.Windows.Forms.Label();
             this.browseTokenFileButton = new System.Windows.Forms.Button();
-            this.ModuleTabPage = new System.Windows.Forms.TabPage();
-            this.moduleGroupBox = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.modNameLabel = new System.Windows.Forms.Label();
-            this.modValueLabel = new System.Windows.Forms.Label();
-            this.modNameTextBox = new System.Windows.Forms.TextBox();
-            this.modValueNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.PacketTabPage = new System.Windows.Forms.TabPage();
             this.packetGroupBox = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
@@ -104,10 +97,6 @@
             this.TokenTabPage.SuspendLayout();
             this.tokenGroupBox.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.ModuleTabPage.SuspendLayout();
-            this.moduleGroupBox.SuspendLayout();
-            this.tableLayoutPanel3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.modValueNumericUpDown)).BeginInit();
             this.PacketTabPage.SuspendLayout();
             this.packetGroupBox.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -144,7 +133,6 @@
             // 
             this.licInfoTabControl.Controls.Add(this.LicenseTabPage);
             this.licInfoTabControl.Controls.Add(this.TokenTabPage);
-            this.licInfoTabControl.Controls.Add(this.ModuleTabPage);
             this.licInfoTabControl.Controls.Add(this.PacketTabPage);
             this.licInfoTabControl.Controls.Add(this.orderTabPage);
             this.licInfoTabControl.Controls.Add(this.tabPage1);
@@ -400,99 +388,6 @@
             this.browseTokenFileButton.UseVisualStyleBackColor = true;
             this.browseTokenFileButton.Click += new System.EventHandler(this.browseTokenFileButton_Click);
             // 
-            // ModuleTabPage
-            // 
-            this.ModuleTabPage.Controls.Add(this.moduleGroupBox);
-            this.ModuleTabPage.Location = new System.Drawing.Point(4, 22);
-            this.ModuleTabPage.Name = "ModuleTabPage";
-            this.ModuleTabPage.Size = new System.Drawing.Size(427, 257);
-            this.ModuleTabPage.TabIndex = 2;
-            this.ModuleTabPage.Text = "Module";
-            this.ModuleTabPage.UseVisualStyleBackColor = true;
-            // 
-            // moduleGroupBox
-            // 
-            this.moduleGroupBox.Controls.Add(this.tableLayoutPanel3);
-            this.moduleGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.moduleGroupBox.Location = new System.Drawing.Point(0, 0);
-            this.moduleGroupBox.Name = "moduleGroupBox";
-            this.moduleGroupBox.Padding = new System.Windows.Forms.Padding(10);
-            this.moduleGroupBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.moduleGroupBox.Size = new System.Drawing.Size(427, 257);
-            this.moduleGroupBox.TabIndex = 8;
-            this.moduleGroupBox.TabStop = false;
-            // 
-            // tableLayoutPanel3
-            // 
-            this.tableLayoutPanel3.BackColor = System.Drawing.Color.Transparent;
-            this.tableLayoutPanel3.ColumnCount = 3;
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 128F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Controls.Add(this.modNameLabel, 0, 0);
-            this.tableLayoutPanel3.Controls.Add(this.modValueLabel, 0, 1);
-            this.tableLayoutPanel3.Controls.Add(this.modNameTextBox, 1, 0);
-            this.tableLayoutPanel3.Controls.Add(this.modValueNumericUpDown, 1, 1);
-            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(10, 23);
-            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 3;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(407, 224);
-            this.tableLayoutPanel3.TabIndex = 9;
-            // 
-            // modNameLabel
-            // 
-            this.modNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.modNameLabel.AutoSize = true;
-            this.modNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.modNameLabel.Location = new System.Drawing.Point(3, 8);
-            this.modNameLabel.Name = "modNameLabel";
-            this.modNameLabel.Size = new System.Drawing.Size(88, 13);
-            this.modNameLabel.TabIndex = 0;
-            this.modNameLabel.Text = "Module Name:";
-            // 
-            // modValueLabel
-            // 
-            this.modValueLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.modValueLabel.AutoSize = true;
-            this.modValueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.modValueLabel.Location = new System.Drawing.Point(3, 38);
-            this.modValueLabel.Name = "modValueLabel";
-            this.modValueLabel.Size = new System.Drawing.Size(102, 13);
-            this.modValueLabel.TabIndex = 1;
-            this.modValueLabel.Text = "Number of Units:";
-            // 
-            // modNameTextBox
-            // 
-            this.modNameTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.tableLayoutPanel3.SetColumnSpan(this.modNameTextBox, 2);
-            this.modNameTextBox.Location = new System.Drawing.Point(133, 5);
-            this.modNameTextBox.Margin = new System.Windows.Forms.Padding(5);
-            this.modNameTextBox.Name = "modNameTextBox";
-            this.modNameTextBox.ReadOnly = true;
-            this.modNameTextBox.Size = new System.Drawing.Size(191, 20);
-            this.modNameTextBox.TabIndex = 7;
-            // 
-            // modValueNumericUpDown
-            // 
-            this.tableLayoutPanel3.SetColumnSpan(this.modValueNumericUpDown, 2);
-            this.modValueNumericUpDown.Location = new System.Drawing.Point(133, 35);
-            this.modValueNumericUpDown.Margin = new System.Windows.Forms.Padding(5);
-            this.modValueNumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.modValueNumericUpDown.Name = "modValueNumericUpDown";
-            this.modValueNumericUpDown.Size = new System.Drawing.Size(69, 20);
-            this.modValueNumericUpDown.TabIndex = 6;
-            // 
             // PacketTabPage
             // 
             this.PacketTabPage.Controls.Add(this.packetGroupBox);
@@ -519,7 +414,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 89F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 96F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -546,16 +441,16 @@
             this.packetNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.packetNameLabel.AutoSize = true;
             this.packetNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.packetNameLabel.Location = new System.Drawing.Point(3, 8);
+            this.packetNameLabel.Location = new System.Drawing.Point(3, 2);
             this.packetNameLabel.Name = "packetNameLabel";
-            this.packetNameLabel.Size = new System.Drawing.Size(87, 13);
+            this.packetNameLabel.Size = new System.Drawing.Size(51, 26);
             this.packetNameLabel.TabIndex = 0;
             this.packetNameLabel.Text = "Packet Name:";
             // 
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(317, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(310, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -567,21 +462,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(99, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(97, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(213, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(208, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(99, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(97, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(213, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(208, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -609,11 +504,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(99, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(97, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(213, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(208, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -631,11 +526,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(99, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(97, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(213, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(208, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -785,7 +680,6 @@
             this.ProductLicenseTypeComboBox.Name = "ProductLicenseTypeComboBox";
             this.ProductLicenseTypeComboBox.Size = new System.Drawing.Size(198, 21);
             this.ProductLicenseTypeComboBox.TabIndex = 1;
-            this.ProductLicenseTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.productLicenseTypeComboBox_SelectedIndexChanged);
             // 
             // ProductLicenseProductComboBox
             // 
@@ -928,11 +822,6 @@
             this.tokenGroupBox.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
-            this.ModuleTabPage.ResumeLayout(false);
-            this.moduleGroupBox.ResumeLayout(false);
-            this.tableLayoutPanel3.ResumeLayout(false);
-            this.tableLayoutPanel3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.modValueNumericUpDown)).EndInit();
             this.PacketTabPage.ResumeLayout(false);
             this.packetGroupBox.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
@@ -954,11 +843,7 @@
         private System.Windows.Forms.TabControl licInfoTabControl;
         private System.Windows.Forms.TabPage LicenseTabPage;
         private System.Windows.Forms.TabPage TokenTabPage;
-        private System.Windows.Forms.TabPage ModuleTabPage;
         private System.Windows.Forms.TabPage PacketTabPage;
-        private System.Windows.Forms.NumericUpDown modValueNumericUpDown;
-        private System.Windows.Forms.Label modValueLabel;
-        private System.Windows.Forms.Label modNameLabel;
         private System.Windows.Forms.Label packetNameLabel;
         private System.Windows.Forms.TextBox packetDescriptTextBox;
         private System.Windows.Forms.TextBox packetOutputPathTextBox;
@@ -969,7 +854,6 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button folderBrowseButton;
         private System.Windows.Forms.GroupBox tokenGroupBox;
-        private System.Windows.Forms.GroupBox moduleGroupBox;
         private System.Windows.Forms.TabPage orderTabPage;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
@@ -991,7 +875,6 @@
         private System.Windows.Forms.Label licNameLabel;
         private System.Windows.Forms.GroupBox licenseGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.GroupBox packetGroupBox;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.GroupBox productLicenseGroupBox;
@@ -1011,7 +894,6 @@
         private System.Windows.Forms.RadioButton softwareRadioButton;
         private System.Windows.Forms.RadioButton hardwareRadioButton;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox modNameTextBox;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Label licDestIDLabel;

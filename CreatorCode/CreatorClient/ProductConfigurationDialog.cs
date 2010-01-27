@@ -23,7 +23,7 @@ namespace Client.Creator
                 IList<ProductTable> products = client.GetProducts();
                 foreach (ProductTable product in products)
                 {
-                    if(!product.pName.Contains("Test") && commLink.GetProductName((uint)product.pId) != "Unknown")
+                    if(!product.pName.Contains("Test") && commLink.GetProductName((byte)product.pId) != "Unknown")
                         comboBox1.Items.Add(product.pName);                    
                 }
             });
