@@ -997,14 +997,13 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 		SpdAttribs::BufferObj bufObj;
 		ProtectionKey* pTmpProKey = NULL;
 
-
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get KeyInfo - start");
 		//Scope for key accessing variables
 		{
 			VARIANT vtKeyList;
 			VariantInit(&vtKeyList);
 			VARIANT* pVtKeyNameList;
 
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - pKeyServer->KeyEnumerate()");
 			hr = pKeyServer->KeyEnumerate(&vtKeyList);
 			if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pVtKeyNameList)))
 			{
@@ -1026,6 +1025,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 
 			VariantClear(&vtKeyList);
 		}
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get KeyInfo - end");
 	
 		{
 			// Add Server Data
@@ -1046,7 +1046,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 		TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), currentSystime);
 		licSystemAttribs.createdDate = std::wstring(timestamp);
 
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through all the Software Licenses");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through all the Software Licenses - start");
 		// Cycle through all the Software Licenses
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs licInfoAttribs;
 		//ZZZ - Comment out to speed up conversion
@@ -1056,8 +1056,9 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			if(SUCCEEDED(hr))
 				licSystemAttribs.ListOfStreamed_InfoAttribs->push_back(licInfoAttribs.ToString());
 		}
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through all the Software Licenses - end");
 		
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Info");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Info - start");
 		//
 		// Get System Info
 		Lic_SystemInfoAttribs sysInfoAttribs;
@@ -1086,6 +1087,8 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 		};
 
 		// Scope of WMIHelper wmi
+
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Info - end");
 		{
 			WMIHelper wmi((wchar_t*)wmiLocation_Byte);
 			hr = wmi.Connect();
@@ -1349,6 +1352,8 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			}
 		}	// End of scope of WMIHelper wmi
 
+
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get Usage Info - start");
 		//Generate Usage Info
 		Lic_UsageInfoAttribs usageInfoAttribs;
 		{
@@ -1358,16 +1363,17 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 			hr = licCache.GetUsage(&usageInfoAttribs);
 			}
 		}
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get Usage Info - end");
 
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString()");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString() - start");
 		licSystemAttribs.Streamed_SoftwareSpecAttribs = std::wstring(g_pSoftwareSpec->GetSoftwareSpec().ToString());
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - sysInfoAttribs.ToString()");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString() - end");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
 
 		licSystemAttribs.Streamed_UsageInfoAttribs = std::wstring(usageInfoAttribs.ToString());
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - end");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - end");
 //OutputDebugString(bstrLicAttribsStream);
 
 		_bstr_t bstr_license_verify_data_code;
@@ -1388,7 +1394,7 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Enter");
 	{
 		hr = E_FAIL;
 	}
-//OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Leave");
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Leave");
 	return hr;
 }
 
@@ -2935,12 +2941,20 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 					prodIt != pLicInfoAttribs->productList->end();
 					prodIt++)
 			{
-				if(prodIt->bUseExpirationDate)
+				if(prodIt->bUseExpirationDate || prodIt->bUseActivations)
 				{
 					//Convert SoftwareLicense ExpirationDate to time_t
 					SYSTEMTIME swProdLicExpiresDateSystime;
-					if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str(), swProdLicExpiresDateSystime))
-						throw E_FAIL;
+					if(prodIt->bUseActivations)
+					{
+						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str(), swProdLicExpiresDateSystime))
+							throw E_FAIL;
+					}
+					else if(prodIt->bUseExpirationDate)
+					{
+						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->expirationDate)).c_str(), swProdLicExpiresDateSystime))
+							throw E_FAIL;
+					}
 					_variant_t vtSwProdLicExpiresDate(NULL);	
 					if (!SystemTimeToVariantTime(&swProdLicExpiresDateSystime, &vtSwProdLicExpiresDate.date)) 
 						throw E_FAIL;
