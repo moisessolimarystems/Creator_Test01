@@ -7,62 +7,62 @@ namespace Client.Creator
 {
     public class ProductCollectionProperty
     {
-        private List<ProductProperty> _productCollection;
-        private uint _productID;
+        private List<ProductLicenseProperty> _productCollection;
+        private byte _productID;
 
-        public ProductCollectionProperty(uint productID)
+        public ProductCollectionProperty(byte productID)
         {
-            _productCollection = new List<ProductProperty>();
+            _productCollection = new List<ProductLicenseProperty>();
             _productID = productID;
         }
 
-        public uint ProductID
+        public byte ProductID
         {
             get { return _productID; }
             set { _productID = value; }
         }
 
-        public List<ProductProperty> ProductCollection
+        public List<ProductLicenseProperty> ProductCollection
         {
             get { return _productCollection; }
             set { _productCollection = value; }
         }
 
-        public ProductProperty GetProductProperty(string productLicense)
+        public ProductLicenseProperty GetProductLicenseProperty(string productLicenseID)
         {
-            ProductProperty selectedProduct = null;
-            foreach (ProductProperty pp in _productCollection)
+            ProductLicenseProperty selectedProductLicense = null;
+            foreach (ProductLicenseProperty plp in _productCollection)
             {
-                if (pp.Product.contractNumber.TVal == productLicense)
+                if (plp.ID == productLicenseID)
                 {
-                    selectedProduct = pp;
+                    selectedProductLicense = plp;
                     break;
                 }
             }
-            if (selectedProduct == null && _productCollection.Count > 0)
-                selectedProduct = _productCollection[0];
-            return selectedProduct;
+            if (selectedProductLicense == null && _productCollection.Count > 0)
+                selectedProductLicense = _productCollection[0];
+            return selectedProductLicense;
         }
 
-        public void UpdateProductProperty(ProductProperty product)
+        public void UpdateProductProperty(ProductLicenseProperty productLicense)
         {
-            RemoveProductProperty(product);
-            _productCollection.Add(product);
+            RemoveProductProperty(productLicense);
+            _productCollection.Add(productLicense);
         }
 
-        public void RemoveProductProperty(ProductProperty product)
+        public void RemoveProductProperty(ProductLicenseProperty productLicense)
         {
-            ProductProperty selectedProduct = null;
-            foreach (ProductProperty pp in _productCollection)
+            ProductLicenseProperty selectedProductLicense = null;
+            foreach (ProductLicenseProperty plp in _productCollection)
             {
-                if (pp.Product.contractNumber.TVal == product.Product.contractNumber.TVal)
+                if (plp.ID == productLicense.ID)
                 {
-                    selectedProduct = pp;
+                    selectedProductLicense = plp;
                     break;
                 }
             }
-            if(selectedProduct != null)
-                _productCollection.Remove(selectedProduct);
+            if (selectedProductLicense != null)
+                _productCollection.Remove(selectedProductLicense);
         }
     }
 }

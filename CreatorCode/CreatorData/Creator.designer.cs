@@ -1785,6 +1785,8 @@ namespace CreatorData
 		
 		private byte _Extensions;
 		
+		private byte _ProductConnection;
+		
 		private EntitySet<ModuleTable> _ModuleTables;
 		
 		private EntityRef<LicenseTable> _LicenseTable;
@@ -1823,6 +1825,8 @@ namespace CreatorData
     partial void OnActivationAmountChanged();
     partial void OnExtensionsChanging(byte value);
     partial void OnExtensionsChanged();
+    partial void OnProductConnectionChanging(byte value);
+    partial void OnProductConnectionChanged();
     #endregion
 		
 		public ProductLicenseTable()
@@ -2128,8 +2132,29 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="ProductLicenseTable_Module", Storage="_ModuleTables", ThisKey="ID", OtherKey="ProductLicenseID")]
-		[DataMember(Order=15, EmitDefaultValue=false)]
+		[Column(Storage="_ProductConnection", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=15)]
+		public byte ProductConnection
+		{
+			get
+			{
+				return this._ProductConnection;
+			}
+			set
+			{
+				if ((this._ProductConnection != value))
+				{
+					this.OnProductConnectionChanging(value);
+					this.SendPropertyChanging();
+					this._ProductConnection = value;
+					this.SendPropertyChanged("ProductConnection");
+					this.OnProductConnectionChanged();
+				}
+			}
+		}
+		
+		[Association(Name="ProductLicenseTable_ModuleTable", Storage="_ModuleTables", ThisKey="ID", OtherKey="ProductLicenseID")]
+		[DataMember(Order=16, EmitDefaultValue=false)]
 		public EntitySet<ModuleTable> ModuleTables
 		{
 			get
@@ -3015,7 +3040,7 @@ namespace CreatorData
 		
 		private short _Value;
 		
-		private short _AppInstance;
+		private byte _AppInstance;
 		
 		private int _ProductLicenseID;
 		
@@ -3031,7 +3056,7 @@ namespace CreatorData
     partial void OnModIDChanged();
     partial void OnValueChanging(short value);
     partial void OnValueChanged();
-    partial void OnAppInstanceChanging(short value);
+    partial void OnAppInstanceChanging(byte value);
     partial void OnAppInstanceChanged();
     partial void OnProductLicenseIDChanging(int value);
     partial void OnProductLicenseIDChanged();
@@ -3105,9 +3130,9 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_AppInstance", DbType="SmallInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
+		[Column(Storage="_AppInstance", DbType="TinyInt NOT NULL", UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=4)]
-		public short AppInstance
+		public byte AppInstance
 		{
 			get
 			{
@@ -3151,7 +3176,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Association(Name="ProductLicenseTable_Module", Storage="_ProductLicenseTable", ThisKey="ProductLicenseID", OtherKey="ID", IsForeignKey=true)]
+		[Association(Name="ProductLicenseTable_ModuleTable", Storage="_ProductLicenseTable", ThisKey="ProductLicenseID", OtherKey="ID", IsForeignKey=true)]
 		public ProductLicenseTable ProductLicenseTable
 		{
 			get

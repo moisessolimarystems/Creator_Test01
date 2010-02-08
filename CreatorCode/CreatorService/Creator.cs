@@ -143,33 +143,23 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetLicenseCountByID(int custID, int destID, int groupID)
-        {
-            return LicenseTable.GetLicenseCountByID(custID, destID, groupID);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public uint GetNextGroupID(uint custID, uint destID)
         {
             return LicenseTable.GetNextGroupID(custID, destID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public uint GetLastGroupID(uint custID, uint destID)
-        {
-            return LicenseTable.GetLastGroupID(custID, destID);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public uint GetLastDestinationID(uint custID)
-        {
-            return LicenseTable.GetLastDestinationID(custID);
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public bool IsLicenseModified(string licName) 
         {
             return LicenseTable.IsLicenseModified(licName);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void MarkDirty(string licenseServer)
+        {
+            LicenseTable lt = LicenseTable.GetLicenseByName(licenseServer, false);
+            lt.IsDirty = true;
+            LicenseTable.UpdateLicense(lt);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -460,7 +450,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, int prodID)
+        public IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, byte prodID)
         {
             return ProductLicenseTable.GetProductLicenses(lsID, prodID);
         }
@@ -496,7 +486,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public int GetProductVersionFromTable(int prodID)
+        public int GetProductVersionFromTable(byte prodID)
         {
             return ProductLicenseTable.GetProductVersionFromTable(prodID);
         }
@@ -758,11 +748,19 @@ namespace Service.Creator
         public void DeleteAllModules(int productlicenseID)
         { ModuleTable.DeleteAllModules(productlicenseID); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public ModuleTable GetModule(string productLicenseName, int modID)
+        public ModuleTable GetModule(string productLicenseName, short modID)
         { return ModuleTable.GetModule(productLicenseName, modID); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ModuleTable> GetAllModules(string productLicenseName)
         { return ModuleTable.GetAllModules(productLicenseName); }
+        public IList<ModuleTable> GetModulesByProductLicense(string productLicenseName)
+        { return ModuleTable.GetModulesByProductLicense(productLicenseName); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public short GetTotalModuleValue(string licenseServer, byte productID, short modID)
+        {
+            return ModuleTable.GetTotalModuleValue(licenseServer, productID, modID);
+        }
+
         #endregion
         #endregion
     }

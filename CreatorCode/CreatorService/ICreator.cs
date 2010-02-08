@@ -51,28 +51,19 @@ namespace Service.Creator
         IList<LicenseTable> GetLicensesByCustomer(string custName);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions);        
+        IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions);
+
+        [OperationContract]
+        LicenseTable GetLicenseByID(int licName, bool bLoadOptions);
 
         [OperationContract]
         LicenseTable GetLicenseByName(string licName, bool bLoadOptions);
 
         [OperationContract]
-        LicenseTable GetLicenseByID(int licID, bool bLoadOptions);
-
-        [OperationContract]
-        int GetLicenseCountByID(int custID, int destID, int groupID);
-
-        [OperationContract]
         uint GetNextGroupID(uint custID, uint destID);
 
         [OperationContract]
-        uint GetLastGroupID(uint custID, uint destID);
-
-        [OperationContract]
         int GetLicenseCountByDestName(uint custID, uint destID);
-
-        [OperationContract]
-        uint GetLastDestinationID(uint custID);
 
         [OperationContract]
         IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll);
@@ -94,6 +85,9 @@ namespace Service.Creator
 
         [OperationContract]
         string KeyProgramVerification(string key, int custNum, int keyNum);
+
+        [OperationContract]
+        void MarkDirty(string licenseServer);
 
         [OperationContract()]
         void CreateLicense(LicenseTable lt);
@@ -166,7 +160,7 @@ namespace Service.Creator
         IList<ProductLicenseTable> GetProductLicenses(string lsID);
 
         [OperationContract]
-        IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, int prodID);
+        IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, byte prodID);
 
         [OperationContract]
         ProductLicenseTable GetProductLicense(string plID);
@@ -178,7 +172,7 @@ namespace Service.Creator
         int GetNextProductLicenseIndex(string lsID);
 
         [OperationContract]
-        int GetProductVersionFromTable(int prodID);
+        int GetProductVersionFromTable(byte prodID);
 
         [OperationContract]
         ProductLicenseTable GetProductLicenseByID(int productLicenseID);
@@ -300,9 +294,13 @@ namespace Service.Creator
         [OperationContract]
         void DeleteAllModules(int productlicenseID);
         [OperationContract]
-        ModuleTable GetModule(string productLicenseName, int modID);
+        ModuleTable GetModule(string productLicenseName, short modID);
         [OperationContract]
         IList<ModuleTable> GetAllModules(string productLicenseName);
+        [OperationContract]
+        IList<ModuleTable> GetModulesByProductLicense(string productLicenseName);
+        [OperationContract]
+        short GetTotalModuleValue(string licenseServer, byte productID, short modID);
         #endregion
     }
 

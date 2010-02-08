@@ -121,7 +121,7 @@ namespace CreatorData
             }
         }
 
-        public static int GetProductVersionFromTable(int productID)
+        public static int GetProductVersionFromTable(byte productID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {

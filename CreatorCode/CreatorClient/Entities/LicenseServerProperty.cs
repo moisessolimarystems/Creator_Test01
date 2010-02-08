@@ -36,11 +36,12 @@ namespace Client.Creator
             _permissions = license.Permissions;
             _isActive = license.IsActive;
             _destinationName = license.DestName;
+
         }
 
         //requires a licPackage stream for licStream not just licLicenseInfoAttribs.
         public LicenseServerProperty(LicenseTable license, PermissionsTable permissions)
-        {            
+        {
             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
             licPackage.Stream = license.LicenseInfo;            
             _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
@@ -224,7 +225,22 @@ namespace Client.Creator
         public string Comments
         {
             get { return _comments; }
-            set { _comments = value; }
+            set 
+            {
+                if (_comments != value)
+                {
+                    Service<ICreator>.Use((client) =>
+                    {
+                        LicenseTable lt = client.GetLicenseByName(Name, false);
+                        if (lt != null)
+                        {
+                            lt.LicenseComments = value;
+                            client.UpdateLicense(lt, false);
+                        }
+                    });
+                    _comments = value;
+                }
+            }
         }
 
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -235,24 +251,24 @@ namespace Client.Creator
         {
             get
             {
-                if (_comments.Contains("|"))
+                if (Comments.Contains("|"))
                 {
                     //split return first half
-                    string[] notes = _comments.Split("|".ToCharArray());
+                    string[] notes = Comments.Split("|".ToCharArray());
                     return notes[0];
                 }
-                return _comments;
+                return Comments;
             }
             set
             {
-                if (_comments.Contains("|"))
+                if (Comments.Contains("|"))
                 {
-                    string[] notes = _comments.Split("|".ToCharArray());
+                    string[] notes = Comments.Split("|".ToCharArray());
                     notes[0] = value;
-                    _comments = string.Format("{0}|{1}", notes[0], notes[1]);
+                    Comments = string.Format("{0}|{1}", notes[0], notes[1]);
                 }
                 else
-                    _comments = value;
+                    Comments = value;
             }
         }
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
@@ -263,27 +279,27 @@ namespace Client.Creator
         {
             get
             {
-                if (_comments.Contains("|"))
+                if (Comments.Contains("|"))
                 {
                     //split return first half
-                    string[] notes = _comments.Split("|".ToCharArray());
+                    string[] notes = Comments.Split("|".ToCharArray());
                     return notes[1];
                 }
                 return "";
             }
             set
             {
-                if (_comments.Contains("|"))
+                if (Comments.Contains("|"))
                 {
-                    string[] notes = _comments.Split("|".ToCharArray());
+                    string[] notes = Comments.Split("|".ToCharArray());
                     notes[1] = value;
-                    _comments = string.Format("{0}|{1}", notes[0], notes[1]);
+                    Comments = string.Format("{0}|{1}", notes[0], notes[1]);
                 }
                 else
                 {
                     if (value.Length > 0)
                     {
-                        _comments = string.Format("{0}|{1}", _comments, value);
+                        Comments = string.Format("{0}|{1}", _comments, value);
                     }
                 }
             }

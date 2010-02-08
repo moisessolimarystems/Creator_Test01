@@ -5,6 +5,8 @@ using System.Text;
 using System.ComponentModel;
 using Solimar.Licensing;
 using Solimar.Licensing.Attribs;
+using Client.Creator.ServiceProxy;
+using Client.Creator.CreatorService;
 
 namespace Client.Creator
 {
@@ -13,19 +15,14 @@ namespace Client.Creator
     {
         private string _name;
         //static to allow ProductProperty to set what product the module belongs before being initialized
-        private Lic_PackageAttribs.Lic_ModuleInfoAttribs _module;
-        public static uint _productID;
+        private ModuleTable _module;
+        public static byte _productID;
+        public CommunicationLink _commLink;
 
-        public ModuleProperty(Lic_PackageAttribs.Lic_ModuleInfoAttribs module)
+        public ModuleProperty(ModuleTable module)
         {
-            _module = module;                      
-        }
-
-        public void SetModuleProperty(ModuleProperty module)
-        {
-            _module.moduleID.TVal = module.ID;
-            _module.moduleAppInstance.TVal = module.AppInstance;
-            _module.moduleValue.TVal = module.Units;
+            _module = module;
+            _commLink = CreatorForm.s_CommLink;
         }
 
         public override bool Equals(object obj)
@@ -33,44 +30,59 @@ namespace Client.Creator
             return _module.Equals(obj as Lic_PackageAttribs.Lic_ModuleInfoAttribs);
         }
 
-        public uint ProductID
+        public byte ProductID
         {
             get { return _productID; }
             set { _productID = value; }
         }
 
-        public uint ID
+        public short ID
         {
-            get { return _module.moduleID.TVal; }
-            set { _module.moduleID.TVal = value; }
+            get { return _module.ModID; }
+            set { _module.ModID = value; }
         }
      
         public virtual string Name
         {
             //need to translate the id to name;
-            get { return CreatorForm.s_CommLink.GetModuleName(_productID, ID); }
+            get { return _commLink.GetModuleName(_productID, ID); }
             set 
             {
-                if ((value as string).Equals("{New Module}"))
-                {
-                    throw new FormatException("Please set a module");
-                }
-                //TODO : need to account for case where _productID is bad.
-                _module.moduleID.TVal = (uint)CreatorForm.s_CommLink.GetModuleID(_productID, value);
                 _name = value; 
             }
         }
 
-        public uint Units
+        public short Value
         {
-            get { return _module.moduleValue.TVal; }
-            set { _module.moduleValue.TVal = value; }
+            get { return _module.Value; }
+            set { _module.Value = value; }
         }
 
-        public uint AppInstance
+        public byte AppInstance
         {
-            get{ return _module.moduleAppInstance.TVal;}
-            set { _module.moduleAppInstance.TVal = value; }
+            get{ return _module.AppInstance;}
+            set { _module.AppInstance = value; }
+        }
+
+        public CommunicationLink CommLink
+        { 
+            get { return _commLink; } 
+        }
+
+        public uint UnlimitedValue
+        {
+            get 
+            {
+                return (uint)_commLink.GetUnlimitedModuleValue(ProductID, (uint)ID);               
+            }
+        }
+
+        public uint MaxValue
+        {
+            get
+            {
+                return (uint)_commLink.GetMaxModuleValue(ProductID, (uint)ID);
+            }
         }
 
         public override string ToString()

@@ -89,39 +89,6 @@ namespace CreatorData
             }
         }
 
-        public static int GetLicenseCountByID(int custID, int destID, int groupID)
-        {
-            int count = 0;
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                var licenses = from l in db.LicenseTables
-                               where l.GroupID.Equals(groupID) && 
-                                     l.DestinationID.Equals(destID) &&  
-                                     l.SCRnumber.Equals(custID) 
-                               select l;
-                count = licenses.Count();                          
-            }
-            return count;
-        }
-
-        public static uint GetLastGroupID(uint custID, uint destID)
-        {
-            uint groupID = 0;
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                var license = from l in db.LicenseTables
-                               where l.DestinationID.Equals(destID) &&
-                                     l.SCRnumber.Equals(custID) &&
-                                     l.GroupID == db.LicenseTables.Max(g => g.GroupID)
-                               select l;
-                if(license.Count() > 0)
-                    groupID = (uint) license.FirstOrDefault().GroupID;
-            }
-            return groupID;
-        }
-
         public static uint GetNextGroupID(uint custID, uint destID)
         {
             int groupID = 0;
@@ -152,22 +119,6 @@ namespace CreatorData
                 }                
             }
             return (uint)groupID;
-        }
-
-        public static uint GetLastDestinationID(uint custID)
-        {
-            uint destinationID = 0;
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                var license = from l in db.LicenseTables
-                              where l.SCRnumber.Equals(custID) &&
-                                    l.DestinationID == db.LicenseTables.Max(d => d.DestinationID)
-                              select l;
-                if(license.Count() > 0)
-                    destinationID = (uint) license.FirstOrDefault().DestinationID;
-            }
-            return destinationID;
         }
 
         public static int GetLicenseCountByDestName(uint custID, uint destID)
