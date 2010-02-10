@@ -856,7 +856,13 @@ namespace Client.Creator.CreatorService {
         private Client.Creator.CreatorService.ConditionOperator OperatorField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string RangeValueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string ValueField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string ValueTypeField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -895,6 +901,19 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public string RangeValue {
+            get {
+                return this.RangeValueField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.RangeValueField, value) != true)) {
+                    this.RangeValueField = value;
+                    this.RaisePropertyChanged("RangeValue");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public string Value {
             get {
                 return this.ValueField;
@@ -903,6 +922,19 @@ namespace Client.Creator.CreatorService {
                 if ((object.ReferenceEquals(this.ValueField, value) != true)) {
                     this.ValueField = value;
                     this.RaisePropertyChanged("Value");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ValueType {
+            get {
+                return this.ValueTypeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.ValueTypeField, value) != true)) {
+                    this.ValueTypeField = value;
+                    this.RaisePropertyChanged("ValueType");
                 }
             }
         }
@@ -931,52 +963,49 @@ namespace Client.Creator.CreatorService {
         LicenseServer = 2,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        LicenseType = 3,
+        ProductLicense = 3,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ProductLicense = 4,
+        ExpirationDate = 4,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ExpirationDate = 5,
+        Product = 5,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Product = 6,
+        ProductVersion = 6,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ProductVersion = 7,
+        State = 7,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        State = 8,
+        Extension = 8,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Extension = 9,
+        Activation = 9,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Activation = 10,
+        ActivationAmount = 10,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ActivationAmount = 11,
+        Active = 11,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Active = 12,
+        HardwareID = 12,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        HardwareID = 13,
+        ActivatedDate = 13,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ActivatedDate = 14,
+        DeactivatedDate = 14,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        DeactivatedDate = 15,
+        Module = 15,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Module = 16,
+        ModuleValue = 16,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        ModuleValue = 17,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Notes = 18,
+        Notes = 17,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
@@ -997,6 +1026,12 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Contains = 4,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        IsInTheLast = 5,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        IsInTheNext = 6,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1920,6 +1955,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTotalModuleValue", ReplyAction="http://tempuri.org/ICreator/GetTotalModuleValueResponse")]
         short GetTotalModuleValue(string licenseServer, byte productID, short modID);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
+        void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByPacketID", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByPacketIDResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int pktID);
         
@@ -2246,6 +2284,10 @@ namespace Client.Creator.CreatorService {
         
         public short GetTotalModuleValue(string licenseServer, byte productID, short modID) {
             return base.Channel.GetTotalModuleValue(licenseServer, productID, modID);
+        }
+        
+        public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion) {
+            base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int pktID) {

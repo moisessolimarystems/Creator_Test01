@@ -22,7 +22,6 @@ namespace Client.Creator
         private Object selectedObject;
         private CommunicationLink m_CommLink;
         private bool m_Validated;
-        private DateTime _currentExpirationDate;
 
         #region Properties
         public DateTime CurrentExpirationDate
@@ -84,7 +83,6 @@ namespace Client.Creator
 
         #region Product License Methods
 
-
         //needs next product license name, license server name
         void LoadProductLicenseTabPage(ProductLicenseDialogData plData)
         {
@@ -122,7 +120,6 @@ namespace Client.Creator
         {
             string[] splitStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
             //can only be one or two
-
             if (splitStatus.Count() > 1)
             {
                 ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
@@ -134,11 +131,9 @@ namespace Client.Creator
                 ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
                 plData.ProductLicense.plState = (byte)state;
             }
-            //plData.ProductLicense.Product.Product.bUseExpirationDate.TVal = true;
             plData.ProductLicense.ProductID = (byte)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
             plData.ProductLicense.ProductConnection = (byte)((plData.ProductLicense.plState == (byte)ProductLicenseState.AddOn) ? 0 : 1);
-            //string[] versionNum = productLicenseVersionMaskedTextBox.Text.Split(".".ToCharArray());
-            plData.ProductLicense.ProductVersion = productLicenseVersionMaskedTextBox.Text; //new LicenseVersion(UInt32.Parse(versionNum[0]), UInt32.Parse(versionNum[1]));
+            plData.ProductLicense.ProductVersion = productLicenseVersionMaskedTextBox.Text;
             plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
             plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;
         }
@@ -237,6 +232,41 @@ namespace Client.Creator
                 }
             }
         }
+
+        private void ValidateTokenForm()
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            m_Validated = true;
+            //Service<ICreator>.Use((client) =>
+            //{
+            //    LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+            //    if (hardwareRadioButton.Checked)
+            //    {
+
+            //        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
+            //        if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenListView.SelectedItems[0].Text))
+            //        {
+            //            m_Validated = false;
+            //            this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
+
+            //            // Set the ErrorProvider error with the text to display.
+            //            //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+            //            MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //        }
+            //    }
+            //    else
+            //    {
+            //    }
+            //});
+            Cursor.Current = Cursors.Default;
+        }
+
+        private bool IsValidTokenType(string tokenType)
+        {
+            if (GetTokenEnum(tokenType) != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
+                return true;
+            return false;
+        }
         #endregion
 
         #region Packet Methods
@@ -275,107 +305,6 @@ namespace Client.Creator
 
         #region TokenTabPage Events
 
-        private void ValidateTokenForm()
-        {
-            Cursor.Current = Cursors.WaitCursor;
-            m_Validated = true;
-            //Service<ICreator>.Use((client) =>
-            //{
-            //    LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
-            //    if (hardwareRadioButton.Checked)
-            //    {
-
-            //        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
-            //        if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenListView.SelectedItems[0].Text))
-            //        {
-            //            m_Validated = false;
-            //            this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
-
-            //            // Set the ErrorProvider error with the text to display.
-            //            //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-            //            MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //        }
-            //    }
-            //    else
-            //    {
-            //    }
-            //});
-            Cursor.Current = Cursors.Default; 
-        }
-
-        #endregion
-
-        #region ProductLicenseTabPage Events
-
-        private void productLicenseProductComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //filter out available types - for status
-            ProductLicenseDialogData storedObject = selectedObject as ProductLicenseDialogData;            
-            //get current product version for product;
-            string selectedProduct = ProductLicenseProductComboBox.SelectedItem.ToString();
-            ProductLicenseTypeComboBox.Items.Clear();
-            productLicenseVersionMaskedTextBox.Text = "0.00";
-            Service<ICreator>.Use((client) => 
-            {
-                //get all orders for a given product
-                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(selectedProduct));
-                List<ProductLicenseTable> productLicenses;
-                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                {
-                    if (productSpec.productName.TVal.Equals(selectedProduct)) //&& !productSpec.productName.TVal.Contains("Test"))
-                    {
-                        productLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(productSpec.productName.TVal));
-                        if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
-                            productLicenses.Count > 0))
-                            ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
-                        break;
-                    }
-                }
-                if (dbProductLicenses.Count > 0)
-                {
-                    ProductLicenseState state = (ProductLicenseState)dbProductLicenses[0].plState;
-                    foreach (ProductLicenseTable plRec in dbProductLicenses)
-                    {
-                        if (plRec.plState.Equals((byte)ProductLicenseState.Licensed))
-                        {
-                            ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", ProductLicenseState.AddOn, plRec.plID));  
-                        }
-                    }               
-                }
-                ProductLicenseTypeComboBox.SelectedIndex = 0;
-                string baseProduct = (selectedProduct.Contains("Test")) ?  CreatorForm.s_CommLink.GetProductBaseName(selectedProduct) : selectedProduct;
-                short productID = CreatorForm.s_CommLink.GetProductID(baseProduct);
-                if (productID > 0)
-                {
-                    int productVersion = client.GetProductVersionFromTable((byte)productID);
-                    productLicenseVersionMaskedTextBox.Text = string.Format("{0:x}", productVersion);
-                }
-            });
-
-        }
-
-        private void expDateTextBox_TextChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                Int32.Parse(expDateTextBox.Text);
-            }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show("Please input a valid number");
-                expDateTextBox.SelectionStart = 0;
-                expDateTextBox.SelectionLength = expDateTextBox.Text.Length;
-            }
-        }
-        #endregion
-
-        private bool IsValidTokenType(string tokenType)
-        {
-            if(GetTokenEnum(tokenType) != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone)
-                return true;
-            return false;
-        }
-            
         private void browseTokenFileButton_Click(object sender, EventArgs e)
         {
             LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
@@ -387,46 +316,26 @@ namespace Client.Creator
                 {
                     using (StreamReader sr = new StreamReader(browseCSVOpenFileDialog.FileName))
                     {
-                        //CustomerTable ct = null;
-                        String line, tokenValue, tokenName;                        
+                        String line, tokenValue, tokenName;
                         while ((line = sr.ReadLine()) != null)
                         {
-                            tokenName = line.Substring(0, line.IndexOf(",") -1);
+                            tokenName = line.Substring(0, line.IndexOf(",") - 1);
                             tokenName = tokenName.Trim(new Char[] { '"' });
                             tokenValue = line.Remove(0, line.IndexOf(",") + 1);
                             tokenValue = tokenValue.Trim(new Char[] { '"' });
-                            //file validation
-                            //if (tokenName == "Company")
-                            //{
-                            //    Service<ICreator>.Use((client) =>
-                            //    {
-                            //        ct = client.GetCustomer(selectedLicense.CustID.ToString(), false);
-                            //    });
-                            //    if (ct != null)
-                            //    {
-                            //        if (ct.SCRname != tokenValue)
-                            //        {
-                            //            MessageBox.Show("Invalid Validation Token file for " + ct.SCRname, "Software Token Error");
-                            //            break;
-                            //        }
-                            //    }
-                            //}
-                            //else
-                            //{
-                                if (IsValidTokenType(tokenName))
-                                {
-                                    ListViewItem lvItem = new ListViewItem(tokenName);
-                                    lvItem.SubItems.Add(tokenValue);
-                                    tokenListView.Items.Add(lvItem);
-                                }
-                            //}
+                            if (IsValidTokenType(tokenName))
+                            {
+                                ListViewItem lvItem = new ListViewItem(tokenName);
+                                lvItem.SubItems.Add(tokenValue);
+                                tokenListView.Items.Add(lvItem);
+                            }
                         }
                         sr.Close();
                     }
                     if (tokenListView.Items.Count > 0)
                     {
                         tokenListView.Columns[0].Width = -2;
-                        tokenListView.Columns[1].Width = -2; 
+                        tokenListView.Columns[1].Width = -2;
                         btnOk.Enabled = true;
                         TokenDescriptionLabel.Text = "Customer Validation Information";
                     }
@@ -475,6 +384,72 @@ namespace Client.Creator
             tokenListView.Items.Clear();
             btnOk.Enabled = false;
         }
+
+        #endregion
+
+        #region ProductLicenseTabPage Events
+
+        private void productLicenseProductComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //filter out available types - for status
+            ProductLicenseDialogData storedObject = selectedObject as ProductLicenseDialogData;            
+            //get current product version for product;
+            string selectedProduct = ProductLicenseProductComboBox.SelectedItem.ToString();
+            ProductLicenseTypeComboBox.Items.Clear();
+            productLicenseVersionMaskedTextBox.Text = "0.00";
+            Service<ICreator>.Use((client) => 
+            {
+                //get all orders for a given product
+                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(selectedProduct));
+                List<ProductLicenseTable> productLicenses;
+                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                {
+                    if (productSpec.productName.TVal.Equals(selectedProduct))
+                    {
+                        productLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(productSpec.productName.TVal));
+                        if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
+                            productLicenses.Count > 0))
+                            ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
+                        break;
+                    }
+                }
+                if (dbProductLicenses.Count > 0)
+                {
+                    ProductLicenseState state = (ProductLicenseState)dbProductLicenses[0].plState;
+                    foreach (ProductLicenseTable plRec in dbProductLicenses)
+                    {
+                        if (plRec.plState.Equals((byte)ProductLicenseState.Licensed))
+                        {
+                            ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", ProductLicenseState.AddOn, plRec.plID));  
+                        }
+                    }               
+                }
+                ProductLicenseTypeComboBox.SelectedIndex = 0;
+                string baseProduct = (selectedProduct.Contains("Test")) ?  CreatorForm.s_CommLink.GetProductBaseName(selectedProduct) : selectedProduct;
+                short productID = CreatorForm.s_CommLink.GetProductID(baseProduct);
+                if (productID > 0)
+                {
+                    int productVersion = client.GetProductVersionFromTable((byte)productID);
+                    productLicenseVersionMaskedTextBox.Text = string.Format("{0:x}", productVersion);
+                }
+            });
+
+        }
+
+        private void expDateTextBox_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                Int32.Parse(expDateTextBox.Text);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Please input a valid number");
+                expDateTextBox.SelectionStart = 0;
+                expDateTextBox.SelectionLength = expDateTextBox.Text.Length;
+            }
+        }
+        #endregion
     }
 
     #region LicenseDialogData class

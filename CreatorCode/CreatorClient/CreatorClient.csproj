@@ -50,7 +50,7 @@
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Shared.VisualComponents, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Creator_Trunk\CreatorCode\SolimarLicensing\Image\Shared.VisualComponents.dll</HintPath>
+      <HintPath>..\SolimarLicensing\Image\Shared.VisualComponents.dll</HintPath>
     </Reference>
     <Reference Include="Solimar.Licensing.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

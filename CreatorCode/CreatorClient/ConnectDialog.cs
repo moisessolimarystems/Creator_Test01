@@ -96,7 +96,17 @@ namespace Client.Creator
             try
             {
                 Client.Creator.ServiceProxy.Service<ICreator>.IsValidHost(this.ServerNameComboBox.Text);
-                m_ValidServer = true;
+                int major = 0, minor = 0, buildversion = 0;
+                Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
+                {
+                    client.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
+                });
+                if (major == VersionInfo.MAJOR_REVISION_NUMBER &&
+                   minor == VersionInfo.MINOR_REVISION_NUMBER &&
+                   buildversion == VersionInfo.BUILD_NUMBER)
+                    m_ValidServer = true;
+                else
+                    throw new Exception("Creator Client and Creator Service versions do not match.");
             }
             catch (Exception ex)
             {

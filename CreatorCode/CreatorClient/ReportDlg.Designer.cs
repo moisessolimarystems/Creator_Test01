@@ -29,11 +29,13 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.conditionValueTextBox = new System.Windows.Forms.TextBox();
+            this.conditionValueTypeComboBox = new System.Windows.Forms.ComboBox();
             this.conditionPlusButton = new System.Windows.Forms.Button();
             this.conditionMinusButton = new System.Windows.Forms.Button();
-            this.conditionValueTextBox = new System.Windows.Forms.TextBox();
             this.conditionOperatorComboBox = new System.Windows.Forms.ComboBox();
             this.conditionNameComboBox = new System.Windows.Forms.ComboBox();
+            this.conditionValueComboBox = new System.Windows.Forms.ComboBox();
             this.matchCheckBox = new System.Windows.Forms.CheckBox();
             this.matchSingleLabel = new System.Windows.Forms.Label();
             this.matchComboBox = new System.Windows.Forms.ComboBox();
@@ -47,16 +49,37 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.conditionValueTextBox);
+            this.groupBox1.Controls.Add(this.conditionValueTypeComboBox);
             this.groupBox1.Controls.Add(this.conditionPlusButton);
             this.groupBox1.Controls.Add(this.conditionMinusButton);
-            this.groupBox1.Controls.Add(this.conditionValueTextBox);
             this.groupBox1.Controls.Add(this.conditionOperatorComboBox);
             this.groupBox1.Controls.Add(this.conditionNameComboBox);
+            this.groupBox1.Controls.Add(this.conditionValueComboBox);
             this.groupBox1.Location = new System.Drawing.Point(12, 33);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(501, 41);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
+            // 
+            // conditionValueTextBox
+            // 
+            this.conditionValueTextBox.Location = new System.Drawing.Point(251, 14);
+            this.conditionValueTextBox.Name = "conditionValueTextBox";
+            this.conditionValueTextBox.Size = new System.Drawing.Size(95, 20);
+            this.conditionValueTextBox.TabIndex = 2;
+            this.conditionValueTextBox.Visible = false;
+            this.conditionValueTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.conditionValueTextBox_KeyDown);
+            // 
+            // conditionValueTypeComboBox
+            // 
+            this.conditionValueTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.conditionValueTypeComboBox.FormattingEnabled = true;
+            this.conditionValueTypeComboBox.Location = new System.Drawing.Point(352, 14);
+            this.conditionValueTypeComboBox.Name = "conditionValueTypeComboBox";
+            this.conditionValueTypeComboBox.Size = new System.Drawing.Size(95, 21);
+            this.conditionValueTypeComboBox.TabIndex = 5;
+            this.conditionValueTypeComboBox.Visible = false;
             // 
             // conditionPlusButton
             // 
@@ -81,14 +104,6 @@
             this.conditionMinusButton.Visible = false;
             this.conditionMinusButton.Click += new System.EventHandler(this.conditionMinusButton_Click);
             // 
-            // conditionValueTextBox
-            // 
-            this.conditionValueTextBox.Location = new System.Drawing.Point(251, 15);
-            this.conditionValueTextBox.Name = "conditionValueTextBox";
-            this.conditionValueTextBox.Size = new System.Drawing.Size(195, 20);
-            this.conditionValueTextBox.TabIndex = 2;
-            this.conditionValueTextBox.Visible = false;
-            // 
             // conditionOperatorComboBox
             // 
             this.conditionOperatorComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -110,6 +125,16 @@
             this.conditionNameComboBox.TabIndex = 0;
             this.conditionNameComboBox.Visible = false;
             this.conditionNameComboBox.SelectedIndexChanged += new System.EventHandler(this.conditionNameComboBox_SelectedIndexChanged);
+            // 
+            // conditionValueComboBox
+            // 
+            this.conditionValueComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.conditionValueComboBox.FormattingEnabled = true;
+            this.conditionValueComboBox.Location = new System.Drawing.Point(251, 14);
+            this.conditionValueComboBox.Name = "conditionValueComboBox";
+            this.conditionValueComboBox.Size = new System.Drawing.Size(196, 21);
+            this.conditionValueComboBox.TabIndex = 6;
+            this.conditionValueComboBox.Visible = false;
             // 
             // matchCheckBox
             // 
@@ -193,5 +218,7 @@
         private System.Windows.Forms.Label matchSingleLabel;
         private System.Windows.Forms.ComboBox matchComboBox;
         private System.Windows.Forms.Label matchMultipleLabel;
+        private System.Windows.Forms.ComboBox conditionValueTypeComboBox;
+        private System.Windows.Forms.ComboBox conditionValueComboBox;
     }
 }

@@ -183,6 +183,12 @@
   <wsdl:message name="ICreator_GetTotalModuleValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetTotalModuleValueResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetCreatorServiceVersion_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCreatorServiceVersion" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetCreatorServiceVersion_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCreatorServiceVersionResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetTransactionsByPacketID_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTransactionsByPacketID" />
   </wsdl:message>
@@ -675,6 +681,10 @@
     <wsdl:operation name="GetTotalModuleValue">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTotalModuleValue" message="tns:ICreator_GetTotalModuleValue_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetTotalModuleValueResponse" message="tns:ICreator_GetTotalModuleValue_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCreatorServiceVersion">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersion" message="tns:ICreator_GetCreatorServiceVersion_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse" message="tns:ICreator_GetCreatorServiceVersion_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetTransactionsByPacketID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByPacketID" message="tns:ICreator_GetTransactionsByPacketID_InputMessage" />
@@ -1173,6 +1183,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetTotalModuleValue">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetTotalModuleValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCreatorServiceVersion">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetCreatorServiceVersion" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

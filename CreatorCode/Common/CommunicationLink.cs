@@ -38,7 +38,21 @@ namespace Client.Creator
                 throw new COMException("Connect Failed", ex);
             }
         }
-       
+
+        //public bool IsValidLicenseServerVersion(string serverName)
+        //{
+        //    bool bRetVal = false;
+        //    int major = 0, minor = 0, buildversion = 0;
+        //    if (m_licenseWrapper.GetVersionLicenseServer(serverName, ref major, ref minor, ref buildversion))
+        //    {
+        //        if (VersionInfo.MAJOR_REVISION_NUMBER == major &&
+        //           VersionInfo.MINOR_REVISION_NUMBER == minor &&
+        //           VersionInfo.BUILD_NUMBER == buildversion)
+        //            bRetVal = true;  
+        //    }
+        //    return bRetVal;
+        //}
+
         public void GetAllSoftwareLicenses(ref String slStream)
         {
             try
@@ -281,6 +295,16 @@ namespace Client.Creator
                 if (productID != 0) break;
             }
             return productID;
+        }
+
+        public List<String> GetProductNameList()
+        {
+            List<String> productList = new List<string>();
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
+            {
+                productList.Add(productSpec.productName.TVal);
+            }
+            return productList;
         }
 
         public string GetProductName(byte productID)

@@ -10,7 +10,9 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Name" type="tns:ConditionName" />
       <xs:element minOccurs="0" name="Operator" type="tns:ConditionOperator" />
+      <xs:element minOccurs="0" name="RangeValue" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ValueType" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Condition" nillable="true" type="tns:Condition" />
@@ -19,7 +21,6 @@
       <xs:enumeration value="UnKnown" />
       <xs:enumeration value="Customer" />
       <xs:enumeration value="LicenseServer" />
-      <xs:enumeration value="LicenseType" />
       <xs:enumeration value="ProductLicense" />
       <xs:enumeration value="ExpirationDate" />
       <xs:enumeration value="Product" />
@@ -45,6 +46,8 @@
       <xs:enumeration value="LessThan" />
       <xs:enumeration value="GreaterThan" />
       <xs:enumeration value="Contains" />
+      <xs:enumeration value="IsInTheLast" />
+      <xs:enumeration value="IsInTheNext" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ConditionOperator" nillable="true" type="tns:ConditionOperator" />

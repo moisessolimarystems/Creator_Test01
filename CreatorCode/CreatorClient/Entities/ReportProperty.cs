@@ -49,10 +49,16 @@ namespace Client.Creator
             _filterOperators = new Dictionary<string, ConditionOperator>
                 {
                     {"is", ConditionOperator.Equal},
+                    {"is not", ConditionOperator.NotEqual}
+                };
+
+        public static readonly IDictionary<string, ConditionOperator>
+            _filterNumberOperators = new Dictionary<string, ConditionOperator>
+                {
+                    {"is", ConditionOperator.Equal},
                     {"is not", ConditionOperator.NotEqual},
                     {"is less than", ConditionOperator.LessThan},
-                    {"is greater than", ConditionOperator.GreaterThan},
-                    {"contains", ConditionOperator.Contains}
+                    {"is greater than", ConditionOperator.GreaterThan}
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
@@ -60,23 +66,23 @@ namespace Client.Creator
                 {
                     {"is", ConditionOperator.Equal},
                     {"is not", ConditionOperator.NotEqual},
-                    {"is after", ConditionOperator.LessThan},
-                    {"is before", ConditionOperator.GreaterThan},
-                    {"is in the last", ConditionOperator.Contains},
-                    {"is not in the last", ConditionOperator.Contains},
-                    {"is in the next", ConditionOperator.Contains},
-                    {"is in the range of", ConditionOperator.Contains}
+                    {"is after", ConditionOperator.GreaterThan},
+                    {"is before", ConditionOperator.LessThan},
+                    {"is in the last", ConditionOperator.IsInTheLast},
+                    //{"is not in the last", ConditionOperator.Contains},
+                    {"is in the next", ConditionOperator.IsInTheNext}//,
+                    //{"is in the range of", ConditionOperator.Contains}
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
             _filterStringOperators = new Dictionary<string, ConditionOperator>
                 {
-                    {"contains", ConditionOperator.Equal},
-                    {"does not contain", ConditionOperator.NotEqual},
-                    {"is", ConditionOperator.LessThan},
-                    {"is not", ConditionOperator.GreaterThan},
-                    {"starts with", ConditionOperator.Contains},
-                    {"ends with", ConditionOperator.Contains}
+                    {"contains", ConditionOperator.Contains},
+                    //{"does not contain", ConditionOperator.NotEqual},
+                    {"is", ConditionOperator.Equal},
+                    {"is not", ConditionOperator.NotEqual}//,
+                    //{"starts with", ConditionOperator.Contains},
+                    //{"ends with", ConditionOperator.Contains}
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
@@ -91,6 +97,22 @@ namespace Client.Creator
             LicenseServer,
             ProductLicense,
             HardwareToken
+        }
+
+        public enum ConditionNameType
+        {
+            Date,
+            String,
+            Number,
+            Bool,
+            Defined
+        }
+
+        public enum ExpirationValueType
+        {
+            days,
+            weeks,
+            months
         }
 
         private string  _id;
@@ -175,7 +197,8 @@ namespace Client.Creator
                         ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
                         {
                             CreatorService.CustomerTable dbCustomer = client.GetCustomer(userCondition.Value, false);
-                            strVal = dbCustomer.SCRnumber.ToString();
+                            if(dbCustomer != null)
+                                strVal = dbCustomer.SCRnumber.ToString();
                         });
                     }
                     else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
@@ -193,6 +216,64 @@ namespace Client.Creator
                 dbConditionList.Add(dbCondition);
             }
             return dbConditionList;
+        }
+
+        //date types - days, weeks, months
+        public ConditionNameType GetConditionNameType(ConditionName cn)
+        {
+            //3 types - string -> bool + contains, date, number, bool
+            ConditionNameType cnt = ConditionNameType.String;
+            switch (cn)
+            {
+                case ConditionName.ActivatedDate:
+                case ConditionName.DeactivatedDate:
+                case ConditionName.ExpirationDate:
+                    return ConditionNameType.Date;
+                    break;
+                case ConditionName.Activation:
+                case ConditionName.ActivationAmount:
+                case ConditionName.Extension:
+                case ConditionName.ModuleValue:
+                    return ConditionNameType.Number;
+                    break;
+                case ConditionName.Customer:
+                case ConditionName.HardwareID:
+                case ConditionName.LicenseServer:
+                case ConditionName.Module:
+                case ConditionName.Notes:
+                case ConditionName.ProductLicense:
+                case ConditionName.ProductVersion:
+                    return ConditionNameType.String;
+                    break;
+                case ConditionName.Active:
+                    return ConditionNameType.Bool;
+                    break;
+                default : // ConditionName.Product, ConditionName.State(PL, HW)
+                    return ConditionNameType.Defined;
+                    break;
+            }
+            return cnt;
+        }
+
+        public string[] GetDefinedValues(ConditionName cn)
+        {
+            List<string> definedValueList = new List<string>();
+            if (cn == ConditionName.Product)
+            {
+                definedValueList.AddRange(CreatorForm.s_CommLink.GetProductNameList());
+            }
+            else
+            {
+                if (_type == ReportType.ProductLicense)
+                {
+                    definedValueList.AddRange(Enum.GetNames(typeof(ProductLicenseState)));
+                }
+                else
+                { 
+                    definedValueList.AddRange(Enum.GetNames(typeof(TokenStatus)));
+                }
+            }
+            return definedValueList.ToArray();
         }
 
         public ConditionName GetFilterName(string filterName)
@@ -214,6 +295,29 @@ namespace Client.Creator
             return conditionName;
         }
 
+        public ConditionOperator GetFilterOperator(ConditionName cn, string filterOperator)
+        {
+            ConditionOperator conditionOp = ConditionOperator.Equal;
+            ConditionNameType cnt = GetConditionNameType(cn);
+            switch (cnt)
+            {
+                case ConditionNameType.Date:
+                    conditionOp = _filterDateOperators[filterOperator];
+                    break;
+                case ConditionNameType.Number:
+                    conditionOp = _filterNumberOperators[filterOperator];
+                    break;
+                case ConditionNameType.String:
+                    conditionOp = _filterStringOperators[filterOperator];
+                    break;
+                case ConditionNameType.Defined:
+                    conditionOp = _filterOperators[filterOperator];
+                    break;
+                default: break;
+            }
+            return conditionOp;
+        }
+
         public string GetFilterKey(CreatorService.Condition userCondition)
         {
             string conditionString = "";
@@ -233,6 +337,70 @@ namespace Client.Creator
                 }
             }
             return conditionString;
+        }
+
+        public string GetOperatorKey(CreatorService.Condition userCondition)
+        {
+            ConditionNameType cnt = GetConditionNameType(userCondition.Name);
+            IDictionary<string, ConditionOperator> filterOperators = null;
+            string conditionString = "";
+            if (cnt == ConditionNameType.Date)
+                filterOperators = _filterDateOperators;
+            else if (cnt == ConditionNameType.Bool)
+                filterOperators = _filterBoolOperators;
+            else if (cnt == ConditionNameType.Number)
+                filterOperators = _filterNumberOperators;
+            else if (cnt == ConditionNameType.String)
+                filterOperators = _filterStringOperators;
+            else
+                filterOperators = _filterOperators;
+            foreach (KeyValuePair<string, ConditionOperator> kvp in filterOperators)
+            {
+                if (kvp.Value == userCondition.Operator)
+                {
+                    conditionString = kvp.Key;
+                    break;
+                }
+            }
+            return conditionString;
+        }
+
+        public ICollection<string> GetOperatorKeys(ConditionName cn)
+        {
+            ConditionNameType cnt = GetConditionNameType(cn);
+            ICollection<string> operatorCollection = _filterOperators.Keys;
+            switch(cnt)
+            {
+                case ConditionNameType.Bool:
+                    return _filterBoolOperators.Keys;
+                    break;
+                case ConditionNameType.Date:
+                    return _filterDateOperators.Keys;
+                    break;
+                case ConditionNameType.Number:
+                    return _filterNumberOperators.Keys;
+                    break;
+                case ConditionNameType.String:
+                    return _filterStringOperators.Keys;
+                default: break; //return string operators
+            }
+            return operatorCollection;
+        }
+
+        public ICollection<string> GetNameKeys()
+        {
+            ICollection<string> nameCollection = _filterLSNames.Keys;
+            switch (_type)
+            {
+                case ReportType.ProductLicense:
+                    return _filterPLNames.Keys;
+                    break;
+                case ReportType.HardwareToken:
+                    return _filterHTNames.Keys;
+                    break;
+                default: break; //return license server names
+            }
+            return nameCollection;
         }
     }
 

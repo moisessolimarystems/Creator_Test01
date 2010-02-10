@@ -276,32 +276,32 @@
             // connectToolStripMenuItem
             // 
             this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.connectToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.connectToolStripMenuItem.Text = "Connect";
             this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(122, 6);
             // 
             // printToolStripMenuItem
             // 
             this.printToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripMenuItem.Image")));
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.printToolStripMenuItem.Text = "Print";
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(122, 6);
             // 
             // exitMainToolStripMenuItem
             // 
             this.exitMainToolStripMenuItem.Name = "exitMainToolStripMenuItem";
-            this.exitMainToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitMainToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.exitMainToolStripMenuItem.Text = "E&xit";
             this.exitMainToolStripMenuItem.Click += new System.EventHandler(this.exitMainToolStripMenuItem_Click);
             // 
@@ -1007,7 +1007,7 @@
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
-            this.TransactionsTabPage.Size = new System.Drawing.Size(696, 394);
+            this.TransactionsTabPage.Size = new System.Drawing.Size(696, 396);
             this.TransactionsTabPage.TabIndex = 1;
             this.TransactionsTabPage.Text = "Transactions";
             this.TransactionsTabPage.UseVisualStyleBackColor = true;
@@ -1031,7 +1031,7 @@
             this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionListView.Name = "TransactionListView";
             this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(696, 369);
+            this.TransactionListView.Size = new System.Drawing.Size(696, 371);
             this.TransactionListView.TabIndex = 0;
             this.TransactionListView.UseCompatibleStateImageBehavior = false;
             this.TransactionListView.View = System.Windows.Forms.View.Details;
@@ -1115,7 +1115,7 @@
             this.PacketTabPage.ImageIndex = 4;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(696, 394);
+            this.PacketTabPage.Size = new System.Drawing.Size(696, 396);
             this.PacketTabPage.TabIndex = 2;
             this.PacketTabPage.Text = "Packets";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -1138,7 +1138,7 @@
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
             this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Size = new System.Drawing.Size(696, 369);
+            this.splitContainer1.Size = new System.Drawing.Size(696, 371);
             this.splitContainer1.SplitterDistance = 294;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
@@ -1161,7 +1161,7 @@
             this.LicensePacketListView.MultiSelect = false;
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(694, 367);
+            this.LicensePacketListView.Size = new System.Drawing.Size(694, 369);
             this.LicensePacketListView.StateImageList = this.ListViewImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
@@ -1245,7 +1245,7 @@
             this.ValidationKeysTabPage.Location = new System.Drawing.Point(4, 22);
             this.ValidationKeysTabPage.Margin = new System.Windows.Forms.Padding(5);
             this.ValidationKeysTabPage.Name = "ValidationKeysTabPage";
-            this.ValidationKeysTabPage.Size = new System.Drawing.Size(981, 426);
+            this.ValidationKeysTabPage.Size = new System.Drawing.Size(981, 428);
             this.ValidationKeysTabPage.TabIndex = 4;
             this.ValidationKeysTabPage.Text = "Validation Keys";
             this.ValidationKeysTabPage.UseVisualStyleBackColor = true;
@@ -1257,7 +1257,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(981, 426);
+            this.panel1.Size = new System.Drawing.Size(981, 428);
             this.panel1.TabIndex = 0;
             // 
             // HardwareKeyListView
@@ -1272,7 +1272,7 @@
             this.HardwareKeyListView.Name = "HardwareKeyListView";
             this.HardwareKeyListView.NoItemsMessage = "There are no hardware keys to show in this view";
             this.HardwareKeyListView.ShowGroups = false;
-            this.HardwareKeyListView.Size = new System.Drawing.Size(981, 401);
+            this.HardwareKeyListView.Size = new System.Drawing.Size(981, 403);
             this.HardwareKeyListView.TabIndex = 1;
             this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
             this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
@@ -1319,7 +1319,7 @@
             this.ReportTabPage.Location = new System.Drawing.Point(4, 22);
             this.ReportTabPage.Margin = new System.Windows.Forms.Padding(5);
             this.ReportTabPage.Name = "ReportTabPage";
-            this.ReportTabPage.Size = new System.Drawing.Size(981, 426);
+            this.ReportTabPage.Size = new System.Drawing.Size(981, 428);
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Reports";
             this.ReportTabPage.UseVisualStyleBackColor = true;
@@ -1337,7 +1337,7 @@
             // reportsSplitContainer.Panel2
             // 
             this.reportsSplitContainer.Panel2.Controls.Add(this.ReportListView);
-            this.reportsSplitContainer.Size = new System.Drawing.Size(981, 426);
+            this.reportsSplitContainer.Size = new System.Drawing.Size(981, 428);
             this.reportsSplitContainer.SplitterDistance = 233;
             this.reportsSplitContainer.TabIndex = 1;
             // 
@@ -1352,7 +1352,7 @@
             treeNode1.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
-            this.reportsTreeView.Size = new System.Drawing.Size(233, 426);
+            this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
             this.reportsTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.reportsTreeView_MouseUp);
@@ -1368,7 +1368,7 @@
             this.ReportListView.HideSelection = false;
             this.ReportListView.Location = new System.Drawing.Point(0, 0);
             this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(744, 426);
+            this.ReportListView.Size = new System.Drawing.Size(744, 428);
             this.ReportListView.TabIndex = 0;
             this.ReportListView.UseCompatibleStateImageBehavior = false;
             this.ReportListView.View = System.Windows.Forms.View.Details;

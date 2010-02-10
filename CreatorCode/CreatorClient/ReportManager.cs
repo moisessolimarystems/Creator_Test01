@@ -122,6 +122,11 @@ namespace Client.Creator
                             if (tmpString == null)
                                 continue;
                             newCondition.Value = tmpString;
+                            tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.TypeAttrib);
+                            if (tmpString == null)
+                                tmpString = "";
+                            newCondition.ValueType = tmpString;
+
                             newReport.Conditions.Add(newCondition);
                         } while (reader.ReadToNextSibling(AppConstants.ReportXMLTags.ConditionElement));
                         reportList.Add(newReport);
@@ -175,6 +180,9 @@ namespace Client.Creator
                         writer.WriteAttributeString(AppConstants.ReportXMLTags.NameAttrib, c.Name.ToString());
                         writer.WriteAttributeString(AppConstants.ReportXMLTags.OperatorAttrib, c.Operator.ToString());
                         writer.WriteAttributeString(AppConstants.ReportXMLTags.ValueAttrib, c.Value);
+                        if(c.ValueType != null)
+                            if(c.ValueType.Length > 0)
+                                writer.WriteAttributeString(AppConstants.ReportXMLTags.TypeAttrib, c.ValueType);
                         writer.WriteEndElement();       //Close Condition Element
                     }
                     writer.WriteFullEndElement();   //Close Report Element
