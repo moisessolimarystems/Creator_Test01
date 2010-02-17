@@ -64,6 +64,9 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
+    <Compile Include="..\Common\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="ICreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Creator.cs">

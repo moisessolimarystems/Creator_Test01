@@ -64,6 +64,8 @@ namespace Service.Creator
                     {"LessThan", "<"},
                     {"GreaterThan", ">"},
                     {"Contains", "Contains"},
+                    {"IsInTheLast", "IsInTheLast"},
+                    {"IsInTheNext", "IsInTheNext"}
                 };
         public static SolimarLicenseServerWrapper m_licServer = new SolimarLicenseServerWrapper();
         public static CommunicationLink m_CommLink = new CommunicationLink();
@@ -179,7 +181,6 @@ namespace Service.Creator
         {
             String value;
             int result;
-            DateTime date;
             StringBuilder conditionString = new StringBuilder();
             foreach (Condition userCondition in cl)
             {
@@ -191,32 +192,71 @@ namespace Service.Creator
                         conditionString.Append(" or ");
                 }
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
-                conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
                 value = userCondition.Value;
-                if (DateTime.TryParse(value, out date))
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                switch (userCondition.Name)
                 {
-                    value = string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day);
-                }
-                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
-                {
-                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
-                }
-                else
-                {
-                    if (!Int32.TryParse(value, out result))
-                    {
-                        if (userCondition.Name == ConditionName.Active)
+                    //case ConditionName.ExpirationDate:
+                    //    string opStr = _filterOperators[userCondition.Operator.ToString()];
+                    //    DateTime date;
+                    //    int parseValue;
+                    //    if (opStr == "IsInTheLast" || opStr == "IsInTheNext")
+                    //    {
+                    //        if (Int32.TryParse(value, out parseValue))
+                    //        {
+                    //            if (opStr == "IsInTheLast")
+                    //                parseValue = -parseValue;
+                    //            if (userCondition.ValueType == "Days")
+                    //                date = DateTime.Today.AddDays(parseValue);
+                    //            else if (userCondition.ValueType == "Weeks")
+                    //                date = DateTime.Today.AddDays(parseValue * 7);
+                    //            else
+                    //                date = DateTime.Today.AddMonths(parseValue);
+                    //            if (opStr == "IsInTheLast")
+                    //                conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
+                    //                                                     _filterLSNames[userCondition.Name.ToString()],
+                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                    //            else
+                    //                conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
+                    //                                                     _filterLSNames[userCondition.Name.ToString()],
+                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (DateTime.TryParse(value, out date))
+                    //            conditionString.Append(string.Format("{0}{1}{2}",
+                    //                                                 _filterLSNames[userCondition.Name.ToString()],
+                    //                                                 _filterOperators[userCondition.Operator.ToString()],
+                    //                                                 string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                    //    }
+                    //    break;
+                    default:
+                        conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
+                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
                         {
-                            bool bValue;
-                            if (bool.TryParse(userCondition.Value, out bValue))
-                                value = (bValue) ? bool.TrueString : bool.FalseString;
+                            conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                         }
                         else
-                            value = "\"" + value + "\"";
-                    }
-                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                    conditionString.Append(value);
-                }                
+                        {
+                            if (!Int32.TryParse(value, out result))
+                            {
+                                if (userCondition.Name == ConditionName.Active)
+                                {
+                                    bool bValue;
+                                    if (bool.TryParse(userCondition.Value, out bValue))
+                                        value = (bValue) ? bool.TrueString : bool.FalseString;
+                                }
+                                else
+                                    value = "\"" + value + "\"";
+                            }
+                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                            conditionString.Append(value);
+                        }
+                        break;
+                };             
             }
             return LicenseTable.GetLicensesByConditions(conditionString.ToString());
         }
@@ -376,9 +416,8 @@ namespace Service.Creator
         {
             String value;
             int result;
-            DateTime date;
             StringBuilder conditionString = new StringBuilder();
-            
+          
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
@@ -388,51 +427,84 @@ namespace Service.Creator
                     else
                         conditionString.Append(" or ");
                 }
+                value = userCondition.Value;
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
-                if (userCondition.Name == ConditionName.Module)
+                switch (userCondition.Name)
                 {
-                    int productID = 0, moduleID = 0;
-                    string[] moduleValue = userCondition.Value.Split(",".ToCharArray());
-                    if (moduleValue.Count() == 2)
-                    {
-                        Int32.TryParse(moduleValue[0], out productID);
-                        Int32.TryParse(moduleValue[1], out moduleID);
-                    }
-                    conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID == {1}).Count() > 0", productID, moduleID));
-                }
-                else if (userCondition.Name == ConditionName.ModuleValue)
-                {
-                    conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
-                }
-                else
-                {
-                    conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);
-                    value = userCondition.Value;
-                    if (DateTime.TryParse(value, out date))
-                    {
-                        value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0);
-                    }
-                    if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
-                    {
-                        conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
-                    }
-                    else
-                    {
-                        if (!Int32.TryParse(value, out result))
+                    case ConditionName.Module:
+                        int productID = 0, moduleID = 0;
+                        string[] moduleValue = userCondition.Value.Split(",".ToCharArray());
+                        if (moduleValue.Count() == 2)
                         {
-                            if (userCondition.Name == ConditionName.Active)
-                            {
-                                bool bValue;
-                                if (bool.TryParse(userCondition.Value, out bValue))
-                                    value = (bValue) ? bool.TrueString : bool.FalseString;
-                            }
-                            else
-                                value = "\"" + value + "\"";
+                            Int32.TryParse(moduleValue[0], out productID);
+                            Int32.TryParse(moduleValue[1], out moduleID);
                         }
-                        conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                        conditionString.Append(value);
-                    }
-                }
+                        conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID == {1}).Count() > 0", productID, moduleID));
+                        break;
+                    case ConditionName.ModuleValue:
+                        conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
+                        break;
+                    case ConditionName.ExpirationDate:
+                        string opStr = _filterOperators[userCondition.Operator.ToString()];
+                        DateTime date;                      
+                        int parseValue;
+                        if(opStr == "IsInTheLast" || opStr == "IsInTheNext")
+                        {
+                            if (Int32.TryParse(value, out parseValue))
+                            {
+                                if (opStr == "IsInTheLast")
+                                    parseValue = -parseValue;
+                                if (userCondition.ValueType == "Days")
+                                    date = DateTime.Today.AddDays(parseValue);
+                                else if (userCondition.ValueType == "Weeks")
+                                    date = DateTime.Today.AddDays(parseValue * 7);
+                                else
+                                    date = DateTime.Today.AddMonths(parseValue);
+                                if(opStr == "IsInTheLast")
+                                    conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
+                                                                         _filterPLNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                else
+                                    conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
+                                                                         _filterPLNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                            }
+                        }
+                        else
+                        {
+                            if (DateTime.TryParse(value, out date))
+                                conditionString.Append(string.Format("{0}{1}{2}", 
+                                                                     _filterPLNames[userCondition.Name.ToString()],
+                                                                     _filterOperators[userCondition.Operator.ToString()],
+                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                        }
+                        break;
+                    default:
+                        conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);                        
+                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        {
+                            conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                        }
+                        else
+                        {
+                            if (!Int32.TryParse(value, out result))
+                            {
+                                if (userCondition.Name == ConditionName.Active)
+                                {
+                                    bool bValue;
+                                    if (bool.TryParse(userCondition.Value, out bValue))
+                                        value = (bValue) ? bool.TrueString : bool.FalseString;
+                                }
+                                else
+                                    value = "\"" + value + "\"";
+                            }
+                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                            conditionString.Append(value);
+                        }
+                        break;
+                };
             }
             return ProductLicenseTable.GetProductLicensesByConditions(conditionString.ToString());
         }
@@ -528,7 +600,6 @@ namespace Service.Creator
         {
             String value;
             int result;
-            DateTime date;
             StringBuilder conditionString = new StringBuilder();
             foreach (Condition userCondition in cl)
             {
@@ -539,27 +610,72 @@ namespace Service.Creator
                     else
                         conditionString.Append(" or ");
                 }
-                //create a condition string from condition list using dictionary to translate condition to conditionstring
-                conditionString.Append(_filterHTNames[userCondition.Name.ToString()]);
                 value = userCondition.Value;
-                if (DateTime.TryParse(value, out date))
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                switch (userCondition.Name)
                 {
-                    value = string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0);
-                }
-                if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
-                {
-                    conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
-                }
-                else
-                {                  
-                    if (!Int32.TryParse(value, out result))
-                    {
-                        if (!value.Contains("DateTime"))
-                            value = "\"" + value + "\"";
-                    }
-                    conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                    conditionString.Append(value);
-                }
+                    case ConditionName.ActivatedDate:
+                    case ConditionName.DeactivatedDate:
+                        string opStr = _filterOperators[userCondition.Operator.ToString()];
+                        DateTime date;
+                        int parseValue;
+                        if (opStr == "IsInTheLast" || opStr == "IsInTheNext")
+                        {
+                            if (Int32.TryParse(value, out parseValue))
+                            {
+                                if (opStr == "IsInTheLast")
+                                    parseValue = -parseValue;
+                                if (userCondition.ValueType == "Days")
+                                    date = DateTime.Today.AddDays(parseValue);
+                                else if (userCondition.ValueType == "Weeks")
+                                    date = DateTime.Today.AddDays(parseValue * 7);
+                                else
+                                    date = DateTime.Today.AddMonths(parseValue);
+                                if (opStr == "IsInTheLast")
+                                    conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
+                                                                         _filterHTNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                else
+                                    conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
+                                                                         _filterHTNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                            }
+                        }
+                        else
+                        {
+                            if (DateTime.TryParse(value, out date))
+                                conditionString.Append(string.Format("{0}{1}{2}",
+                                                                     _filterHTNames[userCondition.Name.ToString()],
+                                                                     _filterOperators[userCondition.Operator.ToString()],
+                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                        }
+                        break;
+                    default:
+                        conditionString.Append(_filterHTNames[userCondition.Name.ToString()]);
+                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        {
+                            conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                        }
+                        else
+                        {
+                            if (!Int32.TryParse(value, out result))
+                            {
+                                if (userCondition.Name == ConditionName.Active)
+                                {
+                                    bool bValue;
+                                    if (bool.TryParse(userCondition.Value, out bValue))
+                                        value = (bValue) ? bool.TrueString : bool.FalseString;
+                                }
+                                else
+                                    value = "\"" + value + "\"";
+                            }
+                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                            conditionString.Append(value);
+                        }
+                        break;
+                };
             }
             return TokenTable.GetHardwareTokensByConditions(conditionString.ToString());
         }
@@ -762,6 +878,13 @@ namespace Service.Creator
         }
 
         #endregion
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion)
+        {
+            major = Client.Creator.VersionInfo.MAJOR_REVISION_NUMBER;
+            minor = Client.Creator.VersionInfo.MINOR_REVISION_NUMBER;
+            buildversion = Client.Creator.VersionInfo.BUILD_NUMBER;
+        }
         #endregion
     }
 }

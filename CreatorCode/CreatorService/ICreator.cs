@@ -302,6 +302,9 @@ namespace Service.Creator
         [OperationContract]
         short GetTotalModuleValue(string licenseServer, byte productID, short modID);
         #endregion
+
+        [OperationContract]
+        void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
     }
 
     [DataContract]
@@ -313,8 +316,6 @@ namespace Service.Creator
         Customer,
         [EnumMember]
         LicenseServer,
-        [EnumMember]
-        LicenseType,
         [EnumMember]
         ProductLicense,
         [EnumMember]
@@ -359,7 +360,11 @@ namespace Service.Creator
         [EnumMember]
         GreaterThan,
         [EnumMember]
-        Contains
+        Contains,
+        [EnumMember]
+        IsInTheLast,
+        [EnumMember]
+        IsInTheNext
     }
 
     [DataContract]
@@ -367,7 +372,9 @@ namespace Service.Creator
     {
         private ConditionName _name;
         private ConditionOperator _operator;
-        private string _value;   
+        private string _value;
+        private string _rangeValue;
+        private string _valueType;
 
         [DataMember]
         public ConditionName Name
@@ -390,6 +397,20 @@ namespace Service.Creator
         {
             get { return _value; }
             set { _value = value; }
+        }
+
+        [DataMember]
+        public string RangeValue
+        {
+            get { return _rangeValue; }
+            set { _rangeValue = value; }
+        }
+
+        [DataMember]
+        public string ValueType
+        {
+            get { return _valueType; }
+            set { _valueType = value; }
         }
    }
 }
