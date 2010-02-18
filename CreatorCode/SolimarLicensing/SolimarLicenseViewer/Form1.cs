@@ -50,23 +50,23 @@ namespace SolimarLicenseViewer
             }
             else if (this.treeView.Nodes.Count > 0)
             {
-                if (this.treeView.Nodes[0].Nodes.Count > 0)
+                if (string.Compare(this.treeView.Nodes[0].Text, "Licenses") == 0)
                     this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes[0];
                 else
-                    this.treeView.SelectedNode = this.treeView.Nodes[0];
+                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count-1];
             }
             Cursor.Current = Cursors.Default;
         }
 
         private void PopulateListView()
         {
-            System.Diagnostics.Trace.WriteLine("PopulateListView() - Start");
+            //System.Diagnostics.Trace.WriteLine("PopulateListView() - Start");
             Cursor.Current = Cursors.WaitCursor;
             this.noFlickerListView.BeginUpdate();
             m_listViewMgr.PopulateView();
             this.noFlickerListView.EndUpdate();
             Cursor.Current = Cursors.Default;
-            System.Diagnostics.Trace.WriteLine("PopulateListView() - End");
+            //System.Diagnostics.Trace.WriteLine("PopulateListView() - End");
         }
 
         private void DisconnectServer()

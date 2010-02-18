@@ -35,6 +35,8 @@ namespace SolimarLicenseViewer
             SOLINDEXER,
             USAGE,
             PRODUCTCONNECTIONSETTINGS,
+            SOLITRACK,
+            SOLSEARCHERENTERPRISESINGLEPLATFORM,
         }
 
 

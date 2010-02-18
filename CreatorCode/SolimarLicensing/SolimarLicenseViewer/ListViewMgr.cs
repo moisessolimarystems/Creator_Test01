@@ -155,7 +155,8 @@ namespace SolimarLicenseViewer
             tmpTSB.Alignment = ToolStripItemAlignment.Right;
             tmpTSB.Text = AppConstants.ProdSettingsTestConnAllTSB;
             tmpTSB.ToolTipText = AppConstants.ProdSettingsTestConnAllToolTipTSB;
-            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.licenseTestAll;
             tmpTSB.Click += new EventHandler(prodConnTestConnAllTSButton_Click);
             tmpTSItemList.Add(tmpTSB);
             m_toolStripList.Add(AppConstants.ProductConnectionSettingsRootNode, tmpTSItemList);
@@ -168,7 +169,8 @@ namespace SolimarLicenseViewer
             tmpTSB.Alignment = ToolStripItemAlignment.Right;
             tmpTSB.Text = AppConstants.ProdSettingsTestConnSelectedTSB;
             tmpTSB.ToolTipText = AppConstants.ProdSettingsTestConnSelectedToolTipTSB;
-            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.licenseTest;
             tmpTSB.Click += new EventHandler(prodConnTestConnSelTSButton_Click);
             tmpTSItemList.Add(tmpTSB);
 
@@ -180,7 +182,8 @@ namespace SolimarLicenseViewer
             tmpTSB.Alignment = ToolStripItemAlignment.Right;
             tmpTSB.Text = AppConstants.ProdSettingsEditConnTSB;
             tmpTSB.ToolTipText = AppConstants.ProdSettingsEditConnToolTipTSB;
-            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.editLicense;
             tmpTSB.Click += new EventHandler(prodConn_EditConnSettings);
             tmpTSItemList.Add(tmpTSB);
 
@@ -274,6 +277,7 @@ namespace SolimarLicenseViewer
         private void PopulateViewColumns()
         {
             TheListView.BeginUpdate();
+            TheListView.SuspendLayout();
             TheListView.Columns.Clear();
             TheBottomListView.Columns.Clear();
             ColumnHeader colHeader = null;
@@ -366,7 +370,7 @@ namespace SolimarLicenseViewer
                     if (SelectedNode.Name == AppConstants.HistoryNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.VerificationCodeHeader);
+                        //TheListView.Columns.Add(AppConstants.VerificationCodeHeader);
                         colHeader = new ColumnHeader();
                         colHeader.Text = AppConstants.DateAppliedHeader;
                         colHeader.Tag = typeof(DateTime);
@@ -514,6 +518,7 @@ namespace SolimarLicenseViewer
             TheBottomListView.Columns.Add("");    //Extra Cell at the end
             ResetListViewColumnSorter(TheListView);
             ResetListViewColumnSorter(TheBottomListView);
+            TheListView.ResumeLayout();
             TheListView.EndUpdate();
         }
 
@@ -1242,7 +1247,7 @@ namespace SolimarLicenseViewer
                         ListViewItem lvItem = new ListViewItem();
                         lvItem.Text = softwareLicense;
                         Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verToken = (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[licInfoAttrib.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1];
-                        lvItem.SubItems.Add(verToken.verificationValue);
+                        //lvItem.SubItems.Add(verToken.verificationValue);
                         lvItem.SubItems.Add(verToken.verificationDate.TVal.ToLocalTime().ToString());
                         this.TheListView.Items.Add(lvItem);
                     }
@@ -1287,7 +1292,7 @@ namespace SolimarLicenseViewer
 
                     if (keyInfo != null)
                     {
-                        System.Diagnostics.Trace.WriteLine("LoadProtectionKeysData() keyName: " + keyInfo.keyName + ", productName: " + keyInfo.productName);
+                        //System.Diagnostics.Trace.WriteLine("LoadProtectionKeysData() keyName: " + keyInfo.keyName + ", productName: " + keyInfo.productName);
                         lvItem.Tag = keyInfo.keyName;
                         lvItem.SubItems.Add(keyInfo.keyName);
 
@@ -1343,7 +1348,7 @@ namespace SolimarLicenseViewer
 
         void TheListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            System.Diagnostics.Trace.WriteLine("TheListView_SelectedIndexChanged()");
+            //System.Diagnostics.Trace.WriteLine("TheListView_SelectedIndexChanged()");
             if (sender is ListView)
             {
                 ListView lView = sender as ListView;
@@ -1415,14 +1420,14 @@ namespace SolimarLicenseViewer
 
         public void LoadProtectionKeyModulesData(string keyName)
         {
-            System.Diagnostics.Trace.WriteLine("LoadProtectionKeyModulesData() keyName: " + keyName);
+            //System.Diagnostics.Trace.WriteLine("LoadProtectionKeyModulesData() keyName: " + keyName);
             try
             {
-                if (m_toolStripList.ContainsKey(AppConstants.BottomUnitsHeader))
+                if (m_toolStripList.ContainsKey(AppConstants.BottomLicenseRootNode))
                 {
                     this.TheBottomListViewToolStrip.Visible = true;
                     this.TheBottomListViewToolStrip.Items.Clear();
-                    this.TheBottomListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.BottomUnitsHeader].ToArray());
+                    this.TheBottomListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.BottomLicenseRootNode].ToArray());
                     this.TheBottomListViewToolStrip.Items[0].Text = string.Format("{0}: {1}", AppConstants.KeyNameHeader, keyName);
                 }
                 else
@@ -1824,24 +1829,29 @@ namespace SolimarLicenseViewer
         private void testConnectionToLicenseServer(System.Collections.Generic.List<ListViewItem> _listViewItemList)
         {
             ConnectionSettings2 connSettings = new ConnectionSettings2();
-            foreach (ListViewItem lvItem in _listViewItemList)
+            if (_listViewItemList.Count > 0)
             {
-                connSettings.ProductID = (int)lvItem.Tag;
-                connSettings.ServerName = lvItem.SubItems[1].Text;
-                connSettings.BackupName = lvItem.SubItems[2].Text;
-                connSettings.UseDevelopmentLic = System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0;
-                try
+                _listViewItemList[0].ListView.BeginUpdate();
+                foreach (ListViewItem lvItem in _listViewItemList)
                 {
-                    testConnectionToLicenseServer(connSettings);
-                    lvItem.ForeColor = System.Drawing.Color.Green;
-                    lvItem.SubItems[4].Text = "Successfully connected to the License Server";
+                    connSettings.ProductID = (int)lvItem.Tag;
+                    connSettings.ServerName = lvItem.SubItems[1].Text;
+                    connSettings.BackupName = lvItem.SubItems[2].Text;
+                    connSettings.UseDevelopmentLic = System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0;
+                    try
+                    {
+                        testConnectionToLicenseServer(connSettings);
+                        lvItem.ForeColor = System.Drawing.Color.Green;
+                        lvItem.SubItems[4].Text = "Successfully connected to the License Server";
+                    }
+                    catch (Exception ex)
+                    {
+                        lvItem.ForeColor = System.Drawing.Color.Red;
+                        lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
+                    }
                 }
-                catch (Exception ex)
-                {
-                    lvItem.ForeColor = System.Drawing.Color.Red;
-                    lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
-                }
-                //setToolTip(lvItem);
+                Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(_listViewItemList[0].ListView);
+                _listViewItemList[0].ListView.EndUpdate();
             }
         }
         // throws an exception if fails to connect...

@@ -208,6 +208,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="keyLicenseManager16.ico" />
+    <None Include="Resources\licenseTestAll.png" />
+    <None Include="Resources\licenseTest.png" />
+    <None Include="Resources\editLicense.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
