@@ -213,6 +213,7 @@ namespace Client.Creator
                 dbCondition.Name = userCondition.Name;
                 dbCondition.Operator = userCondition.Operator;
                 dbCondition.Value = strVal;
+                dbCondition.ValueType = userCondition.ValueType;
                 dbConditionList.Add(dbCondition);
             }
             return dbConditionList;

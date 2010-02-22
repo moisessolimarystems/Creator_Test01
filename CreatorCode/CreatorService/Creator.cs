@@ -454,9 +454,9 @@ namespace Service.Creator
                             {
                                 if (opStr == "IsInTheLast")
                                     parseValue = -parseValue;
-                                if (userCondition.ValueType == "Days")
+                                if (userCondition.ValueType == "days")
                                     date = DateTime.Today.AddDays(parseValue);
-                                else if (userCondition.ValueType == "Weeks")
+                                else if (userCondition.ValueType == "weeks")
                                     date = DateTime.Today.AddDays(parseValue * 7);
                                 else
                                     date = DateTime.Today.AddMonths(parseValue);
@@ -625,9 +625,9 @@ namespace Service.Creator
                             {
                                 if (opStr == "IsInTheLast")
                                     parseValue = -parseValue;
-                                if (userCondition.ValueType == "Days")
+                                if (userCondition.ValueType == "days")
                                     date = DateTime.Today.AddDays(parseValue);
-                                else if (userCondition.ValueType == "Weeks")
+                                else if (userCondition.ValueType == "weeks")
                                     date = DateTime.Today.AddDays(parseValue * 7);
                                 else
                                     date = DateTime.Today.AddMonths(parseValue);
