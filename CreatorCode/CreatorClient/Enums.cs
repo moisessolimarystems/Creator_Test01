@@ -88,8 +88,8 @@ namespace Client.Creator
 
         public enum ProductLicenseState
         {
-            Trial,
             Licensed,
+            Trial,
             AddOn,
         }
 
