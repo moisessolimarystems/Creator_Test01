@@ -18,7 +18,6 @@ namespace Client.Creator
         string _licenseServer;
         ProductLicenseTable _plRec;
         PermissionsTable _permissions;
-        DateTime _currentExpirationDate;
         int _productLicenseDataBaseID;
         CommunicationLink _commLink;
         List<ModuleProperty> _moduleList;
@@ -52,6 +51,12 @@ namespace Client.Creator
             _version = new LicenseVersion(_plRec.ProductVersion);
             _productLicenseDataBaseID = plData.ID;
             _commLink = CreatorForm.s_CommLink;
+
+            //ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;
+            if (_commLink.GetProductSpec(plData.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
+                SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
+            else
+                SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
             if (dbModuleList.Count == 0)
                 InitializeProductEntity();
             foreach (ModuleTable module in dbModuleList)
@@ -452,6 +457,7 @@ namespace Client.Creator
         {
             get { return _moduleList; }
         }
+
         #endregion
 
         #region Browsable Properties
@@ -490,7 +496,7 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_permanent_pwd.Value);
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_version_pwd.Value);
                 return _version;
             }
             set 
@@ -526,7 +532,7 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_permanent_pwd.Value);
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_create_modify_key.Value);
                 return _plRec.ProductConnection;
             }
             set
@@ -646,7 +652,6 @@ namespace Client.Creator
                                     client.MarkDirty(LicenseServer);
                                 }    
                             });
-
                         }
                         else
                             throw new Exception(errorMsg);
@@ -665,7 +670,7 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_permanent_pwd.Value);             
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_extension_pwd.Value);             
                 if(_plRec.ExpirationDate.HasValue)
                     return _plRec.ExpirationDate.Value.ToLocalTime();
                 return null;
@@ -735,6 +740,7 @@ namespace Client.Creator
         {
             get             
             {
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationTotal, !_permissions.pt_extension_pwd.Value);             
                 return _plRec.Activations; 
             }
             set 
@@ -781,6 +787,7 @@ namespace Client.Creator
         {
             get 
             {
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationAmountInDays, !_permissions.pt_extension_pwd.Value);  
                 return _plRec.ActivationAmount; 
             }
             set 
