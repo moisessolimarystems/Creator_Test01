@@ -186,7 +186,7 @@ CSolimarLicenseMgr::CSolimarLicenseMgr() :
 	ServerListLock(CreateMutex(0,0,0)),
 	GracePeriodLock(CreateMutex(0,0,0)),
 	MessageListLock(CreateMutex(0,0,0)),
-	m_ui_level(UI_LEVEL_CRITICAL | UI_STYLE_EVENT_LOG),	// Set to these so that failure to connect will log in event log.
+	m_ui_level(UI_LEVEL_RESPONSE | UI_STYLE_EVENT_LOG),	// Set to these so that failure to connect will log in event log.
 	m_dtGracePeriodStart(0),
 	m_dtGracePeriod(0),
 	m_dtRefreshLicenses(0),
@@ -513,7 +513,11 @@ OutputDebugString(tmpbuf);
 	if(_wcsicmp(m_headerInformation, L"") != 0)
 		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));	// Call this second here so product is on top of error message.
 	if(FAILED(hr))
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", ((connectionFlags & CF_BACKUP_SERVER) != 0) ? MT_WARNING: MT_ERROR , hr);	//Log connection errors as warnings for backups
+
+	if((connectionFlags & CF_BACKUP_SERVER) != 0)
+		hr = S_OK; //Connection to backup server should not error out
+	
 	return hr;
 }
 STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUseSharedLicenseServers)
@@ -777,7 +781,7 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 	while(!m_backupServers.empty())
 		m_backupServers.erase(m_backupServers.begin());
 
-	m_ui_level = UI_LEVEL_CRITICAL | UI_STYLE_EVENT_LOG;
+	m_ui_level = UI_LEVEL_RESPONSE | UI_STYLE_EVENT_LOG;
 	m_initialized = false;
 	m_bUsingBackupServers = false;
 	m_bInViolationPeriod = false;
@@ -2414,8 +2418,8 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 			_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message:%s%s%s%s",
 				bKeyIdentEmpty ? L"" : L"\r\n\r\nLicenseID: ",
 				bKeyIdentEmpty ? L"" : key_ident,
-				bMessageEmpty ? L"" : L"\r\n\r\n",
-				bMessageEmpty ? L"" : message
+				(bMessageEmpty && bErrorMessageEmpty) ? L"" : L"\r\n\r\n",
+				(bMessageEmpty && bErrorMessageEmpty) ? L"" : (!bMessageEmpty ? message : str_error_message.c_str())
 				);
 			event_type = (message_type==MT_WARNING) ? EVENTLOG_WARNING_TYPE : EVENTLOG_INFORMATION_TYPE;
 			break;
