@@ -2629,6 +2629,7 @@ namespace Client.Creator
                 plRec.ProductID = pltData.ProductID;
                 plRec.ProductVersion = pltData.ProductVersion;
                 plRec.ParentProductLicenseID = pltData.ParentProductLicenseID;
+                plRec.ProductConnection = pltData.ProductConnection;
                 client.CreateProductLicense(plRec);
                 //initialize products
                 TransactionManager.CreateTransaction(TransactionType.LicenseServer,
