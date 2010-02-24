@@ -5,7 +5,7 @@
 
 #include "KeyServer.h"
 #include "..\common\LicenseError.h"
-#include "..\common\TimeHelper.h"
+#include "SoftwareServerInstance.h"
 
 #include <string>
 #include <vector>
@@ -17,8 +17,10 @@
 typedef _bstr_t String;
 typedef std::vector<String> StringList;
 
+#include "..\Common\StringUtils.h"
 #include "KeyMessages.h"
 #include "..\common\MultidimensionalSafeArray.h"
+#include "..\common\TimeHelper.h"	//For TimeHelper
 
 // only include the password packet signing PRIVATE key on debug and solimar internal builds
 BYTE KeyServer::crypto_key_password_packet_private[] = {
@@ -51,44 +53,13 @@ unsigned int KeyServer::packet_magic_number_int[] = {
 };
 
 #pragma warning(disable:4355)
-//APCTimer::APCTimer(APCFunc pfunc, void* arg, long interval, initfunc, void* initarg);
-
-void KeyServer::UpdateKeysThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	hr = pThis->ResynchronizeKeys();
-//OutputDebugStringW(L"KeyServer::UpdateKeysThreadFunction() - Leave");
-}
-
-
-void KeyServer::HeartbeatCheckThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	pThis->HeartbeatCheck();
-//OutputDebugStringW(L"KeyServer::HeartbeatCheckThreadFunction() - Leave");
-}
-
-void KeyServer::TimesUpThreadFunction(void* pvThis)
-{
-//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Enter");
-	HRESULT hr = S_OK;
-	KeyServer *pThis = (KeyServer*)pvThis;
-	hr = pThis->TimesUp();
-//OutputDebugStringW(L"KeyServer::TimesUpThreadFunction() - Leave");
-}
 
 KeyServer::KeyServer() : 
 	KeyListLock(CreateMutex(0,0,0)), 
 	PasswordPacketListLock(CreateMutex(0,0,0)), 
 	KeyTrialTimeInfoLock(CreateMutex(0,0,0)),
-	HeartbeatListLock(CreateMutex(0,0,0)), 
-	MessageClientListLock(CreateMutex(0,0,0)),
-	failed_password_attempts(0),
-	USBNotification(this)
+	//HeartbeatListLock(CreateMutex(0,0,0)), 
+	failed_password_attempts(0)
 {
 	//wchar_t tmpbuf[1024];
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
@@ -100,30 +71,6 @@ KeyServer::KeyServer() :
 	//swprintf_s(tmpbuf, 1024, L"    KeyTrialTimeInfoLock:0x%08x : ThreadID: %d", KeyTrialTimeInfoLock, GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
-	_tzset();
-
-	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
-	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
-	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
-
-	{
-	SafeMutex mutex(HeartbeatListLock);
-	heartbeats.clear();
-	}
-
-
-	// get the local host name for use in licensing messages
-	wchar_t hostname[1024];
-	DWORD hostname_size = 0;
-	if (GetComputerNameEx(ComputerNameDnsHostname, hostname, &(hostname_size=1024)) || GetComputerNameEx(ComputerNameNetBIOS, hostname, &(hostname_size=1024)))
-	{
-		server_host_name = hostname;
-	}
-	
-	// trigger a key list resynchronize
-	UpdateKeysThread->RevEnable(UpdateKeysThreadHighPeriodSeconds, UpdateKeysThreadLowPeriodSeconds, 20);
-	UpdateKeysThread->Invoke();
-
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::KeyServer() - Leave, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 }
@@ -134,21 +81,18 @@ KeyServer::~KeyServer()
 	//swprintf_s(tmpbuf, 1024, L" KeyServer::~KeyServer() - Enter, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
-	if (UpdateKeysThread)
-		delete UpdateKeysThread;
-	if (HeartbeatCheckThread)
-		delete HeartbeatCheckThread;
-	if (TimesUpThread)
-		delete TimesUpThread;
+	//if (UpdateKeysThread)
+	//	delete UpdateKeysThread;
+	//if (HeartbeatCheckThread)
+	//	delete HeartbeatCheckThread;
+	//if (TimesUpThread)
+	//	delete TimesUpThread;
 	if (KeyListLock!=NULL)
 		CloseHandle(KeyListLock);
 	if (PasswordPacketListLock!=NULL)
 		CloseHandle(PasswordPacketListLock);
 	if (KeyTrialTimeInfoLock!=NULL)
 		CloseHandle(KeyTrialTimeInfoLock);
-	if (MessageClientListLock!=NULL)
-		CloseHandle(MessageClientListLock);
-
 
 	while(!keys.empty())
 	{
@@ -161,17 +105,26 @@ KeyServer::~KeyServer()
 }
 
 
+
+HRESULT KeyServer::Initialize(RainbowDriver* pDriver)
+{
+	pRainbowDriver = pDriver;
+	HRESULT hr(S_OK);
+	hr = ResynchronizeKeys();
+	return hr;
+}
 HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 {
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Enter, bForceRefresh: %s, ThreadID: %d", bForceRefresh ? L"true" : L"false", GetCurrentThreadId());
 //OutputDebugString(tmpbuf);
+//OutputDebugString(L"KeyServer::ResynchronizeKeys() - Enter");
 	HRESULT hr = S_OK;
 	{// obtain a lock on the driver's key list
 
 		KeyList tmpKeyList;
 		std::list<_bstr_t> deleteProtectionKeyList;
-		KeyServer::KeyList::iterator skeyIt = keys.begin();
+		KeyServer::KeyList::iterator skeyIt;
 
 		{	//Scope for SafeMutex mutex2(KeyListLock);
 			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
@@ -182,48 +135,61 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 					skeyIt++)
 			{
 				// CR.11876 - Make a copy of the Protection Keys.
-				tmpKeyList.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
+				tmpKeyList.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
 			}
 		}
 
-		{	//Scope for SafeMutex mutex1(driver.keys_lock);
-			SafeMutex mutex1(driver.keys_lock);
-			driver.RefreshKeyList();
-			if(driver.AtLeastOneParallelKey())
-				UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
+		{	//Scope for SafeMutex mutex1(pRainbowDriver->keys_lock);
+			SafeMutex mutex1(pRainbowDriver->keys_lock);
+			pRainbowDriver->RefreshKeyList();
+			//if(pRainbowDriver->AtLeastOneParallelKey())
+			//	UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 
 			// first pass, add newly found keys
 			ProtectionKey* tmpProKey;
-			for (RainbowDriver::KeyList::iterator dkey = driver.keys.begin(); dkey!=driver.keys.end(); ++dkey)
+			for (RainbowDriver::KeyList::iterator dkey = pRainbowDriver->keys.begin(); dkey!=pRainbowDriver->keys.end(); ++dkey)
 			{
 				if (tmpKeyList.find(dkey->first)==tmpKeyList.end())
 				{
 					_bstr_t keyName = dkey->first;
-					tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,&driver, true);//Use Share Licensing
-					long application_instances = 0;
-					tmpProKey->ApplicationInstanceCount(&application_instances);
-					if(application_instances > 1)	
-					{
-						//application_instances == virtual keys this single key will represent
-						for(int idx=1; idx<=application_instances; idx++)
-						{
-							wchar_t key_id[128];
-							_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
-							key_id[127]=0;
 
-							if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
-							{
-								//Use Share Licensing - only the first key can use the shared licensing.
-								ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
-								tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
-								tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
-								virtual_key_to_physical_key_list[key_id] = keyName;
-							}
-						}
-						delete tmpProKey;
-					}
-					else	//Only 1 Key
+					unsigned short keyVersion = 0;
+					hr = pRainbowDriver->GetKeyVersion(keyName, &keyVersion);
+
+					if(keyVersion == 0)	//Old Style Protection Key
 					{
+						tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
+						long application_instances = 0;
+						tmpProKey->ApplicationInstanceCount(&application_instances);
+						if(application_instances > 1)	
+						{
+							//application_instances == virtual keys this single key will represent
+							for(int idx=1; idx<=application_instances; idx++)
+							{
+								wchar_t key_id[128];
+								_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
+								key_id[127]=0;
+
+								if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
+								{
+									//Use Share Licensing - only the first key can use the shared licensing.
+									ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
+									tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
+									tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
+									virtual_key_to_physical_key_list[key_id] = keyName;
+								}
+							}
+							delete tmpProKey;
+						}
+						else	//Only 1 Key
+						{
+							tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
+							virtual_key_to_physical_key_list[dkey->first] = dkey->first;
+						}
+					}
+					else if(keyVersion == 1)	//Validation key for Software Licenses
+					{
+						tmpProKey = new ProtectionKey_Version1(dkey->first, &keyspec, pRainbowDriver);
 						tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
 						virtual_key_to_physical_key_list[dkey->first] = dkey->first;
 					}
@@ -233,7 +199,7 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 			skeyIt=tmpKeyList.begin();
 			while (skeyIt!=tmpKeyList.end())
 			{
-				if (driver.keys.find(virtual_key_to_physical_key_list[skeyIt->first])==driver.keys.end())
+				if (pRainbowDriver->keys.find(virtual_key_to_physical_key_list[skeyIt->first])==pRainbowDriver->keys.end())
 				{
 					deleteProtectionKeyList.push_back(_bstr_t(skeyIt->first,true));
 					skeyIt = tmpKeyList.erase(skeyIt);
@@ -292,20 +258,23 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 				if(keyIt != keys.end())	// Update existing Key Cells
 					keyIt->second->CopyCellCache(*(skeyIt->second));
 				else	// Add new Key
-					keys.insert(KeyList::value_type(skeyIt->first, new ProtectionKey(skeyIt->first, *(skeyIt->second))));
+					keys.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
 			}
 
 			// CR.FIX.11909 - Delete temp cache of keys
 			while(!tmpKeyList.empty())
 			{
-				delete tmpKeyList.begin()->second;
+				if(tmpKeyList.begin()->second != NULL)
+					delete tmpKeyList.begin()->second;
 				tmpKeyList.erase(tmpKeyList.begin());
 			}
 		}
 	} // release the lock on the driver's key list
-
+//	swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - keys.count: %d", keys.size());
+//OutputDebugString(tmpbuf);
 //swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave: hr=0x%08x, ThreadID: %d", hr, GetCurrentThreadId());
 //OutputDebugString(tmpbuf);
+//OutputDebugString(L"KeyServer::ResynchronizeKeys() - Leave");
 	return hr;
 }
 
@@ -345,57 +314,6 @@ HRESULT KeyServer::GetApplicationInstanceList(BSTR license_id, BSTR key_ident, V
 }
 
 
-
-
-HRESULT KeyServer::Heartbeat(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	
-	DWORD cur_time = (DWORD)time(0);	
-
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
-//debug_buf[1023] = 0;
-//OutputDebugStringW(debug_buf);
-
-	heartbeats[_bstr_t(license_id,true)]=cur_time;
-
-	return S_OK;
-}
-HRESULT KeyServer::RemoveHeartbeat(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	for (HeartbeatList::iterator heartbeatIt = heartbeats.begin(); heartbeatIt != heartbeats.end(); ++heartbeatIt)
-	{
-		if(_wcsicmp(heartbeatIt->first, license_id) == 0)
-		{
-			heartbeats.erase(heartbeatIt);
-			break;
-		}
-	}
-	RemoveFromNotification(license_id);
-	return S_OK;
-}
-
-HRESULT KeyServer::RemoveFromNotification(BSTR license_id)
-{
-	SafeMutex mutex(HeartbeatListLock);
-	HRESULT hr = LicenseReleaseAll(license_id);
-	//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
-	for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
-	{
-		BSTR bstrEmptyString = SysAllocString(L"");
-		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), bstrEmptyString);
-		SysFreeString(bstrEmptyString);
-	}
-	// Stop notifying the client of messages
-	{
-		SafeMutex mutex(MessageClientListLock);
-		message_clients[_bstr_t(license_id, true)].clear();	//Erase all existing messages
-		message_clients.erase(_bstr_t(license_id, true));							//Remove from notifying list
-	}
-	return hr;
-}
 
 
 HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
@@ -525,7 +443,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 			CryptoHelper::Digest digest;
 
 			if (FAILED(hr = context.HashData((BYTE*)pPacketString1, password_packet_length, digest))) throw(hr);
-			verification = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
+			verification = std::wstring((wchar_t*)StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 		}
 		
 		// parse the password packet
@@ -580,8 +498,8 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		if (FAILED(hr)) throw(hr);
 		
 		// compare the signed hash and the computed hash
-		if (StringToBinaryLength(hash)!=provided_digest.DIGEST_SIZE) throw(E_INVALIDARG);
-		StringToBinary(hash, provided_digest.m_digest, provided_digest.DIGEST_SIZE);
+		if (StringUtils::StringToBinaryLength(hash)!=provided_digest.DIGEST_SIZE) throw(E_INVALIDARG);
+		StringUtils::StringToBinary(hash, provided_digest.m_digest, provided_digest.DIGEST_SIZE);
 		if (computed_digest!=provided_digest) throw(E_INVALIDARG);
 		
 		// verify the hash signature
@@ -592,7 +510,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		BYTE *pSignatureData = 0;
 		if (SUCCEEDED(hr = SafeArrayAccessData(vtSignature.parray, (void**)&pSignatureData)))
 		{
-			StringToBinary(signature, pSignatureData, (DWORD)wcslen(signature)/2);
+			StringUtils::StringToBinary(signature, pSignatureData, (DWORD)wcslen(signature)/2);
 			SafeArrayUnaccessData(vtSignature.parray);
 		}
 		hr = context.VerifySignature(computed_digest, &vtSignature, signature_verify_key);
@@ -636,7 +554,7 @@ HRESULT KeyServer::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verificat
 		// password entry succeeded, provide the verification code to the user
 		*verification_code = verification.Detach();
 
-		GenerateMessage(L"", MT_INFO, S_OK, time(0), MessagePasswordPacketVerificationCode, (wchar_t*)*verification_code);
+		g_licenseController.GenerateMessage(L"", MT_INFO, S_OK, time(0), MessagePasswordPacketVerificationCode, (wchar_t*)*verification_code);
 	}
 	catch (HRESULT &ehr)
 	{
@@ -665,6 +583,8 @@ HRESULT KeyServer::GenerateBasePassword(long customer_number, long key_number, B
 	{
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
+		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
@@ -699,6 +619,8 @@ HRESULT KeyServer::GenerateApplicationInstancePassword(long customer_number, lon
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateApplicationInstancePassword(customer_number, key_number, license_count, password_number, &temp_password);
@@ -730,6 +652,8 @@ HRESULT KeyServer::GenerateVersionPassword(long customer_number, long key_number
 	{
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
+		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
 		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
@@ -764,6 +688,8 @@ HRESULT KeyServer::GenerateExtensionPassword(long customer_number, long key_numb
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateExtensionPassword(customer_number, key_number, extend_days, extension_num, &temp_password);
@@ -797,6 +723,8 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, &temp_password);
@@ -829,6 +757,8 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 		VARIANT_BOOL vtValid;
 		hr = key->second->IsProgrammed(&vtValid);
 		if (vtValid==VARIANT_TRUE)
+			hr = key->second->IsSolimarProtectionKey(&vtValid);
+		if (vtValid==VARIANT_TRUE)
 		{
 			BSTR temp_password=0;
 			hr = key->second->GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password_number, &temp_password);
@@ -848,35 +778,6 @@ HRESULT KeyServer::GenerateModulePassword(long customer_number, long key_number,
 	*password = SysAllocString(L"");
 	
 	return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY;
-}
-
-HRESULT KeyServer::GetLicenseServerTime(VARIANT *pvtSystemTime)
-{
-	// _variant_t( double dblSrc, VARTYPE vtSrc = VT_R8 );
-	double dSysTime;
-	SYSTEMTIME stSysTime;
-
-	GetSystemTime(&stSysTime);
-	if (SystemTimeToVariantTime(&stSysTime, &dSysTime))
-	{
-		*pvtSystemTime = _variant_t(dSysTime, VT_DATE).Detach();
-		return S_OK;
-	}
-	else
-	{
-		VariantInit(pvtSystemTime);
-		return E_FAIL;
-	}
-}
-
-HRESULT KeyServer::GetLicenseMessageList(BSTR license_id, VARIANT *pvtMessageList)
-{
-	SafeMutex mutex(MessageClientListLock);
-	
-	*pvtMessageList = message_clients[_bstr_t(license_id, true)];
-	message_clients[_bstr_t(license_id, true)].clear();
-	
-	return S_OK;
 }
 
 
@@ -958,12 +859,12 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	if (FAILED(hr)) return hr;
 	
     // add the hash and the signature to the string
-	packet_string += BinaryToString(digest.m_digest, digest.DIGEST_SIZE);
+	packet_string += StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE);
 	packet_string += L"\r\n";
 	
 	BYTE *pSignature = 0;
 	if (FAILED(hr = SafeArrayAccessData(vtSignature.parray, (void**)&pSignature))) return hr;
-	packet_string += BinaryToString(pSignature, vtSignature.parray->rgsabound[0].cElements);
+	packet_string += StringUtils::BinaryToString(pSignature, vtSignature.parray->rgsabound[0].cElements);
 	packet_string += L"\r\n";
 	SafeArrayUnaccessData(vtSignature.parray);
 	
@@ -972,7 +873,7 @@ HRESULT KeyServer::PasswordPacketFinalize(BSTR license_id)
 	//if (FAILED(hr = context.HashData((BYTE*)(wchar_t*)packet_string, (packet_string.length()+1), digest))) return hr;
 	
 	// take the first 8 characters from the hex representation of the digest as the verification code
-	password_packets[lid].verification_code = std::wstring((wchar_t*)BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
+	password_packets[lid].verification_code = std::wstring((wchar_t*)StringUtils::BinaryToString(digest.m_digest, digest.DIGEST_SIZE)).substr(0,8).c_str();
 
 
 	// package the string in to a variant
@@ -1443,116 +1344,235 @@ HRESULT KeyServer::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
 	}
 }
 
-void KeyServer::GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...)
+// Populate the pKeyAttribs based on the key_ident.  The values populated in pKeyAttribs will be based 
+// on the key version ProtectionKey that maps to key_ident
+HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs)
 {
-	static const int MAX_MESSAGE_SIZE = 1024;
-	wchar_t message[MAX_MESSAGE_SIZE];
-	va_list pArg;
-	
-	va_start(pArg, MessageLookupID);
-	_vsnwprintf_s(message, 1024, LicensingMessageStringTable[MessageLookupID], pArg);
-	va_end(pArg);
-	message[MAX_MESSAGE_SIZE-1] = 0;
-	
-	GenerateMessageInternal(key_ident, message_type, error, timestamp, MessageLookupID, message);
-}
+	SafeMutex mutex(KeyListLock);
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
 
-void KeyServer::GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message)
-{
-	static const int MAX_MESSAGE_SIZE = 1024;
-	wchar_t event_log_msg[MAX_MESSAGE_SIZE];
-	
-	_variant_t vtTimestamp;
-	vtTimestamp =  TimeHelper::TimeTToVariant(timestamp, false);	//Convert to local time
-	/*
-	_bstr_t str_timestamp;
-	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
-	
-	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
-	
-	// convert the date in to a string
-	char cstr_timestamp[256];
-	if (!GetTimeFormatA(LOCALE_USER_DEFAULT, TIME_FORCE24HOURFORMAT, &systimestamp, NULL, cstr_timestamp, 256))
-		str_timestamp = cstr_timestamp;
-	
-	switch (message_type)
-	{
-	case MT_INFO:
-		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n%s\r\nKey: %s\r\n\r\n%s",
-			str_timestamp.GetBSTR(),
-			key_ident,
-			message);
-		break;
-	case MT_ERROR:
-		_snwprintf(event_log_msg, MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n%s\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			str_timestamp.GetBSTR(),
-			key_ident,
-			error,
-			str_error_message,
-			message);
-		break;
-	}
-	*/
-
-
-	//Ignore Timedate stamp for writing to event log, unnecessary because event log
-	//keeps track of Timedate anyways.
-	_bstr_t str_error_message;	// look in i:\chris r\samplehr.txt
-	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
-	
-	// convert the date in to a string
-	switch (message_type)
-	{
-	case MT_INFO:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
-			key_ident,
-			message);
-		break;
-	case MT_ERROR:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			key_ident,
-			error,
-			str_error_message,
-			message);
-		break;
-	}
-	
-	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
-	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
-	LicenseServerError::WriteEventLog(event_log_msg, event_type);
-	
-	// notify the clients of the message
-	SafeMutex mutex(MessageClientListLock);
-	
-//wchar_t debug_buf1[1024];
-//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Enter() - NumberOfClients=%d", message_clients.size());
-//OutputDebugStringW(debug_buf1);
+	HRESULT hr(S_OK);
 	try
 	{
-		//xxx might need to make this asynchronous
-		//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
-		//zzz add message to the message lists for all clients
-		//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
-		LicensingMessage m(std::wstring(server_host_name), std::wstring(key_ident), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
-		for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
-		{
+		if (key==keys.end())
+			throw E_INVALIDARG;
 
-			c->second.push_back(m);
-//_snwprintf(debug_buf1, 1024, L"   KeyServer::GenerateMessageInternal LicenseID=%s, SizeOfList=%d", (wchar_t*)c->first, c->second.size());
-//OutputDebugStringW(debug_buf1);
-			//xxx make sure that the message backlog is not excessive.
-			//xxx if it is, cull some of the older messages
+		// key->second contains a protectionKey
+		ProtectionKey* pKey = (ProtectionKey*)key->second;
+		
+		// attributes common to all versions
+		unsigned short keyVersion(0);
+		hr = pKey->GetKeyVersion(&keyVersion);
+		if (FAILED(hr))
+			throw hr;
+
+		pKeyAttribs->keyVersion = keyVersion;
+		pKeyAttribs->keyName = std::wstring(key_ident);
+
+		// Cycle through all the cells of a given key
+		unsigned short shortValue;
+		byte valueByte[16];
+		int arrayIdx = 0;
+		for(unsigned short cell = 0; cell<64; cell++)
+		{
+			try
+			{
+				shortValue = pKey->ReadCellCache(cell);
+			}
+			catch(HRESULT&)
+			{
+				shortValue = 0;
+			}
+			catch(_com_error&)
+			{
+				shortValue = 0;
+			}
+			//hr = pRainbowDriver->ReadCell(dkey->first, cell, &shortValue);
+			arrayIdx = (2 * cell) % 16;
+
+			valueByte[arrayIdx] = SUCCEEDED(hr) ? shortValue>>8 : 0;
+			valueByte[arrayIdx+1] = SUCCEEDED(hr) ? (byte)shortValue : 0;
+
+//swprintf_s(tmpbuf, 1024, L" SoftwareServer::GenerateLicenseSystemData() - key: %s, cell: 0x%x, shortValue: 0x%x, valueByte[0x%x]: 0x%x, valueByte[0x%x]: 0x%x", (wchar_t*)dkey->first, cell, shortValue, arrayIdx, valueByte[arrayIdx], arrayIdx+1, valueByte[arrayIdx+1]);
+//OutputDebugString(tmpbuf);
+			if(cell % 8 == 7)
+			{
+				SpdAttribs::CBuffer cBuffer;
+				cBuffer.SetBuffer((byte*)&valueByte, 16);
+				pKeyAttribs->layout->push_back(cBuffer);
+			}
+		}
+		
+		
+		if (keyVersion == 1) // attributes for only key version 1
+		{
+			ProtectionKey_Version1* pKeyV1 = (ProtectionKey_Version1*)pKey;
+			BSTR bstrKeyLicenseCode;
+			hr = pKeyV1->GetSoftwareKeyCode(&bstrKeyLicenseCode);
+			if(SUCCEEDED(hr))
+			{
+				pKeyAttribs->licenseCode = std::wstring(bstrKeyLicenseCode);
+				SysFreeString(bstrKeyLicenseCode);
+			}
+
+			//find the times from key
+			time_t packetCreationTimeT = 0;
+			hr = pKeyV1->GetSoftwarePacketCreationDateTime(&packetCreationTimeT);
+			if(SUCCEEDED(hr) && packetCreationTimeT != 0)
+			{
+				SYSTEMTIME tmpSystime;
+				VARIANT tmpVt;
+				tmpVt = TimeHelper::TimeTToVariant(packetCreationTimeT);
+				VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+				wchar_t timestamp[256];
+				TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+				pKeyAttribs->packetCreationDate = std::wstring(timestamp);
+			}
+
+			time_t currentTimeT = 0;
+			hr = pKeyV1->GetSoftwareCurrentDateTime(&currentTimeT);
+			if(SUCCEEDED(hr) && currentTimeT != 0)
+			{
+				SYSTEMTIME tmpSystime;
+				VARIANT tmpVt;
+				tmpVt = TimeHelper::TimeTToVariant(currentTimeT);
+				VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+				wchar_t timestamp[256];
+				TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+				pKeyAttribs->currentDate = std::wstring(timestamp);
+			}
+
+			unsigned short historyNumber = 0;
+			hr = pKeyV1->GetHistoryNumber(&historyNumber);
+			if(SUCCEEDED(hr))
+				pKeyAttribs->historyNumber = historyNumber;
+			
+			//Get ActivitySlot info
+			for(unsigned short idx=0; idx<20; idx++)
+			{
+				Lic_KeyAttribs::Lic_ActivationInfoAttribs actInfo;
+				unsigned short currentActivations = 0;
+				unsigned short hoursToExpire = 0;
+				hr = pKeyV1->GetSoftwareActivitySlotCurrentActivation(idx, &currentActivations);
+				if(SUCCEEDED(hr))
+					hr = pKeyV1->GetSoftwareActivitySlotHoursToExpiration(idx, &hoursToExpire);
+
+				if(SUCCEEDED(hr))
+				{
+					actInfo.activationSlotId = idx;
+					actInfo.activationSlotCurrentActivation = currentActivations;
+					actInfo.activationSlotHoursToExpire = hoursToExpire;
+					pKeyAttribs->activationInfoList->push_back(actInfo);
+				}
+			}
+
+		}
+		else //if (keyVersion != 1) // all other known or unknown versions
+		{
 		}
 	}
-	catch (_com_error &e)
+	catch(HRESULT &eHr)
 	{
-		e.Error();
+		hr = eHr;
 	}
-//_snwprintf(debug_buf1, 1024, L"KeyServer::GenerateMessageInternal - Leave");
-//OutputDebugStringW(debug_buf1);
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
 }
 
 
+
+
+// For Software Server to access Validation Keys, will only work on keys of version 1
+HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate)
+{
+	HRESULT hr = S_OK;
+	SafeMutex mutex(KeyListLock);
+	// find the key in the key list
+	KeyList::iterator key = keys.find(_bstr_t(key_ident,true));
+	try
+	{	
+		if (key==keys.end())
+			throw E_INVALIDARG;
+
+		// key->second contains a protectionKey
+		ProtectionKey* pKey = (ProtectionKey*)key->second;
+		
+		// attributes common to all versions
+		unsigned short keyVersion(0);
+		hr = pKey->GetKeyVersion(&keyVersion);
+		if (FAILED(hr))
+			throw hr;
+
+
+		if (keyVersion == 1)
+		{
+			ProtectionKey_Version1* pKeyV1 = (ProtectionKey_Version1*)pKey;
+			hr = pKeyV1->SetSoftwareKeyCode(_bstr_t(std::wstring(keyAttribs.licenseCode).c_str()));
+			if(FAILED(hr)) throw hr;
+
+			SYSTEMTIME tmpDateSystime;
+			if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.packetCreationDate)).c_str(), tmpDateSystime))
+				throw(E_FAIL);
+
+			_variant_t tmpDateVt(NULL);	
+			if (!SystemTimeToVariantTime(&tmpDateSystime, &tmpDateVt.date)) 
+				throw(E_FAIL);
+
+			hr = pKeyV1->SetSoftwarePacketCreationDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
+			if(FAILED(hr)) throw hr;
+
+			unsigned short historyNumber(0);
+			hr = pKeyV1->GetHistoryNumber(&historyNumber);
+			if(FAILED(hr)) throw hr;
+
+			if(bForceActivitySlotUpdate || historyNumber < keyAttribs.historyNumber)
+			{
+				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.currentDate)).c_str(), tmpDateSystime))
+				throw(E_FAIL);
+
+				if (!SystemTimeToVariantTime(&tmpDateSystime, &tmpDateVt.date)) 
+					throw(E_FAIL);
+
+				hr = pKeyV1->SetSoftwareCurrentDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
+				if(FAILED(hr)) throw hr;
+
+				//replace all activity slots on key with values in keyAttribs
+				for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actSlotIt = keyAttribs.activationInfoList->begin();
+					actSlotIt != keyAttribs.activationInfoList->end();
+					actSlotIt++)
+				{
+					hr = pKeyV1->SetSoftwareActivitySlotCurrentActivation(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotCurrentActivation));
+					//if(FAILED(hr))
+					//	throw hr;
+					hr = pKeyV1->SetSoftwareActivitySlotHoursToExpiration(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotHoursToExpire));
+					//if(FAILED(hr))
+					//	throw hr;
+				}
+				hr = pKeyV1->SetHistoryNumber(unsigned short(keyAttribs.historyNumber));
+					if(FAILED(hr)) throw hr;
+			}
+
+			//cycle through activation list, if there are any overrides, then overide value on key.
+		}
+		else //if (keyVersion != 1) // all other known or unknown versions
+		{
+			hr = E_INVALIDARG;
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
 
 // support for blocking brute force attempts at password cracking
 // returns the number of milliseconds to delay before checking a password
@@ -1563,102 +1583,12 @@ DWORD KeyServer::PasswordEntryDelay(long failed_attempts)
 	return (DWORD)(10*failed_attempts*failed_attempts);
 }
 
-// checks if client heartbeats have exprired
-// if they have expried, their licenses are revoked
-void KeyServer::HeartbeatCheck()
-{
-	HRESULT hr = S_OK;
-	
-	SafeMutex mutex(HeartbeatListLock);
-	
-	HeartbeatList keepers;
 
-	DWORD cur_time = (DWORD)time(0);
-//wchar_t debug_buf1[1024];
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Enter - NumberOfHeartBeats = %d", heartbeats.size());
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
 
-	for (HeartbeatList::iterator heartbeat = heartbeats.begin(); heartbeat != heartbeats.end(); ++heartbeat)
-	{
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
-
-		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
-		{
-			VARIANT vtAppInstanceList;
-			bool bFoundAppInstance = false;
-
-			////Trying to calculate the Application Instance that timed out
-			//for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
-			//{
-			//	hr = GetApplicationInstanceList(heartbeat->first, keyIt->first, &vtAppInstanceList);
-			//	if(SUCCEEDED(hr) && (vtAppInstanceList.vt & (VT_ARRAY | VT_VARIANT)))
-			//	{
-			//		VARIANT *pElement = 0;	//Vector returned with BSTR name, VARIANT_BOOL bLock
-			//		if (SUCCEEDED(SafeArrayAccessData(vtAppInstanceList.parray, (void**)&pElement)))
-			//		{
-			//			for(unsigned int idx=0; idx<(vtAppInstanceList.parray->rgsabound[0].cElements/2); idx++)
-			//			{
-			//				//if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE && wcscmp(m_applicationInstance, pElement[idx].bstrVal) == 0)
-			//				if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE)
-			//				{
-			//					bFoundAppInstance = true;
-			//					wchar_t debug_buf[1024];
-			//					_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - Application: %s - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", pElement[2*idx].bstrVal, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			//					debug_buf[1023] = 0;
-			//					OutputDebugStringW(debug_buf);
-			//					//app_instance_key_ident = pElement[2*idx].bstrVal;
-			//					//Comment out for testing
-			//					//break;	//There should only be one locked
-			//				}
-			//			}
-			//			SafeArrayUnaccessData(vtAppInstanceList.parray);
-			//		}
-			//	}
-			//	if(bFoundAppInstance == true)
-			//		break;
-			//}
-
-			//xxx debug
-			//wchar_t debug_buf[1024];
-			////_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			//_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			//debug_buf[1023] = 0;
-			//OutputDebugStringW(debug_buf);
-			
-
-			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
-			
-			hr = RemoveFromNotification(heartbeat->first);
-		}
-		else
-		{
-			HeartbeatList::iterator next_heartbeat = heartbeat;
-			keepers.insert(heartbeat,++next_heartbeat);
-		}
-	}
-	
-	heartbeats = keepers;
-//_snwprintf(debug_buf1, 1024, L"KeyServer::HeartbeatCheck Leave - NumberOfHeartBeats = %d", heartbeats.size());
-//debug_buf1[1023] = 0;
-//OutputDebugStringW(debug_buf1);
-
-}
-
-/*
-	HANDLE KeyTrialTimeInfoLock;
-	APCTimer *TimesUpThread;
-	static void TimesUpThreadFunction(void* pvThis);
-	typedef struct {time_t last_decrement; bool key_obtained;} TrialTimeInfo;
-	typedef std::map<_bstr_t, time_t> TrialTimeInfoList;
-	// called periodically by the TimesUpThread
-	HRESULT TimesUp();
-*/
-
+//
 HRESULT KeyServer::TimesUp()
 {
+//OutputDebugStringW(L"KeyServer::TimesUp() - Enter");
 	// get the key list and check if any keys in it are not in the trial key list
 	{
 		SafeMutex mutex1(KeyListLock);
@@ -1732,11 +1662,17 @@ HRESULT KeyServer::TimesUp()
 								HRESULT hr = key->second->DecrementTrialHours();
 //swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
 //OutputDebugString(tmpbuf);
-								GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
 								if (SUCCEEDED(hr))
 								{
 									tk->second.key_obtained = false;
 									tk->second.last_decrement = cur_time;
+
+									unsigned short key_version(0);
+									hr = key->second->GetKeyVersion(&key_version);
+									//Check for key version, if key version 0 then send current message
+									if(key_version == 0)
+										g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
+									//if key version 1 then send no message
 								}
 							}
 						}
@@ -1745,47 +1681,13 @@ HRESULT KeyServer::TimesUp()
 			}
 		}
 	}
-	
+//OutputDebugStringW(L"KeyServer::TimesUp() - Leave");	
 	//xxx check for expired keys?
 	return S_OK;
 }
 
-// supports usb device insert/remove notification
-void KeyServer::USBEventCallback(LPVOID pContext)
+//Check to see if any mutexs are deadlocked
+HRESULT KeyServer::CheckHealth(unsigned int timeout) 
 {
-//OutputDebugStringW(L"KeyServer::USBEventCallback() - Enter");
-	//((KeyServer*)pContext)->ResynchronizeKeys();
-	ResynchronizeKeys();
-//OutputDebugStringW(L"KeyServer::USBEventCallback() - Leave");
+	return S_OK;	//Do nothing, return success
 }
-
-_bstr_t KeyServer::BinaryToString(BYTE *pData, DWORD length)
-{
-	size_t sizeOfStr = (length*2)+1;
-	wchar_t *pStr = new wchar_t[sizeOfStr];
-	memset(pStr,0,sizeOfStr);
-	for (unsigned int b = 0; b < length; ++b)
-	{
-		swprintf_s(pStr+2*b, sizeOfStr,L"%02x",(unsigned int)pData[b]);
-	}
-    return pStr;
-}
-
-DWORD KeyServer::StringToBinaryLength(_bstr_t str)
-{
-	return str.length()/2;
-}
-
-void KeyServer::StringToBinary(_bstr_t str, BYTE *pData, DWORD length)
-{
-	if (length>str.length()/2)
-		return;
-	memset(pData, 0, length);
-	for (unsigned int b = 0; b < length; ++b)
-	{
-		unsigned int i(0);
-		swscanf_s(((wchar_t*)str)+2*b, L"%02x", &i);
-		pData[b] = (BYTE)i;
-	}
-}
-

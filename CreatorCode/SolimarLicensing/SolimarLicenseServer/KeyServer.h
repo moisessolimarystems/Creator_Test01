@@ -6,24 +6,28 @@
 
 #include "KeySpec.h"
 #include "ProtectionKey.h"
+#include "ProtectionKey_Version1.h"
 #include "RainbowDriver.h"
 #include "..\common\SafeMutex.h"
 #include "..\common\apctimer.h"
 
-#include "..\common\ILicensingMessage.h"
+//#include "..\common\ILicensingMessage.h"
 #include "KeyMessages.h"
 #include "..\common\LicensingMessage.h"
 #include "..\common\CryptoHelper.h"
+#include "..\common\LicAttribsCPP\Lic_KeyAttribs.h"
 
-#include "USBNotification.h"
+//#include "USBNotification.h"
 
-class KeyServer : public USBNotification
+class KeyServer// : public USBNotification
 {
 public:
 	
 	KeyServer();
 	~KeyServer();
-	
+
+	HRESULT Initialize(RainbowDriver* pDriver);
+
 	HRESULT ResynchronizeKeys(bool bForceRefresh = false);
 	
 	// Top level functions
@@ -31,8 +35,6 @@ public:
 	HRESULT RemoveApplicationInstance(BSTR license_id, BSTR key_ident, BSTR application_instance);
 	HRESULT GetApplicationInstanceList(BSTR license_id, BSTR key_ident, VARIANT *pvtAppInstanceList);
 
-	HRESULT Heartbeat(BSTR license_id);
-	HRESULT RemoveHeartbeat(BSTR license_id);
 	HRESULT KeyEnumerate(VARIANT *keylist);
 	HRESULT EnterPassword(BSTR password);
 	HRESULT EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verification_code);
@@ -42,7 +44,6 @@ public:
 	HRESULT GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password);
 	HRESULT GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password, long password_number);
-	HRESULT GetLicenseServerTime(VARIANT *pvtSystemTime);
 	
 	// Password packet management
 	HRESULT PasswordPacketInitialize(BSTR license_id);
@@ -88,29 +89,34 @@ public:
 	// Reads raw data off of the key
 	HRESULT KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData);
 	
-	// ILicensingMessage
-	HRESULT GetLicenseMessageList(BSTR license_id, VARIANT *pvtMessageList);
+	//// ILicensingMessage
+	//HRESULT GetLicenseMessageList(BSTR license_id, VARIANT *pvtMessageList);
 
-	// for reporting messages to clients and the event log
-	void GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...);
-	void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
-	
+	//// for reporting messages to clients and the event log
+	//void GenerateMessage(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, ...);
+	//void GenerateMessageInternal(const wchar_t* key_ident, EMessageType message_type, HRESULT error, time_t timestamp, const unsigned int MessageLookupID, const wchar_t* message);
+
+
+	// For Software Server to access Validation Keys
+	HRESULT GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs);
+	// For Software Server to access Validation Keys, will only work on keys of version 1
+	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate=false);
+
+	HRESULT CheckHealth(unsigned int timeout);
 private:
-	HRESULT RemoveFromNotification(BSTR license_id);
-	
-	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
-	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
-	static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
-	static const unsigned int UpdateKeysThreadLowPeriodSeconds = 300;	//(sec) - 5 Minutes
+	//static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
+	//static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
+	//static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
+	//static const unsigned int UpdateKeysThreadLowPeriodSeconds = 300;	//(sec) - 5 Minutes
 
-	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
-	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
-	
-	_bstr_t server_host_name;
+	//static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
+	//static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
+	//
+	//_bstr_t server_host_name;
 
-	typedef std::map<_bstr_t, LicensingMessageList> MessageClientList;
-	
-	// support for generating Password Packet files
+	//typedef std::map<_bstr_t, LicensingMessageList> MessageClientList;
+	//
+	//// support for generating Password Packet files
 	typedef std::map<_bstr_t, _bstr_t> KeyValueMap;
 	typedef std::map<_bstr_t, _bstr_t> StringToStringMap;
 	typedef std::pair<_variant_t, _bstr_t> ExpirePasswordPair;
@@ -124,10 +130,10 @@ private:
 		_bstr_t verification_code;
 	};
 	typedef std::map<_bstr_t, PasswordPacket> ClientPasswordPacketList;
-	
+	//
 	HANDLE KeyListLock;
-	HANDLE HeartbeatListLock;
-	HANDLE MessageClientListLock;
+	//HANDLE HeartbeatListLock;
+	//HANDLE MessageClientListLock;
 	HANDLE PasswordPacketListLock;		//xxx initialize this member
 	
 	
@@ -135,19 +141,19 @@ private:
 	long failed_password_attempts;
 	// returns the number of milliseconds to delay before checking a password
 	static DWORD PasswordEntryDelay(long failed_attempts);
-	void HeartbeatCheck();
+	
 	
 	// support for decrementing trial keys.
 	// The TrialTimeInfo contains the last time that the hours counter on a 
 	// key was decremented, as well as a flag indicating whether the mapped 
 	// key was in use during the last hour.
 	HANDLE KeyTrialTimeInfoLock;
-	APCTimer *TimesUpThread;
-	static void TimesUpThreadFunction(void* pvThis);
+	//APCTimer *TimesUpThread;
+	//static void TimesUpThreadFunction(void* pvThis);
 	typedef struct {time_t last_decrement; bool key_obtained;} TrialTimeInfo;
 	typedef std::map<_bstr_t, TrialTimeInfo> TrialTimeInfoList;
 	// called periodically by the TimesUpThread
-	HRESULT TimesUp();
+	
 	
 	typedef std::vector<_bstr_t> StringList;
 	typedef std::map<_bstr_t, ProtectionKey*> KeyList;
@@ -156,30 +162,32 @@ private:
 	//yyy _COM_SMARTPTR_TYPEDEF(ILicensingMessage,__uuidof(ILicensingMessage));
 	//yyy typedef std::map<_bstr_t, ILicensingMessagePtr> MessageClientList;
 	
-	_bstr_t BinaryToString(BYTE *pData, DWORD length);
-	DWORD StringToBinaryLength(_bstr_t str);
-	void StringToBinary(_bstr_t str, BYTE *pData, DWORD length);
-	
 	// maps license_id to a time_t
 	typedef std::map<_bstr_t, DWORD> HeartbeatList;
 	
-	APCTimer *UpdateKeysThread;
-	APCTimer *HeartbeatCheckThread;
-	static void UpdateKeysThreadFunction(void* pvThis);
-	static void HeartbeatCheckThreadFunction(void* pvThis);
-	virtual void USBEventCallback(LPVOID pContext);		// supports usb device insert/remove notification
+	//APCTimer *UpdateKeysThread;
+	//APCTimer *HeartbeatCheckThread;
+	//static void UpdateKeysThreadFunction(void* pvThis);
+	//static void HeartbeatCheckThreadFunction(void* pvThis);
+	//virtual void USBEventCallback(LPVOID pContext);		// supports usb device insert/remove notification
 
 	KeySpec keyspec;
-	RainbowDriver driver;
 	KeyList keys;
 	StringToStringMap virtual_key_to_physical_key_list;
 	HeartbeatList heartbeats;
 	TrialTimeInfoList trial_keys;
-	MessageClientList message_clients;
+	//MessageClientList message_clients;
 	ClientPasswordPacketList password_packets;
 	
 	static BYTE crypto_key_password_packet_private[];
 	static BYTE crypto_key_password_packet_public[];
 	static BYTE crypto_key_password_packet_password[];
 	static unsigned int packet_magic_number_int[];	//a static BYTE [] still adds string to image, and can be seen in process explorer, this value is a GUID that is easily read
+
+	RainbowDriver* pRainbowDriver;
+	//public:
+	//	RainbowDriver* pRainbowDriver;
+	public:
+		HRESULT TimesUp();
+		//void HeartbeatCheck();
 };
