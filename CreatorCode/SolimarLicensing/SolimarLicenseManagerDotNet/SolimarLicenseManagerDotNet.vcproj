@@ -362,6 +362,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\EventLogHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\SolimarLicenseServer\KeySpec.cpp"
 				>
 			</File>

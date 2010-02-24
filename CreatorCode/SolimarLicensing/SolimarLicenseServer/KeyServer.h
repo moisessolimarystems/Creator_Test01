@@ -102,6 +102,7 @@ public:
 	// For Software Server to access Validation Keys, will only work on keys of version 1
 	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate=false);
 
+	HRESULT CheckHealth(unsigned int timeout);
 private:
 	//static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	//static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)

@@ -1685,3 +1685,9 @@ HRESULT KeyServer::TimesUp()
 	//xxx check for expired keys?
 	return S_OK;
 }
+
+//Check to see if any mutexs are deadlocked
+HRESULT KeyServer::CheckHealth(unsigned int timeout) 
+{
+	return S_OK;	//Do nothing, return success
+}

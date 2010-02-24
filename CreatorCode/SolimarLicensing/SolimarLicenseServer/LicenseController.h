@@ -53,6 +53,9 @@ private:
 
 	HRESULT RemoveFromNotification(BSTR license_id);
 
+	static const unsigned int CheckHealthThreadPeriod = 2*60*1000;		//(ms) - 2 Minutes
+	static const unsigned int MutexDeadlockTimeout= 60*1000;				//(ms) - 1 Minute
+
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
 	static const unsigned int UpdateKeysThreadHighPeriodSeconds = 60;	//(sec) - 1 Minute
@@ -85,6 +88,7 @@ private:
 	HANDLE MessageClientListLock;
 	HANDLE PasswordPacketListLock;		//xxx initialize this member
 	
+	HRESULT CheckHealth(); //Checks for mutex deadlocks, if any are hit, will recycle process.
 	
 	// support for blocking brute force attempts at password cracking
 	long failed_password_attempts;
@@ -118,8 +122,10 @@ private:
 	// maps license_id to a time_t
 	typedef std::map<_bstr_t, DWORD> HeartbeatList;
 	
+	APCTimer *CheckHealthThread;
 	APCTimer *UpdateKeysThread;
 	APCTimer *HeartbeatCheckThread;
+	static void CheckHealthThreadFunction(void* pvThis);
 	static void UpdateKeysThreadFunction(void* pvThis);
 	static void HeartbeatCheckThreadFunction(void* pvThis);
 

@@ -80,7 +80,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicense, BSTR keyIdent);
 
 		HRESULT TimesUp();
-
+		HRESULT CheckHealth(unsigned int timeout);
 	private:
 		HANDLE SoftwareLicenseLock;
 

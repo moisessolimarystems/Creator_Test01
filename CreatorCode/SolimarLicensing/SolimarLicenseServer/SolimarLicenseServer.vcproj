@@ -662,6 +662,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\common\EventLogHelper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\common\FlateHelper.cpp"
 				>
 			</File>

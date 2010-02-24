@@ -879,7 +879,7 @@ HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfo
 
 HRESULT LicenseCache::GetCache_ByProduct(long productID, Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo)
 {
-	HRESULT hr(S_OK);
+	HRESULT hr(LicenseServerError::EHR_LIC_SOFTWARE_NO_PRODUCT);
 	SafeMutex mutex(licenseUseCacheLock);
 
 	//LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.begin();
