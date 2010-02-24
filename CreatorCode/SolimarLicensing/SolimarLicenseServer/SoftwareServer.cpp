@@ -256,12 +256,12 @@ wchar_t tmpbuf[BUF_SIZE];
 			if(SUCCEEDED(hr))
 				tmpLicInfoList.insert(tmpLicInfoList.end(), new Lic_PackageAttribs::Lic_LicenseInfoAttribs(tmpLicInfoAttribs));
 		}
-		
+
+		}	//End scope of SafeMutex mutex(SoftwareLicenseLock);
 //OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - licCache.RefreshCache(&tmpLicInfoList)");
 		licCache.RefreshCache(&tmpLicInfoList, licServerDataMgr.InClockViolation());
 		if(bFirstTime) 
 			bFirstTime = false;
-		}
 
 		//Clean up
 		while(!tmpLicInfoList.empty())
@@ -3038,8 +3038,8 @@ wchar_t debug_buf[1024];
 					lastTouchDateTimeT = 0;
 				double timeDifferenceInSeconds = difftime(curTimeT/*endTime*/, lastTouchDateTimeT/*startTime*/);
 				int timeDifferenceInHours = int(timeDifferenceInSeconds / TimeHelper::ONE_HOUR_IN_SECONDS);
-_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - difftime(%d, %d) = timeDifferenceInSeconds: %f, inMinutes: %d, inHours: %d", curTimeT, lastTouchDateTimeT, timeDifferenceInSeconds, int(timeDifferenceInSeconds/60.0), int(timeDifferenceInSeconds/TimeHelper::ONE_HOUR_IN_SECONDS));
-OutputDebugStringW(debug_buf);
+//_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - difftime(%d, %d) = timeDifferenceInSeconds: %f, inMinutes: %d, inHours: %d", curTimeT, lastTouchDateTimeT, timeDifferenceInSeconds, int(timeDifferenceInSeconds/60.0), int(timeDifferenceInSeconds/TimeHelper::ONE_HOUR_IN_SECONDS));
+//OutputDebugStringW(debug_buf);
 				
 				if(timeDifferenceInHours > 0) // at least an hour has passed, update counters accordingly
 				{
@@ -3200,7 +3200,14 @@ OutputDebugStringW(debug_buf);
 					{
 						BSTR bstrTmpSoftwareLicense;
 						swLicMgrIt->second->GetSoftwareLicenseName(&bstrTmpSoftwareLicense);
-						g_licenseController.GenerateSoftwareLicenseMessage(bstrTmpSoftwareLicense, prodReminderMapIt->first, MT_WARNING, S_OK, time(0), MessageSoftwareModuleExpiration , Lic_PackageAttribsHelper::GetProductName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first).c_str(), prodReminderMapIt->first, wMsg);
+						g_licenseController.GenerateSoftwareLicenseMessage(
+							bstrTmpSoftwareLicense, 
+							prodReminderMapIt->first, 
+							MT_WARNING, 
+							S_OK, 
+							time(0), 
+							MessageSoftwareModuleExpiration , 
+							Lic_PackageAttribsHelper::GetProductName(&(g_pSoftwareSpec->GetSoftwareSpec()), prodReminderMapIt->first).c_str(), prodReminderMapIt->first, wMsg);
 						SysFreeString(bstrTmpSoftwareLicense);
 					}
 					prodReminderMapIt->second.lastReminderSent = curTimeT;
@@ -3215,6 +3222,19 @@ OutputDebugStringW(debug_buf);
 	catch (...)
 	{
 		hr = E_FAIL;
+	}
+	return hr;
+}
+
+//Check to see if any mutexs are deadlocked
+HRESULT SoftwareServer::CheckHealth(unsigned int timeout) 
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(SoftwareLicenseLock, timeout);
+	if(!mutex.Locked())
+	{
+		hr = E_FAIL;
+		//Log to the event log that failed deadlocked on SoftwareLicenseLock
 	}
 	return hr;
 }

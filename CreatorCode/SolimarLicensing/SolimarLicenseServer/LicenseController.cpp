@@ -6,6 +6,15 @@
 #include "..\common\LicenseError.h"
 #include "..\common\TimeHelper.h"
 
+void LicenseController::CheckHealthThreadFunction(void* pvThis)
+{
+//OutputDebugStringW(L"LicenseController::CheckHealthThreadFunction() - Enter");
+	HRESULT hr = S_OK;
+	LicenseController *pThis = (LicenseController*)pvThis;
+	hr = pThis->CheckHealth();
+//OutputDebugStringW(L"LicenseController::CheckHealthThreadFunction() - Leave");
+}
+
 void LicenseController::UpdateKeysThreadFunction(void* pvThis)
 {
 //OutputDebugStringW(L"LicenseController::UpdateKeysThreadFunction() - Enter");
@@ -53,6 +62,7 @@ LicenseController::LicenseController() :
 
 
 	//UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod/6, InitTimerThreadCB, this);
+	CheckHealthThread = new APCTimer(CheckHealthThreadFunction, this, CheckHealthThreadPeriod, InitTimerThreadCB, this);
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod, InitTimerThreadCB, this);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod, InitTimerThreadCB, this);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod, InitTimerThreadCB, this);
@@ -105,7 +115,8 @@ LicenseController::~LicenseController()
 	//wchar_t tmpbuf[1024];
 	//swprintf_s(tmpbuf, 1024, L"LicenseController::~LicenseController() - Enter, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
-
+	if (CheckHealthThread)
+		delete CheckHealthThread;
 	if (UpdateKeysThread)
 		delete UpdateKeysThread;
 	if (HeartbeatCheckThread)
@@ -250,7 +261,7 @@ void LicenseController::GenerateMessageInternal(const wchar_t* license_source, b
 		event_type = EVENTLOG_ERROR_TYPE;
 	else if(message_type == MT_WARNING)
 		event_type = EVENTLOG_WARNING_TYPE;
-	LicenseServerError::WriteEventLog(event_log_msg, event_type);
+	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID);
 	
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
@@ -317,6 +328,7 @@ HRESULT LicenseController::Heartbeat(BSTR license_id)
 }
 HRESULT LicenseController::RemoveHeartbeat(BSTR license_id)
 {
+	{
 	SafeMutex mutex(HeartbeatListLock);
 	for (HeartbeatList::iterator heartbeatIt = heartbeats.begin(); heartbeatIt != heartbeats.end(); ++heartbeatIt)
 	{
@@ -326,18 +338,21 @@ HRESULT LicenseController::RemoveHeartbeat(BSTR license_id)
 			break;
 		}
 	}
+	}
 	RemoveFromNotification(license_id);
 	
 	return S_OK;
 }
 HRESULT LicenseController::RemoveFromNotification(BSTR license_id)
 {
+	HRESULT hr = S_OK;
+	{
 	SafeMutex mutex(HeartbeatListLock);
-	HRESULT hr = keyserver.LicenseReleaseAll(license_id);
+	hr = keyserver.LicenseReleaseAll(license_id);
 	//Cycle through all keys removing the app instance, passing an empty string will remove the correct app instance...
 	for (KeyList::iterator keyIt = keys.begin(); keyIt!=keys.end(); ++keyIt)
 		keyIt->second->RemoveApplicationInstance(_bstr_t(license_id, true), L"");
-
+	}
 	//Remove the app instance, a productID of -1 will remove all products that match license_id, 
 	//passing an empty string will remove the correct app instance...
 	softwareServer.RemoveApplicationInstance(-1, _bstr_t(license_id, true), L"");
@@ -354,6 +369,32 @@ HRESULT LicenseController::RemoveFromNotification(BSTR license_id)
 	return hr;
 }
 
+//Checks for mutex deadlocks, if any are hit, will recycle process.
+HRESULT LicenseController::CheckHealth()
+{
+	HRESULT hr(S_OK);
+
+	hr = keyserver.CheckHealth(MutexDeadlockTimeout);
+	if(SUCCEEDED(hr))
+		hr = softwareServer.CheckHealth(MutexDeadlockTimeout);
+
+	if(FAILED(hr))
+	{
+		//Log to the event log that shutting down license server because of deadlock
+		static const int MAX_MESSAGE_SIZE = 0x2000;
+		wchar_t event_log_msg[MAX_MESSAGE_SIZE];
+		_snwprintf_s(
+			event_log_msg, 
+			_countof(event_log_msg), 
+			MAX_MESSAGE_SIZE, 
+			L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\nSolimar License Server has encountered a deadlock scenario and is shutting down."
+			);
+		LicenseServerError::WriteEventLog(event_log_msg, EVENTLOG_ERROR_TYPE, MessageGenericError);
+		ExitProcess(hr);
+	}
+
+	return hr;
+}
 
 //
 // Check licenses for softwareServer

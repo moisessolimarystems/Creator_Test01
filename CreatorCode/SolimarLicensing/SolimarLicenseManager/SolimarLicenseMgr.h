@@ -149,12 +149,12 @@
 	} while (__retry); \
 } /* end scope */ \
 
-#define SS_GENERATE_AND_DISPATCH_MESSAGE(MessageValue, MessageType, MessageErrorCode) \
+#define SS_GENERATE_AND_DISPATCH_MESSAGE(MessageValue, MessageType, MessageErrorCode, MessageId) \
 { /* begin scope */ \
-	SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(L"", MessageValue, MessageType, MessageErrorCode) \
+	SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(L"", MessageValue, MessageType, MessageErrorCode, MessageId) \
 } /* end scope */ \
 
-#define SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(LicenseServer, MessageValue, MessageType, MessageErrorCode) \
+#define SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(LicenseServer, MessageValue, MessageType, MessageErrorCode, MessageId) \
 { /* begin scope */ \
 	static const int MAX_MESSAGE_SIZE = 0x2000; \
 	wchar_t message[MAX_MESSAGE_SIZE]; \
@@ -164,7 +164,7 @@
 	time_t timestamp = time(0); \
 	_variant_t vtTimestamp; \
 	vtTimestamp = TimeHelper::TimeTToVariant(timestamp, false); \
-	DispatchLicenseMessage(_bstr_t(LicenseServer), _bstr_t(L""), MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message)); \
+	DispatchLicenseMessage(_bstr_t(LicenseServer), _bstr_t(L""), MessageType, MessageErrorCode, vtTimestamp, _bstr_t(message), MessageId); \
 } /* end scope */ \
 
 #define SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp) \
@@ -561,10 +561,10 @@ private:
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
 	static bool isAutoUiStyleDialog(DWORD ui_level);
 	static bool isAutoUiStyleEventLog(DWORD ui_level);
-	void DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message);
-	void DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message);
+	void DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id);
+	void DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id);
 	void KeyMessageShowDialog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);
-	void KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message);
+	void KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message, long message_id);
 	
 	typedef struct {
 		_bstr_t caption, message;

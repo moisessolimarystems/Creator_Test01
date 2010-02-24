@@ -266,7 +266,7 @@ HRESULT SoftwareServerDataMgr::Touch()
 			pServerDataAttribs->bInClockViol = true;
 			//Cycle through all the license info objects, update so they are in violation
 
-			g_licenseController.GenerateMessage(L"License Server", MT_ERROR, S_OK, time(0), MessageGeneric, L"Error - License Server has entered Clock Violation Period, please contact Solimar Systems, Inc. for assistance.");
+			g_licenseController.GenerateMessage(L"License Server", MT_ERROR, S_OK, time(0), MessageViolationEnter, L"Error - License Server has entered Clock Violation Period, please contact Solimar Systems, Inc. for assistance.");
 		}
 		else if(bLeaveClockViolation == true)
 		{
@@ -275,7 +275,7 @@ HRESULT SoftwareServerDataMgr::Touch()
 
 			//Cycle through all the license info objects, update so they are out of violation
 
-			g_licenseController.GenerateMessage(L"License Server", MT_INFO, S_OK, time(0), MessageGeneric, L"Information - License Server has left Clock Violation Period");
+			g_licenseController.GenerateMessage(L"License Server", MT_INFO, S_OK, time(0), MessageViolationLeave, L"Information - License Server has left Clock Violation Period");
 		}
 
 		if(bLogWarning_ClockViolation == true)	//Log to message scheme

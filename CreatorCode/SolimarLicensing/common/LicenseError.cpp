@@ -1,4 +1,5 @@
 #include "LicenseError.h"
+#include "EventLogHelper.h"
 namespace LicenseServerError
 {
 /*
@@ -111,28 +112,17 @@ const SL_ERROR SLErrors[] =
 const unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);
 
 
-HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type)
+HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id)
 {
-	HRESULT hr = S_OK;
-	HANDLE h;
+	//TReadEventLog();
+	return EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, event_type, event_id);
+}
 
-	h = RegisterEventSource(NULL, TEXT("Solimar License Server"));
-	if (h == NULL) return HRESULT_FROM_WIN32(GetLastError());
-
-	if (!ReportEventW(h,           // event log handle
-			(WORD)(event_type),   // event type
-			0,                    // category zero
-			0,			   // event identifier
-			NULL,                 // no user security identifier
-			1,                    // one substitution string
-			0,                    // no data
-			(LPCWSTR*)&event_log_msg,       // pointer to string array
-			NULL))                // pointer to data
-		hr = HRESULT_FROM_WIN32(GetLastError());
-
-	DeregisterEventSource(h);
-
-	return hr;
+//#define MAX_RECORD_BUFFER_SIZE  0x10000  // 64K
+HRESULT TReadEventLog()
+{
+	return E_NOTIMPL;
+	//return EventLogHelper::ReadEventLog_Helper();
 }
 
 // Tries to look up error by looking up IErrorInfo first...

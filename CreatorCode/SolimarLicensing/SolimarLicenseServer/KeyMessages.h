@@ -80,6 +80,10 @@ static const unsigned int MessageSoftwareModuleExpiration = 37;
 
 // generic message
 static const unsigned int MessageGeneric = 38;
+static const unsigned int MessageViolationEnter = 39;
+static const unsigned int MessageViolationLeave = 40;
+static const unsigned int MessageValidInitialize = 41;
+static const unsigned int MessageGenericError = 42;
 
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
@@ -153,6 +157,10 @@ static const wchar_t* LicensingMessageStringTable[256] =
 
 //MessageGeneric
 	/*MessageGeneric*/ L"%s",
+	/*MessageViolationEnter*/ L"%s",
+	/*MessageViolationLeave*/ L"%s",
+	/*MessageValidInitialize*/ L"%s",
+	/*MessageGenericError*/ L"%s",
 
 // general errors
 	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",

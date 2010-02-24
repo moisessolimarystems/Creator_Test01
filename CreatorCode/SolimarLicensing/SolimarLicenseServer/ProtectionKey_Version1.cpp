@@ -64,7 +64,7 @@ bool ProtectionKey_Version1::TimesUp()
 //Called to reduce hours until expire.
 HRESULT ProtectionKey_Version1::DecrementTrialHours()
 {
-OutputDebugStringW(L"ProtectionKey_Version1::DecrementTrialHours()");
+//OutputDebugStringW(L"ProtectionKey_Version1::DecrementTrialHours()");
 
 	//Update current date, and decrement all the hours counters.  Decrement by the difference of current timedate
 	// and last touch.  If an hour hasn't passed, return E_FAIL
@@ -114,7 +114,7 @@ wchar_t debug_buf[1024];
 //_snwprintf_s(debug_buf, 1024, L"ProtectionKey_Version1::DecrementTrialHours() - lastError: %d", lastError);
 //OutputDebugStringW(debug_buf);
 			//g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, LicenseServerError::EHR_KEY_WRITE_ACCESS_DENIED, time(0), MessageKeyWriteFailure);
-			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, E_FAIL, time(0), MessageGeneric, L"Error with the time on the system, please send Solimar License Diagnostic Data.");
+			g_licenseController.GenerateMessage(m_physicalKeyIdent, MT_ERROR, E_FAIL, time(0), MessageGenericError, L"Error with the time on the system, please send Solimar License Diagnostic Data.");
 			if(lastError != 0)
 				throw E_FAIL;
 		}

@@ -301,7 +301,9 @@ namespace LicenseServerError
 		save_error_info->Release(); \
 	}
 
-	HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type);
+	HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id);
+
+	HRESULT TReadEventLog();
 
 	/*
 	 * LIC_PROPAGATE_CUSTOM_ERROR()
