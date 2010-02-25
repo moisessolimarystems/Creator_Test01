@@ -25,6 +25,7 @@ namespace Client.Creator
                     {"Active", ConditionName.Active},
                     {"Customer", ConditionName.Customer},        
                     {"License Server", ConditionName.LicenseServer},
+                    {"Notes", ConditionName.Notes}
                 };
 
         public static readonly IDictionary<string, ConditionName>
