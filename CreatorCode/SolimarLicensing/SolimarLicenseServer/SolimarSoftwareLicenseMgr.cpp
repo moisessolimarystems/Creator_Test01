@@ -1433,7 +1433,7 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 
 			if(bInitializedLicenseFileAttribs)
 			{
-OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From Existing System");
+//OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From Existing System");
 				//Can look to m_licenseFileAttribs for activationSlot to productLicenseNumber relationship
 				pActivitySlotList = &m_licenseFileAttribs.licLicenseInfoAttribs.activitySlotList;
 			}
@@ -1448,7 +1448,7 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 
 				if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
 				{
-OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From New Package");
+//OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Use From New Package");
 					pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList;
 				}
 				else
@@ -1456,7 +1456,7 @@ OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList
 					//recreate activitySlotList from using tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList
 					//going from 0 to keyAttrib.historyNumber
 					//*pActivitySlotList = tmpList;
-OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Recreate from Key and New Package");
+//OutputDebugString(L"SoftwareLicenseMgr::ApplyLicensePacket() - pActivitySlotList = &tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotList - Recreate from Key and New Package");
 
 					//tmpList->insert
 					for(int slotNumber=0; slotNumber<20; slotNumber++)
