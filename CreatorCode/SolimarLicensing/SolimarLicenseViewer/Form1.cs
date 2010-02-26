@@ -182,8 +182,15 @@ namespace SolimarLicenseViewer
                 string licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
                 try
                 {
-                    m_CommLink.GetVersionLicenseServer(m_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
-                    licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                    if (!m_CommLink.IsConnected())
+                    {
+                        licSvrVer = " - Licenese Server NOT installed";
+                    }
+                    else
+                    {
+                        m_CommLink.GetVersionLicenseServer(m_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
+                        licSvrVer = string.Format(" - version: {0}.{1}.{2}", majorVer, minorVer, buildVer);
+                    }
                 }
                 catch (COMException)
                 {
@@ -195,10 +202,9 @@ namespace SolimarLicenseViewer
 
                 if (!m_bViewDiagnosticData)
                 {
-                    this.Text = string.Format("{0} [{1}]{2}{3}",
+                    this.Text = string.Format("{0} [{1}]{2}",
                         AppConstants.FormTitle,
                         m_CommLink.ServerName,
-                        licSvrVer.Length == 0 ? "" : " - version: ",
                         licSvrVer.Length == 0 ? "" : licSvrVer);
                 }
                 else
@@ -215,6 +221,7 @@ namespace SolimarLicenseViewer
                 {
                     //Failed to connect to a license server, disable all license settings.
                     fileLicenseToolStripMenuItem.Visible = false;
+                    diagnosticDataToolStripMenuItem.Visible = false;
                 }
             }
             catch (COMException)
@@ -576,17 +583,19 @@ namespace SolimarLicenseViewer
                 aboutBox.SetManagerVersion(licMgrVer);
                 aboutBox.SetManagerName(System.Environment.MachineName.ToLower());
 
+                string licSvrVer = "";
                 try
                 {
                     m_CommLink.GetVersionLicenseServer(m_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
+                    licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
                 }
                 catch (COMException)
                 {
                     majorVer = 0;
                     minorVer = 0;
                     buildVer = 0;
+                    licSvrVer = string.Format("Not Installed");
                 }
-                string licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
                 aboutBox.SetServerVersion(licSvrVer);
                 aboutBox.SetServerName(m_CommLink.ServerName);
                 aboutBox.ShowDialog(this);

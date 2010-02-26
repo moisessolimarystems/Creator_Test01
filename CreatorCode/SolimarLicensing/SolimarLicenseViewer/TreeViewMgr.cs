@@ -213,7 +213,7 @@ namespace SolimarLicenseViewer
             }
             catch (COMException /*ex*/)
             {
-
+                rootNode = null;
             }
             return rootNode;
         }
