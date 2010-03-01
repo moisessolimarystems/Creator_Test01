@@ -63,7 +63,7 @@ namespace Client.Creator.ServiceProxy
         public static bool IsValidHost(string hostName)
         {
             bool bValidHost = false;
-            ChannelFactory<T> _channelFactory = new ChannelFactory<T>("CreatorServiceTcp",
+            _channelFactory = new ChannelFactory<T>("CreatorServiceTcp",
                                                                        new EndpointAddress(new Uri("net.tcp://" + hostName + ":9091/Creator/tcp")));
             IClientChannel proxy = (IClientChannel)_channelFactory.CreateChannel();
             try
@@ -72,9 +72,9 @@ namespace Client.Creator.ServiceProxy
                 proxy.Close();
                 bValidHost = true;
             }
-            catch (Exception ex)
+            catch (CommunicationException cex)
             {
-                throw ex;
+                throw new Exception(string.Format("Failed to connect to {0}. Check if the creator service is started.", hostName));
             }
             finally
             {
