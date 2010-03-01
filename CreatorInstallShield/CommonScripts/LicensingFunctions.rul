@@ -225,7 +225,7 @@ begin
    	endif;
     
     if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
-    	nvSize = StrFind(svValue, "7.3.2") ;
+    	nvSize = StrFind(svValue, "7.5.1") ;
     	if(nvSize < 0) then 
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
 			if(!SYSINFO.bIsWow64) then    
