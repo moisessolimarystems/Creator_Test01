@@ -42,16 +42,19 @@ namespace Client.Creator
             {
                 _licenseTable = client.GetLicenseByName(_licenseServer, false);
             });
-            _licPackage.Stream = _licenseTable.LicenseInfo;
-            if (PopulateValidationTokens())
+            if (_licenseTable != null)
             {
-                if (PopulateProductInfo())
+                _licPackage.Stream = _licenseTable.LicenseInfo;
+                if (PopulateValidationTokens())
                 {
-                    Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
-                    Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
-                    _licPackage.licLicenseInfoAttribs.TVal = licInfo;
-                    _licenseTable.LicenseInfo = _licPackage.Stream;
-                    bRetVal = true;
+                    if (PopulateProductInfo())
+                    {
+                        Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
+                        Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
+                        _licPackage.licLicenseInfoAttribs.TVal = licInfo;
+                        _licenseTable.LicenseInfo = _licPackage.Stream;
+                        bRetVal = true;
+                    }
                 }
             }
             return bRetVal;
@@ -107,7 +110,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer);
-                foreach (ProductLicenseTable plt in pltList)
+                foreach (ProductLicenseTable plt in pltList.Where(pl => pl.IsActive == true))
                 {
                     Lic_PackageAttribs.Lic_ProductInfoAttribs product = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
                     product.contractNumber.TVal = plt.plID;
