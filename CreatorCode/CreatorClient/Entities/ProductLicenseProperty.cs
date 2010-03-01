@@ -20,7 +20,7 @@ namespace Client.Creator
         PermissionsTable _permissions;
         int _productLicenseDataBaseID;
         CommunicationLink _commLink;
-        List<ModuleProperty> _moduleList;
+        List<ModuleTable> _moduleList;
         LicenseVersion _version;
 
         public const uint UNLIMITED = 999999;
@@ -38,31 +38,12 @@ namespace Client.Creator
         public ProductLicenseProperty(ProductLicenseTable plData, PermissionsTable permissions)
         {
             Permissions = permissions;
-            List<ModuleTable> dbModuleList = null;
-            _moduleList = new List<ModuleProperty>();
-            Service<ICreator>.Use((client) => 
-            {
-                LicenseTable currentLicense = client.GetLicenseByID(plData.LicenseID, false);
-                if(currentLicense != null)
-                    _licenseServer = currentLicense.LicenseName;
-                dbModuleList = client.GetModulesByProductLicense(plData.plID);
-            });
             _plRec = plData;
-            _version = new LicenseVersion(_plRec.ProductVersion);
-            _productLicenseDataBaseID = plData.ID;
             _commLink = CreatorForm.s_CommLink;
-
-            //ProductLicenseType = GetProductSpec(product.Product.productID.TVal).productLicType.TVal;
             if (_commLink.GetProductSpec(plData.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
                 SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
             else
                 SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
-            if (dbModuleList.Count == 0)
-                InitializeProductEntity();
-            foreach (ModuleTable module in dbModuleList)
-            {
-                _moduleList.Add(new ModuleProperty(module));
-            }
         }
 
         public bool HasHardwareToken()
@@ -80,6 +61,7 @@ namespace Client.Creator
         public void InitializeProductEntity()
         {
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec = CreatorForm.s_CommLink.GetProductSpec(ProductID);
+            List<ModuleTable> mtList = new List<ModuleTable>();
             foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
             {
                 short moduleValue = 0;
@@ -94,11 +76,13 @@ namespace Client.Creator
                 mt.Value = moduleValue;
                 mt.AppInstance = modProductConnection;
                 mt.ProductLicenseID = ProductLicenseDatabaseID;
-                Service<ICreator>.Use((client) =>
-                {
-                    client.CreateModule(mt);
-                });
+                mtList.Add(mt);
             }
+            Service<ICreator>.Use((client) =>
+            {
+                client.CreateAllModules(mtList);
+            });
+            _moduleList = mtList;
         }
 
         public bool SetTrialToLicensed()
@@ -107,14 +91,14 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 List<ModuleTable> mtList = new List<ModuleTable>();
-                foreach (ModuleProperty module in _moduleList)
+                foreach (ModuleTable module in ModuleList)
                 {
                     short moduleValue;
-                    if (_commLink.IsDefaultModule(ProductID, module.ID))
-                        moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ID);
+                    if (_commLink.IsDefaultModule(ProductID, module.ModID))
+                        moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);//module.ID));
                     else
                         moduleValue = 0;
-                    ModuleTable mt = client.GetModule(ID, module.ID);
+                    ModuleTable mt = client.GetModule(ID, module.ModID);
                     if (mt != null)
                     {
                         mt.Value = moduleValue;
@@ -171,21 +155,25 @@ namespace Client.Creator
             {
                 List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
-                foreach (ModuleProperty module in _moduleList)
+                //foreach (ModuleProperty module in _moduleList)
+                if (_moduleList != null)
                 {
-                    if (module.Value > 0)
+                    foreach (ModuleTable module in _moduleList)
                     {
-                        ModuleTable mt = mtList.Where(m => m.ModID == module.ID).First();
-                        if (mt != null)
+                        if (module.Value > 0)
                         {
-                            mt.Value += module.Value;
-                            updateModuleList.Add(mt);
+                            ModuleTable mt = mtList.Where(m => m.ModID == module.ModID).First();//.ID).First();
+                            if (mt != null)
+                            {
+                                mt.Value += module.Value;
+                                updateModuleList.Add(mt);
+                            }
                         }
                     }
+                    if (updateModuleList.Count > 0)
+                        client.UpdateAllModules(updateModuleList);
+                    client.DeleteAllModules(ProductLicenseDatabaseID);
                 }
-                if (updateModuleList.Count > 0)
-                    client.UpdateAllModules(updateModuleList);
-                client.DeleteAllModules(ProductLicenseDatabaseID);
             });
             return bRetVal;
         }
@@ -330,21 +318,25 @@ namespace Client.Creator
 
         public bool IsAllowedRemoveModule(short modID)
         {
-            foreach (ModuleProperty module in _moduleList)
+            //foreach (ModuleProperty module in _moduleList)
+            if (_moduleList != null)
             {
-                if (module.ID == modID)
+                foreach (ModuleTable module in _moduleList)
                 {
-                    if (module.Value > 0)
+                    if (module.ModID/*.ID*/ == modID)
                     {
-                        if (Status == ProductLicenseState.Licensed)
+                        if (module.Value > 0)
                         {
-                            if (!_commLink.IsDefaultModule(ProductID, modID))
-                                return true;
-                        }
-                        else
-                        {
-                            if (Status == ProductLicenseState.AddOn)
-                                return true;
+                            if (Status == ProductLicenseState.Licensed)
+                            {
+                                if (!_commLink.IsDefaultModule(ProductID, modID))
+                                    return true;
+                            }
+                            else
+                            {
+                                if (Status == ProductLicenseState.AddOn)
+                                    return true;
+                            }
                         }
                     }
                 }
@@ -408,8 +400,15 @@ namespace Client.Creator
         [Browsable(false)]
         public string LicenseServer
         {
-            get { return _licenseServer; }
-            set { _licenseServer = value; }
+            get
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    LicenseTable lt = client.GetLicenseByID(_plRec.LicenseID, false);
+                    if (lt != null) _licenseServer = lt.LicenseName;
+                });
+                return _licenseServer; 
+            }
         }
 
         [Browsable(false)]
@@ -453,9 +452,19 @@ namespace Client.Creator
         }
 
         [Browsable(false)]
-        public List<ModuleProperty> ModuleList
+        //public List<ModuleProperty> ModuleList
+        public List<ModuleTable> ModuleList
         {
-            get { return _moduleList; }
+            get 
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    _moduleList = client.GetModulesByProductLicense(_plRec.plID);
+                });
+                if (_moduleList.Count == 0)
+                    InitializeProductEntity();
+                return _moduleList; 
+            }
         }
 
         #endregion
@@ -467,11 +476,8 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string ID
         {
-            get { return Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(LicenseServer, Index); }
-            set
-            {
-                _plRec.plID = value;
-            }
+            get { return _plRec.plID; }//Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(LicenseServer, Index); }
+            set { _plRec.plID = value;}
         }
 
         [Category("Product License"), PropertyOrder(2)]
@@ -497,7 +503,7 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_version_pwd.Value);
-                return _version;
+                return new LicenseVersion(_plRec.ProductVersion);             
             }
             set 
             {
@@ -542,9 +548,13 @@ namespace Client.Creator
                 //add-on modules - always 0 unless total is 0 then 1
                 //client modules - matches product
                 //add-on modules - always 0 unless total is 0 then 1
-                foreach (ModuleProperty module in _moduleList)
+                //foreach (ModuleProperty module in _moduleList)
+                if (_moduleList != null)
                 {
-                     module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
+                    foreach (ModuleTable module in _moduleList)
+                    {
+                        module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
+                    }
                 }
                 _plRec.ProductConnection = value;
                 Service<ICreator>.Use((client) =>
