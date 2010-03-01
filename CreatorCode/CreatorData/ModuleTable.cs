@@ -24,6 +24,17 @@ namespace CreatorData
                                                    c.ProductLicenseTable.ParentProductLicenseID == productLicenseName)).ToList();
             }
         }
+
+        public static IList<ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                return db.ModuleTables.Where(c => (c.ProductLicenseTable.LicenseTable.LicenseName == licenseServer &&
+                                                   c.ProductLicenseTable.ProductID == productID) &&
+                                                   c.ProductLicenseTable.IsActive == true).ToList();
+            }
+        }
         
         public static ModuleTable GetModule(string productLicenseName, short modID)
         {
@@ -69,14 +80,7 @@ namespace CreatorData
             }
             return totalValue;
         }
-        //public static void DeleteAllModules(IList<ModuleTable> modules)
-        //{
-        //    using (CreatorDataContext db = new CreatorDataContext())
-        //    {
-        //        db.ModuleTables.DeleteAllOnSubmit(modules);
-        //        db.SubmitChanges();
-        //    }
-        //}
+ 
         public static void DeleteAllModules(int productlicenseID)
         {
             using (CreatorDataContext db = new CreatorDataContext())

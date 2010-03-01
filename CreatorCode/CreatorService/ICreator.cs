@@ -298,6 +298,8 @@ namespace Service.Creator
         [OperationContract]
         IList<ModuleTable> GetAllModules(string productLicenseName);
         [OperationContract]
+        IList<ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID);
+        [OperationContract]
         IList<ModuleTable> GetModulesByProductLicense(string productLicenseName);
         [OperationContract]
         short GetTotalModuleValue(string licenseServer, byte productID, short modID);

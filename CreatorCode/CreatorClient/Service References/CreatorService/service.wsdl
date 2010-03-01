@@ -171,6 +171,12 @@
   <wsdl:message name="ICreator_GetAllModules_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllModulesResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProduct" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProductResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetModulesByProductLicense_InputMessage">
     <wsdl:part name="parameters" element="tns:GetModulesByProductLicense" />
   </wsdl:message>
@@ -674,6 +680,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllModules" message="tns:ICreator_GetAllModules_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllModulesResponse" message="tns:ICreator_GetAllModules_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetAllActiveModulesByProduct">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" message="tns:ICreator_GetAllActiveModulesByProduct_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProductResponse" message="tns:ICreator_GetAllActiveModulesByProduct_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetModulesByProductLicense">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetModulesByProductLicense" message="tns:ICreator_GetModulesByProductLicense_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetModulesByProductLicenseResponse" message="tns:ICreator_GetModulesByProductLicense_OutputMessage" />
@@ -1165,6 +1175,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetAllModules">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllModules" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllActiveModulesByProduct">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

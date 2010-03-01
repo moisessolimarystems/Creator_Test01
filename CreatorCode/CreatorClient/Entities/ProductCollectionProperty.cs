@@ -31,6 +31,7 @@ namespace Client.Creator
         public ProductLicenseProperty GetProductLicenseProperty(string productLicenseID)
         {
             ProductLicenseProperty selectedProductLicense = null;
+            //IEnumerable<ProductLicenseProperty> plpList = _productCollection.Where(c => c.ID == productLicenseID);
             foreach (ProductLicenseProperty plp in _productCollection)
             {
                 if (plp.ID == productLicenseID)
@@ -39,6 +40,7 @@ namespace Client.Creator
                     break;
                 }
             }
+            //selectedProductLicense = plpList.FirstOrDefault();
             if (selectedProductLicense == null && _productCollection.Count > 0)
                 selectedProductLicense = _productCollection[0];
             return selectedProductLicense;
@@ -47,12 +49,14 @@ namespace Client.Creator
         public void UpdateProductProperty(ProductLicenseProperty productLicense)
         {
             RemoveProductProperty(productLicense);
+            //_productCollection.Remove(productLicense);
             _productCollection.Add(productLicense);
         }
 
         public void RemoveProductProperty(ProductLicenseProperty productLicense)
         {
             ProductLicenseProperty selectedProductLicense = null;
+            //_productCollection.Remove(productLicense);
             foreach (ProductLicenseProperty plp in _productCollection)
             {
                 if (plp.ID == productLicense.ID)

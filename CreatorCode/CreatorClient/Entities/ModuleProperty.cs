@@ -46,10 +46,7 @@ namespace Client.Creator
         {
             //need to translate the id to name;
             get { return _commLink.GetModuleName(_productID, ID); }
-            set 
-            {
-                _name = value; 
-            }
+            set { _name = value; }
         }
 
         public short Value

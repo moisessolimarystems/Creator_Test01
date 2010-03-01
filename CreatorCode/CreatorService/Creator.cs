@@ -24,7 +24,8 @@ namespace Service.Creator
                 {            
                     {"Customer", "CustomerTable.SCRname"},
                     {"LicenseServer", "LicenseName"},
-                    {"Active", "IsActive"}
+                    {"Active", "IsActive"},
+                    {"Notes", "LicenseComments"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -869,12 +870,15 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ModuleTable> GetAllModules(string productLicenseName)
         { return ModuleTable.GetAllModules(productLicenseName); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID)
+        { return ModuleTable.GetAllActiveModulesByProduct(licenseServer, productID); }
         public IList<ModuleTable> GetModulesByProductLicense(string productLicenseName)
         { return ModuleTable.GetModulesByProductLicense(productLicenseName); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public short GetTotalModuleValue(string licenseServer, byte productID, short modID)
+        public short GetTotalModuleValue(string productLicenseID, byte productID, short modID)
         {
-            return ModuleTable.GetTotalModuleValue(licenseServer, productID, modID);
+            return ModuleTable.GetTotalModuleValue(productLicenseID, productID, modID);
         }
 
         #endregion

@@ -1949,6 +1949,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllModules", ReplyAction="http://tempuri.org/ICreator/GetAllModulesResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllModules(string productLicenseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllActiveModulesByProduct", ReplyAction="http://tempuri.org/ICreator/GetAllActiveModulesByProductResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetModulesByProductLicense", ReplyAction="http://tempuri.org/ICreator/GetModulesByProductLicenseResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetModulesByProductLicense(string productLicenseName);
         
@@ -2276,6 +2279,10 @@ namespace Client.Creator.CreatorService {
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllModules(string productLicenseName) {
             return base.Channel.GetAllModules(productLicenseName);
+        }
+        
+        public System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID) {
+            return base.Channel.GetAllActiveModulesByProduct(licenseServer, productID);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetModulesByProductLicense(string productLicenseName) {
