@@ -219,7 +219,7 @@ OutputDebugString(L"CSolimarLicenseMgr::CSolimarLicenseMgr() - caught general ex
 
 CSolimarLicenseMgr::~CSolimarLicenseMgr()
 {
-OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Enter");	
+//OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Enter");	
 	Disconnect();
 	if (HeartbeatThread)
 		delete HeartbeatThread;
@@ -229,7 +229,7 @@ OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Enter");
 		CloseHandle(GracePeriodLock);
 	if (MessageListLock!=INVALID_HANDLE_VALUE)
 		CloseHandle(MessageListLock);
-OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Leave");	
+//OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Leave");	
 }
 
 void CSolimarLicenseMgr::HeartbeatThreadFunction(void* pvThis)
@@ -292,15 +292,15 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 // ISolimarLicenseMgr6
 STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 {
-wchar_t tmpbuf[1024];
-swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect3 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s, bUseSoftwareLicense: %s)", //, bUseTestDev: %s, bUseOnlyLicViewer: %s)", 
-			  (wchar_t*)server, 
-			  connectionFlags & CF_ONLY_SHARED_LICENSE ? L"true" : L"false", 
-			  connectionFlags & CF_BACKUP_SERVER ? L"true" : L"false",
-			  connectionFlags & CF_SOFTWARE_LICENSING ? L"true" : L"false"/*,
-			  connectionFlags & CF_ONLY_LICENSE_VIEWER ? L"true" : L"false"*/
-			  );
-OutputDebugString(tmpbuf); 
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect3 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s, bUseSoftwareLicense: %s)", //, bUseTestDev: %s, bUseOnlyLicViewer: %s)", 
+//			  (wchar_t*)server, 
+//			  connectionFlags & CF_ONLY_SHARED_LICENSE ? L"true" : L"false", 
+//			  connectionFlags & CF_BACKUP_SERVER ? L"true" : L"false",
+//			  connectionFlags & CF_SOFTWARE_LICENSING ? L"true" : L"false"/*,
+//			  connectionFlags & CF_ONLY_LICENSE_VIEWER ? L"true" : L"false"*/
+//			  );
+//OutputDebugString(tmpbuf); 
 
 	HRESULT hr = S_OK;
 	{
@@ -513,7 +513,7 @@ OutputDebugString(tmpbuf);
 	if(_wcsicmp(m_headerInformation, L"") != 0)
 		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));	// Call this second here so product is on top of error message.
 	if(FAILED(hr))
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", ((connectionFlags & CF_BACKUP_SERVER) != 0) ? MT_WARNING: MT_ERROR , hr);	//Log connection errors as warnings for backups
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", ((connectionFlags & CF_BACKUP_SERVER) != 0) ? MT_WARNING: MT_ERROR, hr, MessageGenericError);	//Log connection errors as warnings for backups
 
 	if((connectionFlags & CF_BACKUP_SERVER) != 0)
 		hr = S_OK; //Connection to backup server should not error out
@@ -522,9 +522,9 @@ OutputDebugString(tmpbuf);
 }
 STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUseSharedLicenseServers)
 {
-wchar_t tmpbuf[1024];
-swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d, bUseSharedLicenseServers: %s) - Enter", product, bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false");
-OutputDebugString(tmpbuf); 
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d, bUseSharedLicenseServers: %s) - Enter", product, bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false");
+//OutputDebugString(tmpbuf); 
 
 	HRESULT hr(E_FAIL);
 	bool bConnectedToAtleastOneComputer = false;
@@ -619,8 +619,8 @@ OutputDebugString(tmpbuf);
 		RESTORE_ERRORINFO
 	}
 
-swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct leave - m_product: %d, hr: 0x%08x", m_product, hr);
-OutputDebugString(tmpbuf); 	
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct leave - m_product: %d, hr: 0x%08x", m_product, hr);
+//OutputDebugString(tmpbuf); 	
 	return hr;
 }
 
@@ -762,8 +762,8 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 		if(SS_RPC_FAILED(e.Error()))
 		{
 			//Log Message about RPC failure to Key
-			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::Disconnect() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::Disconnect() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 		}
 	}
 	catch (...)
@@ -888,8 +888,8 @@ STDMETHODIMP CSolimarLicenseMgr::KeyProductExists(long product, long prod_ver_ma
 					if(SS_RPC_FAILED(e.Error()))
 					{
 						//Log Message about RPC failure to Key
-						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 				if(*p_bool_key_product_exists == VARIANT_TRUE)
@@ -1009,10 +1009,9 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 	VARIANT_BOOL b_bypass_remote_key_restriction, 
 	VARIANT_BOOL b_view_licenses_only)
 {
-//OutputDebugString(L"CSolimarLicenseMgr::Initialize_Internal() - Enter");
-wchar_t tmpbuf[1024];
-swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize_Internal(application_instance: %s, product: %d, version: %d.%d, app_instance_lock_key: %s, b_view_licenses_only: %s, auto_ui_level: 0x%x) - Enter", (wchar_t*)application_instance, product, prod_ver_major, prod_ver_minor, b_app_instance_lock_key==VARIANT_TRUE ? L"true" : L"false", b_view_licenses_only==VARIANT_TRUE ? L"true" : L"false", auto_ui_level);
-OutputDebugString(tmpbuf);
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize_Internal(application_instance: %s, product: %d, version: %d.%d, app_instance_lock_key: %s, b_view_licenses_only: %s, auto_ui_level: 0x%x) - Enter", (wchar_t*)application_instance, product, prod_ver_major, prod_ver_minor, b_app_instance_lock_key==VARIANT_TRUE ? L"true" : L"false", b_view_licenses_only==VARIANT_TRUE ? L"true" : L"false", auto_ui_level);
+//OutputDebugString(tmpbuf);
 	HRESULT hr = S_OK;
 	
 	// make sure that the client has authenticated already
@@ -1163,19 +1162,17 @@ OutputDebugString(tmpbuf);
 	if(hr != S_OK)
 	{
 		m_bInViolationPeriod = true;
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr, MessageGenericError);
 	}
 	else
 	{
 		m_bInViolationPeriod = false;
-		SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(wstrPrimaryLicenseServer.c_str(), std::wstring(m_headerInformation + _bstr_t(L"\r\n - Initialization Succeeded")).c_str(), MT_INFO, hr);
+		SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(wstrPrimaryLicenseServer.c_str(), std::wstring(m_headerInformation + _bstr_t(L"\r\n - Initialization Succeeded")).c_str(), MT_INFO, hr, MessageValidInitialize);
 	}
 
-swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize3 leave 1 - hr: 0x%08x, m_bInViolationPeriod:%s", hr, m_bInViolationPeriod ? L"true" : L"false");
-OutputDebugString(tmpbuf); 
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize3 leave 1 - hr: 0x%08x, m_bInViolationPeriod:%s", hr, m_bInViolationPeriod ? L"true" : L"false");
+//OutputDebugString(tmpbuf); 
 	return hr;
-	//FOR TESTING
-//hr = RefreshKeyList(true);
 }
 
 
@@ -1248,11 +1245,11 @@ STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 	}
 	catch(_com_error&)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	catch(...)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 	return hr;
@@ -1355,7 +1352,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 						LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(hrPrimaryServers, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 						if(_wcsicmp(m_headerInformation, L"") != 0)
 							LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
-						SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr);
+						SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr, MessageGeneric);
 					}
 				}
 			}
@@ -1402,7 +1399,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(messageHr, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 				if(_wcsicmp(m_headerInformation, L"") != 0)
 					LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
-				SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, L"", MT_ERROR, messageHr);
+				SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, L"", MT_ERROR, messageHr, MessageViolationEnter);
 				m_bInViolationPeriod = true;
 			}
 		}
@@ -1452,7 +1449,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 			if(_wcsicmp(m_headerInformation, L"") != 0)
 				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
-			SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr);
+			SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr, MessageViolationLeave);
 		}
 		m_bInViolationPeriod = false;
 		StopGracePeriod();
@@ -1760,7 +1757,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 	if(_wcsicmp(m_headerInformation, L"") != 0)
 		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
 	if(FAILED(hr))
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr, MessageGenericError);
 
 	//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseObtain() - returns: 0x%08x", (licensing_valid == VARIANT_TRUE ? S_OK : hr));
 	//OutputDebugStringW(debug_buf);
@@ -1885,8 +1882,8 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ModuleLicenseSerialNumbers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ModuleLicenseSerialNumbers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 		}
 	}
@@ -2172,8 +2169,8 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 					if(SS_RPC_FAILED(e.Error()))
 					{
 						//Log Message about RPC failure to Key
-						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 
@@ -2194,8 +2191,8 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 					if(SS_RPC_FAILED(e.Error()))
 					{
 						//Log Message about RPC failure to Key
-						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetSoftwareLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetSoftwareLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 			}
@@ -2246,11 +2243,11 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 	}
 	catch(_com_error&)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	catch(...)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	return S_OK;
 }
@@ -2267,7 +2264,7 @@ STDMETHODIMP CSolimarLicenseMgr::DispatchLicenseMessageList(VARIANT_BOOL clear_m
 
 		for (LicensingMessageList::iterator m = licensing_message_cache.begin(); m != licensing_message_cache.end(); ++m)
 		{
-			DispatchLicenseMessage(_bstr_t(m->key_ident.c_str()), m->message_type, m->error, m->timestamp, _bstr_t(m->message.c_str()));
+			DispatchLicenseMessage(_bstr_t(m->key_ident.c_str()), m->message_type, m->error, m->timestamp, _bstr_t(m->message.c_str()),m->message_id);
 		}
 
 		if (clear_messages==VARIANT_TRUE)
@@ -2300,8 +2297,8 @@ void CSolimarLicenseMgr::SendHeartbeat()
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 		}
 	}
@@ -2338,11 +2335,11 @@ bool CSolimarLicenseMgr::isAutoUiStyleEventLog(DWORD ui_level)
 		UI_STYLE_EVENT_LOG =	0x20,
 */
 
-void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message)
+void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id)
 {
-	DispatchLicenseMessage(L"", key_ident, message_type, error, vtTimestamp, message);
+	DispatchLicenseMessage(L"", key_ident, message_type, error, vtTimestamp, message, message_id);
 }
-void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message)
+void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id)
 {
 	// perform the auto ui requested (dialogs, event log, etc.)
 	if (MessageQualifiesForAutoDispatch(m_ui_level, message_type))
@@ -2353,14 +2350,14 @@ void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR license_server, BSTR key_id
 		}
 		if (isAutoUiStyleEventLog(m_ui_level))
 		{
-			KeyMessageWriteEventLog(key_ident, message_type, error, vtTimestamp, message);
+			KeyMessageWriteEventLog(key_ident, message_type, error, vtTimestamp, message, message_id);
 		}
 	}
 
 	std::wstring str_error_message = (_wcsicmp(L"", message) == 0) ? LicenseServerError::GetErrorMessage(error) : std::wstring(message);
 	{
 		SafeMutex mutex_messages(MessageListLock);
-		licensing_software_message_cache.push_back(LicensingSoftwareMessage(std::wstring(license_server), std::wstring(key_ident), m_product, message_type, 0, vtTimestamp, str_error_message, error));
+		licensing_software_message_cache.push_back(LicensingSoftwareMessage(std::wstring(license_server), std::wstring(key_ident), m_product, message_type, message_id, vtTimestamp, str_error_message, error));
 	}
 }
 
@@ -2371,7 +2368,7 @@ void CSolimarLicenseMgr::KeyMessageShowDialog(BSTR key_ident, unsigned int messa
 		ShowLicenseDialog(_bstr_t(L"Licensing Information"), _bstr_t(str_error_message.c_str()));
 }
 
-void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message)
+void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message, long message_id)
 {
 	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
@@ -2456,7 +2453,7 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 		m_licenseMsgEventLogCache.pop_front();
 
 	if(!bCachedMsg)
-		LicenseServerError::WriteEventLog(event_log_msg, event_type);
+		LicenseServerError::WriteEventLog(event_log_msg, event_type, message_id);
 }
 
 HRESULT CSolimarLicenseMgr::ShowLicenseDialog(_bstr_t caption, _bstr_t message)
@@ -2541,16 +2538,17 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 		//There should only be 1 server...
 		for(;serverIt != serverEndIt; ++serverIt)	//If there should only be 1 server
 		{
-			//software_license
 			try
 			{
 				serverIt->second.software_license.licenses_total.clear();	//Clear current values out.
+				serverIt->second.software_license.licenses_inuse.clear();	//Clear current values out.
+				serverIt->second.software_license.licenses_allocated.clear();	//Clear current values out.
 
 				BSTR bstrLicenseStream;
 				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, GetSoftwareLicenseInfoByProduct_ForAll, (m_product, &bstrLicenseStream), hr);
 				if(FAILED(hr))
 					throw hr;
-
+				
 				// might need to check for NULL or empty
 				Lic_PackageAttribs::Lic_ProductInfoAttribs prodAttribs;
 				prodAttribs.InitFromString(bstrLicenseStream);
@@ -2572,8 +2570,22 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 						modIt != prodAttribs.moduleList->end();
 						modIt++)
 					{
-						//licensesTotalMap[modIt->moduleID] += modIt->moduleValue;
+						long licenses_allocated(0), licenses_inuse(0);
+
+						// get the number of licenses in use for the key for all connections to it - licenses_inuse
+						HRESULT tmpHr;
+						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareModuleLicenseInUseByApp_ByProduct, (m_product, modIt->moduleID, &licenses_inuse), tmpHr);
+						if(FAILED(tmpHr))
+							licenses_inuse = 0;
+
+						// get the number of licenses in allocated for this connection - licenses_allocated
+						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareModuleLicenseInUseByConnection_ByProduct, (m_product, modIt->moduleID, &licenses_allocated), tmpHr);
+						if(FAILED(tmpHr))
+							licenses_allocated = 0;
+
 						serverIt->second.software_license.licenses_total[modIt->moduleID] = modIt->moduleValue;
+						serverIt->second.software_license.licenses_inuse[modIt->moduleID] = licenses_inuse;
+						serverIt->second.software_license.licenses_allocated[modIt->moduleID] = licenses_allocated;
 					}
 				}
 			}
@@ -2588,8 +2600,8 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 		if(SS_RPC_FAILED(e.Error()))
 		{
 			//Log Message about RPC failure to Key
-			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 		}
 	}
 	if(bFoundProductAndVersion == false && SUCCEEDED(hr))
@@ -2702,7 +2714,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyListFromLicServers(bool _bLogError)
 									)
 								);
 
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr);
+								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr, MessageGenericError);
 							}
 							continue;
 						}
@@ -2744,7 +2756,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyListFromLicServers(bool _bLogError)
 										lTrialHours								//DWORD trial_hours
 									)
 								);
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr);
+								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr, MessageGenericError);
 							}
 						}
 					}
@@ -2773,8 +2785,8 @@ HRESULT CSolimarLicenseMgr::RefreshKeyListFromLicServers(bool _bLogError)
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 			hr = e.Error();
 		}
@@ -3991,7 +4003,8 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 					MT_INFO, 
 					LicenseServerError::EC_SP_VERSION_NOT_SUPPORTED, 
 					vtTimestamp, 
-					_bstr_t(message)
+					_bstr_t(message),
+					MessageGenericError
 				);
 			}
 		}
@@ -4289,8 +4302,8 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 									if(SS_RPC_FAILED(e.Error()))
 									{
 										//Log Message about RPC failure to Key
-										SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ObtainLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-										SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+										SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ObtainLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+										SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 									}
 								}
 								
@@ -4410,8 +4423,8 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 								if(SS_RPC_FAILED(e.Error()))
 								{
 									//Log Message about RPC failure to Key
-									SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ReleaseLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-									SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+									SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ReleaseLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+									SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 								}
 							}
 						}
@@ -4492,7 +4505,7 @@ void CSolimarLicenseMgr::StartGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = time(NULL);
       }
-      SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
 	}
 }
 void CSolimarLicenseMgr::StopGracePeriod()
@@ -4504,7 +4517,7 @@ void CSolimarLicenseMgr::StopGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = 0;
 	   }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0, MessageGracePeriodEnded);
 	}
 }
 
@@ -4551,7 +4564,7 @@ HRESULT CSolimarLicenseMgr::RefreshLicensingFromLicServers(bool _bLogError)
 		{
 			(serverIt->second).bUseSoftwareLicensing = false;
 			SAVE_ERRORINFO
-			tempHr = RefreshKeyListFromLicServers(_bLogError);
+			tempHr = RefreshKeyListFromLicServers(_bLogError && !bContainsSoftwareLic);
 			RESTORE_ERRORINFO
 			if(SUCCEEDED(tempHr))	//Don't replace hr if it is FAILED
 				hr = tempHr;
