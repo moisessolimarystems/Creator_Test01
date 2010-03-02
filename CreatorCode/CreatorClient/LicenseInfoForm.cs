@@ -99,8 +99,7 @@ namespace Client.Creator
                     bool bSkip = false;
                     productLicenses = client.GetProductLicensesByProduct(plData.LicenseServerID, (byte)productSpec.productID.TVal);
                     foreach (ProductLicenseTable pl in productLicenses)
-                    {
-                        //skip if client and not perm
+                    {   //skip if client and not perm
                         if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
                            productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
                             bSkip = true;

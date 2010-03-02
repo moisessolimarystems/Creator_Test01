@@ -2724,7 +2724,6 @@ namespace Client.Creator
                         removeProductList.Add(product);
                     }
                 }
-                //if (storedProduct.moduleList.TVal.Count == 0)
                 foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs prod in removeProductList)
                 {
                     licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Remove(prod);
@@ -2753,13 +2752,11 @@ namespace Client.Creator
             destID = Int32.Parse(lsString[1]);
             Service<ICreator>.Use((client) =>
             {
-                //dnt = client.GetDestinationName(custID, destID);
                 _selectedLicenseCustomer = new CustomerProperty(client.GetCustomer(custID.ToString(), false));
                 _selectedTreeNodeKey = selectedProductLicense;
             });
             LoadDestinationNameComboBox(custID, destID);
             //expand selected license server then highlight product license
-
         }
 
         private string GetLicenseNameFromTreeView()
@@ -2916,7 +2913,7 @@ namespace Client.Creator
             PacketProperty newPacket = new PacketProperty(string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
                                                   "",
                                                   DateTime.Today,
-                                                  Path.Combine(m_selectedDirectory, _selectedLicenseCustomer.Name),
+                                                  m_selectedDirectory, //Path.Combine(m_selectedDirectory, _selectedLicenseCustomer.Name),
                                                   "");
 
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Packet", ref s_CommLink))
@@ -2925,7 +2922,7 @@ namespace Client.Creator
                 PacketDialogData data = new PacketDialogData(newPacket, _selectedLicenseCustomer.Name);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    m_selectedDirectory = Path.GetFullPath(data.PacketInfo.OutputPath + "\\..");
+                    m_selectedDirectory = Path.GetFullPath(data.PacketInfo.OutputPath);// + "\\..");
                     GeneratePacket(data.PacketInfo.Name, DetailTreeView.SelectedNode.Name, data.ExpDate, data.PacketInfo.Description, data.PacketInfo.OutputPath);
                 }
             }
@@ -3414,8 +3411,7 @@ namespace Client.Creator
                     {
                         int modValue = 0, modAppInstance = 0;
                         foreach (ModuleTable mt in moduleList.Where(c => c.ModID == moduleSpec.moduleID.TVal))
-                        {
-                            //sum up module value, module app instance
+                        {   //sum up module value, module app instance
                             modValue += mt.Value;
                             modAppInstance += mt.AppInstance;
                         }
@@ -3476,35 +3472,7 @@ namespace Client.Creator
                     ShowModuleListView("All");
                 }
             }
-            public ListViewItem CreateTotalModuleListViewItem(ModuleTable module, byte productID)
-            {
-                string moduleName = s_CommLink.GetModuleName(productID, module.ModID);
-                ListViewItem lvItem = DetailListView.Items.Find(moduleName, false).FirstOrDefault();
-                if (lvItem == null)
-                {
-                    lvItem = new ListViewItem();
-                    ModuleProperty newModule = new ModuleProperty(module);
-                    lvItem.Tag = newModule;
-                    newModule.ProductID = productID;
-                    lvItem.Name = lvItem.Text = moduleName;
-                    lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
-                    lvItem.SubItems.Add(module.Value.ToString());
-                    lvItem.SubItems.Add(module.AppInstance.ToString());
-                }
-                else
-                {
-                    //this value is still referenced to module
-                    int modValue = Int32.Parse(lvItem.SubItems[1].Text);
-                    int modAppInstance = Int32.Parse(lvItem.SubItems[2].Text);
-                    //remove expiration date column
-                    lvItem.SubItems.RemoveAt(1);
-                    //remove contract column
-                    lvItem.SubItems.RemoveAt(1);
-                    lvItem.SubItems.Add((modValue + module.Value).ToString());
-                    lvItem.SubItems.Add((modAppInstance + module.AppInstance).ToString());
-                }
-                return lvItem;
-            }
+
             public ListViewItem CreateModuleListViewItem(ProductLicenseProperty productLicense, ModuleTable module, short totalValue)
             {
                 string moduleName = s_CommLink.GetModuleName(productLicense.ProductID, module.ModID);
