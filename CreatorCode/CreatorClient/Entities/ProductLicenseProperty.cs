@@ -155,8 +155,7 @@ namespace Client.Creator
             {
                 List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
-                //foreach (ModuleProperty module in _moduleList)
-                if (_moduleList != null)
+                if (ModuleList != null)
                 {
                     foreach (ModuleTable module in _moduleList)
                     {
@@ -318,8 +317,7 @@ namespace Client.Creator
 
         public bool IsAllowedRemoveModule(short modID)
         {
-            //foreach (ModuleProperty module in _moduleList)
-            if (_moduleList != null)
+            if (ModuleList != null)
             {
                 foreach (ModuleTable module in _moduleList)
                 {
@@ -452,7 +450,6 @@ namespace Client.Creator
         }
 
         [Browsable(false)]
-        //public List<ModuleProperty> ModuleList
         public List<ModuleTable> ModuleList
         {
             get 
@@ -548,17 +545,18 @@ namespace Client.Creator
                 //add-on modules - always 0 unless total is 0 then 1
                 //client modules - matches product
                 //add-on modules - always 0 unless total is 0 then 1
-                //foreach (ModuleProperty module in _moduleList)
-                if (_moduleList != null)
+                if (ModuleList != null)
                 {
                     foreach (ModuleTable module in _moduleList)
                     {
+                        //needs to update database
                         module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
                     }
                 }
                 _plRec.ProductConnection = value;
                 Service<ICreator>.Use((client) =>
                 {
+                    client.UpdateAllModules(_moduleList);
                     ProductLicenseTable plt = client.GetProductLicense(ID);
                     if (plt != null)
                     {
@@ -570,7 +568,7 @@ namespace Client.Creator
                                                               ProductConnection.ToString());
                         plt.ProductConnection = _plRec.ProductConnection;
                         client.UpdateProductLicense(plt);
-                        client.MarkDirty(LicenseServer);
+                        client.MarkDirty(LicenseServer) ;
                     }
                 });
             }
