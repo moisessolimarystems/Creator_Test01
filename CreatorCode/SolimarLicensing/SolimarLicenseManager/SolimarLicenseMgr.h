@@ -455,7 +455,7 @@ private:
 	HRESULT ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses);
 
 	// checks if there is valid licensing, 2nd Param tells whether to use backup servers or enter Grace/Violation Period if FAILS
-	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error);
+	HRESULT ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error, bool bLogError);
 
 	// re-allocates any unallocated or invalidated licenses (if possible)
 	HRESULT ReallocateLicenses();
