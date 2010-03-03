@@ -63,7 +63,6 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_CLOCK_LIC_PACKET,						EHR_LIC_CLOCK_LIC_PACKET,						L"The System Time does not seem to be set correctly (License Server)"},
 	{EC_LIC_CLOCK_LIC_ARCHIVE,						EHR_LIC_CLOCK_LIC_ARCHIVE,						L"The System Time does not seem to be set correctly (License Server)"},
 	{EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						L"Failed to validate software license with a Validation Token (License server)"},
-	{EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						L"Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)"},
 
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
