@@ -188,13 +188,13 @@ namespace Solimar
 				SolLicErrors.Add(EHR_PACKET_EXPIRED,"Packet expired (License server)");
 				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module (License server)");
 				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server (License server)");
-				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE,"Insufficient licensing, unable to obtain an Application Instances on the server (License server)");
+				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE,"Insufficient licensing, unable to obtain a Product Connection on the server (License server)");
 				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY,"Insufficient licensing, unable to locate a Base Key on the server (License server)");
 				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER,"Licensing on the License server has been restored (License server)");
 				SolLicErrors.Add(EHR_KEY_USE_FAILOVER_KEY_SERVER,"Unable to validate Licensing on the License server, switching to Failover License server (License server)");
 				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (License server)");
-				SolLicErrors.Add(EHR_LIC_PROD_NO_FREE_APP_INSTANCE,"Unable to obtain an Application Instance on the server for the given product (License server)");
-				SolLicErrors.Add(EHR_LIC_MOD_NO_FREE_APP_INSTANCE,"Unable to obtain an Application Instance on the server for the given module (License server)");
+				SolLicErrors.Add(EHR_LIC_PROD_NO_FREE_APP_INSTANCE,"Unable to obtain a Product Connection on the server for the given product (License server)");
+				SolLicErrors.Add(EHR_LIC_MOD_NO_FREE_APP_INSTANCE,"Unable to obtain a Product Connection on the server for the given module (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID,"Failed to validate software license with Protection Key ID (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE,"Failed to validate software license with License Code (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_BIOS_SERIALNUMBER,"Failed to validate software license with Bios Serial Number (License server)");

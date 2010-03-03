@@ -85,13 +85,13 @@
 		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (License server)"/>
 		<HResult name="EHR_KEY_BASE_NOT_MATCHING"	ecode="EC_KEY_BASE_NOT_MATCHING"	value="20" alias="Base Keys do not match module for module (License server)"/>
 		<HResult name="EHR_KEY_NOT_MATCHING_INSTANCES" ecode="EC_KEY_NOT_MATCHING_INSTANCES"			value="21" alias="Keys do not match by Application Instances for all the Key on the server (License server)"/>
-		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Insufficient licensing, unable to obtain an Application Instances on the server (License server)"/>
+		<HResult name="EHR_KEY_NO_FREE_APP_INSTANCE"  ecode="EC_KEY_NO_FREE_APP_INSTANCE"			value="22" alias="Insufficient licensing, unable to obtain a Product Connection on the server (License server)"/>
 		<HResult name="EHR_KEY_NO_BASE_KEY"			      ecode="EC_KEY_NO_BASE_KEY"			value="23" alias="Insufficient licensing, unable to locate a Base Key on the server (License server)"/>
 		<HResult name="EHR_KEY_RESTORED_KEY_SERVER"		ecode="EC_KEY_RESTORED_KEY_SERVER"			value="24" alias="Licensing on the License server has been restored (License server)"/>
 		<HResult name="EHR_KEY_USE_FAILOVER_KEY_SERVER"	ecode="EC_KEY_USE_FAILOVER_KEY_SERVER"			value="25" alias="Unable to validate Licensing on the License server, switching to Failover License server (License server)"/>
 		<HResult name="EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER"	ecode="EC_KEY_NO_REMOTE_VERSION_KEY_SERVER"			value="26" alias="License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (License server)"/>
-		<HResult name="EHR_LIC_PROD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_PROD_NO_FREE_APP_INSTANCE"			value="27" alias="Unable to obtain an Application Instance on the server for the given product (License server)"/>
-		<HResult name="EHR_LIC_MOD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_MOD_NO_FREE_APP_INSTANCE"			value="28" alias="Unable to obtain an Application Instance on the server for the given module (License server)"/>
+		<HResult name="EHR_LIC_PROD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_PROD_NO_FREE_APP_INSTANCE"			value="27" alias="Unable to obtain a Product Connection on the server for the given product (License server)"/>
+		<HResult name="EHR_LIC_MOD_NO_FREE_APP_INSTANCE"	ecode="EC_LIC_MOD_NO_FREE_APP_INSTANCE"			value="28" alias="Unable to obtain a Product Connection on the server for the given module (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID" value="29" alias="Failed to validate software license with Protection Key ID (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE" value="30" alias="Failed to validate software license with License Code (License server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_BIOS_SERIALNUMBER"	ecode="EC_LIC_SOFTWARE_VALIDATION_BIOS_SERIALNUMBER" value="31" alias="Failed to validate software license with Bios Serial Number (License server)"/>

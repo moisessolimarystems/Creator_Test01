@@ -289,7 +289,7 @@ HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR appli
 	if(FAILED(hr))
 	{
 		wchar_t errorBuf[1024];
-		swprintf_s(errorBuf, _countof(errorBuf), L"Application Instances - Licensed: %d, In Use: %d",
+		swprintf_s(errorBuf, _countof(errorBuf), L"Product Connections - Licensed: %d, In Use: %d",
 			productMaxAppInstance,
 			numberOfUniqueAppInstMap.size()
 			);
@@ -555,7 +555,7 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 				hr = LicenseServerError::EHR_LIC_MOD_NO_FREE_APP_INSTANCE;
 				//hr = E_FAIL;	//Change to custom error...
 				wchar_t errorBuf[1024];
-				swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Application Instances - Licensed: %d, In Use: %d",
+				swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Product Connections - Licensed: %d, In Use: %d",
 					wstrModuleName.c_str(),
 					moduleIdent,
 					licensesAppInstanceTotalMap[moduleIdent],
