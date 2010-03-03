@@ -13,6 +13,9 @@
 #include "..\common\NetworkUtils.h"
 #include "..\common\LicenseSettings.h"
 #include "..\SolimarLicenseServer\KeyMessages.h"
+#include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
+#include "..\common\LicAttribsCPP\Lic_GenericAttribs.h"
+#include "..\Common\SoftwareSpecInstance.h"	//ForGlobalSoftwareSpec::GlobalSoftwareSpec & g_pSoftwareSpec
 #include "resource.h"
 #include <string>
 #include "list"
@@ -20,7 +23,7 @@
 #include <comdef.h>
 #include <math.h>
 #include <stdio.h>
-#define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EHR_KEY_NO_SUITABLE_KEY
+#define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EHR_MANAGER_NOT_INITIALIZED
 
 BYTE CSolimarLicenseMgr::challenge_key_manager_thisauthuser_public[] = {
 #include "..\common\keys\SolimarLicenseManager.ThisAuthUser.public.key.txt"
@@ -79,9 +82,21 @@ CSolimarLicenseMgr::KeyInfo::KeyInfo(const KeyInfo &k) :
 	;
 }
 
+CSolimarLicenseMgr::SoftwareLicenseInfo::SoftwareLicenseInfo() :
+	SoftwareLicenseValid(false)
+{
+}
+CSolimarLicenseMgr::SoftwareLicenseInfo::SoftwareLicenseInfo(const SoftwareLicenseInfo &s):
+	licenses_total(s.licenses_total),
+	licenses_allocated(s.licenses_allocated),
+	SoftwareLicenseValid(s.SoftwareLicenseValid)
+{
+}
+
 
 CSolimarLicenseMgr::ServerInfo::ServerInfo() :
 	LicenseServer(NULL),
+	bUseSoftwareLicensing(false),
 	bUseOnlySharedLicenses(false)
 {
 	;
@@ -93,9 +108,17 @@ CSolimarLicenseMgr::ServerInfo::ServerInfo(const ServerInfo &s) :
 	;
 }
 
-CSolimarLicenseMgr::ServerInfo::ServerInfo(_bstr_t servername, bool useOnlySharedLicenses, GITPtr<ISolimarLicenseSvr4> pILicenseServer) : 
+CSolimarLicenseMgr::ServerInfo::ServerInfo(
+	_bstr_t servername, 
+	bool useOnlySharedLicenses, 
+	bool useSoftwareLicensing,
+	bool useOnlyLicenseViewer,
+	GITPtr<ISolimarLicenseSvr4> pILicenseServer
+) : 
 	name(servername), 
 	bUseOnlySharedLicenses(useOnlySharedLicenses),
+	bUseSoftwareLicensing(useSoftwareLicensing),
+	bUseOnlyLicenseViewer(useOnlyLicenseViewer),
 	LicenseServer(pILicenseServer)
 {
 	;
@@ -105,43 +128,56 @@ CSolimarLicenseMgr::ServerInfo::~ServerInfo()
 {
 	;
 }
-HRESULT CSolimarLicenseMgr::ServerInfo::Connect()
+HRESULT CSolimarLicenseMgr::ServerInfo::Reconnect()
 {
+	//OutputFormattedDebugString(L"ServerInfo::Reconnect() - %s", (wchar_t*)this->name);
 	// Try to create an ISolimarLicenseServer proxy to the server
 	COSERVERINFO	serverInfo	= {0, this->name, NULL, 0};
-	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
-	
-	HRESULT hr = CoCreateInstanceEx(
-		__uuidof(CSolimarLicenseSvr), 
-		NULL, 
-		CLSCTX_REMOTE_SERVER | CLSCTX_LOCAL_SERVER,
-		&serverInfo, 
-		1, 
-		&multiQI);
-	if (SUCCEEDED(hr))
+	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr4), NULL, NOERROR};
+	HRESULT hr = S_OK;
+	ISolimarLicenseSvr4 *pILicenseServer = NULL;
+	try
 	{
-		ISolimarLicenseSvr4 *pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
+		hr = CoCreateInstanceEx(
+			__uuidof(CSolimarLicenseSvr), 
+			NULL, 
+			CLSCTX_REMOTE_SERVER | CLSCTX_LOCAL_SERVER, 
+			&serverInfo, 
+			1, 
+			&multiQI);
+		if(FAILED(hr))
+			throw hr;
+
+
+		pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
 		ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 									sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 									challenge_key_server_userauththis_public, 
 									sizeof(challenge_key_server_userauththis_public)/sizeof(BYTE));
 		// try to authenticate the license server
 		hr = CR.AuthenticateServer(pILicenseServer);
-		if (SUCCEEDED(hr))
-		{
-			// let the license server authenticate this manager
-			hr = CR.AuthenticateToServer(pILicenseServer);
-			if (SUCCEEDED(hr))
-			{
-				hr = this->LicenseServer.Attach(pILicenseServer);
-			}
-		}
-		if (FAILED(hr))
-			pILicenseServer->Release();
+		if(FAILED(hr))
+			throw hr;
+
+		// let the license server authenticate this manager
+		hr = CR.AuthenticateToServer(pILicenseServer);
+		if(FAILED(hr))
+			throw hr;
+				
+		hr = this->LicenseServer.Attach(pILicenseServer);
+		if(FAILED(hr))
+			throw hr;	
 	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	if (FAILED(hr) && pILicenseServer!=NULL)
+		pILicenseServer->Release();
 		
 	return hr;
 }
+
 
 
 
@@ -150,40 +186,49 @@ CSolimarLicenseMgr::CSolimarLicenseMgr() :
 	ServerListLock(CreateMutex(0,0,0)),
 	GracePeriodLock(CreateMutex(0,0,0)),
 	MessageListLock(CreateMutex(0,0,0)),
-	m_ui_level(UI_IGNORE),
+	m_ui_level(UI_LEVEL_RESPONSE | UI_STYLE_EVENT_LOG),	// Set to these so that failure to connect will log in event log.
 	m_dtGracePeriodStart(0),
 	m_dtGracePeriod(0),
-	m_dtRefreshKeyList(0),
+	m_dtRefreshLicenses(0),
+	//m_bConfiguredForSoftwareLicense(false),
 	m_bUsingBackupServers(false),
+	m_bInViolationPeriod(false),
+	m_headerInformation(_bstr_t(L"")),
+	m_applicationInstance(_bstr_t(L"")),
+	m_applicationInstanceKey(_bstr_t(L"")),
+	m_product(-1),
+	m_productKeyID(-1),
 	ChallengeResponseHelper(challenge_key_manager_userauththis_private, 
 							sizeof(challenge_key_manager_userauththis_private)/sizeof(BYTE), 
 							challenge_key_manager_thisauthuser_public, 
 							sizeof(challenge_key_manager_thisauthuser_public)/sizeof(BYTE))
 {
-//OutputDebugString(L"CSolimarLicenseMgr::CSolimarLicenseMgr() - Enter");	
-	HeartbeatThread = new APCTimer(HeartbeatThreadFunction, this, 3*1000 /* 3 seconds */, InitTimerThreadCB, this);
-//OutputDebugString(L"CSolimarLicenseMgr::CSolimarLicenseMgr() - Leave");	
+	try
+	{
+		HeartbeatThread = new APCTimer(HeartbeatThreadFunction, this, 3*1000 /* 3 seconds */, InitTimerThreadCB, this);
+
+		if(g_pSoftwareSpec == NULL)
+			g_pSoftwareSpec = new GlobalSoftwareSpec();
+		m_softwareSpec = g_pSoftwareSpec->GetSoftwareSpec();
+	}
+	catch(...)
+	{
+OutputDebugString(L"CSolimarLicenseMgr::CSolimarLicenseMgr() - caught general exception");	
+	}
 }
 
 CSolimarLicenseMgr::~CSolimarLicenseMgr()
 {
 //OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Enter");	
-	try
-	{
-		Disconnect();
-		if (HeartbeatThread)
-			delete HeartbeatThread;
-		if (ServerListLock!=INVALID_HANDLE_VALUE)
-			CloseHandle(ServerListLock);
-		if (GracePeriodLock!=INVALID_HANDLE_VALUE)
-			CloseHandle(GracePeriodLock);
-		if (MessageListLock!=INVALID_HANDLE_VALUE)
-			CloseHandle(MessageListLock);
-	}
-	catch(...)
-	{
-		OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Unknown Exception");
-	}
+	Disconnect();
+	if (HeartbeatThread)
+		delete HeartbeatThread;
+	if (ServerListLock!=INVALID_HANDLE_VALUE)
+		CloseHandle(ServerListLock);
+	if (GracePeriodLock!=INVALID_HANDLE_VALUE)
+		CloseHandle(GracePeriodLock);
+	if (MessageListLock!=INVALID_HANDLE_VALUE)
+		CloseHandle(MessageListLock);
 //OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Leave");	
 }
 
@@ -191,9 +236,10 @@ void CSolimarLicenseMgr::HeartbeatThreadFunction(void* pvThis)
 {
 	HRESULT hr = S_OK;
 	CSolimarLicenseMgr *pThis = (CSolimarLicenseMgr*)pvThis;
+//OutputDebugString(L"CSolimarLicenseMgr::HeartbeatThreadFunction() - Enter");
 	pThis->SendHeartbeat();
+//OutputDebugString(L"CSolimarLicenseMgr::HeartbeatThreadFunction() - Leave");
 }
-
 
 
 // CSolimarLicenseMgr
@@ -234,9 +280,28 @@ STDMETHODIMP CSolimarLicenseMgr::Connect(BSTR server)
 }
 STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlySharedLicenses, VARIANT_BOOL bUseAsBackup)
 {
+	long connectionFlags = 0;
+	if(bUseOnlySharedLicenses == VARIANT_TRUE)
+		connectionFlags += CF_ONLY_SHARED_LICENSE;
+	if(bUseAsBackup == VARIANT_TRUE)
+		connectionFlags += CF_BACKUP_SERVER;
+	return Connect3(server, connectionFlags);
+}
+
+
+// ISolimarLicenseMgr6
+STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
+{
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s)", (wchar_t*)server, bUseOnlySharedLicenses ? L"true" : L"false", bUseAsBackup ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect3 (server: %s, bUseOnlySharedLicenses: %s, bUseAsBackup: %s, bUseSoftwareLicense: %s)", //, bUseTestDev: %s, bUseOnlyLicViewer: %s)", 
+//			  (wchar_t*)server, 
+//			  connectionFlags & CF_ONLY_SHARED_LICENSE ? L"true" : L"false", 
+//			  connectionFlags & CF_BACKUP_SERVER ? L"true" : L"false",
+//			  connectionFlags & CF_SOFTWARE_LICENSING ? L"true" : L"false"/*,
+//			  connectionFlags & CF_ONLY_LICENSE_VIEWER ? L"true" : L"false"*/
+//			  );
 //OutputDebugString(tmpbuf); 
+
 	HRESULT hr = S_OK;
 	{
 	SafeMutex mutex(ServerListLock);
@@ -266,6 +331,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 //OutputDebugString(tmpbuf); 
 	if (SUCCEEDED(hr))
 	{	
+		//Any licensing server that supports remote licensing will have interface ISolimarLicenseSvr4.
 		ISolimarLicenseSvr4 *pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
 		ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 									sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
@@ -287,11 +353,55 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 //OutputDebugString(tmpbuf);
 			if (SUCCEEDED(hr))
 			{
-				SafeMutex mutex(ServerListLock);
-				if(bUseAsBackup == VARIANT_TRUE)
-					m_backupServers[server] = ServerInfo(server, bUseOnlySharedLicenses==VARIANT_TRUE, pILicenseServer);
-				else	//if(bUseAsBackup == VARIANT_FALSE)
-					m_servers[server] = ServerInfo(server, bUseOnlySharedLicenses==VARIANT_TRUE, pILicenseServer);
+				//if((connectionFlags & CF_SOFTWARE_LICENSING) != 0)
+				if((connectionFlags & CF_ONLY_LICENSE_VIEWER) == 0)
+				{
+					//Any licensing server that supports remote licensing will have interface ISolimarSoftwareLicenseSvr.
+					ISolimarSoftwareLicenseSvr *pLocalSoftwareLicSvr;
+					hr = pILicenseServer->QueryInterface(__uuidof(ISolimarSoftwareLicenseSvr), (void**)&pLocalSoftwareLicSvr);
+					if(SUCCEEDED(hr))
+					{
+						pLocalSoftwareLicSvr->Release();
+					}
+					//else
+					//{
+					//	//The license server does not support software licensing, continue
+					//	hr = S_OK;
+					//}
+					//if((connectionFlags & CF_BACKUP_SERVER) != 0)
+					//{
+					//}
+
+					//if connectionFlags & CF_BACKUP_SERVER
+					//		verify there are backup software licenses on the server
+
+					//if connectionFlags & CF_BACKUP_SERVER == 0
+					//		verify there are standard licenses 
+				}
+
+				if(SUCCEEDED(hr))
+				{
+					SafeMutex mutex(ServerListLock);
+					//if(bUseAsBackup == VARIANT_TRUE)
+					if((connectionFlags & CF_BACKUP_SERVER) != 0)
+					{
+						m_backupServers[server] = ServerInfo(
+							server, 
+							((connectionFlags & CF_ONLY_SHARED_LICENSE) != 0), 
+							((connectionFlags & CF_SOFTWARE_LICENSING) != 0), 
+							((connectionFlags & CF_ONLY_LICENSE_VIEWER) != 0), 
+							pILicenseServer);
+					}
+					else	//if(bUseAsBackup == VARIANT_FALSE)
+					{
+						m_servers[server] = ServerInfo(
+							server, 
+							((connectionFlags & CF_ONLY_SHARED_LICENSE) != 0),  
+							((connectionFlags & CF_SOFTWARE_LICENSING) != 0), 
+							((connectionFlags & CF_ONLY_LICENSE_VIEWER) != 0), 
+							pILicenseServer);
+					}
+				}
 			}
 		}
 		if (FAILED(hr))
@@ -301,7 +411,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 	}
 	else	//CoCreateInstanceEx() Failed
 	{
-		//See if remote licensing is not supported - in thos scenarios ISolimarLicenseSvr3 is not on the system, but ISolimarLicenseSvr2 is.
+		//See if remote licensing is not supported - in this scenarios ISolimarLicenseSvr3 is not on the system, but ISolimarLicenseSvr2 is.
 		HRESULT tmpHr = S_OK;
 		COSERVERINFO	serverInfo	= {0, server, NULL, 0};
 		MULTI_QI		multiQI3		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
@@ -341,13 +451,73 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 	if(FAILED(hr))
 	{
 		//CR.FIX.10112 - Return cleaner error messages for ClassNotRegistered and RpcError
-		if(hr == 0x80040154) //ClassNotRegistered
+		if(hr == 0x80040154/*ClassNotRegistered*/)
 			hr = LicenseServerError::EHR_LIC_MGR_NO_LIC_SERVER;
 		else if(hr == 0x800706ba)	//RpcErrror
 			hr = LicenseServerError::EHR_LIC_MGR_NO_COMPUTER;
 	}
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Connect2 leave1 - hr: 0x%08x, sizeOfServerList: %d", hr, m_servers.size());
-//OutputDebugString(tmpbuf); 
+	wchar_t errorBuf[1024];
+	if(FAILED(hr))
+	{
+		long lmMajor = 0, lmMinor = 0, lmBuild = 0;
+		long lsMajor = 0, lsMinor = 0, lsBuild = 0;
+		HRESULT hrResult = E_FAIL;
+		if ((unsigned int)hr == 0x80004002)
+		{
+			hrResult = GetVersionLicenseManager(&lmMajor, &lmMinor, &lmBuild);
+			if(SUCCEEDED(hrResult))
+				hrResult = GetVersionLicenseServer(server, &lsMajor, &lsMinor, &lsBuild);
+		}
+
+		if(SUCCEEDED(hrResult))	//hrResult will only have a value in case of hr == 0x80004002/*NoInterfaceSupported*/
+		{
+			// Override No-Interface with more detailed
+			if (lmMajor >= 3 && lsMajor < 3)
+			{
+				swprintf_s(errorBuf, _countof(errorBuf), L"Failed to connect to License Server: %s%s%s - License Server must be atleast 3.0.0, License Server is at version: %d.%d.%d\r\n - %s",
+					(wchar_t*)server, 
+					connectionFlags & CF_BACKUP_SERVER ? L", Backup: true" : L"",
+					connectionFlags & CF_ONLY_SHARED_LICENSE ? L", Shared: true" : L"",
+					lsMajor, 
+					lsMinor, 
+					lsBuild, 
+					LicenseServerError::GenerateErrorMessage(hr).c_str());
+			}
+			else
+			{
+				swprintf_s(errorBuf, 1024, L"Failed to connect to License Server: %s%s%s - License Manager on localhost is at version: %d.%d.%d, while License Server is at version: %d.%d.%d\r\n - %s",
+					(wchar_t*)server, 
+					connectionFlags & CF_BACKUP_SERVER ? L", Backup: true" : L"",
+					connectionFlags & CF_ONLY_SHARED_LICENSE ? L", Shared: true" : L"",
+					lmMajor, 
+					lmMinor, 
+					lmBuild,
+					lsMajor, 
+					lsMinor, 
+					lsBuild, 
+					LicenseServerError::GenerateErrorMessage(hr).c_str());
+			}
+		}
+		else if(FAILED(hrResult))
+		{
+			swprintf_s(errorBuf, 1024, L"Failed to connect to License Server: %s%s%s - %s", //, bUseTestDev: %s)", 
+			  (wchar_t*)server, 
+			  connectionFlags & CF_BACKUP_SERVER ? L", Backup: true" : L"",
+			  connectionFlags & CF_ONLY_SHARED_LICENSE ? L", Shared: true" : L"",
+			  LicenseServerError::GenerateErrorMessage(hr).c_str()
+			  );
+		}
+	}
+
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(errorBuf)), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+	if(_wcsicmp(m_headerInformation, L"") != 0)
+		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));	// Call this second here so product is on top of error message.
+	if(FAILED(hr))
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", ((connectionFlags & CF_BACKUP_SERVER) != 0) ? MT_WARNING: MT_ERROR, hr, MessageGenericError);	//Log connection errors as warnings for backups
+
+	if((connectionFlags & CF_BACKUP_SERVER) != 0)
+		hr = S_OK; //Connection to backup server should not error out
+	
 	return hr;
 }
 STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUseSharedLicenseServers)
@@ -358,46 +528,83 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 
 	HRESULT hr(E_FAIL);
 	bool bConnectedToAtleastOneComputer = false;
-	for(;;)
+	try
 	{
 		LicenseSettings licSettings;
 		hr = licSettings.Initialize();
 		if(FAILED(hr))
+			throw S_OK;	//set to ok so try to connect to localhost
+
+		long calProdID = product;
+		if(bUseSharedLicenseServers == VARIANT_TRUE)
 		{
-			hr = S_OK;	//set to ok so try to connect to localhost
-			break;
+			if(product == Lic_PackageAttribs::pid_SolIndexer)
+				calProdID = Lic_PackageAttribs::pid_SdxDesigner;
+			else if(product == Lic_PackageAttribs::pid_Rubika)
+				calProdID = Lic_PackageAttribs::pid_RubikaProcessBuilder;
+			else if(product == Lic_PackageAttribs::pid_Spde)
+				calProdID = Lic_PackageAttribs::pid_SpdeQueueManager;
 		}
 
-		std::list<LicenseSettings::LicenseServerSettings*> licServerSettingsList;
-		hr = licSettings.GetLiceseServerByProduct(product, &licServerSettingsList);
+		LicenseSettings::LicenseServerSettingsTwoPointZero licenseServerSettings;
+		hr = licSettings.GetLiceseServerByProduct(calProdID, &licenseServerSettings);
 		if(FAILED(hr))
+			throw hr;
+
+		long connectionFlags = CF_SOFTWARE_LICENSING;
+
+		wchar_t wstrBuff[1024];
+		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(calProdID);
+		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
+			wstrProductName = prodSpecIt->second.productName;
+
+		swprintf_s(wstrBuff, _countof(wstrBuff), L"Product: %s", wstrProductName.c_str());
+		m_headerInformation = _bstr_t(wstrBuff);
+		hr = Connect3(((licenseServerSettings.serverName.length() !=0) ? licenseServerSettings.serverName : L"localhost"), connectionFlags);	//Try to connect to primary server
+		if(FAILED(hr))
+			throw hr;
+
+		if(_wcsicmp(licenseServerSettings.backupServerName, L"") != 0)	//Backup license server is set
 		{
-			hr = S_OK;	//set to ok so try to connect to localhost
-			break;
+			connectionFlags += CF_BACKUP_SERVER;
+			hr = Connect3(licenseServerSettings.backupServerName, connectionFlags);	//Try to connect to backup server
+			if(FAILED(hr))
+				throw hr;
 		}
 
-		for(std::list<LicenseSettings::LicenseServerSettings*>::iterator licServerSettingsIt = licServerSettingsList.begin();
-			licServerSettingsIt != licServerSettingsList.end();
-			licServerSettingsIt++)
+		m_product = calProdID;
+		if(licenseServerSettings.bIsTestDevLicensing == true)
 		{
-			//swprintf_s(tmpbuf, 1024, L"    name: %s, bIsSharedServer: %s, bIsBackupServer: %s) - bUseSharedLicenseServers: %s", 
-			//	(wchar_t*)(*licServerSettingsIt)->serverName, 
-			//	(*licServerSettingsIt)->bIsSharedServer==true ? L"true" : L"false",
-			//	(*licServerSettingsIt)->bIsBackupServer==true ? L"true" : L"false",
-			//	bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false"
-			//	);
-			//OutputDebugString(tmpbuf); 
-
-			if((bUseSharedLicenseServers == VARIANT_TRUE && (*licServerSettingsIt)->bIsSharedServer==true) ||
-				(bUseSharedLicenseServers == VARIANT_FALSE && (*licServerSettingsIt)->bIsSharedServer==false))
-			{
-				hr = Connect2((*licServerSettingsIt)->serverName, (*licServerSettingsIt)->bIsSharedServer ? VARIANT_TRUE : VARIANT_FALSE, (*licServerSettingsIt)->bIsBackupServer ? VARIANT_TRUE : VARIANT_FALSE);
-				if(FAILED(hr))
-					break;
-			}
-			bConnectedToAtleastOneComputer = true;
+			//Successfully connected, use a different product ID for the Test/Dev licensing
+			if(m_product == Lic_PackageAttribs::pid_Iconvert)
+				m_product = Lic_PackageAttribs::pid_TestDevIconvert;
+			else if(m_product == Lic_PackageAttribs::pid_Rubika)
+				m_product = Lic_PackageAttribs::pid_TestDevRubika;
+			else if(m_product == Lic_PackageAttribs::pid_RubikaProcessBuilder)
+				m_product = Lic_PackageAttribs::pid_TestDevRubikaProcessBuilder;
+			else if(m_product == Lic_PackageAttribs::pid_SdxDesigner)
+				m_product = Lic_PackageAttribs::pid_TestDevSdxDesigner;
+			else if(m_product == Lic_PackageAttribs::pid_SolIndexer)
+				m_product = Lic_PackageAttribs::pid_TestDevSolIndexer;
+			else if(m_product == Lic_PackageAttribs::pid_SolFusion)
+				m_product = Lic_PackageAttribs::pid_TestDevSolfusionSp;
+			else if(m_product == Lic_PackageAttribs::pid_SolScript)
+				m_product = Lic_PackageAttribs::pid_TestDevSolScript;
+			else if(m_product == Lic_PackageAttribs::pid_SolsearcherEnt)
+				m_product = Lic_PackageAttribs::pid_TestDevSolsearcherEp;
+			else if(m_product == Lic_PackageAttribs::pid_Spde)
+				m_product = Lic_PackageAttribs::pid_TestDevSpde;
+			else if(m_product == Lic_PackageAttribs::pid_SpdeQueueManager)
+				m_product = Lic_PackageAttribs::pid_TestDevSpdeQueueManager;
+			else if(m_product == Lic_PackageAttribs::pid_SolsearcherSp)
+				m_product = Lic_PackageAttribs::pid_TestDevSseSp;
 		}
-		break;	//Unconditional Break;
+		bConnectedToAtleastOneComputer = true;
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
 	}
 
 	if(SUCCEEDED(hr) && bConnectedToAtleastOneComputer == false)
@@ -407,12 +614,73 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 	}
 	if(FAILED(hr))	//if failed any connect call, disconnect from any possible connections made.
 	{
+		SAVE_ERRORINFO
 		Disconnect();
+		RESTORE_ERRORINFO
 	}
 
-	
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct (product: %d, bUseSharedLicenseServers: %s) - Leave - hr: 0x%x", product, bUseSharedLicenseServers==VARIANT_TRUE ? L"true" : L"false", hr);
-//OutputDebugString(tmpbuf); 
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ConnectByProduct leave - m_product: %d, hr: 0x%08x", m_product, hr);
+//OutputDebugString(tmpbuf); 	
+	return hr;
+}
+
+
+STDMETHODIMP CSolimarLicenseMgr::GetInfoByProduct(	
+	long product, 
+	VARIANT_BOOL bUseSharedLicenseServers, 
+	BSTR* p_server, 
+	BSTR* p_backup_server, 
+	VARIANT_BOOL* p_bool_use_test_dev_licensing)
+{
+	HRESULT hr(E_FAIL);
+	try
+	{
+		LicenseSettings licSettings;
+		hr = licSettings.Initialize();
+		if(FAILED(hr))
+			throw S_OK;	//set to ok so try to connect to localhost
+
+		long calProdID = product;
+		if(bUseSharedLicenseServers == VARIANT_TRUE)
+		{
+			if(product == Lic_PackageAttribs::pid_SolIndexer)
+				calProdID = Lic_PackageAttribs::pid_SdxDesigner;
+			else if(product == Lic_PackageAttribs::pid_Rubika)
+				calProdID = Lic_PackageAttribs::pid_RubikaProcessBuilder;
+			else if(product == Lic_PackageAttribs::pid_Spde)
+				calProdID = Lic_PackageAttribs::pid_SpdeQueueManager;
+		}
+
+		LicenseSettings::LicenseServerSettingsTwoPointZero licenseServerSettings;
+		hr = licSettings.GetLiceseServerByProduct(calProdID, &licenseServerSettings);
+		if(FAILED(hr))
+			throw hr;
+
+		*p_server = SysAllocString(licenseServerSettings.serverName);
+		*p_backup_server = SysAllocString(licenseServerSettings.backupServerName);
+		*p_bool_use_test_dev_licensing = (licenseServerSettings.bIsTestDevLicensing==true) ? VARIANT_TRUE : VARIANT_FALSE;
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+	return hr;
+}
+//Call after an RPC error, clear all allocated licenses so they will have to be re-obtained
+HRESULT CSolimarLicenseMgr::ReConnect(ServerInfo* pSrvInfoObj)
+{
+	SafeMutex mutex(ServerListLock);
+	HRESULT hr = S_OK;
+	try
+	{
+		//clear all allocated licenses...
+		pSrvInfoObj->software_license.licenses_allocated.clear();
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+
 	return hr;
 }
 
@@ -440,30 +708,49 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 	HRESULT hr(S_OK);
 	try
 	{
-		// for each server
+		// for each primary server
 		for (ServerList::iterator server = m_servers.begin(); server != m_servers.end(); ++server)
 		{
-			SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
-			if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+			//FreeAllSoftwareLicenseFromCache
+			if(server->second.bUseSoftwareLicensing)
 			{
-				VARIANT *pvtKeyIdent;
-				if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+				if(SUCCEEDED(hr))
+					hr = FreeAllSoftwareLicenseFromCache(&(server->second), false);
+			}
+			else
+			{
+				SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+				if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
 				{
-					FreeAllKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, false);
+					VARIANT *pvtKeyIdent;
+					if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+					{
+						FreeAllKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, false);
+					}
 				}
 			}
 		}
 
-		// for each server
+		// for each backup server
 		for (ServerList::iterator server = m_backupServers.begin(); server != m_backupServers.end(); ++server)
 		{
-			SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
-			if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+			//FreeAllSoftwareLicenseFromCache
+			if(server->second.bUseSoftwareLicensing)
 			{
-				VARIANT *pvtKeyIdent;
-				if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+				//software_license
+				if(SUCCEEDED(hr))
+					hr = FreeAllSoftwareLicenseFromCache(&(server->second), false);
+			}
+			else
+			{
+				SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+				if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
 				{
-					FreeAllKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, false);
+					VARIANT *pvtKeyIdent;
+					if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+					{
+						FreeAllKeys(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, false);
+					}
 				}
 			}
 		}
@@ -475,8 +762,8 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 		if(SS_RPC_FAILED(e.Error()))
 		{
 			//Log Message about RPC failure to Key
-			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::Disconnect() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 		}
 	}
 	catch (...)
@@ -486,16 +773,26 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 	}
 
 	while(!m_servers.empty())
+	{
+		//m_servers.begin()->second.LicenseServer;
 		m_servers.erase(m_servers.begin());
+	}
 
 	while(!m_backupServers.empty())
 		m_backupServers.erase(m_backupServers.begin());
-	
-	m_ui_level = UI_IGNORE;
+
+	m_ui_level = UI_LEVEL_RESPONSE | UI_STYLE_EVENT_LOG;
 	m_initialized = false;
+	m_bUsingBackupServers = false;
+	m_bInViolationPeriod = false;
+	m_product = -1;
+	m_productKeyID = -1;
+	m_applicationInstance = _bstr_t(L"");
+	m_applicationInstanceKey = _bstr_t(L"");
+	m_headerInformation = _bstr_t(L"");
 
 	// CR.FIX.11491 - Force refresh of keys on disconnect. 
-	m_dtRefreshKeyList = 0;
+	m_dtRefreshLicenses = 0;
 //OutputDebugString(L"CSolimarLicenseMgr::Disconnect() - Leave");	
 	return S_OK;
 }
@@ -514,58 +811,90 @@ STDMETHODIMP CSolimarLicenseMgr::KeyProductExists(long product, long prod_ver_ma
 		// foreach server
 		for (;server != serverEnd; ++server)
 		{
-			// get the key list form the server
-			VARIANT vtKeyList;
-			try 
+			if(server->second.bUseSoftwareLicensing == true)
 			{
-				SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
-				if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+				try
 				{
-					VARIANT *pvtKeyIdent;
-					if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+					BSTR bstrLicenseStream;
+					SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, GetSoftwareLicenseInfoByProduct_ForAll, (m_product, &bstrLicenseStream), hr);
+					if(FAILED(hr))
+						throw hr;
+
+					// might need to check for NULL or empty
+
+					Lic_PackageAttribs::Lic_ProductInfoAttribs prodAttribs;
+					prodAttribs.InitFromString(bstrLicenseStream);
+					SysFreeString(bstrLicenseStream);
+					
+					// if the product id and product version requirements are satisfied
+					if (Version::TinyVersion(Version::ModuleVersion(prodAttribs.product_Major, prodAttribs.product_Minor, 0, 0)) >= Version::TinyVersion(Version::ModuleVersion(prod_ver_major, prod_ver_minor, 0, 0)) && product==prodAttribs.productID)
 					{
-						for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)	//for each key on the server
-						{
-							_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
-							VARIANT vtKeyProductID, vtKeyProductVersion;
-
-							// check that the key has the requisite product version and etc.
-							// CR.11272 - Moved check up higher to reduce remote calls
-							hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-							if (FAILED(hr) || product!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
-
-							hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
-							if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(prod_ver_major, prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
-
-							// check that the key is present and valid
-							VARIANT_BOOL key_license_valid(VARIANT_FALSE);
-							//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
-							hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
-							if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
-							
-							// CR.11272 - Moved check up higher to reduce remote calls
-							// if the product id and product version requirements are satisfied
-							//if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(prod_ver_major, prod_ver_minor, 0, 0)) && product==vtKeyProductID.uiVal)
-							//{
-								*p_bool_key_product_exists = VARIANT_TRUE;
-								break;
-							//}
-						}	//End for each key on the server
-						SafeArrayUnaccessData(vtKeyList.parray);
+						*p_bool_key_product_exists = VARIANT_TRUE;
 					}
 				}
-			}
-			catch (_com_error &e) 
-			{
-				if(SS_RPC_FAILED(e.Error()))
+				catch(HRESULT &ehr)
 				{
-					//Log Message about RPC failure to Key
-					SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-					SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+					hr = ehr;
 				}
+
+				if(*p_bool_key_product_exists == VARIANT_TRUE)
+					break;
 			}
-			if(*p_bool_key_product_exists == VARIANT_TRUE)
-				break;	//Leave Loop
+			else
+			{
+				// get the key list form the server
+				VARIANT vtKeyList;
+				try 
+				{
+					SS_SLSERVER_FTCALL_HR(server->second, KeyEnumerate, (&vtKeyList), hr);
+					if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+					{
+						VARIANT *pvtKeyIdent;
+						if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+						{
+							for (unsigned int i = 0; i<vtKeyList.parray->rgsabound[0].cElements; ++i)	//for each key on the server
+							{
+								_bstr_t key_ident = pvtKeyIdent[i].bstrVal;
+								VARIANT vtKeyProductID, vtKeyProductVersion;
+
+								// check that the key has the requisite product version and etc.
+								// CR.11272 - Moved check up higher to reduce remote calls
+								hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+								if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+								
+								hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+								if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
+								
+								// check that the key is present and valid
+								VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+								//KeyValidateLicense Calls KeyIsPresent() & KeyIsActive()
+								hr = server->second.LicenseServer->KeyValidateLicense(key_ident, &key_license_valid);
+								if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
+								
+								
+								// CR.11272 - Moved check up higher to reduce remote calls
+								// if the product id and product version requirements are satisfied
+								//if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(prod_ver_major, prod_ver_minor, 0, 0)) && product==vtKeyProductID.uiVal)
+								//{
+								*p_bool_key_product_exists = VARIANT_TRUE;
+								break;
+								//}
+							}	//End for each key on the server
+						}
+					}
+				}
+				catch (_com_error &e) 
+				{
+					if(SS_RPC_FAILED(e.Error()))
+					{
+						//Log Message about RPC failure to Key
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+					}
+				}
+				if(*p_bool_key_product_exists == VARIANT_TRUE)
+					break;	//Leave Loop
+			}
 		}	//End for (;server != serverEnd; ++server)
 	}	//End for(int loopIdx=0; loopIdx<2; loopIdx++)
 	return hr;
@@ -600,8 +929,88 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize3(	BSTR application_instance,
 												VARIANT_BOOL app_instance_lock_key,
 												VARIANT_BOOL bypass_remote_key_restriction)
 {
+	return Initialize_Internal(
+		VARIANT_FALSE,		//Configure for Protection Key Licensing
+		application_instance, 
+		product, 
+		prod_ver_major, 
+		prod_ver_minor, 
+		single_key, 
+		specific_single_key_ident, 
+		lock_keys, 
+		auto_ui_level, 
+		grace_period_minutes, 
+		app_instance_lock_key, 
+		bypass_remote_key_restriction, 
+		VARIANT_FALSE);
+}
+
+STDMETHODIMP CSolimarLicenseMgr::SoftwareLicense_Initialize(
+		BSTR application_instance, 
+		long product, 
+		long prod_ver_major, 
+		long prod_ver_minor, 
+		long auto_ui_level, 
+		unsigned long grace_period_minutes)
+{
+	return Initialize_Internal(
+		VARIANT_TRUE, //Configure for Sofware file Licensing
+		application_instance, 
+		product, 
+		prod_ver_major, 
+		prod_ver_minor, 
+		VARIANT_FALSE, //single_key
+		VARIANT_FALSE, //specific_single_key_ident,
+		VARIANT_FALSE, //lock_keys
+		auto_ui_level, 
+		grace_period_minutes, 
+		VARIANT_FALSE,	//app_instance_lock_key
+		VARIANT_FALSE, //bypass_remote_key_restriction
+		VARIANT_FALSE);//not view only licensing
+}
+
+STDMETHODIMP CSolimarLicenseMgr::SoftwareLicense_InitializeViewOnly(
+		BSTR application_instance, 
+		long product, 
+		long prod_ver_major, 
+		long prod_ver_minor) 
+{
+	return Initialize_Internal(
+		VARIANT_TRUE, //Configure for Sofware file Licensing
+		application_instance, 
+		product, 
+		prod_ver_major, 
+		prod_ver_minor, 
+		VARIANT_FALSE, //single_key
+		VARIANT_FALSE, //specific_single_key_ident,
+		VARIANT_FALSE, //lock_keys
+		0, 
+		0, 
+		VARIANT_FALSE,	//app_instance_lock_key
+		VARIANT_FALSE,	//bypass_remote_key_restriction
+		VARIANT_TRUE);	//for view only licensing
+}
+
+// S_OK if some keys were found
+// S_FALSE if no keys are found
+// Error HRESULT if there was an error
+HRESULT CSolimarLicenseMgr::Initialize_Internal(
+	VARIANT_BOOL b_configure_for_software_licenses, 
+	BSTR application_instance, 
+	long product, 
+	long prod_ver_major, 
+	long prod_ver_minor, 
+	VARIANT_BOOL single_key, 
+	BSTR specific_single_key_ident, 
+	VARIANT_BOOL lock_keys, 
+	long auto_ui_level, 
+	unsigned long grace_period_minutes, 
+	VARIANT_BOOL b_app_instance_lock_key, 
+	VARIANT_BOOL b_bypass_remote_key_restriction, 
+	VARIANT_BOOL b_view_licenses_only)
+{
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize3 (application_instance: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)application_instance, app_instance_lock_key ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize_Internal(application_instance: %s, product: %d, version: %d.%d, app_instance_lock_key: %s, b_view_licenses_only: %s, auto_ui_level: 0x%x) - Enter", (wchar_t*)application_instance, product, prod_ver_major, prod_ver_minor, b_app_instance_lock_key==VARIANT_TRUE ? L"true" : L"false", b_view_licenses_only==VARIANT_TRUE ? L"true" : L"false", auto_ui_level);
 //OutputDebugString(tmpbuf);
 	HRESULT hr = S_OK;
 	
@@ -618,72 +1027,258 @@ STDMETHODIMP CSolimarLicenseMgr::Initialize3(	BSTR application_instance,
 			ModuleLicenseRelease(m->first, m->second);
 	}
 	
-	m_ui_level = auto_ui_level;
 	m_specific_single_key_ident = _bstr_t(specific_single_key_ident, true);
 	m_single_key = (single_key==VARIANT_TRUE);
 	m_lock_keys = (lock_keys==VARIANT_TRUE);
-	m_product = product;
+	m_bViewLicenseOnly = (b_view_licenses_only==VARIANT_TRUE);
+	if(m_product == -1 || m_bViewLicenseOnly /*for viewOnlyLicensing, ignore any m_product set by previous Connect call*/)
+		m_product = product;
+
 	m_prod_ver_major = prod_ver_major;
 	m_prod_ver_minor = prod_ver_minor;
+
+	// JWL - HACK - Add special case for Rubika 2.2 and below. Rubika 2.2 and below incoreectly register for licensing
+	// message to be displayed via message boxes, but this causes problems when SOLfusion (a service) kicks off Rubika and there 
+	// are any licensing messages, SOLfusion hangs forever.
+	if((m_product == Lic_PackageAttribs::pid_Rubika) && ((m_prod_ver_major == 2 && m_prod_ver_minor <=2) || m_prod_ver_major<=1))
+		m_ui_level = UI_LEVEL_CRITICAL | UI_STYLE_EVENT_LOG;
+	else	// for all other products
+		m_ui_level = auto_ui_level;
+
 	m_current_single_key = _bstr_t(L"");
 	m_initialized = true;
+	m_dtRefreshLicenses = 0;	//Force refresh on call to Initialize
 	m_dtGracePeriod = grace_period_minutes;
-	m_bLockKeyByAppInstance = app_instance_lock_key == VARIANT_TRUE ? true : false;
-	m_bBypassRemoteKeyRestrictions = bypass_remote_key_restriction == VARIANT_TRUE ? true : false;
+	m_bLockKeyByAppInstance = b_app_instance_lock_key == VARIANT_TRUE ? true : false;
+	m_bBypassRemoteKeyRestrictions = b_bypass_remote_key_restriction == VARIANT_TRUE ? true : false;
 	m_applicationInstance = application_instance;
-	
-	SafeMutex mutex(ServerListLock);
-	
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Pre");
-//OutputDebugString(tmpbuf); 
-	hr = RefreshLicenses();
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Post, hr: 0x%08x", hr);
-//OutputDebugString(tmpbuf);
-	
-	// CR.11272 - Why is there two RefreshKeyList() calls?
-	//   RefreshLicenses() calls RefreshKeyList(), then RefreshKeyList(true) is called.
-	// Maybe to log errors?
-	if(hr != S_OK)	//Log S_FALSE and FAILED(hr), don't call RefreshKeyList() during success cases
-		hr = RefreshKeyList(true/*Log Error*/);
 
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize3 leave 1 - hr: 0x%08x", hr);
+	InternalCalculateLegacyProtectionKeyInfo(m_product);	//Side effect: sets m_productKeyID & m_applicationInstanceKey & bUseOnlySharedLicenses in ServerInfo
+
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize_Internal() m_product: %d, m_productKeyID: %d, m_applicationInstance: %s, m_applicationInstanceKey: %s", m_product, m_productKeyID, (wchar_t*)m_applicationInstance, (wchar_t*)m_applicationInstanceKey);
+//OutputDebugString(tmpbuf);
+
+	m_headerInformation = _bstr_t(L"");
+
+	//if(m_product != -1)	//XXX - Think I can remove this check
+	{
+		//m_bConfiguredForSoftwareLicense = b_configure_for_software_licenses == VARIANT_TRUE ? true : false;;
+		SafeMutex mutex(ServerListLock);
+
+//OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - g_pSoftwareSpec->GetSoftwareSpec - Pre");
+		//m_softwareSpec = g_pSoftwareSpec->GetSoftwareSpec();
+//OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - g_pSoftwareSpec->GetSoftwareSpec - Post");
+		//RefreshSoftwareSpec(&m_softwareSpec);
+
+//OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Pre");
+		hr = RefreshLicenses();
+		if(FAILED(hr) && m_backupServers.size() > 0)
+		{
+			m_bUsingBackupServers = true;
+			hr = RefreshLicenses(); //try to use backup license server.
+			if(FAILED(hr))	//if backup failed, use primary and log the error.
+				m_bUsingBackupServers = false;
+		}
+//OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Post");
+
+		//if(!m_bConfiguredForSoftwareLicense)
+
+		// CR.11272 - Why is there two RefreshKeyList() calls?
+		//   RefreshLicenses() calls RefreshLicensingFromLicServers(), then RefreshLicensingFromLicServers(true) is called.
+		// Maybe to log errors?
+		if(hr != S_OK)	//Log S_FALSE and FAILED(hr), don't call RefreshKeyList() during success cases
+		{
+			SAVE_ERRORINFO
+			hr = RefreshLicensingFromLicServers(true/*Log Error*/) ;
+			RESTORE_ERRORINFO
+		}
+	}
+
+	// S_OK if some keys were found
+	// S_FALSE if no keys are found
+	// Error HRESULT if there was an error
+	std::wstring wstrPrimaryLicenseServer = L"";
+	if(SUCCEEDED(hr) && !m_bViewLicenseOnly)	//Don't log connections of license viewer
+	{
+		//Send a message that connection connects
+		//Move variable wstrBuff to a class variable and use it for all messages with LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE()
+		wchar_t wstrBuff[1024];
+		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
+		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
+			wstrProductName = prodSpecIt->second.productName;
+
+		// This assumes at most only one License Server and one Backup License Server
+		wstrPrimaryLicenseServer = m_servers.begin()!=m_servers.end() ? m_servers.begin()->second.name : L"";
+		std::wstring wstrBackupLicenseServer = m_backupServers.begin()!=m_backupServers.end() ? m_backupServers.begin()->second.name : L"";
+		
+		wchar_t wstrTmpBuf[10];
+		swprintf_s(wstrTmpBuf, _countof(wstrTmpBuf), L"%d.%d", m_prod_ver_major, m_prod_ver_minor);
+		std::wstring wstrVersion = (m_prod_ver_major!=0 && m_prod_ver_minor!=0) ? std::wstring(wstrTmpBuf) : std::wstring(L"");
+
+		swprintf_s(wstrBuff, _countof(wstrBuff), L"Product: %s%s%s, Product Connection: %s, License Server: %s%s%s",
+			wstrProductName.c_str(),
+			wstrVersion.length() != 0 ? L", Version: " : L"",
+			wstrVersion.length() != 0 ? wstrVersion.c_str() : L"",
+			std::wstring(m_applicationInstance).c_str(),
+			wstrPrimaryLicenseServer.c_str(),
+			wstrBackupLicenseServer.length() != 0 ? L", Backup License Server: " : L"",
+			wstrBackupLicenseServer.length() != 0 ? wstrBackupLicenseServer.c_str() : L""
+			);
+		m_headerInformation = _bstr_t(wstrBuff);
+	}
+	else if(FAILED(hr))
+	{
+		//Send a message that connection connects
+		wchar_t wstrBuff[1024];
+		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
+		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
+			wstrProductName = prodSpecIt->second.productName;
+
+		// This assumes at most only one License Server and one Backup License Server
+		std::wstring wstrPrimaryLicenseServer = m_servers.begin()!=m_servers.end() ? m_servers.begin()->second.name : L"";
+		std::wstring wstrBackupLicenseServer = m_backupServers.begin()!=m_backupServers.end() ? m_backupServers.begin()->second.name : L"";
+		
+		wchar_t wstrTmpBuf[10];
+		swprintf_s(wstrTmpBuf, _countof(wstrTmpBuf), L"%d.%d", m_prod_ver_major, m_prod_ver_minor);
+		std::wstring wstrVersion = (m_prod_ver_major!=0 && m_prod_ver_minor!=0) ? std::wstring(wstrTmpBuf) : std::wstring(L"");
+
+		swprintf_s(wstrBuff, _countof(wstrBuff), L"Product: %s%s%s, Product Connection: %s, License Server: %s%s%s",
+			wstrProductName.c_str(),
+			wstrVersion.length() != 0 ? L", Version: " : L"",
+			wstrVersion.length() != 0 ? wstrVersion.c_str() : L"",
+			std::wstring(m_applicationInstance).c_str(),
+			wstrPrimaryLicenseServer.c_str(),
+			wstrBackupLicenseServer.length() != 0 ? L", Backup License Server: " : L"",
+			wstrBackupLicenseServer.length() != 0 ? wstrBackupLicenseServer.c_str() : L""
+			);
+		m_headerInformation = _bstr_t(wstrBuff);
+	}
+
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr, L"Initialization Failed"), __uuidof(0), __uuidof(0));
+	if(_wcsicmp(m_headerInformation, L"") != 0)
+		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));	// Call this second here so product is on top of error message.
+	if(hr != S_OK)
+	{
+//OutputDebugString(L"CSolimarLicenseMgr::Initialize_Internal() - MessageViolationEnter()");
+		m_bInViolationPeriod = true;
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr, MessageGenericError);
+	}
+	else
+	{
+		m_bInViolationPeriod = false;
+		SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(wstrPrimaryLicenseServer.c_str(), std::wstring(m_headerInformation + _bstr_t(L"\r\n - Initialization Succeeded")).c_str(), MT_INFO, hr, MessageValidInitialize);
+	}
+
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::Initialize3 leave 1 - hr: 0x%08x, m_bInViolationPeriod:%s", hr, m_bInViolationPeriod ? L"true" : L"false");
 //OutputDebugString(tmpbuf); 
 	return hr;
 }
 
+
+
+
+
+//Private
+//Side effect: sets m_productKeyID & m_applicationInstanceKey & bUseOnlySharedLicenses in ServerInfo
+void CSolimarLicenseMgr::InternalCalculateLegacyProtectionKeyInfo(long _productID)
+{
+	bool bConfigureForSharedLicensingKey(false);
+	m_applicationInstanceKey = m_applicationInstance;
+	switch(_productID)
+	{
+		case Lic_PackageAttribs::pid_SdxDesigner:
+		case Lic_PackageAttribs::pid_TestDevSdxDesigner:
+		case Lic_PackageAttribs::pid_TestDevSolIndexer:
+			m_productKeyID = Lic_PackageAttribs::pid_SolIndexer;
+			bConfigureForSharedLicensingKey = (_productID!=Lic_PackageAttribs::pid_TestDevSolIndexer);
+			break;
+		case Lic_PackageAttribs::pid_RubikaProcessBuilder:
+		case Lic_PackageAttribs::pid_TestDevRubikaProcessBuilder:
+		case Lic_PackageAttribs::pid_TestDevRubika:
+			m_productKeyID = Lic_PackageAttribs::pid_Rubika;
+			bConfigureForSharedLicensingKey = (_productID!=Lic_PackageAttribs::pid_TestDevRubika);
+			break;
+		case Lic_PackageAttribs::pid_SpdeQueueManager:
+		case Lic_PackageAttribs::pid_TestDevSpdeQueueManager:
+		case Lic_PackageAttribs::pid_TestDevSpde:
+			m_productKeyID = Lic_PackageAttribs::pid_Spde;
+			bConfigureForSharedLicensingKey = (_productID!=Lic_PackageAttribs::pid_TestDevSpde);
+			break;
+		case Lic_PackageAttribs::pid_TestDevIconvert:
+			m_productKeyID = Lic_PackageAttribs::pid_Iconvert;
+			break;
+		case Lic_PackageAttribs::pid_TestDevSolfusionSp:
+			m_productKeyID = Lic_PackageAttribs::pid_SolFusion;
+			break;
+		case Lic_PackageAttribs::pid_TestDevSolScript:
+			m_productKeyID = Lic_PackageAttribs::pid_SolScript;
+			break;
+		case Lic_PackageAttribs::pid_SolsearcherSp:
+		case Lic_PackageAttribs::pid_TestDevSolsearcherEp:
+		case Lic_PackageAttribs::pid_TestDevSseSp:
+			m_productKeyID = Lic_PackageAttribs::pid_SolsearcherEnt;
+			break;
+		default:
+			m_productKeyID = _productID;
+			break;
+	}
+
+	if(bConfigureForSharedLicensingKey)
+	{
+		m_applicationInstanceKey = _bstr_t(L"");
+
+		////Cycle through all the license servers and set all the keys to be shared
+		for (ServerList::iterator serverIt = m_servers.begin();serverIt != m_servers.end(); serverIt++)
+			serverIt->second.bUseOnlySharedLicenses = true;
+
+		for (ServerList::iterator serverIt = m_backupServers.begin();serverIt != m_backupServers.end(); serverIt++)
+			serverIt->second.bUseOnlySharedLicenses = true;
+	}
+}
 STDMETHODIMP CSolimarLicenseMgr::ValidateLicense(VARIANT_BOOL *license_valid)
 {
+//OutputDebugString(L"CSolimarLicenseMgr::ValidateLicense()"); 
 	HRESULT hr = S_OK;
 	try
 	{
-		hr = ValidateLicenseInternal(license_valid, true);
+		hr = ValidateLicenseInternal(license_valid, true, true);
 	}
 	catch(_com_error&)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	catch(...)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ValidateLicense() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 	return hr;
 }
-HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error)
+//Parameter:
+//	bool use_back_up_on_error - use backup servers or enter Grace/Violation Period if FAILS
+HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid, bool use_back_up_on_error, bool bLogError)
 {
-//wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ValidateLicenseInternal (use_back_up_on_error: %s)", use_back_up_on_error ? L"true" : L"false");
-//OutputDebugString(tmpbuf);
 
 	HRESULT hr = S_OK;
 	ENSURE_INITIALIZED;
 	SafeMutex mutex(ServerListLock);
 	bool bAlreadyUsingBackUpServers = m_bUsingBackupServers;
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, _countof(tmpbuf), L"CSolimarLicenseMgr::ValidateLicenseInternal (use_back_up_on_error: %s) - bAlreadyUsingBackUpServers: %s, m_bInViolationPeriod: %s", /*, m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized: %s", */
+//			  use_back_up_on_error ? L"true" : L"false", 
+//			  bAlreadyUsingBackUpServers ? L"true" : L"false", 
+//			  m_bInViolationPeriod ? L"true" : L"false"//,
+//			  //m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized ? L"true" : L"false"
+//			  );
+//OutputDebugString(tmpbuf);
+
 	m_bUsingBackupServers = false;	//Try to Re-use non-Backup Servers.
 	HRESULT hrPrimaryServers = S_OK;
 	for(;;)
 	{
 		//Try to reuse non-backup servers...
-
 		*license_valid = VARIANT_FALSE; 
 		hr = RefreshLicenses();
 		if (SUCCEEDED(hr)) 
@@ -707,14 +1302,22 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 
 		if(*license_valid == VARIANT_TRUE)
 		{
-			break;
+			break;	// Break out of loop
 		}
 		else if(*license_valid == VARIANT_FALSE)
 		{
-			if(m_bUsingBackupServers || !use_back_up_on_error)
+			if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
+			{
+				// case that license file has been removed via license archive, do not allow going to backup server,
+				// go into license violation.
+				break;
+			}
+			else if(m_bUsingBackupServers || !use_back_up_on_error)
 			{
 				//License failed using active server and backup server, fall to grace period section...
-				break;
+				if(bAlreadyUsingBackUpServers)
+					m_bUsingBackupServers = bAlreadyUsingBackUpServers;
+				break;	// Break out of loop
 			}
 			else //if(!m_bUsingBackupServers)	
 			{
@@ -722,6 +1325,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 				hrPrimaryServers = hr;
 				m_bUsingBackupServers = true;
 
+				// Generates a message about using backup servers.
 				if(!bAlreadyUsingBackUpServers)
 				{
 					//Check to see if backup server is specified...
@@ -738,54 +1342,71 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 							bstr_KeyServer = (*m_servers.begin()).second.name;
 						if(!m_backupServers.empty())
 							bstr_BackupKeyServer = (*m_backupServers.begin()).second.name;
-
+						
 						int messageID = MessageKeysUseBackupKeyServer;
-						HRESULT messageHr = LicenseServerError::EHR_KEY_USE_BACKUP_KEY_SERVER;
+						HRESULT messageHr = LicenseServerError::EHR_KEY_USE_FAILOVER_KEY_SERVER;
 						wchar_t licensing_message_buffer[256];
 						swprintf_s(	licensing_message_buffer,
-									sizeof(licensing_message_buffer)/sizeof(wchar_t),
-									LicensingMessageStringTable[messageID],
-									(wchar_t*)bstr_KeyServer, 
-									(wchar_t*)bstr_BackupKeyServer);
-						_variant_t vtTimestamp;
-						_variant_t vtExpirationDate;
-						long lTrialHours = 0, lKeyStatus=0;
-						SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp);
-						SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtExpirationDate);
-
-						// Add messages to License Server queued list
-						AddLicensingMessage(
-							LicensingMessage(
-								std::wstring((wchar_t*)bstr_KeyServer),	//std::wstring &server
-								std::wstring(L""),		//std::wstring &key
-								vtTimestamp,	//VARIANT msg_time
-								MT_WARNING,								//DWORD msg_type
-								messageID,				//DWORD msg_id
-								std::wstring(licensing_message_buffer),  //std::wstring &msg
-								messageHr,										//HRESULT hr
-								lKeyStatus,						//DWORD status
-								vtExpirationDate,						//VARIANT expire_date
-								lTrialHours								//DWORD trial_hours
-							)
-						);
-
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_INFO, messageHr);
+							sizeof(licensing_message_buffer)/sizeof(wchar_t),
+							LicensingMessageStringTable[messageID],
+							(wchar_t*)bstr_KeyServer,
+							(wchar_t*)bstr_BackupKeyServer
+							);
+						LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(hrPrimaryServers, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+						if(_wcsicmp(m_headerInformation, L"") != 0)
+							LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
+						if(bLogError)
+							SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr, MessageGeneric);
 					}
 				}
 			}
 		}
 	}	//End For Loop
 
+//swprintf_s(tmpbuf, _countof(tmpbuf), 
+//			  L"CSolimarLicenseMgr::ValidateLicenseInternal () - m_bUsingBackupServers: %s, license_valid: %s, m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized: %s", 
+//			  m_bUsingBackupServers ? L"true" : L"false",
+//			  (*license_valid == VARIANT_TRUE)  ? L"true" : L"false",
+//			  m_bPrimaryLicenseServerHasBeenSuccessfullyInitialized ? L"true" : L"false"
+//			  );
+//OutputDebugString(tmpbuf);
 	//Grace Period Section
 	if(*license_valid == VARIANT_FALSE)
 	{
 		if(use_back_up_on_error)
 		{
 			StartGracePeriod();	//Does nothing if grace period has already been started
-			if(!InViolationPeriod())
+			if(!GracePeriodHadEnded())
 			{
 				*license_valid = VARIANT_TRUE;
 				hr = S_OK;
+			}
+			else if(m_bInViolationPeriod == false)
+			{
+				//It Violation, see if it entered Violation for the first time...
+				_bstr_t bstr_KeyServer = L"";
+				_bstr_t bstr_BackupKeyServer = L"";
+				if(!m_servers.empty())
+					bstr_KeyServer = (*m_servers.begin()).second.name;
+				if(!m_backupServers.empty())
+					bstr_BackupKeyServer = (*m_backupServers.begin()).second.name;
+
+				HRESULT messageHr = hrPrimaryServers;
+				wchar_t licensing_message_buffer[256];
+				swprintf_s(	licensing_message_buffer,
+								_countof(licensing_message_buffer),
+								L"Entering Licensing Violation period. License error with License Server: %s%s%s.",
+								(wchar_t*)bstr_KeyServer,
+								((_wcsicmp(bstr_BackupKeyServer, L"") != 0) ? L", Backup License Server: " : L""),
+								((_wcsicmp(bstr_BackupKeyServer, L"") != 0) ? (wchar_t*)bstr_BackupKeyServer : L"")
+						);
+				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(messageHr, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+				if(_wcsicmp(m_headerInformation, L"") != 0)
+					LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
+				if(bLogError)
+					SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, L"", MT_ERROR, messageHr, MessageViolationEnter);
+//OutputDebugString(L"CSolimarLicenseMgr::ValidateLicenseInternal() - MessageViolationEnter()");
+				m_bInViolationPeriod = true;
 			}
 		}
 	}
@@ -793,14 +1414,36 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 	{
 		if(bAlreadyUsingBackUpServers && !m_bUsingBackupServers)
 		{
+			//Free all licenses on backup servers
+			// for each backup server
+			for (ServerList::iterator serverIt = m_backupServers.begin(); serverIt != m_backupServers.end(); ++serverIt)
+			{
+				//FreeAllSoftwareLicenseFromCache
+				if(serverIt->second.bUseSoftwareLicensing)
+				{
+					//software_license
+					if(SUCCEEDED(hr))
+						hr = FreeAllSoftwareLicenseFromCache(&(serverIt->second), false);
+				}
+				else
+				{
+					VARIANT vtKeyList;
+					SS_SLSERVER_FTCALL_HR(serverIt->second, KeyEnumerate, (&vtKeyList), hr);
+					if (SUCCEEDED(hr) && (vtKeyList.vt & (VT_ARRAY | VT_VARIANT)))
+					{
+						VARIANT *pvtKeyIdent;
+						if (SUCCEEDED(SafeArrayAccessData(vtKeyList.parray, (void**)&pvtKeyIdent)))
+						{
+							FreeAllKeys(&(serverIt->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, false);
+						}
+					}
+				}
+			}
+
 			//Move to Active Servers, log message not using backservers anymore...
 			_bstr_t bstr_KeyServer = L"";
-			_bstr_t bstr_BackupKeyServer = L"";
-
 			if(!m_servers.empty())
 				bstr_KeyServer = (*m_servers.begin()).second.name;
-			if(!m_backupServers.empty())
-				bstr_BackupKeyServer = (*m_backupServers.begin()).second.name;
 
 			int messageID = MessageKeysRestoreKeyServer;
 			HRESULT messageHr = LicenseServerError::EHR_KEY_RESTORED_KEY_SERVER;
@@ -808,32 +1451,15 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 			swprintf_s(	licensing_message_buffer,
 						sizeof(licensing_message_buffer)/sizeof(wchar_t),
 						LicensingMessageStringTable[messageID],
-						(wchar_t*)bstr_KeyServer, 
-						(wchar_t*)bstr_BackupKeyServer);
-			_variant_t vtTimestamp;
-			_variant_t vtExpirationDate;
-			long lTrialHours = 0, lKeyStatus=0;
-			SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp);
-			SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtExpirationDate);
-
-			// Add messages to License Server queued list
-			AddLicensingMessage(
-				LicensingMessage(
-					std::wstring((wchar_t*)bstr_KeyServer),	//std::wstring &server
-					std::wstring(L""),		//std::wstring &key
-					vtTimestamp,	//VARIANT msg_time
-					MT_WARNING,								//DWORD msg_type
-					messageID,				//DWORD msg_id
-					std::wstring(licensing_message_buffer),  //std::wstring &msg
-					messageHr,										//HRESULT hr
-					lKeyStatus,						//DWORD status
-					vtExpirationDate,						//VARIANT expire_date
-					lTrialHours								//DWORD trial_hours
-				)
-			);
-
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_INFO, messageHr);
+						(wchar_t*)bstr_KeyServer);
+			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(licensing_message_buffer), false), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+			if(_wcsicmp(m_headerInformation, L"") != 0)
+				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(messageHr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
+			if(bLogError)
+				SS_GENERATE_AND_DISPATCH_MESSAGE_WITH_SERVER(bstr_KeyServer, LicenseServerError::GetErrorMessage(messageHr).c_str(), MT_WARNING, messageHr, MessageViolationLeave);
+//OutputDebugString(L"CSolimarLicenseMgr::ValidateLicenseInternal() - MessageViolationLeave()");
 		}
+		m_bInViolationPeriod = false;
 		StopGracePeriod();
 	}
 
@@ -857,30 +1483,71 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseTotal(long module_id, long *count)
 	
 	// perform the license de-allocation
 	RefreshLicenses();	//don't return the state of the manager
+	hr = ModuleLicenseTotalInternal(module_id, count);
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+	return hr;
+}
+HRESULT CSolimarLicenseMgr::ModuleLicenseTotalInternal(long module_id, long *count)
+{
+	HRESULT hr = S_OK;
 	
-	KeySpec::Module &module(m_keyspec.products[m_product][module_id]);
-	bool bModuleIsSharable = module.isSharable;
-
+	*count = 0;
+	
+	ENSURE_INITIALIZED;
+	
+	SafeMutex mutex(ServerListLock);	
+	
 	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
 	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
 
 	// foreach server
 	for (;server != serverEnd; ++server)
 	{
-		// if (server is set to use only sharable licenses and module is sharable ) or (server is set to use all licenses)
-		if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+		if(server->second.bUseSoftwareLicensing) // software licensing
 		{
-			// foreach key
-			for (ServerInfo::KeyList::iterator key = server->second.keys.begin(); key != server->second.keys.end(); ++key)
+			long unlimitedNumber = 0;
+			Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
+			
+			if(prodSpecIt != m_softwareSpec.productSpecMap->end())
 			{
-				if (key->second.KeyPresent)
+				if(prodSpecIt->second.sameModSpecProductID != 0)	//Test/Dev's share the same mod spec
 				{
-					long c = key->second.licenses_total[module_id];
-					// if one of the licenses is set to 'unlimited', retain this fact
-					if (*count>=0x7FFFFFFF || c>=0x7FFFFFFF || *count+c>=0x7FFFFFFF)
-						*count = 0x7FFFFFFF;
-					else
-						*count += c;
+					Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator  tmpProdSpecIt = m_softwareSpec.productSpecMap->find((int)prodSpecIt->second.sameModSpecProductID);
+					if(tmpProdSpecIt != m_softwareSpec.productSpecMap->end())
+						prodSpecIt = tmpProdSpecIt;
+				}
+
+				Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::iterator modSpecIt = prodSpecIt->second.moduleSpecMap->find(module_id);
+				if(modSpecIt != prodSpecIt->second.moduleSpecMap->end())
+				{
+					unlimitedNumber = modSpecIt->second.modUnlimitedValue;
+				}
+			}
+
+			if(unlimitedNumber != 0 && unlimitedNumber<= server->second.software_license.licenses_total[module_id])
+				*count = 0x7FFFFFFF;
+			else
+				*count = server->second.software_license.licenses_total[module_id];
+		}
+		else
+		{
+			KeySpec::Module &module(m_keyspec.products[m_productKeyID][module_id]);
+			bool bModuleIsSharable = module.isSharable;
+			// if (server is set to use only sharable licenses and module is sharable ) or (server is set to use all licenses)
+			if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+			{
+				// foreach key
+				for (ServerInfo::KeyList::iterator key = server->second.keys.begin(); key != server->second.keys.end(); ++key)
+				{
+					if (key->second.KeyPresent)
+					{
+						long c = key->second.licenses_total[module_id];
+						// if one of the licenses is set to 'unlimited', retain this fact
+						if (*count>=0x7FFFFFFF || c>=0x7FFFFFFF || *count+c>=0x7FFFFFFF)
+							*count = 0x7FFFFFFF;
+						else
+							*count += c;
+					}
 				}
 			}
 		}
@@ -904,14 +1571,9 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseInUse(long module_id, long *count)
 	
 	SafeMutex mutex(ServerListLock);
 	
-	// check the cache of obtained licenses
-	*count = m_allocated_licenses[module_id];
+	hr = ModuleLicenseInUseInternal(module_id, count);
 	
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseInUse module_id=%d, count=%d)", module_id, *count);
-//debug_buf[1023] = 0;
-//OutputDebugStringW(debug_buf);
-	return S_OK;
+	return hr;
 }
 
 
@@ -924,39 +1586,191 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseInUse_ByApp(long module_id, long *
 	ENSURE_INITIALIZED;
 	
 	SafeMutex mutex(ServerListLock);
-	*count = appInstanceInUseModuleCacheMap[module_id];
+	hr = ModuleLicenseInUse_ByAppInternal(module_id, count);
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 	return hr;
 }
-
-STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
+HRESULT CSolimarLicenseMgr::ModuleLicenseInUseInternal(long module_id, long *count)
 {
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseObtain AppID: %s, module_id=%d, count=%d)", (wchar_t*)m_applicationInstance, module_id, count);
-//OutputDebugStringW(debug_buf);
-
 	HRESULT hr = S_OK;
+	
+	*count = 0;
 	
 	ENSURE_INITIALIZED;
 	
-	if (count<0)
-		return E_INVALIDARG;
-
-	if(GracePeriodHasStarted())
-		return LicenseServerError::EHR_LICENSE_INSUFFICIENT;
-
-	SafeMutex mutex(ServerListLock);
+	SafeMutex mutex(ServerListLock);	
 	
-	// record that the licenses were obtained
-	m_allocated_licenses[module_id] += count;
-	// perform the license allocation
-	VARIANT_BOOL licensing_valid = VARIANT_FALSE;
-	hr = ValidateLicenseInternal(&licensing_valid, false);
-	if (FAILED(hr) || licensing_valid==VARIANT_FALSE) 
-		m_allocated_licenses[module_id] -= count;
+	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
 
-//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseObtain AppID: %s, module_id=%d, count=%d) - hr: 0x%x", (wchar_t*)m_applicationInstance, module_id, count, licensing_valid == VARIANT_TRUE ? S_OK : hr);
+	bool bUnset(true);
+	// foreach server
+	for (;server != serverEnd; ++server)
+	{
+		if(server->second.bUseSoftwareLicensing) // software licensing
+		{
+			try
+			{
+				long software_licenses_in_use(0);
+
+				if (m_bViewLicenseOnly)
+				{
+					SS_SLSERVER_ON_INTERFACE_FTCALL(ISolimarSoftwareLicenseSvr, server->second, SoftwareAddApplicationInstanceByProduct, (m_product, m_applicationInstance));
+				}
+
+				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, SoftwareModuleLicenseInUseByConnection_ByProduct, (m_product, module_id, &software_licenses_in_use), hr);
+
+				if (m_bViewLicenseOnly)
+				{
+					SS_SLSERVER_ON_INTERFACE_FTCALL(ISolimarSoftwareLicenseSvr, server->second, SoftwareRemoveApplicationInstanceByProduct, (m_product, m_applicationInstance));
+				}
+
+				if(FAILED(hr)) 
+					throw hr;
+
+				*count += software_licenses_in_use; 
+				bUnset = false;
+			}
+			catch(HRESULT &ehr)
+			{
+				hr = ehr;
+			}
+		}
+	}
+
+	if(bUnset)
+	{
+		//Will also enter this if the license servers with software licensing are not able to be reached.
+		*count = m_allocated_licenses[module_id];
+		hr = S_OK;
+	}
+	
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseInUseInternal module_id=%d, count=%d)", module_id, *count);
 //OutputDebugStringW(debug_buf);
-	return (licensing_valid == VARIANT_TRUE ? S_OK : hr);
+	return hr;
+}
+HRESULT CSolimarLicenseMgr::ModuleLicenseInUse_ByAppInternal(long module_id, long *count)
+{
+	HRESULT hr = S_OK;
+	
+	*count = 0;
+	
+	ENSURE_INITIALIZED;
+	
+	SafeMutex mutex(ServerListLock);	
+	
+	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+
+	bool bUnset(true);
+	// foreach server
+	for (;server != serverEnd; ++server)
+	{
+		if(server->second.bUseSoftwareLicensing) // software licensing
+		{
+			//The old scheme just returned the in use number of instance, didn't take multiple processes with the same 
+			//application name into account.  If the new InUse breaks something, look here first
+			try
+			{
+				long software_licenses_in_use(0);
+
+				if (m_bViewLicenseOnly)
+				{
+					SS_SLSERVER_ON_INTERFACE_FTCALL(ISolimarSoftwareLicenseSvr, server->second, SoftwareAddApplicationInstanceByProduct, (m_product, m_applicationInstance));
+				}
+
+				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, SoftwareModuleLicenseInUseByApp_ByProduct, (m_product, module_id, &software_licenses_in_use), hr);
+				//SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, SoftwareModuleLicenseInUseByConnection_ByProduct, (m_product, module_id, &software_licenses_in_use), hr);
+
+				if (m_bViewLicenseOnly)
+				{
+					SS_SLSERVER_ON_INTERFACE_FTCALL(ISolimarSoftwareLicenseSvr, server->second, SoftwareRemoveApplicationInstanceByProduct, (m_product, m_applicationInstance));
+				}
+
+				if(FAILED(hr)) 
+					throw hr;
+
+				*count += software_licenses_in_use; 
+				bUnset = false;
+			}
+			catch(HRESULT &ehr)
+			{
+				hr = ehr;
+			}
+		}
+	}
+
+	if(bUnset)
+	{
+		//Protection Key model, check the cache of obtained licenses instead of querying keys...
+		//This does not take multiple License Servers into account.  Also doesn't take multiple processes
+		//with the same ApplicationInstanceID into account.
+
+		//Will also enter this if the license servers with software licensing are not able to be reached.
+		*count = appInstanceInUseModuleCacheMap[module_id];
+		hr = S_OK;
+	}
+	
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseInUseInternal module_id=%d, count=%d)", module_id, *count);
+//OutputDebugStringW(debug_buf);
+	return hr;
+}
+STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
+{
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, _countof(debug_buf), _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseObtain m_product: %d, AppID: %s, module_id=%d, count=%d)", m_product, (wchar_t*)m_applicationInstance, module_id, count);
+//OutputDebugStringW(debug_buf);
+
+	HRESULT hr = S_OK;
+	ENSURE_INITIALIZED;
+	try
+	{
+		if (m_bViewLicenseOnly) 
+			throw LicenseServerError::EHR_LIC_MGR_VIEW_ONLY;
+
+		if (count<0)
+			throw E_INVALIDARG;
+
+		if(GracePeriodHasStarted())
+			throw LicenseServerError::EHR_LICENSE_INSUFFICIENT;
+
+		SafeMutex mutex(ServerListLock);
+
+		// record that the licenses were obtained
+		m_allocated_licenses[module_id] += count;
+		// perform the license allocation
+		VARIANT_BOOL licensing_valid = VARIANT_FALSE;
+		hr = ValidateLicenseInternal(&licensing_valid, true, false);
+		if (FAILED(hr) || licensing_valid==VARIANT_FALSE) 
+		{
+			m_allocated_licenses[module_id] -= count;
+			//Is case of FAILED(hr) && licensing_valid==VARIANT_TRUE a possible case?
+
+			//1st call to validate will cause licensing to enter violation, if error was
+			//because of insufficient licensing call again with logging off to get licensing
+			//out of violation without a message being logged.
+			//if(hr ==LicenseServerError::EHR_LICENSE_INSUFFICIENT)
+			ValidateLicenseInternal(&licensing_valid, true, false);
+			throw hr;
+		}
+
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+	if(_wcsicmp(m_headerInformation, L"") != 0)
+		LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(-1, std::wstring(m_headerInformation)), __uuidof(0), __uuidof(0));
+	//if(FAILED(hr))
+	//	SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr, MessageGenericError);
+
+	//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseObtain() - returns: 0x%08x", (licensing_valid == VARIANT_TRUE ? S_OK : hr));
+	//OutputDebugStringW(debug_buf);
+	return hr;
 }
 
 STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count)
@@ -973,7 +1787,10 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	ENSURE_INITIALIZED;
 	
 	SafeMutex mutex(ServerListLock);
-	
+
+	if (m_bViewLicenseOnly) 
+		return LicenseServerError::EHR_LIC_MGR_VIEW_ONLY;
+
 	if (count<0 || count>m_allocated_licenses[module_id])
 		return E_INVALIDARG;
 
@@ -984,6 +1801,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 	RefreshLicenses();	//don't return the state of the manager
 //_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseRelease AppID: %s, module_id: %d, count: %d - Leave)", (wchar_t*)m_applicationInstance, module_id, count);
 //OutputDebugStringW(debug_buf);
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 	return S_OK;
 }
 
@@ -1021,7 +1839,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 						// check that the key has the requisite product version and etc.
 						// CR.11272 - Moved check up higher to reduce remote calls
 						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-						if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+						if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 						
 						hr = server->second.LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
 						if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
@@ -1033,14 +1851,14 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 						if (FAILED(hr) || key_license_valid==VARIANT_FALSE) {hr = S_OK; continue;}
 						
 						// if the product id and product version requirements are satisfied
-						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 						{
 							// if a specific key is requested, but this one is not it, skip this key
 							if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 							{
 								// refresh the cache of licenses on the key
 								// for each module in the key spec for the product
-								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_productKeyID].data.begin(); module != m_keyspec.products[m_productKeyID].data.end(); ++module)
 								{
 									//
 									//Accept -1 as ignore moduleID
@@ -1073,8 +1891,8 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ModuleLicenseSerialNumbers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ModuleLicenseSerialNumbers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 		}
 	}
@@ -1123,11 +1941,14 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 		return LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 	}
 
+	if (m_bViewLicenseOnly) 
+		return LicenseServerError::EHR_LIC_MGR_VIEW_ONLY;
+
 	SafeMutex mutex(ServerListLock);
 	
 	// perform the license allocation
 	VARIANT_BOOL licensing_valid = VARIANT_FALSE;
-	hr = ValidateLicenseInternal(&licensing_valid, false);
+	hr = ValidateLicenseInternal(&licensing_valid, true, false);
 	if (SUCCEEDED(hr) && licensing_valid==VARIANT_FALSE) 
 		hr = E_FAIL;
 
@@ -1161,12 +1982,12 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 						if (FAILED(hr)) {hr = S_OK; continue;}
 					
 						// if the product id and product version requirements are satisfied
-						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+						if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 						{
 							// if a specific key is requested, but this one is not it, skip this key
 							if (!(m_single_key && m_specific_single_key_ident.length()>0 && m_specific_single_key_ident!=key_ident))
 							{
-								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end() && licenseToDecrement>0; ++module)
+								for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_productKeyID].data.begin(); module != m_keyspec.products[m_productKeyID].data.end() && licenseToDecrement>0; ++module)
 								{
 									if (module->isLicense && module_id == static_cast<long>(module->id))
 									{
@@ -1214,6 +2035,8 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseCounterDecrement(long module_id, l
 	}
 	return hr;
 }
+
+
 bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 {
 	if (key_ident.length()==0) 
@@ -1227,10 +2050,13 @@ bool CSolimarLicenseMgr::ManagesKey(_bstr_t key_ident)
 	// foreach server
 	for (;server != serverEnd; ++server)
 	{
-		// if this server's key list contains the key in question
-		if (server->second.keys.find(key_ident)!=server->second.keys.end())
+		if(server->second.bUseSoftwareLicensing == false)
 		{
-			return true;
+			// if this server's key list contains the key in question
+			if (server->second.keys.find(key_ident)!=server->second.keys.end())
+			{
+				return true;
+			}
 		}
 	}
 	return false;
@@ -1250,6 +2076,8 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseManager(long* p_ver_major, lon
 	*p_ver_build = BUILD_NUMBER;
 	return S_OK;
 }
+
+
 STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ver_major, long* p_ver_minor, long* p_ver_build)
 {
 	HRESULT hr = S_OK;
@@ -1264,7 +2092,7 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 	if(bFoundServer)
 	{
 		//Use the existing connection to the machine and retrieve the version.
-		hr = serverIt->second.LicenseServer->GetVersionLicenseServer(p_ver_major, p_ver_minor, p_ver_build);
+		SS_SLSERVER_FTCALL_HR(serverIt->second, GetVersionLicenseServer, (p_ver_major, p_ver_minor, p_ver_build), hr);
 		if(FAILED(hr))
 		{
 			*p_ver_major = 0;
@@ -1277,8 +2105,9 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 		//Try to contact the machine and retrieve the version.
 
 		// Try to create an ISolimarLicenseServer proxy to the server
+		// ISolimarLicenseSvr3 contains GetVersionLicenseServer()
 		COSERVERINFO	serverInfo	= {0, server, NULL, 0};
-		MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr4), NULL, NOERROR};
+		MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
 
 		hr = CoCreateInstanceEx(
 			__uuidof(CSolimarLicenseSvr), 
@@ -1289,7 +2118,7 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 			&multiQI);
 		if (SUCCEEDED(hr))
 		{	
-			ISolimarLicenseSvr4 *pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
+			ISolimarLicenseSvr3 *pILicenseServer = (ISolimarLicenseSvr3*)multiQI.pItf;
 			ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 										sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 										challenge_key_server_userauththis_public, 
@@ -1315,11 +2144,13 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 				pILicenseServer->Release();
 		}
 	}
+
 	return hr;
 }
 
 STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList)
 {
+//wchar_t tmpbuf[1024];
 	HRESULT hr = S_OK;
 	ENSURE_INITIALIZED;
 	try
@@ -1330,20 +2161,38 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 			ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
 			ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
 
-			// foreach server
+			LicensingMessageList server_messages_list;
+
 			for (;server != serverEnd; ++server)
 			{
-				ILicensingMessage *pServerLicensingMessage = 0;
 				_variant_t vtServerMessageList;
+				//Get all the Protection Key messages...
 				try
 				{
-					SS_SLSERVER_FTCALL_HR(server->second, QueryInterface, (__uuidof(ILicensingMessage), (void**)&pServerLicensingMessage), hr);
+					SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ILicensingMessage, server->second, GetLicenseMessageList, (VARIANT_TRUE, &vtServerMessageList), hr);
+					LicensingMessageList server_messages(vtServerMessageList);
+					licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
+				}
+				catch (_com_error &e)
+				{
+					if(SS_RPC_FAILED(e.Error()))
+					{
+						//Log Message about RPC failure to Key
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+					}
+				}
+
+
+				//Get all the Software License messages...
+				try
+				{
+					_variant_t vtServerSoftwareMessageList;
+					SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISoftwareLicensingMessage, server->second, GetSoftwareLicenseMessageList, (VARIANT_TRUE, &vtServerSoftwareMessageList), hr);
 					if (SUCCEEDED(hr))
 					{
-						pServerLicensingMessage->GetLicenseMessageList(VARIANT_TRUE, &vtServerMessageList);
-						LicensingMessageList server_messages(vtServerMessageList);
-						licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
-						pServerLicensingMessage->Release();
+						LicensingSoftwareMessageList server_software_messages(vtServerSoftwareMessageList);
+						licensing_software_message_cache.insert(licensing_software_message_cache.end(), server_software_messages.begin(), server_software_messages.end());
 					}
 				}
 				catch (_com_error &e) 
@@ -1351,8 +2200,8 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 					if(SS_RPC_FAILED(e.Error()))
 					{
 						//Log Message about RPC failure to Key
-						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetSoftwareLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 			}
@@ -1366,25 +2215,48 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 				}
 				else
 				{
+					server_messages_list.insert(server_messages_list.end(), *m);
 					++m;
 				}
 			}
-			*pvtMessageList = licensing_message_cache;
+
+			//filter the software message list, removing messages that are not relevant to the manager (by product)
+			for (LicensingSoftwareMessageList::iterator mIt = licensing_software_message_cache.begin(); mIt != licensing_software_message_cache.end();)
+			{
+				LicensingSoftwareMessage lsm = LicensingSoftwareMessage(*mIt);
+				if(m_product != mIt->productId)
+				{
+					mIt = licensing_software_message_cache.erase(mIt);
+				}
+				else
+				{
+					server_messages_list.insert(server_messages_list.end(), LicensingMessage(mIt->licenseServer, mIt->softwareLicense, mIt->messageTimestamp, mIt->messageType, mIt->messageId, mIt->message, mIt->messageErrorHr, 0, _variant_t(0.0,VT_DATE), 0));
+					mIt++;
+				}
+			}
+
+//swprintf_s(tmpbuf, 1024, L"server_messages_list.size: %d", server_messages_list.size());
+//OutputDebugString(tmpbuf);
+			*pvtMessageList = server_messages_list;
 
 			//Dispatch all the messages before returning
 			//DispatchLicenseMessageList(VARIANT_FALSE);
 
 			if (clear_messages==VARIANT_TRUE)
+			{
 				licensing_message_cache.clear();
+				licensing_software_message_cache.clear();
+			}
+
 		}
 	}
 	catch(_com_error&)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - COM Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	catch(...)
 	{
-		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - Unknown Exception", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
 	}
 	return S_OK;
 }
@@ -1401,7 +2273,7 @@ STDMETHODIMP CSolimarLicenseMgr::DispatchLicenseMessageList(VARIANT_BOOL clear_m
 
 		for (LicensingMessageList::iterator m = licensing_message_cache.begin(); m != licensing_message_cache.end(); ++m)
 		{
-			DispatchLicenseMessage(_bstr_t(m->key_ident.c_str()), m->message_type, m->error, m->timestamp, _bstr_t(m->message.c_str()));
+			DispatchLicenseMessage(_bstr_t(m->key_ident.c_str()), m->message_type, m->error, m->timestamp, _bstr_t(m->message.c_str()),m->message_id);
 		}
 
 		if (clear_messages==VARIANT_TRUE)
@@ -1434,8 +2306,8 @@ void CSolimarLicenseMgr::SendHeartbeat()
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 		}
 	}
@@ -1447,9 +2319,9 @@ bool CSolimarLicenseMgr::MessageQualifiesForAutoDispatch(DWORD ui_level, long me
 	(
 		(ui_level & UI_LEVEL_ALL)
 		||
-		((ui_level & UI_LEVEL_RESPONSE) && (message_type==0))
+		((ui_level & UI_LEVEL_RESPONSE) && ((message_type==MT_WARNING) || (message_type==MT_ERROR)))
 		||
-		((ui_level & UI_LEVEL_CRITICAL) && (message_type==2))
+		((ui_level & UI_LEVEL_CRITICAL) && (message_type==MT_ERROR))
 	);
 }
 
@@ -1472,7 +2344,11 @@ bool CSolimarLicenseMgr::isAutoUiStyleEventLog(DWORD ui_level)
 		UI_STYLE_EVENT_LOG =	0x20,
 */
 
-void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message)
+void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id)
+{
+	DispatchLicenseMessage(L"", key_ident, message_type, error, vtTimestamp, message, message_id);
+}
+void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR license_server, BSTR key_ident, long message_type, long error, VARIANT vtTimestamp, BSTR message, long message_id)
 {
 	// perform the auto ui requested (dialogs, event log, etc.)
 	if (MessageQualifiesForAutoDispatch(m_ui_level, message_type))
@@ -1483,17 +2359,26 @@ void CSolimarLicenseMgr::DispatchLicenseMessage(BSTR key_ident, long message_typ
 		}
 		if (isAutoUiStyleEventLog(m_ui_level))
 		{
-			KeyMessageWriteEventLog(key_ident, message_type, error, vtTimestamp, message);
+			KeyMessageWriteEventLog(key_ident, message_type, error, vtTimestamp, message, message_id);
 		}
+	}
+
+	std::wstring str_error_message = (_wcsicmp(L"", message) == 0) ? LicenseServerError::GetErrorMessage(error) : std::wstring(message);
+	{
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::DispatchLicenseMessage(error: 0x%x, msg: %s)", error, str_error_message.c_str());
+		SafeMutex mutex_messages(MessageListLock);
+		licensing_software_message_cache.push_back(LicensingSoftwareMessage(std::wstring(license_server), std::wstring(key_ident), m_product, message_type, message_id, vtTimestamp, str_error_message, error));
 	}
 }
 
 void CSolimarLicenseMgr::KeyMessageShowDialog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message)
 {
-	ShowLicenseDialog(_bstr_t(L"Licensing Information"), _bstr_t(message,true));
+	std::wstring str_error_message = (_wcsicmp(L"", message) == 0) ? LicenseServerError::GetErrorMessage(error) : std::wstring(message);
+	if(str_error_message.length() != 0)
+		ShowLicenseDialog(_bstr_t(L"Licensing Information"), _bstr_t(str_error_message.c_str()));
 }
 
-void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message)
+void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int message_type, HRESULT error, VARIANT vtTimestamp, BSTR message, long message_id)
 {
 	static const int MAX_MESSAGE_SIZE = 1024;
 	wchar_t event_log_msg[MAX_MESSAGE_SIZE];	
@@ -1526,29 +2411,59 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 	}
 	*/
 
-	_bstr_t str_error_message;
-	//xxx implement GetErrorMessage such that it returns the right error message?
-	str_error_message = LicenseServerError::GetErrorMessage(error).c_str();
+	std::wstring str_error_message;
+	str_error_message = LicenseServerError::GetErrorMessage(error);
+	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
+	bool bKeyIdentEmpty = _wcsicmp(L"", key_ident) == 0;
+	bool bErrorMessageEmpty = str_error_message.length() == 0;
+	bool bMessageEmpty = _wcsicmp(L"", message) == 0;
+
 	switch (message_type)
 	{
-	case MT_INFO:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message\r\n\r\nKey: %s\r\n\r\n%s",
-			key_ident,
-			message);
-		break;
-	case MT_ERROR:
-		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nKey: %s\r\n%08x %s\r\n\r\n%s",
-			key_ident,
-			error,
-			str_error_message,
-			message);
-		break;
+		case MT_WARNING:
+		case MT_INFO:
+			_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Status Message:%s%s%s%s",
+				bKeyIdentEmpty ? L"" : L"\r\n\r\nLicenseID: ",
+				bKeyIdentEmpty ? L"" : key_ident,
+				(bMessageEmpty && bErrorMessageEmpty) ? L"" : L"\r\n\r\n",
+				(bMessageEmpty && bErrorMessageEmpty) ? L"" : (!bMessageEmpty ? message : str_error_message.c_str())
+				);
+			event_type = (message_type==MT_WARNING) ? EVENTLOG_WARNING_TYPE : EVENTLOG_INFORMATION_TYPE;
+			break;
+		case MT_ERROR:
+			_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), L"Solimar Systems, Inc.\r\nProduct Licensing Error Message: 0x%08x%s%s%s%s%s%s",
+				error,
+				bKeyIdentEmpty ? L"" : L"\r\n\r\nLicenseID: ",
+				bKeyIdentEmpty ? L"" : key_ident,
+				bErrorMessageEmpty ? L"" : L"\r\n\r\n",
+				bErrorMessageEmpty ? L"" : str_error_message.c_str(),
+				bMessageEmpty ? L"" : L"\r\n\r\n",
+				bMessageEmpty ? L"" : message
+				);
+			event_type = EVENTLOG_ERROR_TYPE;
+			break;
 	}
-	
-	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
-	if (error & 0x8000000) event_type = EVENTLOG_ERROR_TYPE;
-	//EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, message_type);
-	LicenseServerError::WriteEventLog(event_log_msg, message_type);
+
+	// Don't flood event log with the same license message, check cache
+	bool bCachedMsg = false;
+	for(	std::list<std::wstring>::iterator msgCacheIt = m_licenseMsgEventLogCache.begin();
+			msgCacheIt != m_licenseMsgEventLogCache.end();
+			msgCacheIt++)
+	{
+		if(_wcsicmp(msgCacheIt->c_str(), event_log_msg) == 0)
+		{
+			bCachedMsg = true;
+			m_licenseMsgEventLogCache.remove(*msgCacheIt);	// Remove item, so it can be re-added to the end of the cache
+			break;
+		}
+	}
+
+	m_licenseMsgEventLogCache.push_back(event_log_msg);	// Add message to the end of the cache
+	if(m_licenseMsgEventLogCache.size() > 5)	// Cache the last 5 msg
+		m_licenseMsgEventLogCache.pop_front();
+
+	if(!bCachedMsg)
+		LicenseServerError::WriteEventLog(event_log_msg, event_type, message_id);
 }
 
 HRESULT CSolimarLicenseMgr::ShowLicenseDialog(_bstr_t caption, _bstr_t message)
@@ -1604,16 +2519,138 @@ BOOL CALLBACK CSolimarLicenseMgr::LicenseDlgProc(HWND hDlg, UINT message, WPARAM
 
 
 
+
+//
+// Refresh the Lic_ProdInfoAttribs object from the License Server it is connected to.
+// There is an assumption that only one license server can be connected to
+// S_OK if licenses for the product were found
+// S_FALSE if licenses for the product were not found
+// Error HRESULT if there was an error
+
+HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError)
+{
+	HRESULT hr = S_OK;
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers() - Enter");
+//OutputDebugStringW(debug_buf);	
+	ENSURE_INITIALIZED;
+
+	SafeMutex mutex(ServerListLock);
+
+	bool bFoundProductAndVersion = false;
+	long prodMajor = 0, prodMinor = 0;
+	try
+	{
+		
+		ServerList::iterator serverIt = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+		ServerList::iterator serverEndIt = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+
+		//There should only be 1 server...
+		for(;serverIt != serverEndIt; ++serverIt)	//If there should only be 1 server
+		{
+			try
+			{
+				serverIt->second.software_license.licenses_total.clear();	//Clear current values out.
+				serverIt->second.software_license.licenses_inuse.clear();	//Clear current values out.
+				serverIt->second.software_license.licenses_allocated.clear();	//Clear current values out.
+
+				BSTR bstrLicenseStream;
+				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, GetSoftwareLicenseInfoByProduct_ForAll, (m_product, &bstrLicenseStream), hr);
+				if(FAILED(hr))
+					throw hr;
+				
+				// might need to check for NULL or empty
+				Lic_PackageAttribs::Lic_ProductInfoAttribs prodAttribs;
+				prodAttribs.InitFromString(bstrLicenseStream);
+				SysFreeString(bstrLicenseStream);
+
+				// Only add stuff at right version
+				// if the product version requirements are satisfied
+				//if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))
+				prodMajor = prodAttribs.product_Major;
+				prodMinor = prodAttribs.product_Minor;
+
+				if (	Version::ModuleVersion(prodAttribs.product_Major, prodAttribs.product_Minor, prodAttribs.product_SubMajor, prodAttribs.product_SubMinor) >= 
+						(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)))
+				{
+					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, _bLogError);
+					if(SUCCEEDED(hr))
+						bFoundProductAndVersion = true;
+					for(Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = prodAttribs.moduleList->begin();
+						modIt != prodAttribs.moduleList->end();
+						modIt++)
+					{
+						long licenses_allocated(0), licenses_inuse(0);
+
+						// get the number of licenses in use for the key for all connections to it - licenses_inuse
+						HRESULT tmpHr;
+						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareModuleLicenseInUseByApp_ByProduct, (m_product, modIt->moduleID, &licenses_inuse), tmpHr);
+						if(FAILED(tmpHr))
+							licenses_inuse = 0;
+
+						// get the number of licenses in allocated for this connection - licenses_allocated
+						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareModuleLicenseInUseByConnection_ByProduct, (m_product, modIt->moduleID, &licenses_allocated), tmpHr);
+						if(FAILED(tmpHr))
+							licenses_allocated = 0;
+
+						serverIt->second.software_license.licenses_total[modIt->moduleID] = modIt->moduleValue;
+						serverIt->second.software_license.licenses_inuse[modIt->moduleID] = licenses_inuse;
+						serverIt->second.software_license.licenses_allocated[modIt->moduleID] = licenses_allocated;
+					}
+				}
+			}
+			catch(HRESULT &ehr)
+			{
+				hr = ehr;
+			}
+		}
+	}
+	catch (_com_error &e) 
+	{
+		if(SS_RPC_FAILED(e.Error()))
+		{
+			//Log Message about RPC failure to Key
+			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+		}
+	}
+	if(bFoundProductAndVersion == false && SUCCEEDED(hr))
+		hr = LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION;
+
+	
+	if(FAILED(hr))
+	{
+		if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
+		{
+			std::wstring wstrProdName = L"Unknown";
+			Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
+			if(prodSpecIt != m_softwareSpec.productSpecMap->end())
+				wstrProdName = prodSpecIt->second.productName;
+
+			wchar_t errorBuf[1024];
+			swprintf_s(errorBuf, _countof(errorBuf), L"Attempting to run Product: %s Version: %d.%d. You are licensed to run only Version: %d.%d or lower (License Server)",
+				wstrProdName.c_str(),
+				m_prod_ver_major,
+				m_prod_ver_minor,
+				prodMajor,
+				prodMinor
+				);
+			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+		}
+	}
+	return hr;
+}
+
 //
 // refresh the list of the keys on the currently connected servers
 // S_OK if some keys were found
 // S_FALSE if no keys are found
 // Error HRESULT if there was an error
-HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
+HRESULT CSolimarLicenseMgr::RefreshKeyListFromLicServers(bool _bLogError)
 {
 	HRESULT hr = S_OK;
 //wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"    CSolimarLicenseMgr::RefreshKeyList() - Enter");
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - Enter");
 //OutputDebugStringW(debug_buf);	
 	ENSURE_INITIALIZED;
 	
@@ -1687,7 +2724,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 									)
 								);
 
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr);
+								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr, MessageGenericError);
 							}
 							continue;
 						}
@@ -1729,7 +2766,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 										lTrialHours								//DWORD trial_hours
 									)
 								);
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr);
+								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr, MessageGenericError);
 							}
 						}
 					}
@@ -1738,40 +2775,6 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 //_snwprintf(debug_buf, 1024, L"    CSolimarLicenseMgr::RefreshKeyList() - AssociateAppInstanceToBaseKey() - pre");
 //OutputDebugStringW(debug_buf);
 						hr = AssociateAppInstanceToBaseKey(&(server->second), pvtKeyIdent, vtKeyList.parray->rgsabound[0].cElements, _bLogError);
-//_snwprintf(debug_buf, 1024, L"    CSolimarLicenseMgr::RefreshKeyList() - AssociateAppInstanceToBaseKey() - post");
-//OutputDebugStringW(debug_buf);
-						if(FAILED(hr))
-						{
-							if(_bLogError)
-							{
-								//Log error, continue to next server...
-								wchar_t licensing_message_buffer[256];
-								int licMessage = 0;
-								SS_CONVERT_LICENSE_HR_TO_LICENSE_MESSAGE(hr, licensing_message_buffer, licMessage, server->first);
-								_variant_t vtTimestamp;
-								_variant_t vtExpirationDate;
-								long lTrialHours = 0, lKeyStatus=0;
-								SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtTimestamp);
-								SS_GENERATE_NOW_TO_VARIANT_TIME_DATE(vtExpirationDate);
-
-								// Add messages to queued list
-								AddLicensingMessage(
-									LicensingMessage(
-										std::wstring((wchar_t*)server->first),	//std::wstring &server
-										std::wstring(L""),		//std::wstring &key
-										vtTimestamp,	//VARIANT msg_time
-										MT_WARNING,								//DWORD msg_type
-										licMessage,				//DWORD msg_id
-										std::wstring(licensing_message_buffer),  //std::wstring &msg
-										hr,										//HRESULT hr
-										lKeyStatus,						//DWORD status
-										vtExpirationDate,						//VARIANT expire_date
-										lTrialHours								//DWORD trial_hours
-									)
-								);
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicenseServerError::GetErrorMessage(hr).c_str(), MT_INFO, hr);
-							}
-						}
 					}
 
 
@@ -1792,9 +2795,10 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 			if(SS_RPC_FAILED(e.Error()))
 			{
 				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
+			hr = e.Error();
 		}
 	}
 
@@ -1812,6 +2816,10 @@ HRESULT CSolimarLicenseMgr::RefreshKeyList(bool _bLogError)
 //OutputDebugStringW(debug_buf);
 	}
 
+
+
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - Leave 0 - hr: 0x%08x, found_keys: %s", hr, found_keys ? L"true" : L"false");
+//OutputDebugStringW(debug_buf);	
 
 	if (FAILED(hr)) return hr;
     
@@ -1856,7 +2864,7 @@ HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *p
 		// check that the key has the requisite product version and etc.
 		// CR.11272 - Moved check up higher to reduce remote calls
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-		if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+		if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
 		if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
@@ -1867,7 +2875,7 @@ HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *p
 
 		// if the product id and product version requirements are satisfied
 		if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-			m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+			m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 		{
 			VARIANT vtKeyType;
 			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Key Type"].id, &vtKeyType);
@@ -1891,8 +2899,9 @@ HRESULT  CSolimarLicenseMgr::ValidateKeyList(ServerInfo* pServerInfo, VARIANT *p
 					KEYRental		=12,
 					KEYDevelopment	=13,
 					KEYReserved		=14,
+					KEYVerification=0xff,
 				} KeyTypeFlagX;
-				for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+				for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_productKeyID].data.begin(); module != m_keyspec.products[m_productKeyID].data.end(); ++module)
 				{
 					if (module->isLicense)
 					{
@@ -2020,7 +3029,7 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-		if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+		if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
 		if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
@@ -2036,7 +3045,7 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 
 		// if the product id and product version requirements are satisfied
 		if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-			m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+			m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 		{
 			_bstr_t bstrApplicationInstance;
 			std::map<unsigned int, long> lockKeyModuleByModuleMap;	//This map stores all modules that all base keys must match
@@ -2067,8 +3076,9 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 				KEYRental		=12,
 				KEYDevelopment	=13,
 				KEYReserved		=14,
+				KEYVerification=0xff,
 			} KeyTypeFlagX;
-			for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+			for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_productKeyID].data.begin(); module != m_keyspec.products[m_productKeyID].data.end(); ++module)
 			{
 				if (module->isLicense)
 				{
@@ -2164,16 +3174,16 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 		}
 	}	//End for loop
 	//Second Part - Cycle through and make sure 1 of each keytype is grabbed, else grab.
-	//List of need keytype that need to be locked to m_applicationInstance
+	//List of need keytype that need to be locked to m_applicationInstanceKey
 	std::list<_bstr_t> neededKeyTypeList;
 	for(std::list<_bstr_t>::iterator keyTypeIt = keyTypeList.begin(); keyTypeIt != keyTypeList.end(); keyTypeIt++)
 		neededKeyTypeList.push_back(_bstr_t(*keyTypeIt, true));
 
-	//Remove the keytypes that are already locked to m_applicationInstance
-	_bstr_tMap currentAppInstanceMap = appInstanceToKeyInfoMap[m_applicationInstance];	//Find the map of this app instances
+	//Remove the keytypes that are already locked to m_applicationInstanceKey
+	_bstr_tMap currentAppInstanceMap = appInstanceToKeyInfoMap[m_applicationInstanceKey];	//Find the map of this app instances
 	for(_bstr_tMap::iterator keyTypeIt = currentAppInstanceMap.begin(); keyTypeIt != currentAppInstanceMap.end(); keyTypeIt++)
 	{
-		hr = pServerInfo->LicenseServer->AddApplicationInstance(keyTypeIt->first, m_applicationInstance, VARIANT_TRUE);
+		hr = pServerInfo->LicenseServer->AddApplicationInstance(keyTypeIt->first, m_applicationInstanceKey, VARIANT_TRUE);
 
 		neededKeyTypeList.remove(_bstr_t(keyTypeIt->second, true));
 
@@ -2198,7 +3208,7 @@ HRESULT CSolimarLicenseMgr::LockOneOfEachKeyConfiguration(ServerInfo* pServerInf
 				//find a match
 				if(wcscmp(*keyTypeIt, freeKeyIt->second) == 0)
 				{
-					hr = pServerInfo->LicenseServer->AddApplicationInstance(freeKeyIt->first, m_applicationInstance, VARIANT_TRUE);
+					hr = pServerInfo->LicenseServer->AddApplicationInstance(freeKeyIt->first, m_applicationInstanceKey, VARIANT_TRUE);
 					if(SUCCEEDED(hr))	//Successfully locked key...
 					{
 						bLockedAppInstance = true;
@@ -2318,7 +3328,7 @@ HRESULT CSolimarLicenseMgr::FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKey
 		// check that the key has the requisite product version and etc.
 		// CR.11272 - Moved check up higher to reduce remote calls
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-		if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+		if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
 		if (FAILED(hr) || Version::TinyVersion(vtKeyProductVersion.uiVal,0) < Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0))) {hr = S_OK; continue;}
@@ -2334,10 +3344,10 @@ HRESULT CSolimarLicenseMgr::FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKey
 
 		// if the product id and product version requirements are satisfied
 		if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-			m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+			m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 		{
 			//Try to remove application instance, don't throw error if it was never associated with...
-			pServerInfo->LicenseServer->RemoveApplicationInstance(key_ident, m_applicationInstance);
+			pServerInfo->LicenseServer->RemoveApplicationInstance(key_ident, m_applicationInstanceKey);
 		}
 	}
 
@@ -2363,7 +3373,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 	HRESULT hr = S_OK;
 
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"        CSolimarLicenseMgr::SetUnlimitedModulesOnKeys (AppID: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)m_applicationInstance, m_bLockKeyByAppInstance ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"        CSolimarLicenseMgr::SetUnlimitedModulesOnKeys (AppID: %s, app_instance_lock_key: %s) - Enter", (wchar_t*)m_applicationInstanceKey, m_bLockKeyByAppInstance ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
 	for (ServerInfo::KeyList::iterator keyIt = pServerInfo->keys.begin(); keyIt != pServerInfo->keys.end(); ++keyIt)
 	{
@@ -2390,6 +3400,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 				KEYRental		=12,
 				KEYDevelopment	=13,
 				KEYReserved		=14,
+				KEYVerification=0xff,
 			} KeyTypeFlagX;
 
 			//Calculate Base Keys Seen
@@ -2397,7 +3408,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 				baseKeysSeen++;
 
 			//Calculate Modules Seen
-			for (KeySpec::Product::data_list_t::iterator moduleIt = m_keyspec.products[m_product].data.begin(); moduleIt != m_keyspec.products[m_product].data.end(); ++moduleIt)
+			for (KeySpec::Product::data_list_t::iterator moduleIt = m_keyspec.products[m_productKeyID].data.begin(); moduleIt != m_keyspec.products[m_productKeyID].data.end(); ++moduleIt)
 			{
 				if (moduleIt->isLicense)
 				{
@@ -2423,7 +3434,7 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 			// Verify that the key is for this product
 			// CR.11272 - Moved check up higher to reduce remote calls
 			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-			if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+			if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 			// check that the key has the requisite product version and etc.
 			hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2441,21 +3452,21 @@ HRESULT CSolimarLicenseMgr::SetUnlimitedModulesOnKeys(ServerInfo* pServerInfo, V
 			// CR.11272 - Moved check up higher to reduce remote calls = remove if statement
 			// if the product id and product version requirements are satisfied
 			//if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-			//	m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+			//	m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 			//{
-//swprintf_s(tmpbuf, 1024, L"        (key_ident: %s, m_applicationInstance: %s)", (wchar_t*)pvtKeyList[i].bstrVal, (wchar_t*)m_applicationInstance);
+//swprintf_s(tmpbuf, 1024, L"        (key_ident: %s, m_applicationInstanceKey: %s)", (wchar_t*)pvtKeyList[i].bstrVal, (wchar_t*)m_applicationInstance);
 //OutputDebugString(tmpbuf);
 
 			for(std::map<unsigned int, int>::iterator tmpModIt = moduleCounterMap.begin(); tmpModIt != moduleCounterMap.end(); tmpModIt++)
 			{
-				KeySpec::Module &module(m_keyspec.products[m_product][tmpModIt->first]);
+				KeySpec::Module &module(m_keyspec.products[m_productKeyID][tmpModIt->first]);
 				bool bSetUnlimited = false;
 				if(module.unlimited > 0)
 				{
 					if(module.pool != 0)	//Is a pooled module
 					{
 						//Factor in base keys in unlimited Calculation
-						KeySpec::Module &pool(m_keyspec.products[m_product][module.pool]);
+						KeySpec::Module &pool(m_keyspec.products[m_productKeyID][module.pool]);
 						bSetUnlimited = baseKeysSeen * (int)module.unlimited <= moduleCounterMap[module.id] && baseKeysSeen * (int)pool.unlimited <= moduleCounterMap[pool.id];
 					}
 					else if(module.isSharable != 0)	//Is a shared module
@@ -2520,7 +3531,7 @@ HRESULT CSolimarLicenseMgr::RefreshApplicationInstanceInUseCache(ServerInfo* pSe
 		{
 			if(keyIt->second.KeyPresent && keyIt->second.KeyValid)
 			{
-				for (KeySpec::Product::data_list_t::iterator moduleIt = m_keyspec.products[m_product].data.begin(); moduleIt != m_keyspec.products[m_product].data.end(); ++moduleIt)
+				for (KeySpec::Product::data_list_t::iterator moduleIt = m_keyspec.products[m_productKeyID].data.begin(); moduleIt != m_keyspec.products[m_productKeyID].data.end(); ++moduleIt)
 				{
 					if (moduleIt->isLicense)
 					{
@@ -2558,7 +3569,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 		VARIANT vtKeyProductID, vtKeyProductVersion;
 		// CR.11272 - Moved check up higher to reduce remote calls
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-		if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+		if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 		// check that the key has the requisite product version and etc.
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
@@ -2576,7 +3587,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 		// CR.11272 - Moved check up higher to reduce remote calls - removed if statement
 		// if the product id and product version requirements are satisfied
 		//if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
-		//	m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+		//	m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 		//{
 		VARIANT vtKeyType, vtKeyNumberOfAppInstances;
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Key Type"].id, &vtKeyType);
@@ -2609,10 +3620,13 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			bstrApplicationInstance = GetAppInstanceFromKey(pServerInfo, key_ident, bLogError);
 			if(!bFoundAppInstance)
 			{
-				if(wcscmp(bstrApplicationInstance, m_applicationInstance) == 0)
+				if(wcscmp(bstrApplicationInstance, m_applicationInstanceKey) == 0)
 				{
 					//Found a key that is already associated with the application instance, leave
-					hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstance, VARIANT_FALSE);
+					hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstanceKey, VARIANT_FALSE);
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey - pServerInfo->LicenseServer->AddApplicationInstance(%s, %s, true) = %s", (wchar_t*)key_ident, (wchar_t*)m_applicationInstanceKey, hr==S_OK ? L"true" : L"false");
+//OutputDebugString(tmpbuf);
 					keysAlreadyAssignedToAnAppInstance = _bstr_t(key_ident, true);
 					bFoundAppInstance = true;
 				}
@@ -2636,7 +3650,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 						//Don't allow remote license manager to be associated to a non-remote key.
 					}
 				}
-				else if(wcscmp(m_applicationInstance, _bstr_t(L"")) == 0)
+				else if(wcscmp(m_applicationInstanceKey, _bstr_t(L"")) == 0)
 				{
 					//Special case for empty application Instance, add to list of possible keys to add for association if necessary.
 					baseKeyWithNoAppInstanceFirstPrefList.push_back(_bstr_t(key_ident, true));
@@ -2662,7 +3676,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 		{
 			hr = pServerInfo->LicenseServer->AddApplicationInstance(
 					*keyIt, 
-					m_applicationInstance, 
+					m_applicationInstanceKey, 
 					VARIANT_FALSE);	//Don't Lock Key
 			if(SUCCEEDED(hr))	//Successfully locked key...
 			{
@@ -2680,7 +3694,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			{
 				hr = pServerInfo->LicenseServer->AddApplicationInstance(
 						*keyIt, 
-						m_applicationInstance, 
+						m_applicationInstanceKey, 
 						VARIANT_FALSE);	//Don't Lock Key
 				if(SUCCEEDED(hr))	//Successfully locked key...
 				{
@@ -2709,10 +3723,10 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			{
 				hr = pServerInfo->LicenseServer->AddApplicationInstance(
 						*keyIt, 
-						m_applicationInstance, 
+						m_applicationInstanceKey, 
 						VARIANT_FALSE);	//Don't Lock Key
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey - pServerInfo->LicenseServer->AddApplicationInstance(%s, %s, false) = %s", (wchar_t*)*keyIt, (wchar_t*)m_applicationInstance, hr==S_OK ? L"true" : L"false");
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AssociateAppInstanceToBaseKey - pServerInfo->LicenseServer->AddApplicationInstance(%s, %s, false) = %s", (wchar_t*)*keyIt, (wchar_t*)m_applicationInstanceKey, hr==S_OK ? L"true" : L"false");
 //OutputDebugString(tmpbuf);
 			}
 			hr = AddKeyToCache(pServerInfo, *keyIt, bLogError);
@@ -2744,7 +3758,7 @@ _bstr_t CSolimarLicenseMgr::GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR 
 	VARIANT vtAppInstanceList;
 	//SS_SLSERVER_FTCALL_HR(&pServerInfo, GetApplicationInstanceList, (key_ident, &pvtAppInstanceList), hr);
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::GetAppInstanceFromKey() - Enter - pServerInfo->LicenseServer->GetApplicationInstanceList(%s, %s)", (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstance, (wchar_t*)app_instance_key_ident);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::GetAppInstanceFromKey() - Enter - pServerInfo->LicenseServer->GetApplicationInstanceList(%s, %s)", (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstanceKey, (wchar_t*)app_instance_key_ident);
 //OutputDebugString(tmpbuf);
 
 	HRESULT hr = pServerInfo->LicenseServer->GetApplicationInstanceList(bstrKeyIdent, &vtAppInstanceList);
@@ -2763,7 +3777,7 @@ _bstr_t CSolimarLicenseMgr::GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR 
 //OutputDebugString(tmpbuf);
 
 
-				//if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE && wcscmp(m_applicationInstance, pElement[idx].bstrVal) == 0)
+				//if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE && wcscmp(m_applicationInstanceKey, pElement[idx].bstrVal) == 0)
 				if(pElement[(2*idx)+1].boolVal == VARIANT_TRUE)
 				{
 					app_instance_key_ident = pElement[2*idx].bstrVal;
@@ -2784,7 +3798,7 @@ _bstr_t CSolimarLicenseMgr::GetAppInstanceFromKey(ServerInfo* pServerInfo, BSTR 
 HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyIdent, bool bLogError)
 {
 //wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AddKeyToCache(serverName: %s, bstrKeyIdent: %s) - AppID: %s", (wchar_t*)pServerInfo->name, (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstance);
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::AddKeyToCache(serverName: %s, bstrKeyIdent: %s) - AppID: %s", (wchar_t*)pServerInfo->name, (wchar_t*)bstrKeyIdent, (wchar_t*)m_applicationInstanceKey);
 //OutputDebugString(tmpbuf);
 	HRESULT hr(S_OK);
 	_bstr_t key_ident = bstrKeyIdent;
@@ -2793,7 +3807,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 	{
 		// CR.11272 - Moved check up higher to reduce remote calls
 		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
-		if (FAILED(hr) || m_keyspec.products[m_product].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
+		if (FAILED(hr) || m_keyspec.products[m_productKeyID].id!=vtKeyProductID.uiVal) {hr = S_OK; continue;}
 
 		// check that the key is present & active, don't check for validity because unlimited has not been called yet.
 		VARIANT_BOOL key_active(VARIANT_FALSE);
@@ -2823,7 +3837,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 		if (FAILED(hr)) {hr = S_OK; break;}
 
 		// if the product id and product version requirements are satisfied
-		if(m_keyspec.products[m_product].id==vtKeyProductID.uiVal)
+		if(m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
 		{
 			m_productkeys[key_ident] = true;
 			if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)))
@@ -2923,7 +3937,7 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 					
 					// refresh the cache of licenses on the key
 					// for each module in the key spec for the product
-					for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_product].data.begin(); module != m_keyspec.products[m_product].data.end(); ++module)
+					for (KeySpec::Product::data_list_t::iterator module = m_keyspec.products[m_productKeyID].data.begin(); module != m_keyspec.products[m_productKeyID].data.end(); ++module)
 					{
 						if (module->isLicense)
 						{
@@ -2999,7 +4013,8 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 					MT_INFO, 
 					LicenseServerError::EC_SP_VERSION_NOT_SUPPORTED, 
 					vtTimestamp, 
-					_bstr_t(message)
+					_bstr_t(message),
+					MessageGenericError
 				);
 			}
 		}
@@ -3007,11 +4022,14 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 	}
 	return hr;
 }
- 
+
 
 // checks that all licenses checked out are accounted for by some key
 HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses)
 {
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseCache() - Enter");
+	
+
 	ENSURE_INITIALIZED;
 	SafeMutex mutex(ServerListLock);	
 	
@@ -3023,25 +4041,36 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 	// foreach server
 	for (;server != serverEnd; ++server)
 	{
-		// foreach key
-		for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
+		if(server->second.bUseSoftwareLicensing)
 		{
-			if (	k->second.KeyPresent && 
+			// for each module
+			for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
+			{
+				m->second -= server->second.software_license.licenses_allocated[m->first];
+			}
+		}
+		else	// use protection key licensing
+		{
+			// foreach key
+			for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
+			{
+				if (	k->second.KeyPresent && 
 					k->second.KeyValid && 
 					(k->second.KeyObtained || (*server).second.bUseOnlySharedLicenses))
-			{
-				// for each module
-				for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
 				{
-					bool bModuleIsSharable = false;
-					if((*server).second.bUseOnlySharedLicenses)
+					// for each module
+					for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
 					{
-						KeySpec::Module &module(m_keyspec.products[m_product][m->first]);
-						bModuleIsSharable = module.isSharable;
-					}
+						bool bModuleIsSharable = false;
+						if((*server).second.bUseOnlySharedLicenses)
+						{
+							KeySpec::Module &module(m_keyspec.products[m_productKeyID][m->first]);
+							bModuleIsSharable = module.isSharable;
+						}
 
-					if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
-						m->second -= k->second.licenses_allocated[m->first];
+						if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+							m->second -= k->second.licenses_allocated[m->first];
+					}
 				}
 			}
 		}
@@ -3049,13 +4078,12 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 	return S_OK;
 }
 
+
+
 // checks if licenses are valid, if not, an attempt to reallocate licenses is made
 HRESULT CSolimarLicenseMgr::RefreshLicenses()
 {
 	HRESULT hr = S_OK;
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"    CSolimarLicenseMgr::RefreshLicenses() - Enter");
-//OutputDebugStringW(debug_buf);
 
 	ENSURE_INITIALIZED;
 	
@@ -3063,23 +4091,24 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 	
 	// refresh the cache
 	time_t timeNow = time(NULL);
-	double timeDiffSeconds = difftime(m_dtRefreshKeyList, timeNow);
+	double timeDiffSeconds = difftime(m_dtRefreshLicenses, timeNow);
 
-	// don't call RefreshKeyList if just made the same call within the last 5 seconds
+	// don't call RefreshKeyListFromLicServers if just made the same call within the last 5 seconds
 	if(abs(timeDiffSeconds) > 5.0)	
 	{
-		hr = RefreshKeyList();
+		hr = RefreshLicensingFromLicServers();
+		//hr = m_bConfiguredForSoftwareLicense==true ? RefreshSoftwareLicenseFromLicServers() : RefreshKeyList();
 		if(SUCCEEDED(hr))
-			m_dtRefreshKeyList = time(NULL);
+			m_dtRefreshLicenses = time(NULL);
 	}
 
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr)) {	return hr;}
 	
 	// check to see if there is a difference between 
 	// the number of licenses obtained and those backed up by keys
 	ModuleLicenseMap outstanding_licenses;
 	hr = ValidateLicenseCache(outstanding_licenses);
-	if (FAILED(hr)) return hr;
+	if (FAILED(hr))	{	return hr;}
 	
 	// obtain and release licenses where appropriate
 	for (ModuleLicenseMap::iterator module = outstanding_licenses.begin(); module != outstanding_licenses.end(); ++module)
@@ -3099,8 +4128,6 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 		}
 	}
 	
-//_snwprintf(debug_buf, 1024, L"    CSolimarLicenseMgr::RefreshLicenses() - Leave");
-//OutputDebugStringW(debug_buf);
 	return hr;
 }
 
@@ -3116,34 +4143,64 @@ HRESULT CSolimarLicenseMgr::RemoveObsoleteKeysFromCache()
 	// foreach server
 	for (;server != serverEnd; ++server)
 	{
-		typedef std::vector<ServerInfo::KeyList::iterator> KeyListIteratorList;
-		KeyListIteratorList keys_to_delete;
+		if(server->second.bUseSoftwareLicensing == false)
+		{
+			typedef std::vector<ServerInfo::KeyList::iterator> KeyListIteratorList;
+			KeyListIteratorList keys_to_delete;
 
-		// foreach key
-		for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
-		{
-			if (!k->second.KeyPresent)
+			// foreach key
+			for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
 			{
-				keys_to_delete.push_back(k);
+				if (!k->second.KeyPresent)
+				{
+					keys_to_delete.push_back(k);
+				}
 			}
-		}
-		
-		// remove obsoleted keys from the key list
-		for (KeyListIteratorList::iterator ki = keys_to_delete.begin(); ki != keys_to_delete.end(); ++ki)
-		{
-			server->second.keys.erase(*ki);
+			
+			// remove obsoleted keys from the key list
+			for (KeyListIteratorList::iterator ki = keys_to_delete.begin(); ki != keys_to_delete.end(); ++ki)
+			{
+				server->second.keys.erase(*ki);
+			}
 		}
 	}
 	return S_OK;
 }
 
+
+
+//Software server
+HRESULT CSolimarLicenseMgr::AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError)
+{
+	HRESULT hr(S_OK);
+	if(!m_bViewLicenseOnly && pServerInfo != NULL)
+	{
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareAddApplicationInstanceByProduct, (m_product, appInstance), hr);
+	}
+	return hr;
+}
+
+HRESULT CSolimarLicenseMgr::FreeAllSoftwareLicenseFromCache(ServerInfo* pServerInfo, bool bLogError)
+{
+	HRESULT hr(S_OK);
+	if(!m_bViewLicenseOnly && pServerInfo != NULL)
+	{
+		// SoftwareRemoveApplicationInstanceByProduct should release all modules obtained by the appInstance.
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareRemoveApplicationInstanceByProduct, (m_product, m_applicationInstance), hr);
+	}
+	return hr;
+}
+
+
 // attempts to allocate licenses on the known-good keys in the cache
 HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_count)
 {
-//OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal moduleID=%d, licenseCount=%d", module_id, license_count);
-	HRESULT hr = S_OK;
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal - Enter - moduleID=%d, licenseCount=%d", module_id, license_count);
+	HRESULT hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 	
 	ENSURE_INITIALIZED;
+
+	if (m_bViewLicenseOnly) return LicenseServerError::EHR_LIC_MGR_VIEW_ONLY;
 	
 	if (license_count<=0) return E_INVALIDARG;
 	
@@ -3151,91 +4208,148 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 	
 	long licenses_to_obtain(license_count);
 	long licenses_obtained(0);
-	KeySpec::Module &module(m_keyspec.products[m_product][module_id]);
-	bool bModuleIsSharable = module.isSharable;
-	
 	
 	//xxx && !(single_key && allocated_licenses_on_a_key)
 	//xxx how to ensure that the single key case is handled??
 	//xxx need an indicator of which key is the current key (if any) and only use that key
 	//xxx need a way to transfer licenses from the single key to a different single key if needed in case the first one fills up
-
 	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
 	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
 
 	// foreach server
 	for (;server != serverEnd; ++server)
 	{
-		if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+		if(server->second.bUseOnlyLicenseViewer == false)
 		{
-			// foreach key
-			for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
+			if(server->second.bUseSoftwareLicensing) // software licensing
 			{
-				
-				if (k->second.KeyPresent && k->second.KeyValid)
-				{				
-					long key_licenses_available = k->second.licenses_total[module_id] - k->second.licenses_inuse[module_id];
-					long key_licenses_to_obtain = min(licenses_to_obtain - licenses_obtained, key_licenses_available);
+				long totalLicense(0);
+				ModuleLicenseTotalInternal(module_id, &totalLicense);
+				long software_licenses_available = totalLicense - server->second.software_license.licenses_inuse[module_id];
+				//long software_licenses_available = server->second.software_license.licenses_total[module_id] - server->second.software_license.licenses_inuse[module_id];
+				long software_licenses_to_obtain = min(licenses_to_obtain - licenses_obtained, software_licenses_available);
+	OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal totalLicense=%d, software_licenses_available=%d, software_licenses_to_obtain=%d", totalLicense, software_licenses_available, software_licenses_to_obtain);
+				if(software_licenses_available == 0)
+				{
+					hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 
-					// if the key has has licenses available and hasn't been obtained yet, obtain it, except for shared licensing
-					if (!k->second.KeyObtained && key_licenses_to_obtain>0 && !((*server).second.bUseOnlySharedLicenses))
+					Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
+					std::wstring wstrModuleName = std::wstring(L"Unknown Module");
+					if(prodSpecIt != m_softwareSpec.productSpecMap->end())
 					{
-						try
-						{
-							SS_SLSERVER_FTCALL_HR(server->second, KeyObtain, (k->first), hr);
-							if (FAILED(hr)) continue;
-						
-							k->second.KeyObtained = true;
-							
-							if (m_lock_keys)
-							{
-								hr = server->second.LicenseServer->KeyLock(k->first);
-								if (FAILED(hr))
-								{
-									hr = server->second.LicenseServer->KeyRelease(k->first);
-									k->second.KeyObtained = false;
-									continue;
-								}
-								else
-								{
-									k->second.KeyLocked = true;
-								}
-							}
-						}
-						catch (_com_error &e) 
-						{
-							if(SS_RPC_FAILED(e.Error()))
-							{
-								//Log Message about RPC failure to Key
-								SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ObtainLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
-							}
-						}
-						
+						Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::iterator modSpecIt = prodSpecIt->second.moduleSpecMap->find(module_id);
+						if(modSpecIt != prodSpecIt->second.moduleSpecMap->end())
+							wstrModuleName = modSpecIt->second.moduleName;
 					}
-					
-					if (key_licenses_to_obtain>0)
+					wchar_t errorBuf[1024];
+					swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d",
+						wstrModuleName.c_str(),
+						module_id,
+						totalLicense,
+						server->second.software_license.licenses_inuse[module_id]
+						);
+					LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(0), __uuidof(0));
+				}
+				else if(software_licenses_available >= software_licenses_to_obtain)
+				{
+					try
 					{
-						hr = server->second.LicenseServer->KeyModuleLicenseObtain(k->first, module_id, key_licenses_to_obtain);
-						if (SUCCEEDED(hr)) 
-						{
-							licenses_obtained+=key_licenses_to_obtain; 
-							k->second.licenses_allocated[module_id]+=key_licenses_to_obtain;
-							k->second.licenses_inuse[module_id]+=key_licenses_to_obtain;
-							long licenses_inuse_byapp(0);
-							hr = server->second.LicenseServer->KeyModuleLicenseInUse_ByApp(k->first, module_id, &licenses_inuse_byapp);
-							if(SUCCEEDED(hr))
-								k->second.licenses_inuse_byapp[module_id] = licenses_inuse_byapp;
-						}
+						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, SoftwareModuleLicenseObtainByApp_ByProduct, (m_product, module_id, software_licenses_to_obtain), hr);
+						if(FAILED(hr)) 
+							throw hr;
+
+						licenses_obtained+=software_licenses_to_obtain; 
+						server->second.software_license.licenses_allocated[module_id]+=software_licenses_to_obtain;
+						server->second.software_license.licenses_inuse[module_id]+=software_licenses_to_obtain;
+					}
+					catch(HRESULT &ehr)
+					{
+						hr = ehr;
 					}
 				}
 			}
-			if(licenses_obtained == licenses_to_obtain)
-				RefreshApplicationInstanceInUseCache(&(server->second), false);
+			else // protection key licensing
+			{
+				KeySpec::Module &module(m_keyspec.products[m_productKeyID][module_id]);
+				bool bModuleIsSharable = module.isSharable;
+				if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+				{
+					// foreach key
+					for (ServerInfo::KeyList::iterator k = server->second.keys.begin(); k != server->second.keys.end(); ++k)
+					{
+						
+						if (k->second.KeyPresent && k->second.KeyValid)
+						{				
+							long key_licenses_available = k->second.licenses_total[module_id] - k->second.licenses_inuse[module_id];
+							long key_licenses_to_obtain = min(licenses_to_obtain - licenses_obtained, key_licenses_available);
+							// if the key has has licenses available and hasn't been obtained yet, obtain it, except for shared licensing
+							if (!k->second.KeyObtained && key_licenses_to_obtain>0 && !((*server).second.bUseOnlySharedLicenses))
+							{
+								try
+								{
+									SS_SLSERVER_FTCALL_HR(server->second, KeyObtain, (k->first), hr);
+									if (FAILED(hr)) continue;
+								
+									k->second.KeyObtained = true;
+									
+									if (m_lock_keys)
+									{
+										hr = server->second.LicenseServer->KeyLock(k->first);
+										if (FAILED(hr))
+										{
+											hr = server->second.LicenseServer->KeyRelease(k->first);
+											k->second.KeyObtained = false;
+											continue;
+										}
+										else
+										{
+											k->second.KeyLocked = true;
+										}
+									}
+								}
+								catch (_com_error &e) 
+								{
+									if(SS_RPC_FAILED(e.Error()))
+									{
+										//Log Message about RPC failure to Key
+										SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ObtainLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+										SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+									}
+								}
+								
+							}
+							
+							if (key_licenses_to_obtain>0)
+							{
+								hr = server->second.LicenseServer->KeyModuleLicenseObtain(k->first, module_id, key_licenses_to_obtain);
+								if (SUCCEEDED(hr)) 
+								{
+									licenses_obtained+=key_licenses_to_obtain; 
+									k->second.licenses_allocated[module_id]+=key_licenses_to_obtain;
+									k->second.licenses_inuse[module_id]+=key_licenses_to_obtain;
+									 long licenses_inuse_byapp(0);
+									 hr = server->second.LicenseServer->KeyModuleLicenseInUse_ByApp(k->first, module_id, &licenses_inuse_byapp);
+									 if(SUCCEEDED(hr))
+										 k->second.licenses_inuse_byapp[module_id] = licenses_inuse_byapp;
+									 }
+							}
+						}
+					}
+				}
+				if(licenses_obtained == licenses_to_obtain)
+					RefreshApplicationInstanceInUseCache(&(server->second), false);
+			}
 		}
 	}
-	return (licenses_obtained == licenses_to_obtain ? S_OK : LicenseServerError::EHR_LICENSE_INSUFFICIENT);
+	if(hr == E_FAIL)
+		hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
+	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GetErrorMessage(hr), __uuidof(0), __uuidof(0));
+	//OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal - Leave - moduleID=%d, licenseCount=%d, licenses_obtained: %d, licenses_to_obtain: %d, hr: 0x%x", module_id, license_count, licenses_obtained, licenses_to_obtain, hr);
+	return (licenses_obtained == licenses_to_obtain ? S_OK : hr);
+	//return (licenses_obtained == licenses_to_obtain ? S_OK : LicenseServerError::EHR_LICENSE_INSUFFICIENT);
 }
+
+
 
 // attempts to deallocate licenses on keys that have 
 HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license_count)
@@ -3243,83 +4357,108 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 	HRESULT hr = S_OK;
 	
 	ENSURE_INITIALIZED;
-	
+	if (m_bViewLicenseOnly) return LicenseServerError::EHR_LIC_MGR_VIEW_ONLY;
 	if (license_count<=0) return E_INVALIDARG;
 	
 	SafeMutex mutex(ServerListLock);
 	
 	long licenses_to_release(license_count);
 	long licenses_released(0);
-	KeySpec::Module &module(m_keyspec.products[m_product][module_id]);
-	bool bModuleIsSharable = module.isSharable;
+
 
 	ServerList::reverse_iterator server = m_bUsingBackupServers ? m_backupServers.rbegin() : m_servers.rbegin();
 	ServerList::reverse_iterator serverEnd = m_bUsingBackupServers ? m_backupServers.rend() : m_servers.rend();
 	// for each server (backwards)
 	for (;server != serverEnd; ++server)
 	{
-		// if (server is set to use only sharable licenses and module is sharable ) or (server is set to use all licenses)
-		if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+		if(server->second.bUseSoftwareLicensing) // software licensing
 		{
-			// foreach key (backwards)
-			for (ServerInfo::KeyList::reverse_iterator k = server->second.keys.rbegin(); k != server->second.keys.rend(); ++k)
+			long software_licenses_allocated = server->second.software_license.licenses_allocated[module_id];
+			long software_licenses_to_release = min(licenses_to_release-licenses_released,software_licenses_allocated);
+
+			try
 			{
-				if (k->second.KeyPresent && (k->second.KeyObtained || (*server).second.bUseOnlySharedLicenses))
+				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, SoftwareModuleLicenseReleaseByApp_ByProduct, (m_product, module_id, software_licenses_to_release), hr);
+				if(FAILED(hr)) 
+					throw hr;
+
+				licenses_released+=software_licenses_to_release; 
+				server->second.software_license.licenses_allocated[module_id]-=software_licenses_to_release;
+				server->second.software_license.licenses_inuse[module_id]-=software_licenses_to_release;
+			}
+			catch(HRESULT &ehr)
+			{
+				hr = ehr;
+			}
+		}
+		else
+		{
+			KeySpec::Module &module(m_keyspec.products[m_productKeyID][module_id]);
+			bool bModuleIsSharable = module.isSharable;
+			// if (server is set to use only sharable licenses and module is sharable ) or (server is set to use all licenses)
+			if(((*server).second.bUseOnlySharedLicenses && bModuleIsSharable) || !(*server).second.bUseOnlySharedLicenses)
+			{
+				// foreach key (backwards)
+				for (ServerInfo::KeyList::reverse_iterator k = server->second.keys.rbegin(); k != server->second.keys.rend(); ++k)
 				{
-					// if the key has already been obtained
-					if (!k->second.KeyObtained && !((*server).second.bUseOnlySharedLicenses))
+					if (k->second.KeyPresent && (k->second.KeyObtained || (*server).second.bUseOnlySharedLicenses))
 					{
-						try
+						// if the key has already been obtained
+						if (!k->second.KeyObtained && !((*server).second.bUseOnlySharedLicenses))
 						{
-							hr = server->second.LicenseServer->KeyObtain(k->first);
-							if (FAILED(hr)) continue;
-							
-							k->second.KeyObtained = true;
-							
-							if (m_lock_keys)
-						   {
-							   hr = server->second.LicenseServer->KeyLock(k->first);
-							   if (FAILED(hr))
-							   {
-								   hr = server->second.LicenseServer->KeyRelease(k->first);
-								   k->second.KeyObtained = false;
-								   continue;
-							   }
-							   else
-							   {
-								   k->second.KeyLocked = true;
-							   }
-						   }
-						}
-						catch (_com_error &e) 
-						{
-							if(SS_RPC_FAILED(e.Error()))
+							try
 							{
-								//Log Message about RPC failure to Key
-								SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ReleaseLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN);
-								SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT);
+								hr = server->second.LicenseServer->KeyObtain(k->first);
+								if (FAILED(hr)) continue;
+								
+								k->second.KeyObtained = true;
+								
+								if (m_lock_keys)
+								{
+									hr = server->second.LicenseServer->KeyLock(k->first);
+									if (FAILED(hr))
+									{
+										hr = server->second.LicenseServer->KeyRelease(k->first);
+										k->second.KeyObtained = false;
+										continue;
+									}
+									else
+									{
+										k->second.KeyLocked = true;
+									}
+								}
+							}
+							catch (_com_error &e) 
+							{
+								if(SS_RPC_FAILED(e.Error()))
+								{
+									//Log Message about RPC failure to Key
+									SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ReleaseLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+									SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+								}
 							}
 						}
+						
+						long key_licenses_allocated = k->second.licenses_allocated[module_id];
+						long key_licenses_to_release = min(licenses_to_release-licenses_released,key_licenses_allocated);
+						
+						if (key_licenses_to_release>0) 
+							hr = server->second.LicenseServer->KeyModuleLicenseRelease(k->first, module_id, key_licenses_to_release);
+						if (SUCCEEDED(hr)) 
+						{
+							licenses_released+=key_licenses_to_release; 
+							k->second.licenses_allocated[module_id]-=key_licenses_to_release;
+							k->second.licenses_inuse[module_id]-=key_licenses_to_release;
+							long licenses_inuse_byapp(0);
+							hr = server->second.LicenseServer->KeyModuleLicenseInUse_ByApp(k->first, module_id, &licenses_inuse_byapp);
+							if(SUCCEEDED(hr))
+								k->second.licenses_inuse_byapp[module_id] = licenses_inuse_byapp;
+
+							}
+						
+						// if the key no longer has any licenses obtained on it, try to release it and unlock it where necessary
+						//xxx
 					}
-					
-					long key_licenses_allocated = k->second.licenses_allocated[module_id];
-					long key_licenses_to_release = min(licenses_to_release-licenses_released,key_licenses_allocated);
-					
-					if (key_licenses_to_release>0) 
-						hr = server->second.LicenseServer->KeyModuleLicenseRelease(k->first, module_id, key_licenses_to_release);
-					if (SUCCEEDED(hr)) 
-					{
-						licenses_released+=key_licenses_to_release; 
-						k->second.licenses_allocated[module_id]-=key_licenses_to_release;
-						k->second.licenses_inuse[module_id]-=key_licenses_to_release;
-						long licenses_inuse_byapp(0);
-						hr = server->second.LicenseServer->KeyModuleLicenseInUse_ByApp(k->first, module_id, &licenses_inuse_byapp);
-						if(SUCCEEDED(hr))
-							k->second.licenses_inuse_byapp[module_id] = licenses_inuse_byapp;
-					}
-					
-					// if the key no longer has any licenses obtained on it, try to release it and unlock it where necessary
-					//xxx
 				}
 			}
 			if(licenses_released == licenses_to_release)
@@ -3353,21 +4492,14 @@ HRESULT CSolimarLicenseMgr::AddLicensingMessage(LicensingMessage &message)
 //swprintf_s(tmpbuf, 2048, L"AddLicensingMessage message:");
 //OutputDebugString(tmpbuf);
 
-
-	//message.
 	SafeMutex mutex_messages(MessageListLock);
 	licensing_message_cache.push_back(message);
 	return S_OK;
 }
-bool CSolimarLicenseMgr::InViolationPeriod()
+bool CSolimarLicenseMgr::GracePeriodHadEnded()
 {
 	SafeMutex mutex(GracePeriodLock);
-	time_t timeNow = time(NULL);
-	double timeDiff1 = difftime(m_dtGracePeriodStart+(m_dtGracePeriod*60), timeNow);
-	double timeDiff2 = difftime(timeNow, m_dtGracePeriodStart+(m_dtGracePeriod*60));
-	bool bViolation = (GracePeriodHasStarted() && (m_dtGracePeriodStart+(m_dtGracePeriod*60) < (unsigned)timeNow)) || m_dtGracePeriod==0;
-	return bViolation;
-	//return GracePeriodHasStarted() && (difftime(m_dtGracePeriodStart+m_dtGracePeriod, time(NULL)) > 0);
+	return (GracePeriodHasStarted() && (m_dtGracePeriodStart+(m_dtGracePeriod*60) < (unsigned)time(NULL))) || m_dtGracePeriod==0;
 }
 bool CSolimarLicenseMgr::GracePeriodHasStarted()
 {
@@ -3383,7 +4515,7 @@ void CSolimarLicenseMgr::StartGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = time(NULL);
       }
-      SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
 	}
 }
 void CSolimarLicenseMgr::StopGracePeriod()
@@ -3395,6 +4527,263 @@ void CSolimarLicenseMgr::StopGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = 0;
 	   }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0, MessageGracePeriodEnded);
 	}
+}
+
+
+
+
+
+HRESULT CSolimarLicenseMgr::RefreshLicensingFromLicServers(bool _bLogError)
+{
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - Enter");
+//OutputDebugStringW(debug_buf);
+	ENSURE_INITIALIZED;
+	
+	SafeMutex mutex(ServerListLock);
+	HRESULT hr(S_OK);
+	HRESULT tempHr(S_OK);
+		
+	ServerList::iterator serverIt = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+	ServerList::iterator serverEndIt = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+
+	// foreach server
+	if(serverIt != serverEndIt)
+	{
+		bool bContainsSoftwareLic(false);
+		hr = LicenseServerContainsSoftwareLicensingForProduct(m_product, &(serverIt->second), &bContainsSoftwareLic);
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - LicenseServerContainsSoftwareLicensingForProduct() - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+		if(SUCCEEDED(hr))
+		{
+			if(bContainsSoftwareLic)
+			{
+				hr = RefreshSoftwareLicenseFromLicServers(_bLogError);
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - RefreshSoftwareLicenseFromLicServers() - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+
+				if(SUCCEEDED(hr))
+					(serverIt->second).bUseSoftwareLicensing = bContainsSoftwareLic;
+			}
+		}
+
+		//Failed to use software licensing, just use protection key
+		if(!bContainsSoftwareLic || FAILED(hr))	
+		{
+			(serverIt->second).bUseSoftwareLicensing = false;
+			SAVE_ERRORINFO
+			tempHr = RefreshKeyListFromLicServers(_bLogError && !bContainsSoftwareLic);
+			RESTORE_ERRORINFO
+			if(SUCCEEDED(tempHr))	//Don't replace hr if it is FAILED
+				hr = tempHr;
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - RefreshKeyListFromLicServers() - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+		}
+
+		//Failed both software licensing and protection key
+		if(FAILED(hr))
+		{
+			//look to see if there is a software license error and report that
+			SAVE_ERRORINFO
+			tempHr = LicenseServerSoftwareLicenseStatusFirstErrorForProduct(m_product, &(serverIt->second));
+			RESTORE_ERRORINFO
+			if(FAILED(tempHr))
+			{
+				//Replace error info with latest error
+				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(tempHr, LicenseServerError::GenerateErrorMessage(tempHr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+				LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(0), __uuidof(0));
+
+				hr = tempHr;
+			}
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - LicenseServerSoftwareLicenseStatusFirstErrorForProduct() - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+		}
+
+	}
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicensingFromLicServers() - Leave 0 - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+	return hr;
+}
+
+
+HRESULT CSolimarLicenseMgr::LicenseServerContainsProtectionKeyLicensingForProduct(long product_id, ServerInfo* pServerInfo, bool* pbHasLicensing)
+{
+	ENSURE_INITIALIZED;
+	
+	SafeMutex mutex(ServerListLock);
+	HRESULT hr(S_OK);
+	*pbHasLicensing = true;
+	return hr;
+}
+HRESULT CSolimarLicenseMgr::LicenseServerContainsSoftwareLicensingForProduct(long product_id, ServerInfo* pServerInfo, bool* pbHasLicensing)
+{
+//wchar_t debug_buf[1024];
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::LicenseServerContainsSoftwareLicensingForProduct() - Enter");
+//OutputDebugStringW(debug_buf);
+	ENSURE_INITIALIZED;
+
+	SafeMutex mutex(ServerListLock);
+	HRESULT hr(S_OK);
+	try
+	{
+		*pbHasLicensing = false;
+		BSTR bstrLicenseStream;
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), GetSoftwareLicenseInfoByProduct_ForAll, (product_id, &bstrLicenseStream), hr);
+
+//_snwprintf(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::LicenseServerContainsSoftwareLicensingForProduct - GetSoftwareLicenseInfoByProduct_ForAll() - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+		if(FAILED(hr))
+			throw hr;
+
+		// might need to check for NULL or empty
+
+		Lic_PackageAttribs::Lic_ProductInfoAttribs prodAttribs;
+		prodAttribs.InitFromString(bstrLicenseStream);
+		SysFreeString(bstrLicenseStream);
+
+
+		// if licensing is there, products must match.
+		*pbHasLicensing = (int)prodAttribs.productID == product_id ;
+//_snwprintf(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::LicenseServerContainsSoftwareLicensingForProduct() - prodAttribs.productID(%d) == product_id(%d) ", prodAttribs.productID, product_id);
+//OutputDebugStringW(debug_buf);
+
+		if(*pbHasLicensing == false)
+			hr = LicenseServerError::EHR_LIC_SOFTWARE_NO_PRODUCT;
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
+
+//_snwprintf(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::LicenseServerContainsSoftwareLicensingForProduct() - Leave 0 - hr: 0x%08x", hr);
+//OutputDebugStringW(debug_buf);
+	return hr;
+}
+
+HRESULT CSolimarLicenseMgr::LicenseServerSoftwareLicenseStatusFirstErrorForProduct(long product_id, ServerInfo* pServerInfo)
+{
+	ENSURE_INITIALIZED;
+
+	SafeMutex mutex(ServerListLock);
+	HRESULT hr(S_OK);
+	try
+	{
+		BSTR bstrLicenseStream;
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), GetSoftwareLicenseStatus_ByProduct, (m_product, &bstrLicenseStream), hr);
+		if(FAILED(hr))
+			throw hr;
+
+		SpdAttribs::MapStringDwordObj strDwordMapObj;
+		SpdAttribs::TMapStringDword strDwordMap;
+		strDwordMapObj.StringToValue(bstrLicenseStream, strDwordMap);
+		SysFreeString(bstrLicenseStream);
+		for(	SpdAttribs::TMapStringDword::iterator strDwordMapIt = strDwordMap.begin();
+				strDwordMapIt != strDwordMap.end();
+				strDwordMapIt++)
+		{
+			if(FAILED(strDwordMapIt->second))
+			{
+				hr = strDwordMapIt->second;
+				break;
+			}
+		}
+		// might need to check for NULL or empty
+		//Lic_PackageAttribs::Lic_ProductInfoAttribs prodAttribs;
+		//prodAttribs.InitFromString(bstrLicenseStream);
+		//SysFreeString(bstrLicenseStream);
+
+
+		// if licensing is there, products must match.
+		//*pbHasLicensing = (int)prodAttribs.productID == product_id ;
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	catch(...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+//HRESULT CSolimarLicenseMgr::RefreshLicensingSchemeFromLicenseServer(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError)
+//{
+//	//Look for Software License Key
+//	for (int i = 0; i<count; ++i)
+//	{
+//		_bstr_t key_ident = pvtKeyList[i].bstrVal;
+//		VARIANT vtKeyProductID, vtKeyProductVersion;
+//
+//		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+//		if (FAILED(hr)) {hr = S_OK; continue;}
+//
+//		// check that the key is present and valid
+//		VARIANT_BOOL key_license_valid(VARIANT_FALSE);
+//      
+//		// check that the key has the requisite product version and etc.
+//		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product Version"].id, &vtKeyProductVersion);
+//		if (FAILED(hr)) {hr = S_OK; continue;}
+//		hr = pServerInfo->LicenseServer->KeyHeaderQuery(key_ident, m_keyspec.headers[L"Product ID"].id, &vtKeyProductID);
+//		if (FAILED(hr)) {hr = S_OK; continue;}
+//
+//		// if the product id and product version requirements are satisfied
+//		if (Version::TinyVersion(vtKeyProductVersion.uiVal,0) >= Version::TinyVersion(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)) && 
+//			m_keyspec.products[m_productKeyID].id==vtKeyProductID.uiVal)
+//
+//
+//	}
+//}
+
+
+// cycles through all servers in server list seeing if they have a newer
+//software spec than the currently loaded one.  Should call only once probably...
+//Also, only retrieves the Lic_ProductSoftwareSpecAttribs for the product the
+//LicenseManager is initialized for...
+HRESULT CSolimarLicenseMgr::RefreshSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec)
+{
+	
+	HRESULT hr = S_OK;
+
+	//Use your own softwarespec...
+	return E_NOTIMPL;
+
+	ENSURE_INITIALIZED;
+	
+	SafeMutex mutex(ServerListLock);	
+	
+	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+
+	// foreach server
+	for (;server != serverEnd; ++server)
+	{
+		//Get version of keyspec, compare it with other versions from m_servers to pSoftwareSpec
+
+		//Server has a newer version, get its Software Spec...
+
+		//software_license
+		BSTR bstrSpecStream;
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, server->second, GetSoftwareSpecByProduct, (m_product, &bstrSpecStream), hr);
+		if(SUCCEEDED(hr))
+		{
+			Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs tmpProdSpec;
+			tmpProdSpec.InitFromString(bstrSpecStream);
+			if(SUCCEEDED(hr))
+			{
+				pSoftwareSpec->productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(m_product, tmpProdSpec));
+			}
+			SysFreeString(bstrSpecStream);
+		}
+	}
+
+
+
+	return hr;
 }
