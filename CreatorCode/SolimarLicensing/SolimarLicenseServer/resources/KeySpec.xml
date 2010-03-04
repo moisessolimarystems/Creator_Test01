@@ -424,7 +424,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<!-- regular modules -->
 				<Module id="0" offset="0x08c" bits="4" name="Distiller"/>
 				<Module id="1" offset="0x088" bits="4" name="GhostScript"/>
-				<Module id="12" offset="0x0bc" bits="4" name="PS::PS(Rip)"/>
+				<Module id="12" offset="0x0bc" bits="4" name="PostScript::PostScript(Rip)"/>
 				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
 				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
 				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
@@ -450,12 +450,12 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 			<ModuleList>
 				<!-- regular modules -->
 				<Module id="0" offset="0x080" bits="1" name="Merge" unlimited="1"/>
-				<Module id="1" offset="0x081" bits="1" name="Cleanse &amp; Sort" unlimited="1"/>
+				<Module id="1" offset="0x081" bits="1" name="Address Cleanse" unlimited="1"/>
 				<Module id="2" offset="0x082" bits="1" name="Split" unlimited="1"/>
 				<Module id="3" offset="0x083" bits="1" name="Finishing" unlimited="1"/>
-				<Module id="4" offset="0x084" bits="1" name="Concatentate" unlimited="1"/>
+				<Module id="4" offset="0x084" bits="1" name="Concatenate" unlimited="1"/>
 				<Module id="5" offset="0x085" bits="1" name="Imposition" unlimited="1"/>
-				<Module id="6" offset="0x086" bits="1" name="Underlay" unlimited="1"/>
+				<Module id="6" offset="0x086" bits="1" name="Underlay/Overlay" unlimited="1"/>
 				<Module id="7" offset="0x087" bits="1" name="Insert" unlimited="1"/>
 				<Module id="8" offset="0x088" bits="1" name="Segment" unlimited="1"/>
 				<Module id="9" offset="0x089" bits="1" name="Archive Assistant" unlimited="1"/>				
@@ -463,19 +463,19 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="11" offset="0x08B" bits="1" name="Barcode - ***Deprecated***" unlimited="1"/>		
 				<Module id="12" offset="0x08C" bits="1" name="Text Marking - ***Deprecated***" unlimited="1"/>	
 				<Module id="13" offset="0x08D" bits="1" name="Delete" unlimited="1"/>
-				<Module id="14" offset="0x08E" bits="1" name="Replace" unlimited="1"/>
-				<Module id="15" offset="0x08F" bits="1" name="Export / Import" unlimited="1"/>
-				<Module id="16" offset="0x090" bits="1" name="N-to-1" unlimited="1"/>
-				<Module id="17" offset="0x091" bits="1" name="Book Blocks" unlimited="1"/>
+				<Module id="14" offset="0x08E" bits="1" name="Replace - ***Deprecated***" unlimited="1"/>
+				<Module id="15" offset="0x08F" bits="1" name="Export/Import" unlimited="1"/>
+				<Module id="16" offset="0x090" bits="1" name="N to 1" unlimited="1"/>
+				<Module id="17" offset="0x091" bits="1" name="Book Block" unlimited="1"/>
 				<Module id="18" offset="0x092" bits="1" name="2-Up" unlimited="1"/> 
 				<Module id="19" offset="0x093" bits="1" name="Scale &amp; Shift" unlimited="1"/>       
-				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
-				<Module id="21" offset="0x110" bits="16" name="Merge Counter" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
+				<Module id="20" offset="0x100" bits="16" name="Cleanse/Sort Counter - ***Deprecated***" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
+				<Module id="21" offset="0x110" bits="16" name="Merge Counter - ***Deprecated***" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="22" offset="0x120" bits="1" name="Assembly" unlimited="1"/>   
 				<Module id="23" offset="0x121" bits="1" name="Barcode Reader" unlimited="1"/>  
 				<Module id="24" offset="0x122" bits="1" name="XPIF Input" unlimited="1"/>  
-				<Module id="30" offset="0x0F0" bits="4" name="Instances"/>
-       	<Module id="31" offset="0x0F4" bits="4" name="Process Builders" isSharable="true"/>				
+				<Module id="30" offset="0x0F0" bits="4" name="Engine Instances"/>
+        <Module id="31" offset="0x0F4" bits="4" name="Process Builders" isSharable="true"/>				
 			</ModuleList>
 			<ProductList>
 				<Product id="12" name="Rubika">
@@ -543,30 +543,30 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		</KeyLayout>
 		<KeyLayout name="iCONVERT">
 			<ModuleList>
-				<Module id="0"	offset="0x08c" bits="4" name="APPC" pool="128"/>
+				<Module id="0"	offset="0x08c" bits="4" name="APPC - ***Deprecated***" pool="128"/>
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
 				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
-				<Module id="8"	offset="0x0ac" bits="4" name="IConvert Job Event"/>
-				<Module id="9"	offset="0x0a8" bits="4" name="IPDS::2dBarCodes"/>
+				<Module id="8"	offset="0x0ac" bits="4" name="iCONVERT Job Events"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d BarCode"/>
 				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
 				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
 				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PS"/>
 				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF"/>
-				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event"/>
-				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes"/>
-				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL"/>
-				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF"/>
-				<Module id="34"	offset="0x104" bits="4" name="AFP::PS"/>
-				<Module id="35"	offset="0x100" bits="4" name="AFP::TIFF"/>
-				<Module id="40"	offset="0x12c" bits="4" name="IConvertEncryption"/>
-				<Module id="41"	offset="0x128" bits="4" name="IConvertURL"/>
-				<Module id="42"	offset="0x124" bits="4" name="IConvertOverlay"/>
-				<Module id="43"	offset="0x120" bits="4" name="IConvertType1"/>
-				<Module id="48"	offset="0x14c" bits="4" name="AFPEncryption"/>
-				<Module id="49"	offset="0x148" bits="4" name="AFPURL"/>
-				<Module id="50"	offset="0x144" bits="4" name="AFPOverlay"/>
-				<Module id="51"	offset="0x140" bits="4" name="AFPType1"/>
-				<Module id="56"	offset="0x16c" bits="4" name="Emailer"/>
+				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event - ***Deprecated***"/>
+				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes - ***Deprecated***"/>
+				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL - ***Deprecated***"/>
+				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF - ***Deprecated***"/>
+				<Module id="34"	offset="0x104" bits="4" name="AFP::PS - ***Deprecated***"/>
+				<Module id="35"	offset="0x100" bits="4" name="AFP::TIFF - ***Deprecated***"/>
+				<Module id="40"	offset="0x12c" bits="4" name="iCONVERT Encryption - ***Deprecated***"/>
+				<Module id="41"	offset="0x128" bits="4" name="iCONVERT URL - ***Deprecated***"/>
+				<Module id="42"	offset="0x124" bits="4" name="iCONVERT Overlay"/>
+				<Module id="43"	offset="0x120" bits="4" name="iCONVERT Type 1"/>
+				<Module id="48"	offset="0x14c" bits="4" name="AFPEncryption - ***Deprecated***"/>
+				<Module id="49"	offset="0x148" bits="4" name="AFPURL - ***Deprecated***"/>
+				<Module id="50"	offset="0x144" bits="4" name="AFPOverlay - ***Deprecated***"/>
+				<Module id="51"	offset="0x140" bits="4" name="AFPType1 - ***Deprecated***"/>
+				<Module id="56"	offset="0x16c" bits="4" name="Emailer - ***Deprecated***"/>
 				<!-- Max LU pool cell -->
 				<Module id="128" offset="0x280" bits="16" name="Max LU" isPool="true"/>
 			</ModuleList>
@@ -602,19 +602,19 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		</KeyLayout>
 		<KeyLayout name="SOLsearcher Enterprise">
 			<ModuleList>
-				<Module id="0"	offset="0x080" bits="16" name="Index Servers"/>
-				<Module id="1"	offset="0x090" bits="16" name="Report Servers"/>
+				<Module id="0"	offset="0x080" bits="16" name="Index Server"/>
+				<Module id="1"	offset="0x090" bits="16" name="Document Server"/>
 				<Module id="2"	offset="0x0A0" bits="16" name="Concurrent Users" licenseRead="(value * 25)" licenseWrite="(value / 25)"/>
 				<Module id="3"	offset="0x0B0" bits="16" name="Application Databases" unlimited="255"/>
 				<Module id="4"	offset="0x0C0" bits="16" name="Document Assembler" unlimited="1"/>
-				<Module id="5"	offset="0x0D0" bits="16" name="Server" />
-				<Module id="6"	offset="0x0E0" bits="16" name="CPU" />
+				<Module id="5"	offset="0x0D0" bits="16" name="Application Server" />
+				<Module id="6"	offset="0x0E0" bits="16" name="Cores" />
 				<Module id="7"	offset="0x0F0" bits="16" name="Archive" />
 
 				<Module id="128"  offset="0x103" bits="1" name="SSE Full" unlimited="1"/>
 				<Module id="129"  offset="0x102" bits="1" name="Net Folders" unlimited="1"/>
 				<Module id="130"  offset="0x101" bits="1" name="SSE Notes" unlimited="1"/>	
-				<Module id="131"  offset="0x100" bits="1" name="Ascii " unlimited="1"/>							
+				<Module id="131"  offset="0x100" bits="1" name="ASCII" unlimited="1"/>							
 				<Module id="132"  offset="0x107" bits="1" name="PDF" unlimited="1"/>	
 				<Module id="133"  offset="0x106" bits="1" name="Full Text" unlimited="1"/>							
 			</ModuleList>
@@ -638,13 +638,13 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
-		<KeyLayout name="SDX Designer">
+		<KeyLayout name="SOLindexer">
 			<ModuleList>
 				<Module id="0"	offset="0x080" bits="16" name="SDX Designer"/>				
 				<Module id="1"	offset="0x090" bits="16" name="SOLmonitor"/>
 			</ModuleList>
 			<ProductList>
-				<Product id="10" name="SDX Designer">
+				<Product id="10" name="SOLindexer">
 					<ModuleInclude id="0" default="0" isSharable="true"/>
 					<ModuleInclude id="1" default="0"/>
 				</Product>
@@ -699,7 +699,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="6"  offset="0x085" bits="1" name="Disk Spooler" unlimited="1"/> 
 				<Module id="7"  offset="0x084" bits="1" name="File Inserter" unlimited="1"/>
 				
-				<Module id="8"  offset="0x08B" bits="1" name="File Queuer" unlimited="1"/>
+				<Module id="8"  offset="0x08B" bits="1" name="Queue Reader" unlimited="1"/>
 				<Module id="9"  offset="0x08A" bits="1" name="FTP Queuer" unlimited="1"/>
 				<!--  Remove this module, it is unnecessary.  Don't reuse its id or offset if possible.
 				<Module id="10" offset="0x089" bits="1" name="IPDS Output" unlimited="1"/>
@@ -719,17 +719,17 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="20"	offset="0x097" bits="1" name="PostScript::IPDS" unlimited="1"/>
 				<Module id="21"	offset="0x096" bits="1" name="PostScript::Metacode" unlimited="1"/>
 				<Module id="22"	offset="0x095" bits="1" name="PostScript::PDF" unlimited="1"/> 
-				<Module id="23"	offset="0x094" bits="1" name="PostScript::Postscript" unlimited="1"/> 
+				<Module id="23"	offset="0x094" bits="1" name="PostScript::PostScript" unlimited="1"/> 
 				
-				<Module id="24"	offset="0x09B" bits="1" name="PostScript::Postscript (RIP)" unlimited="1"/>
+				<Module id="24"	offset="0x09B" bits="1" name="PostScript::PostScript (RIP)" unlimited="1"/>
 				<Module id="25"	offset="0x09A" bits="1" name="PostScript::TIFF" unlimited="1"/>
 				<Module id="26"	offset="0x099" bits="1" name="SCS::3211" unlimited="1"/>
 				<Module id="27"	offset="0x098" bits="1" name="SCS::Metacode" unlimited="1"/>
 				
-				<Module id="28"	offset="0x09F" bits="1" name="SMART" unlimited="1"/>
+				<Module id="28"	offset="0x09F" bits="1" name="SMART Processor" unlimited="1"/>
 				<Module id="29"	offset="0x09E" bits="1" name="Tape Input" unlimited="1"/>
-				<Module id="30"	offset="0x09D" bits="1" name="TCP/IP lpr Input" unlimited="1"/> 
-				<Module id="31"	offset="0x09C" bits="1" name="TCP/IP lpd Output" unlimited="1"/> 
+				<Module id="30"	offset="0x09D" bits="1" name="TCP/IP Input" unlimited="1"/> 
+				<Module id="31"	offset="0x09C" bits="1" name="TCP/IP Output" unlimited="1"/> 
 				
 				<Module id="32"	offset="0x0A3" bits="1" name="Trash Can" unlimited="1"/>
 				<Module id="33"	offset="0x0A2" bits="1" name="Windows Printer Spooler" unlimited="1"/>
@@ -746,7 +746,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="42"	offset="0x0A9" bits="1" name="RJE::3211" unlimited="1"/>
 				<Module id="43"	offset="0x0A8" bits="1" name="AFPDS::IPDS" unlimited="1"/>
             
-            <Module id="44"	offset="0x0AF" bits="1" name="PDF::Postscript(PDFL)" unlimited="1"/>
+            			<Module id="44"	offset="0x0AF" bits="1" name="PDF::Postscript (PDFL)" unlimited="1"/>
 				<Module id="45"	offset="0x0AE" bits="1" name="PDF::IPDS(PDFL)" unlimited="1"/>
 				<Module id="46"	offset="0x0AD" bits="1" name="PDF::TIFF(PDFL)" unlimited="1"/>
 				<Module id="47"	offset="0x0AC" bits="1" name="PDF::AFPDS(PDFL)" unlimited="1"/>
@@ -765,9 +765,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
         			<Module id="106"	offset="0x188" bits="4" name="Solitrack Input"/>        
 				
 				<!-- Module IDs identifying resources -->
-				<Module id="200"	offset="0x178" bits="4" name="PS Interpreter"/>
-				<Module id="201"	offset="0x174" bits="1" name="TCP IP Output Dynamic Host Selection" unlimited="1"/>
-            <Module id="202"	offset="0x170" bits="4" name="PS(PDFL) Interpreter"/>
+				<Module id="200"	offset="0x178" bits="4" name="PostScript Interpreter"/>
+				<Module id="201"	offset="0x174" bits="1" name="TCP/IP Output Dynamic Host Selection" unlimited="1"/>
+            			<Module id="202"	offset="0x170" bits="4" name="PDF Interpreter (PDFL)"/>
 				
 				<!-- Output Pool module -->
 				<Module id="240"	offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
@@ -783,8 +783,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="305"	offset="0x338" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
 				
 				<!-- Client licensing -->
-				<Module id="400"	offset="0x0B0" bits="8" name="Concurrent Operator Sessions" unlimited="255" isSharable="true"/>
-				<Module id="401"	offset="0x0B8" bits="8" name="Named User Sessions" unlimited="255"/>
+				<Module id="400"	offset="0x0B0" bits="8" name="Concurrent Operator Sessions - ***Deprecated***" unlimited="255" isSharable="true"/>
+				<Module id="401"	offset="0x0B8" bits="8" name="Named User Sessions - ***Deprecated***" unlimited="255"/>
 				<!-- <Module id="402"	offset="0x0C0" bits="8" name="Concurrent Administrator Sessions" unlimited="255"/> -->
 			</ModuleList>
 			
@@ -864,6 +864,42 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				</Product>
 			</ProductList>
 		</KeyLayout>
+    <KeyLayout name="SOLsearcher Enterprise Single Platform">
+      <ProductList>
+        <Product id="15" name="SOLsearcher Enterprise Single Platform">
+        </Product>
+      </ProductList>
+    </KeyLayout>
+    <KeyLayout name="Rubika Process Builder">
+      <ModuleList>
+        <Module id="31"	offset="0x080" bits="16" name="Process Builders"/>
+      </ModuleList>
+      <ProductList>
+        <Product id="17" name="Rubika Process Builder">
+          <ModuleInclude id="31" default="0"/>
+        </Product>
+      </ProductList>
+    </KeyLayout>
+    <KeyLayout name="SDX Designer">
+      <ModuleList>
+        <Module id="0"	offset="0x080" bits="16" name="SDX Designer"/>
+      </ModuleList>
+      <ProductList>
+        <Product id="18" name="SDX Designer">
+          <ModuleInclude id="0" default="0"/>
+        </Product>
+      </ProductList>
+    </KeyLayout>
+    <KeyLayout name="SPDE Queue Manager">
+      <ModuleList>
+        <Module id="400"	offset="0x080" bits="16" name="Queue Manager Sessions"/>
+      </ModuleList>
+      <ProductList>
+        <Product id="19" name="SPDE Queue Manager">
+          <ModuleInclude id="400" default="0"/>
+        </Product>
+      </ProductList>
+    </KeyLayout>
     <KeyLayout name="VerificationKey">
       <ModuleList>
       </ModuleList>
