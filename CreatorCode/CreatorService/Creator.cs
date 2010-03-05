@@ -369,11 +369,11 @@ namespace Service.Creator
         #endregion
 
         #region Transaction Implementation 
-        //[OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        //public IList<TransactionTable> GetTransactionsByLicenseName(string licenseName)
-        //{
-        //    return TransactionTable.GetTransactionsByLicense(licenseName);
-        //}
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<TransactionTable> GetTransactionsByLicenseName(string licenseName)
+        {
+            return TransactionTable.GetTransactionsByLicenseName(licenseName);
+        }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TransactionTable> GetTransactionsByPacketID(int pktID)
         {
@@ -381,15 +381,15 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<TransactionTable> GetNewTransactionsByLicenseName(string licName)
+        public IList<TransactionTable> GetTransactionsByProductLicenseID(int plID)
         {
-            return TransactionTable.GetNewTransactionsByLicenseName(licName);
+            return TransactionTable.GetTransactionsByProductLicenseID(plID);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID)
+        public IList<TransactionTable> GetNewTransactionsByLicenseName(string licName)
         {
-            TransactionTable.UpdateSubLicenseTransactionsByOrder(stdLicOrderID, subLicOrderID);
+            return TransactionTable.GetNewTransactionsByLicenseName(licName);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -862,8 +862,11 @@ namespace Service.Creator
         public void UpdateAllModules(IList<ModuleTable> modules)
         { ModuleTable.UpdateAllModules(modules); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void DeleteAllModules(int productlicenseID)
-        { ModuleTable.DeleteAllModules(productlicenseID); }
+        public void DeleteAllModules(IList<ModuleTable> modules)
+        { ModuleTable.DeleteAllModules(modules); }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void DeleteAllModulesByProductLicense(int productlicenseID)
+        { ModuleTable.DeleteAllModulesByProductLicense(productlicenseID); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public ModuleTable GetModule(string productLicenseName, short modID)
         { return ModuleTable.GetModule(productLicenseName, modID); }

@@ -81,13 +81,21 @@ namespace CreatorData
             return totalValue;
         }
  
-        public static void DeleteAllModules(int productlicenseID)
+        public static void DeleteAllModulesByProductLicense(int productlicenseID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 IList<ModuleTable> modules = db.ModuleTables.Where(m => m.ProductLicenseID == productlicenseID).ToList() ;
                 db.ModuleTables.DeleteAllOnSubmit(modules);
                 db.SubmitChanges();
+            }
+        }
+        public static void DeleteAllModules(IList<ModuleTable> modules)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ModuleTables.DeleteAllOnSubmit(modules);
+                db.SubmitChanges();                
             }
         }
         public static void CreateModule(ModuleTable module)

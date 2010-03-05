@@ -145,7 +145,7 @@ namespace CreatorData
                 //automatically delete associated modules
                 foreach (ProductLicenseTable plt in pltRecords)
                 {
-                    ModuleTable.DeleteAllModules(plt.ID);
+                    ModuleTable.DeleteAllModulesByProductLicense(plt.ID);
                 }
                 db.ProductLicenseTables.DeleteAllOnSubmit(pltRecords);
                 db.SubmitChanges();
@@ -174,7 +174,7 @@ namespace CreatorData
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
-                ModuleTable.DeleteAllModules(plt.ID);
+                ModuleTable.DeleteAllModulesByProductLicense(plt.ID);
                 db.ProductLicenseTables.Attach(plt);
                 db.ProductLicenseTables.DeleteOnSubmit(plt);
                 db.SubmitChanges();

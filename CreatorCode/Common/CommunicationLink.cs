@@ -346,6 +346,20 @@ namespace Client.Creator
             return "Unknown";
         }
 
+        public Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs GetModuleSpec(uint productID, short moduleID)
+        {
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
+            if (moduleList != null)
+            {
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
+                {
+                    if (moduleSpec.moduleID.TVal == moduleID)
+                        return moduleSpec;
+                }
+            }
+            return null;
+        }
+
         public short GetProductID(String productName)
         {            
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
@@ -455,7 +469,7 @@ namespace Client.Creator
             return -1;
         }
 
-        public int GetMaxModuleValue(uint productID, uint moduleID)
+        public int GetMaxModuleValue(uint productID, short moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {

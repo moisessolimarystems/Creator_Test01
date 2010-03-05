@@ -16,37 +16,6 @@ namespace CreatorData
             }
         }
 
-        //sublicense transactions should be <= standardlicense transactions
-        //copied transaction has packetid of 0
-        //new transaction has packetid of null
-        public static void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {
-                db.ObjectTrackingEnabled = false;
-                var stdTransanctions = db.TransactionTables.Where(c => c.taOrderID.Equals(stdLicOrderID));
-                foreach(var trans in stdTransanctions)
-                {
-                    var foundTransaction = db.TransactionTables.Where(c => c.taDateCreated.Equals(trans.taDateCreated) && c.taOrderID.Equals(subLicOrderID)).FirstOrDefault();
-                    if(foundTransaction == null)
-                    {
-                        var order = db.ProductLicenseTables.Where(o => o.ID.Equals(subLicOrderID)).FirstOrDefault();
-                        TransactionTable newTransaction = new TransactionTable();
-                        newTransaction.taDateCreated = trans.taDateCreated;
-                        newTransaction.taDescription = trans.taDescription;
-                        newTransaction.taLicenseID = order.LicenseID;
-                        newTransaction.taOrderID = subLicOrderID;
-                        newTransaction.taPacketID = 0;
-                        newTransaction.taType = trans.taType;
-                        newTransaction.taUnits = trans.taUnits;
-                        newTransaction.taPreviousValue = trans.taPreviousValue;
-                        newTransaction.taUser = trans.taUser;
-                        CreateTransaction(newTransaction);
-                    }
-                }
-            }
-        }
-
         public static IList<TransactionTable> GetTransactionsByLicenseName(string licenseName)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -62,6 +31,15 @@ namespace CreatorData
             {
                 db.ObjectTrackingEnabled = false;
                 return db.TransactionTables.Where(c => c.taPacketID.Equals(packetID)).ToList();
+            }
+        }
+
+        public static IList<TransactionTable> GetTransactionsByProductLicenseID(int productLicenseID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                return db.TransactionTables.Where(c => c.taOrderID == productLicenseID).ToList();
             }
         }
 

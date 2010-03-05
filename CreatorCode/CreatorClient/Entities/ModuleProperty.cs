@@ -78,7 +78,7 @@ namespace Client.Creator
         {
             get
             {
-                return (uint)_commLink.GetMaxModuleValue(ProductID, (uint)ID);
+                return (uint)_commLink.GetMaxModuleValue(ProductID, ID);
             }
         }
 

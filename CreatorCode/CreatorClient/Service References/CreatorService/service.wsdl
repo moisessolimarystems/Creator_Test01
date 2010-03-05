@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_CreateToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_UpdateToken_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateToken" />
   </wsdl:message>
@@ -153,6 +159,12 @@
   <wsdl:message name="ICreator_UpdateAllModules_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateAllModulesResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_DeleteAllModulesByProductLicense_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteAllModulesByProductLicense" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeleteAllModulesByProductLicense_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteAllModulesByProductLicenseResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_DeleteAllModules_InputMessage">
     <wsdl:part name="parameters" element="tns:DeleteAllModules" />
   </wsdl:message>
@@ -195,23 +207,29 @@
   <wsdl:message name="ICreator_GetCreatorServiceVersion_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetCreatorServiceVersionResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetTransactionsByLicenseName_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTransactionsByLicenseName" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetTransactionsByLicenseName_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTransactionsByLicenseNameResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetTransactionsByPacketID_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTransactionsByPacketID" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetTransactionsByPacketID_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetTransactionsByPacketIDResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetTransactionsByProductLicenseID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetTransactionsByProductLicenseID" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetTransactionsByProductLicenseID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetTransactionsByProductLicenseIDResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetNewTransactionsByLicenseName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetNewTransactionsByLicenseName" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetNewTransactionsByLicenseName_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetNewTransactionsByLicenseNameResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_UpdateSubLicenseTransactionsByOrder_InputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateSubLicenseTransactionsByOrder" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_UpdateSubLicenseTransactionsByOrder_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateSubLicenseTransactionsByOrderResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_CreateTransaction_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateTransaction" />
@@ -380,12 +398,6 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetNextHardwareTokenValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValueResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_CreateToken_InputMessage">
-    <wsdl:part name="parameters" element="tns:CreateToken" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_CreateToken_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
@@ -580,6 +592,10 @@
     <wsdl:part name="parameters" element="tns:DeletePacketResponse" />
   </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="CreateToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="UpdateToken">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
@@ -668,6 +684,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateAllModules" message="tns:ICreator_UpdateAllModules_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateAllModulesResponse" message="tns:ICreator_UpdateAllModules_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="DeleteAllModulesByProductLicense">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteAllModulesByProductLicense" message="tns:ICreator_DeleteAllModulesByProductLicense_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteAllModulesByProductLicenseResponse" message="tns:ICreator_DeleteAllModulesByProductLicense_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="DeleteAllModules">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteAllModules" message="tns:ICreator_DeleteAllModules_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteAllModulesResponse" message="tns:ICreator_DeleteAllModules_OutputMessage" />
@@ -696,17 +716,21 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersion" message="tns:ICreator_GetCreatorServiceVersion_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse" message="tns:ICreator_GetCreatorServiceVersion_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetTransactionsByLicenseName">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName" message="tns:ICreator_GetTransactionsByLicenseName_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByLicenseNameResponse" message="tns:ICreator_GetTransactionsByLicenseName_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetTransactionsByPacketID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByPacketID" message="tns:ICreator_GetTransactionsByPacketID_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByPacketIDResponse" message="tns:ICreator_GetTransactionsByPacketID_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetTransactionsByProductLicenseID">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByProductLicenseID" message="tns:ICreator_GetTransactionsByProductLicenseID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByProductLicenseIDResponse" message="tns:ICreator_GetTransactionsByProductLicenseID_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetNewTransactionsByLicenseName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName" message="tns:ICreator_GetNewTransactionsByLicenseName_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNewTransactionsByLicenseNameResponse" message="tns:ICreator_GetNewTransactionsByLicenseName_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="UpdateSubLicenseTransactionsByOrder">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrder" message="tns:ICreator_UpdateSubLicenseTransactionsByOrder_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrderResponse" message="tns:ICreator_UpdateSubLicenseTransactionsByOrder_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="CreateTransaction">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateTransaction" message="tns:ICreator_CreateTransaction_InputMessage" />
@@ -819,10 +843,6 @@
     <wsdl:operation name="GetNextHardwareTokenValue">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue" message="tns:ICreator_GetNextHardwareTokenValue_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse" message="tns:ICreator_GetNextHardwareTokenValue_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="CreateToken">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
@@ -957,6 +977,15 @@
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="CreateToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="UpdateToken">
       <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
       <wsdl:input>
@@ -1155,6 +1184,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="DeleteAllModulesByProductLicense">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteAllModulesByProductLicense" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="DeleteAllModules">
       <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteAllModules" style="document" />
       <wsdl:input>
@@ -1218,6 +1256,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetTransactionsByLicenseName">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetTransactionsByLicenseName" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetTransactionsByPacketID">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetTransactionsByPacketID" style="document" />
       <wsdl:input>
@@ -1227,8 +1274,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetNewTransactionsByLicenseName">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName" style="document" />
+    <wsdl:operation name="GetTransactionsByProductLicenseID">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetTransactionsByProductLicenseID" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1236,8 +1283,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="UpdateSubLicenseTransactionsByOrder">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrder" style="document" />
+    <wsdl:operation name="GetNewTransactionsByLicenseName">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1490,15 +1537,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetNextHardwareTokenValue">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextHardwareTokenValue" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CreateToken">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateToken" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

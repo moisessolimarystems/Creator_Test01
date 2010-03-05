@@ -1874,6 +1874,9 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
+        void CreateToken(Client.Creator.CreatorService.TokenTable tt);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateToken", ReplyAction="http://tempuri.org/ICreator/UpdateTokenResponse")]
         void UpdateToken(Client.Creator.CreatorService.TokenTable tt);
         
@@ -1940,8 +1943,11 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateAllModules", ReplyAction="http://tempuri.org/ICreator/UpdateAllModulesResponse")]
         void UpdateAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteAllModulesByProductLicense", ReplyAction="http://tempuri.org/ICreator/DeleteAllModulesByProductLicenseResponse")]
+        void DeleteAllModulesByProductLicense(int productlicenseID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteAllModules", ReplyAction="http://tempuri.org/ICreator/DeleteAllModulesResponse")]
-        void DeleteAllModules(int productlicenseID);
+        void DeleteAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetModule", ReplyAction="http://tempuri.org/ICreator/GetModuleResponse")]
         Client.Creator.CreatorService.ModuleTable GetModule(string productLicenseName, short modID);
@@ -1961,14 +1967,17 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
         void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByLicenseNameResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByPacketID", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByPacketIDResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int pktID);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByProductLicenseID", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByProductLicenseIDResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByProductLicenseID(int plID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNewTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetNewTransactionsByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licName);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrder", ReplyAction="http://tempuri.org/ICreator/UpdateSubLicenseTransactionsByOrderResponse")]
-        void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateTransaction", ReplyAction="http://tempuri.org/ICreator/CreateTransactionResponse")]
         void CreateTransaction(Client.Creator.CreatorService.TransactionTable tt);
@@ -2053,9 +2062,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
         uint GetNextHardwareTokenValue(uint custID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
-        void CreateToken(Client.Creator.CreatorService.TokenTable tt);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
@@ -2181,6 +2187,10 @@ namespace Client.Creator.CreatorService {
                 base(binding, remoteAddress) {
         }
         
+        public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
+            base.Channel.CreateToken(tt);
+        }
+        
         public void UpdateToken(Client.Creator.CreatorService.TokenTable tt) {
             base.Channel.UpdateToken(tt);
         }
@@ -2269,8 +2279,12 @@ namespace Client.Creator.CreatorService {
             base.Channel.UpdateAllModules(modules);
         }
         
-        public void DeleteAllModules(int productlicenseID) {
-            base.Channel.DeleteAllModules(productlicenseID);
+        public void DeleteAllModulesByProductLicense(int productlicenseID) {
+            base.Channel.DeleteAllModulesByProductLicense(productlicenseID);
+        }
+        
+        public void DeleteAllModules(System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> modules) {
+            base.Channel.DeleteAllModules(modules);
         }
         
         public Client.Creator.CreatorService.ModuleTable GetModule(string productLicenseName, short modID) {
@@ -2297,16 +2311,20 @@ namespace Client.Creator.CreatorService {
             base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName) {
+            return base.Channel.GetTransactionsByLicenseName(licenseName);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByPacketID(int pktID) {
             return base.Channel.GetTransactionsByPacketID(pktID);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licName) {
-            return base.Channel.GetNewTransactionsByLicenseName(licName);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByProductLicenseID(int plID) {
+            return base.Channel.GetTransactionsByProductLicenseID(plID);
         }
         
-        public void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID) {
-            base.Channel.UpdateSubLicenseTransactionsByOrder(stdLicOrderID, subLicOrderID);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetNewTransactionsByLicenseName(string licName) {
+            return base.Channel.GetNewTransactionsByLicenseName(licName);
         }
         
         public void CreateTransaction(Client.Creator.CreatorService.TransactionTable tt) {
@@ -2419,10 +2437,6 @@ namespace Client.Creator.CreatorService {
         
         public uint GetNextHardwareTokenValue(uint custID) {
             return base.Channel.GetNextHardwareTokenValue(custID);
-        }
-        
-        public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
-            base.Channel.CreateToken(tt);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions) {

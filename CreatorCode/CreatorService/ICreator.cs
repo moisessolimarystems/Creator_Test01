@@ -127,17 +127,17 @@ namespace Service.Creator
 
         #region Transaction OperationContracts
 
-        //[OperationContract]
-        //IList<TransactionTable> GetTransactionsByLicenseName(string licenseName);
+        [OperationContract]
+        IList<TransactionTable> GetTransactionsByLicenseName(string licenseName);
 
         [OperationContract]
         IList<TransactionTable> GetTransactionsByPacketID(int pktID);
 
         [OperationContract]
-        IList<TransactionTable> GetNewTransactionsByLicenseName(string licName);
+        IList<TransactionTable> GetTransactionsByProductLicenseID(int plID);
 
         [OperationContract]
-        void UpdateSubLicenseTransactionsByOrder(int stdLicOrderID, int subLicOrderID);
+        IList<TransactionTable> GetNewTransactionsByLicenseName(string licName);
 
         [OperationContract()]
         void CreateTransaction(TransactionTable tt);
@@ -292,7 +292,9 @@ namespace Service.Creator
         [OperationContract]
         void UpdateAllModules(IList<ModuleTable> modules);
         [OperationContract]
-        void DeleteAllModules(int productlicenseID);
+        void DeleteAllModulesByProductLicense(int productlicenseID);
+        [OperationContract]
+        void DeleteAllModules(IList<ModuleTable> modules);
         [OperationContract]
         ModuleTable GetModule(string productLicenseName, short modID);
         [OperationContract]
