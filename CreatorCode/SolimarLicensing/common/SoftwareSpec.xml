@@ -112,37 +112,37 @@
 
 	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="IConvert Job Event"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="IPDS::2dBarCodes"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2d BarCode"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PS"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="IPDS::TIFF"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarCodes"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarCodes" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="IConvertEncryption"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="IConvertURL"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="IConvertOverlay"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="IConvertType1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="iCONVERT Encryption" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="iCONVERT URL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="iCONVERT Overlay" />
+			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="iCONVERT Type 1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="Max LU" bModuleIsPool="true"/>
 			
@@ -150,20 +150,20 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="8" productName="SOLsearcher Enterprise">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Index Servers"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Report Servers"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Index Server"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Document Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Concurrent Users"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Application Databases" modUnlimitedValue="255"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Document Assembler" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Server"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="CPU"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Application Server"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Cores"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Archive"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="SSE Full" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="129" moduleName="Net Folders" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="130" moduleName="SSE Notes" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="131" moduleName="Ascii" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="131" moduleName="ASCII" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="132" moduleName="PDF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="133" moduleName="Full Text" modUnlimitedValue="1"/>
@@ -173,7 +173,7 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Distiller"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="GhostScript"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="PS::PS(Rip)"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="PostScript::PostScript(Rip)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="PostScript::Metacode"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="PostScript::IPDS"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PostScript::TIFF"/>
@@ -191,13 +191,13 @@
 	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Merge" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Cleanse &amp; Sort" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Address Cleanse" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Split" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Finishing" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Concatentate" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Concatenate" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Imposition" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Underlay" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Underlay/Overlay" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Insert" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Segment" modUnlimitedValue="1"/>
@@ -207,20 +207,20 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="Text Marking - ***Deprecated***" modUnlimitedValue="1" moduleVersionDeprecated_Major="2" moduleVersionDeprecated_Minor="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Delete" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="Replace" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="Export / Import" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="Replace" modUnlimitedValue="1" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="Export/Import" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="N-to-1" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="Book Blocks" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="N to 1" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="Book Block" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="2-Up" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="Scale &amp; Translate" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="Scale &amp; Shift" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" />
-			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" />
+			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="Assembly" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Recoder" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="XPIF Input" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Instances" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Recoder" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="XPIF Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
@@ -241,12 +241,12 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Disk Spooler" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="File Inserter" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="File Queuer" modUnlimitedValue="1" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="FTP Queuer" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="10" moduleName="IPDS Output" modUnlimitedValue="1" moduleVersionDeprecated_Major="6" moduleVersionDeprecated_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="11" moduleName="Job Separator" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="Line Data::AFPD" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="Line Data::AFPDS" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Output Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="PCL::Metacode" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="PDF::IPDS" modUnlimitedValue="1"/>
@@ -259,17 +259,17 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="PostScript::IPDS" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="PostScript::Metacode" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="PostScript::PDF" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="PostScript::Postscript" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="PostScript::PostScript" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="PostScript::Postscript (RIP)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="PostScript::PostScript (RIP)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="PostScript::TIFF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="26" moduleName="SCS::3211" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="27" moduleName="SCS::Metacode" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="28" moduleName="SMART" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="28" moduleName="SMART Processor" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="Tape Input" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="TCP/IP lpr Input" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="TCP/IP lpd Output" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="TCP/IP Input" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="TCP/IP Output" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="Trash Can" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="Windows Printer Spooler" modUnlimitedValue="1"/>
@@ -286,7 +286,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="RJE::3211" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="AFPDS::IPDS" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::Postscript(PDFL)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::Postscript (PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="45" moduleName="PDF::IPDS(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="47" moduleName="PDF::AFPDS(PDFL)" modUnlimitedValue="1"/>
@@ -301,12 +301,12 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Parallel Input"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="104" moduleName="Parallel Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="105" moduleName="SCSI SDI Output"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="Solitrack Input"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
 
 			<!-- Module IDs identifying resources -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PS Interpreter"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PS(PDFL) Interpreter"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP/IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter (PDFL)"/>
 			
 			<!-- Output Pool module -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>
@@ -323,7 +323,7 @@
 			
 			<!-- Client licensing -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/><!--IsSharable-->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255" moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/>
 			<!--<Lic_ModuleSoftwareSpecAttribs moduleID="402" moduleName="Concurrent Administrator Sessions" modUnlimitedValue="255"/>-->
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
@@ -350,7 +350,7 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev iCONVERT" sameModSpecProductID="7">
