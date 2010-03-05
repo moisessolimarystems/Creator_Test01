@@ -46,6 +46,95 @@ namespace Client.Creator
                 SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
         }
 
+        //pull all modules by product
+        //remove any deprecated
+        private void RemoveDeprecatedModules(LicenseVersion version)
+        {
+            Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec = null;
+            List<ModuleTable> removeModuleList = new List<ModuleTable>();
+            Service<ICreator>.Use((client) =>
+            {
+                List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
+                foreach (ModuleTable module in dbModuleList)
+                {
+                    bool bDeprecated = false;
+                    moduleSpec = CreatorForm.s_CommLink.GetModuleSpec(ProductID, module.ModID);
+                    if (moduleSpec != null)
+                    {
+                        if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                        {
+                            if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                                bDeprecated = true;
+                            else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
+                            {
+                                if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
+                                    bDeprecated = true;
+                            }
+                        }
+                    }
+                    if (bDeprecated) removeModuleList.Add(module);
+                }
+                foreach (ModuleTable mt in removeModuleList)
+                {
+                    client.DeleteModule(mt);
+                }
+            });
+        }
+        //given a product license 
+        private void AddIntroducedModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
+        {
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecList = CreatorForm.s_CommLink.GetModuleSpecList(ProductID);
+            List<ModuleTable> addModuleList = new List<ModuleTable>();
+            List<ModuleTable> removeModuleList = new List<ModuleTable>();
+            Service<ICreator>.Use((client) =>
+            {
+                IList<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
+                {
+                    if (pltList != null)
+                    {
+                        foreach (ProductLicenseTable plt in pltList)
+                        {
+                            bool bIntroduced = false, bDeprecated = false;
+                            if (dbModuleList.Where(m => (m.ModID == (short)moduleSpec.moduleID.TVal) && (m.ProductLicenseID == plt.ID)).Count() == 0)
+                            {
+                                if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                                {
+                                    if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                                        bDeprecated = true;
+                                    else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
+                                    {
+                                        if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
+                                            bDeprecated = true;
+                                    }
+                                }
+                                if (version.Major > moduleSpec.moduleVersionIntroduced_Major)
+                                    bIntroduced = true;
+                                else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
+                                {
+                                    if (version.Minor >= moduleSpec.moduleVersionIntroduced_Minor)
+                                        bIntroduced = true;
+                                }
+                            }
+                            if (bIntroduced && !bDeprecated)
+                            {
+                                short moduleValue = 0;
+                                if (Status == ProductLicenseState.Trial)
+                                    moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
+                                ModuleTable mt = new ModuleTable();
+                                mt.ModID = (short)moduleSpec.moduleID.TVal;
+                                mt.Value = moduleValue;
+                                mt.AppInstance = ProductConnection;
+                                mt.ProductLicenseID = plt.ID;
+                                addModuleList.Add(mt);
+                            }
+                        }
+                    }
+                }
+                client.CreateAllModules(addModuleList);
+            });
+        }
+
         public bool HasHardwareToken()
         {
             bool bRetVal = false;
@@ -56,33 +145,6 @@ namespace Client.Creator
                     bRetVal = true;
             });
             return bRetVal;
-        }
-
-        public void InitializeProductEntity()
-        {
-            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec = CreatorForm.s_CommLink.GetProductSpec(ProductID);
-            List<ModuleTable> mtList = new List<ModuleTable>();
-            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-            {
-                short moduleValue = 0;
-                byte modProductConnection = 0;
-                if (Status == ProductLicenseState.Trial)
-                {
-                    moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
-                    modProductConnection = 1;
-                }
-                ModuleTable mt = new ModuleTable();
-                mt.ModID = (short)moduleSpec.moduleID.TVal;
-                mt.Value = moduleValue;
-                mt.AppInstance = modProductConnection;
-                mt.ProductLicenseID = ProductLicenseDatabaseID;
-                mtList.Add(mt);
-            }
-            Service<ICreator>.Use((client) =>
-            {
-                client.CreateAllModules(mtList);
-            });
-            _moduleList = mtList;
         }
 
         public bool SetTrialToLicensed()
@@ -171,7 +233,7 @@ namespace Client.Creator
                     }
                     if (updateModuleList.Count > 0)
                         client.UpdateAllModules(updateModuleList);
-                    client.DeleteAllModules(ProductLicenseDatabaseID);
+                    client.DeleteAllModulesByProductLicense(ProductLicenseDatabaseID);
                 }
             });
             return bRetVal;
@@ -321,7 +383,7 @@ namespace Client.Creator
             {
                 foreach (ModuleTable module in _moduleList)
                 {
-                    if (module.ModID/*.ID*/ == modID)
+                    if (module.ModID == modID)
                     {
                         if (module.Value > 0)
                         {
@@ -458,8 +520,8 @@ namespace Client.Creator
                 {
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID);
                 });
-                if (_moduleList.Count == 0)
-                    InitializeProductEntity();
+                //if (_moduleList.Count == 0)
+                //    InitializeProductEntity();
                 return _moduleList; 
             }
         }
@@ -473,7 +535,7 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string ID
         {
-            get { return _plRec.plID; }//Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(LicenseServer, Index); }
+            get { return _plRec.plID; }
             set { _plRec.plID = value;}
         }
 
@@ -506,22 +568,30 @@ namespace Client.Creator
             {
                 if (_version != value)
                 {
+                    IList<ProductLicenseTable> productLicenses = null;
                     Service<ICreator>.Use((client) =>
-                    {
-                        TransactionManager.CreateTransaction(TransactionType.Status,
-                                                              "",
-                                                              ID,
-                                                              string.Format("Edit {0} Product Connection", ProductName),
-                                                              value.ToString(),
-                                                              ProductVersion.ToString());
-                        IList<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
-                        foreach (ProductLicenseTable pl in productLicenses)
+                    {      
+                        if(value.ToString() != ProductVersion.ToString())
+                            TransactionManager.CreateTransaction(TransactionType.Status,
+                                                                  "",
+                                                                  ID,
+                                                                  string.Format("Edit {0} Product Version", ProductName),
+                                                                  value.ToString(),
+                                                                  ProductVersion.ToString());
+                        productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                        if(productLicenses != null)
                         {
-                            pl.ProductVersion = value.ToString();
-                            client.UpdateProductLicense(pl);
+                            foreach (ProductLicenseTable pl in productLicenses)
+                            {
+                                pl.ProductVersion = value.ToString();
+                                client.UpdateProductLicense(pl);
+                            }
                         }
                         client.MarkDirty(LicenseServer);
                     });
+                    RemoveDeprecatedModules(value); //for all modules
+                    AddIntroducedModules(value, productLicenses); //for all product licenses
+                    _plRec.ProductVersion = value.ToString();
                     _version = value;
                 }
             }
@@ -757,19 +827,16 @@ namespace Client.Creator
                     throw new Exception(string.Format("{0} exceeds the max value for activation total"));
                 else
                 {
-                    if (_plRec.Activations == 0 && value > 0)
-                    {
-                        IList<ProductLicenseTable> plList = null;
-                        Service<ICreator>.Use((client) =>
-                        {
-                            plList = client.GetProductLicenses(LicenseServer);
-                        });
-                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
-                            throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
-                    }
-                    _plRec.Activations = value;
                     Service<ICreator>.Use((client) =>
                     {
+                        if (_plRec.Activations == 0 && value > 0)
+                        {
+                            IList<ProductLicenseTable> plList = null;
+                            plList = client.GetProductLicenses(LicenseServer);
+                            if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                                throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                        }
+                        _plRec.Activations = value;
                         ProductLicenseTable plt = client.GetProductLicense(ID);
                         if (plt != null)
                         {
@@ -806,19 +873,16 @@ namespace Client.Creator
                 }
                 else
                 {
-                    if (_plRec.ActivationAmount == 0 && value > 0)
-                    {
-                        IList<ProductLicenseTable> plList = null;
-                        Service<ICreator>.Use((client) =>
-                        {
-                            plList = client.GetProductLicenses(LicenseServer);
-                        });
-                        if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
-                            throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
-                    }
-                    _plRec.ActivationAmount = value;
                     Service<ICreator>.Use((client) =>
                     {
+                        if (_plRec.ActivationAmount == 0 && value > 0)
+                        {
+                            IList<ProductLicenseTable> plList = null;
+                            plList = client.GetProductLicenses(LicenseServer);
+                            if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
+                                throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                        }
+                        _plRec.ActivationAmount = value;
                         ProductLicenseTable plt = client.GetProductLicense(ID);
                         if (plt != null)
                         {
@@ -883,8 +947,7 @@ namespace Client.Creator
             get 
             {
                 if (_plRec.Description.Contains("|"))
-                {
-                    //split return first half
+                {                    //split return first half
                     string[] notes = _plRec.Description.Split("|".ToCharArray());
                     return notes[1];
                 }
