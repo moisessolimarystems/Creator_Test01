@@ -1189,9 +1189,9 @@ namespace Client.Creator
                         if (item != null)
                         {
                             ModuleProperty module = item.Tag as ModuleProperty;
-                            dlvEditToolStripMenuItem.Enabled = true;
-                            incrementToolStripMenuItem.Enabled = (plProperty.GetAvailableModuleUnits(module) > 0 && module.Value < module.MaxValue);
-                            decrementToolStripMenuItem.Enabled = (module.Value > 0);
+                            dlvEditToolStripMenuItem.Enabled = !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
+                            incrementToolStripMenuItem.Enabled = (plProperty.GetAvailableModuleUnits(module) > 0 && module.Value < module.MaxValue) && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
+                            decrementToolStripMenuItem.Enabled = (module.Value > 0) && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
                         }
                     }
                 }
@@ -1262,7 +1262,8 @@ namespace Client.Creator
                 ProductLicenseProperty plp = DetailPropertyGrid.SelectedObject as ProductLicenseProperty;
                 foreach (ListViewItem lvItem in DetailListView.SelectedItems)
                 {
-                    if ((lvItem.Tag as ModuleProperty).Value > 0)
+                    ModuleProperty module = lvItem.Tag as ModuleProperty;
+                    if (module.Value > 0)
                     {
                         DecrementModules(DetailListView.SelectedItems);
                         bRetVal = true;
@@ -2591,7 +2592,7 @@ namespace Client.Creator
             TreeNode plNode = new TreeNode(pltData.plID);
             plNode.Name = pltData.plID;
             plNode.Tag = new ProductLicenseProperty(pltData, m_Permissions);
-            (plNode.Tag as ProductLicenseProperty).InitializeProductEntity();
+            (plNode.Tag as ProductLicenseProperty).ProductVersion = new LicenseVersion(pltData.ProductVersion);
             if (pltData.ParentProductLicenseID != null)
             {
                 plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ADDONORDER");
@@ -2889,7 +2890,7 @@ namespace Client.Creator
                     else //attach to product tree
                     {
                         (productNode.Tag as ProductCollectionProperty).ProductCollection.Add(plNode.Tag as ProductLicenseProperty);
-                    }
+                    }                    
                     if (data.ProductLicense.ParentProductLicenseID == null)
                         productNode.Nodes.Add(plNode);
                     else
@@ -3302,7 +3303,7 @@ namespace Client.Creator
                     {
                         DetailListView.Columns.Clear();
                         DetailListView.Columns.Add("Name", "Name");
-                        DetailListView.Columns.Add("Value", "Value");
+                        DetailListView.Columns.Add("Units", "Units");
                         DetailListView.Columns.Add("Product Connections", "Product Connections");
                     }
                 }
@@ -3312,7 +3313,7 @@ namespace Client.Creator
                     {
                         DetailListView.Columns.Clear();
                         DetailListView.Columns.Add("Name", "Name");
-                        DetailListView.Columns.Add("Value", "Value");
+                        DetailListView.Columns.Add("Units", "Units");
                         DetailListView.Columns.Add("Available", "Available");
                     }
                 }
@@ -3395,7 +3396,6 @@ namespace Client.Creator
                 ImageToolStripLabel.Image = productImage;
                 DetailListViewToolStripLabel.Text = string.Format("{0} Modules", s_CommLink.GetProductName(productData.ProductID));
                 DetailListViewToolStripLabel2.Visible = true;
-                DetailListViewToolStripLabel2.Text = string.Format("Product Version : {0}", productData.ProductCollection[0].ProductVersion.ToString());
                 dlvAddToolStripButton.Visible = false;
                 dlvRemoveToolStripButton.Visible = false;
                 moduleFilterToolStripComboBox.Visible = false;
@@ -3403,25 +3403,44 @@ namespace Client.Creator
                 LicenseServerProperty lsp = DetailTreeView.SelectedNode.Parent.Tag as LicenseServerProperty;
                 Service<ICreator>.Use((client) =>
                 {
+                    ProductLicenseTable plt = client.GetProductLicense(productData.ProductCollection[0].ID);
+                    LicenseVersion version = new LicenseVersion(plt.ProductVersion);
+                    DetailListViewToolStripLabel2.Text = string.Format("Product Version : {0}", version.ToString());
                     List<ModuleTable> moduleList = client.GetAllActiveModulesByProduct(lsp.Name, productData.ProductID);
                     Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec = CreatorForm.s_CommLink.GetProductSpec(productData.ProductID);
                     List<ListViewItem> lvItems = new List<ListViewItem>();
-                    //need to ignore deactivated modules
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {
-                        int modValue = 0, modAppInstance = 0;
-                        foreach (ModuleTable mt in moduleList.Where(c => c.ModID == moduleSpec.moduleID.TVal))
-                        {   //sum up module value, module app instance
-                            modValue += mt.Value;
-                            modAppInstance += mt.AppInstance;
+                        bool bDeprecated = false;
+                        if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                        {
+                            if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                                bDeprecated = true;
+                            else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
+                            {
+                                if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
+                                    bDeprecated = true;
+                            }
                         }
-                        ListViewItem lvItem = new ListViewItem();                        
-                        lvItem.Text = moduleSpec.moduleName.TVal;
-                        lvItem.Name = moduleSpec.moduleID.SVal;
-                        lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
-                        lvItem.SubItems.Add(modValue.ToString());
-                        lvItem.SubItems.Add(modAppInstance.ToString());
-                        lvItems.Add(lvItem);
+                        if (!bDeprecated)
+                        {
+                            int modValue = 0, modAppInstance = 0;
+                            foreach (ModuleTable mt in moduleList.Where(c => c.ModID == moduleSpec.moduleID.TVal))
+                            {   //sum up module value, module app instance
+                                modValue += mt.Value;
+                                modAppInstance += mt.AppInstance;
+                            }
+                            ListViewItem lvItem = new ListViewItem();
+                            lvItem.Text = moduleSpec.moduleName.TVal;
+                            lvItem.Name = moduleSpec.moduleID.SVal;
+                            lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
+                            if (s_CommLink.IsDefaultModule(productSpec.productID.TVal, (short)moduleSpec.moduleID.TVal))
+                                lvItem.SubItems.Add("*");
+                            else
+                                lvItem.SubItems.Add(modValue.ToString());
+                            lvItem.SubItems.Add(modAppInstance.ToString());
+                            lvItems.Add(lvItem);
+                        }
                     }
                     DetailListView.Items.AddRange(lvItems.ToArray());
                 });
@@ -3444,8 +3463,9 @@ namespace Client.Creator
                 //need to set plData read-only attributes
                 Service<ICreator>.Use((client) =>
                 {   //gets all modules for a given product license and add-on product licenses
-                    List<ModuleTable> moduleList = client.GetAllModules(plData.ID);
-                    foreach (ModuleTable module in moduleList.Distinct())
+                    string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
+                    List<ModuleTable> moduleList = client.GetAllModules(productLicense);
+                    foreach (ModuleTable module in moduleList.Where(c => c.ProductLicenseID == plData.ProductLicenseDatabaseID))
                     {   //totalValue = licensed module value + add-on module value;
                         //           = trial module value;
                         short totalValue = 0;
@@ -3482,16 +3502,24 @@ namespace Client.Creator
                 newModule.ProductID = productLicense.ProductID;
                 lvItem.Name = lvItem.Text = moduleName;
                 lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
-                lvItem.SubItems.Add(module.Value.ToString());               
-                //perm, addon - total value is shared between these
-                string availableUnits = "Unlimited";
-                int unlimitedValue = s_CommLink.GetUnlimitedModuleValue(productLicense.ProductID, (uint)module.Value);
-                if (unlimitedValue > 0)
+                if (s_CommLink.IsDefaultModule(productLicense.ProductID, module.ModID))
                 {
-                    uint units = (uint)(unlimitedValue - (int)totalValue);
-                    availableUnits = units.ToString();
+                    lvItem.SubItems.Add("*");
+                    lvItem.SubItems.Add("*");
                 }
-                lvItem.SubItems.Add(availableUnits);
+                else
+                {
+                    lvItem.SubItems.Add(module.Value.ToString());
+                    //perm, addon - total value is shared between these
+                    //available units = maximum value - total value(perm/trial + addon)
+                    //total value should never exceed max value
+                    //bool bVal = false;
+                    //if (module.ModID == 101)
+                    //    bVal = true;
+                    int maxValue = s_CommLink.GetMaxModuleValue(productLicense.ProductID, module.ModID);
+                    int units = maxValue - totalValue;
+                    lvItem.SubItems.Add(units.ToString());
+                }
                 SetModuleState(productLicense,lvItem);
                 return lvItem;
             }
@@ -4425,7 +4453,9 @@ namespace Client.Creator
                     oldValue = (ushort)module.Value;
                     ProductLicenseProperty plp = DetailPropertyGrid.SelectedObject as ProductLicenseProperty;
                     string errorMsg = "";
-                    if (!ushort.TryParse(setModuleToolStripTextBox.Text, out newValue))
+                    if (s_CommLink.IsDefaultModule(plp.ProductID, module.ID))
+                        errorMsg = "Default modules can not be modified.";
+                    else if (!ushort.TryParse(setModuleToolStripTextBox.Text, out newValue))
                         errorMsg = "Invalid format for {0} value";
                     else
                     {
@@ -4515,13 +4545,15 @@ namespace Client.Creator
         private void printToolStripButton_Click(object sender, EventArgs e)
         { 
             CaptureScreen();
-            printDialog1.ShowDialog();
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
         }
 
         private void printToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CaptureScreen();
-            printDialog1.ShowDialog();
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
         }
     }
 }
