@@ -550,7 +550,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d BarCode"/>
 				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
 				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
-				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PS"/>
+				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PostScript"/>
 				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF"/>
 				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event - ***Deprecated***"/>
 				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes - ***Deprecated***"/>
@@ -609,7 +609,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="4"	offset="0x0C0" bits="16" name="Document Assembler" unlimited="1"/>
 				<Module id="5"	offset="0x0D0" bits="16" name="Application Server" />
 				<Module id="6"	offset="0x0E0" bits="16" name="Cores" />
-				<Module id="7"	offset="0x0F0" bits="16" name="Archive" />
+				<Module id="7"	offset="0x0F0" bits="16" name="Document Archive" />
 
 				<Module id="128"  offset="0x103" bits="1" name="SSE Full" unlimited="1"/>
 				<Module id="129"  offset="0x102" bits="1" name="Net Folders" unlimited="1"/>

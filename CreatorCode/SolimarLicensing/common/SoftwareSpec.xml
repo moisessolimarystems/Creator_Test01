@@ -121,7 +121,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PS"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PostScript"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="IPDS::TIFF"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
@@ -158,7 +158,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Document Assembler" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Application Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Cores"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Archive"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Document Archive"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="SSE Full" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="129" moduleName="Net Folders" modUnlimitedValue="1"/>
@@ -312,7 +312,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>
 			
 			<!-- pages per minute extensions -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="300" moduleName="Pages Per Minute Extensions"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="300" moduleName="Pages Per Minute Extensions" moduleVersionDeprecated_Major="6" moduleVersionDeprecated_Minor="0"/>
 			
 			<!-- pages per minute modules -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="301" moduleName="AFPDS::PS PPM" modUnlimitedValue="500"/>

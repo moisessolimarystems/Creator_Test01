@@ -260,7 +260,7 @@ void InititalizeProduct7()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(14, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(14))->second);
 	pTmpModSpec->moduleID = 14;
-	pTmpModSpec->moduleName = std::wstring(L"IPDS::PS");
+	pTmpModSpec->moduleName = std::wstring(L"IPDS::PostScript");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(33, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -470,7 +470,7 @@ void InititalizeProduct8()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(7, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(7))->second);
 	pTmpModSpec->moduleID = 7;
-	pTmpModSpec->moduleName = std::wstring(L"Archive");
+	pTmpModSpec->moduleName = std::wstring(L"Document Archive");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(6, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -1084,6 +1084,8 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleID = 300;
 	pTmpModSpec->moduleName = std::wstring(L"Pages Per Minute Extensions");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionDeprecated_Major = 6;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(301, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(301))->second);
