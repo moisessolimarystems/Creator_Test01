@@ -1951,7 +1951,13 @@ HRESULT SoftwareServer::EnterSoftwareLicArchive(VARIANT vtLicArchive)
 
 			//Find CSIDL_COMMON_APPDATA on local system
 			hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
-			PathAppend(szPath, L"Solimar\\Licensing\\");
+
+			//Append solimar licensing location.
+			// Hide the string so it doesn't appear in the strings of the image - "Solimar\\Data\\"
+			BYTE fileLocByte[] = {
+				0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x44, 0x00, 0x61, 0x00, 0x74, 0x00, 0x61, 0x00, 0x5c, 0x00, 0x5c, 0x00
+			};
+			PathAppend(szPath, (wchar_t*)fileLocByte);
 
 			GUID key_guid;
 			hr = CoCreateGuid(&key_guid);
@@ -2060,7 +2066,13 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 
 			//Find CSIDL_COMMON_APPDATA on local system
 			hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
-			PathAppend(szPath, L"Solimar\\Licensing\\");
+
+			//Append solimar licensing location.
+			// Hide the string so it doesn't appear in the strings of the image - "Solimar\\Data\\"
+			BYTE fileLocByte[] = {
+				0x53, 0x00, 0x6f, 0x00, 0x6c, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x72, 0x00, 0x5c, 0x00, 0x5c, 0x00, 0x44, 0x00, 0x61, 0x00, 0x74, 0x00, 0x61, 0x00, 0x5c, 0x00, 0x5c, 0x00
+			};
+			PathAppend(szPath, (wchar_t*)fileLocByte);
 			
 			GUID key_guid;
 			hr = CoCreateGuid(&key_guid);
