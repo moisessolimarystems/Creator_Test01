@@ -446,7 +446,7 @@ namespace Client.Creator
         [Browsable(false)]
         public DateTime CurrentExpirationDate
         {
-            get { return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); }
+            get { return new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 0, 0); }
         }
 
         [Browsable(false)]
@@ -845,7 +845,7 @@ namespace Client.Creator
                                                                  ID,
                                                                  string.Format("Modify {0} Activation Total", ProductName),
                                                                  value.ToString(),
-                                                                 plt.ActivationAmount.ToString());
+                                                                 plt.Activations.ToString());
                             plt.Activations = _plRec.Activations;
                             client.UpdateProductLicense(plt);
                             client.MarkDirty(LicenseServer);
