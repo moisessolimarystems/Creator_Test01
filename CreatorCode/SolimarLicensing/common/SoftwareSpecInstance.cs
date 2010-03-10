@@ -311,7 +311,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 9;
-			tmpModSpec.moduleName.TVal = "iCONVERT::2d BarCode";
+			tmpModSpec.moduleName.TVal = "iCONVERT::2D BarCode";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -603,7 +603,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 12;
-			tmpModSpec.moduleName.TVal = "PostScript::PostScript(Rip)";
+			tmpModSpec.moduleName.TVal = "PostScript::PostScript(RIP)";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -1206,7 +1206,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 23;
-			tmpModSpec.moduleName.TVal = "Barcode Recoder";
+			tmpModSpec.moduleName.TVal = "Barcode Reader";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -1734,7 +1734,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 24;
-			tmpModSpec.moduleName.TVal = "PostScript::PostScript (RIP)";
+			tmpModSpec.moduleName.TVal = "PostScript::PostScript(RIP)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -1924,7 +1924,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 44;
-			tmpModSpec.moduleName.TVal = "PDF::Postscript (PDFL)";
+			tmpModSpec.moduleName.TVal = "PDF::PostScript(PDFL)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2095,7 +2095,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 2;
-			tmpModSpec.moduleName.TVal = "AFPDS::PS";
+			tmpModSpec.moduleName.TVal = "AFPDS::PostScript";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2266,7 +2266,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 202;
-			tmpModSpec.moduleName.TVal = "PDF Interpreter (PDFL)";
+			tmpModSpec.moduleName.TVal = "PDF Interpreter(PDFL)";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2342,7 +2342,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 301;
-			tmpModSpec.moduleName.TVal = "AFPDS::PS PPM";
+			tmpModSpec.moduleName.TVal = "AFPDS::PostScript PPM";
 			tmpModSpec.modUnlimitedValue.TVal = 500;
 			tmpModSpec.moduleTrialLicense.TVal = 500;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2418,7 +2418,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 39;
-			tmpModSpec.moduleName.TVal = "XCHANGE::PS (DBCS)";
+			tmpModSpec.moduleName.TVal = "XCHANGE::PS(DBCS)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2437,7 +2437,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 305;
-			tmpModSpec.moduleName.TVal = "XCHANGE::PS (DBCS) PPM";
+			tmpModSpec.moduleName.TVal = "XCHANGE::PS(DBCS) PPM";
 			tmpModSpec.modUnlimitedValue.TVal = 500;
 			tmpModSpec.moduleTrialLicense.TVal = 500;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2494,7 +2494,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 102;
-			tmpModSpec.moduleName.TVal = "Bus/Tag Output (PCI)";
+			tmpModSpec.moduleName.TVal = "Bus/Tag Output(PCI)";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2532,7 +2532,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 101;
-			tmpModSpec.moduleName.TVal = "Bus/Tag Input (polaris)";
+			tmpModSpec.moduleName.TVal = "Bus/Tag Input(polaris)";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -2779,7 +2779,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 18;
-			tmpModSpec.moduleName.TVal = "PDF::PostScript (Rip)";
+			tmpModSpec.moduleName.TVal = "PDF::PostScript(RIP)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;

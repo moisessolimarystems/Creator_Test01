@@ -223,7 +223,7 @@ void InititalizeProduct7()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(9, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(9))->second);
 	pTmpModSpec->moduleID = 9;
-	pTmpModSpec->moduleName = std::wstring(L"iCONVERT::2d BarCode");
+	pTmpModSpec->moduleName = std::wstring(L"iCONVERT::2D BarCode");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(8, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -342,7 +342,7 @@ void InititalizeProduct9()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(12, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(12))->second);
 	pTmpModSpec->moduleID = 12;
-	pTmpModSpec->moduleName = std::wstring(L"PostScript::PostScript(Rip)");
+	pTmpModSpec->moduleName = std::wstring(L"PostScript::PostScript(RIP)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(21, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -631,7 +631,7 @@ void InititalizeProduct12()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(23, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(23))->second);
 	pTmpModSpec->moduleID = 23;
-	pTmpModSpec->moduleName = std::wstring(L"Barcode Recoder");
+	pTmpModSpec->moduleName = std::wstring(L"Barcode Reader");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
@@ -855,7 +855,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(24))->second);
 	pTmpModSpec->moduleID = 24;
-	pTmpModSpec->moduleName = std::wstring(L"PostScript::PostScript (RIP)");
+	pTmpModSpec->moduleName = std::wstring(L"PostScript::PostScript(RIP)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
@@ -925,7 +925,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(44, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(44))->second);
 	pTmpModSpec->moduleID = 44;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::Postscript (PDFL)");
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(PDFL)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
@@ -991,7 +991,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
-	pTmpModSpec->moduleName = std::wstring(L"AFPDS::PS");
+	pTmpModSpec->moduleName = std::wstring(L"AFPDS::PostScript");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
@@ -1058,7 +1058,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(202, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(202))->second);
 	pTmpModSpec->moduleID = 202;
-	pTmpModSpec->moduleName = std::wstring(L"PDF Interpreter (PDFL)");
+	pTmpModSpec->moduleName = std::wstring(L"PDF Interpreter(PDFL)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(401, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -1090,7 +1090,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(301, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(301))->second);
 	pTmpModSpec->moduleID = 301;
-	pTmpModSpec->moduleName = std::wstring(L"AFPDS::PS PPM");
+	pTmpModSpec->moduleName = std::wstring(L"AFPDS::PostScript PPM");
 	pTmpModSpec->modUnlimitedValue = 500;
 	pTmpModSpec->moduleTrialLicense = 500;
 	
@@ -1118,14 +1118,14 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(39, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(39))->second);
 	pTmpModSpec->moduleID = 39;
-	pTmpModSpec->moduleName = std::wstring(L"XCHANGE::PS (DBCS)");
+	pTmpModSpec->moduleName = std::wstring(L"XCHANGE::PS(DBCS)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(305, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(305))->second);
 	pTmpModSpec->moduleID = 305;
-	pTmpModSpec->moduleName = std::wstring(L"XCHANGE::PS (DBCS) PPM");
+	pTmpModSpec->moduleName = std::wstring(L"XCHANGE::PS(DBCS) PPM");
 	pTmpModSpec->modUnlimitedValue = 500;
 	pTmpModSpec->moduleTrialLicense = 500;
 	
@@ -1147,7 +1147,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(102, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(102))->second);
 	pTmpModSpec->moduleID = 102;
-	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Output (PCI)");
+	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Output(PCI)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(103, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -1159,7 +1159,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(101, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(101))->second);
 	pTmpModSpec->moduleID = 101;
-	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Input (polaris)");
+	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Input(polaris)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(106, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -1252,7 +1252,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(18, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(18))->second);
 	pTmpModSpec->moduleID = 18;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript (Rip)");
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(RIP)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	

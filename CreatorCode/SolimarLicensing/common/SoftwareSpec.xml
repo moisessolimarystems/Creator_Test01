@@ -117,7 +117,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2d BarCode"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2D BarCode"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF"/>
@@ -173,7 +173,7 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Distiller"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="GhostScript"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="PostScript::PostScript(Rip)"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="PostScript::PostScript(RIP)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="PostScript::Metacode"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="PostScript::IPDS"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PostScript::TIFF"/>
@@ -218,7 +218,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="Assembly" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Recoder" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Reader" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="XPIF Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
@@ -233,7 +233,7 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="3211::ASCII" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="AFPDS::PDF" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="AFPDS::PS" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="AFPDS::PostScript" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="ASCII::3211" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Blocker" modUnlimitedValue="1" moduleDefaultLicense="1"/>
@@ -253,7 +253,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="PDF::Metacode" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="PDF::PostScript" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="PDF::PostScript (Rip)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="PDF::PostScript(RIP)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="PDF::TIFF" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="PostScript::IPDS" modUnlimitedValue="1"/>
@@ -261,7 +261,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="PostScript::PDF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="PostScript::PostScript" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="PostScript::PostScript (RIP)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="PostScript::PostScript(RIP)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="PostScript::TIFF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="26" moduleName="SCS::3211" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="27" moduleName="SCS::Metacode" modUnlimitedValue="1"/>
@@ -279,14 +279,14 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="36" moduleName="XCHANGE::PCL" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="37" moduleName="XCHANGE::PDF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="38" moduleName="XCHANGE::PS" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="39" moduleName="XCHANGE::PS (DBCS)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="39" moduleName="XCHANGE::PS(DBCS)" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="XRocks Printer Controller" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="IPDS Print Controller" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="RJE::3211" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="AFPDS::IPDS" modUnlimitedValue="1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::Postscript (PDFL)" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::PostScript(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="45" moduleName="PDF::IPDS(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="47" moduleName="PDF::AFPDS(PDFL)" modUnlimitedValue="1"/>
@@ -296,8 +296,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="PostScript::AFPDS" modUnlimitedValue="1"/>
 			
 			<!-- Module IDs identifying hardware -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input (polaris)"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output (PCI)"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output(PCI)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Parallel Input"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="104" moduleName="Parallel Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="105" moduleName="SCSI SDI Output"/>
@@ -306,7 +306,7 @@
 			<!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP/IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter (PDFL)"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>
 			
 			<!-- Output Pool module -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>
@@ -315,11 +315,11 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="300" moduleName="Pages Per Minute Extensions" moduleVersionDeprecated_Major="6" moduleVersionDeprecated_Minor="0"/>
 			
 			<!-- pages per minute modules -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="301" moduleName="AFPDS::PS PPM" modUnlimitedValue="500"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="301" moduleName="AFPDS::PostScript PPM" modUnlimitedValue="500"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="302" moduleName="XCHANGE::IPDS PPM" modUnlimitedValue="500"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="303" moduleName="XCHANGE::PCL PPM" modUnlimitedValue="500"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="304" moduleName="XCHANGE::PS PPM" modUnlimitedValue="500"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="305" moduleName="XCHANGE::PS (DBCS) PPM" modUnlimitedValue="500"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="305" moduleName="XCHANGE::PS(DBCS) PPM" modUnlimitedValue="500"/>
 			
 			<!-- Client licensing -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/><!--IsSharable-->
