@@ -133,7 +133,7 @@ namespace Client.Creator
             plData.ProductLicense.ProductID = (byte)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
             plData.ProductLicense.ProductConnection = (byte)((plData.ProductLicense.plState == (byte)ProductLicenseState.AddOn) ? 0 : 1);
             plData.ProductLicense.ProductVersion = productLicenseVersionMaskedTextBox.Text;
-            plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text));
+            plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime();
             plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;
         }
         #endregion
