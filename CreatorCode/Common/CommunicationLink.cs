@@ -244,7 +244,7 @@ namespace Client.Creator
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(byte productID)
         {
-            string productName = "Test/Dev " + GetProductName(productID);
+            string productName = "Test/Dev/DR " + GetProductName(productID);
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 //want to find test dev product spec given base product id
@@ -320,7 +320,7 @@ namespace Client.Creator
         public string GetProductBaseName(string productName)
         {
             if (productName.Contains("Test"))
-                productName = productName.Replace("Test/Dev","").Trim();            
+                productName = productName.Replace("Test/Dev/DR", "").Trim();            
             return productName;        
         }
 
@@ -328,7 +328,7 @@ namespace Client.Creator
         {
             string productName = GetProductName(productID);
             if (productName.Contains("Test"))
-                productName = productName.Replace("Test/Dev", "").Trim();
+                productName = productName.Replace("Test/Dev/DR", "").Trim();
             return productName;
         }
 
@@ -396,7 +396,7 @@ namespace Client.Creator
                     {
                         if (moduleSpec.moduleID.TVal == moduleID)
                         {
-                            if (moduleSpec.moduleDefaultLicense.TVal > 0)
+                            if (moduleSpec.moduleDefaultLicense.TVal > 0 && moduleSpec.moduleTrialLicense.TVal <= 1)
                                 return true;
                         }
                     }
