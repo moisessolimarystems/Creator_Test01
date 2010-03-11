@@ -1156,7 +1156,7 @@ namespace SolimarLicenseViewer
                                     toolTipSB.Append(" Modules'");
                                 else
                                     toolTipSB.Append(" Module's");
-                                toolTipSB.Append(" Application Instance expired because of System Clock Violation");
+                                toolTipSB.Append(" Product Connections expired because of System Clock Violation");
                             }
                             else
                             {
@@ -1169,7 +1169,7 @@ namespace SolimarLicenseViewer
                                         toolTipSB.Append(" Modules'");
                                     else
                                         toolTipSB.Append(" Module's");
-                                    toolTipSB.Append(" Application Instance");
+                                    toolTipSB.Append(" Product Connections");
 
                                     if (DateTime.Now.ToUniversalTime().CompareTo(dTimeToIntKVPair.Key) > 0)
                                         toolTipSB.Append(" expired on: ");

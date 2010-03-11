@@ -71,7 +71,7 @@ namespace SolimarLicenseViewer
         public static readonly String ConnProductHeader = "Product";
         public static readonly String ConnPrimaryServerHeader = "Primary License Server";
         public static readonly String ConnBackupServerHeader = "Fail Over Server";
-        public static readonly String ConnTestDevHeader = "Use Development Licensing";
+        public static readonly String ConnTestDevHeader = "Use Test/Dev/DR Licensing";
         public static readonly String ConnStatusHeader = "Status";
 
         public static readonly String FilterHeader = "View";
@@ -82,7 +82,7 @@ namespace SolimarLicenseViewer
 
         //Product Node Column Headers
         public static readonly String VersionHeader = "Version";
-        public static readonly String AppInstanceHeader = "Application Instance";
+        public static readonly String AppInstanceHeader = "Product Connections";//"Application Instance";
         //History Node Column Headers
         public static readonly String VerificationCodeHeader = "Verification Code";
         public static readonly String DateAppliedHeader = "Date Applied";
@@ -90,16 +90,16 @@ namespace SolimarLicenseViewer
         public static readonly String SummaryAllProdLicNum = " Summary of all Product Licenses";
         public static readonly String ProdLicNumHeader = "Product License";
         public static readonly String ProdLicNumStateHeader = "Status";
-        public static readonly String LicensesHeader = "Licenses";
+        public static readonly String LicensesHeader = "Units";//"Licenses";
         public static readonly String UnitsHeader = "Module";
-        public static readonly String AppInstanceExpiredHeader = "Expired Application Instance";
+        public static readonly String AppInstanceExpiredHeader = "Expired Product Connections";//"Expired Application Instance";
         public static readonly String BottomLicenseRootNode = "BottomLicenses";
         public static readonly String BottomUnitsHeader = "BottomModule";
 
 
         //Usage Node Column Headers
         public static readonly String UsageProductHeader = "Product";
-        public static readonly String UsageAppInstanceHeader = "Application Instance";
+        public static readonly String UsageAppInstanceHeader = "Product Connections";//"Application Instance";
         public static readonly String UsageModuleHeader = "Module";
         public static readonly String ObtainedHeader = "Obtained";
         public static readonly String TotalHeader = "Total";

@@ -19,77 +19,77 @@ namespace Solimar.Licensing
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs tmpModSpec;
 			
-			#region ProdID:115, ProdName: Test/Dev SOLsearcher Enterprise Single Platform
+			#region ProdID:115, ProdName: Test/Dev/DR SOLsearcher Enterprise Single Platform
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 115;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLsearcher Enterprise Single Platform";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLsearcher Enterprise Single Platform";
 			tmpProdSpec.sameModSpecProductID.TVal = 8;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:114, ProdName: Test/Dev SPDE
+			#region ProdID:114, ProdName: Test/Dev/DR SPDE
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 114;
-			tmpProdSpec.productName.TVal = "Test/Dev SPDE";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE";
 			tmpProdSpec.sameModSpecProductID.TVal = 14;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:117, ProdName: Test/Dev Rubika Process Builder
+			#region ProdID:117, ProdName: Test/Dev/DR Rubika Process Builder
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 117;
-			tmpProdSpec.productName.TVal = "Test/Dev Rubika Process Builder";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Rubika Process Builder";
 			tmpProdSpec.sameModSpecProductID.TVal = 17;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:116, ProdName: Test/Dev SOLitrack
+			#region ProdID:116, ProdName: Test/Dev/DR SOLitrack
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 116;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLitrack";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLitrack";
 			tmpProdSpec.sameModSpecProductID.TVal = 16;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:110, ProdName: Test/Dev SOLindexer
+			#region ProdID:110, ProdName: Test/Dev/DR SOLindexer
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 110;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLindexer";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLindexer";
 			tmpProdSpec.sameModSpecProductID.TVal = 10;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:113, ProdName: Test/Dev SOLfusion
+			#region ProdID:113, ProdName: Test/Dev/DR SOLfusion
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 113;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLfusion";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLfusion";
 			tmpProdSpec.sameModSpecProductID.TVal = 13;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:112, ProdName: Test/Dev Rubika
+			#region ProdID:112, ProdName: Test/Dev/DR Rubika
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 112;
-			tmpProdSpec.productName.TVal = "Test/Dev Rubika";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Rubika";
 			tmpProdSpec.sameModSpecProductID.TVal = 12;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:119, ProdName: Test/Dev SPDE Queue Manager
+			#region ProdID:119, ProdName: Test/Dev/DR SPDE Queue Manager
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 119;
-			tmpProdSpec.productName.TVal = "Test/Dev SPDE Queue Manager";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Queue Manager";
 			tmpProdSpec.sameModSpecProductID.TVal = 19;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:118, ProdName: Test/Dev SDX Designer
+			#region ProdID:118, ProdName: Test/Dev/DR SDX Designer
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 118;
-			tmpProdSpec.productName.TVal = "Test/Dev SDX Designer";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SDX Designer";
 			tmpProdSpec.sameModSpecProductID.TVal = 18;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
@@ -1027,26 +1027,26 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:108, ProdName: Test/Dev SOLsearcher Enterprise
+			#region ProdID:108, ProdName: Test/Dev/DR SOLsearcher Enterprise
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 108;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLsearcher Enterprise";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLsearcher Enterprise";
 			tmpProdSpec.sameModSpecProductID.TVal = 8;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:109, ProdName: Test/Dev SOLscript
+			#region ProdID:109, ProdName: Test/Dev/DR SOLscript
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 109;
-			tmpProdSpec.productName.TVal = "Test/Dev SOLscript";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLscript";
 			tmpProdSpec.sameModSpecProductID.TVal = 9;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:107, ProdName: Test/Dev iCONVERT
+			#region ProdID:107, ProdName: Test/Dev/DR iCONVERT
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 107;
-			tmpProdSpec.productName.TVal = "Test/Dev iCONVERT";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR iCONVERT";
 			tmpProdSpec.sameModSpecProductID.TVal = 7;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion

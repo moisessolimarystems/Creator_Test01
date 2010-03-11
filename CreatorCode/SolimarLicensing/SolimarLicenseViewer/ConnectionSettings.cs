@@ -132,8 +132,8 @@ namespace SolimarLicenseViewer
         }
 
         [Category("Licensing"),
-         Description("Set to true if you want the given product to use the Development licensing for testing."),
-         DisplayName("Use Development Licensing")]
+         Description("Set to true if you want the given product to use the Test/Dev/DR licensing for testing."),
+         DisplayName("Use Test/Dev/DR Licensing")]
         public bool UseDevelopmentLic
         {
             get

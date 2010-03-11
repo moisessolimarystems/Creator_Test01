@@ -6,11 +6,11 @@ void InititalizeProduct115()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:115, ProdName: Test/Dev SOLsearcher Enterprise Single Platform
+	// ProdID:115, ProdName: Test/Dev/DR SOLsearcher Enterprise Single Platform
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(115, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(115))->second);
 	pTmpProdSpec->productID = 115;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLsearcher Enterprise Single Platform");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLsearcher Enterprise Single Platform");
 	pTmpProdSpec->sameModSpecProductID = 8;
 }
 
@@ -19,11 +19,11 @@ void InititalizeProduct114()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:114, ProdName: Test/Dev SPDE
+	// ProdID:114, ProdName: Test/Dev/DR SPDE
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(114, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(114))->second);
 	pTmpProdSpec->productID = 114;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SPDE");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE");
 	pTmpProdSpec->sameModSpecProductID = 14;
 }
 
@@ -32,11 +32,11 @@ void InititalizeProduct117()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:117, ProdName: Test/Dev Rubika Process Builder
+	// ProdID:117, ProdName: Test/Dev/DR Rubika Process Builder
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(117, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(117))->second);
 	pTmpProdSpec->productID = 117;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev Rubika Process Builder");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Rubika Process Builder");
 	pTmpProdSpec->sameModSpecProductID = 17;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
@@ -46,11 +46,11 @@ void InititalizeProduct116()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:116, ProdName: Test/Dev SOLitrack
+	// ProdID:116, ProdName: Test/Dev/DR SOLitrack
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(116, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(116))->second);
 	pTmpProdSpec->productID = 116;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLitrack");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLitrack");
 	pTmpProdSpec->sameModSpecProductID = 16;
 }
 
@@ -59,11 +59,11 @@ void InititalizeProduct110()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:110, ProdName: Test/Dev SOLindexer
+	// ProdID:110, ProdName: Test/Dev/DR SOLindexer
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(110, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(110))->second);
 	pTmpProdSpec->productID = 110;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLindexer");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLindexer");
 	pTmpProdSpec->sameModSpecProductID = 10;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
@@ -73,11 +73,11 @@ void InititalizeProduct113()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:113, ProdName: Test/Dev SOLfusion
+	// ProdID:113, ProdName: Test/Dev/DR SOLfusion
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(113, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(113))->second);
 	pTmpProdSpec->productID = 113;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLfusion");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLfusion");
 	pTmpProdSpec->sameModSpecProductID = 13;
 }
 
@@ -86,11 +86,11 @@ void InititalizeProduct112()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:112, ProdName: Test/Dev Rubika
+	// ProdID:112, ProdName: Test/Dev/DR Rubika
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(112, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(112))->second);
 	pTmpProdSpec->productID = 112;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev Rubika");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Rubika");
 	pTmpProdSpec->sameModSpecProductID = 12;
 }
 
@@ -99,11 +99,11 @@ void InititalizeProduct119()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:119, ProdName: Test/Dev SPDE Queue Manager
+	// ProdID:119, ProdName: Test/Dev/DR SPDE Queue Manager
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(119, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(119))->second);
 	pTmpProdSpec->productID = 119;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SPDE Queue Manager");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Queue Manager");
 	pTmpProdSpec->sameModSpecProductID = 19;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
@@ -113,11 +113,11 @@ void InititalizeProduct118()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:118, ProdName: Test/Dev SDX Designer
+	// ProdID:118, ProdName: Test/Dev/DR SDX Designer
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(118, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(118))->second);
 	pTmpProdSpec->productID = 118;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SDX Designer");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SDX Designer");
 	pTmpProdSpec->sameModSpecProductID = 18;
 }
 
@@ -499,11 +499,11 @@ void InititalizeProduct108()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:108, ProdName: Test/Dev SOLsearcher Enterprise
+	// ProdID:108, ProdName: Test/Dev/DR SOLsearcher Enterprise
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(108, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(108))->second);
 	pTmpProdSpec->productID = 108;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLsearcher Enterprise");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLsearcher Enterprise");
 	pTmpProdSpec->sameModSpecProductID = 8;
 }
 
@@ -512,11 +512,11 @@ void InititalizeProduct109()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:109, ProdName: Test/Dev SOLscript
+	// ProdID:109, ProdName: Test/Dev/DR SOLscript
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(109, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(109))->second);
 	pTmpProdSpec->productID = 109;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev SOLscript");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLscript");
 	pTmpProdSpec->sameModSpecProductID = 9;
 }
 
@@ -525,11 +525,11 @@ void InititalizeProduct107()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:107, ProdName: Test/Dev iCONVERT
+	// ProdID:107, ProdName: Test/Dev/DR iCONVERT
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(107, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(107))->second);
 	pTmpProdSpec->productID = 107;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev iCONVERT");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR iCONVERT");
 	pTmpProdSpec->sameModSpecProductID = 7;
 }
 
