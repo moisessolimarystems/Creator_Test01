@@ -54,7 +54,8 @@ private:
 	HRESULT RemoveFromNotification(BSTR license_id);
 
 	static const unsigned int CheckHealthThreadPeriod = 2*60*1000;		//(ms) - 2 Minutes
-	static const unsigned int MutexDeadlockTimeout= 60*1000;				//(ms) - 1 Minute
+	//CR.12791 - For very large license server files on slow computers, generating/viewing diagnostic data can take minutes, which may hit the deadlock timer
+	static const unsigned int MutexDeadlockTimeout= 7*60*1000;				//(ms) - 7 Minutes
 
 	static const unsigned int TrialKeyDecrementCheckPeriod = 60*1000;	//(ms)
 	static const unsigned int UpdateKeysThreadPeriod = 60*1000;			//(ms)
