@@ -51,9 +51,9 @@ namespace SolimarLicenseViewer
             else if (this.treeView.Nodes.Count > 0)
             {
                 if (string.Compare(this.treeView.Nodes[0].Text, "Licenses") == 0)
-                    this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes[0];
+                    this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes.Count > 0 ? this.treeView.Nodes[0].Nodes[0] : this.treeView.Nodes[0];
                 else
-                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count-1];
+                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 1];
             }
             Cursor.Current = Cursors.Default;
         }
@@ -655,7 +655,8 @@ namespace SolimarLicenseViewer
             if (!m_bIsChildForm)
             {
                 // Copy window location to app settings
-                Settings.Default.WindowLocation = this.Location;
+                if(this.Location.X > 0 && this.Location.Y > 0)
+                    Settings.Default.WindowLocation = this.Location;
 
                 // Copy window size to app settings
                 if (this.WindowState == FormWindowState.Normal)
