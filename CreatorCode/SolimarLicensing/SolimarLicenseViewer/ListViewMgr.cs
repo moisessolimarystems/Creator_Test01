@@ -1315,12 +1315,20 @@ namespace SolimarLicenseViewer
                             lvItem.SubItems.Add(keyInfo.licenseTypeName);
                             int daysLeft = (int)(keyInfo.hoursLeft / 24);
                             if (daysLeft == 0 && keyInfo.bIsActive)
+                            {
                                 lvItem.SubItems.Add("Unlimited");
+                                lvItem.SubItems.Add("Unlimited");
+                            }
                             else if (keyInfo.IsKeyTypeDevelopment())
+                            {
                                 lvItem.SubItems.Add(daysLeft.ToString());
+                                lvItem.SubItems.Add(keyInfo.expirationDate.ToString());
+                            }
                             else
+                            {
                                 lvItem.SubItems.Add("-");
-                            lvItem.SubItems.Add(keyInfo.expirationDate.ToString());
+                                lvItem.SubItems.Add("-");
+                            }
                         }
                         else
                         {
