@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ValidationTokenRetriever")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Solimar Validation Token Retriever")]
+[assembly: AssemblyDescription("Solimar Validation Token Retriever")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ValidationTokenRetriever")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2009")]
+[assembly: AssemblyCompany("Solimar Systems, Inc.")]
+[assembly: AssemblyProduct("Solimar Licensing")]
+[assembly: AssemblyCopyright("Copyright ©  2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
