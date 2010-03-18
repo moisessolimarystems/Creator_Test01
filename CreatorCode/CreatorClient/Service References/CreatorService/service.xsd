@@ -413,6 +413,24 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetLicenseServerVersion">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="major" type="xs:int" />
+        <xs:element minOccurs="0" name="minor" type="xs:int" />
+        <xs:element minOccurs="0" name="buildversion" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetLicenseServerVersionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="major" type="xs:int" />
+        <xs:element minOccurs="0" name="minor" type="xs:int" />
+        <xs:element minOccurs="0" name="buildversion" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetTransactionsByLicenseName">
     <xs:complexType>
       <xs:sequence>

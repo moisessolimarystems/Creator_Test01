@@ -473,7 +473,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="21" offset="0x110" bits="16" name="Merge Counter - ***Deprecated***" licenseRead="(value * 4096)" licenseWrite="(value / 4096)" isCounter="true"/>
 				<Module id="22" offset="0x120" bits="1" name="Assembly" unlimited="1"/>   
 				<Module id="23" offset="0x121" bits="1" name="Barcode Reader" unlimited="1"/>  
-				<Module id="24" offset="0x122" bits="1" name="XPIF Input" unlimited="1"/>  
+				<Module id="24" offset="0x122" bits="1" name="Job Ticket Input" unlimited="1"/>  
 				<Module id="30" offset="0x0F0" bits="4" name="Engine Instances"/>
         <Module id="31" offset="0x0F4" bits="4" name="Process Builders" isSharable="true"/>				
 			</ModuleList>
@@ -547,7 +547,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
 				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
 				<Module id="8"	offset="0x0ac" bits="4" name="iCONVERT Job Events"/>
-				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d BarCode"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d Barcode"/>
 				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
 				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
 				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PostScript"/>
@@ -640,8 +640,8 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 		</KeyLayout>
 		<KeyLayout name="SOLindexer">
 			<ModuleList>
-				<Module id="0"	offset="0x080" bits="16" name="SDX Designer"/>				
-				<Module id="1"	offset="0x090" bits="16" name="SOLmonitor"/>
+				<Module id="0"	offset="0x080" bits="16" name="SDX Designer - ***Deprecated***"/>				
+				<Module id="1"	offset="0x090" bits="16" name="Index Engine Instances"/>
 			</ModuleList>
 			<ProductList>
 				<Product id="10" name="SOLindexer">
@@ -872,7 +872,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
     </KeyLayout>
     <KeyLayout name="Rubika Process Builder">
       <ModuleList>
-        <Module id="31"	offset="0x080" bits="16" name="Process Builders"/>
+        <Module id="31"	offset="0x080" bits="16" name="Process Builder Instances"/>
       </ModuleList>
       <ProductList>
         <Product id="17" name="Rubika Process Builder">
@@ -885,7 +885,7 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
         <Module id="0"	offset="0x080" bits="16" name="SDX Designer"/>
       </ModuleList>
       <ProductList>
-        <Product id="18" name="SDX Designer">
+        <Product id="18" name="SDX Designer Instances">
           <ModuleInclude id="0" default="0"/>
         </Product>
       </ProductList>

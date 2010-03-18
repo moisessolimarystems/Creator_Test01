@@ -207,6 +207,12 @@
   <wsdl:message name="ICreator_GetCreatorServiceVersion_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetCreatorServiceVersionResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetLicenseServerVersion_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLicenseServerVersion" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetLicenseServerVersion_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLicenseServerVersionResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetTransactionsByLicenseName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTransactionsByLicenseName" />
   </wsdl:message>
@@ -715,6 +721,10 @@
     <wsdl:operation name="GetCreatorServiceVersion">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersion" message="tns:ICreator_GetCreatorServiceVersion_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse" message="tns:ICreator_GetCreatorServiceVersion_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLicenseServerVersion">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersion" message="tns:ICreator_GetLicenseServerVersion_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersionResponse" message="tns:ICreator_GetLicenseServerVersion_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetTransactionsByLicenseName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName" message="tns:ICreator_GetTransactionsByLicenseName_InputMessage" />
@@ -1249,6 +1259,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetCreatorServiceVersion">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetCreatorServiceVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLicenseServerVersion">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetLicenseServerVersion" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

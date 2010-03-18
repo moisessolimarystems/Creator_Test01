@@ -1967,6 +1967,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
         void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseServerVersion", ReplyAction="http://tempuri.org/ICreator/GetLicenseServerVersionResponse")]
+        void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName);
         
@@ -2309,6 +2312,10 @@ namespace Client.Creator.CreatorService {
         
         public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion) {
             base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
+        }
+        
+        public void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion) {
+            base.Channel.GetLicenseServerVersion(ref major, ref minor, ref buildversion);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName) {
