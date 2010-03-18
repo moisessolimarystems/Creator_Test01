@@ -3,6 +3,11 @@
 
 #include <comdef.h>
 #include <tchar.h>
+// vc6 = 1200, vc7 = 1300, vc7.1 = 1310, vc8 = 1400
+#if _MSC_VER < 1400
+#include <stdio.h>
+#define swprintf_s _snwprintf
+#endif
 
 class EventLogHelper
 {
