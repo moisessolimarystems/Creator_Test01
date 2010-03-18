@@ -121,7 +121,7 @@
 	<Lic_ProductSoftwareSpecAttribs>
 -->	
 
-	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
@@ -159,7 +159,7 @@
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="8" productName="SOLsearcher Enterprise" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="8" productName="SOLsearcher Enterprise">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Index Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Document Server"/>
@@ -180,7 +180,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="133" moduleName="Full Text" modUnlimitedValue="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="9" productName="SOLscript" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="9" productName="SOLscript">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Distiller"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="GhostScript"/>
@@ -193,13 +193,13 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PostScript::PostScript"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Merge" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Address Cleanse" modUnlimitedValue="1"/>
@@ -235,12 +235,12 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="13" productName="SOLfusion" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="13" productName="SOLfusion">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SOLfusion"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>		
-	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="3211::ASCII" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="AFPDS::PDF" modUnlimitedValue="1"/>
@@ -340,26 +340,26 @@
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	
-	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8">
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="16" productName="SOLitrack" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="16" productName="SOLitrack">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Devices"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Operators"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="17" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="17" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builder Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
