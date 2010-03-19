@@ -13,11 +13,14 @@ namespace Client.Creator
         private Lic_PackageAttribs _licPackage;
         private LicenseTable _licenseTable;
         private string _licenseServer;
+        private uint _highestProductRevision;   //set by determining from the included products in a packet.
+
         public LicensePacket(string licenseServer)        
         {            
             _licPackage = new Lic_PackageAttribs();
             _licenseTable = null;
             _licenseServer = licenseServer;
+            _highestProductRevision = 0;
         }
 
         public Lic_PackageAttribs LicPackage
@@ -38,9 +41,11 @@ namespace Client.Creator
         public bool BuildLicensePackage()
         {
             bool bRetVal = false;
+            int major = 0, minor = 0, buildVersion = 0;
             Service<ICreator>.Use((client) =>
             {
                 _licenseTable = client.GetLicenseByName(_licenseServer, false);
+                client.GetLicenseServerVersion(ref major, ref minor, ref buildVersion);
             });
             if (_licenseTable != null)
             {
@@ -52,6 +57,10 @@ namespace Client.Creator
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
                         Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
                         _licPackage.licLicenseInfoAttribs.TVal = licInfo;
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Major.TVal = (uint)major;
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Minor.TVal = (uint)minor;
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMajor.TVal = (uint)buildVersion;
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestProductRevision;//value determined from included products highest revision
                         _licenseTable.LicenseInfo = _licPackage.Stream;
                         bRetVal = true;
                     }
@@ -107,6 +116,7 @@ namespace Client.Creator
         private bool PopulateProductInfo()
         {
             bool bRetVal = false;
+            uint currentProductRevision;
             Service<ICreator>.Use((client) =>
             {
                 List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer);
@@ -151,6 +161,9 @@ namespace Client.Creator
                         }
                     }
                     _licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(product);
+                    //get revision by setting to highest product revision while adding
+                    currentProductRevision = CreatorForm.s_CommLink.GetProductSpecRevision(plt.ProductID);
+                    _highestProductRevision = (currentProductRevision > _highestProductRevision) ? currentProductRevision : _highestProductRevision;
                 }
                 bRetVal = true;
             });
