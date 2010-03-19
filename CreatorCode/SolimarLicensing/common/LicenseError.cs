@@ -13,6 +13,7 @@ namespace Solimar
 			private const uint ITF_LIC_MIN = ITF_MIN+0x9000;
 			private const uint ITF_LIC_SVR_OFFSET = ITF_LIC_MIN+0x0000;
 			private const uint ITF_LIC_RNBO_OFFSET = ITF_LIC_MIN+0x0100;
+			private const uint ITF_LIC_WRPPR_OFFSET = ITF_LIC_MIN+0x0200;
 			private const uint ITF_LIC_MGR_OFFSET = ITF_LIC_MIN+0x0300;
 			private const uint ITF_MAX = 0xFFFF;
 		
@@ -86,8 +87,32 @@ namespace Solimar
 			private const uint EHR_KEY_NO_FREE_APP_INSTANCE = ITF_LIC_SVR_OFFSET+22;
 			private const uint EHR_KEY_NO_BASE_KEY = ITF_LIC_SVR_OFFSET+23;
 			private const uint EHR_KEY_RESTORED_KEY_SERVER = ITF_LIC_SVR_OFFSET+24;
-			private const uint EHR_KEY_USE_BACKUP_KEY_SERVER = ITF_LIC_SVR_OFFSET+25;
+			private const uint EHR_KEY_USE_FAILOVER_KEY_SERVER = ITF_LIC_SVR_OFFSET+25;
 			private const uint EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER = ITF_LIC_SVR_OFFSET+26;
+			private const uint EHR_LIC_PROD_NO_FREE_APP_INSTANCE = ITF_LIC_SVR_OFFSET+27;
+			private const uint EHR_LIC_MOD_NO_FREE_APP_INSTANCE = ITF_LIC_SVR_OFFSET+28;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID = ITF_LIC_SVR_OFFSET+29;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE = ITF_LIC_SVR_OFFSET+30;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_BIOS_SERIALNUMBER = ITF_LIC_SVR_OFFSET+31;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_MAC_ADDRESS = ITF_LIC_SVR_OFFSET+32;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_COMPUTER_NAME = ITF_LIC_SVR_OFFSET+33;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY = ITF_LIC_SVR_OFFSET+34;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE = ITF_LIC_SVR_OFFSET+35;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_PACKET = ITF_LIC_SVR_OFFSET+36;
+			private const uint EHR_LIC_SOFTWARE_CONNECT_FAILOVER_ONLY = ITF_LIC_SVR_OFFSET+37;
+			private const uint EHR_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED = ITF_LIC_SVR_OFFSET+38;
+			private const uint EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET = ITF_LIC_SVR_OFFSET+39;
+			private const uint EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY = ITF_LIC_SVR_OFFSET+40;
+			private const uint EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH = ITF_LIC_SVR_OFFSET+41;
+			private const uint EHR_LIC_SOFTWARE_KEY_ID_REQUIRED = ITF_LIC_SVR_OFFSET+42;
+			private const uint EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED = ITF_LIC_SVR_OFFSET+43;
+			private const uint EHR_LIC_SOFTWARE_NO_PRODUCT = ITF_LIC_SVR_OFFSET+44;
+			private const uint EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION = ITF_LIC_SVR_OFFSET+45;
+			private const uint EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER = ITF_LIC_SVR_OFFSET+46;
+			private const uint EHR_LIC_CLOCK_LIC_PACKET = ITF_LIC_SVR_OFFSET+47;
+			private const uint EHR_LIC_CLOCK_LIC_ARCHIVE = ITF_LIC_SVR_OFFSET+48;
+			private const uint EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC = ITF_LIC_SVR_OFFSET+49;
+			private const uint EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE = ITF_LIC_SVR_OFFSET+50;
 		
 			// Rainbow driver errors
 			private const uint EHR_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -129,8 +154,12 @@ namespace Solimar
 			private const uint EHR_SP_INVALID_STATUS = ITF_LIC_RNBO_OFFSET+SP_INVALID_STATUS;
 		
 			// Rainbow driver errors
+			private const uint EHR_WRPPR_SVR_NOT_CONNECTED = ITF_LIC_WRPPR_OFFSET+1;
+		
+			// Rainbow driver errors
 			private const uint EHR_LIC_MGR_NO_COMPUTER = ITF_LIC_MGR_OFFSET+1;
 			private const uint EHR_LIC_MGR_NO_LIC_SERVER = ITF_LIC_MGR_OFFSET+2;
+			private const uint EHR_LIC_MGR_VIEW_ONLY = ITF_LIC_MGR_OFFSET+3;
 			#endregion
 			
 			#region Defines for Custom HRESULTS Messages
@@ -139,32 +168,56 @@ namespace Solimar
 			static CSolLicHRESULT()
 			{
 				SolLicErrors = new System.Collections.Hashtable();
-				SolLicErrors.Add(EHR_UNKNOWN,"Unknown error (Key server)");
-				SolLicErrors.Add(EHR_DRIVER_INIT_FAILURE,"Driver initialization failure (Key server)");
-				SolLicErrors.Add(EHR_PASSWORD_NO_MATCH,"Passwords do not match (Key server)");
-				SolLicErrors.Add(EHR_PASSWORD_INVALID_FORMAT,"Invalid password format (Key server)");
-				SolLicErrors.Add(EHR_LICENSE_INSUFFICIENT,"Insufficient license (Key server)");
-				SolLicErrors.Add(EHR_LICENSE_INVALID,"Invalid license (Key server)");
-				SolLicErrors.Add(EHR_LICENSE_EXPRIED,"License expired (Key server)");
-				SolLicErrors.Add(EHR_KEY_TRIAL_EXPIRED,"Trial Key expired (Key server)");
-				SolLicErrors.Add(EHR_KEY_NOT_PRESENT,"Key not present (Key server)");
-				SolLicErrors.Add(EHR_CLOCK_ERROR,"Clock error (Key server)");
-				SolLicErrors.Add(EHR_KEY_WRITE_FAILURE,"Failed writing to the key (Key server)");
-				SolLicErrors.Add(EHR_KEY_WRITE_ACCESS_DENIED,"Failed writing to the key, access is denied (Key server)");
-				SolLicErrors.Add(EHR_KEY_NOT_ACTIVATED,"Key not active (Key server)");
-				SolLicErrors.Add(EHR_AUTHENTICATION_FAILURE,"Authentication failure (Key server)");
-				SolLicErrors.Add(EHR_MANAGER_NOT_INITIALIZED,"Manager not initialized (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_SUITABLE_KEY,"No suitable key found (Key server)");
-				SolLicErrors.Add(EHR_KEY_LOCKED,"Key locked (Key server)");
-				SolLicErrors.Add(EHR_CLIENT_TIMEOUT,"Client timeout (Key server)");
-				SolLicErrors.Add(EHR_PACKET_EXPIRED,"Packet expired (Key server)");
-				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module (Key server)");
-				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE,"Insufficient licensing, unable to obtain an Application Instances on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY,"Insufficient licensing, unable to locate a Base Key on the server (Key server)");
-				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER,"Licensing on the Key Server has been restored (Key server)");
-				SolLicErrors.Add(EHR_KEY_USE_BACKUP_KEY_SERVER,"Unable to validate Licensing on the Key Server, switching to Backup Key Server (Key server)");
-				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (Key server)");
+				SolLicErrors.Add(EHR_UNKNOWN,"Unknown error (License server)");
+				SolLicErrors.Add(EHR_DRIVER_INIT_FAILURE,"Driver initialization failure (License server)");
+				SolLicErrors.Add(EHR_PASSWORD_NO_MATCH,"Passwords do not match (License server)");
+				SolLicErrors.Add(EHR_PASSWORD_INVALID_FORMAT,"Invalid password format (License server)");
+				SolLicErrors.Add(EHR_LICENSE_INSUFFICIENT,"Insufficient license (License server)");
+				SolLicErrors.Add(EHR_LICENSE_INVALID,"Invalid license (License server)");
+				SolLicErrors.Add(EHR_LICENSE_EXPRIED,"License expired (License server)");
+				SolLicErrors.Add(EHR_KEY_TRIAL_EXPIRED,"Trial Key expired (License server)");
+				SolLicErrors.Add(EHR_KEY_NOT_PRESENT,"Key not present (License server)");
+				SolLicErrors.Add(EHR_CLOCK_ERROR,"Clock error (License server)");
+				SolLicErrors.Add(EHR_KEY_WRITE_FAILURE,"Failed writing to the key (License server)");
+				SolLicErrors.Add(EHR_KEY_WRITE_ACCESS_DENIED,"Failed writing to the key, access is denied (License server)");
+				SolLicErrors.Add(EHR_KEY_NOT_ACTIVATED,"Key not active (License server)");
+				SolLicErrors.Add(EHR_AUTHENTICATION_FAILURE,"Authentication failure (License server)");
+				SolLicErrors.Add(EHR_MANAGER_NOT_INITIALIZED,"Manager not initialized (License server)");
+				SolLicErrors.Add(EHR_KEY_NO_SUITABLE_KEY,"No suitable key found (License server)");
+				SolLicErrors.Add(EHR_KEY_LOCKED,"Key locked (License server)");
+				SolLicErrors.Add(EHR_CLIENT_TIMEOUT,"Client timeout (License server)");
+				SolLicErrors.Add(EHR_PACKET_EXPIRED,"Packet expired (License server)");
+				SolLicErrors.Add(EHR_KEY_BASE_NOT_MATCHING,"Base Keys do not match module for module (License server)");
+				SolLicErrors.Add(EHR_KEY_NOT_MATCHING_INSTANCES,"Keys do not match by Application Instances for all the Key on the server (License server)");
+				SolLicErrors.Add(EHR_KEY_NO_FREE_APP_INSTANCE,"Insufficient licensing, unable to obtain a Product Connection on the server (License server)");
+				SolLicErrors.Add(EHR_KEY_NO_BASE_KEY,"Insufficient licensing, unable to locate a Base Key on the server (License server)");
+				SolLicErrors.Add(EHR_KEY_RESTORED_KEY_SERVER,"Licensing on the License server has been restored (License server)");
+				SolLicErrors.Add(EHR_KEY_USE_FAILOVER_KEY_SERVER,"Unable to validate Licensing on the License server, switching to Failover License server (License server)");
+				SolLicErrors.Add(EHR_KEY_NO_REMOTE_VERSION_KEY_SERVER,"License Server is at a version that does not support remote connectivity.  Please upgrade the License Server (License server)");
+				SolLicErrors.Add(EHR_LIC_PROD_NO_FREE_APP_INSTANCE,"Unable to obtain a Product Connection on the server for the given product (License server)");
+				SolLicErrors.Add(EHR_LIC_MOD_NO_FREE_APP_INSTANCE,"Unable to obtain a Product Connection on the server for the given module (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_KEY_ID,"Failed to validate software license with Protection Key ID (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_LICENSE_CODE,"Failed to validate software license with License Code (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_BIOS_SERIALNUMBER,"Failed to validate software license with Bios Serial Number (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_MAC_ADDRESS,"Failed to validate software license with MAC address (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_COMPUTER_NAME,"Failed to validate software license with Computer Name (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_CUSTOMER_COPY,"Can not validate against a Customer Copy (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_ARCHIVE,"Can not validate against a License Archive (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_PACKET,"Can not validate against a License Packet (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_CONNECT_FAILOVER_ONLY,"Failed to connect.  This License Server is configured as a Failover License Server and can only be connected to as a failover (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED,"Failed to apply Software License Packet.  This Packet has already been applied (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET,"License Server does not support generating License Packets (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY,"Can not generate License Archive that does not validate against a Protection Key (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,"Failed to apply License Archive. License Codes do not match, probably an trying to use an old License Archive (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,"Software License Expired (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_NO_PRODUCT,"Software Licensing does not contain licensing for the given product (License Server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION,"Software Licensing contains licensing for the given product, but not at the desired version (License Server)");
+				SolLicErrors.Add(EHR_LIC_MOD_NO_OBTAIN_USING_FAILOVER,"Unable to obtain module when using Backup Server (License Server)");
+				SolLicErrors.Add(EHR_LIC_CLOCK_LIC_PACKET,"The System Time does not seem to be set correctly (License Server)");
+				SolLicErrors.Add(EHR_LIC_CLOCK_LIC_ARCHIVE,"The System Time does not seem to be set correctly (License Server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,"Failed to validate software license with a Validation Token (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,"Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)");
 				SolLicErrors.Add(EHR_SP_INVALID_FUNCTION_CODE,"Invalid function code (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_PACKET,"Invalid packet (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_UNIT_NOT_FOUND,"Unit not found (Rainbow driver)");
@@ -202,8 +255,10 @@ namespace Solimar
 				SolLicErrors.Add(EHR_SP_INTERNAL_ERROR,"An internal error (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_PACKET_ALREADY_INITIALIZED,"The packet being initialized was already initialized (Rainbow driver)");
 				SolLicErrors.Add(EHR_SP_INVALID_STATUS,"An invalid status code was returned (Rainbow driver)");
+				SolLicErrors.Add(EHR_WRPPR_SVR_NOT_CONNECTED,"Not Connected (License Server Wrapper)");
 				SolLicErrors.Add(EHR_LIC_MGR_NO_COMPUTER,"Could not communicate with the computer, verify computer name is correct (License Manager)");
 				SolLicErrors.Add(EHR_LIC_MGR_NO_LIC_SERVER,"Unable to contact License Server on the computer, verify License Server is running and is at proper version (License Manager)");
+				SolLicErrors.Add(EHR_LIC_MGR_VIEW_ONLY,"Unable to perform the given action, initialized for view only (License Manager)");
 			}
 			#endregion
 			public static bool IsCustomHR(uint _hresult)
@@ -215,6 +270,10 @@ namespace Solimar
 				string ErrorMessage = "";
 				if(SolLicErrors!=null && SolLicErrors.Contains(_hresult))
 					ErrorMessage = (string)SolLicErrors[_hresult];
+				else {
+					try { System.Runtime.InteropServices.Marshal.ThrowExceptionForHR((int)_hresult);}
+					catch (Exception ex) { ErrorMessage = ex.Message;}
+				}
 				return ErrorMessage;
 			}
 			public static bool IsEqual(int errorCode, uint hresult)
