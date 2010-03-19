@@ -39,20 +39,6 @@ namespace Client.Creator
             }
         }
 
-        //public bool IsValidLicenseServerVersion(string serverName)
-        //{
-        //    bool bRetVal = false;
-        //    int major = 0, minor = 0, buildversion = 0;
-        //    if (m_licenseWrapper.GetVersionLicenseServer(serverName, ref major, ref minor, ref buildversion))
-        //    {
-        //        if (VersionInfo.MAJOR_REVISION_NUMBER == major &&
-        //           VersionInfo.MINOR_REVISION_NUMBER == minor &&
-        //           VersionInfo.BUILD_NUMBER == buildversion)
-        //            bRetVal = true;  
-        //    }
-        //    return bRetVal;
-        //}
-
         public void GetAllSoftwareLicenses(ref String slStream)
         {
             try
@@ -277,6 +263,20 @@ namespace Client.Creator
                 }
             }
             return null;
+        }
+
+        public uint GetProductSpecRevision(ushort productID)
+        {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
+            {
+                if (productSpec.productID.TVal == productID)
+                {
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return GetProductSpecRevision((ushort)productSpec.sameModSpecProductID.TVal);
+                    return productSpec.softwareSpec_SubMinor.TVal;                    
+                }
+            }
+            return 0;
         }
 
         public uint GetProductIDByModuleName(string moduleName)
@@ -520,7 +520,7 @@ namespace Client.Creator
         public Lic_PackageAttribs.Lic_SoftwareSpecAttribs m_softwareSpec;
         private SolimarLicenseServerWrapper m_licServer;
         private SolimarLicenseWrapper m_licenseWrapper;
-        private String m_ServerName;
+        static private String m_ServerName;
         #endregion
     }
 }
