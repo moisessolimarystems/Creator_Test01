@@ -65,7 +65,6 @@ void InititalizeProduct110()
 	pTmpProdSpec->productID = 110;
 	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLindexer");
 	pTmpProdSpec->sameModSpecProductID = 10;
-	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
 
 void InititalizeProduct113()
@@ -131,6 +130,10 @@ void InititalizeProduct7()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(7))->second);
 	pTmpProdSpec->productID = 7;
 	pTmpProdSpec->productName = std::wstring(L"iCONVERT");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -140,7 +143,7 @@ void InititalizeProduct7()
 	pTmpModSpec->moduleName = std::wstring(L"Emailer");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(43, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(43))->second);
@@ -152,17 +155,13 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(48))->second);
 	pTmpModSpec->moduleID = 48;
 	pTmpModSpec->moduleName = std::wstring(L"AFPEncryption");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(49, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(49))->second);
 	pTmpModSpec->moduleID = 49;
 	pTmpModSpec->moduleName = std::wstring(L"AFPURL");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(42, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(42))->second);
@@ -174,25 +173,19 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(29))->second);
 	pTmpModSpec->moduleID = 29;
 	pTmpModSpec->moduleName = std::wstring(L"AFP Job Event");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(40, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(40))->second);
 	pTmpModSpec->moduleID = 40;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT Encryption");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(41, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(41))->second);
 	pTmpModSpec->moduleID = 41;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT URL");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
@@ -210,7 +203,7 @@ void InititalizeProduct7()
 	pTmpModSpec->modulePoolModuleID = 128;
 	pTmpModSpec->moduleDefaultLicense = 15;
 	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
@@ -223,7 +216,7 @@ void InititalizeProduct7()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(9, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(9))->second);
 	pTmpModSpec->moduleID = 9;
-	pTmpModSpec->moduleName = std::wstring(L"iCONVERT::2D BarCode");
+	pTmpModSpec->moduleName = std::wstring(L"iCONVERT::2D Barcode");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(8, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -267,57 +260,43 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(33))->second);
 	pTmpModSpec->moduleID = 33;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PDF");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(32, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(32))->second);
 	pTmpModSpec->moduleID = 32;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PCL");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(30, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(30))->second);
 	pTmpModSpec->moduleID = 30;
-	pTmpModSpec->moduleName = std::wstring(L"AFP::2dBarCodes");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleName = std::wstring(L"AFP::2dBarcodes");
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(51, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(51))->second);
 	pTmpModSpec->moduleID = 51;
 	pTmpModSpec->moduleName = std::wstring(L"AFPType1");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(50, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(50))->second);
 	pTmpModSpec->moduleID = 50;
 	pTmpModSpec->moduleName = std::wstring(L"AFPOverlay");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(35, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(35))->second);
 	pTmpModSpec->moduleID = 35;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::TIFF");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(34, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(34))->second);
 	pTmpModSpec->moduleID = 34;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PS");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionDeprecated_Major = 9;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 8;
+	pTmpModSpec->moduleTrialLicense = 0;
 }
 
 void InititalizeProduct9()
@@ -330,6 +309,10 @@ void InititalizeProduct9()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(9))->second);
 	pTmpProdSpec->productID = 9;
 	pTmpProdSpec->productName = std::wstring(L"SOLscript");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -398,6 +381,10 @@ void InititalizeProduct8()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(8))->second);
 	pTmpProdSpec->productID = 8;
 	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -543,13 +530,17 @@ void InititalizeProduct10()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(10))->second);
 	pTmpProdSpec->productID = 10;
 	pTmpProdSpec->productName = std::wstring(L"SOLindexer");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
-	pTmpModSpec->moduleName = std::wstring(L"SOLmonitor");
+	pTmpModSpec->moduleName = std::wstring(L"Index Engine Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
@@ -557,6 +548,8 @@ void InititalizeProduct10()
 	pTmpModSpec->moduleID = 0;
 	pTmpModSpec->moduleName = std::wstring(L"SDX Designer");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionDeprecated_Major = 3;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
 }
 
 void InititalizeProduct13()
@@ -569,6 +562,10 @@ void InititalizeProduct13()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(13))->second);
 	pTmpProdSpec->productID = 13;
 	pTmpProdSpec->productName = std::wstring(L"SOLfusion");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -589,13 +586,17 @@ void InititalizeProduct12()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(12))->second);
 	pTmpProdSpec->productID = 12;
 	pTmpProdSpec->productName = std::wstring(L"Rubika");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(24))->second);
 	pTmpModSpec->moduleID = 24;
-	pTmpModSpec->moduleName = std::wstring(L"XPIF Input");
+	pTmpModSpec->moduleName = std::wstring(L"Job Ticket Input");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
@@ -808,6 +809,10 @@ void InititalizeProduct15()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(15))->second);
 	pTmpProdSpec->productID = 15;
 	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Enterprise Single Platform");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 	pTmpProdSpec->sameModSpecProductID = 8;
 }
 
@@ -821,6 +826,10 @@ void InititalizeProduct14()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(14))->second);
 	pTmpProdSpec->productID = 14;
 	pTmpProdSpec->productName = std::wstring(L"SPDE");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -1068,7 +1077,7 @@ void InititalizeProduct14()
 	pTmpModSpec->modUnlimitedValue = 255;
 	pTmpModSpec->moduleTrialLicense = 255;
 	pTmpModSpec->moduleVersionDeprecated_Major = 7;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 1;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(400, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(400))->second);
@@ -1077,7 +1086,7 @@ void InititalizeProduct14()
 	pTmpModSpec->modUnlimitedValue = 255;
 	pTmpModSpec->moduleTrialLicense = 255;
 	pTmpModSpec->moduleVersionDeprecated_Major = 7;
-	pTmpModSpec->moduleVersionDeprecated_Minor = 1;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(300, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(300))->second);
@@ -1331,6 +1340,10 @@ void InititalizeProduct17()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(17))->second);
 	pTmpProdSpec->productID = 17;
 	pTmpProdSpec->productName = std::wstring(L"Rubika Process Builder");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 	pTmpProdSpec->prevSharedProductID = 12;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
@@ -1339,7 +1352,7 @@ void InititalizeProduct17()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(31, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(31))->second);
 	pTmpModSpec->moduleID = 31;
-	pTmpModSpec->moduleName = std::wstring(L"Process Builders");
+	pTmpModSpec->moduleName = std::wstring(L"Process Builder Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 }
 
@@ -1353,6 +1366,10 @@ void InititalizeProduct16()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(16))->second);
 	pTmpProdSpec->productID = 16;
 	pTmpProdSpec->productName = std::wstring(L"SOLitrack");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -1385,6 +1402,10 @@ void InititalizeProduct19()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(19))->second);
 	pTmpProdSpec->productID = 19;
 	pTmpProdSpec->productName = std::wstring(L"SPDE Queue Manager");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 	pTmpProdSpec->prevSharedProductID = 14;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
@@ -1408,6 +1429,10 @@ void InititalizeProduct18()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(18))->second);
 	pTmpProdSpec->productID = 18;
 	pTmpProdSpec->productName = std::wstring(L"SDX Designer");
+	pTmpProdSpec->softwareSpec_Major = 1;
+	pTmpProdSpec->softwareSpec_Minor = 0;
+	pTmpProdSpec->softwareSpec_SubMajor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 0;
 	pTmpProdSpec->prevSharedProductID = 10;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
@@ -1416,7 +1441,7 @@ void InititalizeProduct18()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
 	pTmpModSpec->moduleID = 0;
-	pTmpModSpec->moduleName = std::wstring(L"SDX Designer");
+	pTmpModSpec->moduleName = std::wstring(L"SDX Designer Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 }
 

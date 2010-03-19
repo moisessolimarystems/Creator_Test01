@@ -320,6 +320,10 @@ public:
 		SpdAttribs::DwordAttrib sameModSpecProductID;
 		SpdAttribs::DwordAttrib prevSharedProductID;
 		SpdAttribs::WStringAttrib productName;
+		SpdAttribs::DwordAttrib softwareSpec_Major;
+		SpdAttribs::DwordAttrib softwareSpec_Minor;
+		SpdAttribs::DwordAttrib softwareSpec_SubMajor;
+		SpdAttribs::DwordAttrib softwareSpec_SubMinor;
 		Lic_ModuleSoftwareSpecAttribsMap moduleSpecMap;
 	
 		
@@ -331,6 +335,10 @@ public:
 			sameModSpecProductID = c.sameModSpecProductID;
 			prevSharedProductID = c.prevSharedProductID;
 			productName = c.productName;
+			softwareSpec_Major = c.softwareSpec_Major;
+			softwareSpec_Minor = c.softwareSpec_Minor;
+			softwareSpec_SubMajor = c.softwareSpec_SubMajor;
+			softwareSpec_SubMinor = c.softwareSpec_SubMinor;
 			moduleSpecMap = c.moduleSpecMap;
 			return *this ;
 		}
@@ -342,6 +350,10 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", 0),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", 0),
 			productName(m_mapAttribObjs, L"pN", SpdAttribs::WStringObj(L"")),
+			softwareSpec_Major(m_mapAttribObjs, L"vMj", 0),
+			softwareSpec_Minor(m_mapAttribObjs, L"vMn", 0),
+			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", 0),
+			softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", 0),
 			moduleSpecMap(m_mapAttribObjs, L"mSpMp", Map_Lic_ModuleSoftwareSpecAttribsMap_Obj()){;}
 		
 		Lic_ProductSoftwareSpecAttribs(const Lic_ProductSoftwareSpecAttribs &c) : 
@@ -351,6 +363,10 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", c.sameModSpecProductID),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", c.prevSharedProductID),
 			productName(m_mapAttribObjs, L"pN", c.productName),
+			softwareSpec_Major(m_mapAttribObjs, L"vMj", c.softwareSpec_Major),
+			softwareSpec_Minor(m_mapAttribObjs, L"vMn", c.softwareSpec_Minor),
+			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", c.softwareSpec_SubMajor),
+			softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", c.softwareSpec_SubMinor),
 			moduleSpecMap(m_mapAttribObjs, L"mSpMp", c.moduleSpecMap){;}
 		
 		Lic_ProductSoftwareSpecAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
@@ -360,6 +376,10 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", 0),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", 0),
 			productName(m_mapAttribObjs, L"pN", SpdAttribs::WStringObj(L"")),
+			softwareSpec_Major(m_mapAttribObjs, L"vMj", 0),
+			softwareSpec_Minor(m_mapAttribObjs, L"vMn", 0),
+			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", 0),
+			softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", 0),
 			moduleSpecMap(m_mapAttribObjs, L"mSpMp", Map_Lic_ModuleSoftwareSpecAttribsMap_Obj()){;}
 		
 		Lic_ProductSoftwareSpecAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_ProductSoftwareSpecAttribs &c) : 
@@ -369,6 +389,10 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", c.sameModSpecProductID),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", c.prevSharedProductID),
 			productName(m_mapAttribObjs, L"pN", c.productName),
+			softwareSpec_Major(m_mapAttribObjs, L"vMj", c.softwareSpec_Major),
+			softwareSpec_Minor(m_mapAttribObjs, L"vMn", c.softwareSpec_Minor),
+			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", c.softwareSpec_SubMajor),
+			softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", c.softwareSpec_SubMinor),
 			moduleSpecMap(m_mapAttribObjs, L"mSpMp", c.moduleSpecMap){;}
 		
 		Lic_ProductSoftwareSpecAttribs(const CWStringStream &wsAttribsClassName,
@@ -377,6 +401,10 @@ public:
 			const SpdAttribs::DwordAttrib &param_sameModSpecProductID,
 			const SpdAttribs::DwordAttrib &param_prevSharedProductID,
 			const SpdAttribs::WStringAttrib &param_productName,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_Major,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_Minor,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMajor,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMinor,
 			const Lic_ModuleSoftwareSpecAttribsMap &param_moduleSpecMap) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
 				productLicType(m_mapAttribObjs, L"pLT", param_productLicType),
@@ -384,6 +412,10 @@ public:
 				sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", param_sameModSpecProductID),
 				prevSharedProductID(m_mapAttribObjs, L"pSPI", param_prevSharedProductID),
 				productName(m_mapAttribObjs, L"pN", param_productName),
+				softwareSpec_Major(m_mapAttribObjs, L"vMj", param_softwareSpec_Major),
+				softwareSpec_Minor(m_mapAttribObjs, L"vMn", param_softwareSpec_Minor),
+				softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", param_softwareSpec_SubMajor),
+				softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", param_softwareSpec_SubMinor),
 				moduleSpecMap(m_mapAttribObjs, L"mSpMp", param_moduleSpecMap){;}
 		
 		Lic_ProductSoftwareSpecAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
@@ -392,6 +424,10 @@ public:
 			const SpdAttribs::DwordAttrib &param_sameModSpecProductID,
 			const SpdAttribs::DwordAttrib &param_prevSharedProductID,
 			const SpdAttribs::WStringAttrib &param_productName,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_Major,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_Minor,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMajor,
+			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMinor,
 			const Lic_ModuleSoftwareSpecAttribsMap &param_moduleSpecMap) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 				productLicType(m_mapAttribObjs, L"pLT", param_productLicType),
@@ -399,6 +435,10 @@ public:
 				sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", param_sameModSpecProductID),
 				prevSharedProductID(m_mapAttribObjs, L"pSPI", param_prevSharedProductID),
 				productName(m_mapAttribObjs, L"pN", param_productName),
+				softwareSpec_Major(m_mapAttribObjs, L"vMj", param_softwareSpec_Major),
+				softwareSpec_Minor(m_mapAttribObjs, L"vMn", param_softwareSpec_Minor),
+				softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", param_softwareSpec_SubMajor),
+				softwareSpec_SubMinor(m_mapAttribObjs, L"vSMn", param_softwareSpec_SubMinor),
 				moduleSpecMap(m_mapAttribObjs, L"mSpMp", param_moduleSpecMap){;}
 		
 	
