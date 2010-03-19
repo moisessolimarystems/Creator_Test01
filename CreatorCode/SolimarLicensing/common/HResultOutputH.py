@@ -94,9 +94,63 @@ class HResultOutputH(AttribsOutput):
                 class_text += '\t\twchar_t*\t\tmessage;\n'
                 class_text += '\t} SL_ERROR;\n\n'
 
+                class_text += '\t/*\n'
+                class_text += '\t * GetErrorMessage should be used by programs to translate error HRESULTS\n'
+                class_text += '\t */\n'
                 class_text += '\tstd::wstring GetErrorMessage(HRESULT hr);\n'
                 class_text += '\tstd::wstring GetECMessage(unsigned long echr);\n'
-                class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type);\n'
+                class_text += '\n'
+                class_text += '\t/*\n'
+                class_text += '\t * GenerateErrorMessage should be used by programs to translate error HRESULTS\n'
+                class_text += '\t */\n'
+                class_text += '\tstd::wstring GenerateErrorMessage(HRESULT hr, std::wstring wstrHeaderMsg=L"", bool bAppendExistingErrorInfo=true);\n'
+                class_text += '\n'
+
+                class_text += '\t/*\n'
+                class_text += '\t * SAVE_ERRORINFO, RESTORE_ERRORINFO\n'
+                class_text += '\t * Helper macros to save and restore IErrorInfo objects in return blocks.\n'
+                class_text += '\t * For instance, if a COM object is released between a COM error occurring, \n'
+                class_text += '\t * and returning an errored hr from a function, the IErrorInfo object may \n'
+                class_text += '\t * be cleared (similar to the lasterror for Win32 calls). Use these\n'
+                class_text += '\t * macros to help store the IErrorInfo during COM cleanup, and then\n'
+                class_text += '\t *restore IErrorInfo before returning.\n'
+                class_text += '\t */\n'
+                #define SAVE_ERRORINFO
+                class_text += '#define SAVE_ERRORINFO \\\n'
+                class_text += '\tIErrorInfo* save_error_info = NULL; \\\n'
+                class_text += '\tGetErrorInfo(0, &save_error_info); \\\n'
+                class_text += '\tif (save_error_info) \\\n'
+                class_text += '\t\tSetErrorInfo(0, save_error_info);\n'
+                #define RESTORE_ERRORINFO
+                class_text += '#define RESTORE_ERRORINFO \\\n'
+                class_text += '\tif (save_error_info) \\\n'
+                class_text += '\t{ \\\n'
+                class_text += '\t\tSetErrorInfo(0, save_error_info); \\\n'
+                class_text += '\t\tsave_error_info->Release(); \\\n'
+                class_text += '\t}\n'
+                class_text += '\n'
+
+                class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id);\n'
+                class_text += '\tHRESULT TReadEventLog();\n'
+                class_text += '\n'
+
+                class_text += '\t/*\n'
+                class_text += '\t * LIC_PROPAGATE_CUSTOM_ERROR()\n'
+                class_text += '\t *\n'
+                class_text += '\t * Pulls the error message from a given HR, and sets the\n'
+                class_text += '\t * calling objects ISupportErrorInfo with the information.\n'
+                class_text += '\t * This macro can be used to easily propagate error info\n'
+                class_text += '\t * from object to object within Licensing.\n'
+                class_text += '\t */\n'
+                #define LIC_PROPAGATE_CUSTOM_ERROR(hr, clsid, iid)
+                class_text += '#define LIC_PROPAGATE_CUSTOM_ERROR(hr, clsid, iid) \\\n'
+                class_text += '\tif(FAILED(hr)) \\\n'
+                class_text += '\t\tAtlReportError((clsid), (BSTR)(LicenseServerError::GetErrorMessage(hr).c_str()), (iid), (hr));\n'
+                class_text += '\n'
+                #define LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, wstrMsg, clsid, iid)
+                class_text += '#define LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, wstrMsg, clsid, iid) \\\n'
+                class_text += '\tif(FAILED(hr)) \\\n'
+                class_text += '\t\tAtlReportError((clsid), (BSTR)(wstrMsg.c_str()), (iid), (hr));\n'
 
                 #define SL_IS_LIC_HR (hr)
                 class_text += '\n\n\t/*\n\t* SL_IS_LIC_HR()\n\t*\n\t* Determine if hr is a Lic HR\n\t*/\n'
@@ -122,7 +176,7 @@ class HResultOutputH(AttribsOutput):
 	def GenerateGenericHResultsFile(self, hresults_class):#include <string>\n\n
 		# generate and write the header file text
 		self.WriteFileIfDifferent(self.ComputeFilePath(hresults_class['filename']),     \
-                                          """#ifndef _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n#define _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n\n#include <windows.h>\n#include <string>\n\nnamespace LicenseServerError\n%s\n""" %  \
+                                          """#ifndef _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n#define _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n\n#include <windows.h>\n#include <string>\n#include <atlbase.h>\t// For AtlReportError\n#if _MSC_VER >= 1400\n#include <atlcom.h>\t// For AtlReportError\n#endif\nnamespace LicenseServerError\n%s\n""" %  \
                                           (self.GenerateHResultsClass(hresults_class)))
 			
 
