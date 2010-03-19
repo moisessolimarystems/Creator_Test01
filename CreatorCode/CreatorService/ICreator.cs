@@ -309,6 +309,9 @@ namespace Service.Creator
 
         [OperationContract]
         void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
+
+        [OperationContract]
+        void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion);
     }
 
     [DataContract]

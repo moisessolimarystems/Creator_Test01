@@ -70,6 +70,7 @@ namespace Service.Creator
                 };
         public static SolimarLicenseServerWrapper m_licServer = new SolimarLicenseServerWrapper();
         public static CommunicationLink m_CommLink = new CommunicationLink();
+        public static SolimarLicenseWrapper m_licenseWrapper = new SolimarLicenseWrapper();
 
         #region ICreator Members
 
@@ -891,6 +892,12 @@ namespace Service.Creator
             major = Client.Creator.VersionInfo.MAJOR_REVISION_NUMBER;
             minor = Client.Creator.VersionInfo.MINOR_REVISION_NUMBER;
             buildversion = Client.Creator.VersionInfo.BUILD_NUMBER;
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion)
+        {
+            m_licenseWrapper.GetVersionLicenseServer("localhost", ref major, ref minor, ref buildversion);
         }
         #endregion
     }
