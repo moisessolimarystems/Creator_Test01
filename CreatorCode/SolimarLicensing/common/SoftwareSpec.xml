@@ -45,7 +45,18 @@
 </typedef>
 -->
 
-
+<!--
+  SoftwareSpec option attributes
+  
+  softwareSpec_Major  integer
+                      Do not manually set. Creator will fill in value with license server major.
+  softwareSpec_Minor  integer
+                      Do not manually set. Creator will fill in value with license server minor.
+  softwareSpec_SubMajor integer
+                      Do not manually set. Creator will fill in value with license server build version.  
+  softwareSpec_SubMinor integer
+                      Used to indicate software spec revision. Bump up subminor when any changes are made.
+-->
 <!-- 
 	ProductInclude optional attributes
 	
@@ -89,7 +100,7 @@
 							for the shared license. Any modules participating in the pool will use the 'pool' attribute
 							to indicate that they participate in this pool, and the participating module's storage
 							specification (offset,bits) indicate then whether that module is enabled or not.
-	moduleVersionIntroduced_Major	integer
+	moduleVersionIntroduced_Major	integer                
 	moduleVersionIntroduced_Minor	integer
 	moduleVersionIntroduced_SubMajor	integer
 	moduleVersionIntroduced_SubMinor	integer
@@ -110,45 +121,45 @@
 	<Lic_ProductSoftwareSpecAttribs>
 -->	
 
-	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT">
+	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2D BarCode"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2D Barcode"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PostScript"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="IPDS::TIFF"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarCodes" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarcodes" moduleTrialLicense="0"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF" moduleTrialLicense="0"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="iCONVERT Encryption" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="iCONVERT URL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="iCONVERT Overlay" />
+			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="iCONVERT Encryption"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="iCONVERT URL"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="iCONVERT Overlay"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="iCONVERT Type 1"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1" moduleTrialLicense="0"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="Max LU" bModuleIsPool="true"/>
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="8" productName="SOLsearcher Enterprise">
+	<Lic_ProductSoftwareSpecAttribs productID="8" productName="SOLsearcher Enterprise" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Index Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Document Server"/>
@@ -169,7 +180,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="133" moduleName="Full Text" modUnlimitedValue="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="9" productName="SOLscript">
+	<Lic_ProductSoftwareSpecAttribs productID="9" productName="SOLscript" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Distiller"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="GhostScript"/>
@@ -182,13 +193,13 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PostScript::PostScript"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer">
+	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="SOLmonitor"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika">
+	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Merge" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Address Cleanse" modUnlimitedValue="1"/>
@@ -219,17 +230,17 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="Assembly" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Reader" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="XPIF Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="Job Ticket Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="13" productName="SOLfusion">
+	<Lic_ProductSoftwareSpecAttribs productID="13" productName="SOLfusion" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SOLfusion"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>		
-	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE">
+	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="3211::ASCII" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="AFPDS::PDF" modUnlimitedValue="1"/>
@@ -322,33 +333,33 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="305" moduleName="XCHANGE::PS(DBCS) PPM" modUnlimitedValue="500"/>
 			
 			<!-- Client licensing -->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/><!--IsSharable-->
-			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255" moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="0"/><!--IsSharable-->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255" moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="0"/>
 			<!--<Lic_ModuleSoftwareSpecAttribs moduleID="402" moduleName="Concurrent Administrator Sessions" modUnlimitedValue="255"/>-->
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	
-	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8">
+	<Lic_ProductSoftwareSpecAttribs productID="15" productName="SOLsearcher Enterprise Single Platform" sameModSpecProductID="8" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="16" productName="SOLitrack">
+	<Lic_ProductSoftwareSpecAttribs productID="16" productName="SOLitrack" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Devices"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Operators"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="17" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="17" productName="Rubika Process Builder" prevSharedProductID="12" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builder Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer Instances"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
@@ -359,7 +370,7 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="109" productName="Test/Dev/DR SOLscript" sameModSpecProductID="9">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="110" productName="Test/Dev/DR SOLindexer" sameModSpecProductID="10" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="110" productName="Test/Dev/DR SOLindexer" sameModSpecProductID="10">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="112" productName="Test/Dev/DR Rubika" sameModSpecProductID="12">
 	</Lic_ProductSoftwareSpecAttribs>
