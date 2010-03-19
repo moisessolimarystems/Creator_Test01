@@ -2054,6 +2054,10 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -TimeHelper::ONE_DAY_IN_SECONDS)
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_PACKET;
 
+		//Verify that the software spec version of the packet is not higher than the license server sotfware spec version.
+		if((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpLicPackageAttribs.licSoftwareSpecAttribs.softwareSpec_SubMinor)
+			throw LicenseServerError::EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE;
+
 		SoftwareLicenseMgr* pSoftwareLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(_bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&tmpLicPackageAttribs.licLicenseInfoAttribs).c_str()));
 
 		WCHAR szPath[MAX_PATH];

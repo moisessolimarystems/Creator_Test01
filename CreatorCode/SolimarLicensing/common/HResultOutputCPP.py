@@ -54,24 +54,18 @@ class HResultOutputCPP(AttribsOutput):
                 class_text += '\nconst unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);\n\n\n'
 
                 #function: HRESULT WriteEventLog
-                class_text += 'HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type)\n'
+                class_text += 'HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id)\n'
                 class_text += '{\n'
-                class_text += '\tHRESULT hr = S_OK;\n'
-                class_text += '\tHANDLE h;\n\n'
-                class_text += '\th = RegisterEventSource(NULL, TEXT("Solimar License Server"));\n'
-                class_text += '\tif (h == NULL) return HRESULT_FROM_WIN32(GetLastError());\n\n'
-                class_text += '\tif (!ReportEventW(h,           // event log handle\n'
-                class_text += '\t\t\t(WORD)(event_type),   // event type\n'
-                class_text += '\t\t\t0,                    // category zero\n'
-                class_text += '\t\t\t0,			   // event identifier\n'
-                class_text += '\t\t\tNULL,                 // no user security identifier\n'
-                class_text += '\t\t\t1,                    // one substitution string\n'
-                class_text += '\t\t\t0,                    // no data\n'
-                class_text += '\t\t\t(LPCWSTR*)&event_log_msg,       // pointer to string array\n'
-                class_text += '\t\t\tNULL))                // pointer to data\n'
-                class_text += '\t\thr = HRESULT_FROM_WIN32(GetLastError());\n\n'
-                class_text += '\tDeregisterEventSource(h);\n\n'
-                class_text += '\treturn hr;\n}\n'
+                class_text += '\t//TReadEventLog();\n'
+                class_text += '\treturn EventLogHelper::WriteEventLog(L"Solimar License Server", event_log_msg, event_type, event_id);\n'
+                class_text += '}\n'
+                class_text += '\n'
+                class_text += '//#define MAX_RECORD_BUFFER_SIZE  0x10000  // 64K\n'
+                class_text += 'HRESULT TReadEventLog()\n'
+                class_text += '{\n'
+                class_text += '\treturn E_NOTIMPL;\n'
+                class_text += '\t//return EventLogHelper::ReadEventLog_Helper();\n'
+                class_text += '}\n'
 
                 #function: HRESULT GetErrorMessage                
                 class_text += '\n'
@@ -228,5 +222,5 @@ class HResultOutputCPP(AttribsOutput):
 	def GenerateGenericHResultsFile(self, hresults_class):
 		# generate and write the header file text
 		self.WriteFileIfDifferent(self.ComputeFilePath(hresults_class['filename']),     \
-                                          """#include "LicenseError.h"\nnamespace LicenseServerError\n{\n/*\n * SLErrors[]\n *\n * custom errors.\n */\n%s\n""" %  \
+                                          """#include "LicenseError.h"\n#include "EventLogHelper.h"\nnamespace LicenseServerError\n{\n/*\n * SLErrors[]\n *\n * custom errors.\n */\n%s\n""" %  \
                                           (self.GenerateHResultsClass(hresults_class)))		

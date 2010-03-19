@@ -130,7 +130,8 @@ class HResultOutputH(AttribsOutput):
                 class_text += '\t}\n'
                 class_text += '\n'
 
-                class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type);\n'
+                class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id);\n'
+                class_text += '\tHRESULT TReadEventLog();\n'
                 class_text += '\n'
 
                 class_text += '\t/*\n'
