@@ -395,7 +395,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].License")]
+	[Table(Name="[dbo].License")]
 	[DataContract()]
 	public partial class LicenseTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1216,7 +1216,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].Packet")]
+	[Table(Name="[dbo].Packet")]
 	[DataContract()]
 	public partial class PacketTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1558,7 +1558,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].DestinationName")]
+	[Table(Name="[dbo].DestinationName")]
 	[DataContract()]
 	public partial class DestinationNameTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1750,7 +1750,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].ProductLicense")]
+	[Table(Name="[dbo].ProductLicense")]
 	[DataContract()]
 	public partial class ProductLicenseTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2267,7 +2267,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].SoftwareTokenTable")]
+	[Table(Name="[dbo].SoftwareTokenTable")]
 	[DataContract()]
 	public partial class SoftwareTokenTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2393,7 +2393,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].[Transaction]")]
+	[Table(Name="[dbo].[Transaction]")]
 	[DataContract()]
 	public partial class TransactionTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2735,7 +2735,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].Token")]
+	[Table(Name="[dbo].Token")]
 	[DataContract()]
 	public partial class TokenTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -3027,7 +3027,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[CORP\\AChou].Module")]
+	[Table(Name="[dbo].Module")]
 	[DataContract()]
 	public partial class ModuleTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
