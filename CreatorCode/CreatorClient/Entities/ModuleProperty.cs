@@ -74,11 +74,11 @@ namespace Client.Creator
             }
         }
 
-        public uint MaxValue
+        public uint TrialValue
         {
             get
             {
-                return (uint)_commLink.GetMaxModuleValue(ProductID, ID);
+                return (uint)_commLink.GetModuleTrialValue(ProductID, ID);
             }
         }
 
