@@ -1190,7 +1190,7 @@ namespace Client.Creator
                         {
                             ModuleProperty module = item.Tag as ModuleProperty;
                             dlvEditToolStripMenuItem.Enabled = !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
-                            incrementToolStripMenuItem.Enabled = (plProperty.GetAvailableModuleUnits(module) > 0 && module.Value < module.MaxValue) && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
+                            incrementToolStripMenuItem.Enabled = (plProperty.GetAvailableModuleUnits(module) > 0 && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID));
                             decrementToolStripMenuItem.Enabled = (module.Value > 0) && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
                         }
                     }
@@ -1243,7 +1243,7 @@ namespace Client.Creator
                 foreach (ListViewItem lvItem in DetailListView.SelectedItems)
                 {
                     ModuleProperty module = lvItem.Tag as ModuleProperty;
-                    if (plp.GetAvailableModuleUnits(module) > 0 && module.Value < module.MaxValue)
+                    if (plp.GetAvailableModuleUnits(module) > 0)
                     {
                         IncrementModules(DetailListView.SelectedItems);
                         bRetVal = true;
@@ -3516,9 +3516,14 @@ namespace Client.Creator
                     //bool bVal = false;
                     //if (module.ModID == 101)
                     //    bVal = true;
-                    int maxValue = s_CommLink.GetMaxModuleValue(productLicense.ProductID, module.ModID);
-                    int units = maxValue - totalValue;
-                    lvItem.SubItems.Add(units.ToString());
+                    if (newModule.UnlimitedValue == 0)
+                        lvItem.SubItems.Add("Unlimited");
+                    else
+                    {
+                        //int maxValue = s_CommLink.GetMaxModuleValue(productLicense.ProductID, module.ModID);
+                        uint units = productLicense.GetAvailableModuleUnits(newModule);
+                        lvItem.SubItems.Add(units.ToString());
+                    }
                 }
                 SetModuleState(productLicense,lvItem);
                 return lvItem;
@@ -4461,8 +4466,8 @@ namespace Client.Creator
                     {
                         if (oldValue != newValue)
                         {
-                            if (newValue > module.MaxValue)
-                                errorMsg = "Specified value exceeds maximum allowed for {0}";
+                            if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
+                                errorMsg = "Specified value exceeds the available units allowed for {0}";
                             else
                             {
                                 module.Value = (short)newValue;
