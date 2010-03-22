@@ -469,14 +469,14 @@ namespace Client.Creator
             return -1;
         }
 
-        public int GetMaxModuleValue(uint productID, short moduleID)
+        public int GetModuleTrialValue(uint productID, short moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
-                        return GetMaxModuleValue(productSpec.sameModSpecProductID.TVal, moduleID);
+                        return GetModuleTrialValue(productSpec.sameModSpecProductID.TVal, moduleID);
                     else
                     {
                         foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
