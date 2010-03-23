@@ -735,7 +735,7 @@ namespace Client.Creator
                     findToolStrip.Visible = false;
                     CustomersListView.Visible = false;
                     //Load Destination Names into combobox
-                    LoadDestinationNameComboBox(_selectedLicenseCustomer.Id);
+                    LoadDestinationNameComboBox(_selectedLicenseCustomer);
                 }
             }
         }
@@ -2269,12 +2269,21 @@ namespace Client.Creator
                 LoadDestinationNameComboBox(custID, destID);
             });
         }
-        private void LoadDestinationNameComboBox(int custID)
+        private void LoadDestinationNameComboBox(CustomerProperty custProperty)
         {
             DestNameComboBox.Items.Clear();
             Service<ICreator>.Use((client) =>
             {
-                List<DestinationNameTable> destNames = client.GetDestNamesByCustID(custID);
+                List<DestinationNameTable> destNames = client.GetDestNamesByCustID(custProperty.Id);
+                if (destNames.Count < 1)
+                {
+                    DestinationNameTable destRec = new DestinationNameTable();
+                    destRec.CustID = custProperty.Id;
+                    destRec.DestID = 0;
+                    destRec.DestName = custProperty.Name;
+                    client.CreateDestinationName(destRec);
+                    destNames = client.GetDestNamesByCustID(custProperty.Id);
+                }
                 foreach (DestinationNameTable dnt in destNames)
                 {
                     DestNameComboBox.Items.Add(dnt.DestName);
@@ -2286,8 +2295,6 @@ namespace Client.Creator
                 }
                 if (destNames.Count > 0)
                     DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(destNames.Where(c => c.DestID.Equals(0)).FirstOrDefault().DestName);
-                else
-                    LoadDBLicenses("", "", "", false);
             });
         }
         private void LoadDestinationNameComboBox(int custID, int destID)
