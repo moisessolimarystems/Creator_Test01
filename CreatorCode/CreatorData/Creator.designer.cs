@@ -66,12 +66,6 @@ namespace CreatorData
     partial void DeleteModuleTable(ModuleTable instance);
     #endregion
 		
-		public CreatorDataContext() : 
-				base(global::CreatorData.Properties.Settings.Default.TestKeyConnectionString, mappingSource)
-		{
-			OnCreated();
-		}
-		
 		public CreatorDataContext(string connection) : 
 				base(connection, mappingSource)
 		{
@@ -395,7 +389,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].License")]
+	[Table(Name="dbo.License")]
 	[DataContract()]
 	public partial class LicenseTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1216,7 +1210,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].Packet")]
+	[Table(Name="dbo.Packet")]
 	[DataContract()]
 	public partial class PacketTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1558,7 +1552,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].DestinationName")]
+	[Table(Name="dbo.DestinationName")]
 	[DataContract()]
 	public partial class DestinationNameTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -1750,7 +1744,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].ProductLicense")]
+	[Table(Name="dbo.ProductLicense")]
 	[DataContract()]
 	public partial class ProductLicenseTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2267,7 +2261,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].SoftwareTokenTable")]
+	[Table(Name="dbo.SoftwareTokenTable")]
 	[DataContract()]
 	public partial class SoftwareTokenTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2393,7 +2387,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].[Transaction]")]
+	[Table(Name="dbo.[Transaction]")]
 	[DataContract()]
 	public partial class TransactionTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -2735,7 +2729,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].Token")]
+	[Table(Name="dbo.Token")]
 	[DataContract()]
 	public partial class TokenTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -3027,7 +3021,7 @@ namespace CreatorData
 		}
 	}
 	
-	[Table(Name="[dbo].Module")]
+	[Table(Name="dbo.Module")]
 	[DataContract()]
 	public partial class ModuleTable : INotifyPropertyChanging, INotifyPropertyChanged
 	{
