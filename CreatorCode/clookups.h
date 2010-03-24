@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 // Defines
 //------------------------------------------------------------------------------
-const int MAX_SOLIMAR_PRODUCTS = 17;    // 9 Products Total, should be largest product ID + 1
+const int MAX_SOLIMAR_PRODUCTS = 32;    // 9 Products Total, should be largest product ID + 1
                                         // current largest product ID = 14
 struct SolimarProduct
 {
