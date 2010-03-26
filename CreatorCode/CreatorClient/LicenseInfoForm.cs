@@ -14,7 +14,6 @@ using Solimar.Licensing.LicenseManagerWrapper;
 using Solimar.Licensing.Attribs;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
-
 namespace Client.Creator
 {
     public partial class LicenseInfoForm : Shared.VisualComponents.DialogBaseForm
@@ -236,27 +235,37 @@ namespace Client.Creator
         {
             Cursor.Current = Cursors.WaitCursor;
             m_Validated = true;
-            //Service<ICreator>.Use((client) =>
-            //{
-            //    LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
-            //    if (hardwareRadioButton.Checked)
-            //    {
-
-            //        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
-            //        if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenListView.SelectedItems[0].Text))
-            //        {
-            //            m_Validated = false;
-            //            this.tokenValueTextBox.Select(0, this.tokenValueTextBox.Text.Length);
-
-            //            // Set the ErrorProvider error with the text to display.
-            //            //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-            //            MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //        }
-            //    }
-            //    else
-            //    {
-            //    }
-            //});
+            Service<ICreator>.Use((client) =>
+            {
+                LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType;
+                if (hardwareRadioButton.Checked)
+                {
+                    selectedType = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID;
+                    if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, tokenListView.SelectedItems[0].Text))
+                    {
+                        m_Validated = false;
+                        // Set the ErrorProvider error with the text to display.
+                        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+                        MessageBox.Show(tokenListView.SelectedItems[0].Text + " already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }  
+                }
+                else
+                {                    
+                    //foreach (ListViewItem lvItem in tokenListView.Items)
+                    //{
+                    //    selectedType = GetTokenEnum(lvItem.Text);
+                    //    if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, lvItem.SubItems[1].Text))
+                    //    {
+                    //        //retrieve 
+                    //        m_Validated = false;                            
+                    //        // Set the ErrorProvider error with the text to display.
+                    //        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
+                    //        MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //    }
+                    //}
+                }
+            });
             Cursor.Current = Cursors.Default;
         }
 
@@ -314,19 +323,27 @@ namespace Client.Creator
                 try
                 {
                     using (StreamReader sr = new StreamReader(browseCSVOpenFileDialog.FileName))
-                    {
+                    {                        
                         String line, tokenValue, tokenName;
+                        int tokenNameStartPos, tokenNameEndPos, tokenValueStartPos, tokenValueEndPos;
                         while ((line = sr.ReadLine()) != null)
                         {
-                            tokenName = line.Substring(0, line.IndexOf(",") - 1);
-                            tokenName = tokenName.Trim(new Char[] { '"' });
-                            tokenValue = line.Remove(0, line.IndexOf(",") + 1);
-                            tokenValue = tokenValue.Trim(new Char[] { '"' });
-                            if (IsValidTokenType(tokenName))
+                            if (line.Length > 0)
                             {
-                                ListViewItem lvItem = new ListViewItem(tokenName);
-                                lvItem.SubItems.Add(tokenValue);
-                                tokenListView.Items.Add(lvItem);
+                                tokenNameStartPos = line.IndexOf("\"");
+                                tokenNameEndPos = line.IndexOf("\"", tokenNameStartPos + 1);
+                                tokenName = line.Substring(tokenNameStartPos, tokenNameEndPos - tokenNameStartPos);
+                                tokenName = tokenName.Trim(new Char[] { '"' });
+                                tokenValueStartPos = line.IndexOf("\"", tokenNameEndPos + 1);
+                                tokenValueEndPos = line.IndexOf("\"", tokenValueStartPos + 1);
+                                tokenValue = line.Substring(tokenValueStartPos, tokenValueEndPos - tokenValueStartPos);
+                                tokenValue = tokenValue.Trim(new Char[] { '"' });
+                                if (IsValidTokenType(tokenName))
+                                {
+                                    ListViewItem lvItem = new ListViewItem(tokenName);
+                                    lvItem.SubItems.Add(tokenValue);
+                                    tokenListView.Items.Add(lvItem);
+                                }
                             }
                         }
                         sr.Close();
@@ -339,8 +356,9 @@ namespace Client.Creator
                         TokenDescriptionLabel.Text = "Customer Validation Information";
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    MessageBox.Show("Failed to import validation tokens from " + browseCSVOpenFileDialog.FileName, "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
