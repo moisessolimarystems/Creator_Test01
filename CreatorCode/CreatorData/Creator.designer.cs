@@ -1655,7 +1655,7 @@ namespace CreatorData
 			}
 		}
 		
-		[Column(Storage="_DestName", DbType="VarChar(50) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[Column(Storage="_DestName", DbType="VarChar(100) NOT NULL", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
 		[DataMember(Order=4)]
 		public string DestName
 		{
