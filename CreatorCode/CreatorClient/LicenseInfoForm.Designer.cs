@@ -172,7 +172,7 @@
             this.tableLayoutPanel1.BackColor = System.Drawing.Color.Transparent;
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 271F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 320F));
             this.tableLayoutPanel1.Controls.Add(this.licDescriptLabel, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.licDestIDLabel, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.licDescriptTextBox, 1, 3);
@@ -220,22 +220,22 @@
             this.licDescriptTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.licDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.licDescriptTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licDescriptTextBox.Location = new System.Drawing.Point(135, 65);
+            this.licDescriptTextBox.Location = new System.Drawing.Point(86, 65);
             this.licDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.licDescriptTextBox.Multiline = true;
             this.licDescriptTextBox.Name = "licDescriptTextBox";
-            this.licDescriptTextBox.Size = new System.Drawing.Size(261, 79);
+            this.licDescriptTextBox.Size = new System.Drawing.Size(310, 79);
             this.licDescriptTextBox.TabIndex = 9;
             // 
             // licNameTextBox
             // 
             this.licNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.licNameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.licNameTextBox.Location = new System.Drawing.Point(135, 5);
+            this.licNameTextBox.Location = new System.Drawing.Point(86, 5);
             this.licNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.licNameTextBox.Name = "licNameTextBox";
             this.licNameTextBox.ReadOnly = true;
-            this.licNameTextBox.Size = new System.Drawing.Size(188, 20);
+            this.licNameTextBox.Size = new System.Drawing.Size(309, 20);
             this.licNameTextBox.TabIndex = 1;
             // 
             // licNameLabel
@@ -253,11 +253,11 @@
             // destinationTextBox
             // 
             this.destinationTextBox.BackColor = System.Drawing.SystemColors.Window;
-            this.destinationTextBox.Location = new System.Drawing.Point(135, 35);
+            this.destinationTextBox.Location = new System.Drawing.Point(86, 35);
             this.destinationTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.destinationTextBox.Name = "destinationTextBox";
             this.destinationTextBox.ReadOnly = true;
-            this.destinationTextBox.Size = new System.Drawing.Size(188, 20);
+            this.destinationTextBox.Size = new System.Drawing.Size(309, 20);
             this.destinationTextBox.TabIndex = 10;
             // 
             // TokenTabPage
@@ -412,9 +412,9 @@
             // tableLayoutPanel4
             // 
             this.tableLayoutPanel4.ColumnCount = 3;
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.6496F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70.3504F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 97F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27.92208F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 72.07792F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 53F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -441,16 +441,16 @@
             this.packetNameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.packetNameLabel.AutoSize = true;
             this.packetNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.packetNameLabel.Location = new System.Drawing.Point(3, 2);
+            this.packetNameLabel.Location = new System.Drawing.Point(3, 8);
             this.packetNameLabel.Name = "packetNameLabel";
-            this.packetNameLabel.Size = new System.Drawing.Size(51, 26);
+            this.packetNameLabel.Size = new System.Drawing.Size(87, 13);
             this.packetNameLabel.TabIndex = 0;
             this.packetNameLabel.Text = "Packet Name:";
             // 
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(309, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(353, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -462,21 +462,21 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(96, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(103, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
-            this.packetNameTextBox.Size = new System.Drawing.Size(208, 20);
+            this.packetNameTextBox.Size = new System.Drawing.Size(245, 20);
             this.packetNameTextBox.TabIndex = 4;
             // 
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(96, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(103, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(208, 68);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(245, 68);
             this.packetDescriptTextBox.TabIndex = 7;
             // 
             // packetDateLabel
@@ -504,11 +504,11 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(96, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(103, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(208, 32);
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(245, 32);
             this.packetOutputPathTextBox.TabIndex = 6;
             // 
             // label3
@@ -526,11 +526,11 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(96, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(103, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
-            this.packetExpDateTextBox.Size = new System.Drawing.Size(208, 20);
+            this.packetExpDateTextBox.Size = new System.Drawing.Size(245, 20);
             this.packetExpDateTextBox.TabIndex = 9;
             // 
             // orderTabPage
@@ -558,8 +558,8 @@
             // tableLayoutPanel5
             // 
             this.tableLayoutPanel5.ColumnCount = 2;
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 39.4015F));
-            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60.5985F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27.43142F));
+            this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 72.56858F));
             this.tableLayoutPanel5.Controls.Add(this.label4, 0, 0);
             this.tableLayoutPanel5.Controls.Add(this.productLicenseDescriptionTextBox, 1, 5);
             this.tableLayoutPanel5.Controls.Add(this.label7, 0, 5);
@@ -569,9 +569,9 @@
             this.tableLayoutPanel5.Controls.Add(this.label5, 0, 3);
             this.tableLayoutPanel5.Controls.Add(this.productLicenseVersionMaskedTextBox, 1, 3);
             this.tableLayoutPanel5.Controls.Add(this.ProductLicenseTypeComboBox, 1, 2);
-            this.tableLayoutPanel5.Controls.Add(this.ProductLicenseProductComboBox, 1, 1);
             this.tableLayoutPanel5.Controls.Add(this.label1, 0, 2);
             this.tableLayoutPanel5.Controls.Add(this.label2, 0, 1);
+            this.tableLayoutPanel5.Controls.Add(this.ProductLicenseProductComboBox, 1, 1);
             this.tableLayoutPanel5.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel5.Location = new System.Drawing.Point(10, 23);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
@@ -593,18 +593,18 @@
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(3, 8);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(150, 13);
+            this.label4.Size = new System.Drawing.Size(103, 13);
             this.label4.TabIndex = 5;
-            this.label4.Text = "Product License Number:";
+            this.label4.Text = "Product License:";
             // 
             // productLicenseDescriptionTextBox
             // 
             this.productLicenseDescriptionTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.productLicenseDescriptionTextBox.Location = new System.Drawing.Point(163, 155);
+            this.productLicenseDescriptionTextBox.Location = new System.Drawing.Point(114, 155);
             this.productLicenseDescriptionTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.productLicenseDescriptionTextBox.Multiline = true;
             this.productLicenseDescriptionTextBox.Name = "productLicenseDescriptionTextBox";
-            this.productLicenseDescriptionTextBox.Size = new System.Drawing.Size(233, 51);
+            this.productLicenseDescriptionTextBox.Size = new System.Drawing.Size(282, 51);
             this.productLicenseDescriptionTextBox.TabIndex = 10;
             // 
             // label7
@@ -620,7 +620,7 @@
             // 
             // expDateTextBox
             // 
-            this.expDateTextBox.Location = new System.Drawing.Point(163, 125);
+            this.expDateTextBox.Location = new System.Drawing.Point(114, 125);
             this.expDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.expDateTextBox.Name = "expDateTextBox";
             this.expDateTextBox.Size = new System.Drawing.Size(52, 20);
@@ -632,11 +632,11 @@
             // 
             this.productLicenseNumberTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.productLicenseNumberTextBox.Enabled = false;
-            this.productLicenseNumberTextBox.Location = new System.Drawing.Point(163, 5);
+            this.productLicenseNumberTextBox.Location = new System.Drawing.Point(114, 5);
             this.productLicenseNumberTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.productLicenseNumberTextBox.Name = "productLicenseNumberTextBox";
             this.productLicenseNumberTextBox.ReadOnly = true;
-            this.productLicenseNumberTextBox.Size = new System.Drawing.Size(198, 20);
+            this.productLicenseNumberTextBox.Size = new System.Drawing.Size(282, 20);
             this.productLicenseNumberTextBox.TabIndex = 4;
             // 
             // label6
@@ -663,7 +663,7 @@
             // 
             // productLicenseVersionMaskedTextBox
             // 
-            this.productLicenseVersionMaskedTextBox.Location = new System.Drawing.Point(163, 95);
+            this.productLicenseVersionMaskedTextBox.Location = new System.Drawing.Point(114, 95);
             this.productLicenseVersionMaskedTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.productLicenseVersionMaskedTextBox.Mask = "0.00";
             this.productLicenseVersionMaskedTextBox.Name = "productLicenseVersionMaskedTextBox";
@@ -675,10 +675,10 @@
             // 
             this.ProductLicenseTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ProductLicenseTypeComboBox.FormattingEnabled = true;
-            this.ProductLicenseTypeComboBox.Location = new System.Drawing.Point(163, 65);
+            this.ProductLicenseTypeComboBox.Location = new System.Drawing.Point(114, 65);
             this.ProductLicenseTypeComboBox.Margin = new System.Windows.Forms.Padding(5);
             this.ProductLicenseTypeComboBox.Name = "ProductLicenseTypeComboBox";
-            this.ProductLicenseTypeComboBox.Size = new System.Drawing.Size(198, 21);
+            this.ProductLicenseTypeComboBox.Size = new System.Drawing.Size(149, 21);
             this.ProductLicenseTypeComboBox.TabIndex = 1;
             // 
             // ProductLicenseProductComboBox
@@ -686,10 +686,10 @@
             this.ProductLicenseProductComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.ProductLicenseProductComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ProductLicenseProductComboBox.FormattingEnabled = true;
-            this.ProductLicenseProductComboBox.Location = new System.Drawing.Point(163, 35);
+            this.ProductLicenseProductComboBox.Location = new System.Drawing.Point(114, 35);
             this.ProductLicenseProductComboBox.Margin = new System.Windows.Forms.Padding(5);
             this.ProductLicenseProductComboBox.Name = "ProductLicenseProductComboBox";
-            this.ProductLicenseProductComboBox.Size = new System.Drawing.Size(198, 21);
+            this.ProductLicenseProductComboBox.Size = new System.Drawing.Size(282, 21);
             this.ProductLicenseProductComboBox.Sorted = true;
             this.ProductLicenseProductComboBox.TabIndex = 0;
             this.ProductLicenseProductComboBox.SelectedIndexChanged += new System.EventHandler(this.productLicenseProductComboBox_SelectedIndexChanged);
