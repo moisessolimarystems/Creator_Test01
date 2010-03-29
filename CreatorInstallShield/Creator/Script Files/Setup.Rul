@@ -34,7 +34,8 @@ prototype CheckRequirements();
 //VARIANT			gvDllString;  
 STRING      	gsvSetupType, gsvDir;    
 NUMBER			gUnInstallType; 
-STRING SETUPEXEDIR[MAX_PATH + 1];    
+STRING			SETUPEXEDIR[MAX_PATH + 1];        
+BOOL 			gServerType;
   
 //=============================================================================
 //
@@ -220,7 +221,7 @@ end;
 // installed features or uninstall the application.
 //---------------------------------------------------------------------------
 function OnMaintUIBefore()
-	NUMBER nResult;
+	NUMBER nResult, nInstalled, nAction;
 	STRING szTitle, szMsg, svDir, svResult, szCaption;
 begin
 	// TO DO: if you want to enable background, window title, and caption bar title   								
@@ -263,7 +264,7 @@ Dlg_Start:
                 // In non-REMOVEONLY mode, redisplay the previous dialog.
 			    goto Dlg_Start;
             endif;
-
+	
 		endif;
 	endif;
 
@@ -281,7 +282,14 @@ Dlg_SdFeatureTree:
 		case REMOVEALL: FeatureRemoveAll();
 		case REPAIR:    FeatureReinstall();
 	endswitch;
-    
+	//set bool to determine if "Server" feature is installed
+	if (MsiGetFeatureState(ISMSI_HANDLE, "Server", nInstalled, nAction) = ERROR_SUCCESS) then
+		if (nInstalled = INSTALLSTATE_LOCAL) then
+			gServerType = TRUE;
+		else		
+			gServerType = FALSE;
+		endif;
+	endif; 
 	// setup default status 
 	SetStatusWindow(0, "");
 	Enable(STATUSEX);
@@ -334,7 +342,9 @@ begin
 	bOpt1   = FALSE;
 	bOpt2   = FALSE; 
 	
-    UninstallLicensing("");
+    if(gServerType = TRUE) then    		
+    	UninstallLicensing("");
+    endif;
 	// Added - Version 9.5 - Use appropriate strings for complete
     // uninstall.
     if( REMOVEALLMODE ) then
