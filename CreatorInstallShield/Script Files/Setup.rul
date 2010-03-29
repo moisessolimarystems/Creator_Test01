@@ -716,17 +716,15 @@ function InstallLicensing()
 begin     
 
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
-	szPath = WINSYSDIR + "\msiexec.exe";
      
     svSrcPath = SRCDIR + "\\Common\\SolimarLicensing\\SolimarInternalRelease.exe";
     LongPathToQuote(svSrcPath, TRUE); 
-    szPath = WINSYSDIR + "\msiexec.exe";
     if(RegDBGetKeyValueEx("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarInternalRelease","CurrentVersion",nvType, svValue, nvSize) == 0) then
-		 szOpts = " /x " + svSrcPath + " /qn"  ; 
-		 LaunchAppAndWait(szPath, szOpts, WAIT);
+		 szOpts = "/x /S /v\"REMOVE=ALL /qn\""; 
+		 LaunchAppAndWait(svSrcPath, szOpts, WAIT);
     endif; 
-    szOpts = " /i " + svSrcPath + " /qn"  ;
-    LaunchAppAndWait(szPath, szOpts, WAIT);
+    szOpts = " /S /v\"ALLUSERS=1 /qn\""; 
+    LaunchAppAndWait(svSrcPath, szOpts, WAIT);
     
     InstallSentinelDriver();
 end;             
@@ -766,7 +764,7 @@ begin
    	endif;
 
     if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
-    	nvSize = StrFind(svValue, "7.6.1") ;
+    	nvSize = StrFind(svValue, "7.5.1") ;
     	if(nvSize < 0) then //StrFind(svValue, "1.0.5") < 0) then
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
 			sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
