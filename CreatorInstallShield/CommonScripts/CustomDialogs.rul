@@ -44,13 +44,13 @@ end;
 //=============================================================================
 function SdLicenseDlg()
     NUMBER nResult;
-    STRING szTitle, szMsg, szLicenseFile, szQuestion;
+    STRING szTitle, szOpt1, szOpt2, szLicenseFile;
 begin           
     szLicenseFile = SUPPORTDIR ^ "End Use License Agreement.rtf";
     szTitle    = "";
-    szMsg      = "";
-    szQuestion = "";
-    nResult    = SdLicenseRtf( szTitle, szMsg, szQuestion, szLicenseFile );
+    szOpt1     = "";
+    szOpt2     = "";
+    nResult    = SdLicense2Rtf( szTitle, szOpt1, szOpt2, szLicenseFile, FALSE );
     return nResult;
 end;
 
