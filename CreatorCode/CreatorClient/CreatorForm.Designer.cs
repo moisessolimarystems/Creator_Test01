@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode7,
-            treeNode8,
-            treeNode9});
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode2,
+            treeNode3,
+            treeNode4});
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,6 +76,9 @@
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.LicensesTabPage = new System.Windows.Forms.TabPage();
+            this.CustomersListView = new Shared.VisualComponents.NoFlickerListView();
+            this.custNumColumnHeader = new System.Windows.Forms.ColumnHeader();
+            this.custNameColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.LicenseViewSplitContainer = new System.Windows.Forms.SplitContainer();
             this.findToolStrip = new System.Windows.Forms.ToolStrip();
             this.closeFindToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -126,9 +129,6 @@
             this.PacketListToolStrip = new System.Windows.Forms.ToolStrip();
             this.packetToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-            this.CustomersListView = new Shared.VisualComponents.NoFlickerListView();
-            this.custNumColumnHeader = new System.Windows.Forms.ColumnHeader();
-            this.custNameColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.ValidationKeysTabPage = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.HardwareKeyListView = new Shared.VisualComponents.NoFlickerListView();
@@ -629,6 +629,37 @@
             this.LicensesTabPage.TabIndex = 1;
             this.LicensesTabPage.Text = "License Servers";
             this.LicensesTabPage.UseVisualStyleBackColor = true;
+            // 
+            // CustomersListView
+            // 
+            this.CustomersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.custNumColumnHeader,
+            this.custNameColumnHeader});
+            this.CustomersListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CustomersListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CustomersListView.FullRowSelect = true;
+            this.CustomersListView.GridLines = true;
+            this.CustomersListView.Location = new System.Drawing.Point(0, 0);
+            this.CustomersListView.MultiSelect = false;
+            this.CustomersListView.Name = "CustomersListView";
+            this.CustomersListView.NoItemsMessage = "";
+            this.CustomersListView.Size = new System.Drawing.Size(981, 428);
+            this.CustomersListView.TabIndex = 2;
+            this.CustomersListView.UseCompatibleStateImageBehavior = false;
+            this.CustomersListView.View = System.Windows.Forms.View.Details;
+            this.CustomersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseDoubleClick);
+            this.CustomersListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseUp);
+            this.CustomersListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.CustomersListView_ColumnClick);
+            // 
+            // custNumColumnHeader
+            // 
+            this.custNumColumnHeader.Text = "Customer";
+            this.custNumColumnHeader.Width = 76;
+            // 
+            // custNameColumnHeader
+            // 
+            this.custNameColumnHeader.Text = "Name";
+            this.custNameColumnHeader.Width = 901;
             // 
             // LicenseViewSplitContainer
             // 
@@ -1208,37 +1239,6 @@
             this.toolStripLabel1.Size = new System.Drawing.Size(78, 22);
             this.toolStripLabel1.Text = "Packet Filter";
             // 
-            // CustomersListView
-            // 
-            this.CustomersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.custNumColumnHeader,
-            this.custNameColumnHeader});
-            this.CustomersListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CustomersListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CustomersListView.FullRowSelect = true;
-            this.CustomersListView.GridLines = true;
-            this.CustomersListView.Location = new System.Drawing.Point(0, 0);
-            this.CustomersListView.MultiSelect = false;
-            this.CustomersListView.Name = "CustomersListView";
-            this.CustomersListView.NoItemsMessage = "";
-            this.CustomersListView.Size = new System.Drawing.Size(981, 428);
-            this.CustomersListView.TabIndex = 2;
-            this.CustomersListView.UseCompatibleStateImageBehavior = false;
-            this.CustomersListView.View = System.Windows.Forms.View.Details;
-            this.CustomersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseDoubleClick);
-            this.CustomersListView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.CustomersListView_MouseUp);
-            this.CustomersListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.CustomersListView_ColumnClick);
-            // 
-            // custNumColumnHeader
-            // 
-            this.custNumColumnHeader.Text = "Customer";
-            this.custNumColumnHeader.Width = 76;
-            // 
-            // custNameColumnHeader
-            // 
-            this.custNameColumnHeader.Text = "Name";
-            this.custNameColumnHeader.Width = 901;
-            // 
             // ValidationKeysTabPage
             // 
             this.ValidationKeysTabPage.Controls.Add(this.panel1);
@@ -1348,10 +1348,10 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode2.Name = "RootNode";
-            treeNode2.Text = "Reports";
+            treeNode1.Name = "RootNode";
+            treeNode1.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode1});
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
@@ -1408,29 +1408,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode7.ImageIndex = 1;
-            treeNode7.Name = "LicenseNode";
-            treeNode7.SelectedImageIndex = 1;
-            treeNode7.Text = "Licenses";
-            treeNode8.ImageIndex = 2;
-            treeNode8.Name = "PacketNode";
-            treeNode8.SelectedImageIndex = 2;
-            treeNode8.Text = "Packets";
-            treeNode9.Name = "KeyNode";
-            treeNode9.Text = "Hardware Keys";
-            treeNode10.ImageIndex = 3;
-            treeNode10.Name = "CreatorRootNode";
-            treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode10.SelectedImageIndex = 3;
-            treeNode10.Text = "Creator";
-            treeNode11.ImageIndex = 0;
-            treeNode11.Name = "ReportRootNode";
-            treeNode11.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode11.SelectedImageIndex = 0;
-            treeNode11.Text = "Reports";
+            treeNode2.ImageIndex = 1;
+            treeNode2.Name = "LicenseNode";
+            treeNode2.SelectedImageIndex = 1;
+            treeNode2.Text = "Licenses";
+            treeNode3.ImageIndex = 2;
+            treeNode3.Name = "PacketNode";
+            treeNode3.SelectedImageIndex = 2;
+            treeNode3.Text = "Packets";
+            treeNode4.Name = "KeyNode";
+            treeNode4.Text = "Hardware Keys";
+            treeNode5.ImageIndex = 3;
+            treeNode5.Name = "CreatorRootNode";
+            treeNode5.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode5.SelectedImageIndex = 3;
+            treeNode5.Text = "Creator";
+            treeNode6.ImageIndex = 0;
+            treeNode6.Name = "ReportRootNode";
+            treeNode6.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode6.SelectedImageIndex = 0;
+            treeNode6.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode10,
-            treeNode11});
+            treeNode5,
+            treeNode6});
             this.MainTreeView.SelectedImageIndex = 0;
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;

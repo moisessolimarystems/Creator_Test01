@@ -21,6 +21,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Drawing.Printing;
 using System.Drawing.Imaging;
+using System.ServiceProcess;
 
 /*
  * TODO : 
@@ -61,6 +62,23 @@ namespace Client.Creator
         public DateTime CurrentExpirationDate
         {
             get { return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); }
+        }
+
+        public bool LicenseServerAvailable
+        {
+            get
+            {
+                ServiceController sc = new ServiceController(AppConstants.LicenseServerName);
+                bool bLicenseServer = false;
+                try
+                {
+                    bLicenseServer = (sc.Status != null);
+                }
+                catch (Exception ex)
+                {
+                }
+                return bLicenseServer;
+            }
         }
 
         #endregion
@@ -1190,8 +1208,8 @@ namespace Client.Creator
                         {
                             ModuleProperty module = item.Tag as ModuleProperty;
                             dlvEditToolStripMenuItem.Enabled = !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
-                            incrementToolStripMenuItem.Enabled = (plProperty.GetAvailableModuleUnits(module) > 0 && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID));
-                            decrementToolStripMenuItem.Enabled = (module.Value > 0) && !s_CommLink.IsDefaultModule(plProperty.ProductID, module.ID);
+                            incrementToolStripMenuItem.Enabled = plProperty.CanIncrementModule(module); 
+                            decrementToolStripMenuItem.Enabled = plProperty.CanDecrementModule(module);
                         }
                     }
                 }
@@ -3245,7 +3263,7 @@ namespace Client.Creator
         private void EnableHardwareKeyView()
         {
             navigateBackToolStripButton.Enabled = true;
-            seekKeyToolStripButton.Enabled = true;
+            seekKeyToolStripButton.Enabled = LicenseServerAvailable;
             reserveHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value;
             searchToolStripTextBox.Visible = false;
             SearchToolStripLabel.Visible = false;
@@ -3255,10 +3273,10 @@ namespace Client.Creator
             activateHardwareKeyToolStripButton.Enabled = false;
             if (HardwareKeyListView.SelectedItems.Count > 0)
             {
-                deactivateHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value;
+                deactivateHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && LicenseServerAvailable;
                 if (HardwareKeyListView.SelectedItems[0].SubItems[2].Text != "Active" && 
                     HardwareKeyListView.SelectedItems[0].SubItems[2].Text != "Lost")
-                    activateHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value;
+                    activateHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && LicenseServerAvailable;
             }
             clearKeyToolStripButton.Enabled = true;
             ValidationKeyToolStrip.Visible = true;
@@ -3272,7 +3290,7 @@ namespace Client.Creator
             SearchToolStripLabel.Enabled = true;
             navigateBackToolStripButton.Enabled = false;
             navigateForwardToolStripButton.Enabled = false;
-            seekKeyToolStripButton.Enabled = true;
+            seekKeyToolStripButton.Enabled = LicenseServerAvailable;
             reserveHardwareKeyToolStripButton.Enabled = false;
             deactivateHardwareKeyToolStripButton.Enabled = false;
             activateHardwareKeyToolStripButton.Enabled = false;
@@ -3475,15 +3493,15 @@ namespace Client.Creator
                     foreach (ModuleTable module in moduleList.Where(c => c.ProductLicenseID == plData.ProductLicenseDatabaseID))
                     {   //totalValue = licensed module value + add-on module value;
                         //           = trial module value;
-                        short totalValue = 0;
+                        uint totalValue = 0;
                         if (plData.Status == ProductLicenseState.Trial)
-                            totalValue = module.Value;
+                            totalValue = (uint)module.Value;
                         else
                         {
                             foreach (ModuleTable mod in moduleList)
                             {
                                 if (mod.ModID == module.ModID)
-                                    totalValue += mod.Value;
+                                    totalValue += (uint)mod.Value;
                             }
                         }
                         ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
@@ -3500,7 +3518,7 @@ namespace Client.Creator
                 }
             }
 
-            public ListViewItem CreateModuleListViewItem(ProductLicenseProperty productLicense, ModuleTable module, short totalValue)
+            public ListViewItem CreateModuleListViewItem(ProductLicenseProperty productLicense, ModuleTable module, uint totalValue)
             {
                 string moduleName = s_CommLink.GetModuleName(productLicense.ProductID, module.ModID);
                 ListViewItem lvItem = new ListViewItem();
@@ -3528,7 +3546,7 @@ namespace Client.Creator
                     else
                     {
                         //int maxValue = s_CommLink.GetMaxModuleValue(productLicense.ProductID, module.ModID);
-                        uint units = productLicense.GetAvailableModuleUnits(newModule);
+                        uint units = productLicense.GetAvailableModuleUnits(newModule, totalValue);
                         lvItem.SubItems.Add(units.ToString());
                     }
                 }

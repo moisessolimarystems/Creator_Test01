@@ -469,7 +469,7 @@ namespace Client.Creator
             return -1;
         }
 
-        public int GetModuleTrialValue(uint productID, short moduleID)
+        public short GetModuleTrialValue(uint productID, short moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
@@ -483,7 +483,7 @@ namespace Client.Creator
                         {
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
-                                return (int)moduleSpec.moduleTrialLicense.TVal;
+                                return (short)moduleSpec.moduleTrialLicense.TVal;
                             }
                         }
                     }

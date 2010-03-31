@@ -233,7 +233,7 @@ begin
 			else  
 				sentPath = SRCDIR ^ "Common\\SolimarLicensing64\\SPNComboInstaller.exe"; 
 			endif;
-   			sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
+   			sentOpts = " /v\"/qb ADDLOCAL=Parallel_Driver,USB_Driver REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    			if(Is(FILE_EXISTS, sentPath)) then
    				if(LaunchAppAndWait(sentPath, sentOpts, WAIT) < 0) then
    					MessageBox("Unable to install Rainbow Sentinel Driver. Please retry from source.", SEVERE);
@@ -247,7 +247,7 @@ begin
 		else
 			sentPath = SRCDIR ^ "Common\\SolimarLicensing64\\SPNComboInstaller.exe"; 
 		endif;
-   		sentOpts = " /v\"/qb REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
+   		sentOpts = " /v\"/qb ADDLOCAL=Parallel_Driver,USB_Driver REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
    		if(Is(FILE_EXISTS, sentPath)) then
    			if(LaunchAppAndWait(sentPath, sentOpts, WAIT) < 0) then
    				MessageBox("Unable to install Rainbow Sentinel Driver. Please retry from source.", SEVERE);

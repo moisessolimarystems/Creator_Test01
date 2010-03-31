@@ -74,11 +74,11 @@ namespace Client.Creator
             }
         }
 
-        public uint TrialValue
+        public short TrialValue
         {
             get
             {
-                return (uint)_commLink.GetModuleTrialValue(ProductID, ID);
+                return _commLink.GetModuleTrialValue(ProductID, ID);
             }
         }
 

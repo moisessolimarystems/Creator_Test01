@@ -7,6 +7,7 @@ namespace Client.Creator
 {
     class AppConstants
     {
+        public static readonly String LicenseServerName = "Solimar License Server";
         //Form Constants
         public static readonly String ClientTitle = "Creator";
         //XML File/Folder Path
