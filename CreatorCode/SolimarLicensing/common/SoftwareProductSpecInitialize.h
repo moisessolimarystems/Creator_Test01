@@ -790,6 +790,8 @@ void InititalizeProduct12()
 	pTmpModSpec->moduleName = std::wstring(L"Process Builders");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionDeprecated_Major = 3;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(30, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(30))->second);
@@ -829,7 +831,7 @@ void InititalizeProduct14()
 	pTmpProdSpec->softwareSpec_Major = 1;
 	pTmpProdSpec->softwareSpec_Minor = 0;
 	pTmpProdSpec->softwareSpec_SubMajor = 0;
-	pTmpProdSpec->softwareSpec_SubMinor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 1;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -860,6 +862,15 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleName = std::wstring(L"PDF::AFPDS");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(52, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(52))->second);
+	pTmpModSpec->moduleID = 52;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::AFPDS(MO)");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 7;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(24))->second);
@@ -1050,6 +1061,15 @@ void InititalizeProduct14()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(51, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(51))->second);
+	pTmpModSpec->moduleID = 51;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::AFPDS(OC)");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 7;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(201, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(201))->second);

@@ -49,11 +49,11 @@
   SoftwareSpec option attributes
   
   softwareSpec_Major  integer
-                      Do not manually set. Creator will fill in value with license server major.
+                      Do not manually set. Creator will fill in value with license server major. Build process also fills in value.
   softwareSpec_Minor  integer
-                      Do not manually set. Creator will fill in value with license server minor.
+                      Do not manually set. Creator will fill in value with license server minor. Build process also fills in value.
   softwareSpec_SubMajor integer
-                      Do not manually set. Creator will fill in value with license server build version.  
+                      Do not manually set. Creator will fill in value with license server build version. Build process also fills in value. 
   softwareSpec_SubMinor integer
                       Used to indicate software spec revision. Bump up subminor when any changes are made.
 -->
@@ -111,7 +111,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="1">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -232,7 +232,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Reader" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="Job Ticket Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="13" productName="SOLfusion" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
@@ -240,7 +240,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SOLfusion"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>		
-	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
+	<Lic_ProductSoftwareSpecAttribs productID="14" productName="SPDE" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="1">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="3211::ASCII" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="AFPDS::PDF" modUnlimitedValue="1"/>
@@ -305,7 +305,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="PDF::PostScript(PDFL-RIP)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="PDF::AFPDS" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="PostScript::AFPDS" modUnlimitedValue="1"/>
-			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="PDF::AFPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PDF::AFPDS(MO)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>			
 			<!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output(PCI)"/>
