@@ -400,7 +400,7 @@ function SdFinishUpgradeDlg()
     STRING  szDialogName, szSourceDir, svArgument, szTitle, szMsg1, szButton, szTemp;
     NUMBER  nDialog, nCmdValue; 
     BOOL    bDone;   
-
+	HWND    hwndDlg, hwndRbut;
 begin 
 	//
    	// Initialize variables to be used with this function...
@@ -447,8 +447,13 @@ begin
        			// Do some initialization                                             
        			CtrlSetText  (szDialogName, RES_DIALOG_TITLE, szTitle);
        			CtrlSetText  (szDialogName, RES_DIALOG_SUBTITLE_MSG, szMsg1); 
-       			CtrlSetText  (szDialogName, RES_PBUT_NEXT, szButton);
-       			bDone = FALSE;
+       			CtrlSetText  (szDialogName, RES_PBUT_NEXT, szButton);  
+				//always hide readme/launchme radio buttons
+                hwndDlg = CmdGetHwndDlg( szDialogName );
+                hwndRbut = GetDlgItem( hwndDlg, 501 );
+                ShowWindow( hwndRbut, SW_HIDE );
+                hwndRbut = GetDlgItem( hwndDlg, 502 );
+                ShowWindow( hwndRbut, SW_HIDE );
     		case RES_PBUT_CANCEL:   // Click EXIT                                                  
            		// The user clicked the Cancel button.
            		bDone = TRUE;               		                                    
