@@ -706,6 +706,7 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		//Must inflate first...
 		unsigned char* uncompressedBuf = NULL;
 		long uncompressedBufSize(0);
+		unsigned char* uncompressedBufNullTerm = NULL;
 		DWORD password_packet_length = vtLicensePacket.parray->rgsabound[0].cElements;
 
 	//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::EnterSoftwareLicPacket() - Pre context.DecryptData - password_packet_length: %d", password_packet_length);
@@ -753,7 +754,12 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		//pPacket = 0;
 		//delete [] uncompressedBuf;
 
-		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBuf).c_str();
+		uncompressedBufNullTerm = new unsigned char[uncompressedBufSize+1];
+		memcpy(uncompressedBufNullTerm, uncompressedBuf, (uncompressedBufSize)*sizeof(unsigned char));
+		uncompressedBufNullTerm[uncompressedBufSize] = '\0';
+
+		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBufNullTerm).c_str();
+
 		//
 		// decrypt the password packet (two copies)
 		// this copy is used for strtok
@@ -765,6 +771,7 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		memcpy(pPacketString1, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		memcpy(pPacketString2, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		delete [] uncompressedBuf;
+		delete [] uncompressedBufNullTerm;
 		
 		// compute the verification code
 		{
