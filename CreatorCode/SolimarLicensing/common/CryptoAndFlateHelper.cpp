@@ -113,6 +113,7 @@ HRESULT CryptoAndFlateHelper::EncryptCompressByteArrayToStream(
 		//Must inflate first...
 		unsigned char* uncompressedBuf = NULL;
 		long uncompressedBufSize(0);
+		unsigned char* uncompressedBufNullTerm = NULL;
 		DWORD password_packet_length = vtByteArray.parray->rgsabound[0].cElements;
 
 		{
@@ -140,7 +141,11 @@ HRESULT CryptoAndFlateHelper::EncryptCompressByteArrayToStream(
 		if(uncompressedBuf == NULL)
 			throw E_INVALIDARG;
 		
-		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBuf).c_str();
+		uncompressedBufNullTerm = new unsigned char[uncompressedBufSize+1];
+		memcpy(uncompressedBufNullTerm, uncompressedBuf, (uncompressedBufSize)*sizeof(unsigned char));
+		uncompressedBufNullTerm[uncompressedBufSize] = '\0';
+
+		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBufNullTerm).c_str();
 
 		//
 		// decrypt the password packet, this copy is used for strtok
@@ -152,6 +157,7 @@ HRESULT CryptoAndFlateHelper::EncryptCompressByteArrayToStream(
 		memcpy(pPacketString1, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		memcpy(pPacketString2, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		delete [] uncompressedBuf;
+		delete [] uncompressedBufNullTerm;
 
 		// parse the password packet
 		wchar_t *pNextToken;
