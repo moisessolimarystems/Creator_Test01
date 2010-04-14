@@ -194,14 +194,14 @@ namespace Client.Creator
                     {
                         deactivateToolStripMenuItem.Visible = true;                        
                     }            
-                    if (licData.IsEnabled)
-                        createPacketFileToolStripMenuItem.Enabled = true;
                     newProductLicenseToolStripMenuItem.Enabled = licData.IsActive && m_Permissions.pt_create_modify_key.Value;
                     validationTokensToolStripMenuItem.Enabled  = licData.IsActive && m_Permissions.pt_create_modify_key.Value;
                     newTokenToolStripMenuItem.Enabled          = !licData.IsEnabled && m_Permissions.pt_create_modify_key.Value;
                     clearToolStripMenuItem.Enabled             = licData.IsEnabled && !licData.HasActiveHardwareToken && m_Permissions.pt_create_modify_key.Value;
                     markLostToolStripMenuItem.Enabled          = licData.HasActiveHardwareToken && m_Permissions.pt_create_modify_key.Value;
-                }                
+                }
+                if (licData.IsEnabled && m_Permissions.pt_version_pwd.Value)
+                    createPacketFileToolStripMenuItem.Enabled = true;
             }
             deactivateToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;
             reactivateToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;         
@@ -254,7 +254,7 @@ namespace Client.Creator
             {
                 addLicMainToolStripBtn.Enabled = m_Permissions.pt_create_modify_key.Value;
                 addProductLicenseMainToolStripDropDownBtn.Enabled = (node.Tag as LicenseServerProperty).IsActive && m_Permissions.pt_create_modify_key.Value;
-                createPacketMainToolStripBtn.Enabled = (node.Tag as LicenseServerProperty).IsActive;
+                createPacketMainToolStripBtn.Enabled = (node.Tag as LicenseServerProperty).IsActive && m_Permissions.pt_version_pwd.Value;
                 EnableLicenseMainToolStripDropDownMenuItems();
                 EnableProductLicenseMainToolStripDropDownMenuItems();
             }          
@@ -972,7 +972,7 @@ namespace Client.Creator
                         m_CurrentLicenseName = (node.Tag as LicenseServerProperty).Name;
                         if (!(node.Tag as LicenseServerProperty).IsActive)
                             DetailPropertyGrid.Enabled = false;
-                        createPacketMainToolStripBtn.Enabled = true;
+                        //createPacketMainToolStripBtn.Enabled = true;
                     }
                     break;
             }
@@ -2934,22 +2934,17 @@ namespace Client.Creator
         #region Packet Methods
         private void GenerateLicensePacket()
         {
+            string packetName = string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             if (!(m_selectedDirectory.Length > 0))
                 m_selectedDirectory = Directory.GetCurrentDirectory();
-            PacketProperty newPacket = new PacketProperty(string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
-                                                  "",
-                                                  DateTime.Today,
-                                                  m_selectedDirectory, //Path.Combine(m_selectedDirectory, _selectedLicenseCustomer.Name),
-                                                  "");
 
             using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Packet", ref s_CommLink))
             {
-                //update license server with latest tokens
-                PacketDialogData data = new PacketDialogData(newPacket, _selectedLicenseCustomer.Name);
+                PacketDialogData data = new PacketDialogData(_selectedLicenseCustomer.Name, packetName, m_selectedDirectory);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    m_selectedDirectory = Path.GetFullPath(data.PacketInfo.OutputPath);// + "\\..");
-                    GeneratePacket(data.PacketInfo.Name, DetailTreeView.SelectedNode.Name, data.ExpDate, data.PacketInfo.Description, data.PacketInfo.OutputPath);
+                    m_selectedDirectory = Path.GetFullPath(data.SelectedDirectory);
+                    GeneratePacket(packetName, DetailTreeView.SelectedNode.Name, data.ExpDate, data.UserNotes, data.SelectedDirectory);
                 }
             }
         }
@@ -4584,6 +4579,19 @@ namespace Client.Creator
             CaptureScreen();
             if (printDialog1.ShowDialog() == DialogResult.OK)
                 printDocument1.Print();
+        }
+
+        private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            softwareTokenPreferencesToolStripMenuItem.Enabled = false;
+            updateVersionsToolStripMenuItem.Enabled = false;
+            if (m_Permissions != null)
+            {
+                if (m_Permissions.pt_permanent_pwd.HasValue)
+                    softwareTokenPreferencesToolStripMenuItem.Enabled = m_Permissions.pt_permanent_pwd.Value;
+                if (m_Permissions.pt_version_pwd.HasValue)
+                    updateVersionsToolStripMenuItem.Enabled = m_Permissions.pt_version_pwd.Value;
+            }
         }
     }
 }
