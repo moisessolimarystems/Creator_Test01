@@ -44,11 +44,14 @@ namespace Client.Creator
                     e.Cancel = true;
                 }
                 else
-                {
-                    //update product version
-                    string[] keyName = textBox1.Text.Split(".".ToCharArray());
-                    string version = string.Format("{0}{1}0", keyName[0], keyName[1]);
-                    int newVersion = Int32.Parse(version, System.Globalization.NumberStyles.HexNumber);
+                {                    //update product version
+                    LicenseVersion version = new LicenseVersion(textBox1.Text);
+                    string strVersion;
+                    if(version.Minor > 9)
+                        strVersion = string.Format("{0}{1}0", version.Major, version.Minor);
+                    else
+                        strVersion = string.Format("{0}0{1}0", version.Major, version.Minor);
+                    int newVersion = Int32.Parse(strVersion, System.Globalization.NumberStyles.HexNumber);
                     ServiceProxy.Service<ICreator>.Use((client) =>
                     {
                         ProductTable productRec = client.GetProduct(comboBox1.SelectedItem.ToString());
@@ -56,11 +59,6 @@ namespace Client.Creator
                         {
                             productRec.pVersion = newVersion;
                             client.UpdateProductTable(productRec);
-                            //MessageBox.Show(string.Format("{0} version updated from {1} to {2}", comboBox1.SelectedItem.ToString().Trim(), oldVersion, newVersion),
-                            //                "Product Version Update Confirmation",
-                            //                MessageBoxButtons.OK,
-                            //                MessageBoxIcon.Information
-                            //                );
                         }
                     });
                     
@@ -92,8 +90,8 @@ namespace Client.Creator
                 ProductTable productRec = client.GetProduct(comboBox1.SelectedItem.ToString());
                 string hexVersion = string.Format("{0:x}", productRec.pVersion);
                 string minorVersion = hexVersion.Substring(hexVersion.Length - 3, 2);
-                string majorVersion = hexVersion.Substring(0, hexVersion.Length - (minorVersion.Length+1));
-                textBox1.Text = string.Format("{0}.{1}", majorVersion, minorVersion); 
+                string majorVersion = hexVersion.Substring(0, hexVersion.Length - (minorVersion.Length + 1));
+                textBox1.Text = string.Format("{0}.{1}", Int32.Parse(majorVersion), Int32.Parse(minorVersion)); 
             });
         }
     }

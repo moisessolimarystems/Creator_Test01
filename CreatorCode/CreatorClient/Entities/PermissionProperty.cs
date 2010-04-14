@@ -8,8 +8,11 @@ namespace Client.Creator
 {
     public class PermissionProperty
     {
+        #region Fields
         PermissionsTable _permissionRec;
+        #endregion
 
+        #region Constructor
         public PermissionProperty()
         {
         }
@@ -18,6 +21,7 @@ namespace Client.Creator
         {
             _permissionRec = permRec;
         }
+        #endregion
 
     }
 }

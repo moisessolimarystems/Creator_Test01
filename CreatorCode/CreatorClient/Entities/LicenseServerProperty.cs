@@ -13,33 +13,33 @@ namespace Client.Creator
     [TypeConverter(typeof(PropertySorterTypeConverter))]
     public class LicenseServerProperty : BaseGridItem
     {
-        #region Private Variables
+        #region Fields
 
-        private Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfo;
-        private string _destinationName;
-        private string _comments;
-        private PermissionsTable _permissions;
-        private bool _isActive;
+        Lic_PackageAttribs.Lic_LicenseInfoAttribs _licInfo;
+        string                                    _destinationName;
+        string                                    _comments;
+        PermissionsTable                          _permissions;
+        bool                                      _isActive;
 
         #endregion
 
+        #region Constructor
+        /// <summary>
+        /// Initializes an empty instance of the LicenseServerProperty class. 
+        /// Represents a license object that holds the entire contents of a license server(tokens, product licenses, modules)
+        /// </summary>
         public LicenseServerProperty()
         {
             _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
         }
 
-        public LicenseServerProperty(LicenseServerProperty license)
-        {
-            _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
-            _licInfo.Stream = license.LicInfo.Stream;
-            _comments = license.Comments;
-            _permissions = license.Permissions;
-            _isActive = license.IsActive;
-            _destinationName = license.DestName;
-
-        }
-
-        //requires a licPackage stream for licStream not just licLicenseInfoAttribs.
+        /// <summary>
+        /// Initializes a new instance of the LicenseServerProperty class.
+        /// Represents a license object that holds the entire contents of a license server(tokens, product licenses, modules)
+        /// Uses information from the database to initialize the fields of the LicenseServerProperty.
+        /// </summary>
+        /// <param name="license">LicenseTable object from database.</param>
+        /// <param name="permissions">PermissionTable object from datbase.</param>
         public LicenseServerProperty(LicenseTable license, PermissionsTable permissions)
         {
             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
@@ -56,23 +56,34 @@ namespace Client.Creator
                     _destinationName = dest.DestName;
             });
         }
+        #endregion
 
         #region Properties
+        #region UnBrowsable
+        /// <summary>
+        /// Gets or sets the PermissionsTable to retrieve user rights.
+        /// </summary>
         [Browsable(false)]
         [System.ComponentModel.RefreshProperties(RefreshProperties.All)]
         public PermissionsTable Permissions
         {
             get { return _permissions; }
             set { _permissions = value; }
-        }   
+        }
 
+        /// <summary>
+        /// Gets or sets the LicenseInfoAttribs object to hold license server information.
+        /// </summary>
         [Browsable(false)]
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs LicInfo
         {
             get { return _licInfo; }
             set { _licInfo = value; }
-        }  
+        }
 
+        /// <summary>
+        /// Gets the modified status of the license server.
+        /// </summary>
         [Browsable(false)]
         public bool IsModified
         {
@@ -86,7 +97,10 @@ namespace Client.Creator
                 return bValue;
             }
         }
-        //Deactivation sets to false otherwise retrieve value from database.
+
+        /// <summary>
+        /// Gets or sets the active status of the license server.
+        /// </summary>
         [Browsable(false)]
         public bool IsActive
         {
@@ -94,6 +108,9 @@ namespace Client.Creator
             set { _isActive = value; }
         }
 
+        /// <summary>
+        /// Gets the enabled status for the license server. Enabled if valid tokens have been set for the license server.
+        /// </summary>
         [Browsable(false)]
         public bool IsEnabled
         {
@@ -122,6 +139,9 @@ namespace Client.Creator
             }
         }
 
+        /// <summary>
+        /// Gets the active status of any hardware token included with the license server.
+        /// </summary>
         [Browsable(false)]
         public bool HasActiveHardwareToken
         {
@@ -150,6 +170,9 @@ namespace Client.Creator
             }
         }
 
+        /// <summary>
+        /// Gets lost status of any hardware token included with the license server.
+        /// </summary>
         [Browsable(false)]
         public bool HasLostToken
         {
@@ -178,6 +201,9 @@ namespace Client.Creator
             }
         }
 
+        /// <summary>
+        /// Gets or sets the customer ID. Represents the first section of the license server ID.
+        /// </summary>
         [Browsable(false)]
         public uint CustID
         {
@@ -185,6 +211,9 @@ namespace Client.Creator
             set { _licInfo.customerID.TVal = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the destination ID. Represents the middle section of the license server ID.
+        /// </summary>
         [Browsable(false)]
         public uint DestID
         {
@@ -192,6 +221,9 @@ namespace Client.Creator
             set { _licInfo.destinationID.TVal = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the group ID. Represents the last section of the license server ID.
+        /// </summary>
         [Browsable(false)]
         public uint GroupID
         {
@@ -199,33 +231,14 @@ namespace Client.Creator
             set { _licInfo.softwareGroupLicenseID.TVal = value; }
         }
 
-        [Category("License Server"), PropertyOrder(1)]
-        [DisplayName("Name")]
-        [Description("Unique identifier for the license server.")]
-        [ReadOnly(true)]
-        public override string Name
-        {
-            get
-            {
-                return Lic_LicenseInfoAttribsHelper.GetDisplayLabel(_licInfo);
-            }
-        }
-
-        [Category("License Server"), PropertyOrder(2)]
-        [DisplayName("Destination Name")]
-        [Description("Name of the end user for the license server.")]
-        [ReadOnly(true)]
-        public string DestName
-        {
-            get { return _destinationName; }
-            set { _destinationName = value; }
-        }
-
+        /// <summary>
+        /// Gets or sets the user comments for the license server.
+        /// </summary>
         [Browsable(false)]
         public string Comments
         {
             get { return _comments; }
-            set 
+            set
             {
                 if (_comments != value)
                 {
@@ -242,7 +255,40 @@ namespace Client.Creator
                 }
             }
         }
+        #endregion
 
+        #region Browsable
+        /// <summary>
+        /// Gets the license server ID. Uses helper function to format ID from license server object.
+        /// </summary>
+        [Category("License Server"), PropertyOrder(1)]
+        [DisplayName("Name")]
+        [Description("Unique identifier for the license server.")]
+        [ReadOnly(true)]
+        public override string Name
+        {
+            get
+            {
+                return Lic_LicenseInfoAttribsHelper.GetDisplayLabel(_licInfo);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the destination name for the license server.
+        /// </summary>
+        [Category("License Server"), PropertyOrder(2)]
+        [DisplayName("Destination Name")]
+        [Description("Name of the end user for the license server.")]
+        [ReadOnly(true)]
+        public string DestName
+        {
+            get { return _destinationName; }
+            set { _destinationName = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the user notes for the license server. Full string held in Comments property.
+        /// </summary>
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [Category("License Server Notes"), PropertyOrder(1)]
         [DisplayName("Notes")]
@@ -271,6 +317,10 @@ namespace Client.Creator
                     Comments = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the additional user notes for the license server. Full string held in Comments property.
+        /// </summary>
         [Editor(typeof(System.ComponentModel.Design.MultilineStringEditor), typeof(System.Drawing.Design.UITypeEditor))]
         [Category("License Server Notes"), PropertyOrder(2)]
         [DisplayName("Additional Notes")]
@@ -303,7 +353,8 @@ namespace Client.Creator
                     }
                 }
             }
-        }    
+        }
+        #endregion
         #endregion
 
     }

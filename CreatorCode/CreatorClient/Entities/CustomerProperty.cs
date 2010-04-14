@@ -10,8 +10,11 @@ namespace Client.Creator
 {
     public class CustomerProperty
     {
+        #region Fields
         CustomerTable _customer;
+        #endregion
 
+        #region Constructor
         public CustomerProperty() 
         {
             _customer = new CustomerTable();
@@ -21,6 +24,7 @@ namespace Client.Creator
         {
             _customer = cust;
         }
+        #endregion
 
         #region Properties
         [Browsable(false)]

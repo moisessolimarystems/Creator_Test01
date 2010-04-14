@@ -8,6 +8,7 @@ namespace Client.Creator
 {
     public class ReportProperty
     {
+
         public static readonly IDictionary<string, ConditionName>
         _filterHTNames = new Dictionary<string, ConditionName>
                 {  

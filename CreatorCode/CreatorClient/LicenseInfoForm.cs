@@ -283,18 +283,17 @@ namespace Client.Creator
             topPanel.Controls.Clear();
             packetGroupBox.Parent = topPanel;
             selectedObject = packetData as Object;
-            packetNameTextBox.Text = packetData.PacketInfo.Name;
+            packetNameTextBox.Text = packetData.PacketName;
             packetExpDateTextBox.Text = DateTime.Now.AddDays(14).ToLongDateString();
-            packetOutputPathTextBox.Text = packetData.PacketInfo.OutputPath;           
-            packetDescriptTextBox.Text = packetData.PacketInfo.Description;
+            packetOutputPathTextBox.Text = packetData.SelectedDirectory;           
         }
         private void SavePacketTabPage(PacketDialogData packetData)
         {
             packetData.ExpDate = DateTime.Parse(packetExpDateTextBox.Text); 
-            packetData.PacketInfo.OutputPath = packetOutputPathTextBox.Text;
-            if (!Directory.Exists(packetData.PacketInfo.OutputPath))            
-                Directory.CreateDirectory(packetData.PacketInfo.OutputPath);            
-            packetData.PacketInfo.Description = packetDescriptTextBox.Text;
+            packetData.SelectedDirectory = packetOutputPathTextBox.Text;
+            if (!Directory.Exists(packetData.SelectedDirectory))            
+                Directory.CreateDirectory(packetData.SelectedDirectory);            
+            packetData.UserNotes = packetDescriptTextBox.Text;
         }
         #endregion
 
@@ -496,37 +495,52 @@ namespace Client.Creator
     #region PacketDialogData class
     public class PacketDialogData : Shared.VisualComponents.DialogData
     {
-        private PacketProperty m_PacketInfo;
-        private DateTime m_ExpDate;
-        private string m_Customer;
+        string _packetName;
+        DateTime _expDate;
+        string _customerName;
+        string _selectedDirectory;
+        string _userNotes;
 
         #region Constructors
 
-        public PacketDialogData(PacketProperty packetInfo, string customerName)
+        public PacketDialogData(string customerName, string packetName, string selectedDirectory)
         {
-            m_PacketInfo = packetInfo;
-            m_Customer = customerName;
+            _customerName = customerName;
+            _packetName = packetName;
+            _selectedDirectory = selectedDirectory;
         }
         #endregion
 
         #region Properties
 
-        public PacketProperty PacketInfo
+        public string PacketName
         {
-            get { return this.m_PacketInfo; }
-            set { this.m_PacketInfo = value; }
+            get { return _packetName; }
+            set { _packetName = value; }            
+        }
+
+        public string SelectedDirectory
+        {
+            get { return _selectedDirectory; }
+            set { _selectedDirectory = value; }
         }
 
         public DateTime ExpDate
         {
-            get { return m_ExpDate; }
-            set { m_ExpDate = value; }
+            get { return _expDate; }
+            set { _expDate = value; }
         }
 
         public string CustomerName
         {
-            get { return m_Customer; }
-            set { m_Customer = value; }
+            get { return _customerName; }
+            set { _customerName = value; }
+        }
+
+        public string UserNotes
+        {
+            get { return _userNotes; }
+            set { _userNotes = value; }
         }
         #endregion
     }

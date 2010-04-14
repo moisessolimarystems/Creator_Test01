@@ -107,7 +107,6 @@
     <Compile Include="Entities\CustomerManager.cs" />
     <Compile Include="Entities\LicensePacket.cs" />
     <Compile Include="Entities\ProductCollectionProperty.cs" />
-    <Compile Include="Entities\Transaction.cs" />
     <Compile Include="Entities\TransactionManager.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ExportListViewManager.cs" />
@@ -135,7 +134,6 @@
       <DependentUpon>CreatorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Entities\LicenseServerProperty.cs" />
-    <Compile Include="Entities\PacketProperty.cs" />
     <Compile Include="Entities\PermissionProperty.cs" />
     <Compile Include="Collections\SortableCollection.cs" />
     <Compile Include="Entities\ReportProperty.cs" />

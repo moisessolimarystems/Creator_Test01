@@ -10,11 +10,18 @@ namespace Client.Creator
 {
     class LicensePacket
     {
+        #region Fields
         private Lic_PackageAttribs _licPackage;
         private LicenseTable _licenseTable;
         private string _licenseServer;
         private uint _highestProductRevision;   //set by determining from the included products in a packet.
+        #endregion
 
+        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the LicensePacket class.
+        /// </summary>
+        /// <param name="licenseServer">The license server name that belongs to the license packet.</param>
         public LicensePacket(string licenseServer)        
         {            
             _licPackage = new Lic_PackageAttribs();
@@ -22,21 +29,28 @@ namespace Client.Creator
             _licenseServer = licenseServer;
             _highestProductRevision = 0;
         }
+        #endregion 
 
+        #region Properties
+        /// <summary>
+        /// Gets the License Package object containing information to store in a license packet.
+        /// </summary>
         public Lic_PackageAttribs LicPackage
         {
             get { return _licPackage; }
         }
-
+        /// <summary>
+        /// Gets the license table containing database information on a license server.
+        /// </summary>
         public LicenseTable DatabaseRecord
         {
             get { return _licenseTable; }
         }
-        
+        #endregion
+
+        #region Methods
         /// <summary>
-        /// add tokens
-        /// create products
-        /// add modules to products
+        /// Builds a license package object by retrieving information from the database. Stores resulting object into _licenseTable[FIELD].
         /// </summary>
         public bool BuildLicensePackage()
         {
@@ -50,17 +64,17 @@ namespace Client.Creator
             if (_licenseTable != null)
             {
                 _licPackage.Stream = _licenseTable.LicenseInfo;
-                if (PopulateValidationTokens())
+                if (PopulateValidationTokens()) //add tokens to _licPackage 
                 {
-                    if (PopulateProductInfo())
-                    {
+                    if (PopulateProductInfo())  //add products,productlicenses,modules to _licPackage
+                    {   //set software spec version based on the spec built with Creator
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
                         Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
                         _licPackage.licLicenseInfoAttribs.TVal = licInfo;
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Major.TVal = (uint)major;
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Minor.TVal = (uint)minor;
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMajor.TVal = (uint)buildVersion;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestProductRevision;//value determined from included products highest revision
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestProductRevision;   //value determined from included products highest revision
                         _licenseTable.LicenseInfo = _licPackage.Stream;
                         bRetVal = true;
                     }
@@ -68,7 +82,9 @@ namespace Client.Creator
             }
             return bRetVal;
         }
-
+        /// <summary>
+        /// Saves the resulting _licPackage object from BuildLicensePackage into the database.
+        /// </summary>
         public void SaveLicensePackage()
         {
             Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = LicPackage.licLicenseInfoAttribs;
@@ -81,6 +97,9 @@ namespace Client.Creator
             });            
         }
 
+        /// <summary>
+        /// Retrieves all validation tokens in the database for a license server and stores them the _licPackage object with the tokens.
+        /// </summary>
         private bool PopulateValidationTokens()
         {
             bool bRetVal = true;
@@ -113,6 +132,9 @@ namespace Client.Creator
             return bRetVal;
         }
 
+        /// <summary>
+        /// Retrieves all product licenses from the database along with their modules and stores them into the _licPackage object.
+        /// </summary>
         private bool PopulateProductInfo()
         {
             bool bRetVal = false;
@@ -169,5 +191,6 @@ namespace Client.Creator
             });
             return bRetVal;
         }
+        #endregion 
     }
 }

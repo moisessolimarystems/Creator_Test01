@@ -12,39 +12,30 @@ namespace Client.Creator
     public class ValidationProperty : BaseGridItem
     {
 
-
+        #region Fields
         string _status;
         Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs _token;
+        #endregion
 
-        public ValidationProperty()
-        {
-            _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-            _status = "Active";
-        }
-
-        public ValidationProperty(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token)
-        {
-
-            _token = token;
-            _status = "Active";
-        }
-
+        #region Constructor
+        /// <summary>
+        /// Initializes a new instance of the ValidationProperty class. 
+        /// Represents a validation token for a license server.
+        /// </summary>
+        /// <param name="token">TokenTable object from database.</param>
         public ValidationProperty(TokenTable token)
         {
-
             _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
             _token.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType ;
             _token.tokenValue.TVal = token.TokenValue;
             _status = "Active";
         }
+        #endregion 
 
-        public override string Name
-        {
-            //need to translate the id to name;
-            get { return System.Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), TokenType); }
-        }
-
-        [Browsable(false)]
+        #region Properties
+        /// <summary>
+        /// Gets or sets the collection of product licenses.
+        /// </summary>
         public bool IsAllowedRemoveToken
         {
             get
@@ -55,40 +46,41 @@ namespace Client.Creator
             }
         }
 
-        [Browsable(false)]
+        /// <summary>
+        /// Gets or sets the collection of product licenses.
+        /// </summary>
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs ValidationToken
         {
             get { return _token; }
             set { _token = value; }
         }
 
-        [DisplayName("Token Type")]
-        [Description("Token Type")]
-        [Category("ValidationProperty")]
+        /// <summary>
+        /// Gets or sets the collection of product licenses.
+        /// </summary>
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType TokenType
         {
             get { return _token.tokenType.TVal; }
             set { _token.tokenType.TVal = value; }
         }
 
-        [DisplayName("Token Value")]
-        [Description("Token Value")]
-        [Category("ValidationProperty")]
+        /// <summary>
+        /// Gets or sets the collection of product licenses.
+        /// </summary>
         public string TokenValue
         {
             get { return _token.tokenValue.TVal; }
             set { _token.tokenValue.TVal = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the collection of product licenses.
+        /// </summary>
         public string Status
         {
             get{ return _status;  }
-            set { _status = value; }         
+            set { _status = value; }
         }
-
-        public override string ToString()
-        {
-            return Name;
-        }
+        #endregion
     }
 }
