@@ -16,7 +16,7 @@ namespace Client.Creator
     public class ProductLicenseProperty
     {
         #region Fields
-        public const uint UNLIMITED = 999999;
+        private const uint UNLIMITED = 999999;
         public enum ProductLicenseAttributes
         {
             Status,
@@ -43,6 +43,7 @@ namespace Client.Creator
         {
             Permissions = permissions;
             _plRec = plData;
+            _version = new LicenseVersion(_plRec.ProductVersion);
             _commLink = CreatorForm.s_CommLink;
             if (_commLink.GetProductSpec(plData.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
                 SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
@@ -1141,34 +1142,28 @@ namespace Client.Creator
         }
     }
 
-    internal class VersionConverter : ExpandableObjectConverter
+    internal class VersionConverter : TypeConverter
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(string))
-            {
-                return true;
-            }
+            if (destinationType == typeof(LicenseVersion))
+                return true;            
             return base.CanConvertTo(context, destinationType);
-        }
-
-        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destType)
-        {
-            if (destType == typeof(string) && value is LicenseVersion)
-            {
-                // Cast the value to an LicenseVersion
-                LicenseVersion version = (LicenseVersion)value;
-
-                // Return Major and Minor separated by period.
-                return version.Major + "." + version.Minor;
-            }
-            return base.ConvertTo(context, culture, value, destType);
         }
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type t)
         {
             if (t == typeof(string))
                 return true;
             return base.CanConvertFrom(context, t);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destType)
+        {
+            if (value == null)
+            {
+                return "0.0";
+            }
+            return value.ToString();
         }
 
         public override Object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo info, Object value)
