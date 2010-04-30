@@ -81,6 +81,7 @@
     <Compile Include="NoFlickerListView.designer.cs">
       <DependentUpon>NoFlickerListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoftwareSpecViewerControl.cs">
       <SubType>Component</SubType>
     </Compile>
