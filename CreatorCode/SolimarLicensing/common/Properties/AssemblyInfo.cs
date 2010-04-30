@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SolimarLicensing.Common.Properties")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Solimar Systems, Inc.")]
-[assembly: AssemblyProduct("SolimarLicensing.Common.Properties")]
-[assembly: AssemblyCopyright("Copyright ©  2007")]
+[assembly: AssemblyCompany(Solimar.Licensing.AssemblyInfo.ASSEMBLY_COMPANY)]
+[assembly: AssemblyProduct(Solimar.Licensing.AssemblyInfo.ASSEMBLY_PRODUCTNAME)]
+[assembly: AssemblyCopyright(Solimar.Licensing.AssemblyInfo.ASSEMBLY_COPYRIGHT_NOTICE)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion(Solimar.Licensing.VersionInfo.PRODUCT_VERSION)]
+[assembly: AssemblyFileVersion(Solimar.Licensing.VersionInfo.PRODUCT_VERSION)]
