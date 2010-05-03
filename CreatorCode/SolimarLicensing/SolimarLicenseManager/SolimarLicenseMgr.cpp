@@ -1751,7 +1751,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 		m_allocated_licenses[module_id] += count;
 		// perform the license allocation
 		VARIANT_BOOL licensing_valid = VARIANT_FALSE;
-		hr = ValidateLicenseInternal(&licensing_valid, true, false);
+		hr = ValidateLicenseInternal(&licensing_valid, false/*don't use grace period*/, false/*don't log error*/);
 		if (FAILED(hr) || licensing_valid==VARIANT_FALSE) 
 		{
 			m_allocated_licenses[module_id] -= count;
