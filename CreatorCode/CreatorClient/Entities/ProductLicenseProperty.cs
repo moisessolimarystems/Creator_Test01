@@ -31,7 +31,6 @@ namespace Client.Creator
         string _licenseServer;
         ProductLicenseTable _plRec;
         PermissionsTable _permissions;
-        int _productLicenseDataBaseID;
         CommunicationLink _commLink;
         List<ModuleTable> _moduleList;
         LicenseVersion _version;
@@ -392,8 +391,8 @@ namespace Client.Creator
                         errorMsg = "Can't remove expiration date for non-hardware token validation.";
                     if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
                         errorMsg = "Please set a valid expiration date";
-                    if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddYears(1)) > 0)
-                        errorMsg = string.Format("{0} exceeds the expiration date limit of one year.", value.Value);
+                    if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
+                        errorMsg = string.Format("{0} exceeds the expiration date limit of 18 months.", value.Value);
                     if (errorMsg.Length == 0)
                     {
                         Service<ICreator>.Use((client) =>
@@ -728,12 +727,13 @@ namespace Client.Creator
                     short moduleValue;
                     if (_commLink.IsDefaultModule(ProductID, module.ModID))
                         moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);//module.ID));
-                    else
-                        moduleValue = 0;
+                    else                    
+                        moduleValue = 0;                    
                     ModuleTable mt = client.GetModule(ID, module.ModID);
                     if (mt != null)
                     {
                         mt.Value = moduleValue;
+                        if (moduleValue == 0) mt.AppInstance = 0;
                         mtList.Add(mt);
                     }
                     else
@@ -759,8 +759,8 @@ namespace Client.Creator
                             ModuleTable mt = client.GetModule(ID, module.ModID);
                             if (mt != null)
                             {
-                                mt.Value = _commLink.GetModuleTrialValue(ProductID, module.ModID);
-                                mt.AppInstance = 1;
+                                mt.Value = _commLink.GetModuleTrialValue(ProductID, module.ModID);                                
+                                mt.AppInstance = (byte)((mt.Value == 0) ? 0 : 1);
                                 mtList.Add(mt);
                             }
                             else
