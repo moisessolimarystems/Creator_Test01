@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Reports");
             System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
             System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
             System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Hardware Keys");
@@ -86,7 +86,7 @@
             this.findToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.nextFindToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.DetailTreeView = new System.Windows.Forms.TreeView();
-            this.DetailTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
+            this.CreatorImageList = new System.Windows.Forms.ImageList(this.components);
             this.CustomerToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.DestNameComboBox = new System.Windows.Forms.ToolStripComboBox();
@@ -95,7 +95,6 @@
             this.DetailSplitContainer = new System.Windows.Forms.SplitContainer();
             this.DetailPropertyGrid = new System.Windows.Forms.PropertyGrid();
             this.DetailListView = new System.Windows.Forms.ListView();
-            this.ListViewImageList = new System.Windows.Forms.ImageList(this.components);
             this.DetailListViewToolStrip = new System.Windows.Forms.ToolStrip();
             this.ImageToolStripLabel = new System.Windows.Forms.ToolStripLabel();
             this.DetailListViewToolStripLabel = new System.Windows.Forms.ToolStripLabel();
@@ -142,7 +141,6 @@
             this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.MainTreeView = new System.Windows.Forms.TreeView();
-            this.MainTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.customerToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ReportTreeViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -700,6 +698,7 @@
             this.findToolStrip.Size = new System.Drawing.Size(328, 25);
             this.findToolStrip.TabIndex = 5;
             this.findToolStrip.Text = "toolStrip1";
+            this.findToolStrip.Visible = false;
             // 
             // closeFindToolStripButton
             // 
@@ -738,45 +737,58 @@
             this.DetailTreeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DetailTreeView.HideSelection = false;
             this.DetailTreeView.ImageIndex = 0;
-            this.DetailTreeView.ImageList = this.DetailTreeViewImageList;
+            this.DetailTreeView.ImageList = this.CreatorImageList;
             this.DetailTreeView.Location = new System.Drawing.Point(0, 25);
             this.DetailTreeView.Name = "DetailTreeView";
             this.DetailTreeView.SelectedImageIndex = 0;
             this.DetailTreeView.ShowNodeToolTips = true;
             this.DetailTreeView.Size = new System.Drawing.Size(328, 399);
-            this.DetailTreeView.StateImageList = this.DetailTreeViewImageList;
+            this.DetailTreeView.StateImageList = this.CreatorImageList;
             this.DetailTreeView.TabIndex = 2;
             this.DetailTreeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeExpand);
             this.DetailTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseUp);
             this.DetailTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.DetailTreeView_AfterSelect);
             this.DetailTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DetailTreeView_KeyDown);
             // 
-            // DetailTreeViewImageList
+            // CreatorImageList
             // 
-            this.DetailTreeViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("DetailTreeViewImageList.ImageStream")));
-            this.DetailTreeViewImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.DetailTreeViewImageList.Images.SetKeyName(0, "iCONVERT.ICO");
-            this.DetailTreeViewImageList.Images.SetKeyName(1, "rubika32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(2, "RubikaProcessBuilder32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(3, "sdxDesigner32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(4, "SOLindexer32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(5, "SOLsearcherSinglePlatform32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(6, "SOLenterprise32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(7, "solfusion32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(8, "solScript32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(9, "Queue Manager32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(10, "System Manager32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(11, "spde32.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(12, "SOLitrack32.png");
-            this.DetailTreeViewImageList.Images.SetKeyName(13, "SPDNT.ICO");
-            this.DetailTreeViewImageList.Images.SetKeyName(14, "Customer.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(15, "License.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(16, "LicenseUpdate.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(17, "LicenseDisabled.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(18, "LicenseDeactivated.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(19, "Order.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(20, "AppInstance.ico");
-            this.DetailTreeViewImageList.Images.SetKeyName(21, "Empty.ico");
+            this.CreatorImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("CreatorImageList.ImageStream")));
+            this.CreatorImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.CreatorImageList.Images.SetKeyName(0, "iCONVERT.ICO");
+            this.CreatorImageList.Images.SetKeyName(1, "rubika32.ico");
+            this.CreatorImageList.Images.SetKeyName(2, "RubikaProcessBuilder32.ico");
+            this.CreatorImageList.Images.SetKeyName(3, "sdxDesigner32.ico");
+            this.CreatorImageList.Images.SetKeyName(4, "SOLindexer32.ico");
+            this.CreatorImageList.Images.SetKeyName(5, "SOLsearcherSinglePlatform32.ico");
+            this.CreatorImageList.Images.SetKeyName(6, "SOLenterprise32.ico");
+            this.CreatorImageList.Images.SetKeyName(7, "solfusion32.ico");
+            this.CreatorImageList.Images.SetKeyName(8, "solScript32.ico");
+            this.CreatorImageList.Images.SetKeyName(9, "Queue Manager32.ico");
+            this.CreatorImageList.Images.SetKeyName(10, "System Manager32.ico");
+            this.CreatorImageList.Images.SetKeyName(11, "spde32.ico");
+            this.CreatorImageList.Images.SetKeyName(12, "SOLitrack32.png");
+            this.CreatorImageList.Images.SetKeyName(13, "SPDNT.ICO");
+            this.CreatorImageList.Images.SetKeyName(14, "Customer.ico");
+            this.CreatorImageList.Images.SetKeyName(15, "License.ico");
+            this.CreatorImageList.Images.SetKeyName(16, "LicenseUpdate.ico");
+            this.CreatorImageList.Images.SetKeyName(17, "LicenseDisabled.ico");
+            this.CreatorImageList.Images.SetKeyName(18, "LicenseDeactivated.ico");
+            this.CreatorImageList.Images.SetKeyName(19, "Order.ico");
+            this.CreatorImageList.Images.SetKeyName(20, "AppInstance.ico");
+            this.CreatorImageList.Images.SetKeyName(21, "Empty.ico");
+            this.CreatorImageList.Images.SetKeyName(22, "pass64.ico");
+            this.CreatorImageList.Images.SetKeyName(23, "fail64.ico");
+            this.CreatorImageList.Images.SetKeyName(24, "listbullets.png");
+            this.CreatorImageList.Images.SetKeyName(25, "transaction_logfile.ico");
+            this.CreatorImageList.Images.SetKeyName(26, "zippedFile.png");
+            this.CreatorImageList.Images.SetKeyName(27, "ttCompuer.png");
+            this.CreatorImageList.Images.SetKeyName(28, "ttHardwareKeyID.ico");
+            this.CreatorImageList.Images.SetKeyName(29, "ttMacAddress.png");
+            this.CreatorImageList.Images.SetKeyName(30, "ttBiosSerialNumber.png");
+            this.CreatorImageList.Images.SetKeyName(31, "ttLicenseCode.png");
+            this.CreatorImageList.Images.SetKeyName(32, "Module.ico");
+            this.CreatorImageList.Images.SetKeyName(33, "ValidationTokens.png");
+            this.CreatorImageList.Images.SetKeyName(34, "sdx_report32.ico");
             // 
             // CustomerToolStrip
             // 
@@ -815,7 +827,6 @@
             this.PropertyGridTabControl.Controls.Add(this.TransactionsTabPage);
             this.PropertyGridTabControl.Controls.Add(this.PacketTabPage);
             this.PropertyGridTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PropertyGridTabControl.ImageList = this.ListViewImageList;
             this.PropertyGridTabControl.ItemSize = new System.Drawing.Size(22, 20);
             this.PropertyGridTabControl.Location = new System.Drawing.Point(0, 0);
             this.PropertyGridTabControl.Margin = new System.Windows.Forms.Padding(0);
@@ -887,7 +898,6 @@
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
             this.DetailListView.Size = new System.Drawing.Size(636, 110);
-            this.DetailListView.SmallImageList = this.ListViewImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
             this.DetailListView.View = System.Windows.Forms.View.Details;
@@ -895,23 +905,6 @@
             this.DetailListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.DetailListView_ColumnClick);
             this.DetailListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.DetailListView_ItemSelectionChanged);
             this.DetailListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DetailListView_KeyDown);
-            // 
-            // ListViewImageList
-            // 
-            this.ListViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ListViewImageList.ImageStream")));
-            this.ListViewImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.ListViewImageList.Images.SetKeyName(0, "pass64.ico");
-            this.ListViewImageList.Images.SetKeyName(1, "fail64.ico");
-            this.ListViewImageList.Images.SetKeyName(2, "listbullets.png");
-            this.ListViewImageList.Images.SetKeyName(3, "transaction_logfile.ico");
-            this.ListViewImageList.Images.SetKeyName(4, "zippedFile.png");
-            this.ListViewImageList.Images.SetKeyName(5, "ttCompuer.png");
-            this.ListViewImageList.Images.SetKeyName(6, "ttHardwareKeyID.ico");
-            this.ListViewImageList.Images.SetKeyName(7, "ttMacAddress.png");
-            this.ListViewImageList.Images.SetKeyName(8, "ttBiosSerialNumber.png");
-            this.ListViewImageList.Images.SetKeyName(9, "ttLicenseCode.png");
-            this.ListViewImageList.Images.SetKeyName(10, "Module.ico");
-            this.ListViewImageList.Images.SetKeyName(11, "ValidationTokens.png");
             // 
             // DetailListViewToolStrip
             // 
@@ -1163,7 +1156,6 @@
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
             this.LicensePacketListView.Size = new System.Drawing.Size(634, 369);
-            this.LicensePacketListView.StateImageList = this.ListViewImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
             this.LicensePacketListView.View = System.Windows.Forms.View.Details;
@@ -1346,13 +1338,16 @@
             // 
             this.reportsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.reportsTreeView.HideSelection = false;
+            this.reportsTreeView.ImageIndex = 34;
+            this.reportsTreeView.ImageList = this.CreatorImageList;
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode2.Name = "RootNode";
-            treeNode2.Text = "Reports";
+            treeNode12.Name = "RootNode";
+            treeNode12.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode12});
+            this.reportsTreeView.SelectedImageIndex = 34;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
@@ -1404,8 +1399,6 @@
             this.MainTreeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MainTreeView.FullRowSelect = true;
             this.MainTreeView.HideSelection = false;
-            this.MainTreeView.ImageIndex = 0;
-            this.MainTreeView.ImageList = this.MainTreeViewImageList;
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
@@ -1432,20 +1425,10 @@
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode10,
             treeNode11});
-            this.MainTreeView.SelectedImageIndex = 0;
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);
             this.MainTreeView.TabIndex = 0;
-            // 
-            // MainTreeViewImageList
-            // 
-            this.MainTreeViewImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("MainTreeViewImageList.ImageStream")));
-            this.MainTreeViewImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.MainTreeViewImageList.Images.SetKeyName(0, "sdx_report32.ico");
-            this.MainTreeViewImageList.Images.SetKeyName(1, "JobGroups.ico");
-            this.MainTreeViewImageList.Images.SetKeyName(2, "History.ico");
-            this.MainTreeViewImageList.Images.SetKeyName(3, "tree.ico");
             // 
             // statusStrip1
             // 
@@ -1573,7 +1556,7 @@
             // csvToolStripMenuItem
             // 
             this.csvToolStripMenuItem.Name = "csvToolStripMenuItem";
-            this.csvToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+            this.csvToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.csvToolStripMenuItem.Text = "CSV";
             this.csvToolStripMenuItem.Click += new System.EventHandler(this.csvToolStripMenuItem_Click);
             // 
@@ -1581,7 +1564,7 @@
             // 
             this.xmlToolStripMenuItem.Enabled = false;
             this.xmlToolStripMenuItem.Name = "xmlToolStripMenuItem";
-            this.xmlToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+            this.xmlToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.xmlToolStripMenuItem.Text = "XML";
             this.xmlToolStripMenuItem.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
             // 
@@ -2024,8 +2007,7 @@
         private System.Windows.Forms.ColumnHeader UserColumnHeader;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitMainToolStripMenuItem;
-        private System.Windows.Forms.ImageList DetailTreeViewImageList;
-        private System.Windows.Forms.ImageList MainTreeViewImageList;
+        private System.Windows.Forms.ImageList CreatorImageList;
         private System.Windows.Forms.SplitContainer DetailSplitContainer;
         private System.Windows.Forms.PropertyGrid DetailPropertyGrid;
         private System.Windows.Forms.ContextMenuStrip DetailListViewContextMenuStrip;
@@ -2037,7 +2019,6 @@
         private System.Windows.Forms.ContextMenuStrip PacketContextMenuStrip;
         private System.Windows.Forms.TabPage PacketTabPage;
         private System.Windows.Forms.ToolStripMenuItem verifyToolStripMenuItem;
-        private System.Windows.Forms.ImageList ListViewImageList;
         private System.Windows.Forms.ToolStrip PacketListToolStrip;
         private System.Windows.Forms.TabPage ReportTabPage;
         private Shared.VisualComponents.NoFlickerListView ReportListView;

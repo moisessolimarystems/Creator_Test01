@@ -198,43 +198,6 @@ namespace Service.Creator
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
                 {
-                    //case ConditionName.ExpirationDate:
-                    //    string opStr = _filterOperators[userCondition.Operator.ToString()];
-                    //    DateTime date;
-                    //    int parseValue;
-                    //    if (opStr == "IsInTheLast" || opStr == "IsInTheNext")
-                    //    {
-                    //        if (Int32.TryParse(value, out parseValue))
-                    //        {
-                    //            if (opStr == "IsInTheLast")
-                    //                parseValue = -parseValue;
-                    //            if (userCondition.ValueType == "Days")
-                    //                date = DateTime.Today.AddDays(parseValue);
-                    //            else if (userCondition.ValueType == "Weeks")
-                    //                date = DateTime.Today.AddDays(parseValue * 7);
-                    //            else
-                    //                date = DateTime.Today.AddMonths(parseValue);
-                    //            if (opStr == "IsInTheLast")
-                    //                conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
-                    //                                                     _filterLSNames[userCondition.Name.ToString()],
-                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
-                    //            else
-                    //                conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
-                    //                                                     _filterLSNames[userCondition.Name.ToString()],
-                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                    //                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        if (DateTime.TryParse(value, out date))
-                    //            conditionString.Append(string.Format("{0}{1}{2}",
-                    //                                                 _filterLSNames[userCondition.Name.ToString()],
-                    //                                                 _filterOperators[userCondition.Operator.ToString()],
-                    //                                                 string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
-                    //    }
-                    //    break;
                     default:
                         conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
                         if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
@@ -512,15 +475,9 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<ProductLicenseTable> GetAllProductLicenses()
+        public IList<ProductLicenseTable> GetProductLicenses(string lsID, bool bIncludeLicensedAddOns)
         {
-            return ProductLicenseTable.GetAllProductLicenses();
-        }
-
-        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<ProductLicenseTable> GetProductLicenses(string lsID)
-        {
-            return ProductLicenseTable.GetProductLicenses(lsID);
+            return ProductLicenseTable.GetProductLicenses(lsID, bIncludeLicensedAddOns);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

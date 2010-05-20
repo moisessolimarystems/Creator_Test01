@@ -144,7 +144,7 @@ namespace Client.Creator
             LicenseServerProperty licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
             //disable new order if at least two validation tokens do not exist    
             if (m_Permissions.pt_create_modify_key.Value)            
-                if (licData.IsEnabled)
+                if (licData.IsActive)
                     newProductLicenseMainToolStripMenuItem.Enabled = true;
         }
 
@@ -972,7 +972,6 @@ namespace Client.Creator
                         m_CurrentLicenseName = (node.Tag as LicenseServerProperty).Name;
                         if (!(node.Tag as LicenseServerProperty).IsActive)
                             DetailPropertyGrid.Enabled = false;
-                        //createPacketMainToolStripBtn.Enabled = true;
                     }
                     break;
             }
@@ -1084,7 +1083,7 @@ namespace Client.Creator
                     {
                         TreeNode emptyNode = new TreeNode("No License Servers Available");
                         emptyNode.Name = "Empty";
-                        emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("Empty");
+                        emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetIconIndex("Empty");
                         DetailTreeView.Nodes.Add(emptyNode);
                         LicenseViewSplitContainer.Panel2Collapsed = true;
                         EnableToolStripMenu(emptyNode);
@@ -1433,9 +1432,16 @@ namespace Client.Creator
                     if (oldStatus == ProductLicenseState.AddOn &&
                         newStatus == ProductLicenseState.Licensed)
                     {
+                          ProductLicenseProperty selectedProductLicense = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
+                        TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
+                        ProductCollectionProperty pcp = productNode.Tag as ProductCollectionProperty;
+                        pcp.RemoveProductProperty(selectedProductLicense);
+                        //remove from product collection
                         TreeNode parentNode = DetailTreeView.SelectedNode.Parent;
                         int selectedIndex = DetailTreeView.SelectedNode.Index;
-                        DeleteProductLicenseNode(DetailTreeView.SelectedNode, false);
+                        //set status of add-on to inactive.
+                        //inactive add-on gets removed from tree, collection, but not deleted.
+                        //DeleteProductLicenseNode(DetailTreeView.SelectedNode, false);
                         if (DetailTreeView.SelectedNode.Nodes.Count > 1)
                         {
                             selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
@@ -1634,7 +1640,7 @@ namespace Client.Creator
 
         private void verifyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int imageIndex = Enums.GetListViewIconIndex("VERIFIED");
+            int imageIndex = Enums.GetIconIndex("VERIFIED");
             using (PacketVerification dlg = new PacketVerification())
             {   //selectedItem text will be packet name
                 PacketVerificationDialogData data = new PacketVerificationDialogData();
@@ -1817,12 +1823,28 @@ namespace Client.Creator
                 if ((reportsTreeView.SelectedNode.Tag as ReportProperty).Type == ReportProperty.ReportType.LicenseServer)
                 {
                     if (item.SubItems[1].Text != "")
+                    {
                         LoadSelectedLicenseServer(item.SubItems[1].Text);
+                    }
                 }
                 else if((reportsTreeView.SelectedNode.Tag as ReportProperty).Type == ReportProperty.ReportType.ProductLicense)
                 {
                     if (item.SubItems[1].Text != "")
-                        LoadSelectedProductLicense(item.SubItems[1].Text);
+                    {
+                        ProductLicenseTable plt = null;
+                        Service<ICreator>.Use((client) =>
+                        {//ignore add-on PL that has been licensed.
+                            plt = client.GetProductLicense(item.SubItems[1].Text);
+                        });
+                        if (plt != null)
+                        {
+                            if (!(plt.plState == (byte)ProductLicenseState.Licensed && plt.ParentProductLicenseID != null))
+                                LoadSelectedProductLicense(item.SubItems[1].Text);
+                            else
+                                MessageBox.Show(string.Format("Product License - {0} is no longer available to be viewed.", item.SubItems[1].Text), "Warning");
+                        }                               
+                        //verify existence of product license - add-ons are not deleted when merged into parent
+                    }
                 }
             }
         }
@@ -1875,7 +1897,7 @@ namespace Client.Creator
             LicensePacketListView.Items.Clear();
             foreach (ListViewItem lvItem in storageListView.Items)
             {   //type length > 0 filter otherwise all
-                if (lvItem.ImageIndex == Enums.GetListViewIconIndex(type) ||
+                if (lvItem.ImageIndex == Enums.GetIconIndex(type) ||
                     type.Length == 0)
                 {
                     ListViewItem clonedItem = lvItem.Clone() as ListViewItem;
@@ -2113,7 +2135,7 @@ namespace Client.Creator
                 license = client.GetLicenseByName(licenseNode.Name, false);
                 licenseNode.Tag = new LicenseServerProperty(license, m_Permissions);
                 if (license != null)
-                    pltList = client.GetProductLicenses(license.LicenseName);
+                    pltList = client.GetProductLicenses(license.LicenseName,false);
             });
             //need to clear out existing product collection
             TreeNode productNode = null;
@@ -2126,7 +2148,7 @@ namespace Client.Creator
                     {
                         productNode = new TreeNode(productName);
                         productNode.Name = productName;
-                        productNode.ImageIndex = Enums.GetDetailTreeViewIconIndex(s_CommLink.GetProductBaseName(productName));
+                        productNode.ImageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(productName));
                         productNode.SelectedImageIndex = productNode.ImageIndex;
                         productNode.Nodes.Add(new VirtualTreeNode());
                         //load products also
@@ -2218,7 +2240,7 @@ namespace Client.Creator
                 {
                     TreeNode licNode = new TreeNode();
                     licNode.Text = licNode.Name = license.LicenseName;
-                    licNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("License");
+                    licNode.ImageIndex = Enums.GetIconIndex("License");
                     licNode.SelectedImageIndex = licNode.ImageIndex;
                     if (!licNode.IsExpanded)
                         licNode.Nodes.Add(new VirtualTreeNode());
@@ -2237,7 +2259,7 @@ namespace Client.Creator
             {
                 TreeNode emptyNode = new TreeNode("No License Servers Available");
                 emptyNode.Name = "Empty";
-                emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("Empty");
+                emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetIconIndex("Empty");
                 DetailTreeView.Nodes.Add(emptyNode);
                 LicenseViewSplitContainer.Panel2Collapsed = true;
             }
@@ -2274,6 +2296,7 @@ namespace Client.Creator
             int custID, destID;
             //load licenses, highlight particular license
             CustomersListView.Visible = false;
+            findToolStrip.Visible = false;
             MainTabControl.SelectedTab = LicensesTabPage;
             //get destination from string or.....store in tag?
             lsString = selectedLicense.Split("-".ToCharArray());
@@ -2372,7 +2395,7 @@ namespace Client.Creator
                     node.ToolTipText = "";
                     if (!selectedLicense.IsActive)
                     {
-                        node.ImageIndex = node.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("LicenseDeactivated");
+                        node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDeactivated");
                         node.NodeFont = new Font(this.Font, FontStyle.Italic);
                         node.ForeColor = SystemColors.InactiveCaptionText;
                     }
@@ -2380,18 +2403,18 @@ namespace Client.Creator
                     {
                         node.NodeFont = this.Font;
                         node.ForeColor = this.ForeColor;
-                        node.ImageIndex = node.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("License");
+                        node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("License");
                         if (modifiedLicenses != null)
                         {
                             if (modifiedLicenses.Contains(selectedLicense.Name))
                             {
-                                node.ImageIndex = node.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("LicenseUpdate");
+                                node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseUpdate");
                                 node.ToolTipText = "Changes have been made to license. Generate license packet.";
                             }
                         }
                         if (!(selectedLicense).IsEnabled) //disable key, not enough tokens
                         {
-                            node.ImageIndex = node.SelectedImageIndex = Enums.GetDetailTreeViewIconIndex("LicenseDisabled");
+                            node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDisabled");
                             node.ToolTipText = "Not enough validation tokens are set. Add a new validation token to enable license.";
                         }
                     }
@@ -2543,7 +2566,7 @@ namespace Client.Creator
                             plNode.Tag = new ProductLicenseProperty(plt, m_Permissions);
                             if (plt.ParentProductLicenseID != null)
                             {
-                                plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ADDONORDER");
+                                plNode.ImageIndex = Enums.GetIconIndex("ADDONORDER");
                                 plNode.SelectedImageIndex = plNode.ImageIndex;
                                 plParent = node.Nodes.Find(plt.ParentProductLicenseID, false).FirstOrDefault();
                                 if (plParent != null)
@@ -2554,7 +2577,7 @@ namespace Client.Creator
                             }
                             else
                             {
-                                plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ORDER");
+                                plNode.ImageIndex = Enums.GetIconIndex("ORDER");
                                 plNode.SelectedImageIndex = plNode.ImageIndex;
                                 node.Nodes.Add(plNode);
                             }
@@ -2601,7 +2624,7 @@ namespace Client.Creator
         {
             TreeNode node = new TreeNode(plData.ProductName);
             node.Name = plData.ProductName;
-            node.ImageIndex = Enums.GetDetailTreeViewIconIndex(s_CommLink.GetProductBaseName(node.Name));
+            node.ImageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(node.Name));
             node.SelectedImageIndex = node.ImageIndex;
             node.Tag = new ProductCollectionProperty(plData.ProductID);
             (node.Tag as ProductCollectionProperty).ProductCollection.Add(plData);
@@ -2620,12 +2643,12 @@ namespace Client.Creator
             (plNode.Tag as ProductLicenseProperty).ProductVersion = new LicenseVersion(pltData.ProductVersion);
             if (pltData.ParentProductLicenseID != null)
             {
-                plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ADDONORDER");
+                plNode.ImageIndex = Enums.GetIconIndex("ADDONORDER");
                 plNode.SelectedImageIndex = plNode.ImageIndex;
             }
             else
             {
-                plNode.ImageIndex = Enums.GetDetailTreeViewIconIndex("ORDER");
+                plNode.ImageIndex = Enums.GetIconIndex("ORDER");
                 plNode.SelectedImageIndex = plNode.ImageIndex;
             }
             return plNode;
@@ -2770,6 +2793,7 @@ namespace Client.Creator
             int custID = 0, destID = 0;
             //load licenses, highlight particular license
             CustomersListView.Visible = false;
+            findToolStrip.Visible = false;
             MainTabControl.SelectedTab = LicensesTabPage;
             //get destination from string or.....store in tag?
             lsString = selectedProductLicense.Split("-".ToCharArray());
@@ -2870,7 +2894,6 @@ namespace Client.Creator
 
         private void AddProductLicense()
         {            
-            //show contract dialog
             int plIndex = 0, licenseID = 0;
             ProductLicenseTable plt = new ProductLicenseTable();
             string licenseName = DetailTreeView.SelectedNode.Name;
@@ -2890,6 +2913,7 @@ namespace Client.Creator
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     string productName = s_CommLink.GetProductName(data.ProductLicense.ProductID);
+                    if (!DetailTreeView.SelectedNode.IsExpanded) DetailTreeView.SelectedNode.Expand();
                     TreeNode productNode = DetailTreeView.SelectedNode.Nodes.Find(productName, false).FirstOrDefault();                                                                   
                     TreeNode plNode = CreateProductLicenseNode(data.ProductLicense);                        
                     if (productNode == null)
@@ -2915,14 +2939,26 @@ namespace Client.Creator
                     else //attach to product tree
                     {
                         (productNode.Tag as ProductCollectionProperty).ProductCollection.Add(plNode.Tag as ProductLicenseProperty);
-                    }                    
-                    if (data.ProductLicense.ParentProductLicenseID == null)
-                        productNode.Nodes.Add(plNode);
+                    }
+                    if (!productNode.IsExpanded) productNode.Expand();
+                    TreeNode productLicenseNode = productNode.Nodes.Find(data.ProductLicense.plID, true).FirstOrDefault();
+                    if (productLicenseNode == null)
+                    {
+                        if (data.ProductLicense.ParentProductLicenseID == null)
+                        {
+                            productNode.Nodes.Add(plNode);
+                        }
+                        else
+                        {   //add to parent order node
+                            TreeNode parentProductLicenseNode = DetailTreeView.SelectedNode.Nodes.Find(data.ProductLicense.ParentProductLicenseID, true).FirstOrDefault();
+                            parentProductLicenseNode.Nodes.Add(plNode);
+                        }
+                    }
                     else
                     {
-                        //add to parent order node
-                        TreeNode parentProductLicenseNode = DetailTreeView.SelectedNode.Nodes.Find(data.ProductLicense.ParentProductLicenseID, true).FirstOrDefault();
-                        parentProductLicenseNode.Nodes.Add(plNode);
+                        if (data.ProductLicense.ParentProductLicenseID != null && !productLicenseNode.Parent.IsExpanded)                        
+                            productLicenseNode.Parent.Expand();
+                        plNode = productLicenseNode;
                     }
                     DetailTreeView.SelectedNode = plNode;
                     SetLicenseServerState(DetailTreeView.SelectedNode, true);
@@ -2970,7 +3006,7 @@ namespace Client.Creator
                     packetItem.Name = packet.PacketName;
                     packetItem.Text = packet.DateCreated.ToString();
                     packetItem.Tag = packet;
-                    packetItem.ImageIndex = Enums.GetListViewIconIndex((packet.IsVerified ? "VERIFIED" : "UNVERIFIED"));
+                    packetItem.ImageIndex = Enums.GetIconIndex((packet.IsVerified ? "VERIFIED" : "UNVERIFIED"));
                     packetItem.StateImageIndex = packetItem.ImageIndex;
                     packetItem.SubItems.Add(packet.PacketName);
                     packetItem.SubItems.Add(packet.ExpiredDate.ToShortDateString());
@@ -3356,7 +3392,7 @@ namespace Client.Creator
                 IList<TokenTable> tokenList = null;
                 IList<SoftwareTokenTable> swTokenList = null;
                 DetailListView.Items.Clear();
-                Image tokenImage = ListViewImageList.Images[Enums.GetListViewIconIndex("VALIDATIONTOKENS")];
+                Image tokenImage = CreatorImageList.Images[Enums.GetIconIndex("VALIDATIONTOKENS")];
                 ImageToolStripLabel.Size = new Size(tokenImage.Width, tokenImage.Height);
                 ImageToolStripLabel.Image = tokenImage;
                 DetailListViewToolStripLabel.Text = "Validation Tokens";
@@ -3398,7 +3434,7 @@ namespace Client.Creator
                             });
                         }
                         lvItem.Name = lvItem.Text = vToken.TokenType.ToString();
-                        lvItem.ImageIndex = Enums.GetListViewIconIndex(lvItem.Text);
+                        lvItem.ImageIndex = Enums.GetIconIndex(lvItem.Text);
                         lvItem.SubItems.Add(vToken.TokenValue);
                         lvItem.SubItems.Add(vToken.Status);
                         DetailListView.Items.Add(lvItem);
@@ -3411,7 +3447,7 @@ namespace Client.Creator
             public void PopulateDetailListView(ProductCollectionProperty productData)
             {
                 DetailListView.Items.Clear();
-                Image productImage = DetailTreeViewImageList.Images[Enums.GetDetailTreeViewIconIndex(s_CommLink.GetProductBaseName((byte)productData.ProductID))];
+                Image productImage = CreatorImageList.Images[Enums.GetIconIndex(s_CommLink.GetProductBaseName((byte)productData.ProductID))];
                 ImageToolStripLabel.Size = new Size(productImage.Width, productImage.Height);
                 ImageToolStripLabel.Image = productImage;
                 DetailListViewToolStripLabel.Text = string.Format("{0} Modules", s_CommLink.GetProductName(productData.ProductID));
@@ -3453,7 +3489,7 @@ namespace Client.Creator
                             ListViewItem lvItem = new ListViewItem();
                             lvItem.Text = moduleSpec.moduleName.TVal;
                             lvItem.Name = moduleSpec.moduleID.SVal;
-                            lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
+                            lvItem.ImageIndex = Enums.GetIconIndex("MODULE");
                             if (s_CommLink.IsDefaultModule(productSpec.productID.TVal, (short)moduleSpec.moduleID.TVal))
                                 lvItem.SubItems.Add("*");
                             else
@@ -3471,7 +3507,7 @@ namespace Client.Creator
                 DetailListView.Items.Clear();
                 storageListView.Items.Clear();
                 //test-dev image missing
-                Image productImage = DetailTreeViewImageList.Images[Enums.GetDetailTreeViewIconIndex(s_CommLink.GetProductBaseName(plData.ProductName))];
+                Image productImage = CreatorImageList.Images[Enums.GetIconIndex(s_CommLink.GetProductBaseName(plData.ProductName))];
                 ImageToolStripLabel.Size = new Size(productImage.Width, productImage.Height);
                 ImageToolStripLabel.Image = productImage;
                 DetailListViewToolStripLabel.Text = string.Format("{0} Modules", plData.ProductName);
@@ -3521,7 +3557,7 @@ namespace Client.Creator
                 lvItem.Tag = newModule;
                 newModule.ProductID = productLicense.ProductID;
                 lvItem.Name = lvItem.Text = moduleName;
-                lvItem.ImageIndex = Enums.GetListViewIconIndex("MODULE");
+                lvItem.ImageIndex = Enums.GetIconIndex("MODULE");
                 if (s_CommLink.IsDefaultModule(productLicense.ProductID, module.ModID))
                 {
                     lvItem.SubItems.Add("*");
@@ -3567,7 +3603,8 @@ namespace Client.Creator
             {
                 //now two steps, given a license name, get all transactions for a license and sort by packet
                 transactions = client.GetNewTransactionsByLicenseName(licenseName).OrderByDescending(c => c.taDateCreated).ToList();
-                productLicenses = client.GetProductLicenses(licenseName);                
+                //filtered out add-ons, want to include add on information....
+                productLicenses = client.GetProductLicenses(licenseName,true);                
                 if (transactions.Count > 0)
                 {
                     lvItems = new ListViewItem[transactions.Count];
@@ -3769,7 +3806,10 @@ namespace Client.Creator
                     LoadHardwareTokenReport(rp);
             }
             else
+            {
                 ReportListView.Items.Clear();
+                ReportListView.Columns.Clear();
+            }
         }
         /// <summary>
         /// Populates the ListView column headers based upon the selected TreeNode of the License view.
@@ -3799,7 +3839,7 @@ namespace Client.Creator
                 ReportListView.Columns.Add("Active");
                 ReportListView.Columns.Add("Notes");
             }
-            else
+            else if(_reportType == ReportProperty.ReportType.HardwareToken)
             {
                 ReportListView.Columns.Add("Customer");
                 ReportListView.Columns.Add("Hardware ID");
@@ -3816,6 +3856,7 @@ namespace Client.Creator
             List<ReportProperty> reportList = _reportManager.GetReports();
             ////populate tree node
             TreeNode reportNode = null;
+            //RootNode not selectable, 
             foreach (TreeNode node in reportsTreeView.Nodes)
             {
                 node.Nodes.Clear();
@@ -3824,6 +3865,20 @@ namespace Client.Creator
                     foreach (ReportProperty report in reportList)
                     {
                         reportNode = new TreeNode();
+                        //add icon depending on type
+                        switch(report.Type)
+                        {
+                            case ReportProperty.ReportType.HardwareToken:
+                                reportNode.ImageIndex = reportNode.SelectedImageIndex = Enums.GetIconIndex("TTHARDWAREKEYID");
+                                break;
+                            case ReportProperty.ReportType.LicenseServer:
+                                reportNode.ImageIndex = reportNode.SelectedImageIndex = Enums.GetIconIndex("LICENSE");
+                                break;
+                            case ReportProperty.ReportType.ProductLicense:
+                                reportNode.ImageIndex = reportNode.SelectedImageIndex = Enums.GetIconIndex("ORDER");
+                                break;
+                            default: break;
+                        }
                         reportNode.Text = report.ID;
                         reportNode.Tag = report;
                         node.Nodes.Add(reportNode);
@@ -3831,6 +3886,7 @@ namespace Client.Creator
                 }
             }
             reportsTreeView.SelectedNode = reportsTreeView.Nodes[0];
+            LoadReportNode(reportsTreeView.SelectedNode);
             reportsTreeView.Nodes[0].ExpandAll();
         }
         #endregion

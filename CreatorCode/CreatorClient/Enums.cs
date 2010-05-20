@@ -38,7 +38,7 @@ namespace Client.Creator
             ProductConnection        = 17
         }
 
-        enum DetailTreeViewIconList
+        enum IconList
         {
             ICONVERT,
             RUBIKA,
@@ -61,11 +61,7 @@ namespace Client.Creator
             LICENSEDEACTIVATED,
             ORDER,
             ADDONORDER,
-            EMPTY
-        }
-
-        enum ListViewIconList
-        {
+            EMPTY,
             VERIFIED,
             UNVERIFIED,
             LISTBULLETS,
@@ -102,26 +98,12 @@ namespace Client.Creator
 
         public class Enums
         {
-            public static int GetDetailTreeViewIconIndex(String key)
+            public static int GetIconIndex(String key)
             {
-                DetailTreeViewIconList iconIndex;
+                IconList iconIndex;
                 try
                 {
-                    iconIndex = (DetailTreeViewIconList)Enum.Parse(typeof(DetailTreeViewIconList), key.Replace(" ", ""), true);
-                }
-                catch (Exception ex)
-                {
-                    return -1;
-                }
-                return (int)iconIndex;
-            }
-
-            public static int GetListViewIconIndex(String key)
-            {
-                ListViewIconList iconIndex;
-                try
-                {
-                    iconIndex = (ListViewIconList)Enum.Parse(typeof(ListViewIconList), key.Replace(" ", ""), true);
+                    iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", ""), true);
                 }
                 catch (Exception ex)
                 {

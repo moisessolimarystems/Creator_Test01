@@ -141,7 +141,7 @@ namespace Client.Creator
             uint currentProductRevision;
             Service<ICreator>.Use((client) =>
             {
-                List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer);
+                List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer,false);
                 foreach (ProductLicenseTable plt in pltList.Where(pl => pl.IsActive == true))
                 {
                     Lic_PackageAttribs.Lic_ProductInfoAttribs product = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
@@ -174,7 +174,7 @@ namespace Client.Creator
                     if (moduleList.Count > 0)
                     {
                         foreach (ModuleTable module in moduleList)
-                        {
+                        {                            
                             Lic_PackageAttribs.Lic_ModuleInfoAttribs mod = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
                             mod.moduleID.TVal = (uint)module.ModID;
                             mod.moduleValue.TVal = (uint)module.Value;

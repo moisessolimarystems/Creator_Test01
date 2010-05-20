@@ -29,8 +29,8 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string licenseName = Lic_LicenseInfoAttribsHelper.GenerateLicenseServerName((int)licData.CustID, (int)licData.DestID, (int)licData.GroupID);
-                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(licenseName);
-                List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name);
+                List<ProductLicenseTable> productLicenses = client.GetProductLicenses(licenseName, false);
+                List<ProductLicenseTable> subProductLicenses = client.GetProductLicenses(licData.Name, false);
                 foreach (ProductLicenseTable plRecord in productLicenses)
                 {
                     if (plRecord.plState != (byte)ProductLicenseState.AddOn && plRecord.IsActive)

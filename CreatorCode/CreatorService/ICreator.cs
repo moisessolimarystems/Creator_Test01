@@ -154,10 +154,7 @@ namespace Service.Creator
         IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl, bool matchAll);
 
         [OperationContract]
-        IList<ProductLicenseTable> GetAllProductLicenses();
-
-        [OperationContract]
-        IList<ProductLicenseTable> GetProductLicenses(string lsID);
+        IList<ProductLicenseTable> GetProductLicenses(string lsID, bool bIncludeLicensedAddOns);
 
         [OperationContract]
         IList<ProductLicenseTable> GetProductLicensesByProduct(string lsID, byte prodID);

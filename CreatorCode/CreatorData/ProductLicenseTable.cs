@@ -8,6 +8,7 @@ namespace CreatorData
 {
     public partial class ProductLicenseTable
     {
+        //don't filter, but should not allow jump to product license
         public static IList<ProductLicenseTable> GetProductLicensesByConditions(string conditionStrings)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -17,23 +18,33 @@ namespace CreatorData
                 return licenses;
             }
         }
-
-         public static IList<ProductLicenseTable> GetAllProductLicenses()
+        //filter out add-on product licenses that are now licensed
+        public static IList<ProductLicenseTable> GetProductLicenses(string licenseServerName, bool bIncludeLicensedAddOns) 
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.ToList();
+                if (!bIncludeLicensedAddOns)
+                {
+                    return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
+                                                              c.LicenseTable.LicenseName.Equals(licenseServerName) &&
+                                                             !(c.plState == 0 && c.ParentProductLicenseID != null)).ToList();
+                }
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
+                                      c.LicenseTable.LicenseName.Equals(licenseServerName)).ToList();
             }
         }
 
-        public static IList<ProductLicenseTable> GetProductLicenses(string licenseServerName)
+        //filter out add-on product licenses that are now licensed
+        public static IList<ProductLicenseTable> GetProductLicenses(string licenseServerName, int productID)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&                                                                                                                 
-                                                          c.LicenseTable.LicenseName.Equals(licenseServerName)).ToList();
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
+                                                          c.LicenseTable.LicenseName.Equals(licenseServerName) &&
+                                                          !(c.plState == 0 && c.ParentProductLicenseID != null) &&
+                                                          c.ProductID.Equals(productID)).ToList();
             }
         }
 
@@ -42,7 +53,8 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && c.plID.Equals(productLicenseID)).SingleOrDefault();
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && 
+                                                          c.plID.Equals(productLicenseID)).SingleOrDefault();
             }
         }
 
@@ -51,17 +63,8 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && c.ID.Equals(productLicenseID)).SingleOrDefault();
-            }
-        }
-
-        public static IList<ProductLicenseTable> GetProductLicenses(string licenseServerName, int productID)
-        {
-            using (CreatorDataContext db = new CreatorDataContext())
-            {                
-                db.ObjectTrackingEnabled = false;
-                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && c.LicenseTable.LicenseName.Equals(licenseServerName) &&
-                                           c.ProductID.Equals(productID)).ToList();
+                return db.ProductLicenseTables.Where(c => c.LicenseID > 0 && 
+                                                          c.ID.Equals(productLicenseID)).SingleOrDefault();
             }
         }
 
