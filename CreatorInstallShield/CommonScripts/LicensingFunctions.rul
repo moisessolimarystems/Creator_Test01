@@ -78,28 +78,17 @@ begin
 	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);                                
     bValue = TRUE;   //want to install, only case where false is if equal or newer 			
 	LongPathToQuote(szLicPath, TRUE);     
-		//if licensing component exists check if need to remove/re-install
+	//if licensing component exists check if need to remove/re-install
     if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then  
-		 bValue = IsOldSolimarLicense(gbl_Array(2)); 
-		 // true = old license so remove, false = equal or newer so dont uninstall.
-		 if(bValue) then	   
-		  	//license component product code found in string table.
-		 	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING); 
-		 	szOpts = " /x " + gbl_ProductCode(3) + " /qn REMOVE=ALL" ;   //removing should not remove subkeys from other products
-		 	LaunchAppAndWait(szPath, szOpts, WAIT);	
-		endif;     
-	endif;
-     		 	     		     		 	     		 
+		bValue = IsOldSolimarLicense(gbl_Array(2));    
+	endif;	 	     		     		 	     		 
    	if(bValue) then  //true when not installed and older found 
-   	 	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then
-     		szOpts = " /S /v\"ALLUSERS=1 /qn\"" + szParam;     
-   			LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
-   			if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
-		 	 	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);
-		    endif;	   			
-		else 	
-			 MessageBox ("Unable to uninstall and upgrade "+ gbl_Array(2) +". Please retry from source.",SEVERE);			
-		endif; 		
+     	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);
+     	szOpts = " /S /v\"ALLUSERS=1 /qn\"" + szParam;        			
+   		LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
+   		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
+		  	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);
+		endif;	   			 		
 	endif;                                                        
 			
  	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then 	
@@ -131,14 +120,11 @@ function UninstallLicensing(szParam)
 	STRING szPath, szOpts, svValue;
 	STRING svLicenseName, svLicenseCode;
 	INT nvSize, nResult, nvType;  
-	BOOL bValue;
 begin        
 	if(SYSINFO.bIsWow64) then
 		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
 	endif;  
-    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);  
-	//szPath = WINSYSDIR + "\msiexec.exe";      
-    bValue = FALSE;
+    RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);       
 		//if licensing component exists check if need to remove/re-install	    
     if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then  		 	
 		 	//licensing component found so remove current product key from licensing 
@@ -147,21 +133,7 @@ begin
 		 		MessageBox("Failed to delete : " + SOLIMAR_LICENSE_KEY ^ gbl_Array(2) + "\\" + PRODUCT_GUID, INFORMATION);
 		 	endif;		 	
    	 	 endif;  
-   	 	 //Don't remove due to the remote licensing scheme.
-	   	 /*bValue = IsSharedLicenseRegKey(gbl_Array(2));     //check if other products are using licensing
-		 if(!bValue) then  //if not shared remove current products key and uninstall 
-	   		 //license component productcode found in string table
-		 	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);  
-		 	szOpts = " /x " + gbl_ProductCode(2) + " /qn REMOVE=ALL " + szParam;
-		 	LaunchAppAndWait(szPath, szOpts, WAIT);
-		 	szOpts = " /x " + gbl_ProductCode(3) + " /qn REMOVE=ALL " + szParam;
-		 	LaunchAppAndWait(szPath, szOpts, WAIT); 
-		 	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then
-		 		MessageBox ("Unable to uninstall " + gbl_Array(2) + ". Please retry from source.",SEVERE);
-		 	endif;		 	
-		 endif; 
-		 */
-		 //else finish after removing current product key from licensing registry.  
+   	 	 //Don't remove due to the remote licensing scheme. 
 	endif;   
  	if(SYSINFO.bIsWow64) then
  		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
