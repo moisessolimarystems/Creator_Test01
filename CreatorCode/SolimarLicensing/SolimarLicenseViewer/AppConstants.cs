@@ -10,6 +10,12 @@ namespace SolimarLicenseViewer
         public static readonly String SolimarRegKey     = "SOFTWARE\\Solimar";
         public static readonly String SolimarRegKey32On64 = "SOFTWARE\\Wow6432Node\\Solimar";
         public static readonly String LicenseProduct    = "Solimar Licensing";        
+
+        //for detecting if SSE System Manager is on the System - CR.13130
+        public static readonly String RegKey_Sse = "SOLSearcher";
+        public static readonly String RegKey_SseInstallInfo = "InstallInfo";
+        public static readonly String RegKey_SseInstallInfoSse = "ProductCode_4";
+        public static readonly String RegKey_SseInstallInfoSseSp = "ProductCode_7";
         
         //XML File/Folder Path
         public static readonly String LocalConnectionFilePath = "\\Solimar\\SolimarLicenseServer\\";
