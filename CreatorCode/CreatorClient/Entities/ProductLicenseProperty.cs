@@ -203,7 +203,7 @@ namespace Client.Creator
                             TransactionManager.CreateTransaction(TransactionType.Status,
                                                                   "",
                                                                   ID,
-                                                                  string.Format("Edit {0} Product Version", ProductName),
+                                                                  string.Format("Edit {0} Version", ProductName),
                                                                   value.ToString(),
                                                                   ProductVersion.ToString());
                         productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
@@ -461,7 +461,7 @@ namespace Client.Creator
                         if (_plRec.Activations == 0 && value > 0)
                         {
                             IList<ProductLicenseTable> plList = null;
-                            plList = client.GetProductLicenses(LicenseServer);
+                            plList = client.GetProductLicenses(LicenseServer,false);
                             if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
                                 throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                         }
@@ -510,7 +510,7 @@ namespace Client.Creator
                             if (_plRec.ActivationAmount == 0 && value > 0)
                             {
                                 IList<ProductLicenseTable> plList = null;
-                                plList = client.GetProductLicenses(LicenseServer);
+                                plList = client.GetProductLicenses(LicenseServer,false);
                                 if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
                                     throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                             }
@@ -780,21 +780,34 @@ namespace Client.Creator
         public bool SetAddonToLicensed()
         {
             bool bRetVal = true;
+            string previousValue, moduleName;
             Service<ICreator>.Use((client) =>
             {
                 List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
                 if (ModuleList != null)
-                {
+                {   //add-on module list = _moduleList, parent module list = mtlist
                     foreach (ModuleTable module in _moduleList)
                     {
                         if (module.Value > 0)
                         {
-                            ModuleTable mt = mtList.Where(m => m.ModID == module.ModID).First();//.ID).First();
+                            ModuleTable mt = mtList.Where(m => m.ModID == module.ModID).First();
                             if (mt != null)
                             {
-                                mt.Value += module.Value;
-                                updateModuleList.Add(mt);
+                                if (module.Value > 0)
+                                {
+                                    previousValue = mt.Value.ToString();
+                                    mt.Value += module.Value;
+                                    updateModuleList.Add(mt);
+                                    moduleName = _commLink.GetModuleName(ProductID, mt.ModID);    
+                                    //Create transaction for add-on PL modules being merged into parent PL 
+                                    TransactionManager.CreateTransaction(TransactionType.Module,
+                                                                          "",
+                                                                          ParentID,
+                                                                          string.Format("Merge {0} - {1} [{2}]", ProductName, moduleName, ID),
+                                                                          mt.Value.ToString(),
+                                                                          previousValue);
+                                }
                             }
                         }
                     }
@@ -938,7 +951,7 @@ namespace Client.Creator
                     TransactionManager.CreateTransaction(TransactionType.Module,
                                                           "",
                                                           ID,
-                                                          string.Format("Modify {0} Module Value - {1}", ProductName, module.Name),
+                                                          string.Format("Modify {0} - {1}", ProductName, module.Name),
                                                           module.Value.ToString(),
                                                           previousValue);
                     mt.Value = (module.Value > 0) ? module.Value : (short)0;
