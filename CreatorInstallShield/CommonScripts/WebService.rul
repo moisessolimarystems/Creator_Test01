@@ -257,9 +257,9 @@ end;
 // create a virtual directory using the siteid
 //////////////////////////////////////////////////////////
 function CreateVirtualDirectory(nvSiteID, szName, svTargetDir, bUpgrade)
-	OBJECT objDir, objSite, objW3SVC;
 	NUMBER nvReturn, nDelay, nCount; 
 	STRING szComputerName, szBindings, szInfo, szMsg, szSiteID, szVal;
+	OBJECT objIIS_Root, objVirtDir; 
 begin
 
 	/*nDelay = 2;
@@ -267,75 +267,31 @@ begin
 	SdShowMsg ( szVal, TRUE );
 	Delay(nDelay); 
 	*/
-
-	NumToStr(szSiteID, nvSiteID);
-	try 
-		//Get our Web Site Object
-		set objSite = CoGetObject("IIS://LocalHost/W3SVC/" + szSiteID +"/ROOT", ""); 
-	catch
-		szMsg = "Unable to retrieve website using SiteID: " + szSiteID;
-		MessageBoxEx(szMsg, "IIS Configuration Error", SEVERE);
-		nvReturn = 1;
-	endcatch;
-
-	if (nvReturn == 0) then
-		//Create the virtual directory
-		try 
-			set objDir = objSite.Create("IISWebVirtualDir", szName); 
-			objDir.Path = svTargetDir;
-			
-			objDir.AppFriendlyName = szName;
-			objDir.AccessRead = TRUE;
-			objDir.SetInfo;
-		catch 
-			//surpress message if upgradeing
-			if (bUpgrade!=TRUE) then
-				szMsg = "Unable to create virtual directory for: " + szName +"\nPlease check to ensure it doesn't already exist";
-				MessageBoxEx(szMsg, "IIS Configuration Error", WARNING);
-			endif;
-			nvReturn = 1;
-		endcatch;
+  	NumToStr(szSiteID, nvSiteID);  
+  	set objIIS_Root = CoGetObject("IIS://localhost/W3SVC/"+ szSiteID +"/Root", "");
+  	if (IsObject(objIIS_Root)) then
+      	try  
+        	set objVirtDir = objIIS_Root.Create("IISWebVirtualDir", szName);
+        	if (IsObject(objVirtDir)) then
+          		objVirtDir.Path = svTargetDir; 
+          		objVirtDir.DefaultDoc = "publish.htm";
+          		objVirtDir.AccessRead = TRUE;
+          		objVirtDir.AccessScript = TRUE;
+          		objVirtDir.SetInfo();
+          		objVirtDir.AppCreate(TRUE);
+          		objVirtDir.SetInfo();                                      
+       		endif;
+    	catch
+      		MessageBox("Unable to create Virual Directory.", INFORMATION);
+    	endcatch;
+  	endif;      
+  		
+	if (IsObject(objVirtDir)) then
+		set objVirtDir = NOTHING;
 	endif;
 
-	if (nvReturn == 0) then
-		//Set the application protection (TRUE = "High", FALSE = "low")
-		try 
-			try 
-				objDir.AppCreate2(0);
-				//MessageBox("Set application protection to 0 (IIS 5)", WARNING);
-			catch
-				objDir.AppCreate(FALSE); //(TRUE);
-				//MessageBox("Set application protection to FALSE (IIS 4)", WARNING);
-			endcatch;
-			objDir.SetInfo;
-		catch
-			szMsg = "Unable to set Application Protection level for: " + szName;
-			MessageBoxEx(szMsg, "IIS Configuration Error", SEVERE);
-			nvReturn = 1;
-		endcatch;
-	endif; 
-
-	if (nvReturn == 0) then
-		//Try to set the execute permissions
-		try 
-			//this combination sets "Scripts Only"
-			objDir.AccessScript = TRUE;
-			objDir.AccessExecute = FALSE;
-			objDir.SetInfo;
-		catch
-			szMsg = "Unable to set application Execute Permissions for: " + szName;
-			MessageBoxEx(szMsg, "IIS Configuration Error", SEVERE);
-			nvReturn = 1;
-		endcatch;
-	endif;
-
-	//MessageBox("Now Check the IIS value for ExecutePermissions for this webserver", INFORMATION);
-	if (IsObject(objSite)) then
-		set objSite = NOTHING;
-	endif;
-
-	if (IsObject(objDir)) then
-		set objDir = NOTHING;
+	if (IsObject(objIIS_Root)) then
+		set objIIS_Root = NOTHING;
 	endif;
 
 	SdShowMsg ( szVal, FALSE );
@@ -391,42 +347,32 @@ end;
 // create a virtual directory using the siteid
 //////////////////////////////////////////////////////////
 function DeleteVirtualDirectory(nvSiteID, szName,bUpgrade)
-	OBJECT objDir, objSite, objW3SVC;
+	OBJECT objIIS_Root, objVirtDir;
 	NUMBER nvReturn, nDelay, nCount; 
 	STRING szComputerName, szBindings, szInfo, szMsg, szSiteID, szVal;
 begin
-
-	NumToStr(szSiteID, nvSiteID);
-	try 
-		//Get our Web Site Object
-		set objSite = CoGetObject("IIS://LocalHost/W3SVC/" + szSiteID +"/ROOT", ""); 
-	catch
-		szMsg = "Unable to retrieve website using SiteID: " + szSiteID;
-		MessageBoxEx(szMsg, "IIS Configuration Error", SEVERE);
-		nvReturn = 1;
-	endcatch;
-
-	if (nvReturn == 0) then
-		//Create the virtual directory
-		try 
-			set objDir = objSite.Delete("IISWebVirtualDir", szName); 
-		catch 
-			//surpress message if upgradeing
-			if (bUpgrade!=TRUE) then
-				szMsg = "Unable to delete virtual directory for: " + szName +"\nPlease check to ensure it doesn't already exist";
-				MessageBoxEx(szMsg, "IIS Configuration Error", WARNING);
-			endif;
-			nvReturn = 1;
-		endcatch;
-	endif;
+    
+  	NumToStr(szSiteID, nvSiteID);   
+  	set objIIS_Root = CoGetObject("IIS://localhost/W3SVC/"+ szSiteID +"/Root", "");	  	
+  	if (IsObject(objIIS_Root)) then
+      	try  
+        	set objVirtDir = objIIS_Root.Delete("IISWebVirtualDir", szName);
+        	if (IsObject(objVirtDir)) then
+          		objVirtDir.AppDelete(TRUE);
+          		objVirtDir.SetInfo();                                      
+       		endif;        	
+    	catch
+      		MessageBox("Unable to delete Virual Directory.", INFORMATION);
+    	endcatch;
+  	endif;   	
 
 	//MessageBox("Now Check the IIS value for ExecutePermissions for this webserver", INFORMATION);
-	if (IsObject(objSite)) then
-		set objSite = NOTHING;
+	if (IsObject(objVirtDir)) then
+		set objVirtDir = NOTHING;
 	endif;
 
-	if (IsObject(objDir)) then
-		set objDir = NOTHING;
+	if (IsObject(objIIS_Root)) then
+		set objIIS_Root = NOTHING;
 	endif;
 
 	SdShowMsg ( szVal, FALSE );
