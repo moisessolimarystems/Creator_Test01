@@ -295,6 +295,7 @@ namespace ValidationTokenRetriever
 			this.propertyGrid1.Size = new System.Drawing.Size(519, 174);
 			this.propertyGrid1.TabIndex = 2;
 			this.propertyGrid1.ToolbarVisible = false;
+			this.propertyGrid1.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
 			// 
 			// Form1
 			// 
@@ -345,7 +346,7 @@ namespace ValidationTokenRetriever
 		private System.Windows.Forms.Panel bottomPanel;
 		private System.Windows.Forms.Panel mainBackPanel;
 		private System.Windows.Forms.Panel propertiesPanel;
-		private System.Windows.Forms.PropertyGrid propertyGrid1;
+        private System.Windows.Forms.PropertyGrid propertyGrid1;
 	}
 }
 

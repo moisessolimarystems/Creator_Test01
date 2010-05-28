@@ -5,6 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Solimar.Licensing.Common;
+using System.Reflection;
 
 namespace ValidationTokenRetriever
 {
@@ -144,6 +146,8 @@ namespace ValidationTokenRetriever
 				globalErrorProvider.SetError(propertyGrid1, errorStrBuilder.ToString());
 			this.ActiveControl = companyTextBox;
 		}
+
+
 		private SolimarValidationData m_vData = null;
 		private string FindComputerName()
 		{
@@ -438,184 +442,8 @@ namespace ValidationTokenRetriever
 		{
 			m_vData.CompanyName = companyTextBox.Text;
 		}
-	}
-
-	public class SolimarValidationData
-	{
-		[Category("Validation Token"),
-		 Browsable(false),
-		 DisplayName("Company Name")]
-		public string CompanyName
-		{
-			get { return m_companyName; }
-			set { m_companyName = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("Domain Name")]
-		public string DomainName
-		{
-			get { return m_domainName; }
-			set { m_domainName = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("Computer Name")]
-		public string ComputerName
-		{
-			get { return m_computerName; }
-			set { m_computerName = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("Bios Serial Number")]
-		public string BiosSerialNumber
-		{
-			get { return m_biosSerialNumber; }
-			set { m_biosSerialNumber = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("MAC Address")]
-		public string macAddress
-		{
-			get { return m_macAddress; }
-			set { m_macAddress = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("Operating System")]
-		public string OperatingSystem
-		{
-			get { return m_operatingSystem; }
-			set { m_operatingSystem = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("Part of Domain")]
-		public string PartOfDomain
-		{
-			get { return m_bPartOfDomain; }
-			set { m_bPartOfDomain = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("System Manufacturer")]
-		public string SystemManufacturer
-		{
-			get { return m_systemManufacturer; }
-			set { m_systemManufacturer = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("System Model")]
-		public string SystemModel
-		{
-			get { return m_systemModel; }
-			set { m_systemModel = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("System Type")]
-		public string SystemType
-		{
-			get { return m_systemType; }
-			set { m_systemType = value; }
-		}
-		[Category("Validation Token"),
-		 ReadOnly(true),
-		 DisplayName("System UUID")]
-		public string SystemUUID
-		{
-			get { return m_systemUUID; }
-			set { m_systemUUID = value; }
-		}
-
-
-
-		public string ToCSV()
-		{
-			StringBuilder csvStrBuilder = new StringBuilder();
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Field"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Value"));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Version"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("1.0.0.0"));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Company"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_companyName));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Computer Name"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_computerName));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Domain Name"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_domainName));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Bios Serial Number"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_biosSerialNumber));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Mac Address"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_macAddress));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Operating System"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_operatingSystem));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("Part of Domain"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_bPartOfDomain));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Manufacturer"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemManufacturer));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Model"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemModel));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Type"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemType));
-			csvStrBuilder.Append("\r\n");
-
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe("System Product UUID"));
-			csvStrBuilder.Append(",");
-			csvStrBuilder.Append(Solimar.Licensing.Common.CSVHelper.MakeCsvSafe(m_systemUUID));
-			csvStrBuilder.Append("\r\n");
-
-			return csvStrBuilder.ToString();
-		}
-
-		private string m_companyName = "";
-		private string m_domainName = "";
-		private string m_bPartOfDomain = "";
-		private string m_computerName = "";
-		private string m_macAddress = "";
-		private string m_biosSerialNumber = "";
-		private string m_systemUUID = "";
-		private string m_systemManufacturer = "";
-		private string m_systemModel = "";
-		private string m_systemType = "";
-		private string m_operatingSystem = "";
-
 
 	}
+
+	
 }
