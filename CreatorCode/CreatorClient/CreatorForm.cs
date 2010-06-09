@@ -100,7 +100,6 @@ namespace Client.Creator
             _lvManager.SetListViewColumnSorter(ReportListView);
             ResetMainToolStripMenu();
             //set to make read-only items not greyed-out            
-            DetailPropertyGrid.ViewForeColor = Color.FromArgb(254, 0, 0, 0);
         }
 
         #region Enable/Disable ContextMenu
@@ -1608,7 +1607,7 @@ namespace Client.Creator
                 {
                     foreach (ListViewItem packetItem in LicensePacketListView.Items)
                     {
-                        if (packetItem.StateImageIndex != 0)
+                        if (packetItem.ImageIndex != 0)
                         {
                             verifyToolStripMenuItem.Enabled = true;
                             break;
@@ -1907,6 +1906,7 @@ namespace Client.Creator
             }
             _lvManager.AutoResizeColumns(LicensePacketListView);
             LicensePacketListView.EndUpdate();
+            splitContainer1.Panel2Collapsed = (LicensePacketListView.SelectedItems.Count > 0) ? false : true;
         }
 
         private bool ValidTransactionType(string type, TransactionTable transaction)
@@ -3007,7 +3007,6 @@ namespace Client.Creator
                     packetItem.Text = packet.DateCreated.ToString();
                     packetItem.Tag = packet;
                     packetItem.ImageIndex = Enums.GetIconIndex((packet.IsVerified ? "VERIFIED" : "UNVERIFIED"));
-                    packetItem.StateImageIndex = packetItem.ImageIndex;
                     packetItem.SubItems.Add(packet.PacketName);
                     packetItem.SubItems.Add(packet.ExpiredDate.ToShortDateString());
                     packetItem.SubItems.Add(packet.UserName);

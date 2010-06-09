@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode7,
-            treeNode8,
-            treeNode9});
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode32 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode22 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode28 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode29 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode30 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode22,
+            treeNode28,
+            treeNode29});
+            System.Windows.Forms.TreeNode treeNode31 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -621,6 +621,7 @@
             // 
             this.LicensesTabPage.Controls.Add(this.CustomersListView);
             this.LicensesTabPage.Controls.Add(this.LicenseViewSplitContainer);
+
             this.LicensesTabPage.Location = new System.Drawing.Point(4, 22);
             this.LicensesTabPage.Margin = new System.Windows.Forms.Padding(5);
             this.LicensesTabPage.Name = "LicensesTabPage";
@@ -827,6 +828,7 @@
             this.PropertyGridTabControl.Controls.Add(this.TransactionsTabPage);
             this.PropertyGridTabControl.Controls.Add(this.PacketTabPage);
             this.PropertyGridTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PropertyGridTabControl.ImageList = this.CreatorImageList;
             this.PropertyGridTabControl.ItemSize = new System.Drawing.Size(22, 20);
             this.PropertyGridTabControl.Location = new System.Drawing.Point(0, 0);
             this.PropertyGridTabControl.Margin = new System.Windows.Forms.Padding(0);
@@ -840,7 +842,7 @@
             // PropertyGridTabPage
             // 
             this.PropertyGridTabPage.Controls.Add(this.DetailSplitContainer);
-            this.PropertyGridTabPage.ImageIndex = 2;
+            this.PropertyGridTabPage.ImageIndex = 24;
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
@@ -882,6 +884,7 @@
             this.DetailPropertyGrid.Size = new System.Drawing.Size(636, 259);
             this.DetailPropertyGrid.TabIndex = 2;
             this.DetailPropertyGrid.ToolbarVisible = false;
+            this.DetailPropertyGrid.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.DetailPropertyGrid.SelectedObjectsChanged += new System.EventHandler(this.DetailPropertyGrid_SelectedObjectsChanged);
             this.DetailPropertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.DetailPropertyGrid_PropertyValueChanged);
             // 
@@ -898,6 +901,7 @@
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
             this.DetailListView.Size = new System.Drawing.Size(636, 110);
+            this.DetailListView.SmallImageList = this.CreatorImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
             this.DetailListView.View = System.Windows.Forms.View.Details;
@@ -997,7 +1001,7 @@
             // 
             this.TransactionsTabPage.Controls.Add(this.TransactionListView);
             this.TransactionsTabPage.Controls.Add(this.TransactionsToolStrip);
-            this.TransactionsTabPage.ImageIndex = 3;
+            this.TransactionsTabPage.ImageIndex = 25;
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
@@ -1106,7 +1110,7 @@
             // 
             this.PacketTabPage.Controls.Add(this.splitContainer1);
             this.PacketTabPage.Controls.Add(this.PacketListToolStrip);
-            this.PacketTabPage.ImageIndex = 4;
+            this.PacketTabPage.ImageIndex = 26;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
             this.PacketTabPage.Size = new System.Drawing.Size(636, 396);
@@ -1133,7 +1137,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
             this.splitContainer1.Panel2Collapsed = true;
             this.splitContainer1.Size = new System.Drawing.Size(636, 371);
-            this.splitContainer1.SplitterDistance = 294;
+            this.splitContainer1.SplitterDistance = 293;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
             // 
@@ -1156,6 +1160,7 @@
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
             this.LicensePacketListView.Size = new System.Drawing.Size(634, 369);
+            this.LicensePacketListView.SmallImageList = this.CreatorImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
             this.LicensePacketListView.View = System.Windows.Forms.View.Details;
@@ -1193,7 +1198,7 @@
             this.packetDescriptionRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.packetDescriptionRichTextBox.Location = new System.Drawing.Point(0, 0);
             this.packetDescriptionRichTextBox.Name = "packetDescriptionRichTextBox";
-            this.packetDescriptionRichTextBox.Size = new System.Drawing.Size(148, 44);
+            this.packetDescriptionRichTextBox.Size = new System.Drawing.Size(634, 75);
             this.packetDescriptionRichTextBox.TabIndex = 0;
             this.packetDescriptionRichTextBox.Text = "";
             this.packetDescriptionRichTextBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.packetDescriptionRichTextBox_MouseUp);
@@ -1343,10 +1348,10 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode12.Name = "RootNode";
-            treeNode12.Text = "Reports";
+            treeNode32.Name = "RootNode";
+            treeNode32.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode12});
+            treeNode32});
             this.reportsTreeView.SelectedImageIndex = 34;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
@@ -1402,29 +1407,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode7.ImageIndex = 1;
-            treeNode7.Name = "LicenseNode";
-            treeNode7.SelectedImageIndex = 1;
-            treeNode7.Text = "Licenses";
-            treeNode8.ImageIndex = 2;
-            treeNode8.Name = "PacketNode";
-            treeNode8.SelectedImageIndex = 2;
-            treeNode8.Text = "Packets";
-            treeNode9.Name = "KeyNode";
-            treeNode9.Text = "Hardware Keys";
-            treeNode10.ImageIndex = 3;
-            treeNode10.Name = "CreatorRootNode";
-            treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode10.SelectedImageIndex = 3;
-            treeNode10.Text = "Creator";
-            treeNode11.ImageIndex = 0;
-            treeNode11.Name = "ReportRootNode";
-            treeNode11.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode11.SelectedImageIndex = 0;
-            treeNode11.Text = "Reports";
+            treeNode22.ImageIndex = 1;
+            treeNode22.Name = "LicenseNode";
+            treeNode22.SelectedImageIndex = 1;
+            treeNode22.Text = "Licenses";
+            treeNode28.ImageIndex = 2;
+            treeNode28.Name = "PacketNode";
+            treeNode28.SelectedImageIndex = 2;
+            treeNode28.Text = "Packets";
+            treeNode29.Name = "KeyNode";
+            treeNode29.Text = "Hardware Keys";
+            treeNode30.ImageIndex = 3;
+            treeNode30.Name = "CreatorRootNode";
+            treeNode30.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode30.SelectedImageIndex = 3;
+            treeNode30.Text = "Creator";
+            treeNode31.ImageIndex = 0;
+            treeNode31.Name = "ReportRootNode";
+            treeNode31.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode31.SelectedImageIndex = 0;
+            treeNode31.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode10,
-            treeNode11});
+            treeNode30,
+            treeNode31});
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);
@@ -1556,7 +1561,7 @@
             // csvToolStripMenuItem
             // 
             this.csvToolStripMenuItem.Name = "csvToolStripMenuItem";
-            this.csvToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.csvToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
             this.csvToolStripMenuItem.Text = "CSV";
             this.csvToolStripMenuItem.Click += new System.EventHandler(this.csvToolStripMenuItem_Click);
             // 
@@ -1564,7 +1569,7 @@
             // 
             this.xmlToolStripMenuItem.Enabled = false;
             this.xmlToolStripMenuItem.Name = "xmlToolStripMenuItem";
-            this.xmlToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.xmlToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
             this.xmlToolStripMenuItem.Text = "XML";
             this.xmlToolStripMenuItem.Click += new System.EventHandler(this.xmlToolStripMenuItem_Click);
             // 
