@@ -7,20 +7,20 @@ namespace SolimarLicenseViewer
     public class AppConstants
     {
         //initial key created when installed
-        public static readonly String SolimarRegKey     = "SOFTWARE\\Solimar";
+        public static readonly String SolimarRegKey = "SOFTWARE\\Solimar";
         public static readonly String SolimarRegKey32On64 = "SOFTWARE\\Wow6432Node\\Solimar";
-        public static readonly String LicenseProduct    = "Solimar Licensing";        
+        public static readonly String LicenseProduct = "Solimar Licensing";
 
         //for detecting if SSE System Manager is on the System - CR.13130
         public static readonly String RegKey_Sse = "SOLSearcher";
         public static readonly String RegKey_SseInstallInfo = "InstallInfo";
         public static readonly String RegKey_SseInstallInfoSse = "ProductCode_4";
         public static readonly String RegKey_SseInstallInfoSseSp = "ProductCode_7";
-        
+
         //XML File/Folder Path
         public static readonly String LocalConnectionFilePath = "\\Solimar\\SolimarLicenseServer\\";
-        public static readonly String LocalConnectionFile     = "LocalConnectionSettings.xml";
-        
+        public static readonly String LocalConnectionFile = "LocalConnectionSettings.xml";
+
         //Form Constants
         public static readonly String LicenseView = "License";
         public static readonly String UsageView = "Usage";
@@ -41,12 +41,12 @@ namespace SolimarLicenseViewer
         public static readonly String ProductConnectionSettingsUnknownStatus = "Status Unknown";
 
         #region ToolStripToolBar Constant
-        public static readonly String ProdSettingsEditConnTSB = "Edit Connection Settings";
         public static readonly String ProdSettingsEditConnToolTipTSB = "Edit Connection Settings for the given Product";
-        public static readonly String ProdSettingsTestConnSelectedTSB = "Test Connection Settings";
+        public static readonly String ProdSettingsEditConnTSB = ProdSettingsEditConnToolTipTSB;
         public static readonly String ProdSettingsTestConnSelectedToolTipTSB = "Test Connection to License Server for the given Product";
-        public static readonly String ProdSettingsTestConnAllTSB = "Test All Connection Settings";
-        public static readonly String ProdSettingsTestConnAllToolTipTSB = "Test Connection to All License Server";
+        public static readonly String ProdSettingsTestConnSelectedTSB = ProdSettingsTestConnSelectedToolTipTSB;
+        public static readonly String ProdSettingsTestConnAllToolTipTSB = "Test Connection to License Server for All Products";
+        public static readonly String ProdSettingsTestConnAllTSB = ProdSettingsTestConnAllToolTipTSB;
         #endregion
 
         #region ListView Constants
@@ -56,7 +56,7 @@ namespace SolimarLicenseViewer
         public static readonly String NotUsedStatus = "Not Used";
         public static readonly String ExpiredStatus = "Activation Expired";
         public static readonly String HistoryNode = "History";
-        
+
 
         //License Node Column Headers
         public static readonly String NameHeader = "Name";
@@ -113,27 +113,27 @@ namespace SolimarLicenseViewer
         public static readonly String PkModuleHeader = "Module Name";
         public static readonly String PkModuleInUseHeader = "In Use";
         public static readonly String PkModuleTotalHeader = "Total Licenses";
-        
+
         #endregion
 
         public class ProductSettingsXML
         {
             //XML Elements & Attributes
-            public static readonly String LicensingStructureElement  = "LicensingStructure";
-            public static readonly String ServerStructureElement     = "ServerStructure";
-            public static readonly String VersionElement			 = "Version";
-            public static readonly String ValueAttrib				 = "value";
-            public static readonly String ServerElement			     = "Server";
-            public static readonly String ProductElement		 	 = "Product";
-            public static readonly String IdAttrib					 = "id";
-            public static readonly String NameAttrib				 = "name";
-            public static readonly String BackupAttrib				 = "backup";
-            public static readonly String SharedAttrib               = "shared";
+            public static readonly String LicensingStructureElement = "LicensingStructure";
+            public static readonly String ServerStructureElement = "ServerStructure";
+            public static readonly String VersionElement = "Version";
+            public static readonly String ValueAttrib = "value";
+            public static readonly String ServerElement = "Server";
+            public static readonly String ProductElement = "Product";
+            public static readonly String IdAttrib = "id";
+            public static readonly String NameAttrib = "name";
+            public static readonly String BackupAttrib = "backup";
+            public static readonly String SharedAttrib = "shared";
 
             //new to verion 2.0
-            public static readonly String SoftwareLicAttrib          = "softwareLic";   //Not currently used
-            public static readonly String TestDevAttrib              = "testDev";
-            public static readonly String DisasterRecoveryAttrib     = "disasterRecovery";  //Not currently used
+            public static readonly String SoftwareLicAttrib = "softwareLic";   //Not currently used
+            public static readonly String TestDevAttrib = "testDev";
+            public static readonly String DisasterRecoveryAttrib = "disasterRecovery";  //Not currently used
         }
     }
 }
