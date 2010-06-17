@@ -296,7 +296,7 @@ namespace SolimarLicenseViewer
                 catch (COMException ex)
                 {
                     //alert user of failure
-                    HandleExceptions.DisplayException(this, ex, "Failed to apply license password!", "Apply License Password");
+                    HandleExceptions.DisplayException(this, ex, "Invalid Password - Failed to apply license password", "Apply License Password");
                 }
                 finally
                 {
