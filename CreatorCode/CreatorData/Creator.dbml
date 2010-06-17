@@ -77,7 +77,7 @@
       <Column Name="plState" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="LicenseID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ExpirationDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" UpdateCheck="Never" />
-      <Column Name="Description" Type="System.String" DbType="VarChar(100)" CanBeNull="true" UpdateCheck="Never" />
+      <Column Name="Description" Type="System.String" DbType="VarChar(255)" CanBeNull="true" UpdateCheck="Never" />
       <Column Name="ProductID" Type="System.Byte" DbType="TinyInt NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ProductVersion" Type="System.String" DbType="VarChar(10) NOT NULL" CanBeNull="false" UpdateCheck="Never" />
       <Column Name="ParentProductLicenseID" Type="System.String" DbType="VarChar(50)" CanBeNull="true" UpdateCheck="Never" />
