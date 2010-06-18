@@ -450,6 +450,11 @@ public:
 	//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one then will create new license file.
 	STDMETHOD(ConvertProtectionKeyToSoftwareLicense)(BSTR softwareLicense, BSTR keyIdent);
 private:
+
+	// Connection to the License Server via CocreateInstance will have a different m_licenseId.
+	// m_licenseId is used to track all of the licensing usage for a given connection. It is possible 
+	// to have multiple connections with the same ApplicationInstance name, but each connection 
+	// will have a different m_licenseId
 	_bstr_t m_licenseId;
 	static BYTE challenge_key_server_thisauthuser_public[];
 	static BYTE challenge_key_server_userauththis_private[];

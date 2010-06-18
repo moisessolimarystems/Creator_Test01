@@ -15,7 +15,7 @@ namespace ValidationTokenRetriever
 		public Form1()
 		{
 			InitializeComponent();
-			Initialize();
+
 		}
 
 		private void Initialize()
@@ -68,6 +68,8 @@ namespace ValidationTokenRetriever
 			try
 			{
 				m_vData.macAddress = FindMACAddress();
+				if (m_vData.macAddress == string.Empty)
+					throw new Exception("No MAC Address is detected, must have a MAC Address.");
 			}
 			catch (Exception exc)
 			{
@@ -143,11 +145,17 @@ namespace ValidationTokenRetriever
 
 			propertyGrid1.SelectedObject = m_vData;
 			if (errorStrBuilder.Length > 0)
-				globalErrorProvider.SetError(propertyGrid1, errorStrBuilder.ToString());
+			{
+				string errMsg = string.Format("Will be unable to generate Solimar Validation Token Data because: \r\n{0}", errorStrBuilder.ToString());
+				this.m_errorMsg = string.Format("Error trying to generate Solimar Validation Token Data because: \r\n{0}", errorStrBuilder.ToString());
+				//globalErrorProvider.SetError(genButton, errorStrBuilder.ToString());
+				MessageBox.Show(this, errMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				globalErrorProvider.SetError(genButton, errMsg);
+			}
 			this.ActiveControl = companyTextBox;
 		}
 
-
+		private string m_errorMsg = string.Empty;
 		private SolimarValidationData m_vData = null;
 		private string FindComputerName()
 		{
@@ -172,7 +180,13 @@ namespace ValidationTokenRetriever
 					//you can change the string to an array and get all
 					//network adapters found as well
 					if ((bool)obj["IPEnabled"] == true)
-						address = obj["MacAddress"].ToString();
+					{
+						string serviceName = (string)obj["ServiceName"];
+						if (serviceName != null && string.Compare(serviceName, "msloop") != 0)
+						{
+							address = obj["MacAddress"].ToString();
+						}
+					}
 				}
 				//dispose of our object
 				obj.Dispose();
@@ -361,15 +375,23 @@ namespace ValidationTokenRetriever
 
 		private void exportToFile()
 		{
-			globalSaveFileDialog.FileName = MakeFileNameSafe(m_vData.CompanyName) + "-" + MakeFileNameSafe(m_vData.ComputerName) + ".svt.csv";
-			if (globalSaveFileDialog.ShowDialog() == DialogResult.OK)
+			if (this.m_errorMsg == string.Empty)
 			{
-				using (System.IO.TextWriter txtWriter = new System.IO.StreamWriter(globalSaveFileDialog.OpenFile()))
+				globalSaveFileDialog.FileName = MakeFileNameSafe(m_vData.CompanyName) + "-" + MakeFileNameSafe(m_vData.ComputerName) + ".svt.csv";
+				if (globalSaveFileDialog.ShowDialog() == DialogResult.OK)
 				{
-					//txtWriter.Write(generateExportText());
-					txtWriter.Write(m_vData.ToCSV());
-					txtWriter.Close();
+					using (System.IO.TextWriter txtWriter = new System.IO.StreamWriter(globalSaveFileDialog.OpenFile()))
+					{
+						//txtWriter.Write(generateExportText());
+						txtWriter.Write(m_vData.ToCSV());
+						txtWriter.Close();
+					}
 				}
+			}
+			else
+			{
+				MessageBox.Show(this, this.m_errorMsg, "Error generating Validation Token Data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				globalErrorProvider.SetError(genButton, this.m_errorMsg);
 			}
 		}
 		private string generateExportText()
@@ -443,7 +465,12 @@ namespace ValidationTokenRetriever
 			m_vData.CompanyName = companyTextBox.Text;
 		}
 
+		private void Form1_Load(object sender, EventArgs e)
+		{
+			Initialize();
+		}
+
 	}
 
-	
+
 }
