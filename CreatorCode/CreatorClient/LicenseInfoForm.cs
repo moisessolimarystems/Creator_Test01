@@ -226,7 +226,7 @@ namespace Client.Creator
                     newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     newToken.tokenType.TVal = GetTokenEnum(lvItem.Text);  
                     newToken.tokenValue.TVal = lvItem.SubItems[1].Text;
-                    tokenData.TokenList.Add(newToken);                
+                    tokenData.TokenList.Add(newToken);               
                 }
             }
         }
@@ -251,19 +251,75 @@ namespace Client.Creator
                     }  
                 }
                 else
-                {                    
-                    //foreach (ListViewItem lvItem in tokenListView.Items)
-                    //{
-                    //    selectedType = GetTokenEnum(lvItem.Text);
-                    //    if (client.TokenExists(selectedLicense.CustID, (byte)selectedType, lvItem.SubItems[1].Text))
-                    //    {
-                    //        //retrieve 
-                    //        m_Validated = false;                            
-                    //        // Set the ErrorProvider error with the text to display.
-                    //        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
-                    //        MessageBox.Show("Validation token already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    //    }
-                    //}
+                {
+                    IList<SoftwareTokenTable> tokenList = client.GetAllSoftwareTokens();
+                    if (tokenList != null) //ensure all active tokens are available from customer
+                    {
+                        foreach (SoftwareTokenTable token in tokenList.Where(t => t.Status > 0))
+                        {
+                            if (token.TokenType != Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID.ToString())
+                            {   
+                                if (!(tokenListView.Items.Find(token.TokenType, false).Count() > 0))
+                                {
+                                    m_Validated = false;
+                                    MessageBox.Show(token.TokenType + " is missing from customer provided validation tokens!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (m_Validated) //ensure all tokens have a value
+                    {
+                        foreach (ListViewItem lvItem in tokenListView.Items)
+                        {
+                            if (!(lvItem.SubItems[1].Text.Length > 0))
+                            {
+                                m_Validated = false;
+                                MessageBox.Show(lvItem.Text + " has an empty value!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                break;
+                            }
+                        }
+                    }
+                    if (m_Validated) //ensure all token sets are unique
+                    {
+                        ListViewItem[] foundTokens;
+                        string tokenName, tokenValue;
+                        CustomerTable customerDB = client.GetCustomer(selectedLicense.CustID.ToString(), false);
+                        if (customerDB != null)
+                        {
+                            IList<LicenseTable> licServerList = client.GetLicensesByCustomer(customerDB.SCRname);
+                            IList<TokenTable> tokenDBList = client.GetTokensByCustomerID(customerDB.SCRnumber);
+                            foreach (LicenseTable licServer in licServerList)
+                            {
+                                bool bMatch = true;
+                                //all tokens must match in order to pass validation
+                                foreach (TokenTable token in tokenDBList.Where(t => t.LicenseID == licServer.ID))
+                                {
+                                    tokenName = ((Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType).ToString();
+                                    foundTokens = tokenListView.Items.Find(tokenName, false);
+                                    if(foundTokens.Count() > 0)
+                                    {
+                                        tokenValue = foundTokens[0].SubItems[1].Text;
+                                        if(token.TokenValue != tokenValue)
+                                        {    
+                                            bMatch = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (licServer.LicenseName != selectedLicense.Name)
+                                {
+                                    if (bMatch)
+                                    {
+                                        m_Validated = false;
+                                        MessageBox.Show(string.Format("Validation tokens are not unique for {0}!\nLicense Server - {1} has the same validation tokens.", customerDB.SCRname, licServer.LicenseName), "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        //token is already in LS - A
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             });
             Cursor.Current = Cursors.Default;
@@ -340,6 +396,7 @@ namespace Client.Creator
                                 if (IsValidTokenType(tokenName))
                                 {
                                     ListViewItem lvItem = new ListViewItem(tokenName);
+                                    lvItem.Name = GetTokenEnum(tokenName).ToString();
                                     lvItem.SubItems.Add(tokenValue);
                                     tokenListView.Items.Add(lvItem);
                                 }
