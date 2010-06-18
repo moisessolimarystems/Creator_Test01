@@ -196,6 +196,8 @@ namespace Service.Creator
 
         #region Token TokenContracts
         [OperationContract]
+        IList<TokenTable> GetTokensByCustomerID(int custID);
+        [OperationContract]
         IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl, bool matchAll);
         [OperationContract]
         IList<TokenTable> GetAllTokens(string searchString, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType token);    

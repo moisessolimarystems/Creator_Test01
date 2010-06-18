@@ -555,6 +555,12 @@ namespace Service.Creator
 
         #region Token Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<TokenTable> GetTokensByCustomerID(int custID)
+        {
+            return TokenTable.GetTokensByCustomerID(custID);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<TokenTable> GetHardwareTokensByConditions(IList<Condition> cl, bool matchAll)
         {
             String value;

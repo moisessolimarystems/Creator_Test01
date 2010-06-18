@@ -1874,6 +1874,9 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
+        void CreateToken(Client.Creator.CreatorService.TokenTable tt);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdateToken", ReplyAction="http://tempuri.org/ICreator/UpdateTokenResponse")]
         void UpdateToken(Client.Creator.CreatorService.TokenTable tt);
         
@@ -2030,6 +2033,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteProductLicense", ReplyAction="http://tempuri.org/ICreator/DeleteProductLicenseResponse")]
         void DeleteProductLicense(Client.Creator.CreatorService.ProductLicenseTable ta);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTokensByCustomerID", ReplyAction="http://tempuri.org/ICreator/GetTokensByCustomerIDResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetTokensByCustomerID(int custID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetHardwareTokensByConditions", ReplyAction="http://tempuri.org/ICreator/GetHardwareTokensByConditionsResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
         
@@ -2059,9 +2065,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
         uint GetNextHardwareTokenValue(uint custID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
-        void CreateToken(Client.Creator.CreatorService.TokenTable tt);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
@@ -2185,6 +2188,10 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
+            base.Channel.CreateToken(tt);
         }
         
         public void UpdateToken(Client.Creator.CreatorService.TokenTable tt) {
@@ -2395,6 +2402,10 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteProductLicense(ta);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetTokensByCustomerID(int custID) {
+            return base.Channel.GetTokensByCustomerID(custID);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> GetHardwareTokensByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
             return base.Channel.GetHardwareTokensByConditions(cl, matchAll);
         }
@@ -2433,10 +2444,6 @@ namespace Client.Creator.CreatorService {
         
         public uint GetNextHardwareTokenValue(uint custID) {
             return base.Channel.GetNextHardwareTokenValue(custID);
-        }
-        
-        public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
-            base.Channel.CreateToken(tt);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions) {

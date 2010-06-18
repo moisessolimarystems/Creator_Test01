@@ -125,6 +125,15 @@ namespace CreatorData
             }
         }
 
+        public static IList<TokenTable> GetTokensByCustomerID(int custID)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                return db.TokenTables.Where(c => c.CustID == custID).ToList();
+            }
+        }
+
         //each license can only have at most one of each token type
         public static TokenTable GetTokenByLicenseName(string licenseName, byte tokenType)
         {
