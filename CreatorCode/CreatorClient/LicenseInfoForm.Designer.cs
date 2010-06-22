@@ -76,9 +76,9 @@
             this.label5 = new System.Windows.Forms.Label();
             this.productLicenseVersionMaskedTextBox = new System.Windows.Forms.MaskedTextBox();
             this.ProductLicenseTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.ProductLicenseProductComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.ProductLicenseProductComboBox = new System.Windows.Forms.ComboBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label9 = new System.Windows.Forms.Label();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
@@ -348,6 +348,7 @@
             this.tokenListView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tokenListView.FullRowSelect = true;
             this.tokenListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.tokenListView.HideSelection = false;
             this.tokenListView.Location = new System.Drawing.Point(5, 23);
             this.tokenListView.Margin = new System.Windows.Forms.Padding(5);
             this.tokenListView.Name = "tokenListView";
@@ -414,7 +415,7 @@
             this.tableLayoutPanel4.ColumnCount = 3;
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 27.92208F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 72.07792F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 53F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 54F));
             this.tableLayoutPanel4.Controls.Add(this.packetNameLabel, 0, 0);
             this.tableLayoutPanel4.Controls.Add(this.folderBrowseButton, 2, 2);
             this.tableLayoutPanel4.Controls.Add(this.packetNameTextBox, 1, 0);
@@ -450,7 +451,7 @@
             // folderBrowseButton
             // 
             this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
-            this.folderBrowseButton.Location = new System.Drawing.Point(372, 65);
+            this.folderBrowseButton.Location = new System.Drawing.Point(371, 65);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
             this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
@@ -462,7 +463,7 @@
             // 
             this.packetNameTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetNameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetNameTextBox.Location = new System.Drawing.Point(109, 5);
+            this.packetNameTextBox.Location = new System.Drawing.Point(108, 5);
             this.packetNameTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetNameTextBox.Name = "packetNameTextBox";
             this.packetNameTextBox.ReadOnly = true;
@@ -472,7 +473,7 @@
             // packetDescriptTextBox
             // 
             this.packetDescriptTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(109, 107);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(108, 107);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
@@ -484,9 +485,9 @@
             this.packetDateLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.packetDateLabel.AutoSize = true;
             this.packetDateLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.packetDateLabel.Location = new System.Drawing.Point(3, 38);
+            this.packetDateLabel.Location = new System.Drawing.Point(3, 32);
             this.packetDateLabel.Name = "packetDateLabel";
-            this.packetDateLabel.Size = new System.Drawing.Size(98, 13);
+            this.packetDateLabel.Size = new System.Drawing.Size(67, 26);
             this.packetDateLabel.TabIndex = 1;
             this.packetDateLabel.Text = "Expiration Date:";
             // 
@@ -504,7 +505,7 @@
             // packetOutputPathTextBox
             // 
             this.packetOutputPathTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(109, 65);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(108, 65);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
@@ -526,7 +527,7 @@
             // 
             this.packetExpDateTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.packetExpDateTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.packetExpDateTextBox.Location = new System.Drawing.Point(109, 35);
+            this.packetExpDateTextBox.Location = new System.Drawing.Point(108, 35);
             this.packetExpDateTextBox.Margin = new System.Windows.Forms.Padding(5);
             this.packetExpDateTextBox.Name = "packetExpDateTextBox";
             this.packetExpDateTextBox.ReadOnly = true;
@@ -681,19 +682,6 @@
             this.ProductLicenseTypeComboBox.Size = new System.Drawing.Size(149, 21);
             this.ProductLicenseTypeComboBox.TabIndex = 1;
             // 
-            // ProductLicenseProductComboBox
-            // 
-            this.ProductLicenseProductComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.ProductLicenseProductComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ProductLicenseProductComboBox.FormattingEnabled = true;
-            this.ProductLicenseProductComboBox.Location = new System.Drawing.Point(120, 35);
-            this.ProductLicenseProductComboBox.Margin = new System.Windows.Forms.Padding(5);
-            this.ProductLicenseProductComboBox.Name = "ProductLicenseProductComboBox";
-            this.ProductLicenseProductComboBox.Size = new System.Drawing.Size(282, 21);
-            this.ProductLicenseProductComboBox.Sorted = true;
-            this.ProductLicenseProductComboBox.TabIndex = 0;
-            this.ProductLicenseProductComboBox.SelectedIndexChanged += new System.EventHandler(this.productLicenseProductComboBox_SelectedIndexChanged);
-            // 
             // label1
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -716,6 +704,19 @@
             this.label2.TabIndex = 3;
             this.label2.Text = "Product:";
             // 
+            // ProductLicenseProductComboBox
+            // 
+            this.ProductLicenseProductComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.ProductLicenseProductComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ProductLicenseProductComboBox.FormattingEnabled = true;
+            this.ProductLicenseProductComboBox.Location = new System.Drawing.Point(120, 35);
+            this.ProductLicenseProductComboBox.Margin = new System.Windows.Forms.Padding(5);
+            this.ProductLicenseProductComboBox.Name = "ProductLicenseProductComboBox";
+            this.ProductLicenseProductComboBox.Size = new System.Drawing.Size(282, 21);
+            this.ProductLicenseProductComboBox.Sorted = true;
+            this.ProductLicenseProductComboBox.TabIndex = 0;
+            this.ProductLicenseProductComboBox.SelectedIndexChanged += new System.EventHandler(this.productLicenseProductComboBox_SelectedIndexChanged);
+            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.label9);
@@ -727,7 +728,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(427, 257);
+            this.tabPage1.Size = new System.Drawing.Size(446, 257);
             this.tabPage1.TabIndex = 5;
             this.tabPage1.Text = "tabPage1";
             this.tabPage1.UseVisualStyleBackColor = true;

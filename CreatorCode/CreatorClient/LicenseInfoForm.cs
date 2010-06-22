@@ -163,7 +163,7 @@ namespace Client.Creator
         {
             selectedObject = tokenData.LicInfo as Object;
             ////hardware token get value from database
-            btnOk.Enabled = true;
+            btnOk.Enabled = false;
             topPanel.Controls.Clear();
             tokenGroupBox.Parent = topPanel;
             hardwareRadioButton.Checked = true;
@@ -246,9 +246,8 @@ namespace Client.Creator
                     {
                         m_Validated = false;
                         // Set the ErrorProvider error with the text to display.
-                        //errorProvider1.SetError(this.tokenValueTextBox, "Validation token already exists for this customer!");
                         MessageBox.Show(tokenListView.SelectedItems[0].Text + " already exists for this customer!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }  
+                    }
                 }
                 else
                 {
@@ -291,20 +290,21 @@ namespace Client.Creator
                             IList<TokenTable> tokenDBList = client.GetTokensByCustomerID(customerDB.SCRnumber);
                             foreach (LicenseTable licServer in licServerList)
                             {
-                                bool bMatch = true;
-                                //all tokens must match in order to pass validation
+                                bool bMatch = false; 
                                 foreach (TokenTable token in tokenDBList.Where(t => t.LicenseID == licServer.ID))
                                 {
                                     tokenName = ((Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType).ToString();
-                                    foundTokens = tokenListView.Items.Find(tokenName, false);
-                                    if(foundTokens.Count() > 0)
+                                    foundTokens = tokenListView.Items.Find(tokenName, false);                                        
+                                    if (foundTokens.Count() > 0)
                                     {
                                         tokenValue = foundTokens[0].SubItems[1].Text;
-                                        if(token.TokenValue != tokenValue)
-                                        {    
+                                        if (token.TokenValue != tokenValue)
+                                        {
                                             bMatch = false;
                                             break;
                                         }
+                                        else
+                                            bMatch = true;
                                     }
                                 }
                                 if (licServer.LicenseName != selectedLicense.Name)
@@ -411,6 +411,8 @@ namespace Client.Creator
                         btnOk.Enabled = true;
                         TokenDescriptionLabel.Text = "Customer Validation Information";
                     }
+                    else
+                        btnOk.Enabled = false;
                 }
                 catch (Exception ex)
                 {
@@ -426,7 +428,6 @@ namespace Client.Creator
             TokenDescriptionLabel.Text = "Available Hardware Tokens";
             browseTokenFileButton.Visible = false;
             tokenListView.Items.Clear();
-            btnOk.Enabled = true;
             Service<ICreator>.Use((client) =>
             {
                 IList<TokenTable> tokenList = client.GetAvailableHardwareTokensByCustID(selectedOrder.CustID);
@@ -442,11 +443,14 @@ namespace Client.Creator
             });
             if (tokenListView.Items.Count > 0)
             {
-                tokenListView.Focus();
-                tokenListView.Items[0].Selected = true;
+                btnOk.Enabled = true;
                 tokenListView.Columns[0].Width = -2;
                 tokenListView.Columns[1].Width = -2;
+                tokenListView.Focus();
+                tokenListView.Items[0].Selected = true;  
             }
+            else
+                btnOk.Enabled = false;
 
         }
         //enable browse button, ask for 
