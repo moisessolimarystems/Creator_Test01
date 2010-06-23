@@ -41,9 +41,7 @@ namespace Client.Creator
 
         private void LicenseInfoForm_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
         {
-            if (e.Data is LicenseDialogData)
-                LoadLicenseTabPage(e.Data as LicenseDialogData);
-            else if (e.Data is TokenDialogData)
+            if (e.Data is TokenDialogData)
                 LoadTokenTabPage(e.Data as TokenDialogData);
             else if (e.Data is PacketDialogData)
                 LoadPacketTabPage(e.Data as PacketDialogData);
@@ -55,10 +53,7 @@ namespace Client.Creator
         { 
             if (e.Result != DialogResult.OK)
                 return;
-
-            if (e.Data is LicenseDialogData)
-                SaveLicenseTabPage(e.Data as LicenseDialogData);
-            else if (e.Data is TokenDialogData)
+            if (e.Data is TokenDialogData)
                 SaveTokenTabPage(e.Data as TokenDialogData);
             else if (e.Data is PacketDialogData)
                 SavePacketTabPage(e.Data as PacketDialogData);
@@ -68,7 +63,7 @@ namespace Client.Creator
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (tokenGroupBox.Parent == topPanel)
+            if (tokenAttribsSplitContainer.Parent == topPanel)
                 ValidateTokenForm();
         }
 
@@ -82,21 +77,19 @@ namespace Client.Creator
 
         #region Product License Methods
 
-        //needs next product license name, license server name
-        void LoadProductLicenseTabPage(ProductLicenseDialogData plData)
+        void InitializeProductLicenseTabPage(ProductLicenseTable plt)
         {
-            selectedObject = plData as Object;
-            topPanel.Controls.Clear();
-            productLicenseGroupBox.Parent = topPanel;
-            productLicenseNumberTextBox.Text = plData.ProductLicense.plID;
+            ProductLicenseDialogData pltData = selectedObject as ProductLicenseDialogData;
+            productLicenseAttribsGroupBox.Text = plt.plID;
             List<ProductLicenseTable> productLicenses;
             List<string> productList = new List<string>();
             Service<ICreator>.Use((client) => 
             {
+                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicenses(pltData.LicenseServerString, true);
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     bool bSkip = false;
-                    productLicenses = client.GetProductLicensesByProduct(plData.LicenseServerID, (byte)productSpec.productID.TVal);
+                    productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal).ToList();//client.GetProductLicensesByProduct(pltData.LicenseServerString, (byte)productSpec.productID.TVal);
                     foreach (ProductLicenseTable pl in productLicenses)
                     {   //skip if client and not perm
                         if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
@@ -109,51 +102,54 @@ namespace Client.Creator
             });
             if (productList.Count == 0)
                 productList.Add("No Products Available");
+            ProductLicenseProductComboBox.Items.Clear();
             ProductLicenseProductComboBox.Items.AddRange(productList.ToArray());
-            ProductLicenseProductComboBox.SelectedIndex = 0;
-            expDateTextBox.Text = "30";
+            
+            //if plt.productID 
+            //set to plt.productid 
+            //convert id to product string
+            ProductLicenseProductComboBox.SelectedIndex = (plt.ProductID > 0) ? ProductLicenseProductComboBox.FindString(m_CommLink.GetProductName(plt.ProductID)) : 0;
+            //set product version
+            if (plt.ProductVersion != null)
+                productLicenseVersionMaskedTextBox.Text = plt.ProductVersion;
+            //set to plt.expiration
+            expDateTextBox.Text = (plt.ExpirationDate.HasValue) ? plt.ExpirationDate.Value.Date.Subtract(DateTime.Today).Days.ToString() : "30";
+            //set longDate string
+            longDateLabel.Text = "(" + CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime().ToLongDateString() + ")";
+            //set to description if set
+            productLicenseDescriptionTextBox.Text = plt.Description;
+            EnableBindingNavigatorItems();
+        }
+
+        //needs next product license name, license server name
+        void LoadProductLicenseTabPage(ProductLicenseDialogData plData)
+        {
+            selectedObject = plData as Object;
+            topPanel.Controls.Clear();
+            productLicenseSplitContainer.Parent = topPanel;
+            //splitContainer1.Parent = topPanel;
+            //productLicenseGroupBox.Parent = topPanel;
+            //bindingNavigator1.Parent = topPanel;
+            //bindingNavigator1.BringToFront();
+            //tableLayoutPanel5.Parent = topPanel;
+            //tableLayoutPanel5.BringToFront();
+            //create bindinglist from productlicense
+            BindingList<ProductLicenseTable> bindingList = new BindingList<ProductLicenseTable>();
+            bindingNavigator1.BindingSource = new BindingSource();
+            bindingNavigator1.BindingSource.DataSource = bindingList;            
+            InitializeProductLicenseTabPage(AddCurrentItem());
         }
 
         void SaveProductLicenseTabPage(ProductLicenseDialogData plData)
         {
-            string[] splitStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
-            //can only be one or two
-            if (splitStatus.Count() > 1)
+            SaveCurrentItem();
+            List<ProductLicenseTable> pltList = new List<ProductLicenseTable>();
+            foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
             {
-                ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
-                plData.ProductLicense.plState = (byte)state;
-                plData.ProductLicense.ParentProductLicenseID = splitStatus[1].Trim();
+                pltList.Add(plt);
+                // item.
             }
-            else
-            {
-                ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
-                plData.ProductLicense.plState = (byte)state;
-            }
-            plData.ProductLicense.ProductID = (byte)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
-            plData.ProductLicense.ProductConnection = (byte)((plData.ProductLicense.plState == (byte)ProductLicenseState.AddOn) ? 0 : 1);
-            plData.ProductLicense.ProductVersion = productLicenseVersionMaskedTextBox.Text;
-            plData.ProductLicense.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime();
-            plData.ProductLicense.Description = productLicenseDescriptionTextBox.Text;
-        }
-        #endregion
-
-        #region License Methods
-
-        private void LoadLicenseTabPage(LicenseDialogData licData)
-        {
-            topPanel.Controls.Clear();
-            licenseGroupBox.Parent = topPanel;
-            //need to get next available value from DB for destination ID and group ID.
-            selectedObject = licData.LicInfo as Object;         
-            destinationTextBox.Text = licData.LicInfo.DestName;
-            //license name
-            licNameTextBox.Text = licData.LicInfo.Name;
-        }
-
-        private void SaveLicenseTabPage(LicenseDialogData licData)
-        {
-            //TODO : validate that the license does not already exist
-            licData.LicInfo.Comments = licDescriptTextBox.Text;
+            plData.ProductLicense = pltList;
         }
         #endregion
 
@@ -165,7 +161,7 @@ namespace Client.Creator
             ////hardware token get value from database
             btnOk.Enabled = false;
             topPanel.Controls.Clear();
-            tokenGroupBox.Parent = topPanel;
+            tokenAttribsSplitContainer.Parent = topPanel;
             hardwareRadioButton.Checked = true;
         }
 
@@ -337,15 +333,15 @@ namespace Client.Creator
         private void LoadPacketTabPage(PacketDialogData packetData)
         {
             topPanel.Controls.Clear();
-            packetGroupBox.Parent = topPanel;
+            licPktSplitContainer.Parent = topPanel;
             selectedObject = packetData as Object;
-            packetNameTextBox.Text = packetData.PacketName;
-            packetExpDateTextBox.Text = DateTime.Now.AddDays(14).ToLongDateString();
-            packetOutputPathTextBox.Text = packetData.SelectedDirectory;           
+            licPacketAttribsGroupBox.Text = packetData.PacketName + ".packet";
+            licPacketDescriptionLabel.Text = string.Format("This packet will expire on {0}. Please choose a location for the license packet to be generated.", DateTime.Now.AddDays(14).ToLongDateString());
+            packetOutputPathTextBox.Text = packetData.SelectedDirectory;                       
         }
         private void SavePacketTabPage(PacketDialogData packetData)
         {
-            packetData.ExpDate = DateTime.Parse(packetExpDateTextBox.Text); 
+            packetData.ExpDate = DateTime.Now.AddDays(14); 
             packetData.SelectedDirectory = packetOutputPathTextBox.Text;
             if (!Directory.Exists(packetData.SelectedDirectory))            
                 Directory.CreateDirectory(packetData.SelectedDirectory);            
@@ -362,6 +358,11 @@ namespace Client.Creator
                 PacketDialogData selectedPacketData = selectedObject as PacketDialogData;
                 packetOutputPathTextBox.Text = Path.Combine(folderBrowserDialog.SelectedPath, selectedPacketData.CustomerName);
             }
+        }
+
+        private void packetDescriptTextBox_TextChanged(object sender, EventArgs e)
+        {
+            licPacketNotesLabel.Text = string.Format("{0} Characters Left(Limit is 255 characters)", 255 - packetDescriptTextBox.Text.Length);
         }
 
         #endregion 
@@ -409,7 +410,7 @@ namespace Client.Creator
                         tokenListView.Columns[0].Width = -2;
                         tokenListView.Columns[1].Width = -2;
                         btnOk.Enabled = true;
-                        TokenDescriptionLabel.Text = "Customer Validation Information";
+                        TokenDescriptionLabel.Text = selectedLicense.DestName + " Validation Information";
                     }
                     else
                         btnOk.Enabled = false;
@@ -425,7 +426,7 @@ namespace Client.Creator
         private void hardwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
-            TokenDescriptionLabel.Text = "Available Hardware Tokens";
+            TokenDescriptionLabel.Text = "Please select from the available hardware tokens.";
             browseTokenFileButton.Visible = false;
             tokenListView.Items.Clear();
             Service<ICreator>.Use((client) =>
@@ -456,7 +457,8 @@ namespace Client.Creator
         //enable browse button, ask for 
         private void softwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            TokenDescriptionLabel.Text = "Please browse for customer information.";
+            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
+            TokenDescriptionLabel.Text = string.Format("Please browse to the lsData file containing {0} validation tokens.", selectedOrder.DestName);
             browseTokenFileButton.Visible = true;
             tokenListView.Items.Clear();
             btnOk.Enabled = false;
@@ -477,13 +479,13 @@ namespace Client.Creator
             Service<ICreator>.Use((client) => 
             {
                 //get all orders for a given product
-                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(selectedProduct));
+                IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerString, (byte)m_CommLink.GetProductID(selectedProduct));
                 List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     if (productSpec.productName.TVal.Equals(selectedProduct))
                     {
-                        productLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerID, (byte)m_CommLink.GetProductID(productSpec.productName.TVal));
+                        productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)m_CommLink.GetProductID(productSpec.productName.TVal)).ToList();//client.GetProductLicensesByProduct(storedObject.LicenseServerString, (byte)m_CommLink.GetProductID(productSpec.productName.TVal));
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             productLicenses.Count > 0))
                             ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
@@ -518,6 +520,7 @@ namespace Client.Creator
             try
             {
                 Int32.Parse(expDateTextBox.Text);
+                longDateLabel.Text = "(" + CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime().ToLongDateString() + ")";
             }
             catch (Exception ex)
             {
@@ -526,32 +529,133 @@ namespace Client.Creator
                 expDateTextBox.SelectionLength = expDateTextBox.Text.Length;
             }
         }
-        #endregion
-    }
 
-    #region LicenseDialogData class
-    public class LicenseDialogData : Shared.VisualComponents.DialogData
-    {
-        private LicenseServerProperty m_LicInfo;
-
-        #region Constructors
-
-        public LicenseDialogData(LicenseServerProperty licInfo)
+        private void bindingNavigatorAddNewItem_Click(object sender, EventArgs e)
         {
-            m_LicInfo = licInfo;            
+            //save current view
+            SaveCurrentItem();
+            //initialize new view
+            InitializeProductLicenseTabPage(AddCurrentItem());
+        }
+
+        private void bindingNavigatorDeleteItem_Click(object sender, EventArgs e)
+        {
+            InitializeProductLicenseTabPage(RemoveCurrentItem());
+            //delete current item
+            //re-initialize previous view
+        }
+
+        private void SaveCurrentItem()
+        {
+            ProductLicenseTable plt = bindingNavigator1.BindingSource.Current as ProductLicenseTable;
+            string[] splitStatus = ProductLicenseTypeComboBox.SelectedItem.ToString().Split(":".ToCharArray());
+            //can only be one or two
+            if (splitStatus.Count() > 1)
+            {
+                ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
+                plt.plState = (byte)state;
+                plt.ParentProductLicenseID = splitStatus[1].Trim();
+            }
+            else
+            {
+                ProductLicenseState state = (ProductLicenseState)Enum.Parse(typeof(ProductLicenseState), splitStatus[0].Trim());
+                plt.plState = (byte)state;
+            }
+            plt.ProductID = (byte)m_CommLink.GetProductID(ProductLicenseProductComboBox.SelectedItem.ToString());
+            plt.ProductConnection = (byte)((plt.plState == (byte)ProductLicenseState.AddOn) ? 0 : 1);
+            plt.ProductVersion = productLicenseVersionMaskedTextBox.Text;
+            plt.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime();
+            plt.Description = productLicenseDescriptionTextBox.Text;
+        }
+
+        private ProductLicenseTable AddCurrentItem()
+        {
+            ProductLicenseDialogData pltData = selectedObject as ProductLicenseDialogData;
+            ProductLicenseTable plt = new ProductLicenseTable();
+            plt.plIndex = pltData.NextLicenseServerIndex;
+            plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, pltData.NextLicenseServerIndex);
+            plt.LicenseID = pltData.LicenseServerID;            
+            bindingNavigator1.BindingSource.Add(plt);
+            //set current position to the end
+            bindingNavigator1.BindingSource.Position = bindingNavigator1.BindingSource.List.Count-1;
+            //bump next available LS index
+            pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex + 1;
+            return bindingNavigator1.BindingSource.Current as ProductLicenseTable;
+        }
+
+        //remove current plt
+        //reindex from current to end
+        //set current to item before removed item
+        //update next available index
+        private ProductLicenseTable RemoveCurrentItem()
+        {
+            ProductLicenseDialogData pltData = selectedObject as ProductLicenseDialogData;
+            int currentPosition = bindingNavigator1.BindingSource.Position;
+            int removeIndex = 0;
+            if (bindingNavigator1.BindingSource.Count > 1)
+            {
+                removeIndex = (bindingNavigator1.BindingSource.Current as ProductLicenseTable).plIndex;
+                bindingNavigator1.BindingSource.RemoveCurrent();            
+                bindingNavigator1.BindingSource.Position = currentPosition - 1;
+                foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
+                {   //reindex list
+                    if (plt.plIndex > removeIndex)
+                        plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, --plt.plIndex); 
+                }
+                pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex - 1;
+            }
+            return bindingNavigator1.BindingSource.Current as ProductLicenseTable;
+        }
+
+        private void bindingNavigatorMovePreviousItem_Click(object sender, EventArgs e)
+        {
+            SaveCurrentItem();
+            bindingNavigator1.BindingSource.MovePrevious();
+            InitializeProductLicenseTabPage(bindingNavigator1.BindingSource.Current as ProductLicenseTable);
+        }
+
+        private void bindingNavigatorMoveNextItem_Click(object sender, EventArgs e)
+        {
+            SaveCurrentItem();
+            bindingNavigator1.BindingSource.MoveNext();
+            InitializeProductLicenseTabPage(bindingNavigator1.BindingSource.Current as ProductLicenseTable);
+        }
+
+        private void EnableBindingNavigatorItems()
+        {
+            //enable move next
+            bindingNavigatorMoveNextItem.Enabled = (bindingNavigator1.BindingSource.Position != bindingNavigator1.BindingSource.Count - 1);
+            //enablt move back
+            bindingNavigatorMovePreviousItem.Enabled = (bindingNavigator1.BindingSource.Position != 0);
+            //enable move last
+            bindingNavigatorMoveFirstItem.Enabled = (bindingNavigator1.BindingSource.Position != 0);
+            //enable move first
+            bindingNavigatorMoveLastItem.Enabled = (bindingNavigator1.BindingSource.Position != bindingNavigator1.BindingSource.Count - 1);
+            //enable delete
+            bindingNavigatorDeleteItem.Enabled = (bindingNavigator1.BindingSource.List.Count > 1);
+        }
+
+        private void bindingNavigatorMoveLastItem_Click(object sender, EventArgs e)
+        {
+            SaveCurrentItem();
+            bindingNavigator1.BindingSource.MoveLast();
+            InitializeProductLicenseTabPage(bindingNavigator1.BindingSource.Current as ProductLicenseTable);
+        }
+
+        private void bindingNavigatorMoveFirstItem_Click(object sender, EventArgs e)
+        {
+            SaveCurrentItem();
+            bindingNavigator1.BindingSource.MoveFirst();
+            InitializeProductLicenseTabPage(bindingNavigator1.BindingSource.Current as ProductLicenseTable);
+        }
+
+        private void productLicenseDescriptionTextBox_TextChanged(object sender, EventArgs e)
+        {
+            notesCharactersLeftLabel.Text = string.Format("{0} Characters Left(Limit is 255 characters)", 255 - productLicenseDescriptionTextBox.Text.Length);
+
         }
         #endregion
-
-        #region Properties
-
-        public LicenseServerProperty LicInfo
-        {
-            get { return this.m_LicInfo; }
-            set { this.m_LicInfo = value; }
-        }
-        #endregion
     }
-    #endregion
 
     #region PacketDialogData class
     public class PacketDialogData : Shared.VisualComponents.DialogData
@@ -643,29 +747,52 @@ namespace Client.Creator
     #region ProductLicenseDialogData class
     public class ProductLicenseDialogData : Shared.VisualComponents.DialogData
     {
-        private ProductLicenseTable _pltInfo;
-        private string _licenseServerID;
+        private List<ProductLicenseTable> _pltInfoList;
+        private string _lsString;
+        private int _lsID;
+        private int _nextProductLicenseIndex;
 
         #region Constructors
 
-        public ProductLicenseDialogData(string licenseServerID, ProductLicenseTable pltInfo)
+        public ProductLicenseDialogData(string licenseServerString)
         {
-            _pltInfo = pltInfo;
-            _licenseServerID = licenseServerID;
+            _pltInfoList = new List<ProductLicenseTable>();
+            _lsString = licenseServerString;
+            Service<ICreator>.Use((client) =>
+            {
+                _nextProductLicenseIndex = client.GetNextProductLicenseIndex(licenseServerString);
+                _lsID = client.GetLicenseByName(licenseServerString, false).ID;
+            });
         }
         #endregion
 
         #region Properties
 
-        public ProductLicenseTable ProductLicense
+        public List<ProductLicenseTable> ProductLicense
         {
-            get { return this._pltInfo; }
-            set { this._pltInfo = value; }
+            get { return this._pltInfoList.ToList(); }
+            set 
+            {
+                this._pltInfoList.Clear();
+                this._pltInfoList.AddRange(value);
+            }
         }
-        public string LicenseServerID
+        public string LicenseServerString
         {
-            get { return this._licenseServerID; }
+            get { return this._lsString; }
         }
+
+        public int NextLicenseServerIndex
+        {
+            get { return this._nextProductLicenseIndex; }
+            set { this._nextProductLicenseIndex = value; }
+        }
+
+        public int LicenseServerID
+        {
+            get { return _lsID; }
+        }
+
         #endregion
     }
     #endregion

@@ -653,6 +653,195 @@ namespace Client.Creator.CreatorService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PacketTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
+    [System.SerializableAttribute()]
+    public partial class PacketTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int IDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime DateCreatedField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PacketVerificationCodeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool IsVerifiedField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PacketCommentsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string PacketNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int LicenseIDField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string UserNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime ExpiredDateField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string VerifiedByField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
+            get {
+                return this.IDField;
+            }
+            set {
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
+        public System.DateTime DateCreated {
+            get {
+                return this.DateCreatedField;
+            }
+            set {
+                if ((this.DateCreatedField.Equals(value) != true)) {
+                    this.DateCreatedField = value;
+                    this.RaisePropertyChanged("DateCreated");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
+        public string PacketVerificationCode {
+            get {
+                return this.PacketVerificationCodeField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PacketVerificationCodeField, value) != true)) {
+                    this.PacketVerificationCodeField = value;
+                    this.RaisePropertyChanged("PacketVerificationCode");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
+        public bool IsVerified {
+            get {
+                return this.IsVerifiedField;
+            }
+            set {
+                if ((this.IsVerifiedField.Equals(value) != true)) {
+                    this.IsVerifiedField = value;
+                    this.RaisePropertyChanged("IsVerified");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
+        public string PacketComments {
+            get {
+                return this.PacketCommentsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PacketCommentsField, value) != true)) {
+                    this.PacketCommentsField = value;
+                    this.RaisePropertyChanged("PacketComments");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
+        public string PacketName {
+            get {
+                return this.PacketNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.PacketNameField, value) != true)) {
+                    this.PacketNameField = value;
+                    this.RaisePropertyChanged("PacketName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
+        public int LicenseID {
+            get {
+                return this.LicenseIDField;
+            }
+            set {
+                if ((this.LicenseIDField.Equals(value) != true)) {
+                    this.LicenseIDField = value;
+                    this.RaisePropertyChanged("LicenseID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
+        public string UserName {
+            get {
+                return this.UserNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
+                    this.UserNameField = value;
+                    this.RaisePropertyChanged("UserName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
+        public System.DateTime ExpiredDate {
+            get {
+                return this.ExpiredDateField;
+            }
+            set {
+                if ((this.ExpiredDateField.Equals(value) != true)) {
+                    this.ExpiredDateField = value;
+                    this.RaisePropertyChanged("ExpiredDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
+        public string VerifiedBy {
+            get {
+                return this.VerifiedByField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.VerifiedByField, value) != true)) {
+                    this.VerifiedByField = value;
+                    this.RaisePropertyChanged("VerifiedBy");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="TransactionTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
     [System.SerializableAttribute()]
     public partial class TransactionTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -1468,6 +1657,9 @@ namespace Client.Creator.CreatorService {
         private bool IsActiveField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string UserLockField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTablesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -1619,7 +1811,20 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=10)]
+        [System.Runtime.Serialization.DataMemberAttribute(Order=10)]
+        public string UserLock {
+            get {
+                return this.UserLockField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.UserLockField, value) != true)) {
+                    this.UserLockField = value;
+                    this.RaisePropertyChanged("UserLock");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> PacketTables {
             get {
                 return this.PacketTablesField;
@@ -1632,7 +1837,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=11)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.ProductLicenseTable> ProductLicenseTables {
             get {
                 return this.ProductLicenseTablesField;
@@ -1645,7 +1850,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=12)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> TransactionTables {
             get {
                 return this.TransactionTablesField;
@@ -1658,7 +1863,7 @@ namespace Client.Creator.CreatorService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=13)]
+        [System.Runtime.Serialization.DataMemberAttribute(EmitDefaultValue=false, Order=14)]
         public System.Collections.Generic.List<Client.Creator.CreatorService.TokenTable> TokenTables {
             get {
                 return this.TokenTablesField;
@@ -1681,198 +1886,15 @@ namespace Client.Creator.CreatorService {
         }
     }
     
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="PacketTable", Namespace="http://schemas.datacontract.org/2004/07/CreatorData")]
-    [System.SerializableAttribute()]
-    public partial class PacketTable : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int IDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.DateTime DateCreatedField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PacketVerificationCodeField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool IsVerifiedField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PacketCommentsField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string PacketNameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private int LicenseIDField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string UserNameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.DateTime ExpiredDateField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string VerifiedByField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
-            get {
-                return this.IDField;
-            }
-            set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=1)]
-        public System.DateTime DateCreated {
-            get {
-                return this.DateCreatedField;
-            }
-            set {
-                if ((this.DateCreatedField.Equals(value) != true)) {
-                    this.DateCreatedField = value;
-                    this.RaisePropertyChanged("DateCreated");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=2)]
-        public string PacketVerificationCode {
-            get {
-                return this.PacketVerificationCodeField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.PacketVerificationCodeField, value) != true)) {
-                    this.PacketVerificationCodeField = value;
-                    this.RaisePropertyChanged("PacketVerificationCode");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=3)]
-        public bool IsVerified {
-            get {
-                return this.IsVerifiedField;
-            }
-            set {
-                if ((this.IsVerifiedField.Equals(value) != true)) {
-                    this.IsVerifiedField = value;
-                    this.RaisePropertyChanged("IsVerified");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=4)]
-        public string PacketComments {
-            get {
-                return this.PacketCommentsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.PacketCommentsField, value) != true)) {
-                    this.PacketCommentsField = value;
-                    this.RaisePropertyChanged("PacketComments");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=5)]
-        public string PacketName {
-            get {
-                return this.PacketNameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.PacketNameField, value) != true)) {
-                    this.PacketNameField = value;
-                    this.RaisePropertyChanged("PacketName");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=6)]
-        public int LicenseID {
-            get {
-                return this.LicenseIDField;
-            }
-            set {
-                if ((this.LicenseIDField.Equals(value) != true)) {
-                    this.LicenseIDField = value;
-                    this.RaisePropertyChanged("LicenseID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=7)]
-        public string UserName {
-            get {
-                return this.UserNameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
-                    this.UserNameField = value;
-                    this.RaisePropertyChanged("UserName");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=8)]
-        public System.DateTime ExpiredDate {
-            get {
-                return this.ExpiredDateField;
-            }
-            set {
-                if ((this.ExpiredDateField.Equals(value) != true)) {
-                    this.ExpiredDateField = value;
-                    this.RaisePropertyChanged("ExpiredDate");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Order=9)]
-        public string VerifiedBy {
-            get {
-                return this.VerifiedByField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.VerifiedByField, value) != true)) {
-                    this.VerifiedByField = value;
-                    this.RaisePropertyChanged("VerifiedBy");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseServerVersion", ReplyAction="http://tempuri.org/ICreator/GetLicenseServerVersionResponse")]
+        void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
+        uint GetNextHardwareTokenValue(uint custID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreateToken", ReplyAction="http://tempuri.org/ICreator/CreateTokenResponse")]
         void CreateToken(Client.Creator.CreatorService.TokenTable tt);
@@ -1967,8 +1989,8 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
         void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseServerVersion", ReplyAction="http://tempuri.org/ICreator/GetLicenseServerVersionResponse")]
-        void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeletePacket", ReplyAction="http://tempuri.org/ICreator/DeletePacketResponse")]
+        void DeletePacket(Client.Creator.CreatorService.PacketTable pt);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTransactionsByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName);
@@ -2063,9 +2085,6 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
         bool IsHardwareTokenActive(uint custID, string tokenValue);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
-        uint GetNextHardwareTokenValue(uint custID);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
         
@@ -2117,6 +2136,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetModifiedLicensesByCustomer", ReplyAction="http://tempuri.org/ICreator/GetModifiedLicensesByCustomerResponse")]
         System.Collections.Generic.List<string> GetModifiedLicensesByCustomer(string custName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetEnabledLicensesByCustomer", ReplyAction="http://tempuri.org/ICreator/GetEnabledLicensesByCustomerResponse")]
+        System.Collections.Generic.List<string> GetEnabledLicensesByCustomer(string custName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GenerateLicensePacket", ReplyAction="http://tempuri.org/ICreator/GenerateLicensePacketResponse")]
         void GenerateLicensePacket(string pktName, Client.Creator.CreatorService.LicenseTable licName, System.DateTime expDate, string comments, ref string vCode, ref byte[] newByteArrayLicensePacket, string user);
         
@@ -2158,9 +2180,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdatePacket", ReplyAction="http://tempuri.org/ICreator/UpdatePacketResponse")]
         void UpdatePacket(Client.Creator.CreatorService.PacketTable pt);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeletePacket", ReplyAction="http://tempuri.org/ICreator/DeletePacketResponse")]
-        void DeletePacket(Client.Creator.CreatorService.PacketTable pt);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
@@ -2188,6 +2207,14 @@ namespace Client.Creator.CreatorService {
         
         public CreatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion) {
+            base.Channel.GetLicenseServerVersion(ref major, ref minor, ref buildversion);
+        }
+        
+        public uint GetNextHardwareTokenValue(uint custID) {
+            return base.Channel.GetNextHardwareTokenValue(custID);
         }
         
         public void CreateToken(Client.Creator.CreatorService.TokenTable tt) {
@@ -2314,8 +2341,8 @@ namespace Client.Creator.CreatorService {
             base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
         }
         
-        public void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion) {
-            base.Channel.GetLicenseServerVersion(ref major, ref minor, ref buildversion);
+        public void DeletePacket(Client.Creator.CreatorService.PacketTable pt) {
+            base.Channel.DeletePacket(pt);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.TransactionTable> GetTransactionsByLicenseName(string licenseName) {
@@ -2442,10 +2469,6 @@ namespace Client.Creator.CreatorService {
             return base.Channel.IsHardwareTokenActive(custID, tokenValue);
         }
         
-        public uint GetNextHardwareTokenValue(uint custID) {
-            return base.Channel.GetNextHardwareTokenValue(custID);
-        }
-        
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions) {
             return base.Channel.GetAllCustomers(searchStr, enableLoadOptions);
         }
@@ -2514,6 +2537,10 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetModifiedLicensesByCustomer(custName);
         }
         
+        public System.Collections.Generic.List<string> GetEnabledLicensesByCustomer(string custName) {
+            return base.Channel.GetEnabledLicensesByCustomer(custName);
+        }
+        
         public void GenerateLicensePacket(string pktName, Client.Creator.CreatorService.LicenseTable licName, System.DateTime expDate, string comments, ref string vCode, ref byte[] newByteArrayLicensePacket, string user) {
             base.Channel.GenerateLicensePacket(pktName, licName, expDate, comments, ref vCode, ref newByteArrayLicensePacket, user);
         }
@@ -2568,10 +2595,6 @@ namespace Client.Creator.CreatorService {
         
         public void UpdatePacket(Client.Creator.CreatorService.PacketTable pt) {
             base.Channel.UpdatePacket(pt);
-        }
-        
-        public void DeletePacket(Client.Creator.CreatorService.PacketTable pt) {
-            base.Channel.DeletePacket(pt);
         }
     }
 }

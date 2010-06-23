@@ -173,6 +173,12 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<string> GetEnabledLicensesByCustomer(string custName)
+        {
+            return LicenseTable.GetEnabledLicenseNamesByCustomer(custName);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public int GetLicenseCountByDestName(uint custID, uint destID)
         {
             return LicenseTable.GetLicenseCountByDestName(custID, destID);

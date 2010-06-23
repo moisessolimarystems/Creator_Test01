@@ -75,6 +75,9 @@ namespace Service.Creator
         IList<string> GetModifiedLicensesByCustomer(string custName);
 
         [OperationContract]
+        IList<string> GetEnabledLicensesByCustomer(string custName);
+
+        [OperationContract]
         void GenerateLicensePacket(string pktName, LicenseTable licName, DateTime expDate, string comments, ref string vCode, ref Byte[] newByteArrayLicensePacket, string user);
 
         [OperationContract]

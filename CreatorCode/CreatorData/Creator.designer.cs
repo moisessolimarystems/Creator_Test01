@@ -23,7 +23,7 @@ namespace CreatorData
 	using System;
 	
 	
-	[System.Data.Linq.Mapping.DatabaseAttribute(Name="TestKey3")]
+	[System.Data.Linq.Mapping.DatabaseAttribute(Name="TestKey")]
 	public partial class CreatorDataContext : System.Data.Linq.DataContext
 	{
 		
@@ -66,6 +66,7 @@ namespace CreatorData
     partial void DeleteModuleTable(ModuleTable instance);
     #endregion
 		
+	
 		public CreatorDataContext(string connection) : 
 				base(connection, mappingSource)
 		{
@@ -416,6 +417,8 @@ namespace CreatorData
 		
 		private bool _IsActive;
 		
+		private string _UserLock;
+		
 		private EntitySet<PacketTable> _PacketTables;
 		
 		private EntitySet<ProductLicenseTable> _ProductLicenseTables;
@@ -452,6 +455,8 @@ namespace CreatorData
     partial void OnIsDirtyChanged();
     partial void OnIsActiveChanging(bool value);
     partial void OnIsActiveChanged();
+    partial void OnUserLockChanging(string value);
+    partial void OnUserLockChanged();
     #endregion
 		
 		public LicenseTable()
@@ -673,8 +678,29 @@ namespace CreatorData
 			}
 		}
 		
+		[Column(Storage="_UserLock", DbType="VarChar(50)", CanBeNull=false, UpdateCheck=UpdateCheck.Never)]
+		[DataMember(Order=11)]
+		public string UserLock
+		{
+			get
+			{
+				return this._UserLock;
+			}
+			set
+			{
+				if ((this._UserLock != value))
+				{
+					this.OnUserLockChanging(value);
+					this.SendPropertyChanging();
+					this._UserLock = value;
+					this.SendPropertyChanged("UserLock");
+					this.OnUserLockChanged();
+				}
+			}
+		}
+		
 		[Association(Name="LicenseTable_PacketTable", Storage="_PacketTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=11, EmitDefaultValue=false)]
+		[DataMember(Order=12, EmitDefaultValue=false)]
 		public EntitySet<PacketTable> PacketTables
 		{
 			get
@@ -693,7 +719,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_ProductLicenseTable", Storage="_ProductLicenseTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=12, EmitDefaultValue=false)]
+		[DataMember(Order=13, EmitDefaultValue=false)]
 		public EntitySet<ProductLicenseTable> ProductLicenseTables
 		{
 			get
@@ -712,7 +738,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TransactionTable", Storage="_TransactionTables", ThisKey="ID", OtherKey="taLicenseID")]
-		[DataMember(Order=13, EmitDefaultValue=false)]
+		[DataMember(Order=14, EmitDefaultValue=false)]
 		public EntitySet<TransactionTable> TransactionTables
 		{
 			get
@@ -731,7 +757,7 @@ namespace CreatorData
 		}
 		
 		[Association(Name="LicenseTable_TokenTable", Storage="_TokenTables", ThisKey="ID", OtherKey="LicenseID")]
-		[DataMember(Order=14, EmitDefaultValue=false)]
+		[DataMember(Order=15, EmitDefaultValue=false)]
 		public EntitySet<TokenTable> TokenTables
 		{
 			get
