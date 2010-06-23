@@ -162,7 +162,26 @@ namespace CreatorData
                                select c.LicenseName;                
                 return licenses.ToList();
             }
-        }      
+        }
+
+        public static IList<string> GetEnabledLicenseNamesByCustomer(string custName)
+        {
+            //return all license names for a customer where a license has transactions that have no packetid value
+            //enabled = SW tokens present not enabled = SW tokens not present
+            //enabled = HW token active, not enabled = HW token deactive or not present
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                //find all licenses that have (sw tokens - reserved) or (hw tokens - active)
+                db.ObjectTrackingEnabled = false;
+                var licenses = from l in db.LicenseTables
+                               from t in db.TokenTables
+                               where l.CustomerTable.SCRname.Equals(custName) &&
+                                     ((t.TokenType == 1 && t.TokenStatus == 1) || (t.TokenType > 1 && t.TokenStatus == 0)) &&
+                                     t.LicenseID == l.ID
+                               select l.LicenseName;
+                return licenses.Distinct().ToList();
+            }
+        }  
 
         public static void CreateLicense(LicenseTable license)
         {
