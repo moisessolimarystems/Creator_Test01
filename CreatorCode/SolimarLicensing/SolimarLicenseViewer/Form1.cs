@@ -578,8 +578,19 @@ namespace SolimarLicenseViewer
                 int majorVer = 0;
                 int minorVer = 0;
                 int buildVer = 0;
-                m_CommLink.GetVersionLicenseManager(ref majorVer, ref minorVer, ref buildVer);
-                string licMgrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                string licMgrVer = "";
+                try
+                {
+                    m_CommLink.GetVersionLicenseManager(ref majorVer, ref minorVer, ref buildVer);
+                    licMgrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                }
+                catch (COMException)
+                {
+                    majorVer = 0;
+                    minorVer = 0;
+                    buildVer = 0;
+                    licMgrVer = string.Format("Not Installed");
+                }
                 aboutBox.SetManagerVersion(licMgrVer);
                 aboutBox.SetManagerName(System.Environment.MachineName.ToLower());
 
