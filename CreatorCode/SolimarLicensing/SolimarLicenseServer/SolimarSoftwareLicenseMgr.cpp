@@ -457,13 +457,10 @@ HRESULT SoftwareLicenseMgr::WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wC
 		0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x63, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x76, 0x00, 0x32, 0x00, 0x00, 0x00
 	};
 	WMIHelper wmi((wchar_t*)wmiLocation_Byte);
-	hr = wmi.Connect();
-	if(SUCCEEDED(hr))
+	if(SUCCEEDED(wmi.Connect()))
 	{
-		hr = wmi.ExecuteQuery(_wQuery, rList);
-		if(SUCCEEDED(hr) && rList.size()>0)
+		if(SUCCEEDED(wmi.ExecuteQuery(_wQuery, rList)) && rList.size()>0)
 		{
-			hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC;	//reset to an error
 			for (unsigned int idx=0; idx<rList.size(); ++idx)
 			{
 				VARIANT* pvtTmp = &rList[idx][_wColumn];
@@ -487,13 +484,10 @@ HRESULT SoftwareLicenseMgr::WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wC
 		0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x5c, 0x00, 0x63, 0x00, 0x69, 0x00, 0x6d, 0x00, 0x76, 0x00, 0x32, 0x00, 0x00, 0x00
 	};
 	WMIHelper wmi((wchar_t*)wmiLocation_Byte);
-	hr = wmi.Connect();
-	if(SUCCEEDED(hr))
+	if(SUCCEEDED(wmi.Connect()))
 	{
-		hr = wmi.ExecuteQuery(_wQuery, rList);
-		if(SUCCEEDED(hr) && rList.size()>0)
+		if(SUCCEEDED(wmi.ExecuteQuery(_wQuery, rList)) && rList.size()>0)
 		{
-			hr = LicenseServerError::EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC;	//reset to an error
 			for (unsigned int idx=0; idx<rList.size(); ++idx)
 			{
 				VARIANT* pvtTmp = &rList[idx][_wColumn];
