@@ -25,18 +25,21 @@ unsigned char* FlateHelper::UnCompressStream(char* buf, long bufSize, long* outB
 
 	d_stream.next_out = outBuf;
 	d_stream.avail_out = *outBufSize;
-	err = inflate(&d_stream, Z_NO_FLUSH);
-	if (err != Z_STREAM_END) 
+	err = inflate(&d_stream, Z_FINISH);
+
+	//Success Case
+	if (err == Z_STREAM_END ||
+		(err == Z_OK && (*outBufSize == d_stream.total_out))	//CR.FIX.13625 - There is still more data in the buffer, buffer have already read all the data we care about.
+		)
 	{
-	  inflateEnd(&d_stream);
-	  delete[] outBuf;
-	  return NULL;
+		*outBufSize = d_stream.total_out;
+		inflateEnd(&d_stream);
+		return outBuf;
 	}
-
-	*outBufSize = d_stream.total_out;
-
+	//error case
 	inflateEnd(&d_stream);
-	return outBuf;
+	delete[] outBuf;
+	return NULL;
 }
 unsigned char* FlateHelper::CompressStream(char* origBuf, long origBufSize, long* pOutBufSize)
 {
