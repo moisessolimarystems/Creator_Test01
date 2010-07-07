@@ -109,6 +109,7 @@ namespace Client.Creator
             foreach (ToolStripItem tsm in items)
             {
                 tsm.Visible = false;
+                tsm.Enabled = false;
             }
         }
 
@@ -144,11 +145,12 @@ namespace Client.Creator
             //disable new order if at least two validation tokens do not exist    
             if (m_Permissions.pt_create_modify_key.Value)            
                 if (licData.IsActive)
-                    newProductLicenseMainToolStripMenuItem.Enabled = true;
+                        newProductLicenseMainToolStripMenuItem.Enabled = true;
         }
 
         private void EnableLicenseContextMenu(bool value)
         {
+            bool lockStatus = true;
             LicenseServerProperty licData = null;
             if (DetailTreeView.SelectedNode != null)
                 licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
@@ -157,30 +159,34 @@ namespace Client.Creator
             expandAllToolStripMenuItem.Visible = !DetailTreeView.SelectedNode.IsExpanded;
             expandAllToolStripMenuItem.Enabled = (DetailTreeView.SelectedNode.Nodes.Count == 0) ? false : true;
             collapseToolStripMenuItem.Visible = DetailTreeView.SelectedNode.IsExpanded;
+            collapseToolStripMenuItem.Enabled = DetailTreeView.SelectedNode.IsExpanded;
             //add license items
             newLicenseToolStripMenuItem.Visible = true;
             newLicenseToolStripMenuItem.Enabled = (DestNameComboBox.Items.Count > 2) && m_Permissions.pt_create_modify_key.Value;
             newProductLicenseToolStripMenuItem.Visible = true; 
-            newProductLicenseToolStripMenuItem.Enabled = false;
             lcmToolStripSeparator3.Visible = true;
             //find item
             findToolStripMenuItem.Visible = true;
+            findToolStripMenuItem.Enabled = true;
             //separator item
             lcmToolStripSeparator1.Visible = true;
             //generate license item
             createPacketFileToolStripMenuItem.Visible = true;
-            createPacketFileToolStripMenuItem.Enabled = false;
             validationTokensToolStripMenuItem.Visible = true;
-            validationTokensToolStripMenuItem.Enabled = false;
             //separator item
             lcmToolStripSeparator4.Visible = true;
             //also need to account for admin allowed extra new orders 
             if (licData != null)
             {
+                //call once b/c it contacts DB.
+                lockStatus = licData.LockStatus; 
                 if (m_Permissions.pt_create_modify_key.Value)
                 {
                     //license items
-                    deleteToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;              
+                    lockToolStripMenuItem.Visible = true;
+                    lockToolStripMenuItem.Enabled = (licData.UserLock.Length == 0); 
+                    unlockToolStripMenuItem.Visible = true;
+                    unlockToolStripMenuItem.Enabled = (licData.UserLock.Length > 0);            
                     //allow refresh if license is not expired or has validation tokens          
                     lcmToolStripSeparator2.Visible = true;
                     if (!licData.IsActive)
@@ -191,28 +197,31 @@ namespace Client.Creator
                     }
                     else
                     {
-                        deactivateToolStripMenuItem.Visible = true;                        
-                    }            
-                    newProductLicenseToolStripMenuItem.Enabled = licData.IsActive && m_Permissions.pt_create_modify_key.Value;
-                    validationTokensToolStripMenuItem.Enabled  = licData.IsActive && m_Permissions.pt_create_modify_key.Value;
-                    newTokenToolStripMenuItem.Enabled          = !licData.IsEnabled && m_Permissions.pt_create_modify_key.Value;
-                    clearToolStripMenuItem.Enabled             = licData.IsEnabled && !licData.HasActiveHardwareToken && m_Permissions.pt_create_modify_key.Value;
-                    markLostToolStripMenuItem.Enabled          = licData.HasActiveHardwareToken && m_Permissions.pt_create_modify_key.Value;
+                        deactivateToolStripMenuItem.Visible = true;
+                    }
+                    if (lockStatus)
+                    {
+                        deleteToolStripMenuItem.Enabled = true;
+                        newProductLicenseToolStripMenuItem.Enabled = licData.IsActive;
+                        validationTokensToolStripMenuItem.Enabled = licData.IsActive;
+                        newTokenToolStripMenuItem.Enabled = !licData.IsEnabled;
+                        clearToolStripMenuItem.Enabled = licData.IsEnabled && !licData.HasActiveHardwareToken;
+                        markLostToolStripMenuItem.Enabled = licData.HasActiveHardwareToken;
+                        deactivateToolStripMenuItem.Enabled = true;
+                        reactivateToolStripMenuItem.Enabled = true;
+                    }
                 }
                 if (licData.IsEnabled && m_Permissions.pt_version_pwd.Value)
                     createPacketFileToolStripMenuItem.Enabled = true;
-            }
-            deactivateToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;
-            reactivateToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;         
+            }      
         }
 
         private void EnableProductLicenseContextMenu()
         {
             expandAllToolStripMenuItem.Visible = !DetailTreeView.SelectedNode.IsExpanded;
             expandAllToolStripMenuItem.Enabled = (DetailTreeView.SelectedNode.Nodes.Count == 0) ? false : true;
-            collapseToolStripMenuItem.Visible = DetailTreeView.SelectedNode.IsExpanded;
+            collapseToolStripMenuItem.Enabled = collapseToolStripMenuItem.Visible = DetailTreeView.SelectedNode.IsExpanded;
             //allow deactivate if pl is not deactivated
-            deactivateToolStripMenuItem.Enabled = deleteToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;
             if (DetailTreeView.SelectedNode.Tag is ProductLicenseProperty)
             {
                 lcmToolStripSeparator1.Visible = true;
@@ -221,6 +230,8 @@ namespace Client.Creator
                     lsProperty = DetailTreeView.SelectedNode.Parent.Parent.Tag as LicenseServerProperty;
                 else
                     lsProperty = DetailTreeView.SelectedNode.Parent.Parent.Parent.Tag as LicenseServerProperty;
+                if(m_Permissions.pt_create_modify_key.Value)
+                    deactivateToolStripMenuItem.Enabled = deleteToolStripMenuItem.Enabled = lsProperty.LockStatus;
                 ProductLicenseProperty plProperty = DetailTreeView.SelectedNode.Tag as ProductLicenseProperty;
                 if (plProperty.IsActive && plProperty.Status != ProductLicenseState.AddOn)
                     deactivateToolStripMenuItem.Visible = true;
@@ -230,6 +241,7 @@ namespace Client.Creator
             }
             lcmToolStripSeparator3.Visible = true;
             findToolStripMenuItem.Visible = true;
+            findToolStripMenuItem.Enabled = true;
         }
 
         private void EnableDetailListView(bool value)
@@ -241,7 +253,7 @@ namespace Client.Creator
         //1) handle permissions
         //2) handle rights depending on current selected object
         private void EnableToolStripMenu(TreeNode node)
-        {
+        {            
             ResetMainToolStripMenu();
             printToolStripButton.Enabled = true;
             navigateBackToolStripButton.Enabled = true;
@@ -251,11 +263,15 @@ namespace Client.Creator
             SearchToolStripLabel.Enabled = true;
             if (node.Tag is LicenseServerProperty)
             {
-                addLicMainToolStripBtn.Enabled = m_Permissions.pt_create_modify_key.Value;
-                addProductLicenseMainToolStripDropDownBtn.Enabled = (node.Tag as LicenseServerProperty).IsActive && m_Permissions.pt_create_modify_key.Value;
-                createPacketMainToolStripBtn.Enabled = (node.Tag as LicenseServerProperty).IsActive && m_Permissions.pt_version_pwd.Value;
-                EnableLicenseMainToolStripDropDownMenuItems();
-                EnableProductLicenseMainToolStripDropDownMenuItems();
+                LicenseServerProperty lsp = node.Tag as LicenseServerProperty;
+                if (lsp.LockStatus)
+                {
+                    addLicMainToolStripBtn.Enabled = m_Permissions.pt_create_modify_key.Value;
+                    addProductLicenseMainToolStripDropDownBtn.Enabled = lsp.IsActive && m_Permissions.pt_create_modify_key.Value;
+                    createPacketMainToolStripBtn.Enabled = lsp.IsActive && m_Permissions.pt_version_pwd.Value;
+                    EnableLicenseMainToolStripDropDownMenuItems();
+                    EnableProductLicenseMainToolStripDropDownMenuItems();
+                }
             }          
         }
 
@@ -939,37 +955,48 @@ namespace Client.Creator
 
         private void LoadDetailTreeViewSelectedNode(TreeNode node)
         {
+            ProductLicenseProperty plp;
+            LicenseServerProperty lsp = null;
+            TreeNode lspNode = null;
             DetailPropertyGrid.Enabled = true;
             DetailSplitContainer.Panel1Collapsed = false;
             switch (node.Level)
             { 
                 case 1:            //level 1 - Product
-                    m_CurrentLicenseName = (node.Parent.Tag as LicenseServerProperty).Name;
+                    lspNode = node.Parent;
+                    lsp = lspNode.Tag as LicenseServerProperty;
+                    bool bLocked = lsp.LockStatus;
+                    m_CurrentLicenseName = lsp.Name;
                     DetailSplitContainer.Panel1Collapsed = true;                    
                     LoadProductNode(node);
                     break;
                 case 2:            //level 2 - Product License
                     LoadProductNode(node.Parent);
-                    ProductLicenseProperty plProperty = node.Tag as ProductLicenseProperty;
-                    LicenseServerProperty licProperty = node.Parent.Parent.Tag as LicenseServerProperty;
-                    m_CurrentLicenseName = licProperty.Name;
-                    if (!licProperty.IsActive || !plProperty.IsActive)
+                    lspNode = node.Parent.Parent;
+                    plp = node.Tag as ProductLicenseProperty;
+                    lsp = lspNode.Tag as LicenseServerProperty;
+                    m_CurrentLicenseName = lsp.Name;
+                    if (!lsp.IsActive || !plp.IsActive || !lsp.LockStatus)
                         DetailPropertyGrid.Enabled = false;
                     break;
                 case 3:            //level 3 - AddOn Product License
                     LoadProductNode(node.Parent.Parent);
-                    ProductLicenseProperty plAddOn = node.Tag as ProductLicenseProperty;
-                    LicenseServerProperty lsAddOn = node.Parent.Parent.Parent.Tag as LicenseServerProperty;
-                    m_CurrentLicenseName = lsAddOn.Name;
-                    if (!lsAddOn.IsActive || !plAddOn.IsActive)
+                    lspNode = node.Parent.Parent.Parent;
+                    plp = node.Tag as ProductLicenseProperty; //product license add-on
+                    lsp = lspNode.Tag as LicenseServerProperty; //license server add-on
+                    m_CurrentLicenseName = lsp.Name;
+                    if (!lsp.IsActive || !plp.IsActive || !lsp.LockStatus)
                         DetailPropertyGrid.Enabled = false;
                     break;
-                default:    //level 0 - Customer
+                default:    //level 0 - License Server
                     if (node.Tag is LicenseServerProperty)
                     {
                         LoadLicenseNode(node);
-                        m_CurrentLicenseName = (node.Tag as LicenseServerProperty).Name;
-                        if (!(node.Tag as LicenseServerProperty).IsActive)
+                        lspNode = node;
+                        lsp = lspNode.Tag as LicenseServerProperty;
+                        m_CurrentLicenseName = lsp.Name;
+                        //lock license server 
+                        if (!lsp.IsActive || !lsp.LockStatus)
                             DetailPropertyGrid.Enabled = false;
                     }
                     break;
@@ -982,8 +1009,11 @@ namespace Client.Creator
                 //major performance hit
                 SetLicenseServerState(node, false);
                 SetCurrentViewTabPages(node);
+                //Update the currently selected license server for lock status
+                lspNode.Text = (lsp.UserLock != "") ? lsp.Name + " - " + lsp.UserLock : lsp.Name;
             }
         }
+
         private void SetCurrentViewTabPages(TreeNode node)
         {
             if (!PropertyGridTabControl.TabPages.Contains(PropertyGridTabPage))
@@ -1040,7 +1070,6 @@ namespace Client.Creator
                     default:
                         break;
                 }
-                //SetLicenseServerState(e.Node, false);
             }
             DetailTreeView.EndUpdate();
         }
@@ -1164,7 +1193,6 @@ namespace Client.Creator
             {
                 ListViewItem item = DetailListView.GetItemAt(e.X, e.Y);
                 ResetContextMenu(DetailListViewContextMenuStrip.Items);
-                DisableContextMenu(DetailListViewContextMenuStrip.Items);
                 if (DetailPropertyGrid.SelectedObject is LicenseServerProperty)
                 {
                     if ((DetailPropertyGrid.SelectedObject as LicenseServerProperty).IsActive)
@@ -1211,8 +1239,9 @@ namespace Client.Creator
                         }
                     }
                 }
-                if (bShow)
-                    DetailListViewContextMenuStrip.Show(DetailListView, e.X, e.Y);
+                if(DetailPropertyGrid.Enabled) //if propertygrid isn't enabled, don't allow changes.
+                    if (bShow)
+                        DetailListViewContextMenuStrip.Show(DetailListView, e.X, e.Y);
             }
         }
         private void DetailListView_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -1567,7 +1596,8 @@ namespace Client.Creator
             {
                 verifyToolStripMenuItem.Visible = false;
                 updateToolStripMenuItem.Visible = true;
-                PacketContextMenuStrip.Show(packetDescriptionRichTextBox, e.X, e.Y);
+                if (DetailPropertyGrid.Enabled) //don't allow changes, if propertygrid is disabled                
+                    PacketContextMenuStrip.Show(packetDescriptionRichTextBox, e.X, e.Y);
             }
         }
         #endregion
@@ -1614,8 +1644,9 @@ namespace Client.Creator
                         }
                     }
                 }
-                if (bShow)
-                    PacketContextMenuStrip.Show(LicensePacketListView, e.X, e.Y);
+                if (DetailPropertyGrid.Enabled) //don't allow changes, if propertygrid is disabled                
+                    if (bShow)
+                        PacketContextMenuStrip.Show(LicensePacketListView, e.X, e.Y);
             }
         }
         private void LicensePacketListView_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -2039,18 +2070,11 @@ namespace Client.Creator
                 }
                 newLicense.CustID = (uint)custRec.SCRnumber;
                 DestinationNameTable dnt = client.GetDestinationID(_selectedLicenseCustomer.Id, DestNameComboBox.Text);
-                newLicense.DestName = dnt.DestName;
                 newLicense.DestID = (uint)dnt.DestID;
                 newLicense.GroupID = client.GetNextGroupID(newLicense.CustID, newLicense.DestID);
             });
             newLicense.Permissions = m_Permissions;
-            //display settings form for product connections
-            using (LicenseInfoForm dlg = new LicenseInfoForm("Create New License Server", ref s_CommLink))
-            {
-                LicenseDialogData data = new LicenseDialogData(newLicense);
-                if (dlg.ShowDialog(this, data) == DialogResult.OK)
-                    CreateLicenseNode(data);
-            }
+            CreateLicenseNode(newLicense);
         }
         private void CreateLicenseEntity(LicenseServerProperty licProperties)
         {
@@ -2066,7 +2090,7 @@ namespace Client.Creator
                 licRecord.SCRnumber = (int)licProperties.CustID;                
                 licRecord.LicenseName = licProperties.Name;
                 licRecord.IsActive = true;
-                licRecord.LicenseComments = licProperties.Comments;
+                licRecord.LicenseComments = "";
                 //need to add any validation tokens into licInfo.Stream
                 licRecord.LicenseInfo = licInfo.Stream;
                 client.CreateLicense(licRecord);
@@ -2098,11 +2122,11 @@ namespace Client.Creator
                 client.DeleteLicense(licRecord);
             });
         }
-        private void CreateLicenseNode(LicenseDialogData data)
+        private void CreateLicenseNode(LicenseServerProperty lsp)
         {
-            CreateLicenseEntity(data.LicInfo);
+            CreateLicenseEntity(lsp);
             //resort tree
-            LoadDBLicenses("", data.LicInfo.Name, data.LicInfo.DestName, false);
+            LoadDBLicenses("", lsp.Name, lsp.DestName, false);
         }
         private bool DeleteLicenseNode(TreeNode selectedLicenseNode, bool bVerify)
         {
@@ -2134,6 +2158,7 @@ namespace Client.Creator
             {
                 license = client.GetLicenseByName(licenseNode.Name, false);
                 licenseNode.Tag = new LicenseServerProperty(license, m_Permissions);
+                licenseNode.Text = (license.UserLock != null) ? license.LicenseName + " - " + license.UserLock : license.LicenseName;
                 if (license != null)
                     pltList = client.GetProductLicenses(license.LicenseName,false);
             });
@@ -2231,6 +2256,7 @@ namespace Client.Creator
         {
             DetailTreeView.BeginUpdate();
             DetailTreeView.Nodes.Clear();
+            //add each license server to tree view
             if (licRecords.Count > 0)
             {
                 TreeNode[] nodes = new TreeNode[licRecords.Count()];
@@ -2239,7 +2265,9 @@ namespace Client.Creator
                 foreach (var license in licRecords.OrderBy(d => d.DestinationID).ThenBy(g => g.GroupID))
                 {
                     TreeNode licNode = new TreeNode();
-                    licNode.Text = licNode.Name = license.LicenseName;
+                    licNode.Text = license.LicenseName;
+                    if (license.UserLock != null) licNode.Text += " - " + license.UserLock;
+                    licNode.Name = license.LicenseName;
                     licNode.ImageIndex = Enums.GetIconIndex("License");
                     licNode.SelectedImageIndex = licNode.ImageIndex;
                     if (!licNode.IsExpanded)
@@ -2250,6 +2278,7 @@ namespace Client.Creator
                 }
                 DetailTreeView.Nodes.AddRange(nodes);
             }
+            //configure layout depending on number of tree nodes
             if (DetailTreeView.Nodes.Count > 0)
             {
                 LicenseViewSplitContainer.Panel2Collapsed = false;
@@ -2284,7 +2313,11 @@ namespace Client.Creator
                 }
                 else
                     DetailTreeView.SelectedNode = DetailTreeView.Nodes[0];
+                //System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+                //watch.Start();
                 SetLicenseServerState(DetailTreeView.SelectedNode, true);
+                //watch.Stop();
+                //MessageBox.Show(string.Format("Elapsed: {0}\nIn milliseconds: {1}\nIn timer ticks: {2}", watch.Elapsed, watch.ElapsedMilliseconds, watch.ElapsedTicks), "INFORMATION", MessageBoxButtons.OK);
             }
             else
                 DetailPropertyGrid.SelectedObject = null;
@@ -2380,9 +2413,11 @@ namespace Client.Creator
             }
             LicenseServerProperty selectedLicense;
             IList<string> modifiedLicenses = null;
+            IList<string> enabledLicenses = null;
             Service<ICreator>.Use((client) =>
             {
                 modifiedLicenses = client.GetModifiedLicensesByCustomer(_selectedLicenseCustomer.Name);
+                enabledLicenses = client.GetEnabledLicensesByCustomer(_selectedLicenseCustomer.Name);
             });
             foreach (TreeNode node in DetailTreeView.Nodes)
             {
@@ -2412,10 +2447,13 @@ namespace Client.Creator
                                 node.ToolTipText = "Changes have been made to license. Generate license packet.";
                             }
                         }
-                        if (!(selectedLicense).IsEnabled) //disable key, not enough tokens
+                        if (enabledLicenses != null)
                         {
-                            node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDisabled");
-                            node.ToolTipText = "Not enough validation tokens are set. Add a new validation token to enable license.";
+                            if (!enabledLicenses.Contains(selectedLicense.Name))
+                            {
+                                node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDisabled");
+                                node.ToolTipText = "Not enough validation tokens are set. Add a new validation token to enable license.";
+                            }
                         }
                     }
                 }
@@ -2428,7 +2466,7 @@ namespace Client.Creator
         #region Validation Token Methods
         public void CreateValidationToken(LicenseServerProperty licInfo)
         {
-            using (LicenseInfoForm dlg = new LicenseInfoForm("Add Validation Tokens", ref s_CommLink))
+            using (LicenseInfoForm dlg = new LicenseInfoForm("New Validation Token(s) for " + licInfo.Name, ref s_CommLink))
             {
                 TokenDialogData data = new TokenDialogData(licInfo);
                 string HardwareTokenValue = "";
@@ -2465,7 +2503,7 @@ namespace Client.Creator
                                     dbToken = new TokenTable();
                                     dbToken.LicenseID = dbLicense.ID;
                                     dbToken.TokenType = (byte)token.tokenType.TVal;
-                                    dbToken.TokenValue = token.tokenValue.TVal;
+                                    dbToken.TokenValue = token.tokenValue.TVal;                                    
                                     dbToken.CustID = (int)data.LicInfo.CustID;
                                     client.CreateToken(dbToken);
                                 }
@@ -2634,7 +2672,7 @@ namespace Client.Creator
 
         #region Product License Methods
         private TreeNode CreateProductLicenseNode(ProductLicenseTable pltData)
-        {
+        {            
             pltData = CreateProductLicenseEntity(pltData);
             //add modules to db
             TreeNode plNode = new TreeNode(pltData.plID);
@@ -2655,6 +2693,7 @@ namespace Client.Creator
         }
         private ProductLicenseTable CreateProductLicenseEntity(ProductLicenseTable pltData)
         {
+            //pltRec already created and reserved. Retrieve and populate attributes
             ProductLicenseTable plRec = new ProductLicenseTable();
             Service<ICreator>.Use((client) =>
             {
@@ -2893,72 +2932,65 @@ namespace Client.Creator
         //}
 
         private void AddProductLicense()
-        {            
-            int plIndex = 0, licenseID = 0;
-            ProductLicenseTable plt = new ProductLicenseTable();
-            string licenseName = DetailTreeView.SelectedNode.Name;
-            Service<ICreator>.Use((client) =>
-            {
-                plIndex = client.GetNextProductLicenseIndex(licenseName);    
-                licenseID = client.GetLicenseByName(licenseName,false).ID;
-            });
-            plt.plIndex = plIndex;
-            plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(licenseName, plIndex);
-            plt.LicenseID = licenseID;
+        {
+            string licenseName = DetailTreeView.SelectedNode.Name;          
             //license file already created
             //display settings form for product connections
-            using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Product License", ref s_CommLink))
+            using (LicenseInfoForm dlg = new LicenseInfoForm("New Product License(s) for " + licenseName, ref s_CommLink))
             {
-                ProductLicenseDialogData data = new ProductLicenseDialogData(licenseName, plt);
+                ProductLicenseDialogData data = new ProductLicenseDialogData(licenseName);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    string productName = s_CommLink.GetProductName(data.ProductLicense.ProductID);
-                    if (!DetailTreeView.SelectedNode.IsExpanded) DetailTreeView.SelectedNode.Expand();
-                    TreeNode productNode = DetailTreeView.SelectedNode.Nodes.Find(productName, false).FirstOrDefault();                                                                   
-                    TreeNode plNode = CreateProductLicenseNode(data.ProductLicense);                        
-                    if (productNode == null)
+                    TreeNode plNode = null, productNode = null, productLicenseNode = null, parentProductLicenseNode = null;
+                    foreach (ProductLicenseTable plt in data.ProductLicense)
                     {
-                        productNode = CreateProductNode(plNode.Tag as ProductLicenseProperty);                        
-                        //add node in alpha order
-                        bool bAdded = false;
-                        if (DetailTreeView.SelectedNode.Nodes.Count > 0)
+                        ProductLicenseTable plTable = plt;
+                        string productName = s_CommLink.GetProductName(plTable.ProductID); 
+                        if (!DetailTreeView.SelectedNode.IsExpanded) DetailTreeView.SelectedNode.Expand();
+                        productNode = DetailTreeView.SelectedNode.Nodes.Find(productName, false).FirstOrDefault();
+                        plNode = CreateProductLicenseNode(plTable);                      
+                        if (productNode == null)
                         {
-                            foreach (TreeNode node in DetailTreeView.SelectedNode.Nodes)
+                            productNode = CreateProductNode(plNode.Tag as ProductLicenseProperty);
+                            //add node in alpha order
+                            bool bAdded = false;
+                            if (DetailTreeView.SelectedNode.Nodes.Count > 0)
                             {
-                                if (string.Compare(node.Text, productNode.Text) > 0)
+                                foreach (TreeNode node in DetailTreeView.SelectedNode.Nodes)
                                 {
-                                    DetailTreeView.SelectedNode.Nodes.Insert(node.Index, productNode);
-                                    bAdded = true;
-                                    break;
+                                    if (string.Compare(node.Text, productNode.Text) > 0)
+                                    {
+                                        DetailTreeView.SelectedNode.Nodes.Insert(node.Index, productNode);
+                                        bAdded = true;
+                                        break;
+                                    }
                                 }
                             }
+                            if (!bAdded)
+                                DetailTreeView.SelectedNode.Nodes.Add(productNode);
                         }
-                        if (!bAdded)
-                            DetailTreeView.SelectedNode.Nodes.Add(productNode);
-                    }
-                    else //attach to product tree
-                    {
-                        (productNode.Tag as ProductCollectionProperty).ProductCollection.Add(plNode.Tag as ProductLicenseProperty);
-                    }
-                    if (!productNode.IsExpanded) productNode.Expand();
-                    TreeNode productLicenseNode = productNode.Nodes.Find(data.ProductLicense.plID, true).FirstOrDefault();
-                    if (productLicenseNode == null)
-                    {
-                        if (data.ProductLicense.ParentProductLicenseID == null)
+                        else //attach to product tree
                         {
-                            productNode.Nodes.Add(plNode);
+                            (productNode.Tag as ProductCollectionProperty).ProductCollection.Add(plNode.Tag as ProductLicenseProperty);
+                        }
+                        if (!productNode.IsExpanded) productNode.Expand();
+                        productLicenseNode = productNode.Nodes.Find(plTable.plID, true).FirstOrDefault();
+                        if (productLicenseNode == null)
+                        {
+                            if ( plTable.ParentProductLicenseID == null)
+                                productNode.Nodes.Add(plNode);                            
+                            else
+                            {   //add to parent order node
+                                parentProductLicenseNode = DetailTreeView.SelectedNode.Nodes.Find(/*data.ProductLicense.ParentProductLicenseID*/ plTable.ParentProductLicenseID, true).FirstOrDefault();
+                                parentProductLicenseNode.Nodes.Add(plNode);
+                            }
                         }
                         else
-                        {   //add to parent order node
-                            TreeNode parentProductLicenseNode = DetailTreeView.SelectedNode.Nodes.Find(data.ProductLicense.ParentProductLicenseID, true).FirstOrDefault();
-                            parentProductLicenseNode.Nodes.Add(plNode);
+                        {
+                            if (plTable.ParentProductLicenseID != null && !productLicenseNode.Parent.IsExpanded)
+                                productLicenseNode.Parent.Expand();
+                            plNode = productLicenseNode;
                         }
-                    }
-                    else
-                    {
-                        if (data.ProductLicense.ParentProductLicenseID != null && !productLicenseNode.Parent.IsExpanded)                        
-                            productLicenseNode.Parent.Expand();
-                        plNode = productLicenseNode;
                     }
                     DetailTreeView.SelectedNode = plNode;
                     SetLicenseServerState(DetailTreeView.SelectedNode, true);
@@ -2974,7 +3006,7 @@ namespace Client.Creator
             if (!(m_selectedDirectory.Length > 0))
                 m_selectedDirectory = Directory.GetCurrentDirectory();
 
-            using (LicenseInfoForm dlg = new LicenseInfoForm("Create New Packet", ref s_CommLink))
+            using (LicenseInfoForm dlg = new LicenseInfoForm("Generate License Packet for " + DetailTreeView.SelectedNode.Name, ref s_CommLink))
             {
                 PacketDialogData data = new PacketDialogData(_selectedLicenseCustomer.Name, packetName, m_selectedDirectory);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
@@ -3591,7 +3623,7 @@ namespace Client.Creator
         private void LoadTransactionItems(string licenseName)
         {
             IList<PacketTable> packets = null;
-            IList<TransactionTable> transactions = null;
+            IList<TransactionTable> transactions = null, selectedTransactions = null;
             IList<ProductLicenseTable> productLicenses = null;
             ProductLicenseTable pl = null;
             string productLicenseName = "";
@@ -3627,25 +3659,26 @@ namespace Client.Creator
                     storageListView.Items.AddRange(lvItems);
                 }
                 packets = client.GetPacketsByLicenseName(licenseName).OrderByDescending(c => c.DateCreated).ToList();
+                transactions = client.GetTransactionsByLicenseName(licenseName);
                 foreach (var packet in packets)
                 {
-                    transactions = client.GetTransactionsByPacketID(packet.ID).OrderByDescending(c => c.taDateCreated).ToList(); ;
-                    if (transactions.Count > 0)
+                    selectedTransactions = transactions.Where(t => t.taPacketID == packet.ID).OrderByDescending(c => c.taDateCreated).ToList();
+                    if (selectedTransactions.Count > 0)
                     {
-                        lvItems = new ListViewItem[transactions.Count];
-                        for (index = 0; index < transactions.Count; index++)
+                        lvItems = new ListViewItem[selectedTransactions.Count];
+                        for (index = 0; index < selectedTransactions.Count; index++)
                         {
-                            pl = productLicenses.Where(c => c.ID == transactions[index].taOrderID).FirstOrDefault();
+                            pl = productLicenses.Where(c => c.ID == selectedTransactions[index].taOrderID).FirstOrDefault();
                             productLicenseName = (pl != null) ? pl.plID : "";
                             ListViewItem item = new ListViewItem();
-                            item.Tag = transactions[index];
-                            item.Text = transactions[index].taDateCreated.ToString();
-                            item.SubItems.Add(Enum.GetName(typeof(TransactionType), transactions[index].taType));
-                            item.SubItems.Add(transactions[index].taDescription);
-                            item.SubItems.Add(transactions[index].taUnits);
-                            item.SubItems.Add(transactions[index].taPreviousValue);
+                            item.Tag = selectedTransactions[index];
+                            item.Text = selectedTransactions[index].taDateCreated.ToString();
+                            item.SubItems.Add(Enum.GetName(typeof(TransactionType), selectedTransactions[index].taType));
+                            item.SubItems.Add(selectedTransactions[index].taDescription);
+                            item.SubItems.Add(selectedTransactions[index].taUnits);
+                            item.SubItems.Add(selectedTransactions[index].taPreviousValue);
                             item.SubItems.Add(productLicenseName);
-                            item.SubItems.Add(transactions[index].taUser);
+                            item.SubItems.Add(selectedTransactions[index].taUser);
                             item.SubItems.Add(packet.PacketName);
                             lvItems[index] = item;
                         }
@@ -3999,9 +4032,7 @@ namespace Client.Creator
         private void OnDBLicensesRetrieved(IList<LicenseTable> data, string selectedName)
         {
             if (data != null)
-            {
                 LoadLicenseView(data, selectedName);
-            }
             if (searchToolStripTextBox.ForeColor == SystemColors.InactiveCaptionText)
                 searchToolStripTextBox.Text = "License Server Filter";
             loadingCircle1.Active = false;
@@ -4125,7 +4156,7 @@ namespace Client.Creator
             bool bFound = false;
             string[] findStringArray;
             findStringArray = findString.Split("-".ToCharArray());
-            //valid search string
+            //valid search string LS = 3, PL = 4
             if (findStringArray.Count() == 3 || findStringArray.Count() == 4)
             {
                 TreeNode findNode = null;
@@ -4162,6 +4193,29 @@ namespace Client.Creator
             if (!bFound)
             {
                 MessageBox.Show("Failed to find " + findToolStripTextBox.Text, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void unlockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //unlocks license server
+            LicenseServerProperty selectedNode = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
+            if (selectedNode != null)
+            {
+                selectedNode.LockStatus = false;
+                DetailTreeView.SelectedNode.Text = DetailTreeView.SelectedNode.Name;
+            }
+        }
+
+        private void lockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //locks license server, adds user who is locking
+            LicenseServerProperty selectedNode = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
+            if (selectedNode != null)
+            {
+                selectedNode.LockStatus = true;
+                DetailTreeView.SelectedNode.Text += " - " + WindowsIdentity.GetCurrent().Name;
+                //rename 
             }
         }
 
