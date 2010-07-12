@@ -7,6 +7,7 @@ using Solimar.Licensing.Attribs;
 using System.Reflection;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
+using System.Security.Principal;
 
 namespace Client.Creator
 {
@@ -20,6 +21,7 @@ namespace Client.Creator
         string                                    _comments;
         PermissionsTable                          _permissions;
         bool                                      _isActive;
+        string                                    _userLock;
 
         #endregion
 
@@ -30,7 +32,7 @@ namespace Client.Creator
         /// </summary>
         public LicenseServerProperty()
         {
-            _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
+            _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();            
         }
 
         /// <summary>
@@ -49,12 +51,6 @@ namespace Client.Creator
             _isActive = license.IsActive;
             _comments = license.LicenseComments;
             Permissions = permissions;
-            Service<ICreator>.Use((client) => 
-            {
-                DestinationNameTable dest = client.GetDestinationName((int)CustID, (int)DestID);
-                if(dest != null)
-                    _destinationName = dest.DestName;
-            });
         }
         #endregion
 
@@ -136,6 +132,53 @@ namespace Client.Creator
                         bEnabled = false;
                 });
                 return bEnabled;
+            }
+        }
+
+        /// <summary>
+        /// Gets the enabled status for the license server. Enabled if valid tokens have been set for the license server.
+        /// </summary>
+        [Browsable(false)]
+        public string UserLock
+        {
+            get 
+            {
+                if (_userLock == null)
+                    return "";
+                return _userLock;
+            }
+        }
+
+        /// <summary>
+        /// Gets the enabled status for the license server. Enabled if valid tokens have been set for the license server.
+        /// </summary>
+        [Browsable(false)]
+        public bool LockStatus
+        {
+            get
+            {
+                bool bLocked = true;
+                Service<ICreator>.Use((client) =>
+                {
+                    LicenseTable lt = client.GetLicenseByName(Name, false);
+                    if (lt != null)
+                    {
+                        _userLock = lt.UserLock;
+                        if ((lt.UserLock == null) || (lt.UserLock.ToLower() != WindowsIdentity.GetCurrent().Name.ToLower()))
+                            bLocked = false;
+                    }
+                });
+                return bLocked;
+            }
+            set
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    LicenseTable lt = client.GetLicenseByName(Name, false);
+                    if (lt != null)
+                        lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name : null;                    
+                    client.UpdateLicense(lt, false);
+                });
             }
         }
 
@@ -237,7 +280,12 @@ namespace Client.Creator
         [Browsable(false)]
         public string Comments
         {
-            get { return _comments; }
+            get 
+            {
+                if (_comments == null)
+                    return "";
+                return _comments; 
+            }
             set
             {
                 if (_comments != value)
@@ -282,8 +330,16 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string DestName
         {
-            get { return _destinationName; }
-            set { _destinationName = value; }
+            get 
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    DestinationNameTable dest = client.GetDestinationName((int)CustID, (int)DestID);
+                    if (dest != null)
+                        _destinationName = dest.DestName;
+                });
+                return _destinationName; 
+            }
         }
 
         /// <summary>
