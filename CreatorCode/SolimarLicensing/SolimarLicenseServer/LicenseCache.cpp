@@ -73,22 +73,28 @@ HRESULT LicenseCacheByProduct::GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoA
 		licenseToModUseListIt != licenseToModUseList.end();
 		licenseToModUseListIt++)
 	{
+		std::wstring appInstance = (licenseToAppInstList.find(licenseToModUseListIt->first) != licenseToAppInstList.end()) ? std::wstring(licenseToAppInstList[licenseToModUseListIt->first]) : std::wstring(L"[UNKNOWN] - ") + std::wstring(licenseToModUseListIt->first);
+
+		// Find the AppInstance for the License
+		usAppInIt = pProdUsageInfo->appInstanceList->begin();
 		while(usAppInIt != pProdUsageInfo->appInstanceList->end())
 		{
-			if(_wcsicmp(licenseToAppInstList[licenseToModUseListIt->first], std::wstring(usAppInIt->applicationInstance).c_str()) == 0)
+			if(_wcsicmp(appInstance.c_str(), std::wstring(usAppInIt->applicationInstance).c_str()) == 0)
 				break;
 			usAppInIt++;
 		}
 
-		if(usAppInIt == pProdUsageInfo->appInstanceList->end())	//Object not found, add
+		//Object not found, add a new one
+		if(usAppInIt == pProdUsageInfo->appInstanceList->end())	
 		{
 			Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInInfo;
-			usAppInInfo.applicationInstance = std::wstring(licenseToAppInstList[licenseToModUseListIt->first]);
+			usAppInInfo.applicationInstance = appInstance;
 			pProdUsageInfo->appInstanceList->push_back(usAppInInfo);
 			usAppInIt = pProdUsageInfo->appInstanceList->end();
 			usAppInIt--;
 		}
-
+		
+		// Add inuse modules
 		for(ModuleLicenseMap::iterator modUseListIt = licenseToModUseListIt->second.begin();
 			modUseListIt != licenseToModUseListIt->second.end();
 			modUseListIt++)
@@ -111,8 +117,6 @@ HRESULT LicenseCacheByProduct::GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoA
 			}
 			modIt->moduleUsage = int(modIt->moduleUsage) + int(modUseListIt->second);
 		}
-		
-
 	}
 	return hr;
 }
@@ -323,6 +327,9 @@ HRESULT LicenseCacheByProduct::RemoveApplicationInstance(BSTR licenseID, BSTR ap
 		{
 			ModuleLicenseReleaseByApp(licenseID, modMapIt->first, modMapIt->second);
 		}
+
+		// CR.13274v1 - Remove LicenseID from list.
+		licenseToModUseList.erase(licToModListIt);
 	}
 
 	//Remove licenseID from licenseToAppInstList...
