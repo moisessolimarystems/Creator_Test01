@@ -710,7 +710,7 @@ namespace Client.Creator
             bool bRetVal = false;
             Service<ICreator>.Use((client) =>
             {
-                TokenTable tt = client.GetTokenByLicenseName(_licenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                TokenTable tt = client.GetTokenByLicenseName(LicenseServer, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
                 if (tt != null)
                     bRetVal = true;
             });
@@ -1135,7 +1135,7 @@ namespace Client.Creator
             {
                 return "";
             }
-            return (value as DateTime?).Value.ToShortDateString();
+            return (value as DateTime?).Value.ToLongDateString();
         }
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
