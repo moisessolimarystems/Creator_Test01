@@ -157,12 +157,6 @@
     <Compile Include="ProductConfigurationDialog.designer.cs">
       <DependentUpon>ProductConfigurationDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProductLicenseSelectionForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ProductLicenseSelectionForm.Designer.cs">
-      <DependentUpon>ProductLicenseSelectionForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="PacketVerification.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -194,9 +188,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ProductConfigurationDialog.resx">
       <DependentUpon>ProductConfigurationDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ProductLicenseSelectionForm.resx">
-      <DependentUpon>ProductLicenseSelectionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PacketVerification.resx">
       <DependentUpon>PacketVerification.cs</DependentUpon>

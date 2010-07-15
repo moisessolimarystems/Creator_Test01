@@ -458,7 +458,7 @@ namespace Client.Creator
         private void softwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
-            TokenDescriptionLabel.Text = string.Format("Please browse to the lsData file containing {0} validation tokens.", selectedOrder.DestName);
+            TokenDescriptionLabel.Text = string.Format("Please browse to the csv file containing {0} validation tokens.", selectedOrder.DestName);
             browseTokenFileButton.Visible = true;
             tokenListView.Items.Clear();
             btnOk.Enabled = false;
@@ -652,7 +652,6 @@ namespace Client.Creator
         private void productLicenseDescriptionTextBox_TextChanged(object sender, EventArgs e)
         {
             notesCharactersLeftLabel.Text = string.Format("{0} Characters Left(Limit is 255 characters)", 255 - productLicenseDescriptionTextBox.Text.Length);
-
         }
         #endregion
     }

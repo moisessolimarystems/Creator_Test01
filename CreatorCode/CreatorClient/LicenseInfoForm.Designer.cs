@@ -177,6 +177,7 @@
             // tokenAttribsSplitContainer
             // 
             this.tokenAttribsSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tokenAttribsSplitContainer.IsSplitterFixed = true;
             this.tokenAttribsSplitContainer.Location = new System.Drawing.Point(0, 0);
             this.tokenAttribsSplitContainer.Name = "tokenAttribsSplitContainer";
             this.tokenAttribsSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -236,10 +237,10 @@
             this.tokenListView.FullRowSelect = true;
             this.tokenListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.tokenListView.HideSelection = false;
-            this.tokenListView.Location = new System.Drawing.Point(19, 35);
+            this.tokenListView.Location = new System.Drawing.Point(19, 46);
             this.tokenListView.Margin = new System.Windows.Forms.Padding(40, 5, 5, 5);
             this.tokenListView.Name = "tokenListView";
-            this.tokenListView.Size = new System.Drawing.Size(375, 95);
+            this.tokenListView.Size = new System.Drawing.Size(375, 84);
             this.tokenListView.TabIndex = 14;
             this.tokenListView.UseCompatibleStateImageBehavior = false;
             this.tokenListView.View = System.Windows.Forms.View.Details;
@@ -256,12 +257,11 @@
             // 
             // TokenDescriptionLabel
             // 
-            this.TokenDescriptionLabel.AutoSize = true;
             this.TokenDescriptionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TokenDescriptionLabel.Location = new System.Drawing.Point(16, 19);
             this.TokenDescriptionLabel.Margin = new System.Windows.Forms.Padding(40, 3, 3, 0);
             this.TokenDescriptionLabel.Name = "TokenDescriptionLabel";
-            this.TokenDescriptionLabel.Size = new System.Drawing.Size(31, 13);
+            this.TokenDescriptionLabel.Size = new System.Drawing.Size(378, 30);
             this.TokenDescriptionLabel.TabIndex = 13;
             this.TokenDescriptionLabel.Text = "[Edit]";
             // 
@@ -377,11 +377,12 @@
             // 
             // packetDescriptTextBox
             // 
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(21, 25);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(21, 21);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(40, 5, 5, 5);
+            this.packetDescriptTextBox.MaxLength = 255;
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(360, 63);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(360, 67);
             this.packetDescriptTextBox.TabIndex = 7;
             this.packetDescriptTextBox.TextChanged += new System.EventHandler(this.packetDescriptTextBox_TextChanged);
             // 
@@ -618,6 +619,7 @@
             // 
             this.productLicenseDescriptionTextBox.Location = new System.Drawing.Point(25, 19);
             this.productLicenseDescriptionTextBox.Margin = new System.Windows.Forms.Padding(40, 3, 40, 3);
+            this.productLicenseDescriptionTextBox.MaxLength = 255;
             this.productLicenseDescriptionTextBox.Multiline = true;
             this.productLicenseDescriptionTextBox.Name = "productLicenseDescriptionTextBox";
             this.productLicenseDescriptionTextBox.Size = new System.Drawing.Size(360, 49);
@@ -901,7 +903,6 @@
             this.tokenAttribsSplitContainer.Panel2.ResumeLayout(false);
             this.tokenAttribsSplitContainer.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.PacketTabPage.ResumeLayout(false);
