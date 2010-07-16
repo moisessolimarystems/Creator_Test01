@@ -13,8 +13,11 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                var licenses = db.LicenseTables.Where(conditionStrings).ToList();                
-                
+                DataLoadOptions dlo = new DataLoadOptions();
+                dlo.LoadWith<LicenseTable>(id => id.PacketTables);
+                dlo.LoadWith<LicenseTable>(id => id.TokenTables);
+                db.LoadOptions = dlo;
+                var licenses = db.LicenseTables.Where(conditionStrings).ToList();                                
                 return licenses;
             }
         }
