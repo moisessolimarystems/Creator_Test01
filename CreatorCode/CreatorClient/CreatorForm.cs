@@ -113,14 +113,6 @@ namespace Client.Creator
             }
         }
 
-        private void DisableContextMenu(ToolStripItemCollection items)
-        {
-            foreach (ToolStripItem tsm in items)
-            {
-                tsm.Enabled = false;                
-            }
-        }
-
         private void ResetMainToolStripMenu()
         {
             foreach (ToolStripItem tsm in MainToolStrip.Items)
@@ -128,31 +120,8 @@ namespace Client.Creator
                 if(!(tsm.Tag is ToolStripSeparator))
                     tsm.Enabled = false;
             }            
-            //DisableContextMenu(addLicMainToolStripBtn.DropDownItems);
-            //DisableContextMenu(addProductLicenseMainToolStripDropDownBtn.DropDownItems);
             printToolStripButton.Enabled = true; //print button always available
         }
-
-        // private void EnableLicenseMainToolStripDropDownMenuItems()
-        //{
-        //    //if (DetailTreeView.SelectedNode.Tag is LicenseServerProperty)
-        //     if(DetailPropertyGrid.SelectedObject != null)                             
-        //        if(DetailPropertyGrid.SelectedObject is LicenseServerProperty)
-        //            newStandardLicenseToolStripMenuItem.Enabled = m_Permissions.pt_create_modify_key.Value;            
-        //}
-
-        //private void EnableProductLicenseMainToolStripDropDownMenuItems()
-        //{
-        //    if (DetailPropertyGrid.SelectedObject != null)
-        //    {
-        //        //LicenseServerProperty licData = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
-        //        LicenseServerProperty licData = DetailPropertyGrid.SelectedObject as LicenseServerProperty;
-        //        //disable new order if at least two validation tokens do not exist    
-        //        if (m_Permissions.pt_create_modify_key.Value)
-        //            if (licData.IsActive)
-        //                newProductLicenseMainToolStripMenuItem.Enabled = true;
-        //    }
-        //}
 
         //CONTACT DB : 4
         private void EnableLicenseContextMenu(bool value)
@@ -191,10 +160,10 @@ namespace Client.Creator
                 if (m_Permissions.pt_extension_pwd.Value && m_Permissions.pt_version_pwd.Value)
                 {
                     //license items
-                    lockToolStripMenuItem.Visible = true;
-                    lockToolStripMenuItem.Enabled = (licData.UserLock.Length == 0);
-                    unlockToolStripMenuItem.Visible = true;
-                    unlockToolStripMenuItem.Enabled = (licData.UserLock.Length > 0);
+                    checkOutToolStripMenuItem.Visible = true;
+                    checkOutToolStripMenuItem.Enabled = (licData.UserLock.Length == 0);
+                    checkInToolStripMenuItem.Visible = true;
+                    checkInToolStripMenuItem.Enabled = (licData.UserLock.Length > 0);
                     //allow refresh if license is not expired or has validation tokens          
                     lcmToolStripSeparator2.Visible = true;    
                 }
@@ -280,8 +249,6 @@ namespace Client.Creator
                 {                    
                     addProductLicenseMainToolStripDropDownBtn.Enabled = lsp.IsActive && m_Permissions.pt_create_modify_key.Value;
                     createPacketMainToolStripBtn.Enabled = lsp.IsActive && m_Permissions.pt_version_pwd.Value;
-                    //EnableLicenseMainToolStripDropDownMenuItems();
-                    //EnableProductLicenseMainToolStripDropDownMenuItems();
                 }
             }          
         }
@@ -4171,7 +4138,6 @@ namespace Client.Creator
             SetLicenseServerState(DetailTreeView.SelectedNode, false);
         }
         #endregion
-
         
         private void cloneToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -4180,54 +4146,7 @@ namespace Client.Creator
             //launch pl dialog? disallow modification
         }
 
-        private void findSearchString(string findString)
-        {
-            //determine if the string is a license server or product license
-            //
-            bool bFound = false;
-            string[] findStringArray;
-            findStringArray = findString.Split("-".ToCharArray());
-            //valid search string LS = 3, PL = 4
-            if (findStringArray.Count() == 3 || findStringArray.Count() == 4)
-            {
-                TreeNode findNode = null;
-                if (findStringArray.Count() == 3)
-                {
-                    findNode = DetailTreeView.Nodes.Find(findString, false).FirstOrDefault();
-                    if (findNode != null)
-                    {
-                        DetailTreeView.SelectedNode = findNode;
-                        bFound = true;
-                    }
-                }
-                else
-                {
-                    ProductLicenseTable plt = null;
-                    //pull from database 
-                    Service<ICreator>.Use((client) =>
-                    {
-                        plt = client.GetProductLicense(findToolStripTextBox.Text);
-                    });
-                    if (plt != null)
-                    {
-                        findNode = DetailTreeView.Nodes.Find(findString.Substring(0, findString.LastIndexOf("-")), false).FirstOrDefault();
-                        findNode.ExpandAll();
-                        findNode = findNode.Nodes.Find(findString, true).FirstOrDefault();
-                        if (findNode != null)
-                        {
-                            DetailTreeView.SelectedNode = findNode;
-                            bFound = true;
-                        }
-                    }
-                }
-            }
-            if (!bFound)
-            {
-                MessageBox.Show("Failed to find " + findToolStripTextBox.Text, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void unlockToolStripMenuItem_Click(object sender, EventArgs e)
+        private void checkInToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //unlocks license server
             LicenseServerProperty selectedNode = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
@@ -4241,7 +4160,7 @@ namespace Client.Creator
             }
         }
 
-        private void lockToolStripMenuItem_Click(object sender, EventArgs e)
+        private void checkOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //locks license server, adds user who is locking
             LicenseServerProperty selectedNode = DetailTreeView.SelectedNode.Tag as LicenseServerProperty;
@@ -4659,6 +4578,33 @@ namespace Client.Creator
             }
         }
 
+        private void printToolStripButton_Click(object sender, EventArgs e)
+        {
+            CaptureScreen();
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CaptureScreen();
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
+        }
+
+        private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            softwareTokenPreferencesToolStripMenuItem.Enabled = false;
+            updateVersionsToolStripMenuItem.Enabled = false;
+            if (m_Permissions != null)
+            {
+                if (m_Permissions.pt_permanent_pwd.HasValue)
+                    softwareTokenPreferencesToolStripMenuItem.Enabled = m_Permissions.pt_permanent_pwd.Value;
+                if (m_Permissions.pt_version_pwd.HasValue)
+                    updateVersionsToolStripMenuItem.Enabled = m_Permissions.pt_version_pwd.Value;
+            }
+        }
+
         private void SetModuleState(ProductLicenseProperty plp, ListViewItem lvItem)
         {
             ModuleProperty module = lvItem.Tag as ModuleProperty;
@@ -4690,6 +4636,52 @@ namespace Client.Creator
             memoryGraphics.CopyFromScreen(this.Location.X, this.Location.Y, 0, 0, s);
         }
 
+        private void findSearchString(string findString)
+        {
+            //determine if the string is a license server or product license
+            //
+            bool bFound = false;
+            string[] findStringArray;
+            findStringArray = findString.Split("-".ToCharArray());
+            //valid search string LS = 3, PL = 4
+            if (findStringArray.Count() == 3 || findStringArray.Count() == 4)
+            {
+                TreeNode findNode = null;
+                if (findStringArray.Count() == 3)
+                {
+                    findNode = DetailTreeView.Nodes.Find(findString, false).FirstOrDefault();
+                    if (findNode != null)
+                    {
+                        DetailTreeView.SelectedNode = findNode;
+                        bFound = true;
+                    }
+                }
+                else
+                {
+                    ProductLicenseTable plt = null;
+                    //pull from database 
+                    Service<ICreator>.Use((client) =>
+                    {
+                        plt = client.GetProductLicense(findToolStripTextBox.Text);
+                    });
+                    if (plt != null)
+                    {
+                        findNode = DetailTreeView.Nodes.Find(findString.Substring(0, findString.LastIndexOf("-")), false).FirstOrDefault();
+                        findNode.ExpandAll();
+                        findNode = findNode.Nodes.Find(findString, true).FirstOrDefault();
+                        if (findNode != null)
+                        {
+                            DetailTreeView.SelectedNode = findNode;
+                            bFound = true;
+                        }
+                    }
+                }
+            }
+            if (!bFound)
+            {
+                MessageBox.Show("Failed to find " + findToolStripTextBox.Text, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private void printDocument1_PrintPage(System.Object sender,
                System.Drawing.Printing.PrintPageEventArgs e)
         {
@@ -4711,40 +4703,6 @@ namespace Client.Creator
             System.Drawing.Rectangle destRect = new System.Drawing.Rectangle(x, y, width, height);
             e.Graphics.DrawImage(memoryImage, destRect, 0, 0, memoryImage.Width, memoryImage.Height, System.Drawing.GraphicsUnit.Pixel);
         }
-
-        private void printToolStripButton_Click(object sender, EventArgs e)
-        { 
-            CaptureScreen();
-            if (printDialog1.ShowDialog() == DialogResult.OK)
-                printDocument1.Print();
-        }
-
-        private void printToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            CaptureScreen();
-            if (printDialog1.ShowDialog() == DialogResult.OK)
-                printDocument1.Print();
-        }
-
-        private void toolsToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
-        {
-            softwareTokenPreferencesToolStripMenuItem.Enabled = false;
-            updateVersionsToolStripMenuItem.Enabled = false;
-            if (m_Permissions != null)
-            {
-                if (m_Permissions.pt_permanent_pwd.HasValue)
-                    softwareTokenPreferencesToolStripMenuItem.Enabled = m_Permissions.pt_permanent_pwd.Value;
-                if (m_Permissions.pt_version_pwd.HasValue)
-                    updateVersionsToolStripMenuItem.Enabled = m_Permissions.pt_version_pwd.Value;
-            }
-        }
-
-
-
-
-
-
-
 
     }
 }
