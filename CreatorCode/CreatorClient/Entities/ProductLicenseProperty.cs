@@ -333,6 +333,7 @@ namespace Client.Creator
                         }
                         if (errorMsg.Length == 0)
                         {
+                            _plRec.plState = (byte)value;
                             if (value == ProductLicenseState.Licensed)
                             {
                                 if (!(ProductName.Contains("Test")) && HasHardwareToken() && ParentID == null)
@@ -340,8 +341,7 @@ namespace Client.Creator
                                         ExpirationDate = null;
                             }
                             else
-                                ExpirationDate = CurrentExpirationDate.AddDays(30);
-                            _plRec.plState = (byte)value;
+                                ExpirationDate = CurrentExpirationDate.AddDays(30);                            
                             Service<ICreator>.Use((client) =>
                             {
                                 ProductLicenseTable plt = client.GetProductLicense(ID);
@@ -390,7 +390,7 @@ namespace Client.Creator
                         !value.HasValue && !HasHardwareToken())
                         errorMsg = "Can't remove expiration date for non-hardware token validation.";
                     if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
-                        errorMsg = "Please set a valid expiration date";
+                        errorMsg = "Please set a valid expiration date.";
                     if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
                         errorMsg = string.Format("{0} exceeds the expiration date limit of 18 months.", value.Value);
                     if (errorMsg.Length == 0)
@@ -483,6 +483,7 @@ namespace Client.Creator
                 }
             }
         }
+
         [Category("Product License Activations"), PropertyOrder(2)]
         [TypeConverter(typeof(ByteConverter))]
         [DisplayName("Amount In Days")]
@@ -547,8 +548,7 @@ namespace Client.Creator
             get
             {
                 if (_plRec.Description.Contains("|"))
-                {
-                    //split return first half
+                {                    //split return first half
                     string[] notes = _plRec.Description.Split("|".ToCharArray());
                     return notes[0];
                 }
@@ -575,6 +575,7 @@ namespace Client.Creator
                 });
             }
         }
+
         [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         [Category("Product License Notes"), PropertyOrder(2)]
         [DisplayName("Additional Notes")]
