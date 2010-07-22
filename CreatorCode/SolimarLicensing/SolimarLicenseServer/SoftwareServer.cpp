@@ -286,12 +286,12 @@ OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Caught une
 }
 
 
-//HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
-//{
-////OutputDebugString(L"SoftwareServer::ValidateLicense()");
-//	SafeMutex mutex(SoftwareLicenseLock);
-//	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
-//}
+HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
+{
+//OutputDebugString(L"SoftwareServer::ValidateLicense()");
+	SafeMutex mutex(SoftwareLicenseLock);
+	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
+}
 HRESULT SoftwareServer::ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount)
 {
 	SafeMutex mutex(SoftwareLicenseLock);

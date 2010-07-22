@@ -6,13 +6,19 @@
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
 
+/// <summary>Software Licensing, Cache used to track licensing total/usage on a product level</summary>
 class LicenseCacheByProduct
 {
 	public:
 		LicenseCacheByProduct();
 		~LicenseCacheByProduct();
 
+		//
+		// Summary:
+		//   Summary of GetCache
 		HRESULT GetCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
+
+		/// <summary>Populates an usage object</summary>
 		HRESULT GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs* pProdUsageInfo);
 
 		// bLicSvrClockViolation is true when the current system time is before the last touch time, user has set their system clock backwards in time.
@@ -20,20 +26,27 @@ class LicenseCacheByProduct
 		HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pSoftwareSpec);
 		HRESULT ClearCache_Totals();
 
-		//LicenseCacheByProduct(int productID);
-
-		//int GetProductID() {return m_productID;}
+		//
+		// Summary: 
+		//   Add the licenseID and applicationInstance to the LicenseCacheByProduct.
+		//   Returns FAILED(hr) if not licensed for enough applicatinInstances.
 		HRESULT AddApplicationInstance(BSTR licenseID, BSTR applicationInstance);
 
-		//Side Effect: will free all the licenses obtained to the licenseID.
+		// Side Effect: will free all the licenses obtained to the licenseID.
 		HRESULT RemoveApplicationInstance(BSTR licenseID, BSTR applicationInstance);
+
+		// Summary:
+		//   Populates a list of string that are all Application Instances that have modules obtained
+		//   Params: BSTR* pBstrListAppInstStream - streamed value of Lic_StringListAttribs
 		HRESULT GetApplicationInstanceList(BSTR licenseID, BSTR *pBstrListAppInstStream);
 
 		HRESULT ModuleLicenseTotalForAll(long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long moduleIdent, long* pLicenseCount);
 
+		// Ensures that the InUse for modules are less than Total count for entire product regardless of licenseID
+		HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+
 		//Results based on the licenseID.
-		//HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseObtainByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseReleaseByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseDecrementCounterByApp(BSTR licenseID, long moduleIdent, long licenseCount);
@@ -52,7 +65,7 @@ class LicenseCacheByProduct
 		int productMajorVersion;
 		int productMinorVersion;
 
-		typedef std::map<long, long> ModuleLicenseMap;
+		typedef std::map<long, long> ModuleLicenseMap;										// map<long[[modID], long[modInUse]>>
 		typedef std::list<_bstr_t> ApplicationList;                                // list of application names
 		typedef std::map<unsigned int, ApplicationList> ModuleApplicationUseList;	// map of modules and which application instances are associated
 		typedef std::map<_bstr_t, _bstr_t> LicenseToApplicationInstanceList;			// maps license identifier guid to application instance names
@@ -80,6 +93,8 @@ class LicenseCacheByProduct
 		HANDLE licenseUseCacheByProductLock;
 };
 
+
+/// <summary>Software Licensing, Cache used to track licensing total/usage for all products</summary>
 class LicenseCache
 {
 	public:
@@ -106,8 +121,10 @@ class LicenseCache
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long productID, long moduleIdent, long* pLicenseCount);
 
+		//Ensures that the InUse for modules are less than Total count for entire product regardless of licenseID
+		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+
 		//Results based on the licenseID.
-		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseInUseByApp(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseByLicenseID(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseObtainByApp(long productID, BSTR licenseID, long moduleIdent, long licenseCount);

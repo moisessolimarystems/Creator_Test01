@@ -96,6 +96,7 @@ CSolimarLicenseMgr::SoftwareLicenseInfo::SoftwareLicenseInfo(const SoftwareLicen
 
 CSolimarLicenseMgr::ServerInfo::ServerInfo() :
 	LicenseServer(NULL),
+	bValidLicensing(false),
 	bUseSoftwareLicensing(false),
 	bUseOnlySharedLicenses(false)
 {
@@ -116,6 +117,7 @@ CSolimarLicenseMgr::ServerInfo::ServerInfo(
 	GITPtr<ISolimarLicenseSvr4> pILicenseServer
 ) : 
 	name(servername), 
+	bValidLicensing(false),
 	bUseOnlySharedLicenses(useOnlySharedLicenses),
 	bUseSoftwareLicensing(useSoftwareLicensing),
 	bUseOnlyLicenseViewer(useOnlyLicenseViewer),
@@ -1465,8 +1467,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 
 	if(FAILED(hrPrimaryServers) && FAILED(hr))	// Means there was a error contacting both primary and backup license servers, return error from primary
 		hr = hrPrimaryServers;
-//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ValidateLicenseInternal return: 0x%08x", hr);
-//OutputDebugString(tmpbuf);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseInternal return: 0x%08x", hr);
 	return hr;
 }
 
@@ -1777,8 +1778,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseObtain(long module_id, long count)
 	//if(FAILED(hr))
 	//	SS_GENERATE_AND_DISPATCH_MESSAGE(L"", MT_ERROR, hr, MessageGenericError);
 
-	//_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseMgr::ModuleLicenseObtain() - returns: 0x%08x", (licensing_valid == VARIANT_TRUE ? S_OK : hr));
-	//OutputDebugStringW(debug_buf);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ModuleLicenseObtain(%d, %d) - returns: 0x%08x", module_id, count, hr);
 	return hr;
 }
 
@@ -2585,6 +2585,8 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, _bLogError);
 					if(SUCCEEDED(hr))
 						bFoundProductAndVersion = true;
+
+					HRESULT tmpHr;
 					for(Lic_PackageAttribs::Lic_ProductInfoAttribs::TVector_Lic_ModuleInfoAttribsList::iterator modIt = prodAttribs.moduleList->begin();
 						modIt != prodAttribs.moduleList->end();
 						modIt++)
@@ -2592,7 +2594,6 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 						long licenses_allocated(0), licenses_inuse(0);
 
 						// get the number of licenses in use for the key for all connections to it - licenses_inuse
-						HRESULT tmpHr;
 						SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareModuleLicenseInUseByApp_ByProduct, (m_product, modIt->moduleID, &licenses_inuse), tmpHr);
 						if(FAILED(tmpHr))
 							licenses_inuse = 0;
@@ -2606,6 +2607,13 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 						serverIt->second.software_license.licenses_inuse[modIt->moduleID] = licenses_inuse;
 						serverIt->second.software_license.licenses_allocated[modIt->moduleID] = licenses_allocated;
 					}
+
+					VARIANT_BOOL server_license_valid(VARIANT_FALSE);
+					SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, serverIt->second, SoftwareValidateLicenseApp_ByProduct, (m_product, &server_license_valid), tmpHr);
+					if(FAILED(tmpHr) || server_license_valid==VARIANT_FALSE)
+						serverIt->second.bValidLicensing = false;
+					else
+						serverIt->second.bValidLicensing = true;
 				}
 			}
 			catch(HRESULT &ehr)
@@ -4037,8 +4045,6 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses)
 {
 //OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseCache() - Enter");
-	
-
 	ENSURE_INITIALIZED;
 	SafeMutex mutex(ServerListLock);	
 	
@@ -4055,7 +4061,8 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 			// for each module
 			for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
 			{
-				m->second -= server->second.software_license.licenses_allocated[m->first];
+				if(server->second.bValidLicensing)
+					m->second -= server->second.software_license.licenses_allocated[m->first];
 			}
 		}
 		else	// use protection key licensing

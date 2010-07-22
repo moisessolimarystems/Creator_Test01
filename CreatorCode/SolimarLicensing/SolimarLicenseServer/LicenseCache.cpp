@@ -396,13 +396,25 @@ HRESULT LicenseCacheByProduct::ModuleLicenseInUseForAll(long moduleIdent, long* 
 	return hr;
 }
 
-//Results based on the licenseID.
-//HRESULT LicenseCacheByProduct::ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
-//{
-//	HRESULT hr(S_OK);
-//	SafeMutex mutex(licenseUseCacheByProductLock);
-//	return hr;
-//}
+//Validates the sum of all the modulesInUse are less than moduleTotals, for all modules, not just ones being 
+//used by the licenseID.
+HRESULT LicenseCacheByProduct::ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(licenseUseCacheByProductLock);
+	for(ModuleLicenseMap::iterator modLicMapIt = licensesTotalMap.begin();
+		modLicMapIt != licensesTotalMap.end();
+		modLicMapIt++)
+	{
+		if(modLicMapIt->second < licensesInuseMap[modLicMapIt->first])
+		{
+			hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
+			break;
+		}
+	}
+	*pBLicenseValid = SUCCEEDED(hr) ? VARIANT_TRUE : VARIANT_FALSE;
+	return hr;
+}
 
 //Returns the number of module licenses inuse by the ApplicationInstance the licenseID is associate with
 HRESULT LicenseCacheByProduct::ModuleLicenseInUseByApp(BSTR licenseID, long moduleIdent, long* pLicenseCount)
@@ -1008,18 +1020,17 @@ HRESULT LicenseCache::ModuleLicenseInUseForAll(long productID, long moduleIdent,
 	return hr;
 }
 
-//Results based on the licenseID.
-//HRESULT LicenseCache::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
-//{
-//	SafeMutex mutex(licenseUseCacheLock);
-//	HRESULT hr(S_OK);
-//	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
-//	if(prodCacheMapIt != productCacheMap.end())
-//		hr = prodCacheMapIt->second->ValidateLicense(licenseID, pBLicenseValid);
-//	else
-//		hr = E_INVALIDARG;
-//	return hr;
-//}
+HRESULT LicenseCache::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid)
+{
+	SafeMutex mutex(licenseUseCacheLock);
+	HRESULT hr(S_OK);
+	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
+	if(prodCacheMapIt != productCacheMap.end())
+		hr = prodCacheMapIt->second->ValidateLicense(licenseID, pBLicenseValid);
+	else
+		hr = E_INVALIDARG;
+	return hr;
+}
 HRESULT LicenseCache::ModuleLicenseInUseByApp(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount)
 {
 	SafeMutex mutex(licenseUseCacheLock);

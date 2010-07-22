@@ -372,6 +372,7 @@ private:
 		bool bUseOnlySharedLicenses;
 		bool bUseSoftwareLicensing;	//Not used yet, maybe not needed
 		bool bUseOnlyLicenseViewer;
+		bool bValidLicensing;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		SoftwareLicenseInfo software_license;
 		KeyList keys;

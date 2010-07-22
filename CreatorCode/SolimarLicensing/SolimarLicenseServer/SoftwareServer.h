@@ -26,8 +26,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, BSTR *pBstrVerificationCode);
 		HRESULT EnterLicensePacket(VARIANT vtPasswordPacket, BSTR *pBstrVerificationCode);
 
-		//Licensing functions
-		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
+		//Licensing functions - Ensure that the inuse to the total values are correct
+		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
 		
 		
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
