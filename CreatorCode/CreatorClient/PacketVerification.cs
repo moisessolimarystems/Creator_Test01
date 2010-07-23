@@ -28,7 +28,6 @@ namespace Client.Creator
         private void PacketVerification_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
         {
             _pktData = e.Data as PacketVerificationDialogData;
-            //_selectedPacketName = (e.Data as PacketVerificationDialogData).SelectedPacketName;
         }
 
         private void PacketVerification_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
@@ -58,17 +57,36 @@ namespace Client.Creator
                 PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCodeTextBox.Text);
                 if (storedPacket != null)
                 {
-                    storedPacket.IsVerified = true;
-                    storedPacket.VerifiedBy = WindowsIdentity.GetCurrent().Name;
-                    client.UpdatePacket(storedPacket);
-                    _selectedPacketName = storedPacket.PacketName;
-                    LicenseTable lt = client.GetLicenseByID(storedPacket.LicenseID, false);
-                    _licenseName = lt.LicenseName;
-                    MessageBox.Show("Verified packet " + _selectedPacketName, 
-                                    "Successful Verification",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Information);
-                    _validVerificationCode = true;
+                    if (storedPacket.IsVerified)
+                    {
+                        MessageBox.Show(_selectedPacketName + " has already been verified!", "Duplicate Verification", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        _selectedPacketName = storedPacket.PacketName;
+                        LicenseTable lt = client.GetLicenseByID(storedPacket.LicenseID, false);
+                        _licenseName = lt.LicenseName;
+                        IList<PacketTable> packetList = client.GetPacketsByLicenseName(_licenseName);
+                        List<PacketTable> modifiedPacketList = new List<PacketTable>();
+                        if (packetList != null)
+                        {
+                            foreach (PacketTable packet in packetList)
+                            {
+                                if (packet.DateCreated.CompareTo(storedPacket.DateCreated) <= 0 && packet.IsVerified != true)
+                                {
+                                    packet.IsVerified = true;
+                                    packet.VerifiedBy = WindowsIdentity.GetCurrent().Name;
+                                    modifiedPacketList.Add(packet);
+                                }
+                            }
+                            client.UpdatePackets(modifiedPacketList);
+                        }
+                        MessageBox.Show("Verified packet " + _selectedPacketName, 
+                                        "Successful Verification",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                        _validVerificationCode = true;
+                    }
                 }
                 else
                 {
