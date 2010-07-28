@@ -104,6 +104,8 @@ namespace Service.Creator
         #endregion
 
         #region Packet OperationContracts
+        [OperationContract]
+        IList<PacketTable> GetPacketsByConditions(IList<Condition> cl, bool matchAll);
 
         [OperationContract]
         IList<PacketTable> GetPacketsByLicenseName(string ln);
@@ -122,6 +124,9 @@ namespace Service.Creator
 
         [OperationContract()]
         void UpdatePacket(PacketTable pt);
+
+        [OperationContract()]
+        void UpdatePackets(IList<PacketTable> packets);
 
         [OperationContract()]
         void DeletePacket(PacketTable pt);
@@ -354,7 +359,17 @@ namespace Service.Creator
         [EnumMember]
         ModuleValue,
         [EnumMember]
-        Notes
+        Notes,
+        [EnumMember]
+        Verified,
+        [EnumMember]
+        Validation,
+        [EnumMember]
+        DateCreated,
+        [EnumMember]
+        VerifiedBy,
+        [EnumMember]
+        LicensePacket
     }
 
     [DataContract]
