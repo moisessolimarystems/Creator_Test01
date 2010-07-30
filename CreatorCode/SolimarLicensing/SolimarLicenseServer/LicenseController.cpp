@@ -266,42 +266,47 @@ void LicenseController::GenerateMessageInternal(const wchar_t* license_source, b
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
 	
-	try
+	//CR.FIX.13371 - Don't pass MessageClientTimeout message back to the various License Managers.
+	// Software style Messages use a MessageGeneric, so can't filter those messages the same way.
+	if(MessageLookupID != MessageClientTimeout)
 	{
-		if(bGenerateSoftwareLicMsg)
+		try
 		{
-			LicensingSoftwareMessage softwareLicMsg(
-				std::wstring(server_host_name), 
-				std::wstring(license_source), 
-				productID,
-				message_type,
-				MessageLookupID, 
-				vtTimestamp, 
-				std::wstring(message), 
-				error);
-			for (SoftwareMessageClientList::iterator clientIt = message_software_clients.begin(); clientIt != message_software_clients.end(); ++clientIt)
+			if(bGenerateSoftwareLicMsg)
 			{
-				clientIt->second.push_back(softwareLicMsg);
+				LicensingSoftwareMessage softwareLicMsg(
+					std::wstring(server_host_name), 
+					std::wstring(license_source), 
+					productID,
+					message_type,
+					MessageLookupID, 
+					vtTimestamp, 
+					std::wstring(message), 
+					error);
+				for (SoftwareMessageClientList::iterator clientIt = message_software_clients.begin(); clientIt != message_software_clients.end(); ++clientIt)
+				{
+					clientIt->second.push_back(softwareLicMsg);
+				}
+			}
+			else	//Generate a standard Licensing Message
+			{
+				//xxx might need to make this asynchronous
+				//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
+				//zzz add message to the message lists for all clients
+				//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
+				LicensingMessage m(std::wstring(server_host_name), std::wstring(license_source), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
+				for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
+				{
+					c->second.push_back(m);
+					//xxx make sure that the message backlog is not excessive.
+					//xxx if it is, cull some of the older messages
+				}
 			}
 		}
-		else	//Generate a standard Licensing Message
+		catch (_com_error &e)
 		{
-			//xxx might need to make this asynchronous
-			//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
-			//zzz add message to the message lists for all clients
-			//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
-			LicensingMessage m(std::wstring(server_host_name), std::wstring(license_source), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
-			for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
-			{
-				c->second.push_back(m);
-				//xxx make sure that the message backlog is not excessive.
-				//xxx if it is, cull some of the older messages
-			}
+			e.Error();
 		}
-	}
-	catch (_com_error &e)
-	{
-		e.Error();
 	}
 }
 
@@ -392,7 +397,6 @@ HRESULT LicenseController::CheckHealth()
 		LicenseServerError::WriteEventLog(event_log_msg, EVENTLOG_ERROR_TYPE, MessageGenericError);
 		ExitProcess(hr);
 	}
-
 	return hr;
 }
 
