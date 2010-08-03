@@ -110,7 +110,18 @@ HRESULT KeyServer::Initialize(RainbowDriver* pDriver)
 {
 	pRainbowDriver = pDriver;
 	HRESULT hr(S_OK);
-	hr = ResynchronizeKeys();
+
+	//CR.FIX.13351 - Only force a refresh of the licensing cache if there is a parallel key attached because cannot detect when 
+	//parallel key are attached/detached. Don't refresh of the licensing cache on creation of server objects because some products
+	//like Rubika will simultaneously created multiple in separate processes, leading to large delays in refreshing cache when there 
+	//are large number of usb keys attached.
+	bool bResynchronizeKeys = false;
+	{
+		SafeMutex mutex1(pRainbowDriver->keys_lock);
+		bResynchronizeKeys = pRainbowDriver->AtLeastOneParallelKey();
+	}
+	if(bResynchronizeKeys)
+		hr = ResynchronizeKeys();
 	return hr;
 }
 HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
@@ -120,156 +131,168 @@ HRESULT KeyServer::ResynchronizeKeys(bool bForceRefresh)
 //OutputDebugString(tmpbuf);
 //OutputDebugString(L"KeyServer::ResynchronizeKeys() - Enter");
 	HRESULT hr = S_OK;
-	{// obtain a lock on the driver's key list
+	// CR.FIX.13281 - Wrap call in try catch incase unexpected exception is thrown.
+	try
+	{
+		{// obtain a lock on the driver's key list
 
-		KeyList tmpKeyList;
-		std::list<_bstr_t> deleteProtectionKeyList;
-		KeyServer::KeyList::iterator skeyIt;
+			KeyList tmpKeyList;
+			std::list<_bstr_t> deleteProtectionKeyList;
+			KeyServer::KeyList::iterator skeyIt;
 
-		{	//Scope for SafeMutex mutex2(KeyListLock);
-			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
-			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
-			SafeMutex mutex2(KeyListLock);
-			for(	skeyIt = keys.begin();
-					skeyIt != keys.end();
-					skeyIt++)
-			{
-				// CR.11876 - Make a copy of the Protection Keys.
-				tmpKeyList.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
-			}
-		}
-
-		{	//Scope for SafeMutex mutex1(pRainbowDriver->keys_lock);
-			SafeMutex mutex1(pRainbowDriver->keys_lock);
-			pRainbowDriver->RefreshKeyList();
-			//if(pRainbowDriver->AtLeastOneParallelKey())
-			//	UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
-
-			// first pass, add newly found keys
-			ProtectionKey* tmpProKey;
-			for (RainbowDriver::KeyList::iterator dkey = pRainbowDriver->keys.begin(); dkey!=pRainbowDriver->keys.end(); ++dkey)
-			{
-				if (tmpKeyList.find(dkey->first)==tmpKeyList.end())
+			{	//Scope for SafeMutex mutex2(KeyListLock);
+				// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
+				// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
+				SafeMutex mutex2(KeyListLock);
+				for(	skeyIt = keys.begin();
+						skeyIt != keys.end();
+						skeyIt++)
 				{
-					_bstr_t keyName = dkey->first;
+					// CR.11876 - Make a copy of the Protection Keys.
+					tmpKeyList.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
+				}
+			}
 
-					unsigned short keyVersion = 0;
-					hr = pRainbowDriver->GetKeyVersion(keyName, &keyVersion);
+			{	//Scope for SafeMutex mutex1(pRainbowDriver->keys_lock);
+				SafeMutex mutex1(pRainbowDriver->keys_lock);
+				pRainbowDriver->RefreshKeyList();
+				//if(pRainbowDriver->AtLeastOneParallelKey())
+				//	UpdateKeysThread->RevUp();	//Kick up how often looking for keys.
 
-					if(keyVersion == 0)	//Old Style Protection Key
+				// first pass, add newly found keys
+				ProtectionKey* tmpProKey;
+				for (RainbowDriver::KeyList::iterator dkey = pRainbowDriver->keys.begin(); dkey!=pRainbowDriver->keys.end(); ++dkey)
+				{
+					if (tmpKeyList.find(dkey->first)==tmpKeyList.end())
 					{
-						tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
-						long application_instances = 0;
-						tmpProKey->ApplicationInstanceCount(&application_instances);
-						if(application_instances > 1)	
-						{
-							//application_instances == virtual keys this single key will represent
-							for(int idx=1; idx<=application_instances; idx++)
-							{
-								wchar_t key_id[128];
-								_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
-								key_id[127]=0;
+						_bstr_t keyName = dkey->first;
 
-								if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
-								{
-									//Use Share Licensing - only the first key can use the shared licensing.
-									ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
-									tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
-									tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
-									virtual_key_to_physical_key_list[key_id] = keyName;
-								}
-							}
-							delete tmpProKey;
-						}
-						else	//Only 1 Key
+						unsigned short keyVersion = 0;
+						hr = pRainbowDriver->GetKeyVersion(keyName, &keyVersion);
+
+						if(keyVersion == 0)	//Old Style Protection Key
 						{
+							tmpProKey = new ProtectionKey(dkey->first, dkey->first, &keyspec,pRainbowDriver, true);//Use Share Licensing
+							long application_instances = 0;
+							tmpProKey->ApplicationInstanceCount(&application_instances);
+							if(application_instances > 1)	
+							{
+								//application_instances == virtual keys this single key will represent
+								for(int idx=1; idx<=application_instances; idx++)
+								{
+									wchar_t key_id[128];
+									_snwprintf_s(key_id, sizeof(key_id)/sizeof(wchar_t), L"%s (%d)", (wchar_t*)keyName, idx);
+									key_id[127]=0;
+
+									if (tmpKeyList.find(key_id)==tmpKeyList.end())	//Only add new keys
+									{
+										//Use Share Licensing - only the first key can use the shared licensing.
+										ProtectionKey* tmpVirtProKey = new ProtectionKey(key_id, *tmpProKey);
+										tmpVirtProKey->SetUseSharedLicensing(idx==1);//Use Share Licensing
+										tmpKeyList.insert(KeyList::value_type(key_id, tmpVirtProKey));
+										virtual_key_to_physical_key_list[key_id] = keyName;
+									}
+								}
+								delete tmpProKey;
+							}
+							else	//Only 1 Key
+							{
+								tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
+								virtual_key_to_physical_key_list[dkey->first] = dkey->first;
+							}
+						}
+						else if(keyVersion == 1)	//Validation key for Software Licenses
+						{
+							tmpProKey = new ProtectionKey_Version1(dkey->first, &keyspec, pRainbowDriver);
 							tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
 							virtual_key_to_physical_key_list[dkey->first] = dkey->first;
 						}
 					}
-					else if(keyVersion == 1)	//Validation key for Software Licenses
+				}
+				// second pass, remove keys that are no longer reported by the driver
+				skeyIt=tmpKeyList.begin();
+				while (skeyIt!=tmpKeyList.end())
+				{
+					if (pRainbowDriver->keys.find(virtual_key_to_physical_key_list[skeyIt->first])==pRainbowDriver->keys.end())
 					{
-						tmpProKey = new ProtectionKey_Version1(dkey->first, &keyspec, pRainbowDriver);
-						tmpKeyList.insert(KeyList::value_type(dkey->first,tmpProKey));
-						virtual_key_to_physical_key_list[dkey->first] = dkey->first;
+						deleteProtectionKeyList.push_back(_bstr_t(skeyIt->first,true));
+						skeyIt = tmpKeyList.erase(skeyIt);
+					}
+					else
+						++skeyIt;
+				}
+			}
+
+			std::map<_bstr_t, ProtectionKey*> physicalKeyMap;// Performance optimization, used by virtual keys to look at instead of querying physical key.
+			// last pass, refresh all of the read-caches
+			for (skeyIt = tmpKeyList.begin(); skeyIt!=tmpKeyList.end(); ++skeyIt)
+			{
+				try
+				{
+					if(physicalKeyMap.find(skeyIt->second->GetPhysicalKeyIdent()) != physicalKeyMap.end())
+					{
+						//Physical key in cache, copy cells of physical key to this virtual key
+						skeyIt->second->CopyCellCache(*(physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()]));
+					}
+					else	
+					{
+						//Physical key not in cache, query the physical key
+						skeyIt->second->UpdateAllCellsCache(bForceRefresh);
+						physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()] = skeyIt->second;
 					}
 				}
-			}
-			// second pass, remove keys that are no longer reported by the driver
-			skeyIt=tmpKeyList.begin();
-			while (skeyIt!=tmpKeyList.end())
-			{
-				if (pRainbowDriver->keys.find(virtual_key_to_physical_key_list[skeyIt->first])==pRainbowDriver->keys.end())
+				catch (_com_error &e)
 				{
-					deleteProtectionKeyList.push_back(_bstr_t(skeyIt->first,true));
-					skeyIt = tmpKeyList.erase(skeyIt);
-				}
-				else
-					++skeyIt;
-			}
-		}
-
-		std::map<_bstr_t, ProtectionKey*> physicalKeyMap;// Performance optimization, used by virtual keys to look at instead of querying physical key.
-		// last pass, refresh all of the read-caches
-		for (skeyIt = tmpKeyList.begin(); skeyIt!=tmpKeyList.end(); ++skeyIt)
-		{
-			try
-			{
-				if(physicalKeyMap.find(skeyIt->second->GetPhysicalKeyIdent()) != physicalKeyMap.end())
-				{
-					//Physical key in cache, copy cells of physical key to this virtual key
-					skeyIt->second->CopyCellCache(*(physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()]));
-				}
-				else	
-				{
-					//Physical key not in cache, query the physical key
-					skeyIt->second->UpdateAllCellsCache(bForceRefresh);
-					physicalKeyMap[skeyIt->second->GetPhysicalKeyIdent()] = skeyIt->second;
+					hr = e.Error();
+					break;
 				}
 			}
-			catch (_com_error &e)
-			{
-				hr = e.Error();
-				break;
-			}
-		}
 
 
-		{	//Scope for SafeMutex mutex2(KeyListLock);
-			// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
-			// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
-			SafeMutex mutex2(KeyListLock);	
-			// CR.FIX.11909 - Remove keys no longer attached
-			while(!deleteProtectionKeyList.empty())
-			{
-				skeyIt = keys.find(*deleteProtectionKeyList.begin());
-				if(skeyIt != keys.end())
-					keys.erase(skeyIt);
-				deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
-			}
+			{	//Scope for SafeMutex mutex2(KeyListLock);
+				// CR.10675.v2 - Minimize the Locking of this mutex.  A PC under heavy load takes a very long time to 
+				// cycle through multiple keys on a system, don't want to lock this mutex the entire time.
+				SafeMutex mutex2(KeyListLock);	
+				// CR.FIX.11909 - Remove keys no longer attached
+				while(!deleteProtectionKeyList.empty())
+				{
+					skeyIt = keys.find(*deleteProtectionKeyList.begin());
+					if(skeyIt != keys.end())
+						keys.erase(skeyIt);
+					deleteProtectionKeyList.erase(deleteProtectionKeyList.begin());
+				}
 
-			// CR.FIX.11909 - Cycle through keys, adding/updating key cache from temp key cache
-			KeyServer::KeyList::iterator keyIt;
-			for(	skeyIt = tmpKeyList.begin();
-					skeyIt != tmpKeyList.end();
-					skeyIt++)
-			{
-				keyIt = keys.find(_bstr_t(skeyIt->first,true));
-				if(keyIt != keys.end())	// Update existing Key Cells
-					keyIt->second->CopyCellCache(*(skeyIt->second));
-				else	// Add new Key
-					keys.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
-			}
+				// CR.FIX.11909 - Cycle through keys, adding/updating key cache from temp key cache
+				KeyServer::KeyList::iterator keyIt;
+				for(	skeyIt = tmpKeyList.begin();
+						skeyIt != tmpKeyList.end();
+						skeyIt++)
+				{
+					keyIt = keys.find(_bstr_t(skeyIt->first,true));
+					if(keyIt != keys.end())	// Update existing Key Cells
+						keyIt->second->CopyCellCache(*(skeyIt->second));
+					else	// Add new Key
+						keys.insert(KeyList::value_type(skeyIt->first, (skeyIt->second)->Copy(skeyIt->first)));
+				}
 
-			// CR.FIX.11909 - Delete temp cache of keys
-			while(!tmpKeyList.empty())
-			{
-				if(tmpKeyList.begin()->second != NULL)
-					delete tmpKeyList.begin()->second;
-				tmpKeyList.erase(tmpKeyList.begin());
+				// CR.FIX.11909 - Delete temp cache of keys
+				while(!tmpKeyList.empty())
+				{
+					if(tmpKeyList.begin()->second != NULL)
+						delete tmpKeyList.begin()->second;
+					tmpKeyList.erase(tmpKeyList.begin());
+				}
 			}
-		}
-	} // release the lock on the driver's key list
+		} // release the lock on the driver's key list
+	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
 //	swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - keys.count: %d", keys.size());
 //OutputDebugString(tmpbuf);
 //swprintf_s(tmpbuf, 1024, L"KeyServer::ResynchronizeKeys() - Leave: hr=0x%08x, ThreadID: %d", hr, GetCurrentThreadId());
@@ -319,41 +342,55 @@ HRESULT KeyServer::GetApplicationInstanceList(BSTR license_id, BSTR key_ident, V
 HRESULT KeyServer::KeyEnumerate(VARIANT *keylist)
 {
 	HRESULT hr = S_OK;
-	VariantInit(keylist);
-	
-	SafeMutex mutex(KeyListLock);
-
-//wchar_t debug_buf[1024];
-//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
-//debug_buf[1023] = 0;
-//OutputDebugStringW(debug_buf);
-	SAFEARRAY *pSA = SafeArrayCreateVector(VT_VARIANT, 0, (unsigned int)keys.size());
-	VARIANT *pElement = 0;
-	hr = SafeArrayAccessData(pSA, (void**)&pElement);
-	if (SUCCEEDED(hr))
+	// CR.FIX.13281 - Wrap call in try catch incase unexpected exception is thrown.
+	try
 	{
-		SafeMutex mutex(KeyListLock);
-		for (KeyList::iterator i = keys.begin(); i!=keys.end(); ++i, ++pElement)
-		{
-			VariantInit(pElement);
-			pElement->vt = VT_BSTR;
-			pElement->bstrVal = i->first.copy();
-//_snwprintf(debug_buf, 1024, L"KeyServer::KeyEnumerate keyName = %s", pElement->bstrVal);
-//debug_buf[1023] = 0;
-//OutputDebugStringW(debug_buf);
-
-		}
-		SafeArrayUnaccessData(pSA);
+		VariantInit(keylist);
 		
-		keylist->vt = VT_VARIANT | VT_ARRAY;
-		keylist->parray = pSA;
+		SafeMutex mutex(KeyListLock);
+
+	//wchar_t debug_buf[1024];
+	//_snwprintf(debug_buf, 1024, L"KeyServer::Heartbeat (%s) cur_time=%d)", (BSTR)license_id, cur_time);
+	//debug_buf[1023] = 0;
+	//OutputDebugStringW(debug_buf);
+		SAFEARRAY *pSA = SafeArrayCreateVector(VT_VARIANT, 0, (unsigned int)keys.size());
+		VARIANT *pElement = 0;
+		hr = SafeArrayAccessData(pSA, (void**)&pElement);
+		if (SUCCEEDED(hr))
+		{
+			SafeMutex mutex(KeyListLock);
+			for (KeyList::iterator i = keys.begin(); i!=keys.end(); ++i, ++pElement)
+			{
+				VariantInit(pElement);
+				pElement->vt = VT_BSTR;
+				pElement->bstrVal = i->first.copy();
+	//_snwprintf(debug_buf, 1024, L"KeyServer::KeyEnumerate keyName = %s", pElement->bstrVal);
+	//debug_buf[1023] = 0;
+	//OutputDebugStringW(debug_buf);
+
+			}
+			SafeArrayUnaccessData(pSA);
+			
+			keylist->vt = VT_VARIANT | VT_ARRAY;
+			keylist->parray = pSA;
+		}
+
+		if (FAILED(hr))
+		{
+	//OutputDebugStringW(L"KeyServer::KeyEnumerate - Failed");
+			SafeArrayDestroy(pSA);
+		}
+	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
 	}
 	
-	if (FAILED(hr))
-	{
-//OutputDebugStringW(L"KeyServer::KeyEnumerate - Failed");
-		SafeArrayDestroy(pSA);
-	}
+
 	
 	return hr;
 }
@@ -1590,89 +1627,94 @@ HRESULT KeyServer::TimesUp()
 {
 //OutputDebugStringW(L"KeyServer::TimesUp() - Enter");
 	// get the key list and check if any keys in it are not in the trial key list
+	HRESULT hr(S_OK);
+	// CR.FIX.13281 - Wrap call in try catch incase unexpected exception is thrown.
+	try
 	{
-		SafeMutex mutex1(KeyListLock);
-		SafeMutex mutex2(KeyTrialTimeInfoLock);
-		
-		for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 		{
-			if (trial_keys.find(key->first)==trial_keys.end())
+			SafeMutex mutex1(KeyListLock);
+			SafeMutex mutex2(KeyTrialTimeInfoLock);
+			
+			for (KeyList::iterator key = keys.begin(); key != keys.end(); ++key)
 			{
-				trial_keys[key->first].key_obtained = 0;
-				trial_keys[key->first].last_decrement = 0;
-			}
-		}
-	}
-	
-	// check for any keys that are both trial keys and are currently being used
-	{
-		SafeMutex mutex1(KeyListLock);
-		SafeMutex mutex2(KeyTrialTimeInfoLock);		
-		
-		KeyList::iterator key;
-
-		for (TrialTimeInfoList::iterator tk = trial_keys.begin(); tk != trial_keys.end(); ++tk)
-		{
-			if ((key = keys.find(tk->first))!=keys.end())
-			{
-				if (key->second->isOnTrial() && key->second->KeyInUse())
+				if (trial_keys.find(key->first)==trial_keys.end())
 				{
-					tk->second.key_obtained = true;
+					trial_keys[key->first].key_obtained = 0;
+					trial_keys[key->first].last_decrement = 0;
 				}
 			}
 		}
-	}
-	
-	// check all the keys for whether an hour has expired, or the key has just been obtained
-	// if one of these conditions occurs, decrement an hour from the key
-	{
-		SafeMutex mutex(KeyTrialTimeInfoLock);
-//wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L"KeyServer::TimesUp() - Loop Start");
-//OutputDebugString(tmpbuf);
-		for (TrialTimeInfoList::iterator tk = trial_keys.begin(); tk != trial_keys.end(); ++tk)
+		
+		// check for any keys that are both trial keys and are currently being used
 		{
-//swprintf_s(tmpbuf, 1024, L"    key: %s, lastDecrement: %f", (wchar_t*)tk->first, tk->second.last_decrement);
-//OutputDebugString(tmpbuf);
-
-			static const time_t ONE_HOUR = (time_t)(60*60);
-			time_t cur_time = time(NULL);
+			SafeMutex mutex1(KeyListLock);
+			SafeMutex mutex2(KeyTrialTimeInfoLock);		
 			
-			// if the key hasn't been decremented yet
-			if (tk->second.last_decrement==0 || tk->second.last_decrement+ONE_HOUR<=cur_time)
+			KeyList::iterator key;
+
+			for (TrialTimeInfoList::iterator tk = trial_keys.begin(); tk != trial_keys.end(); ++tk)
 			{
-				// if the key was used at all since the last decrement
-				if (tk->second.key_obtained)
+				if ((key = keys.find(tk->first))!=keys.end())
 				{
-					// decrement the hours, and note when the last successful decrement was
+					if (key->second->isOnTrial() && key->second->KeyInUse())
 					{
-						SafeMutex mutex(KeyListLock);
-						KeyList::iterator key;
-						if ((key = keys.find(tk->first))!=keys.end())
+						tk->second.key_obtained = true;
+					}
+				}
+			}
+		}
+		
+		// check all the keys for whether an hour has expired, or the key has just been obtained
+		// if one of these conditions occurs, decrement an hour from the key
+		{
+			SafeMutex mutex(KeyTrialTimeInfoLock);
+	//wchar_t tmpbuf[1024];
+	//swprintf_s(tmpbuf, 1024, L"KeyServer::TimesUp() - Loop Start");
+	//OutputDebugString(tmpbuf);
+			for (TrialTimeInfoList::iterator tk = trial_keys.begin(); tk != trial_keys.end(); ++tk)
+			{
+	//swprintf_s(tmpbuf, 1024, L"    key: %s, lastDecrement: %f", (wchar_t*)tk->first, tk->second.last_decrement);
+	//OutputDebugString(tmpbuf);
+
+				static const time_t ONE_HOUR = (time_t)(60*60);
+				time_t cur_time = time(NULL);
+				
+				// if the key hasn't been decremented yet
+				if (tk->second.last_decrement==0 || tk->second.last_decrement+ONE_HOUR<=cur_time)
+				{
+					// if the key was used at all since the last decrement
+					if (tk->second.key_obtained)
+					{
+						// decrement the hours, and note when the last successful decrement was
 						{
-							// if the key is no longer a trial key, give up trying to decrement it
-							if (!key->second->isOnTrial())
+							SafeMutex mutex(KeyListLock);
+							KeyList::iterator key;
+							if ((key = keys.find(tk->first))!=keys.end())
 							{
-								tk->second.key_obtained = false;
-								tk->second.last_decrement = 0;
-							}
-							// key is a trial key, decrement the trial hours
-							else
-							{
-								HRESULT hr = key->second->DecrementTrialHours();
-//swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
-//OutputDebugString(tmpbuf);
-								if (SUCCEEDED(hr))
+								// if the key is no longer a trial key, give up trying to decrement it
+								if (!key->second->isOnTrial())
 								{
 									tk->second.key_obtained = false;
-									tk->second.last_decrement = cur_time;
+									tk->second.last_decrement = 0;
+								}
+								// key is a trial key, decrement the trial hours
+								else
+								{
+									HRESULT hr = key->second->DecrementTrialHours();
+	//swprintf_s(tmpbuf, 1024, L"    key->second.DecrementTrialHours(key: %s)", (wchar_t*)tk->first);
+	//OutputDebugString(tmpbuf);
+									if (SUCCEEDED(hr))
+									{
+										tk->second.key_obtained = false;
+										tk->second.last_decrement = cur_time;
 
-									unsigned short key_version(0);
-									hr = key->second->GetKeyVersion(&key_version);
-									//Check for key version, if key version 0 then send current message
-									if(key_version == 0)
-										g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
-									//if key version 1 then send no message
+										unsigned short key_version(0);
+										hr = key->second->GetKeyVersion(&key_version);
+										//Check for key version, if key version 0 then send current message
+										if(key_version == 0)
+											g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
+										//if key version 1 then send no message
+									}
 								}
 							}
 						}
@@ -1681,9 +1723,17 @@ HRESULT KeyServer::TimesUp()
 			}
 		}
 	}
+	catch (_com_error &e)
+	{
+		hr = e.Error();
+	}
+	catch(HRESULT &ehr)
+	{
+		hr = ehr;
+	}
 //OutputDebugStringW(L"KeyServer::TimesUp() - Leave");	
 	//xxx check for expired keys?
-	return S_OK;
+	return hr;
 }
 
 //Check to see if any mutexs are deadlocked
