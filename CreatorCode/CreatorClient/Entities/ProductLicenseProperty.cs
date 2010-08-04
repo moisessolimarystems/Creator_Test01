@@ -9,6 +9,7 @@ using Solimar.Licensing.Attribs;
 using System.Reflection;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
+using System.Globalization;
 
 namespace Client.Creator
 {
@@ -273,6 +274,7 @@ namespace Client.Creator
         }
 
         [Category("Product License"), PropertyOrder(5)]
+        [TypeConverter(typeof(StateEnumComboBoxConverter))]
         [DisplayName("Status")]
         [Description("State of product license.")]
         [ReadOnly(true)]
@@ -301,32 +303,21 @@ namespace Client.Creator
                                 //was trial now licensed
                                 //clear modules of non-defaults and set defaults           
                                 //plstate is stored in terms of enums.productlicensestate
-                                if (_plRec.plState == (byte)ProductLicenseState.Trial)
-                                {
-                                    if (!SetTrialToLicensed())
-                                        errorMsg = "Failed to change status from trial to licensed";
-                                }
-                                else if (_plRec.plState == (byte)ProductLicenseState.AddOn)
-                                {
-                                    if (!SetAddonToLicensed())
-                                        errorMsg = "Failed to change status from add-on to licensed";
-                                }
-                                else if (_plRec.plState != (byte)ProductLicenseState.AddOn)
-                                    errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
+                                if (!SetTrialToLicensed())
+                                    errorMsg = "Failed to change status from trial to licensed";
                                 break;
                             case ProductLicenseState.Trial:
                                 //was perm now trial
-                                if (_plRec.plState == (byte)ProductLicenseState.Licensed)
-                                {
-                                    if (!SetLicensedToTrial())
-                                        errorMsg = "Failed to change status from license";
-                                }
-                                else
-                                    errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
+                                if (!SetLicensedToTrial())
+                                    errorMsg = "Failed to change status from licensed";
                                 break;
                             case ProductLicenseState.AddOn:
                                 if (ParentID == null)
                                     errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
+                                break;
+                            case ProductLicenseState.LicensedAddOn:
+                                if (!SetAddonToLicensed())
+                                    errorMsg = "Failed to change status from add-on to licensed";
                                 break;
                             default:
                                 break;
@@ -1191,6 +1182,77 @@ namespace Client.Creator
                 return new LicenseVersion(UInt32.Parse(versionString[0]), UInt32.Parse(versionString[1]));
             }
             return base.ConvertFrom(context, info, value);
+        }
+    }
+
+    internal class StateEnumComboBoxConverter : EnumConverter
+    {
+        private Type _enumType;
+        /// Initializing instance
+        /// type Enum
+        ///this is only one function, that you must
+        ///to change. All another functions for enums
+        ///you can use by Ctrl+C/Ctrl+V
+
+        public StateEnumComboBoxConverter(Type type)
+        : base(type)
+        {
+            _enumType = type;
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context,Type destType)
+        {
+            return destType == typeof(string);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context,CultureInfo culture,object value, Type destType)
+        {
+            FieldInfo fi = _enumType.GetField(Enum.GetName(_enumType, value));
+            DescriptionAttribute dna =(DescriptionAttribute)Attribute.GetCustomAttribute(fi, typeof(DescriptionAttribute)); 
+            if (dna != null)
+                return dna.Description;
+            else
+                return value.ToString();
+        }
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context,Type srcType)
+        {
+            return srcType == typeof(string);
+        } 
+
+        public override object ConvertFrom(ITypeDescriptorContext context,CultureInfo culture,object value)
+        {
+            foreach (FieldInfo fi in _enumType.GetFields())
+            {
+                DescriptionAttribute dna = (DescriptionAttribute)Attribute.GetCustomAttribute(fi, typeof(DescriptionAttribute)); 
+                if ((dna != null) && ((string)value == dna.Description))
+                return Enum.Parse(_enumType, fi.Name);
+            }
+            return Enum.Parse(_enumType, (string)value);
+        }
+
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            //Allow trial, licensed or add-on, licensed
+            ProductLicenseProperty plp = context.Instance as ProductLicenseProperty;
+            List<ProductLicenseState> stateList = new List<ProductLicenseState>();
+            if (plp.ParentID == null)
+            {
+                stateList.Add(ProductLicenseState.Trial);
+                stateList.Add(ProductLicenseState.Licensed);
+            }
+            else
+            {
+                stateList.Add(ProductLicenseState.AddOn);
+                stateList.Add(ProductLicenseState.LicensedAddOn);
+            }
+            return new StandardValuesCollection(stateList);
         }
     }
 }
