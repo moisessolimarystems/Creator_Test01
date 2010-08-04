@@ -36,6 +36,11 @@
       <xs:enumeration value="Module" />
       <xs:enumeration value="ModuleValue" />
       <xs:enumeration value="Notes" />
+      <xs:enumeration value="Verified" />
+      <xs:enumeration value="Validation" />
+      <xs:enumeration value="DateCreated" />
+      <xs:enumeration value="VerifiedBy" />
+      <xs:enumeration value="LicensePacket" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ConditionName" nillable="true" type="tns:ConditionName" />

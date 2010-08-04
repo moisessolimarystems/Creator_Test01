@@ -1195,6 +1195,21 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         Notes = 17,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Verified = 18,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Validation = 19,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        DateCreated = 20,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        VerifiedBy = 21,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        LicensePacket = 22,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]
@@ -1890,8 +1905,20 @@ namespace Client.Creator.CreatorService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CreatorService.ICreator")]
     public interface ICreator {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTotalModuleValue", ReplyAction="http://tempuri.org/ICreator/GetTotalModuleValueResponse")]
+        short GetTotalModuleValue(string licenseServer, byte productID, short modID);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
+        void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicenseServerVersion", ReplyAction="http://tempuri.org/ICreator/GetLicenseServerVersionResponse")]
         void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/TokenExists", ReplyAction="http://tempuri.org/ICreator/TokenExistsResponse")]
+        bool TokenExists(uint custID, byte tokenType, string tokenValue);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
+        bool IsHardwareTokenActive(uint custID, string tokenValue);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue", ReplyAction="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse")]
         uint GetNextHardwareTokenValue(uint custID);
@@ -1983,11 +2010,11 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetModulesByProductLicense", ReplyAction="http://tempuri.org/ICreator/GetModulesByProductLicenseResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.ModuleTable> GetModulesByProductLicense(string productLicenseName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTotalModuleValue", ReplyAction="http://tempuri.org/ICreator/GetTotalModuleValueResponse")]
-        short GetTotalModuleValue(string licenseServer, byte productID, short modID);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdatePacket", ReplyAction="http://tempuri.org/ICreator/UpdatePacketResponse")]
+        void UpdatePacket(Client.Creator.CreatorService.PacketTable pt);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetCreatorServiceVersion", ReplyAction="http://tempuri.org/ICreator/GetCreatorServiceVersionResponse")]
-        void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdatePackets", ReplyAction="http://tempuri.org/ICreator/UpdatePacketsResponse")]
+        void UpdatePackets(System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> packets);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeletePacket", ReplyAction="http://tempuri.org/ICreator/DeletePacketResponse")]
         void DeletePacket(Client.Creator.CreatorService.PacketTable pt);
@@ -2079,12 +2106,6 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetTokenByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetTokenByLicenseNameResponse")]
         Client.Creator.CreatorService.TokenTable GetTokenByLicenseName(string licName, byte tokenType);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/TokenExists", ReplyAction="http://tempuri.org/ICreator/TokenExistsResponse")]
-        bool TokenExists(uint custID, byte tokenType, string tokenValue);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsHardwareTokenActive", ReplyAction="http://tempuri.org/ICreator/IsHardwareTokenActiveResponse")]
-        bool IsHardwareTokenActive(uint custID, string tokenValue);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetAllCustomers", ReplyAction="http://tempuri.org/ICreator/GetAllCustomersResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions);
         
@@ -2163,6 +2184,9 @@ namespace Client.Creator.CreatorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/DeleteLicense", ReplyAction="http://tempuri.org/ICreator/DeleteLicenseResponse")]
         void DeleteLicense(Client.Creator.CreatorService.LicenseTable lt);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPacketsByConditions", ReplyAction="http://tempuri.org/ICreator/GetPacketsByConditionsResponse")]
+        System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetPacketsByLicenseName", ReplyAction="http://tempuri.org/ICreator/GetPacketsByLicenseNameResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByLicenseName(string ln);
         
@@ -2177,9 +2201,6 @@ namespace Client.Creator.CreatorService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/CreatePacket", ReplyAction="http://tempuri.org/ICreator/CreatePacketResponse")]
         void CreatePacket(Client.Creator.CreatorService.PacketTable pt);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/UpdatePacket", ReplyAction="http://tempuri.org/ICreator/UpdatePacketResponse")]
-        void UpdatePacket(Client.Creator.CreatorService.PacketTable pt);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")]
@@ -2209,8 +2230,24 @@ namespace Client.Creator.CreatorService {
                 base(binding, remoteAddress) {
         }
         
+        public short GetTotalModuleValue(string licenseServer, byte productID, short modID) {
+            return base.Channel.GetTotalModuleValue(licenseServer, productID, modID);
+        }
+        
+        public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion) {
+            base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
+        }
+        
         public void GetLicenseServerVersion(ref int major, ref int minor, ref int buildversion) {
             base.Channel.GetLicenseServerVersion(ref major, ref minor, ref buildversion);
+        }
+        
+        public bool TokenExists(uint custID, byte tokenType, string tokenValue) {
+            return base.Channel.TokenExists(custID, tokenType, tokenValue);
+        }
+        
+        public bool IsHardwareTokenActive(uint custID, string tokenValue) {
+            return base.Channel.IsHardwareTokenActive(custID, tokenValue);
         }
         
         public uint GetNextHardwareTokenValue(uint custID) {
@@ -2333,12 +2370,12 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetModulesByProductLicense(productLicenseName);
         }
         
-        public short GetTotalModuleValue(string licenseServer, byte productID, short modID) {
-            return base.Channel.GetTotalModuleValue(licenseServer, productID, modID);
+        public void UpdatePacket(Client.Creator.CreatorService.PacketTable pt) {
+            base.Channel.UpdatePacket(pt);
         }
         
-        public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion) {
-            base.Channel.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
+        public void UpdatePackets(System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> packets) {
+            base.Channel.UpdatePackets(packets);
         }
         
         public void DeletePacket(Client.Creator.CreatorService.PacketTable pt) {
@@ -2461,14 +2498,6 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetTokenByLicenseName(licName, tokenType);
         }
         
-        public bool TokenExists(uint custID, byte tokenType, string tokenValue) {
-            return base.Channel.TokenExists(custID, tokenType, tokenValue);
-        }
-        
-        public bool IsHardwareTokenActive(uint custID, string tokenValue) {
-            return base.Channel.IsHardwareTokenActive(custID, tokenValue);
-        }
-        
         public System.Collections.Generic.List<Client.Creator.CreatorService.CustomerTable> GetAllCustomers(string searchStr, bool enableLoadOptions) {
             return base.Channel.GetAllCustomers(searchStr, enableLoadOptions);
         }
@@ -2573,6 +2602,10 @@ namespace Client.Creator.CreatorService {
             base.Channel.DeleteLicense(lt);
         }
         
+        public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
+            return base.Channel.GetPacketsByConditions(cl, matchAll);
+        }
+        
         public System.Collections.Generic.List<Client.Creator.CreatorService.PacketTable> GetPacketsByLicenseName(string ln) {
             return base.Channel.GetPacketsByLicenseName(ln);
         }
@@ -2591,10 +2624,6 @@ namespace Client.Creator.CreatorService {
         
         public void CreatePacket(Client.Creator.CreatorService.PacketTable pt) {
             base.Channel.CreatePacket(pt);
-        }
-        
-        public void UpdatePacket(Client.Creator.CreatorService.PacketTable pt) {
-            base.Channel.UpdatePacket(pt);
         }
     }
 }

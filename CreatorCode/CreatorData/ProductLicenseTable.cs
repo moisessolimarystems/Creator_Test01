@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Linq;
 using System.Text;
 using System.Linq.Dynamic;
 
@@ -14,8 +15,10 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
+                DataLoadOptions dlo = new DataLoadOptions();
                 var licenses = db.ProductLicenseTables.Where(conditionStrings).ToList();
                 return licenses;
+                
             }
         }
         //filter out add-on product licenses that are now licensed
@@ -28,7 +31,7 @@ namespace CreatorData
                 {
                     return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
                                                               c.LicenseTable.LicenseName.Equals(licenseServerName) &&
-                                                             !(c.plState == 0 && c.ParentProductLicenseID != null)).ToList();
+                                                              c.plState != 3 /*State = 3 -> Licensed Add-On*/).ToList();
                 }
                 return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
                                       c.LicenseTable.LicenseName.Equals(licenseServerName)).ToList();
@@ -43,7 +46,7 @@ namespace CreatorData
                 db.ObjectTrackingEnabled = false;
                 return db.ProductLicenseTables.Where(c => c.LicenseID > 0 &&
                                                           c.LicenseTable.LicenseName.Equals(licenseServerName) &&
-                                                          !(c.plState == 0 && c.ParentProductLicenseID != null) &&
+                                                          c.plState != 3 /*State = 3 -> Licensed Add-On*/ &
                                                           c.ProductID.Equals(productID)).ToList();
             }
         }

@@ -10,6 +10,18 @@ namespace Client.Creator
     {
 
         public static readonly IDictionary<string, ConditionName>
+            _filterLPNames = new Dictionary<string, ConditionName>
+                { 
+                    {"Customer", ConditionName.Customer},
+                    {"License Packet", ConditionName.LicensePacket},
+                    {"Date Created", ConditionName.DateCreated},        
+                    {"Expiration Date", ConditionName.ExpirationDate},                   
+                    {"Verified", ConditionName.Verified},
+                    {"Verified By", ConditionName.VerifiedBy},
+                    {"Notes", ConditionName.Notes}
+                };
+
+        public static readonly IDictionary<string, ConditionName>
         _filterHTNames = new Dictionary<string, ConditionName>
                 {  
                     {"Activated Date", ConditionName.ActivatedDate},
@@ -25,8 +37,10 @@ namespace Client.Creator
                 {  
                     {"Active", ConditionName.Active},
                     {"Customer", ConditionName.Customer},        
-                    {"License Server", ConditionName.LicenseServer},
-                    {"Notes", ConditionName.Notes}
+                    {"License Server", ConditionName.LicenseServer},                   
+                    {"Notes", ConditionName.Notes},
+                    {"Validation", ConditionName.Validation},
+                    {"Verified", ConditionName.Verified}
                 };
 
         public static readonly IDictionary<string, ConditionName>
@@ -45,6 +59,7 @@ namespace Client.Creator
                     {"Product License", ConditionName.ProductLicense},
                     {"Product Version", ConditionName.ProductVersion},
                     {"State", ConditionName.State},
+                    {"Verified", ConditionName.Verified}
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
@@ -98,7 +113,8 @@ namespace Client.Creator
         {
             LicenseServer,
             ProductLicense,
-            HardwareToken
+            HardwareToken,
+            LicensePacket
         }
 
         public enum ConditionNameType
@@ -115,6 +131,12 @@ namespace Client.Creator
             days,
             weeks,
             months
+        }
+       
+        public enum ValidationType
+        {
+            Hardware,
+            Software
         }
 
         private string  _id;
@@ -167,16 +189,26 @@ namespace Client.Creator
             {
                 Condition dbCondition = new Condition();
                 string strVal = userCondition.Value;
-                if (_type == ReportProperty.ReportType.LicenseServer)
+                if (_type == ReportType.LicenseServer || _type == ReportType.LicensePacket)
                 {
                 }
-                else if (_type == ReportProperty.ReportType.ProductLicense)
+                else if (_type == ReportType.ProductLicense)
                 {
                     if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
                     {
                         try
                         {
-                            strVal = ((int)Enum.Parse(typeof(ProductLicenseState), userCondition.Value)).ToString();
+                            int currentState = -1;
+                            foreach (ProductLicenseState pls in Enum.GetValues(typeof(ProductLicenseState)))
+                            {
+                                if (userCondition.Value == Enums.GetEnumDescription(pls))
+                                {
+                                    currentState = (int)pls;
+                                    break;
+                                }
+                            }
+                            //convert description to productlicensestate
+                            strVal = currentState.ToString(); 
                         }
                         catch (Exception) { }
                     }
@@ -192,7 +224,7 @@ namespace Client.Creator
                         strVal = string.Format("{0},{1}",productID, _commLink.GetModuleID(productID, userCondition.Value));
                     }
                 }
-                else
+                else //HardwareToken
                 {
                     if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
                     {
@@ -231,6 +263,7 @@ namespace Client.Creator
                 case ConditionName.ActivatedDate:
                 case ConditionName.DeactivatedDate:
                 case ConditionName.ExpirationDate:
+                case ConditionName.DateCreated:
                     return ConditionNameType.Date;
                     break;
                 case ConditionName.Activation:
@@ -242,16 +275,19 @@ namespace Client.Creator
                 case ConditionName.Customer:
                 case ConditionName.HardwareID:
                 case ConditionName.LicenseServer:
+                case ConditionName.LicensePacket:
                 case ConditionName.Module:
                 case ConditionName.Notes:
                 case ConditionName.ProductLicense:
                 case ConditionName.ProductVersion:
+                case ConditionName.VerifiedBy:
                     return ConditionNameType.String;
                     break;
                 case ConditionName.Active:
+                case ConditionName.Verified:
                     return ConditionNameType.Bool;
                     break;
-                default : // ConditionName.Product, ConditionName.State(PL, HW)
+                default : // ConditionName.Product, ConditionName.State(PL, HW), ConditionName.Validation
                     return ConditionNameType.Defined;
                     break;
             }
@@ -265,14 +301,21 @@ namespace Client.Creator
             {
                 definedValueList.AddRange(CreatorForm.s_CommLink.GetProductNameList());
             }
+            else if (cn == ConditionName.Validation)
+            {
+                definedValueList.AddRange(Enum.GetNames(typeof(ValidationType)));
+            }
             else
             {
                 if (_type == ReportType.ProductLicense)
                 {
-                    definedValueList.AddRange(Enum.GetNames(typeof(ProductLicenseState)));
+                    foreach(ProductLicenseState pls in Enum.GetValues(typeof(ProductLicenseState)))
+                    {
+                        definedValueList.Add(Enums.GetEnumDescription(pls));
+                    }
                 }
                 else
-                { 
+                {
                     definedValueList.AddRange(Enum.GetNames(typeof(TokenStatus)));
                 }
             }
@@ -292,6 +335,9 @@ namespace Client.Creator
                      break;
                 case ReportType.HardwareToken:
                     conditionName = _filterHTNames[filterName];
+                     break;
+                case ReportType.LicensePacket:
+                     conditionName = _filterLPNames[filterName];
                      break;
                 default: break;
             }
@@ -316,6 +362,9 @@ namespace Client.Creator
                 case ConditionNameType.Defined:
                     conditionOp = _filterOperators[filterOperator];
                     break;
+                case ConditionNameType.Bool:
+                    conditionOp = _filterBoolOperators[filterOperator];
+                    break;
                 default: break;
             }
             return conditionOp;
@@ -329,8 +378,10 @@ namespace Client.Creator
                 filterNames = _filterLSNames;
             else if (Type == ReportType.ProductLicense)
                 filterNames = _filterPLNames;
-            else
+            else if (Type == ReportType.HardwareToken)
                 filterNames = _filterHTNames;
+            else
+                filterNames = _filterLPNames;
             foreach (KeyValuePair<string, ConditionName> kvp in filterNames)
             {
                 if (kvp.Value == userCondition.Name)
@@ -400,6 +451,9 @@ namespace Client.Creator
                     break;
                 case ReportType.HardwareToken:
                     return _filterHTNames.Keys;
+                    break;
+                case ReportType.LicensePacket:
+                    return _filterLPNames.Keys;
                     break;
                 default: break; //return license server names
             }

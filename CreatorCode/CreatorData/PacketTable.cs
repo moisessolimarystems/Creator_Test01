@@ -2,12 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Linq;
+using System.Linq.Dynamic;
 using System.Text;
 
 namespace CreatorData
 {
     public partial class PacketTable
     {
+        public static IList<PacketTable> GetPacketsByConditions(string conditionStrings)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                var packets = db.PacketTables.Where(conditionStrings).ToList();
+                return packets;
+            }
+        }
+
         public static IList<PacketTable> GetPacketsByLicenseName(string licenseName)
         {
             using (CreatorDataContext db = new CreatorDataContext())
@@ -58,6 +69,18 @@ namespace CreatorData
             {
                 db.PacketTables.Attach(packet, true);
                 db.SubmitChanges();
+            }
+        }
+
+        public static void UpdatePackets(IList<PacketTable> packets)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                foreach (PacketTable packet in packets)
+                {
+                    db.PacketTables.Attach(packet, true);
+                    db.SubmitChanges();
+                }
             }
         }
 

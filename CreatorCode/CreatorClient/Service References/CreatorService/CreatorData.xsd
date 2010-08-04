@@ -98,6 +98,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="PacketTable" nillable="true" type="tns:PacketTable" />
+  <xs:complexType name="ArrayOfPacketTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPacketTable" nillable="true" type="tns:ArrayOfPacketTable" />
   <xs:complexType name="ArrayOfTransactionTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="TransactionTable" nillable="true" type="tns:TransactionTable" />
@@ -243,10 +249,4 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="LicenseTable" nillable="true" type="tns:LicenseTable" />
-  <xs:complexType name="ArrayOfPacketTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfPacketTable" nillable="true" type="tns:ArrayOfPacketTable" />
 </xs:schema>

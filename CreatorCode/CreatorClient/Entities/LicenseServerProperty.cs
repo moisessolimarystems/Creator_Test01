@@ -141,7 +141,7 @@ namespace Client.Creator
         [Browsable(false)]
         public string UserLock
         {
-            get 
+            get
             {
                 if (_userLock == null)
                     return "";
@@ -164,8 +164,7 @@ namespace Client.Creator
                     if (lt != null)
                     {
                         _userLock = lt.UserLock;
-                        if ((lt.UserLock == null) || (lt.UserLock.ToLower() != WindowsIdentity.GetCurrent().Name.ToLower()))
-                            bLocked = false;
+                        if (lt.UserLock == null) bLocked = false;
                     }
                 });
                 return bLocked;
@@ -176,7 +175,7 @@ namespace Client.Creator
                 {
                     LicenseTable lt = client.GetLicenseByName(Name, false);
                     if (lt != null)
-                        lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name : null;                    
+                        lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name : null;
                     client.UpdateLicense(lt, false);
                 });
             }

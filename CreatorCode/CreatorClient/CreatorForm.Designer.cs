@@ -49,7 +49,6 @@
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.updateVersionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.softwareTokenPreferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -146,6 +145,7 @@
             this.lsReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.plReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hardwareTokenReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.licensePacketReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reportToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.editReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -305,8 +305,7 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.updateVersionsToolStripMenuItem,
-            this.softwareTokenPreferencesToolStripMenuItem,
-            this.optionsToolStripMenuItem});
+            this.softwareTokenPreferencesToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -325,12 +324,6 @@
             this.softwareTokenPreferencesToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
             this.softwareTokenPreferencesToolStripMenuItem.Text = "Software Token Preferences...";
             this.softwareTokenPreferencesToolStripMenuItem.Click += new System.EventHandler(this.softwareTokenPreferencesToolStripMenuItem_Click);
-            // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
-            this.optionsToolStripMenuItem.Text = "Options...";
             // 
             // viewToolStripMenuItem
             // 
@@ -728,7 +721,6 @@
             this.DetailTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseUp);
             this.DetailTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.DetailTreeView_AfterSelect);
             this.DetailTreeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseDown);
-            this.DetailTreeView.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeSelect);
             this.DetailTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DetailTreeView_KeyDown);
             // 
             // CreatorImageList
@@ -1453,7 +1445,8 @@
             this.newReportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lsReportToolStripMenuItem,
             this.plReportToolStripMenuItem,
-            this.hardwareTokenReportToolStripMenuItem});
+            this.hardwareTokenReportToolStripMenuItem,
+            this.licensePacketReportToolStripMenuItem});
             this.newReportToolStripMenuItem.Name = "newReportToolStripMenuItem";
             this.newReportToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.newReportToolStripMenuItem.Text = "New";
@@ -1478,6 +1471,13 @@
             this.hardwareTokenReportToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.hardwareTokenReportToolStripMenuItem.Text = "Hardware Token Report";
             this.hardwareTokenReportToolStripMenuItem.Click += new System.EventHandler(this.hardwareTokenReportToolStripMenuItem_Click);
+            // 
+            // licensePacketReportToolStripMenuItem
+            // 
+            this.licensePacketReportToolStripMenuItem.Name = "licensePacketReportToolStripMenuItem";
+            this.licensePacketReportToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.licensePacketReportToolStripMenuItem.Text = "License Packet Report";
+            this.licensePacketReportToolStripMenuItem.Click += new System.EventHandler(this.licensePacketReportToolStripMenuItem_Click);
             // 
             // reportToolStripSeparator1
             // 
@@ -1691,6 +1691,7 @@
             // checkOutToolStripMenuItem
             // 
             this.checkOutToolStripMenuItem.Name = "checkOutToolStripMenuItem";
+            this.checkOutToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.checkOutToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.checkOutToolStripMenuItem.Text = "Check Out...";
             this.checkOutToolStripMenuItem.Click += new System.EventHandler(this.checkOutToolStripMenuItem_Click);
@@ -1698,6 +1699,7 @@
             // checkInToolStripMenuItem
             // 
             this.checkInToolStripMenuItem.Name = "checkInToolStripMenuItem";
+            this.checkInToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
             this.checkInToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.checkInToolStripMenuItem.Text = "Check In...";
             this.checkInToolStripMenuItem.Click += new System.EventHandler(this.checkInToolStripMenuItem_Click);
@@ -2038,7 +2040,6 @@
         private System.Windows.Forms.ToolStripSeparator lcmToolStripSeparator4;
         private System.Windows.Forms.ToolStripLabel SearchToolStripLabel;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader ExpDateColumnHeader;
@@ -2130,6 +2131,7 @@
         private System.Windows.Forms.ToolStripButton printToolStripButton;
         private System.Windows.Forms.ToolStripButton addLicMainToolStripBtn;
         private System.Windows.Forms.ToolStripButton addProductLicenseMainToolStripDropDownBtn;
+        private System.Windows.Forms.ToolStripMenuItem licensePacketReportToolStripMenuItem;
     }
 }
 

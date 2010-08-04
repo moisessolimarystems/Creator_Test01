@@ -56,12 +56,14 @@ namespace CreatorData
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
+                IList<LicenseTable> licenseList = null;
                 db.ObjectTrackingEnabled = false;
                 //need to be able to translate destid to destname from searchstring
-                var licenseFilter = from l in db.LicenseTables
-                                    where l.CustomerTable.SCRname.Equals(custName)
-                                    select l;
-                return licenseFilter.ToList();
+                if (custName.Length == 0)
+                    licenseList = db.LicenseTables.ToList();
+                else
+                    licenseList = db.LicenseTables.Where(l => l.CustomerTable.SCRname == custName).ToList();
+                return licenseList;
             }
         }
 

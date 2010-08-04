@@ -25,7 +25,9 @@ namespace Service.Creator
                     {"Customer", "CustomerTable.SCRname"},
                     {"LicenseServer", "LicenseName"},
                     {"Active", "IsActive"},
-                    {"Notes", "LicenseComments"}
+                    {"Notes", "LicenseComments"},
+                    {"Validation", "Validation"},
+                    {"Verified", "Verified"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -54,7 +56,21 @@ namespace Service.Creator
                     {"ActivationAmount","ActivationAmount"},
                     {"Module", "Module"},
                     {"ModuleValue", "ModuleValue"},
-                    {"Notes", "Description"}
+                    {"Notes", "Description"},
+                    {"Verified", "Verified"}
+                };
+
+        private static readonly IDictionary<string, string>
+            _filterLPNames = new Dictionary<string, string>
+                {     
+                    {"Customer", "LicenseTable.CustomerTable.SCRname"},
+                    {"LicensePacket", "PacketName"},
+                    {"DateCreated", "DateCreated"},
+                    {"ExpirationDate", "ExpiredDate"},
+                    {"LicenseServer", "LicenseTable.LicenseName"},
+                    {"Verified", "IsVerified"},
+                    {"VerifiedBy", "VerifiedBy"},
+                    {"Notes","PacketComments"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -68,6 +84,7 @@ namespace Service.Creator
                     {"IsInTheLast", "IsInTheLast"},
                     {"IsInTheNext", "IsInTheNext"}
                 };
+
         public static SolimarLicenseServerWrapper m_licServer = new SolimarLicenseServerWrapper();
         public static CommunicationLink m_CommLink = new CommunicationLink();
         public static SolimarLicenseWrapper m_licenseWrapper = new SolimarLicenseWrapper();
@@ -189,6 +206,7 @@ namespace Service.Creator
         {
             String value;
             int result;
+            bool bValue;
             StringBuilder conditionString = new StringBuilder();
             foreach (Condition userCondition in cl)
             {
@@ -199,11 +217,21 @@ namespace Service.Creator
                     else
                         conditionString.Append(" or ");
                 }
-                //create a condition string from condition list using dictionary to translate condition to conditionstring
                 value = userCondition.Value;
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
                 {
+                    case ConditionName.Validation:
+                        string op = ((value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
+                        conditionString.Append(string.Format("TokenTables.Where(TokenType {0} 1).Count() > 0", op));
+                        break;
+                    case ConditionName.Verified:
+                        //if true not verified count should be  = 0 and packet counts > 0
+                        //if false not verified count should be != 0 or packet counts = 0
+                        string op1 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "&&" : "||";
+                        string op2 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "!=" : "=";
+                        conditionString.Append(string.Format("(PacketTables.Where(IsVerified=False).Count(){0}0 {1} PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
+                        break;
                     default:
                         conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
                         if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
@@ -212,19 +240,18 @@ namespace Service.Creator
                         }
                         else
                         {
-                            if (!Int32.TryParse(value, out result))
+                            if (userCondition.Name == ConditionName.Active)
                             {
-                                if (userCondition.Name == ConditionName.Active)
-                                {
-                                    bool bValue;
-                                    if (bool.TryParse(userCondition.Value, out bValue))
-                                        value = (bValue) ? bool.TrueString : bool.FalseString;
-                                }
-                                else
-                                    value = "\"" + value + "\"";
+                                value = (userCondition.Operator == ConditionOperator.Equal) ? bool.TrueString : bool.FalseString;
+                                conditionString.Append(string.Format("={0}",value));
                             }
-                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                            conditionString.Append(value);
+                            else
+                            {
+                                if (!Int32.TryParse(value, out result))
+                                    value = "\"" + value + "\"";
+                                conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                                conditionString.Append(value);
+                            }
                         }
                         break;
                 };             
@@ -301,6 +328,91 @@ namespace Service.Creator
 
         #region Packet Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<PacketTable> GetPacketsByConditions(IList<Condition> cl, bool matchAll)
+        {
+            String value;
+            int result;
+            StringBuilder conditionString = new StringBuilder();
+            foreach (Condition userCondition in cl)
+            {
+                if (conditionString.Length != 0)
+                {
+                    if (matchAll)
+                        conditionString.Append(" and ");
+                    else
+                        conditionString.Append(" or ");
+                }
+                value = userCondition.Value;
+                //create a condition string from condition list using dictionary to translate condition to conditionstring
+                switch (userCondition.Name)
+                {
+                    case ConditionName.ExpirationDate:
+                    case ConditionName.DateCreated:
+                        string opStr = _filterOperators[userCondition.Operator.ToString()];
+                        DateTime date;
+                        int parseValue;
+                        if (opStr == "IsInTheLast" || opStr == "IsInTheNext")
+                        {
+                            if (Int32.TryParse(value, out parseValue))
+                            {
+                                if (opStr == "IsInTheLast")
+                                    parseValue = -parseValue;
+                                if (userCondition.ValueType == "days")
+                                    date = DateTime.Today.AddDays(parseValue);
+                                else if (userCondition.ValueType == "weeks")
+                                    date = DateTime.Today.AddDays(parseValue * 7);
+                                else
+                                    date = DateTime.Today.AddMonths(parseValue);
+                                if (opStr == "IsInTheLast")
+                                    conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
+                                                                         _filterLPNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                else
+                                    conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
+                                                                         _filterLPNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
+                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                            }
+                        }
+                        else
+                        {
+                            if (DateTime.TryParse(value, out date))
+                                conditionString.Append(string.Format("{0}{1}{2}",
+                                                                     _filterLPNames[userCondition.Name.ToString()],
+                                                                     _filterOperators[userCondition.Operator.ToString()],
+                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                        }
+                        break;
+                    default:
+                        conditionString.Append(_filterLPNames[userCondition.Name.ToString()]);
+                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        {
+                            conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
+                        }
+                        else
+                        {
+                            if (!Int32.TryParse(value, out result))
+                            {
+                                if (userCondition.Name == ConditionName.Verified)
+                                {
+                                    bool bValue;
+                                    if (bool.TryParse(userCondition.Value, out bValue))
+                                        value = (bValue) ? bool.TrueString : bool.FalseString;
+                                }
+                                else
+                                    value = "\"" + value + "\"";
+                            }
+                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                            conditionString.Append(value);
+                        }
+                        break;
+                };
+            }
+            return PacketTable.GetPacketsByConditions(conditionString.ToString());
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<PacketTable> GetPacketsByLicenseName(string licName)
         {
             return PacketTable.GetPacketsByLicenseName(licName);
@@ -330,6 +442,11 @@ namespace Service.Creator
         public void UpdatePacket(PacketTable pt)
         {
             PacketTable.UpdatePacket(pt);
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdatePackets(IList<PacketTable> ptList)
+        {
+            PacketTable.UpdatePackets(ptList);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeletePacket(PacketTable pt)
@@ -401,7 +518,14 @@ namespace Service.Creator
                 value = userCondition.Value;
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
-                {
+                {                    
+                    case ConditionName.Verified:
+                        //if true not verified count should be  = 0
+                        //if false not verified count should be != 0
+                        string op1 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "&&" : "||";
+                        string op2 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "!=" : "=";
+                        conditionString.Append(string.Format("(LicenseTable.PacketTables.Where(IsVerified=False).Count(){0}0 {1} LicenseTable.PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
+                        break;
                     case ConditionName.Module:
                         int productID = 0, moduleID = 0;
                         string[] moduleValue = userCondition.Value.Split(",".ToCharArray());
@@ -460,19 +584,18 @@ namespace Service.Creator
                         }
                         else
                         {
-                            if (!Int32.TryParse(value, out result))
+                            if (userCondition.Name == ConditionName.Active)
                             {
-                                if (userCondition.Name == ConditionName.Active)
-                                {
-                                    bool bValue;
-                                    if (bool.TryParse(userCondition.Value, out bValue))
-                                        value = (bValue) ? bool.TrueString : bool.FalseString;
-                                }
-                                else
-                                    value = "\"" + value + "\"";
+                                value = (userCondition.Operator == ConditionOperator.Equal) ? bool.TrueString : bool.FalseString;
+                                conditionString.Append(string.Format("={0}", value));
                             }
-                            conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
-                            conditionString.Append(value);
+                            else
+                            {
+                                if (!Int32.TryParse(value, out result))
+                                    value = "\"" + value + "\"";
+                                conditionString.Append(_filterOperators[userCondition.Operator.ToString()]);
+                                conditionString.Append(value);
+                            }
                         }
                         break;
                 };

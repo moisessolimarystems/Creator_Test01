@@ -183,9 +183,10 @@ namespace Client.Creator
             {
                 valueCB.Visible = true;
                 ComboBox definedCB = (ComboBox)valueCB;
+                int currentIndex = definedCB.SelectedIndex;
                 definedCB.Items.Clear();
                 definedCB.Items.AddRange(_reportData.Report.GetDefinedValues(cn));
-                if (definedCB.SelectedIndex == null) definedCB.SelectedIndex = 0;
+                definedCB.SelectedIndex = (currentIndex < 0) ? 0 : currentIndex;
             }
             else if(cnt == ReportProperty.ConditionNameType.Date)
             { //date
