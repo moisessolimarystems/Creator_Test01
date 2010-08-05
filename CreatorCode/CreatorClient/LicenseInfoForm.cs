@@ -65,6 +65,8 @@ namespace Client.Creator
         {
             if (tokenAttribsSplitContainer.Parent == topPanel)
                 ValidateTokenForm();
+            if (selectedObject is ProductLicenseDialogData)
+                ValidateProductLicenses();
         }
 
         private void LicenseInfoForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -76,6 +78,32 @@ namespace Client.Creator
         #endregion
 
         #region Product License Methods
+        void ValidateProductLicenses()
+        {
+            ProductLicenseDialogData pltData = selectedObject as ProductLicenseDialogData;
+            m_Validated = true;
+            List<ProductLicenseTable> pltList = null;
+            Service<ICreator>.Use((client) =>
+            {
+                pltList = client.GetProductLicenses(pltData.LicenseServerString, true);               
+            });
+            SaveCurrentItem();
+            foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
+            {
+                if (pltList.Where(p => p.plID == plt.plID).Count() != 0)
+                {
+                    string previousID = plt.plID;
+                    //retrieve the next available number 
+                    plt.plIndex = pltData.NextLicenseServerIndex;
+                    plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, pltData.NextLicenseServerIndex);
+                    pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex + 1;                    
+                    MessageBox.Show(string.Format("{0} already exists! {0} will be updated to {1}. Please try again.", previousID, plt.plID), "Error", MessageBoxButtons.OK);
+                    m_Validated = false;
+                    InitializeProductLicenseTabPage(plt);
+                    break;
+                }
+            } 
+        }
 
         void InitializeProductLicenseTabPage(ProductLicenseTable plt)
         {
@@ -127,12 +155,6 @@ namespace Client.Creator
             selectedObject = plData as Object;
             topPanel.Controls.Clear();
             productLicenseSplitContainer.Parent = topPanel;
-            //splitContainer1.Parent = topPanel;
-            //productLicenseGroupBox.Parent = topPanel;
-            //bindingNavigator1.Parent = topPanel;
-            //bindingNavigator1.BringToFront();
-            //tableLayoutPanel5.Parent = topPanel;
-            //tableLayoutPanel5.BringToFront();
             //create bindinglist from productlicense
             BindingList<ProductLicenseTable> bindingList = new BindingList<ProductLicenseTable>();
             bindingNavigator1.BindingSource = new BindingSource();
@@ -142,12 +164,11 @@ namespace Client.Creator
 
         void SaveProductLicenseTabPage(ProductLicenseDialogData plData)
         {
-            SaveCurrentItem();
+            //SaveCurrentItem();
             List<ProductLicenseTable> pltList = new List<ProductLicenseTable>();
             foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
             {
                 pltList.Add(plt);
-                // item.
             }
             plData.ProductLicense = pltList;
         }
