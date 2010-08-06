@@ -1101,7 +1101,10 @@ namespace SolimarLicenseViewer
                                     moduleID = (int)modInfo.moduleID.TVal;
                                     lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
                                     if (bExpired)
+                                    {
                                         lvItem.ForeColor = System.Drawing.Color.Red;
+                                        lvItem.ToolTipText = string.Format("Module Expired on: {0}", expirationDateText);
+                                    }
                                     else
                                         lvItem.ForeColor = m_TreeNode.ForeColor;
 
@@ -1302,6 +1305,10 @@ namespace SolimarLicenseViewer
                         {
                             lvItem.Font = new System.Drawing.Font(lvItem.Font, System.Drawing.FontStyle.Italic);
                             lvItem.ForeColor = System.Drawing.Color.Red;
+                            if (keyInfo.IsKeyTypeDevelopment() && keyInfo.hoursLeft == 0)
+                                lvItem.ToolTipText = string.Format("Test\\Dev Protection Key {0} expired: 0 hours left", keyInfo.keyName);
+                            else
+                                lvItem.ToolTipText = string.Format("Protection Key {0} expired on: {1}", keyInfo.keyName, keyInfo.expirationDate.ToString());
                         }
 
                         lvItem.Text = keyInfo.keyTypeName;
@@ -1848,11 +1855,13 @@ namespace SolimarLicenseViewer
                         testConnectionToLicenseServer(connSettings);
                         lvItem.ForeColor = System.Drawing.Color.Green;
                         lvItem.SubItems[4].Text = "Successfully connected to the License Server";
+                        lvItem.ToolTipText = string.Format("Connection Status: {0}", lvItem.SubItems[4].Text);
                     }
                     catch (Exception ex)
                     {
                         lvItem.ForeColor = System.Drawing.Color.Red;
                         lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
+                        lvItem.ToolTipText = string.Format("Connection Error: {0}", lvItem.SubItems[4].Text);
                     }
                 }
                 Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(_listViewItemList[0].ListView);
@@ -1873,32 +1882,7 @@ namespace SolimarLicenseViewer
                     using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
                     {
                         Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
-                        if (_connectionSettings.UseDevelopmentLic == true)
-                        {
-                            //Successfully connected, use a different product ID for the Test/Dev licensing
-                            if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Iconvert)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevIconvert;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubika;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubikaProcessBuilder;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSdxDesigner;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolIndexer;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolFusion)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolfusionSp;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolScript)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolScript;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherEnt)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolsearcherEp;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpde;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpdeQueueManager;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherSp)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSseSp;
-                        }
+
                         licWrapper.ConnectByProductEx((int)productID, false);
 
                         licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
