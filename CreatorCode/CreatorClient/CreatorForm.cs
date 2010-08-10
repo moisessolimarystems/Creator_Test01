@@ -163,7 +163,7 @@ namespace Client.Creator
                     checkOutToolStripMenuItem.Visible = true;
                     checkOutToolStripMenuItem.Enabled = (licData.UserLock.Length == 0);
                     checkInToolStripMenuItem.Visible = true;
-                    checkInToolStripMenuItem.Enabled = (licData.UserLock == WindowsIdentity.GetCurrent().Name || m_Permissions.pt_permanent_pwd.Value);
+                    checkInToolStripMenuItem.Enabled = (licData.UserLock.ToLower() == WindowsIdentity.GetCurrent().Name.ToLower() || m_Permissions.pt_permanent_pwd.Value);
                     //allow refresh if license is not expired or has validation tokens          
                     lcmToolStripSeparator2.Visible = true;    
                 }
@@ -1338,7 +1338,7 @@ namespace Client.Creator
                             if (lsp.LockStatus)
                             {
                                 //check user, if admin always allow, if regular user only allow if same
-                                if(lsp.UserLock == WindowsIdentity.GetCurrent().Name || m_Permissions.pt_permanent_pwd.Value)
+                                if(lsp.UserLock.ToLower() == WindowsIdentity.GetCurrent().Name.ToLower() || m_Permissions.pt_permanent_pwd.Value)
                                     checkInLicenseServer(DetailTreeView.SelectedNode);
                             }
                         }
