@@ -366,22 +366,22 @@ namespace Service.Creator
                                 if (opStr == "IsInTheLast")
                                     conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
                                                                          _filterLPNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                                 else
                                     conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
                                                                          _filterLPNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                             }
                         }
                         else
                         {
                             if (DateTime.TryParse(value, out date))
-                                conditionString.Append(string.Format("{0}{1}{2}",
+                                conditionString.Append(string.Format("{0}.Date{1}{2}",
                                                                      _filterLPNames[userCondition.Name.ToString()],
                                                                      _filterOperators[userCondition.Operator.ToString()],
-                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                     string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                         }
                         break;
                     default:
@@ -728,22 +728,22 @@ namespace Service.Creator
                                 if (opStr == "IsInTheLast")
                                     conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
                                                                          _filterHTNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                                 else
                                     conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
                                                                          _filterHTNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                             }
                         }
                         else
                         {
-                            if (DateTime.TryParse(value, out date))
-                                conditionString.Append(string.Format("{0}{1}{2}",
+                            if (DateTime.TryParse(value, out date)) //Hardware Token dates are DateTime?
+                                conditionString.Append(string.Format("{0}.Value.Date{1}{2}",
                                                                      _filterHTNames[userCondition.Name.ToString()],
                                                                      _filterOperators[userCondition.Operator.ToString()],
-                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                     string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                         }
                         break;
                     default:
