@@ -1,5 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/CreatorData" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CreatorData" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ArrayOfModuleTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ModuleTable" nillable="true" type="tns:ModuleTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfModuleTable" nillable="true" type="tns:ArrayOfModuleTable" />
+  <xs:complexType name="ModuleTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="ModID" type="xs:short" />
+      <xs:element minOccurs="0" name="Value" type="xs:short" />
+      <xs:element minOccurs="0" name="AppInstance" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="ProductLicenseID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ModuleTable" nillable="true" type="tns:ModuleTable" />
   <xs:complexType name="TokenTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -67,22 +83,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfSoftwareTokenTable" nillable="true" type="tns:ArrayOfSoftwareTokenTable" />
-  <xs:complexType name="ModuleTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="ModID" type="xs:short" />
-      <xs:element minOccurs="0" name="Value" type="xs:short" />
-      <xs:element minOccurs="0" name="AppInstance" type="xs:unsignedByte" />
-      <xs:element minOccurs="0" name="ProductLicenseID" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ModuleTable" nillable="true" type="tns:ModuleTable" />
-  <xs:complexType name="ArrayOfModuleTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="ModuleTable" nillable="true" type="tns:ModuleTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfModuleTable" nillable="true" type="tns:ArrayOfModuleTable" />
   <xs:complexType name="PacketTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
