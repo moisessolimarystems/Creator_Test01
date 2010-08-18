@@ -175,8 +175,6 @@ namespace Client.Creator
         {
             get
             {
-                //SetBrowsableAttribStatus(ProductLicenseAttributes.ActivationTotal, _product.Name.Contains("Test"));
-                //SetBrowsableAttribStatus(ProductLicenseAttributes.ActivationAmountInDays, _product.Name.Contains("Test"));
                 return _commLink.GetProductName(ProductID);
             }
         }
@@ -195,33 +193,36 @@ namespace Client.Creator
             }
             set
             {
-                if (_version != value)
+                if (IsActive)
                 {
-                    IList<ProductLicenseTable> productLicenses = null;
-                    Service<ICreator>.Use((client) =>
+                    if (_version != value)
                     {
-                        if (value.ToString() != ProductVersion.ToString())
-                            TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                  "",
-                                                                  ID,
-                                                                  string.Format("Edit {0} Version", ProductName),
-                                                                  value.ToString(),
-                                                                  ProductVersion.ToString());
-                        productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
-                        if (productLicenses != null)
+                        IList<ProductLicenseTable> productLicenses = null;
+                        Service<ICreator>.Use((client) =>
                         {
-                            foreach (ProductLicenseTable pl in productLicenses)
+                            if (value.ToString() != ProductVersion.ToString())
+                                TransactionManager.CreateTransaction(TransactionType.Status,
+                                                                      "",
+                                                                      ID,
+                                                                      string.Format("Edit {0} Version", ProductName),
+                                                                      value.ToString(),
+                                                                      ProductVersion.ToString());
+                            productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                            if (productLicenses != null)
                             {
-                                pl.ProductVersion = value.ToString();
-                                client.UpdateProductLicense(pl);
+                                foreach (ProductLicenseTable pl in productLicenses)
+                                {
+                                    pl.ProductVersion = value.ToString();
+                                    client.UpdateProductLicense(pl);
+                                }
                             }
-                        }
-                        client.MarkDirty(LicenseServer);
-                    });
-                    RemoveDeprecatedModules(value); //for all modules
-                    AddIntroducedModules(value, productLicenses); //for all product licenses
-                    _plRec.ProductVersion = value.ToString();
-                    _version = value;
+                            client.MarkDirty(LicenseServer);
+                        });
+                        RemoveDeprecatedModules(value); //for all modules
+                        AddIntroducedModules(value, productLicenses); //for all product licenses
+                        _plRec.ProductVersion = value.ToString();
+                        _version = value;
+                    }
                 }
             }
         }
@@ -234,7 +235,7 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_create_modify_key.Value);
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_create_modify_key.Value);      
                 return _plRec.ProductConnection;
             }
             set
@@ -244,32 +245,35 @@ namespace Client.Creator
                 //add-on modules - always 0 unless total is 0 then 1
                 //client modules - matches product
                 //add-on modules - always 0 unless total is 0 then 1
-                if (ModuleList != null)
+                if (IsActive)
                 {
-                    foreach (ModuleTable module in _moduleList)
+                    if (ModuleList != null)
                     {
-                        //needs to update database
-                        module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
+                        foreach (ModuleTable module in _moduleList)
+                        {
+                            //needs to update database
+                            module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
+                        }
                     }
+                    _plRec.ProductConnection = value;
+                    Service<ICreator>.Use((client) =>
+                    {
+                        client.UpdateAllModules(_moduleList);
+                        ProductLicenseTable plt = client.GetProductLicense(ID);
+                        if (plt != null)
+                        {
+                            TransactionManager.CreateTransaction(TransactionType.Status,
+                                                                  "",
+                                                                  ID,
+                                                                  string.Format("Edit {0} Product Connection", ProductName),
+                                                                  value.ToString(),
+                                                                  ProductConnection.ToString());
+                            plt.ProductConnection = _plRec.ProductConnection;
+                            client.UpdateProductLicense(plt);
+                            client.MarkDirty(LicenseServer);
+                        }
+                    });
                 }
-                _plRec.ProductConnection = value;
-                Service<ICreator>.Use((client) =>
-                {
-                    client.UpdateAllModules(_moduleList);
-                    ProductLicenseTable plt = client.GetProductLicense(ID);
-                    if (plt != null)
-                    {
-                        TransactionManager.CreateTransaction(TransactionType.Status,
-                                                              "",
-                                                              ID,
-                                                              string.Format("Edit {0} Product Connection", ProductName),
-                                                              value.ToString(),
-                                                              ProductConnection.ToString());
-                        plt.ProductConnection = _plRec.ProductConnection;
-                        client.UpdateProductLicense(plt);
-                        client.MarkDirty(LicenseServer);
-                    }
-                });
             }
         }
 
@@ -289,69 +293,72 @@ namespace Client.Creator
             {
                 //be able to change status to deactivated 
                 //only set if value changed.
-                if (!(_plRec.plState == (byte)value))
+                if (IsActive)
                 {
-                    System.Windows.Forms.DialogResult dlgResult = System.Windows.Forms.DialogResult.No;
-                    if (value != ProductLicenseState.AddOn)
-                        dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
-                    if (dlgResult == System.Windows.Forms.DialogResult.Yes || value == ProductLicenseState.AddOn)
+                    if (!(_plRec.plState == (byte)value))
                     {
-                        string errorMsg = "";
-                        switch (value)
+                        System.Windows.Forms.DialogResult dlgResult = System.Windows.Forms.DialogResult.No;
+                        if (value != ProductLicenseState.AddOn)
+                            dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
+                        if (dlgResult == System.Windows.Forms.DialogResult.Yes || value == ProductLicenseState.AddOn)
                         {
-                            case ProductLicenseState.Licensed:
-                                //was trial now licensed
-                                //clear modules of non-defaults and set defaults           
-                                //plstate is stored in terms of enums.productlicensestate
-                                if (!SetTrialToLicensed())
-                                    errorMsg = "Failed to change status from trial to licensed";
-                                break;
-                            case ProductLicenseState.Trial:
-                                //was perm now trial
-                                if (!SetLicensedToTrial())
-                                    errorMsg = "Failed to change status from licensed";
-                                break;
-                            case ProductLicenseState.AddOn:
-                                if (ParentID == null)
-                                    errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
-                                break;
-                            case ProductLicenseState.LicensedAddOn:
-                                if (!SetAddonToLicensed())
-                                    errorMsg = "Failed to change status from add-on to licensed";
-                                break;
-                            default:
-                                break;
-                        }
-                        if (errorMsg.Length == 0)
-                        {
-                            _plRec.plState = (byte)value;
-                            if (value == ProductLicenseState.Licensed)
+                            string errorMsg = "";
+                            switch (value)
                             {
-                                if (!(ProductName.Contains("Test")) && HasHardwareToken() && ParentID == null)
-                                    if (System.Windows.Forms.MessageBox.Show("Clear Expiration Date?", "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
-                                        ExpirationDate = null;
+                                case ProductLicenseState.Licensed:
+                                    //was trial now licensed
+                                    //clear modules of non-defaults and set defaults           
+                                    //plstate is stored in terms of enums.productlicensestate
+                                    if (!SetTrialToLicensed())
+                                        errorMsg = "Failed to change status from trial to licensed";
+                                    break;
+                                case ProductLicenseState.Trial:
+                                    //was perm now trial
+                                    if (!SetLicensedToTrial())
+                                        errorMsg = "Failed to change status from licensed";
+                                    break;
+                                case ProductLicenseState.AddOn:
+                                    if (ParentID == null)
+                                        errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
+                                    break;
+                                case ProductLicenseState.LicensedAddOn:
+                                    if (!SetAddonToLicensed())
+                                        errorMsg = "Failed to change status from add-on to licensed";
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (errorMsg.Length == 0)
+                            {
+                                _plRec.plState = (byte)value;
+                                if (value == ProductLicenseState.Licensed)
+                                {
+                                    if (!(ProductName.Contains("Test")) && HasHardwareToken() && ParentID == null)
+                                        if (System.Windows.Forms.MessageBox.Show("Clear Expiration Date?", "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                                            ExpirationDate = null;
+                                }
+                                else
+                                    ExpirationDate = CurrentExpirationDate.AddDays(30);
+                                Service<ICreator>.Use((client) =>
+                                {
+                                    ProductLicenseTable plt = client.GetProductLicense(ID);
+                                    if (plt != null)
+                                    {
+                                        TransactionManager.CreateTransaction(TransactionType.Status,
+                                                                              "",
+                                                                              ID,
+                                                                              string.Format("Edit {0} Status", ProductName),
+                                                                              ((ProductLicenseState)value).ToString(),
+                                                                              ((ProductLicenseState)plt.plState).ToString());
+                                        plt.plState = _plRec.plState;
+                                        client.UpdateProductLicense(plt);
+                                        client.MarkDirty(LicenseServer);
+                                    }
+                                });
                             }
                             else
-                                ExpirationDate = CurrentExpirationDate.AddDays(30);                            
-                            Service<ICreator>.Use((client) =>
-                            {
-                                ProductLicenseTable plt = client.GetProductLicense(ID);
-                                if (plt != null)
-                                {
-                                    TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                          "",
-                                                                          ID,
-                                                                          string.Format("Edit {0} Status", ProductName),
-                                                                          ((ProductLicenseState)value).ToString(),
-                                                                          ((ProductLicenseState)plt.plState).ToString());
-                                    plt.plState = _plRec.plState;
-                                    client.UpdateProductLicense(plt);
-                                    client.MarkDirty(LicenseServer);
-                                }
-                            });
+                                throw new Exception(errorMsg);
                         }
-                        else
-                            throw new Exception(errorMsg);
                     }
                 }
             }
@@ -374,47 +381,50 @@ namespace Client.Creator
             }
             set
             {
-                if (_plRec.ExpirationDate != value)
+                if (IsActive)
                 {
-                    string errorMsg = "";
-                    if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
-                        !value.HasValue && !HasHardwareToken())
-                        errorMsg = "Can't remove expiration date for non-hardware token validation.";
-                    if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
-                        errorMsg = "Please set a valid expiration date.";
-                    if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
-                        errorMsg = string.Format("{0} exceeds the expiration date limit of 18 months.", value.Value);
-                    if (errorMsg.Length == 0)
+                    if (_plRec.ExpirationDate != value)
                     {
-                        Service<ICreator>.Use((client) =>
+                        string errorMsg = "";
+                        if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
+                            !value.HasValue && !HasHardwareToken())
+                            errorMsg = "Can't remove expiration date for non-hardware token validation.";
+                        if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
+                            errorMsg = "Please set a valid expiration date.";
+                        if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
+                            errorMsg = string.Format("{0} exceeds the expiration date limit of 18 months.", value.Value);
+                        if (errorMsg.Length == 0)
                         {
-                            ProductLicenseTable plt = client.GetProductLicense(ID);
-                            if (plt != null)
+                            Service<ICreator>.Use((client) =>
                             {
-                                string storedValue = "None", newValue = "None";
-                                if (ExpirationDate.HasValue)
-                                    storedValue = ExpirationDate.Value.ToShortDateString();
-                                if (value.HasValue)
-                                    newValue = value.Value.ToShortDateString();
-                                TransactionManager.CreateTransaction(TransactionType.ExpirationDate,
-                                                  "",
-                                                  ID,
-                                                  string.Format("Modify {0} Expiration Date", ProductName),
-                                                  newValue,
-                                                  storedValue);
-                                if (value.HasValue)
-                                    plt.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
-                                else
-                                    plt.ExpirationDate = value;
-                                client.UpdateProductLicense(plt);
-                                client.MarkDirty(LicenseServer);
-                                _plRec.ExpirationDate = plt.ExpirationDate;
-                            }
-                        });
-                    }
-                    else
-                    {
-                        throw new Exception(errorMsg);
+                                ProductLicenseTable plt = client.GetProductLicense(ID);
+                                if (plt != null)
+                                {
+                                    string storedValue = "None", newValue = "None";
+                                    if (ExpirationDate.HasValue)
+                                        storedValue = ExpirationDate.Value.ToShortDateString();
+                                    if (value.HasValue)
+                                        newValue = value.Value.ToShortDateString();
+                                    TransactionManager.CreateTransaction(TransactionType.ExpirationDate,
+                                                      "",
+                                                      ID,
+                                                      string.Format("Modify {0} Expiration Date", ProductName),
+                                                      newValue,
+                                                      storedValue);
+                                    if (value.HasValue)
+                                        plt.ExpirationDate = new DateTime(value.Value.Year, value.Value.Month, value.Value.Day, 10, 0, 0).ToUniversalTime();
+                                    else
+                                        plt.ExpirationDate = value;
+                                    client.UpdateProductLicense(plt);
+                                    client.MarkDirty(LicenseServer);
+                                    _plRec.ExpirationDate = plt.ExpirationDate;
+                                }
+                            });
+                        }
+                        else
+                        {
+                            throw new Exception(errorMsg);
+                        }
                     }
                 }
             }
@@ -443,34 +453,37 @@ namespace Client.Creator
             }
             set
             {
-                if (value >= AppConstants.MaxActivations)
-                    throw new Exception(string.Format("{0} exceeds the max value for activation total"));
-                else
+                if (IsActive)
                 {
-                    Service<ICreator>.Use((client) =>
+                    if (value >= AppConstants.MaxActivations)
+                        throw new Exception(string.Format("{0} exceeds the max value for activation total"));
+                    else
                     {
-                        if (_plRec.Activations == 0 && value > 0)
+                        Service<ICreator>.Use((client) =>
                         {
-                            IList<ProductLicenseTable> plList = null;
-                            plList = client.GetProductLicenses(LicenseServer,false);
-                            if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
-                                throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
-                        }
-                        _plRec.Activations = value;
-                        ProductLicenseTable plt = client.GetProductLicense(ID);
-                        if (plt != null)
-                        {
-                            TransactionManager.CreateTransaction(TransactionType.ActivationTotal,
-                                                                 "",
-                                                                 ID,
-                                                                 string.Format("Modify {0} Activation Total", ProductName),
-                                                                 value.ToString(),
-                                                                 plt.Activations.ToString());
-                            plt.Activations = _plRec.Activations;
-                            client.UpdateProductLicense(plt);
-                            client.MarkDirty(LicenseServer);
-                        }
-                    });
+                            if (_plRec.Activations == 0 && value > 0)
+                            {
+                                IList<ProductLicenseTable> plList = null;
+                                plList = client.GetProductLicenses(LicenseServer, false);
+                                if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                                    throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                            }
+                            _plRec.Activations = value;
+                            ProductLicenseTable plt = client.GetProductLicense(ID);
+                            if (plt != null)
+                            {
+                                TransactionManager.CreateTransaction(TransactionType.ActivationTotal,
+                                                                     "",
+                                                                     ID,
+                                                                     string.Format("Modify {0} Activation Total", ProductName),
+                                                                     value.ToString(),
+                                                                     plt.Activations.ToString());
+                                plt.Activations = _plRec.Activations;
+                                client.UpdateProductLicense(plt);
+                                client.MarkDirty(LicenseServer);
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -489,43 +502,46 @@ namespace Client.Creator
             }
             set
             {
-                try
+                if (IsActive)
                 {
-                    if (value >= AppConstants.MaxActivationAmountInDays)
+                    try
                     {
-                        throw new Exception(string.Format("{0} exceeds the max value for the amount in days value per activation.", value));
-                    }
-                    else
-                    {
-                        Service<ICreator>.Use((client) =>
+                        if (value >= AppConstants.MaxActivationAmountInDays)
                         {
-                            if (_plRec.ActivationAmount == 0 && value > 0)
+                            throw new Exception(string.Format("{0} exceeds the max value for the amount in days value per activation.", value));
+                        }
+                        else
+                        {
+                            Service<ICreator>.Use((client) =>
                             {
-                                IList<ProductLicenseTable> plList = null;
-                                plList = client.GetProductLicenses(LicenseServer,false);
-                                if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
-                                    throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
-                            }
-                            _plRec.ActivationAmount = value;
-                            ProductLicenseTable plt = client.GetProductLicense(ID);
-                            if (plt != null)
-                            {
-                                TransactionManager.CreateTransaction(TransactionType.ActivationAmount,
-                                                                     "",
-                                                                     ID,
-                                                                     string.Format("Modify {0} Activation Amount in Days", ProductName),
-                                                                     value.ToString(),
-                                                                     plt.ActivationAmount.ToString());
-                                plt.ActivationAmount = value;
-                                client.UpdateProductLicense(plt);
-                                client.MarkDirty(LicenseServer);
-                            }
-                        });
+                                if (_plRec.ActivationAmount == 0 && value > 0)
+                                {
+                                    IList<ProductLicenseTable> plList = null;
+                                    plList = client.GetProductLicenses(LicenseServer, false);
+                                    if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
+                                        throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                                }
+                                _plRec.ActivationAmount = value;
+                                ProductLicenseTable plt = client.GetProductLicense(ID);
+                                if (plt != null)
+                                {
+                                    TransactionManager.CreateTransaction(TransactionType.ActivationAmount,
+                                                                         "",
+                                                                         ID,
+                                                                         string.Format("Modify {0} Activation Amount in Days", ProductName),
+                                                                         value.ToString(),
+                                                                         plt.ActivationAmount.ToString());
+                                    plt.ActivationAmount = value;
+                                    client.UpdateProductLicense(plt);
+                                    client.MarkDirty(LicenseServer);
+                                }
+                            });
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Invalid value for Activation Amount");
+                    catch (Exception ex)
+                    {
+                        throw new Exception("Invalid value for Activation Amount");
+                    }
                 }
             }
         }
