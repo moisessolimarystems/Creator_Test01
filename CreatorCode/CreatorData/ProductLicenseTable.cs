@@ -158,6 +158,18 @@ namespace CreatorData
             }
         }
 
+        public static void UpdateAllProductLicenses(IList<ProductLicenseTable> pltList)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                foreach (ProductLicenseTable plt in pltList)
+                {
+                    db.ProductLicenseTables.Attach(plt, true);
+                    db.SubmitChanges();
+                }
+            }
+        }
+
         public static void CreateProductLicense(ProductLicenseTable plt)
         {
             using (CreatorDataContext db = new CreatorDataContext())

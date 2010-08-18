@@ -14,7 +14,7 @@ using Client.Creator;
 
 namespace Service.Creator
 {
-    // NOTE: If you change the class name "Service1" here, you must also update the reference to "Service1" in App.config.
+    // NOTE: If you change the class name "Creator" here, you must also update the reference to "Creator" in App.config.
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant
             , InstanceContextMode = InstanceContextMode.Single)]
     public class Creator : ICreator
@@ -519,10 +519,10 @@ namespace Service.Creator
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
                 {                    
-                    case ConditionName.Verified:
-                        //if true not verified count should be  = 0
-                        //if false not verified count should be != 0
+                    case ConditionName.Verified: 
+                        //verified requires zero not verified packets & non-zero packet count, not verified satisfied by non-zero not verified packets or no packets found
                         string op1 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "&&" : "||";
+                        //if true not verified count should be = 0, if false not verified count should be != 0
                         string op2 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "!=" : "=";
                         conditionString.Append(string.Format("(LicenseTable.PacketTables.Where(IsVerified=False).Count(){0}0 {1} LicenseTable.PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
                         break;
@@ -673,6 +673,12 @@ namespace Service.Creator
         public void UpdateProductLicense(ProductLicenseTable plt)
         {
             ProductLicenseTable.UpdateProductLicense(plt);
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateAllProductLicenses(IList<ProductLicenseTable> pltList)
+        {
+            ProductLicenseTable.UpdateAllProductLicenses(pltList);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -978,6 +984,7 @@ namespace Service.Creator
         }
 
         #endregion
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion)
         {

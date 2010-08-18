@@ -198,6 +198,9 @@ namespace Service.Creator
         void UpdateProductLicense(ProductLicenseTable ta);
 
         [OperationContract()]
+        void UpdateAllProductLicenses(IList<ProductLicenseTable> pltList);
+
+        [OperationContract()]
         void DeleteProductLicense(ProductLicenseTable ta);
 
         #endregion
