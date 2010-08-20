@@ -113,7 +113,7 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageTempKeyExpiresToday*/ L"Your temporary license expires today.",
 	/*MessageTempKeyExpired*/ L"Your temporary license has expired.",
 	/*MessageTempKeyNotActive*/ L"Key has not been activated.", //"Do you wish to activate the %hd day " "temporary license for this key?"
-	/*MessageTempKeyDecrementing*/ L"Key trial hours has been decremented.",
+	/*MessageTempKeyDecrementing*/ L"Key trial hours have been decremented.",
 
 // entering passwords
 	/*MessagePasswordPermanent*/ L"Password Correct. You now have a permanent license to use this key.",
