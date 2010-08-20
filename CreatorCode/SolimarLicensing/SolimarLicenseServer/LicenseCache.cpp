@@ -15,8 +15,14 @@ LicenseCacheByProduct::LicenseCacheByProduct() :
 	productMajorVersion(0),
 	productMinorVersion(0),
 	pProductSpec(NULL),
+	bProductUseActivations(false),
+	productActivationCurrentExpirationDateTimeT(0),
+	bProductUseProdLicExpirationDate(false),
+	productExpirationDateTimeT(0),
 	licenseUseCacheByProductLock(CreateMutex(0,0,0))
 {
+	productActivationCurrentExpirationDateString = std::wstring(L"1900-01-01 00:00:00.0000");
+	productExpirationDateString = std::wstring(L"1900-01-01 00:00:00.0000");
 }
 LicenseCacheByProduct::~LicenseCacheByProduct()
 {
@@ -41,6 +47,16 @@ HRESULT LicenseCacheByProduct::GetCache(Lic_PackageAttribs::Lic_ProductInfoAttri
 	pProdInfo->productAppInstance = productMaxAppInstance;
 	pProdInfo->product_Major = productMajorVersion;
 	pProdInfo->product_Minor = productMinorVersion;
+	if(bProductUseActivations)
+	{
+		pProdInfo->bUseActivations = bProductUseActivations;
+		pProdInfo->activationCurrentExpirationDate = productActivationCurrentExpirationDateString;
+	}
+	if(bProductUseProdLicExpirationDate)
+	{
+		pProdInfo->bUseExpirationDate = bProductUseProdLicExpirationDate;
+		pProdInfo->expirationDate = productExpirationDateString;
+	}
 	for(ModuleLicenseMap::iterator modLicMapIt = licensesTotalMap.begin();
 		modLicMapIt != licensesTotalMap.end();
 		modLicMapIt++)
@@ -130,18 +146,17 @@ HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoA
 	//See if pProdInfo is not expired or in validation, if valid add to cache.
 	bool bAddToCache(!bLicSvrClockViolation);
 
+	//See if expirations dates come into play.  if both pProdInfo->bUseActivations and pProdInfo->bUseExpirationDate are set to use, 
+	//then use the lower one.
+	bool bUseActivationExpirationDate = (bool)pProdInfo->bUseActivations;
+	bool bUseProdLicExpirationDate = (bool)pProdInfo->bUseExpirationDate;
+	time_t activationExpirationTimeT = 0; //0 means not used
+	time_t prodLicExpirationTimeT = 0; //0 means not used
 	if(bAddToCache)
 	{
-		//See if expirations dates come into play.  if both pProdInfo->bUseActivations and pProdInfo->bUseExpirationDate are set to use, 
-		//then use the lower one.
-		bool bUseActivationExpirationDate = (bool)pProdInfo->bUseActivations;
-		bool bUseProdLicExpirationDate = (bool)pProdInfo->bUseExpirationDate;
 		if(bUseActivationExpirationDate || bUseProdLicExpirationDate)
 		{
 			time_t currentTimeDateTimeT = time(NULL);	//Retrieves Universal Time
-			time_t activationExpirationTimeT = 0; //0 means not used
-			time_t prodLicExpirationTimeT = 0; //0 means not used
-
 			try
 			{
 				if(bUseActivationExpirationDate)
@@ -218,6 +233,30 @@ HRESULT LicenseCacheByProduct::RefreshCache(Lic_PackageAttribs::Lic_ProductInfoA
 			licensesAppInstanceTotalMap[modIt->moduleID] += modIt->moduleAppInstance;
 		}
 	}
+	else
+	{
+		// CR.12672 - Track expired Product Licenses
+		if(bUseActivationExpirationDate)
+		{
+			if((activationExpirationTimeT != -1 ) && 
+				((productActivationCurrentExpirationDateTimeT == 0) || (activationExpirationTimeT < productActivationCurrentExpirationDateTimeT)))
+			{
+				bProductUseActivations = bUseActivationExpirationDate;
+				productActivationCurrentExpirationDateTimeT = activationExpirationTimeT;
+				productActivationCurrentExpirationDateString = pProdInfo->activationCurrentExpirationDate;
+			}
+		}
+		if(bUseProdLicExpirationDate)
+		{
+			if((prodLicExpirationTimeT != -1) &&
+				((productExpirationDateTimeT == 0) || (prodLicExpirationTimeT < productExpirationDateTimeT)))
+			{
+				bProductUseProdLicExpirationDate = bUseProdLicExpirationDate;
+				productExpirationDateTimeT = prodLicExpirationTimeT;
+				productExpirationDateString = pProdInfo->expirationDate;
+			}
+		}
+	}
 	return hr;
 }
 HRESULT LicenseCacheByProduct::RefreshSoftwareSpec(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* param_pProductSpec)
@@ -245,6 +284,12 @@ HRESULT LicenseCacheByProduct::ClearCache_Totals()
 	licensesAppInstanceTotalMap.clear();
 	productMajorVersion = 0;
 	productMinorVersion = 0;
+	bProductUseActivations = false;
+	productActivationCurrentExpirationDateTimeT = 0;
+	productActivationCurrentExpirationDateString = std::wstring(L"1900-01-01 00:00:00.0000");
+	bProductUseProdLicExpirationDate = false;
+	productExpirationDateTimeT = 0;
+	productExpirationDateString = std::wstring(L"1900-01-01 00:00:00.0000");
 	return hr;
 }
 HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR applicationInstance)

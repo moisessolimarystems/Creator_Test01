@@ -65,6 +65,15 @@ class LicenseCacheByProduct
 		int productMajorVersion;
 		int productMinorVersion;
 
+		// CR.12672 - For the product licenses that don't get added to the cache because they have expired, use these
+		// variables to track earliest expiration date and type
+		bool bProductUseActivations;
+		time_t productActivationCurrentExpirationDateTimeT;
+		SpdAttribs::WStringAttrib productActivationCurrentExpirationDateString;
+		bool bProductUseProdLicExpirationDate;
+		time_t productExpirationDateTimeT;
+		SpdAttribs::WStringAttrib productExpirationDateString;
+
 		typedef std::map<long, long> ModuleLicenseMap;										// map<long[[modID], long[modInUse]>>
 		typedef std::list<_bstr_t> ApplicationList;                                // list of application names
 		typedef std::map<unsigned int, ApplicationList> ModuleApplicationUseList;	// map of modules and which application instances are associated
