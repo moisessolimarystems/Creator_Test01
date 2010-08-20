@@ -30,7 +30,7 @@ class LicenseCacheByProduct
 		// Summary: 
 		//   Add the licenseID and applicationInstance to the LicenseCacheByProduct.
 		//   Returns FAILED(hr) if not licensed for enough applicatinInstances.
-		HRESULT AddApplicationInstance(BSTR licenseID, BSTR applicationInstance, long flags);
+		HRESULT AddApplicationInstance(BSTR licenseID, BSTR applicationInstance);
 
 		// Side Effect: will free all the licenses obtained to the licenseID.
 		HRESULT RemoveApplicationInstance(BSTR licenseID, BSTR applicationInstance);
@@ -39,11 +39,6 @@ class LicenseCacheByProduct
 		//   Populates a list of string that are all Application Instances that have modules obtained
 		//   Params: BSTR* pBstrListAppInstStream - streamed value of Lic_StringListAttribs
 		HRESULT GetApplicationInstanceList(BSTR licenseID, BSTR *pBstrListAppInstStream);
-
-		// Summary:
-		//   Populates a list of string that are all Application Instances that have modules obtained
-		//   Params: BSTR* pBstrListUsAppInstInfoAttribs - streamed value of Lic_UsAppInstanceInfoAttribsList
-		HRESULT GetApplicationInstanceList2(BSTR licenseID, BSTR *pBstrListUsAppInstInfoAttribs);
 
 		HRESULT ModuleLicenseTotalForAll(long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long moduleIdent, long* pLicenseCount);
@@ -83,12 +78,10 @@ class LicenseCacheByProduct
 		typedef std::list<_bstr_t> ApplicationList;                                // list of application names
 		typedef std::map<unsigned int, ApplicationList> ModuleApplicationUseList;	// map of modules and which application instances are associated
 		typedef std::map<_bstr_t, _bstr_t> LicenseToApplicationInstanceList;			// maps license identifier guid to application instance names
-		typedef std::map<_bstr_t, long> LicenseToApplicationInstanceFlagsList;	   // maps license identifier guid to application instance flags
 		typedef std::map<_bstr_t, ModuleLicenseMap> LicenseToModuleUseList;			// maps license identifier guid to modules it is using
 		
 		ModuleApplicationUseList moduleAppInstUseList;			// map<long[modID], list<appInst>> - List of AppInstances for a given modID
 		LicenseToApplicationInstanceList licenseToAppInstList;// map<bstr[licID], bstr[appInst]> - multiple licID can all share the same appInst...
-		LicenseToApplicationInstanceFlagsList licenseToAppInstFlagsList;// map<bstr[licID], long[flag]> - multiple licID can all share the same appInst...
 		LicenseToModuleUseList licenseToModUseList;				// map<bstr[licID], map<long[[modID], long[modInUse]>>
 		
 		ModuleLicenseMap licensesAppInstanceTotalMap;	// map<long[modID], long[appInstForTheModule]>
@@ -116,14 +109,14 @@ class LicenseCache
 	public:
 		LicenseCache();
 		~LicenseCache();
-		HRESULT AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance, long flags);
+		HRESULT AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance);
 
 		
 		//Side Effect: will free all the licenses obtained to the licenseID for a given productID
 		//if productID = -1, remove licenseID from all products
 		HRESULT RemoveApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance);
 		HRESULT GetApplicationInstanceList(long productID, BSTR licenseID, BSTR *pBstrListAppInstStream);
-		HRESULT GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs);
+		
 
 		HRESULT RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation);
 		HRESULT GetCache_ByProduct(long productID, Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
