@@ -113,7 +113,8 @@
 		<HResult name="EHR_LIC_CLOCK_LIC_PACKET"	ecode="EC_LIC_CLOCK_LIC_PACKET"	value="47" alias="The System Time does not seem to be set correctly (License Server)"/>
 		<HResult name="EHR_LIC_CLOCK_LIC_ARCHIVE"	ecode="EC_LIC_CLOCK_LIC_ARCHIVE" value="48" alias="The System Time does not seem to be set correctly (License Server)"/>
 		<HResult name="EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC"	ecode="EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC" value="49" alias="Failed to validate software license with a Validation Token (License server)"/>
-		
+		<HResult name="EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE"	ecode="EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE" value="50" alias="Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)"/>
+		<HResult name="EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED"	ecode="EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED"	value="51" alias="Product License Expired (License server)"/>
 	</HResultType>
 	<!--	-->
 	<!-- HResults with offset ITF_LIC_CR_APP_MIN -->
