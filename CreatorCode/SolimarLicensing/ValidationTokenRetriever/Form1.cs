@@ -27,6 +27,7 @@ namespace ValidationTokenRetriever
 			Application.Exit();
 		}
 
+
 		private void RefreshState()
 		{
 			m_vData = new SolimarValidationData();
@@ -469,6 +470,61 @@ namespace ValidationTokenRetriever
 		{
 			Initialize();
 		}
+		private void Form1_Shown(object sender, EventArgs e)
+		{
+			ChangeTabPage(0);
+		}
+
+		private void idLicenseSvrButton_Click(object sender, EventArgs e)
+		{
+			ChangeTabPage((string.Compare(idLicenseSvrTextBox.Text, FindComputerName(), true) != 0) ? 1 : 2);
+		}
+
+		private Control m_activeControl = null;
+		private int m_activeControlsTabPageIdx = -1;
+		private void ChangeTabPage(int _newTabPageIdx)
+		{
+			if (_newTabPageIdx != m_activeControlsTabPageIdx && _newTabPageIdx >= 0 && _newTabPageIdx < mainTabControl.TabPages.Count)
+			{
+				//Reattach old page
+				if (m_activeControl != null)
+					mainTabControl.TabPages[m_activeControlsTabPageIdx].Controls.Add(m_activeControl);
+
+				m_activeControl = mainTabControl.TabPages[_newTabPageIdx].Controls[0];
+				m_activeControlsTabPageIdx = _newTabPageIdx;
+				mainBackPanel.Controls.Add(m_activeControl);
+			}
+			if (_newTabPageIdx == 0)
+			{
+				ActiveControl = idLicenseSvrTextBox;
+				this.AcceptButton = idLicenseSvrButton;
+			}
+			else if (_newTabPageIdx == 1)
+			{
+				wrongLicenseSvrLabel.Text = string.Format("The computer name you entered for the Solimar License Server (\"{0}\") is not this computer (\"{1}\").\r\n\r\nYou must run the Solimar Validation Token Retriever on the computer that will host the Solimar License Server.", idLicenseSvrTextBox.Text, FindComputerName());
+				this.AcceptButton = closeButton;
+			}
+			else if (_newTabPageIdx == 2)
+			{
+				exportToolStripMenuItem.Visible = true;
+				this.AcceptButton = genButton;
+			}
+		}
+
+		private void idLicenseSvrTextBox_TextChanged(object sender, EventArgs e)
+		{
+			idLicenseSvrButton.Enabled = idLicenseSvrTextBox.TextLength > 0;
+		}
+
+		private void idLicenseSvrTextBox_KeyDown(object sender, KeyEventArgs e)
+		{
+			if ((e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return) && idLicenseSvrButton.Enabled)
+				idLicenseSvrButton_Click(idLicenseSvrButton, null);
+		}
+
+
+
+
 
 	}
 
