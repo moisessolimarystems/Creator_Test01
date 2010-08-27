@@ -54,6 +54,9 @@
     <Compile Include="..\common\ValidationTokenReaderHelper.cs">
       <Link>ValidationTokenReaderHelper.cs</Link>
     </Compile>
+    <Compile Include="..\common\VersionInfo.cs">
+      <Link>VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
