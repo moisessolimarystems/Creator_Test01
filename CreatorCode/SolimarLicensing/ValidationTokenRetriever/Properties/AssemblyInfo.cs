@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Solimar Validation Token Retriever")]
 [assembly: AssemblyDescription("Solimar Validation Token Retriever")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Solimar Systems, Inc.")]
-[assembly: AssemblyProduct("Solimar Licensing")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
+[assembly: AssemblyCompany(Solimar.Licensing.AssemblyInfo.ASSEMBLY_COMPANY)]
+[assembly: AssemblyProduct(Solimar.Licensing.AssemblyInfo.ASSEMBLY_PRODUCTNAME)]
+[assembly: AssemblyCopyright(Solimar.Licensing.AssemblyInfo.ASSEMBLY_COPYRIGHT_NOTICE)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion(Solimar.Licensing.VersionInfo.PRODUCT_VERSION)]
+[assembly: AssemblyFileVersion(Solimar.Licensing.VersionInfo.PRODUCT_VERSION)]
