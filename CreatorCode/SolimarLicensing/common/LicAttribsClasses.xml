@@ -352,7 +352,7 @@
 				<attrib type="string" name="LicFileLicenseCode" tagname="fV" default=""/>
 				<attrib type="string" name="LicName" tagname="lB" default=""/>
 				<attrib type="DateTime" name="LicModifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
-
+				<attrib type="bool" name="bHideFromUI" tagname="bHide" default="false" />
 				<attrib type="DateTime" name="LicCurrentDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 				<typedef type="class" name="Lic_ActivationInfoAttribs">
 					<AttribsClass code_class_name="Lic_ActivationInfoAttribs" name="ai" descriptive_name="Activation Slot Info Attributes" base="">
@@ -455,12 +455,46 @@
 		</typedef>
 		<attrib type="Lic_UsProductInfoAttribsList" name="productList" tagname="pLt" default="" />
 	</AttribsClass>
+	
+	<AttribsClass code_class_name="Sys_EventLogInfoAttribs" name="S_ElInA" descriptive_name="System Event Log Info Attributes" base="" filename="Sys_EventLogInfoAttribs">
+		<typedef type="class" name="Sys_EventLogEntriesInfoAttribs">
+		<AttribsClass code_class_name="Sys_EventLogEntriesInfoAttribs" name="S_EEA" descriptive_name="System - Event Log Entries Info Attributes" base="">
+			<attrib type="string" name="category" tagname="c" default=""/>
+			<attrib type="unsigned __int32" name="categoryNumber" tagname="cN" default="0"/>
+			<attrib type="byte[]" name="data" tagname="d" default="" />
+			<attrib type="unsigned __int32" name="entryType" tagname="eT" default="0"/>
+			<attrib type="unsigned __int32" name="eventID" tagname="eI" default="0"/>
+			<attrib type="unsigned __int32" name="index" tagname="i" default="0"/>
+			<attrib type="unsigned __int32" name="instanceId" tagname="iI" default="0"/>
+			<attrib type="string" name="machineName" tagname="mN" default=""/>
+			<attrib type="string" name="message" tagname="mG" default=""/>
+			<attrib type="list(string)" name="replacementStrings" tagname="rLt" default="" />
+			<attrib type="string" name="source" tagname="sR" default=""/>
+			<attrib type="DateTime" name="timeGenerated" tagname="tG" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="DateTime" name="timeWritten" tagname="tW" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="string" name="userName" tagname="uN" default=""/>
+		</AttribsClass>
+		</typedef>
+		<typedef type="collection" name="Sys_EventLogEntriesInfoAttribsList">
+			<List value_type="Sys_EventLogEntriesInfoAttribs"/>
+		</typedef>
+		<attrib type="Sys_EventLogEntriesInfoAttribsList" name="entryList" tagname="eLt" default="" />
+		<attrib type="string" name="log" tagname="l" default=""/>
+		<attrib type="string" name="logName" tagname="lN" default=""/>
+		<attrib type="string" name="machineName" tagname="mN" default=""/>
+		<attrib type="unsigned __int32" name="maximumKilobytes" tagname="mK" default="0"/>
+		<attrib type="unsigned __int32" name="minimumRetentionDays" tagname="mR" default="0"/>
+		<attrib type="unsigned __int32" name="enumOverflowAction" tagname="oA" default="0"/>
+		<attrib type="string" name="source" tagname="s" default=""/>
+	</AttribsClass>
+	
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
 		<attrib type="string" name="Streamed_ServerDataAttribs" tagname="sD" default="" />
 		<attrib type="string" name="Streamed_SystemInfoAttribs" tagname="sI" default="" />
 		<attrib type="string" name="Streamed_SoftwareSpecAttribs" tagname="sS" default="" />
 		<attrib type="string" name="Streamed_UsageInfoAttribs" tagname="sU" default="" />
+		<attrib type="string" name="Streamed_SystemEventLogInfoAttribs" tagname="sE" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>

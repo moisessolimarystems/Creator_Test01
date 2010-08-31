@@ -261,7 +261,7 @@ void LicenseController::GenerateMessageInternal(const wchar_t* license_source, b
 		event_type = EVENTLOG_ERROR_TYPE;
 	else if(message_type == MT_WARNING)
 		event_type = EVENTLOG_WARNING_TYPE;
-	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID);
+	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID, productID);
 	
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);

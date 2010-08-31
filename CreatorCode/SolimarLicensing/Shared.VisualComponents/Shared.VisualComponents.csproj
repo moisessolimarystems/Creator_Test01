@@ -44,6 +44,7 @@
   </Target>
   -->
   <ItemGroup>
+    <Compile Include="ControlHelper.cs" />
     <Compile Include="DialogBaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,6 +57,13 @@
     <Compile Include="DifferenceLicenseInfoControl.Designer.cs">
       <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventLogEntryControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EventLogEntryControl.designer.cs">
+      <DependentUpon>EventLogEntryControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventLogMgr.cs" />
     <Compile Include="LicenseInfoViewerControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -104,6 +112,9 @@
     <EmbeddedResource Include="DifferenceLicenseInfoControl.resx">
       <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EventLogEntryControl.resx">
+      <DependentUpon>EventLogEntryControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LicenseInfoViewerControl.resx">
       <DependentUpon>LicenseInfoViewerControl.cs</DependentUpon>

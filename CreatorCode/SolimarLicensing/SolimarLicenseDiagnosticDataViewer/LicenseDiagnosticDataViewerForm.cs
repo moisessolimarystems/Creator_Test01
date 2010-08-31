@@ -420,6 +420,18 @@ namespace SolimarLicenseDiagnosticDataViewer
                     m_guidToFormMap.Add(childNode.Tag as string, licSoftwareSpecAttribsForm);
                     rootNode.Nodes.Add(childNode);
 
+                    childNode = new TreeNode("Sys_EventLogInfoAttribs");
+                    childNode.Tag = Guid.NewGuid().ToString();
+                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs tmpSysEventLogInfoAttribs = new Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs();
+                    tmpSysEventLogInfoAttribs.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_SystemEventLogInfoAttribs);
+                    Sys_EventLogInfoAttribs_DisplayForm sysEventLogInfoAttribsForm = new Sys_EventLogInfoAttribs_DisplayForm();
+                    sysEventLogInfoAttribsForm.SetData(tmpSysEventLogInfoAttribs);
+                    sysEventLogInfoAttribsForm.MdiParent = this;
+                    sysEventLogInfoAttribsForm.Show();
+                    m_guidToFormMap.Add(childNode.Tag as string, sysEventLogInfoAttribsForm);
+                    rootNode.Nodes.Add(childNode);
+
                     childNode = new TreeNode("List of Lic_KeyAttribs");
                     toolTipBuilder.Append(string.Format("\r\nList of Lic_KeyAttribs: {0}", m_loadedLicSysAttribs.ListOfStreamed_KeyAttribs.TVal.Count));
                     foreach (string streamedKeyAttrib in m_loadedLicSysAttribs.ListOfStreamed_KeyAttribs.TVal)

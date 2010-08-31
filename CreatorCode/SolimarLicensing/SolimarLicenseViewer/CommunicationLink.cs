@@ -34,7 +34,7 @@ namespace SolimarLicenseViewer
         public bool bIsProgrammed;
         public long applicationInstance;
     }
-    public class CommunicationLink
+    public class CommunicationLink : Shared.VisualComponents.IEventLog
     {
         #region Constructor
         public CommunicationLink()
@@ -45,6 +45,25 @@ namespace SolimarLicenseViewer
             Solimar.Licensing.GlobalSoftwareSpec globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
             m_softwareSpec = globalSwSpec.softwareSpec;
             m_ServerName = "Not Connected";
+        }
+        #endregion
+
+        #region IEventLog
+        public string GetMachineName() { return this.ServerName; }
+        public System.Collections.Generic.IList<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs> GetAllEntries()
+        {
+            string streamedEventLog = this.GetEventLogList_ForLicenseServer();
+
+            System.Collections.Generic.IList<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs> eventLogList = new System.Collections.Generic.List<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs>();
+            Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs sysEventLogInfo = new Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs();
+            sysEventLogInfo.AssignMembersFromStream(streamedEventLog);
+
+            foreach (Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs eventEntryInfo in sysEventLogInfo.entryList.TVal)
+            {
+                eventLogList.Add(eventEntryInfo);
+            }
+            return eventLogList;
+
         }
         #endregion
 
@@ -191,6 +210,11 @@ namespace SolimarLicenseViewer
                                     try { m_usageAttribs.AssignMembersFromStream(Solimar.Licensing.Attribs.XMLDocumentHelper.GetDocumentElementFromString(usageInfoStreamed).InnerText); }
                                     catch (Exception) { }
                                 }
+                                if(eventLogListStreamed.Length != 0)
+                                {
+                                    m_DiagnosticEventLogStreamed = Solimar.Licensing.Attribs.XMLDocumentHelper.GetDocumentElementFromString(eventLogListStreamed).InnerText;
+                                }
+
                                 m_DiagnosticDateCreatedDate = Solimar.Licensing.Attribs.AttribFormat.ConvertStringToDateTime(modifiedDateStreamed);
                                 foreach (string streamedInfo in streamedInfoList.TVal)
                                 {
@@ -509,6 +533,23 @@ namespace SolimarLicenseViewer
             }
         }
 
+        public string GetEventLogList_ForLicenseServer()
+        {
+            string streamedEventLog = string.Empty;
+            try
+            {
+                if (this.bDiagnosticDateView == false)
+                    streamedEventLog = m_licServer.GetEventLogList_ForLicenseServer();
+                else
+                    streamedEventLog = m_DiagnosticEventLogStreamed;
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+            return streamedEventLog;
+        }
+
         //Cache for Protection Key Info - m_protectionKeyCache
         private System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> m_protectionKeyCache = null;
         public System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> KeyEnumerate()
@@ -745,6 +786,7 @@ namespace SolimarLicenseViewer
         private Byte[] m_DiagnosticDateByteArray = null;
         private Exception m_exception = null;
         private Solimar.Licensing.Attribs.Lic_UsageInfoAttribs m_usageAttribs = new Solimar.Licensing.Attribs.Lic_UsageInfoAttribs();
+        private string m_DiagnosticEventLogStreamed = string.Empty;
         #endregion
         public bool bDiagnosticDateView { get { return m_bDiagnosticDateView; } }
         public DateTime? diagnosticDateCreatedDate { get { return m_DiagnosticDateCreatedDate; } }

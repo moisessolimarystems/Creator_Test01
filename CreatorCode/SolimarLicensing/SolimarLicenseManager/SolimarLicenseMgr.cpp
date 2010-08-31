@@ -547,6 +547,7 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 			else if(product == Lic_PackageAttribs::pid_Spde)
 				calProdID = Lic_PackageAttribs::pid_SpdeQueueManager;
 		}
+		m_product = calProdID;
 
 		LicenseSettings::LicenseServerSettingsTwoPointZero licenseServerSettings;
 		hr = licSettings.GetLiceseServerByProduct(calProdID, &licenseServerSettings);
@@ -575,7 +576,7 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 				throw hr;
 		}
 
-		m_product = calProdID;
+		
 		if(licenseServerSettings.bIsTestDevLicensing == true)
 		{
 			//Successfully connected, use a different product ID for the Test/Dev licensing
@@ -616,6 +617,7 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 	}
 	if(FAILED(hr))	//if failed any connect call, disconnect from any possible connections made.
 	{
+		m_product = -1;
 		SAVE_ERRORINFO
 		Disconnect();
 		RESTORE_ERRORINFO
@@ -1042,7 +1044,7 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 	// JWL - HACK - Add special case for Rubika 2.2 and below. Rubika 2.2 and below incoreectly register for licensing
 	// message to be displayed via message boxes, but this causes problems when SOLfusion (a service) kicks off Rubika and there 
 	// are any licensing messages, SOLfusion hangs forever.
-	if((m_product == Lic_PackageAttribs::pid_Rubika) && ((m_prod_ver_major == 2 && m_prod_ver_minor <=2) || m_prod_ver_major<=1))
+	if((m_product == Lic_PackageAttribs::pid_Rubika) && ((m_prod_ver_major == 2 && m_prod_ver_minor <=2) || m_prod_ver_major==1))
 		m_ui_level = UI_LEVEL_CRITICAL | UI_STYLE_EVENT_LOG;
 	else	// for all other products
 		m_ui_level = auto_ui_level;
@@ -1053,7 +1055,11 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 	m_dtGracePeriod = grace_period_minutes;
 	m_bLockKeyByAppInstance = b_app_instance_lock_key == VARIANT_TRUE ? true : false;
 	m_bBypassRemoteKeyRestrictions = b_bypass_remote_key_restriction == VARIANT_TRUE ? true : false;
-	m_applicationInstance = application_instance;
+
+	// CR.13548 - To force all m_applicationInstance to be the upper case
+	CComBSTR tmpBstr = application_instance;
+	tmpBstr.ToUpper();
+	m_applicationInstance = tmpBstr;
 
 	InternalCalculateLegacyProtectionKeyInfo(m_product);	//Side effect: sets m_productKeyID & m_applicationInstanceKey & bUseOnlySharedLicenses in ServerInfo
 
@@ -2472,7 +2478,7 @@ void CSolimarLicenseMgr::KeyMessageWriteEventLog(BSTR key_ident, unsigned int me
 		m_licenseMsgEventLogCache.pop_front();
 
 	if(!bCachedMsg)
-		LicenseServerError::WriteEventLog(event_log_msg, event_type, message_id);
+		LicenseServerError::WriteEventLog(event_log_msg, event_type, message_id, m_product);
 }
 
 HRESULT CSolimarLicenseMgr::ShowLicenseDialog(_bstr_t caption, _bstr_t message)
@@ -2547,6 +2553,9 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 	SafeMutex mutex(ServerListLock);
 
 	bool bFoundProductAndVersion = false;
+	bool bFoundExpiredProduct = false;
+	bool bActivationExpired = false;
+	std::wstring expiredDate = L"";
 	long prodMajor = 0, prodMinor = 0;
 	try
 	{
@@ -2615,6 +2624,17 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 					else
 						serverIt->second.bValidLicensing = true;
 				}
+				else if (	Version::ModuleVersion(prodAttribs.product_Major, prodAttribs.product_Minor, prodAttribs.product_SubMajor, prodAttribs.product_SubMinor) == 
+						(Version::ModuleVersion(0, 0, 0, 0)))
+				{
+					// CR.12672 - (prodAttribs.product_Major, prodAttribs.product_Minor) == (0,0,0,0) means no product license, check to see if expired.
+					if((prodAttribs.bUseActivations == true) || (prodAttribs.bUseExpirationDate == true))
+					{
+						bFoundExpiredProduct = true;
+						bActivationExpired = prodAttribs.bUseActivations;
+						expiredDate = bActivationExpired ? prodAttribs.activationCurrentExpirationDate : prodAttribs.expirationDate;
+					}
+				}
 			}
 			catch(HRESULT &ehr)
 			{
@@ -2632,12 +2652,14 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 		}
 	}
 	if(bFoundProductAndVersion == false && SUCCEEDED(hr))
-		hr = LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION;
+	{
+		hr = bFoundExpiredProduct ? LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED : LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION;
+	}
 
 	
 	if(FAILED(hr))
 	{
-		if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
+		if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION || hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED)
 		{
 			std::wstring wstrProdName = L"Unknown";
 			Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
@@ -2645,13 +2667,25 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 				wstrProdName = prodSpecIt->second.productName;
 
 			wchar_t errorBuf[1024];
-			swprintf_s(errorBuf, _countof(errorBuf), L"Attempting to run Product: %s Version: %d.%d. You are licensed to run only Version: %d.%d or lower (License Server)",
-				wstrProdName.c_str(),
-				m_prod_ver_major,
-				m_prod_ver_minor,
-				prodMajor,
-				prodMinor
-				);
+			if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
+			{
+				swprintf_s(errorBuf, _countof(errorBuf), L"Attempting to run Product: %s Version: %d.%d. You are licensed to run only Version: %d.%d or lower (License Server)",
+					wstrProdName.c_str(),
+					m_prod_ver_major,
+					m_prod_ver_minor,
+					prodMajor,
+					prodMinor
+					);
+			}
+			else if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED)
+			{
+				swprintf_s(
+					errorBuf, 
+					_countof(errorBuf), 
+					bActivationExpired ? L"Activation Expired on %s" : L"Expired on %s",
+					expiredDate.c_str()
+					);
+			}
 			LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
 		}
 	}
@@ -3637,7 +3671,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			bstrApplicationInstance = GetAppInstanceFromKey(pServerInfo, key_ident, bLogError);
 			if(!bFoundAppInstance)
 			{
-				if(wcscmp(bstrApplicationInstance, m_applicationInstanceKey) == 0)
+				if(wcsicmp(bstrApplicationInstance, m_applicationInstanceKey) == 0)
 				{
 					//Found a key that is already associated with the application instance, leave
 					hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstanceKey, VARIANT_FALSE);

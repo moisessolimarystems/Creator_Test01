@@ -71,6 +71,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
 		// Only for Interal License Servers
 		HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
+		HRESULT GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream);
 
 		HRESULT ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue);
 
@@ -127,6 +128,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		typedef std::map<_bstr_t, SoftwareLicenseMgr*> SoftwareLicList; //map<_bstr_t(licenseFileName, SoftwareLicenseMgr*>
 
 		SoftwareLicList softwareLicMgrMap; 
+
+		HRESULT ResynchronizeSoftwareLicensesInternal(bool bForceRefresh = false);
 
 		HRESULT ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStream, _bstr_t bstrVerificationCode);
 		HRESULT ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionKey* pKey, _bstr_t bstrVerificationKey, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pLicenseInfoAttribs);

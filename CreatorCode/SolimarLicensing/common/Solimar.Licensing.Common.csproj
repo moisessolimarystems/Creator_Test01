@@ -47,6 +47,7 @@
   </Target>
   -->
   <ItemGroup>
+    <Compile Include="Collections.cs" />
     <Compile Include="CsvHelper.cs" />
     <Compile Include="LicAttribsCS\ClassTypeInfo.cs" />
     <Compile Include="LicAttribsCS\CSpdAttribsBase.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="LicAttribsCS\Lic_PackageAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribsHelper.cs" />
     <Compile Include="LicAttribsCS\Lic_UsageInfoAttribs.cs" />
+    <Compile Include="LicAttribsCS\Sys_EventLogInfoAttribs.cs" />
     <Compile Include="LicenseError.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoftwareSpecInstance.cs" />

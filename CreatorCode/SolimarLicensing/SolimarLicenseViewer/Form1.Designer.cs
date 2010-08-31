@@ -37,7 +37,6 @@ namespace SolimarLicenseViewer
             this.treeView = new System.Windows.Forms.TreeView();
             this.productIconList = new System.Windows.Forms.ImageList(this.components);
             this.infoSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.noFlickerListView = new Shared.VisualComponents.NoFlickerListView();
             this.lvContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
@@ -48,7 +47,6 @@ namespace SolimarLicenseViewer
             this.testConnSelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testConnToAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvToolStrip = new System.Windows.Forms.ToolStrip();
-            this.bottomNoFlickerListView = new Shared.VisualComponents.NoFlickerListView();
             this.bottomLvToolStrip = new System.Windows.Forms.ToolStrip();
             this.importPktDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportPktDialog = new System.Windows.Forms.SaveFileDialog();
@@ -82,6 +80,14 @@ namespace SolimarLicenseViewer
             this.remoteConnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteConnectToolStripMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.remoteSvrToolStrip = new System.Windows.Forms.ToolStrip();
+            this.remoteSvrTSLabel = new System.Windows.Forms.ToolStripLabel();
+            this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
+            this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
+            this.noFlickerListView = new Shared.VisualComponents.NoFlickerListView();
+            this.bottomEventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
+            this.bottomNoFlickerListView = new Shared.VisualComponents.NoFlickerListView();
             this.statusStrip1.SuspendLayout();
             this.formSplitContainer.Panel1.SuspendLayout();
             this.formSplitContainer.Panel2.SuspendLayout();
@@ -91,6 +97,11 @@ namespace SolimarLicenseViewer
             this.infoSplitContainer.SuspendLayout();
             this.lvContextMenuStrip.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.toolStripContainer1.ContentPanel.SuspendLayout();
+            this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
+            this.toolStripContainer1.SuspendLayout();
+            this.remoteSvrToolStrip.SuspendLayout();
+            this.diagnosticDataToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -118,7 +129,7 @@ namespace SolimarLicenseViewer
             // formSplitContainer
             // 
             this.formSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.formSplitContainer.Location = new System.Drawing.Point(0, 24);
+            this.formSplitContainer.Location = new System.Drawing.Point(0, 0);
             this.formSplitContainer.Name = "formSplitContainer";
             // 
             // formSplitContainer.Panel1
@@ -174,6 +185,7 @@ namespace SolimarLicenseViewer
             this.productIconList.Images.SetKeyName(20, "Product Connection Settings.ico");
             this.productIconList.Images.SetKeyName(21, "solitrack16.png");
             this.productIconList.Images.SetKeyName(22, "SOLenterpriseSP32.ico");
+            this.productIconList.Images.SetKeyName(23, "eventLog.png");
             // 
             // infoSplitContainer
             // 
@@ -189,29 +201,13 @@ namespace SolimarLicenseViewer
             // 
             // infoSplitContainer.Panel2
             // 
+            this.infoSplitContainer.Panel2.Controls.Add(this.bottomEventLogEntryControl1);
             this.infoSplitContainer.Panel2.Controls.Add(this.bottomNoFlickerListView);
             this.infoSplitContainer.Panel2.Controls.Add(this.bottomLvToolStrip);
             this.infoSplitContainer.Panel2Collapsed = true;
             this.infoSplitContainer.Size = new System.Drawing.Size(463, 349);
             this.infoSplitContainer.SplitterDistance = 104;
             this.infoSplitContainer.TabIndex = 2;
-            // 
-            // noFlickerListView
-            // 
-            this.noFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
-            this.noFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.noFlickerListView.FullRowSelect = true;
-            this.noFlickerListView.HideSelection = false;
-            this.noFlickerListView.Location = new System.Drawing.Point(0, 0);
-            this.noFlickerListView.Name = "noFlickerListView";
-            this.noFlickerListView.ShowItemToolTips = true;
-            this.noFlickerListView.Size = new System.Drawing.Size(463, 349);
-            this.noFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.noFlickerListView.TabIndex = 3;
-            this.noFlickerListView.UseCompatibleStateImageBehavior = false;
-            this.noFlickerListView.View = System.Windows.Forms.View.Details;
-            this.noFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
-            this.noFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
             // 
             // lvContextMenuStrip
             // 
@@ -294,29 +290,12 @@ namespace SolimarLicenseViewer
             this.lvToolStrip.Text = "toolStrip2";
             this.lvToolStrip.Visible = false;
             // 
-            // bottomNoFlickerListView
-            // 
-            this.bottomNoFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
-            this.bottomNoFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomNoFlickerListView.FullRowSelect = true;
-            this.bottomNoFlickerListView.HideSelection = false;
-            this.bottomNoFlickerListView.Location = new System.Drawing.Point(0, 0);
-            this.bottomNoFlickerListView.Name = "bottomNoFlickerListView";
-            this.bottomNoFlickerListView.ShowItemToolTips = true;
-            this.bottomNoFlickerListView.Size = new System.Drawing.Size(150, 46);
-            this.bottomNoFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.bottomNoFlickerListView.TabIndex = 4;
-            this.bottomNoFlickerListView.UseCompatibleStateImageBehavior = false;
-            this.bottomNoFlickerListView.View = System.Windows.Forms.View.Details;
-            this.bottomNoFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
-            this.bottomNoFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
-            // 
             // bottomLvToolStrip
             // 
             this.bottomLvToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.bottomLvToolStrip.Location = new System.Drawing.Point(0, 0);
             this.bottomLvToolStrip.Name = "bottomLvToolStrip";
-            this.bottomLvToolStrip.Size = new System.Drawing.Size(150, 25);
+            this.bottomLvToolStrip.Size = new System.Drawing.Size(463, 25);
             this.bottomLvToolStrip.TabIndex = 5;
             this.bottomLvToolStrip.Text = "toolStrip1";
             this.bottomLvToolStrip.Visible = false;
@@ -360,7 +339,7 @@ namespace SolimarLicenseViewer
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripButton_Click);
             // 
@@ -381,6 +360,7 @@ namespace SolimarLicenseViewer
             // 
             // menuStrip1
             // 
+            this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileMenu,
             this.fileLicenseToolStripMenuItem,
@@ -556,15 +536,116 @@ namespace SolimarLicenseViewer
             this.remoteConnectToolStripMenuSeparator.Size = new System.Drawing.Size(125, 6);
             this.remoteConnectToolStripMenuSeparator.Visible = false;
             // 
+            // toolStripContainer1
+            // 
+            // 
+            // toolStripContainer1.BottomToolStripPanel
+            // 
+            this.toolStripContainer1.BottomToolStripPanel.Enabled = false;
+            // 
+            // toolStripContainer1.ContentPanel
+            // 
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.formSplitContainer);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(655, 349);
+            this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toolStripContainer1.Location = new System.Drawing.Point(0, 0);
+            this.toolStripContainer1.Name = "toolStripContainer1";
+            this.toolStripContainer1.Size = new System.Drawing.Size(655, 373);
+            this.toolStripContainer1.TabIndex = 4;
+            this.toolStripContainer1.Text = "toolStripContainer1";
+            // 
+            // toolStripContainer1.TopToolStripPanel
+            // 
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.menuStrip1);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.remoteSvrToolStrip);
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.diagnosticDataToolStrip);
+            // 
+            // remoteSvrToolStrip
+            // 
+            this.remoteSvrToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.remoteSvrToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.remoteSvrTSLabel});
+            this.remoteSvrToolStrip.Location = new System.Drawing.Point(3, 24);
+            this.remoteSvrToolStrip.Name = "remoteSvrToolStrip";
+            this.remoteSvrToolStrip.Size = new System.Drawing.Size(170, 25);
+            this.remoteSvrToolStrip.TabIndex = 1;
+            this.remoteSvrToolStrip.Visible = false;
+            // 
+            // remoteSvrTSLabel
+            // 
+            this.remoteSvrTSLabel.Name = "remoteSvrTSLabel";
+            this.remoteSvrTSLabel.Size = new System.Drawing.Size(158, 22);
+            this.remoteSvrTSLabel.Text = "Remove Server Connections:";
+            this.remoteSvrTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // diagnosticDataToolStrip
+            // 
+            this.diagnosticDataToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.diagnosticDataToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.diagnosticDataTSLabel});
+            this.diagnosticDataToolStrip.Location = new System.Drawing.Point(3, 24);
+            this.diagnosticDataToolStrip.Name = "diagnosticDataToolStrip";
+            this.diagnosticDataToolStrip.Size = new System.Drawing.Size(105, 25);
+            this.diagnosticDataToolStrip.TabIndex = 2;
+            this.diagnosticDataToolStrip.Visible = false;
+            // 
+            // diagnosticDataTSLabel
+            // 
+            this.diagnosticDataTSLabel.Name = "diagnosticDataTSLabel";
+            this.diagnosticDataTSLabel.Size = new System.Drawing.Size(93, 22);
+            this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
+            this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // noFlickerListView
+            // 
+            this.noFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
+            this.noFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.noFlickerListView.FullRowSelect = true;
+            this.noFlickerListView.HideSelection = false;
+            this.noFlickerListView.Location = new System.Drawing.Point(0, 0);
+            this.noFlickerListView.Name = "noFlickerListView";
+            this.noFlickerListView.ShowItemToolTips = true;
+            this.noFlickerListView.Size = new System.Drawing.Size(463, 349);
+            this.noFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.noFlickerListView.TabIndex = 3;
+            this.noFlickerListView.UseCompatibleStateImageBehavior = false;
+            this.noFlickerListView.View = System.Windows.Forms.View.Details;
+            this.noFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
+            this.noFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
+            // 
+            // bottomEventLogEntryControl1
+            // 
+            this.bottomEventLogEntryControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomEventLogEntryControl1.Location = new System.Drawing.Point(0, 0);
+            this.bottomEventLogEntryControl1.Name = "bottomEventLogEntryControl1";
+            this.bottomEventLogEntryControl1.Size = new System.Drawing.Size(150, 46);
+            this.bottomEventLogEntryControl1.TabIndex = 6;
+            // 
+            // bottomNoFlickerListView
+            // 
+            this.bottomNoFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
+            this.bottomNoFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomNoFlickerListView.FullRowSelect = true;
+            this.bottomNoFlickerListView.HideSelection = false;
+            this.bottomNoFlickerListView.Location = new System.Drawing.Point(0, 0);
+            this.bottomNoFlickerListView.Name = "bottomNoFlickerListView";
+            this.bottomNoFlickerListView.ShowItemToolTips = true;
+            this.bottomNoFlickerListView.Size = new System.Drawing.Size(150, 46);
+            this.bottomNoFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.bottomNoFlickerListView.TabIndex = 4;
+            this.bottomNoFlickerListView.UseCompatibleStateImageBehavior = false;
+            this.bottomNoFlickerListView.View = System.Windows.Forms.View.Details;
+            this.bottomNoFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
+            this.bottomNoFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(655, 395);
-            this.Controls.Add(this.formSplitContainer);
+            this.Controls.Add(this.toolStripContainer1);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -585,6 +666,15 @@ namespace SolimarLicenseViewer
             this.lvContextMenuStrip.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.toolStripContainer1.ContentPanel.ResumeLayout(false);
+            this.toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
+            this.toolStripContainer1.TopToolStripPanel.PerformLayout();
+            this.toolStripContainer1.ResumeLayout(false);
+            this.toolStripContainer1.PerformLayout();
+            this.remoteSvrToolStrip.ResumeLayout(false);
+            this.remoteSvrToolStrip.PerformLayout();
+            this.diagnosticDataToolStrip.ResumeLayout(false);
+            this.diagnosticDataToolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -644,6 +734,12 @@ namespace SolimarLicenseViewer
         private System.Windows.Forms.ToolStripMenuItem generateLicenseDiagnosticDataForSolimarToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadDiagnosticDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator diagnosticDataToolStripMenuSeparator;
+        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
+        private System.Windows.Forms.ToolStrip remoteSvrToolStrip;
+        private System.Windows.Forms.ToolStripLabel remoteSvrTSLabel;
+        private System.Windows.Forms.ToolStrip diagnosticDataToolStrip;
+        private System.Windows.Forms.ToolStripLabel diagnosticDataTSLabel;
+        private Shared.VisualComponents.EventLogEntryControl bottomEventLogEntryControl1;
 
     }
 }

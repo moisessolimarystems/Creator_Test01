@@ -207,6 +207,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Icons\eventLogError.ico" />
+    <None Include="Icons\eventLogInfo.ico" />
+    <None Include="Icons\eventLogWarning.ico" />
     <Content Include="keyLicenseManager16.ico" />
     <None Include="Resources\licenseTestAll.png" />
     <None Include="Resources\licenseTest.png" />

@@ -64,6 +64,7 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_CLOCK_LIC_ARCHIVE,						EHR_LIC_CLOCK_LIC_ARCHIVE,						L"The System Time does not seem to be set correctly (License Server)"},
 	{EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC,						L"Failed to validate software license with a Validation Token (License server)"},
 	{EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE,						L"Unable to use Software License Packet.  The License Server has to be upgraded before this Software License Packet can be used (License server)"},
+	{EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED,						EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED,						L"Product License Expired (License server)"},
 
 	{EC_SP_INVALID_FUNCTION_CODE,						EHR_SP_INVALID_FUNCTION_CODE,						L"Invalid function code (Rainbow driver)"},
 	{EC_SP_INVALID_PACKET,						EHR_SP_INVALID_PACKET,						L"Invalid packet (Rainbow driver)"},
@@ -113,6 +114,13 @@ const SL_ERROR SLErrors[] =
 const unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);
 
 
+HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id, long product_id)
+{
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, _countof(tmpbuf), L"event_type: %d, product_id: %d, event_id: %d", event_type, product_id, event_id);
+//OutputDebugString(tmpbuf);
+	return WriteEventLog(event_log_msg, event_type, (product_id!=-1) ? (product_id * 1000) + event_id : event_id);
+}
 HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id)
 {
 	//TReadEventLog();

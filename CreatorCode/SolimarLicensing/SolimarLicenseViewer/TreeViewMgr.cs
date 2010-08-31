@@ -37,6 +37,7 @@ namespace SolimarLicenseViewer
             PRODUCTCONNECTIONSETTINGS,
             SOLITRACK,
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
+            EVENTLOG,
         }
 
 
@@ -317,6 +318,19 @@ namespace SolimarLicenseViewer
         }
         #endregion
 
+        #region Event Log Node
+        private TreeNode GenerateEventLogNode()
+        {
+            TreeNode rootNode = null;
+            rootNode = new TreeNode(SolimarLicenseViewer.AppConstants.EventLogRootNode);
+            rootNode.ImageIndex = GetIconIndex("eventLog");
+            rootNode.SelectedImageIndex = rootNode.ImageIndex;
+            rootNode.Name = SolimarLicenseViewer.AppConstants.EventLogRootNode;
+            //rootNode.ToolTipText = rootNode.Text;
+            return rootNode;
+        }
+        #endregion
+
         #region Product Connection Settings Node
         private TreeNode GenerateProductConnectionSettingsNode()
         {
@@ -358,6 +372,10 @@ namespace SolimarLicenseViewer
                 if (tmpNode != null)
                     this.TheTreeView.Nodes.Add(tmpNode);
             }
+
+            tmpNode = GenerateEventLogNode();
+            if (tmpNode != null)
+                this.TheTreeView.Nodes.Add(tmpNode);
 
             this.TheTreeView.ShowRootLines = this.TheTreeView.Nodes.Count > 1;
             this.TheTreeView.ExpandAll();

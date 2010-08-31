@@ -10,7 +10,7 @@ namespace SolimarLicenseViewer
         public static readonly String SolimarRegKey = "SOFTWARE\\Solimar";
         public static readonly String SolimarRegKey32On64 = "SOFTWARE\\Wow6432Node\\Solimar";
         public static readonly String LicenseProduct = "Solimar Licensing";
-
+        
         //for detecting if SSE System Manager is on the System - CR.13130
         public static readonly String RegKey_Sse = "SOLSearcher";
         public static readonly String RegKey_SseInstallInfo = "InstallInfo";
@@ -27,11 +27,14 @@ namespace SolimarLicenseViewer
         public static readonly String FormTitle = "Solimar License Viewer";
         public static readonly String DiagnosticDataTitle = "Solimar License Diagnostic Data Viewer";
         public static readonly String UnlimitedValue = "Unlimited";
+        public static readonly String LicenseServer = "Solimar License Server";
+        public static readonly String LicenseServerNoProduct = " No Product";
 
 
         //TreeView Constants
         public static readonly String LicenseRootNode = "Licenses";
         public static readonly String UsageRootNode = "Usage";
+        public static readonly String EventLogRootNode = "Event Log (out of 100 Newest Items)";
         public static readonly String NoConnectedProductsRootNode = "No Connected Products";
         public static readonly String ProtectionKeyRootNode = "Protection Keys";
         public static readonly String ProductConnectionSettingsRootNode = "Product Connection Settings";
@@ -47,6 +50,15 @@ namespace SolimarLicenseViewer
         public static readonly String ProdSettingsTestConnSelectedTSB = ProdSettingsTestConnSelectedToolTipTSB;
         public static readonly String ProdSettingsTestConnAllToolTipTSB = "Test Connection to License Server for All Products";
         public static readonly String ProdSettingsTestConnAllTSB = ProdSettingsTestConnAllToolTipTSB;
+
+        public static readonly String EventLogFilterInfoToolTipTSB = "Filter Information Messages";
+        public static readonly String EventLogFilterInfoTSB = "Messages";
+        public static readonly String EventLogFilterErrorToolTipTSB = "Filter Error Messages";
+        public static readonly String EventLogFilterErrorTSB = "Errors";
+        public static readonly String EventLogFilterWarningToolTipTSB = "Filter Warning Messages";
+        public static readonly String EventLogFilterWarningTSB = "Warnings";
+        public static readonly String EventLogSourceLabel = "Source";
+        public static readonly String EventLogSourceToolTip = "Filter Source";
         #endregion
 
         #region ListView Constants
@@ -113,6 +125,13 @@ namespace SolimarLicenseViewer
         public static readonly String PkModuleHeader = "Module Name";
         public static readonly String PkModuleInUseHeader = "In Use";
         public static readonly String PkModuleTotalHeader = "Total Licenses";
+
+        //Event Log Column Hearers
+        public static readonly String EventLogLevelHeader = "Level";
+        public static readonly String EventLogDateTimeHeader = "Date and Time";
+        public static readonly String EventLogSourceHeader = "Source";
+        public static readonly String EventLogEventIdHeader = "Event ID";
+        public static readonly String EventLogTaskCategoryHeader = "Task Category";
 
         #endregion
 

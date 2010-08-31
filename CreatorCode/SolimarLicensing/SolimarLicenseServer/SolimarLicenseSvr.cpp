@@ -637,7 +637,7 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateStreamData_ByLicenseSystemData(VARIANT 
 STDMETHODIMP CSolimarLicenseSvr::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return E_NOTIMPL;
+	return g_licenseController.softwareServer.GetEventLogList_ForLicenseServer(pBstrEventLogAttribsListStream);
 }
 
 STDMETHODIMP CSolimarLicenseSvr::ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue)

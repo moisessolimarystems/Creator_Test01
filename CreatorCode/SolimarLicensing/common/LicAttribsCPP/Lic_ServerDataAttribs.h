@@ -223,6 +223,7 @@ public:
 		SpdAttribs::WStringAttrib LicFileLicenseCode;
 		SpdAttribs::WStringAttrib LicName;
 		SpdAttribs::WStringAttrib LicModifiedDate;
+		SpdAttribs::BoolAttrib bHideFromUI;
 		SpdAttribs::WStringAttrib LicCurrentDate;
 		SpdAttribs::WStringAttrib Streamed_ActivationAttribs;
 	
@@ -234,6 +235,7 @@ public:
 			LicFileLicenseCode = c.LicFileLicenseCode;
 			LicName = c.LicName;
 			LicModifiedDate = c.LicModifiedDate;
+			bHideFromUI = c.bHideFromUI;
 			LicCurrentDate = c.LicCurrentDate;
 			Streamed_ActivationAttribs = c.Streamed_ActivationAttribs;
 			return *this ;
@@ -245,6 +247,7 @@ public:
 			LicFileLicenseCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
 			LicName(m_mapAttribObjs, L"lB", SpdAttribs::WStringObj(L"")),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			bHideFromUI(m_mapAttribObjs, L"bHide", false),
 			LicCurrentDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", SpdAttribs::WStringObj(L"")){;}
 		
@@ -254,6 +257,7 @@ public:
 			LicFileLicenseCode(m_mapAttribObjs, L"fV", c.LicFileLicenseCode),
 			LicName(m_mapAttribObjs, L"lB", c.LicName),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", c.LicModifiedDate),
+			bHideFromUI(m_mapAttribObjs, L"bHide", c.bHideFromUI),
 			LicCurrentDate(m_mapAttribObjs, L"cDt", c.LicCurrentDate),
 			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", c.Streamed_ActivationAttribs){;}
 		
@@ -263,6 +267,7 @@ public:
 			LicFileLicenseCode(m_mapAttribObjs, L"fV", SpdAttribs::WStringObj(L"")),
 			LicName(m_mapAttribObjs, L"lB", SpdAttribs::WStringObj(L"")),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
+			bHideFromUI(m_mapAttribObjs, L"bHide", false),
 			LicCurrentDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", SpdAttribs::WStringObj(L"")){;}
 		
@@ -272,6 +277,7 @@ public:
 			LicFileLicenseCode(m_mapAttribObjs, L"fV", c.LicFileLicenseCode),
 			LicName(m_mapAttribObjs, L"lB", c.LicName),
 			LicModifiedDate(m_mapAttribObjs, L"mDt", c.LicModifiedDate),
+			bHideFromUI(m_mapAttribObjs, L"bHide", c.bHideFromUI),
 			LicCurrentDate(m_mapAttribObjs, L"cDt", c.LicCurrentDate),
 			Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", c.Streamed_ActivationAttribs){;}
 		
@@ -280,6 +286,7 @@ public:
 			const SpdAttribs::WStringAttrib &param_LicFileLicenseCode,
 			const SpdAttribs::WStringAttrib &param_LicName,
 			const SpdAttribs::WStringAttrib &param_LicModifiedDate,
+			const SpdAttribs::BoolAttrib &param_bHideFromUI,
 			const SpdAttribs::WStringAttrib &param_LicCurrentDate,
 			const SpdAttribs::WStringAttrib &param_Streamed_ActivationAttribs) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
@@ -287,6 +294,7 @@ public:
 				LicFileLicenseCode(m_mapAttribObjs, L"fV", param_LicFileLicenseCode),
 				LicName(m_mapAttribObjs, L"lB", param_LicName),
 				LicModifiedDate(m_mapAttribObjs, L"mDt", param_LicModifiedDate),
+				bHideFromUI(m_mapAttribObjs, L"bHide", param_bHideFromUI),
 				LicCurrentDate(m_mapAttribObjs, L"cDt", param_LicCurrentDate),
 				Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", param_Streamed_ActivationAttribs){;}
 		
@@ -295,6 +303,7 @@ public:
 			const SpdAttribs::WStringAttrib &param_LicFileLicenseCode,
 			const SpdAttribs::WStringAttrib &param_LicName,
 			const SpdAttribs::WStringAttrib &param_LicModifiedDate,
+			const SpdAttribs::BoolAttrib &param_bHideFromUI,
 			const SpdAttribs::WStringAttrib &param_LicCurrentDate,
 			const SpdAttribs::WStringAttrib &param_Streamed_ActivationAttribs) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -302,6 +311,7 @@ public:
 				LicFileLicenseCode(m_mapAttribObjs, L"fV", param_LicFileLicenseCode),
 				LicName(m_mapAttribObjs, L"lB", param_LicName),
 				LicModifiedDate(m_mapAttribObjs, L"mDt", param_LicModifiedDate),
+				bHideFromUI(m_mapAttribObjs, L"bHide", param_bHideFromUI),
 				LicCurrentDate(m_mapAttribObjs, L"cDt", param_LicCurrentDate),
 				Streamed_ActivationAttribs(m_mapAttribObjs, L"saA", param_Streamed_ActivationAttribs){;}
 		
