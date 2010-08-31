@@ -24,6 +24,7 @@ namespace Solimar
 				public AttribsMemberString Streamed_SystemInfoAttribs = new AttribsMemberString("sI", "");
 				public AttribsMemberString Streamed_SoftwareSpecAttribs = new AttribsMemberString("sS", "");
 				public AttribsMemberString Streamed_UsageInfoAttribs = new AttribsMemberString("sU", "");
+				public AttribsMemberString Streamed_SystemEventLogInfoAttribs = new AttribsMemberString("sE", "");
 				public AttribsMemberStringList ListOfStreamed_InfoAttribs = new AttribsMemberStringList("iLt", new ArrayList());
 				public AttribsMemberDateTime createdDate = new AttribsMemberDateTime("cDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 			

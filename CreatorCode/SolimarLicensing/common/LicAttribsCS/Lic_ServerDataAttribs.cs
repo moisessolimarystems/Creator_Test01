@@ -105,6 +105,7 @@ namespace Solimar
 					public AttribsMemberString LicFileLicenseCode = new AttribsMemberString("fV", "");
 					public AttribsMemberString LicName = new AttribsMemberString("lB", "");
 					public AttribsMemberDateTime LicModifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
+					public AttribsMemberBOOL bHideFromUI = new AttribsMemberBOOL("bHide", false);
 					public AttribsMemberDateTime LicCurrentDate = new AttribsMemberDateTime("cDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberString Streamed_ActivationAttribs = new AttribsMemberString("saA", "");
 				

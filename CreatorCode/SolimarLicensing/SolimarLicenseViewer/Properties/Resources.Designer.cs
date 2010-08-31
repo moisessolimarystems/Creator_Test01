@@ -74,6 +74,27 @@ namespace SolimarLicenseViewer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap eventLogError {
+            get {
+                object obj = ResourceManager.GetObject("eventLogError", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap eventLogInfo {
+            get {
+                object obj = ResourceManager.GetObject("eventLogInfo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap eventLogWarning {
+            get {
+                object obj = ResourceManager.GetObject("eventLogWarning", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap licenseTest {
             get {
                 object obj = ResourceManager.GetObject("licenseTest", resourceCulture);
