@@ -539,10 +539,12 @@ STDMETHODIMP CSolimarLicenseSvr::GetSoftwareSpec(BSTR *pBstrSoftwareSpecAttribsS
 	return g_licenseController.softwareServer.GetSoftwareSpec(pBstrSoftwareSpecAttribsStream);
 }
 
+
+
 STDMETHODIMP CSolimarLicenseSvr::SoftwareAddApplicationInstanceByProduct(long productID, BSTR applicationInstance)
 {
 	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.AddApplicationInstance(productID, m_licenseId, applicationInstance, 0);
+	return g_licenseController.softwareServer.AddApplicationInstance(productID, m_licenseId, applicationInstance);
 }
 
 STDMETHODIMP CSolimarLicenseSvr::SoftwareRemoveApplicationInstanceByProduct(long productID, BSTR applicationInstance)
@@ -647,18 +649,6 @@ STDMETHODIMP CSolimarLicenseSvr::SoftwareLicenseUseActivationToExtendTime_ByLice
 {
 	CHECK_CLIENT_AUTHENTICATION;
 	return g_licenseController.softwareServer.SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(softwareLicense, contractNumber);
-}
-
-// ISolimarSoftwareLicenseSvr2
-STDMETHODIMP CSolimarLicenseSvr::SoftwareAddApplicationInstanceByProduct2(long productID, BSTR applicationInstance, long flags)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.AddApplicationInstance(productID, m_licenseId, applicationInstance, flags);
-}
-STDMETHODIMP CSolimarLicenseSvr::SoftwareGetApplicationInstanceListByProduct2(long productID, BSTR *pBstrListUsAppInstInfoAttribs)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.GetApplicationInstanceList2(productID, m_licenseId, pBstrListUsAppInstInfoAttribs);
 }
 
 //
