@@ -1078,7 +1078,7 @@ namespace Solimar.Licensing
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 4;
 			tmpModSpec.bModuleIsCounter.TVal = false;
 			tmpModSpec.bModuleIsPool.TVal = false;
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
@@ -1097,7 +1097,7 @@ namespace Solimar.Licensing
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 1;
 			tmpModSpec.bModuleIsCounter.TVal = false;
 			tmpModSpec.bModuleIsPool.TVal = false;
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
