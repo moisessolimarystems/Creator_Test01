@@ -392,12 +392,17 @@ namespace Client.Creator
             {
                 if (productSpec.productID.TVal == productID)
                 {
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return IsDefaultModule(productSpec.sameModSpecProductID.TVal, moduleID);
+                    else
                     {
-                        if (moduleSpec.moduleID.TVal == moduleID)
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                         {
-                            if (moduleSpec.moduleDefaultLicense.TVal > 0 && moduleSpec.moduleTrialLicense.TVal <= 1)
-                                return true;
+                            if (moduleSpec.moduleID.TVal == moduleID)
+                            {
+                                if (moduleSpec.moduleDefaultLicense.TVal > 0 && moduleSpec.moduleTrialLicense.TVal <= 1)
+                                    return true;
+                            }
                         }
                     }
                 }
@@ -412,12 +417,17 @@ namespace Client.Creator
             {
                 if (productSpec.productID.TVal == productID)
                 {
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return IsDefaultModule(productSpec.sameModSpecProductID.TVal, moduleName);
+                    else
                     {
-                        if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                         {
-                            if (moduleSpec.moduleDefaultLicense.TVal > 0)
-                                return true;
+                            if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                            {
+                                if (moduleSpec.moduleDefaultLicense.TVal > 0)
+                                    return true;
+                            }
                         }
                     }
                 }
@@ -432,11 +442,16 @@ namespace Client.Creator
             {
                 if (productSpec.productID.TVal == productID)
                 {
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return GetDefaultModuleValue(productSpec.sameModSpecProductID.TVal, moduleID);
+                    else
                     {
-                        if (moduleSpec.moduleID.TVal == moduleID)
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                         {
-                            return (short)moduleSpec.moduleDefaultLicense.TVal;
+                            if (moduleSpec.moduleID.TVal == moduleID)
+                            {
+                                return (short)moduleSpec.moduleDefaultLicense.TVal;
+                            }
                         }
                     }
                 }
