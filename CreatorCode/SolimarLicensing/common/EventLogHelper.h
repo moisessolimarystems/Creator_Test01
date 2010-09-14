@@ -14,8 +14,9 @@ class EventLogHelper
 public:
     static HRESULT WriteEventLog(wchar_t* event_source, wchar_t *event_log_msg, unsigned int event_type, long event_id);
     static HRESULT ReadEventLog_Helper();
+	 static HRESULT ReadEventLog(BSTR *pBstrEventLogAttribsListStream);
 //	 static LPWSTR GetMessageString(DWORD MessageId, DWORD argc, LPWSTR argv);
-private:
+protected:
 static DWORD DumpRecordsInBuffer(PBYTE pBuffer, DWORD dwBytesRead);
 static DWORD GetEventTypeName(DWORD EventType);
 static LPWSTR GetMessageString(DWORD Id, DWORD argc, LPWSTR args);

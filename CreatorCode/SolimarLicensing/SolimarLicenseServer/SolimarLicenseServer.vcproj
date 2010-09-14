@@ -367,6 +367,7 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
+				GenerateXMLDocumentationFiles="true"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
@@ -663,6 +664,10 @@
 			</File>
 			<File
 				RelativePath="..\common\EventLogHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\common\EventLogLicenseHelper.cpp"
 				>
 			</File>
 			<File
