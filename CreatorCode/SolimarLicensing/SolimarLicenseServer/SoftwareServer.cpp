@@ -12,7 +12,8 @@
 #include "..\common\LicAttribsCPP\Lic_LicenseSystemAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_SystemInfoAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
-
+#include "..\common\LicAttribsCPP\Sys_EventLogInfoAttribs.h"
+#include "..\common\EventLogLicenseHelper.h"
 
 #include <shlobj.h> //For SHGetFolderPath
 #include <shlwapi.h> //For PathAppend
@@ -127,7 +128,6 @@ SoftwareServer::SoftwareServer():
 		g_pSoftwareSpec = new GlobalSoftwareSpec();
 	//Use Global SoftwareSpec - Only need to do once
 	licCache.RefreshSoftwareSpec(&(g_pSoftwareSpec->GetSoftwareSpec()));
-	;	
 }
 
 SoftwareServer::~SoftwareServer()
@@ -176,11 +176,25 @@ HRESULT SoftwareServer::GetApplicationInstanceList(long productID, BSTR license_
 
 HRESULT SoftwareServer::ResynchronizeSoftwareLicenses(bool bForceRefresh)
 {
+	HRESULT hr(S_OK);
+	if(bFirstTime)	//CR.13563 - Block whole call of initializing software licensing, first time.
+	{
+		SafeMutex mutex(SoftwareLicenseLock);
+		hr = ResynchronizeSoftwareLicensesInternal(bForceRefresh);
+	}
+	else
+	{
+		hr = ResynchronizeSoftwareLicensesInternal(bForceRefresh);
+	}
+	return hr;
+}
+HRESULT SoftwareServer::ResynchronizeSoftwareLicensesInternal(bool bForceRefresh)
+{
 const int BUF_SIZE = 1024;
 wchar_t tmpbuf[BUF_SIZE];
 //if(bFirstTime)
 //{
-//	swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter");
+//	swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter, ThreadID: %d", GetCurrentThreadId());
 //	OutputDebugString(tmpbuf);
 //}
 //OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter");
@@ -1380,6 +1394,19 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpe
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString() - end");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
 
+
+		BSTR tmpStreamedEventLog;
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - EventLogLicenseHelper::ReadEventLog() - start");
+		hr = EventLogLicenseHelper::ReadEventLog(&tmpStreamedEventLog);
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - EventLogLicenseHelper::ReadEventLog() - end");
+		if(SUCCEEDED(hr))
+		{
+			licSystemAttribs.Streamed_SystemEventLogInfoAttribs = std::wstring(tmpStreamedEventLog);
+			SysFreeString(tmpStreamedEventLog);
+		}
+
+		//licSystemAttribs.Streamed_SystemEventLogInfoAttribs = 
+
 		licSystemAttribs.Streamed_UsageInfoAttribs = std::wstring(usageInfoAttribs.ToString());
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
@@ -1468,8 +1495,8 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 			//Do not implement returning connection settings
 			*pBstrConnectionAttribsListStream = SysAllocString(L"");
 
-			//Do not implement returning event log list for License Server Entries
-			*pBstrEventLogAttribsListStream = SysAllocString(L"");
+			//Returning event log list for License Server Entries
+			*pBstrEventLogAttribsListStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_SystemEventLogInfoAttribs.ToString()).c_str());
 
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Erase empty modules;");
 //			//yyy - testing start
@@ -2373,6 +2400,11 @@ SoftwareLicenseMgr* SoftwareServer::GetSoftwareLicenseMgr_ByLicenseInternal(BSTR
 	return retVal;
 }
 
+HRESULT SoftwareServer::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream)
+{
+	return EventLogLicenseHelper::ReadEventLog(pBstrEventLogAttribsListStream);
+}
+
 //HRESULT SoftwareServer::RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense)
 //{
 //	HRESULT hr(S_OK);
@@ -2967,16 +2999,16 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 					prodIt != pLicInfoAttribs->productList->end();
 					prodIt++)
 			{
-				if(prodIt->bUseExpirationDate || prodIt->bUseActivations)
+				if((prodIt->bUseExpirationDate==true) || (prodIt->bUseActivations==true))
 				{
 					//Convert SoftwareLicense ExpirationDate to time_t
 					SYSTEMTIME swProdLicExpiresDateSystime;
-					if(prodIt->bUseActivations)
+					if(prodIt->bUseActivations == true)
 					{
 						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str(), swProdLicExpiresDateSystime))
 							throw E_FAIL;
 					}
-					else if(prodIt->bUseExpirationDate)
+					else if(prodIt->bUseExpirationDate == true)
 					{
 						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->expirationDate)).c_str(), swProdLicExpiresDateSystime))
 							throw E_FAIL;
@@ -3128,27 +3160,39 @@ wchar_t debug_buf[1024];
 					prodReminderMapIt != swLicReminderMap[wstrSoftwareLicenseName].prodReminderMap.end();
 					prodReminderMapIt++)
 			{
-				//Check on the closest expiration date, 
-				//14 days to expiration, send reminder every 12 hours
-				//7 days to expiration, send reminder every 4 hours
-				//3 days to expiration, send reminder every 1 hours
+				//// Remove these checks, now only do one a day...
+				////Check on the closest expiration date, 
+				////14 days to expiration, send reminder every 12 hours
+				////7 days to expiration, send reminder every 4 hours
+				////3 days to expiration, send reminder every 1 hours
 
+				//time_t sendReminderTimePeriod = 0;
+				//if(prodReminderMapIt->second.closestExpDate == -1)
+				//	sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//else if(prodReminderMapIt->second.closestExpDate < curTimeT)
+				//	sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//else	//if(prodReminderMapIt->second.closestExpDate > curTimeT)
+				//{
+				//	double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTimeT);
+				//	if(timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 14)
+				//		sendReminderTimePeriod = 0;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 14 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 7)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 12;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 7 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 3)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 4;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 3 >= timeTillExpiration && timeTillExpiration > 0)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//}
+
+				//Check on the closest expiration date, Change to not flood event log
+				//14 days to expiration or less, send reminder every 1 day
 				time_t sendReminderTimePeriod = 0;
-				if(prodReminderMapIt->second.closestExpDate == -1)
-					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
-				else if(prodReminderMapIt->second.closestExpDate < curTimeT)
-					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
-				else	//if(prodReminderMapIt->second.closestExpDate > curTimeT)
+				if((prodReminderMapIt->second.closestExpDate == -1) || 
+					(prodReminderMapIt->second.closestExpDate < curTimeT) || 
+					((prodReminderMapIt->second.closestExpDate > curTimeT) && (difftime(prodReminderMapIt->second.closestExpDate, curTimeT) <= TimeHelper::ONE_DAY_IN_SECONDS * 14))
+					)
 				{
-					double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTimeT);
-					if(timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 14)
-						sendReminderTimePeriod = 0;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 14 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 7)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 12;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 7 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 3)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 4;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 3 >= timeTillExpiration && timeTillExpiration > 0)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+					sendReminderTimePeriod = TimeHelper::ONE_DAY_IN_SECONDS;
 				}
 
 				bool bSendReminder = false;
