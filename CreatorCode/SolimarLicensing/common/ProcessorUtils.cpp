@@ -1,5 +1,5 @@
 #include "ProcessorUtils.h"
-
+#include <intrin.h>
 const int HT_ENABLED		= 0x10000000; // CPUID:1 EDX[28]
 const int LOGICAL_COUNT		= 0x00FF0000; // CPUID:1 EBX[23:16]
 const int INTEL_CORE_COUNT	= 0xFC000000; // CPUID:4 EAX[31:26]
@@ -162,12 +162,16 @@ BYTE ProcessorUtils::GetApicID()
 {
 	DWORD c_ebx;
 
-	__asm
-	{
-		mov eax,1
-		cpuid
-		mov c_ebx, ebx
-	}
+	//__asm
+	//{
+	//	mov eax,1
+	//	cpuid
+	//	mov c_ebx, ebx
+	//}
+
+	int CPUInfo[4] = { 0, 0, 0, 0 };
+	__cpuid(CPUInfo, 1);
+	c_ebx = CPUInfo[1];	//ebx
 
 	return (BYTE)((c_ebx & APIC_ID) >> 24);
 }
@@ -182,14 +186,18 @@ DWORD ProcessorUtils::GetMaxStandardCPUID()
 {
 	DWORD max_cpuid;
 
-	__asm
-	{
-		mov eax,0
-		cpuid
-		mov max_cpuid, eax
-	}
-
+	//__asm
+	//{
+	//	mov eax,0
+	//	cpuid
+	//	mov max_cpuid, eax
+	//}
+	int CPUInfo[4] = { 0, 0, 0, 0 };
+	__cpuid(CPUInfo, 0);
+	max_cpuid = CPUInfo[0]; //eax
 	return max_cpuid;
+
+	
 }
 
 /*
@@ -202,12 +210,15 @@ DWORD ProcessorUtils::GetMaxExtendedCPUID()
 {
 	DWORD max_x_cpuid;
 
-	__asm
-	{
-		mov eax,0x80000000
-		cpuid
-		mov max_x_cpuid, eax
-	}
+	//__asm
+	//{
+	//	mov eax,0x80000000
+	//	cpuid
+	//	mov max_x_cpuid, eax
+	//}
+	int CPUInfo[4] = { 0, 0, 0, 0 };
+	__cpuid(CPUInfo, 0x80000000);
+	max_x_cpuid = CPUInfo[0]; //eax
 
 	return max_x_cpuid;
 }
@@ -224,14 +235,19 @@ ProcessorUtils::ProcessorVendor ProcessorUtils::GetProcessorVendor()
 	
 	DWORD c_ebx, c_ecx, c_edx;
 	
-	__asm
-	{
-		mov eax,0
-		cpuid
-		mov c_ebx, ebx
-		mov c_ecx, ecx
-		mov c_edx, edx
-	}
+	//__asm
+	//{
+	//	mov eax,0
+	//	cpuid
+	//	mov c_ebx, ebx
+	//	mov c_ecx, ecx
+	//	mov c_edx, edx
+	//}
+	int CPUInfo[4] = { 0, 0, 0, 0 };
+	__cpuid(CPUInfo, 0);
+	c_ebx = CPUInfo[1]; //ebx
+	c_ecx = CPUInfo[2]; //ecx
+	c_edx = CPUInfo[3]; //edx
 
 	if (IsGenuineIntel(c_ebx, c_ecx, c_edx))
 	{
@@ -284,13 +300,17 @@ DWORD ProcessorUtils::GetNumLogicalPerCore()
 		case VENDOR_INTEL:
 			if (GetMaxStandardCPUID() >= 1)
 			{
-				__asm 
-				{
-					mov eax,1
-					cpuid
-					mov c_ebx, ebx
-					mov c_edx, edx
-				}
+				//__asm 
+				//{
+				//	mov eax,1
+				//	cpuid
+				//	mov c_ebx, ebx
+				//	mov c_edx, edx
+				//}
+				int CPUInfo[4] = { 0, 0, 0, 0 };
+				__cpuid(CPUInfo, 1);
+				c_ebx = CPUInfo[1]; //ebx
+				c_edx = CPUInfo[3]; //edx
 				if (c_edx & HT_ENABLED)
 				{
 					logicalPerPackage = ((c_ebx & LOGICAL_COUNT) >> 16);
@@ -308,7 +328,6 @@ DWORD ProcessorUtils::GetNumLogicalPerCore()
 			// Default logicalPerCore = 1
 			break;
 	}
-	
 	return logicalPerCore;
 }
 
@@ -329,20 +348,27 @@ DWORD ProcessorUtils::GetNumLogicalPerPackage()
 
 	if (GetMaxStandardCPUID() >= 1)
 	{
-		__asm 
-		{
-			mov eax,1
-			cpuid
-			mov c_ebx, ebx
-			mov c_ecx, ecx
-			mov c_edx, edx
-		}
+		//__asm 
+		//{
+		//	mov eax,1
+		//	cpuid
+		//	mov c_ebx, ebx
+		//	mov c_ecx, ecx
+		//	mov c_edx, edx
+		//}
+
+		int CPUInfo[4] = { 0, 0, 0, 0 };
+		__cpuid(CPUInfo, 1);
+		c_ebx = CPUInfo[1]; //ebx
+		c_ecx = CPUInfo[2]; //ecx
+		c_edx = CPUInfo[3]; //edx
+
 		if (c_edx & HT_ENABLED)
 		{
 			logicalPerPackage = ((c_ebx & LOGICAL_COUNT) >> 16);
 		}
 	}
-	
+
 	return logicalPerPackage;
 }
 
@@ -365,25 +391,31 @@ DWORD ProcessorUtils::GetNumCoresPerPackage()
 		case VENDOR_INTEL:
 			if (GetMaxStandardCPUID() >= 4)
 			{
-				__asm 
-				{
-					mov eax,4
-					mov ecx,0
-					cpuid
-					mov c_eax, eax
-				}
+				//__asm 
+				//{
+				//	mov eax,4
+				//	mov ecx,0
+				//	cpuid
+				//	mov c_eax, eax
+				//}
+				int CPUInfo[4] = { 0, 0, 0, 0 };
+				__cpuidex(CPUInfo, 4, 0);
+				c_eax = CPUInfo[0]; //eax
 				coresPerPackage = ((c_eax & INTEL_CORE_COUNT) >> 26) + 1;
 			}
 			break;
 		case VENDOR_AMD:
 			if (GetMaxExtendedCPUID() >= 0x80000008)
 			{
-				__asm
-				{
-					mov eax, 0x80000008
-					cpuid
-					mov c_ecx, ecx
-				}			
+				//__asm
+				//{
+				//	mov eax, 0x80000008
+				//	cpuid
+				//	mov c_ecx, ecx
+				//}			
+				int CPUInfo[4] = { 0, 0, 0, 0 };
+				__cpuid(CPUInfo, 0x80000008);
+				c_ecx = CPUInfo[2]; //ecx
 				coresPerPackage = (c_ecx & AMD_CORE_COUNT) + 1;
 			}
 			break;
@@ -408,8 +440,8 @@ BOOL ProcessorUtils::GetNumAvailablePackagesAndCores(
 										DWORD& numAvailablePackages, 
 										DWORD& numAvailableCores)
 {
-	DWORD processAffinity = 0;
-	DWORD systemAffinity = 0;
+	DWORD_PTR processAffinity = 0;
+	DWORD_PTR systemAffinity = 0;
 	if (!GetProcessAffinityMask(GetCurrentProcess(), &processAffinity, &systemAffinity))
 	{
 		return FALSE;
@@ -419,7 +451,7 @@ BOOL ProcessorUtils::GetNumAvailablePackagesAndCores(
 	set<BYTE> coreIDSet;
 	set<BYTE> pkgIDSet;
 	BYTE apicID = 0;
-	DWORD affinityMask = 1;
+	DWORD_PTR affinityMask = 1;
 	while (affinityMask && affinityMask <= systemAffinity)
 	{
 		if (SetThreadAffinityMask(GetCurrentThread(), affinityMask))
