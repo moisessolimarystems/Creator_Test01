@@ -860,6 +860,7 @@ namespace Client.Creator
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
                 List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                //Get AddOn modules with modID and set them to 0;
                 foreach (ModuleTable module in moduleList.Where(m => m.ProductLicenseID != ProductLicenseDatabaseID && m.ModID == modID))
                 {
                     module.AppInstance = 0;
@@ -873,10 +874,16 @@ namespace Client.Creator
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
                 List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                List<int> updatedModuleList = new List<int>(); //list to keep track of one set of modules to increment product connection.
+                //increment should occur for only 1 add-on module set not all add-on module sets
                 foreach (ModuleTable module in moduleList.Where(m => m.ProductLicenseID != ProductLicenseDatabaseID && m.ModID == modID))
                 {
-                    module.AppInstance = 1;
-                    client.UpdateModule(module);
+                    if (!updatedModuleList.Exists(u => u == module.ModID))
+                    {
+                        module.AppInstance = 1;
+                        client.UpdateModule(module);
+                        updatedModuleList.Add(module.ModID);
+                    }
                 }
             });
         }
@@ -910,6 +917,7 @@ namespace Client.Creator
             //should not contact database
             return (module.UnlimitedValue - totalModuleValue); //GetTotalModuleValue(module.ID));
         }
+        //mo
         public bool SetModule(ModuleProperty module)
         {
             bool bSuccess = false;
@@ -918,19 +926,22 @@ namespace Client.Creator
             {
                 if (totalModAppInstance == 0)
                     module.AppInstance = 1;
-                else //>1
+                else //>=1
                 {
                     if (totalModAppInstance > 1)
                     {
                         if (_commLink.IsClientType(ProductID) && Status != ProductLicenseState.AddOn)
                             module.AppInstance = ProductConnection;
                         else
-                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : 1);
+                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : 1);                        
                     }
                     else
                     {
                         if (Status == ProductLicenseState.AddOn)
-                            module.AppInstance = 0;
+                        {
+                            if(module.AppInstance != 1) //only set add-on product connection to 0 if parent product connection is >=1
+                                module.AppInstance = 0;
+                        }
                         else
                         {
                             module.AppInstance = 1;
