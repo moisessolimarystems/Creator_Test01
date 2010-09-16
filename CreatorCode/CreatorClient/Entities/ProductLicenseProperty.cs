@@ -732,11 +732,7 @@ namespace Client.Creator
                 List<ModuleTable> mtList = new List<ModuleTable>();
                 foreach (ModuleTable module in ModuleList)
                 {
-                    short moduleValue;
-                    if (_commLink.IsDefaultModule(ProductID, module.ModID))
-                        moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);//module.ID));
-                    else                    
-                        moduleValue = 0;                    
+                    short moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);                 
                     ModuleTable mt = client.GetModule(ID, module.ModID);
                     if (mt != null)
                     {
