@@ -3,8 +3,8 @@
 
 #include <windows.h>
 #include <string>
-#include <atlbase.h>	// For AtlReportError
 #if _MSC_VER >= 1400
+#include <atlbase.h>	// For AtlReportError
 #include <atlcom.h>	// For AtlReportError
 #endif
 namespace LicenseServerError
