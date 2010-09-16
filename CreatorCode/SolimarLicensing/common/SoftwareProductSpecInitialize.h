@@ -542,6 +542,7 @@ void InititalizeProduct10()
 	pTmpModSpec->moduleID = 1;
 	pTmpModSpec->moduleName = std::wstring(L"Index Engine Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleDefaultLicense = 4;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
@@ -1463,5 +1464,6 @@ void InititalizeProduct18()
 	pTmpModSpec->moduleID = 0;
 	pTmpModSpec->moduleName = std::wstring(L"SDX Designer Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleDefaultLicense = 1;
 }
 

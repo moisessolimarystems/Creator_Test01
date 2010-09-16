@@ -196,7 +196,7 @@
 	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances" moduleDefaultLicense="4"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="12" productName="Rubika" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
@@ -357,7 +357,7 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="18" productName="SDX Designer" prevSharedProductID="10" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer Instances"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer Instances" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient" softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="0">
