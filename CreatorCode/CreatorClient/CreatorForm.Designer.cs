@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode32 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode22 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode28 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode29 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode30 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode22,
-            treeNode28,
-            treeNode29});
-            System.Windows.Forms.TreeNode treeNode31 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode72 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode62 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode68 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode69 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode70 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode62,
+            treeNode68,
+            treeNode69});
+            System.Windows.Forms.TreeNode treeNode71 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,8 +53,6 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolStrip = new System.Windows.Forms.ToolStrip();
-            this.navigateBackToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.navigateForwardToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.addLicMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
             this.addProductLicenseMainToolStripDropDownBtn = new System.Windows.Forms.ToolStripButton();
@@ -200,6 +198,9 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.navigateHomeToolStripButton = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -349,9 +350,10 @@
             // MainToolStrip
             // 
             this.MainToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.navigateBackToolStripButton,
-            this.navigateForwardToolStripButton,
+            this.navigateHomeToolStripButton,
             this.toolStripSeparator5,
+            this.newCustMainToolStripBtn,
+            this.toolStripSeparator9,
             this.addLicMainToolStripBtn,
             this.addProductLicenseMainToolStripDropDownBtn,
             this.createPacketMainToolStripBtn,
@@ -361,9 +363,9 @@
             this.seekKeyToolStripButton,
             this.reserveHardwareKeyToolStripButton,
             this.deactivateHardwareKeyToolStripButton,
-            this.newCustMainToolStripBtn,
             this.activateHardwareKeyToolStripButton,
             this.clearKeyToolStripButton,
+            this.toolStripSeparator8,
             this.printToolStripButton});
             this.MainToolStrip.Location = new System.Drawing.Point(0, 24);
             this.MainToolStrip.Name = "MainToolStrip";
@@ -371,30 +373,10 @@
             this.MainToolStrip.Size = new System.Drawing.Size(989, 25);
             this.MainToolStrip.TabIndex = 1;
             // 
-            // navigateBackToolStripButton
-            // 
-            this.navigateBackToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.navigateBackToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("navigateBackToolStripButton.Image")));
-            this.navigateBackToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.navigateBackToolStripButton.Name = "navigateBackToolStripButton";
-            this.navigateBackToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.navigateBackToolStripButton.Text = "Back";
-            this.navigateBackToolStripButton.Click += new System.EventHandler(this.navigateBackToolStripButton_Click);
-            // 
-            // navigateForwardToolStripButton
-            // 
-            this.navigateForwardToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.navigateForwardToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("navigateForwardToolStripButton.Image")));
-            this.navigateForwardToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.navigateForwardToolStripButton.Name = "navigateForwardToolStripButton";
-            this.navigateForwardToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.navigateForwardToolStripButton.Text = "Forward";
-            this.navigateForwardToolStripButton.Click += new System.EventHandler(this.navigateForwardToolStripButton_Click);
-            // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 27);
             // 
             // addLicMainToolStripBtn
             // 
@@ -402,7 +384,7 @@
             this.addLicMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("addLicMainToolStripBtn.Image")));
             this.addLicMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.addLicMainToolStripBtn.Name = "addLicMainToolStripBtn";
-            this.addLicMainToolStripBtn.Size = new System.Drawing.Size(23, 22);
+            this.addLicMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
             this.addLicMainToolStripBtn.Text = "Add New License Server";
             this.addLicMainToolStripBtn.Click += new System.EventHandler(this.addLicMainToolStripBtn_Click);
             // 
@@ -413,7 +395,7 @@
             this.addProductLicenseMainToolStripDropDownBtn.Image = ((System.Drawing.Image)(resources.GetObject("addProductLicenseMainToolStripDropDownBtn.Image")));
             this.addProductLicenseMainToolStripDropDownBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.addProductLicenseMainToolStripDropDownBtn.Name = "addProductLicenseMainToolStripDropDownBtn";
-            this.addProductLicenseMainToolStripDropDownBtn.Size = new System.Drawing.Size(23, 22);
+            this.addProductLicenseMainToolStripDropDownBtn.Size = new System.Drawing.Size(23, 24);
             this.addProductLicenseMainToolStripDropDownBtn.Text = "Add New Product License";
             this.addProductLicenseMainToolStripDropDownBtn.ToolTipText = "Add New Product License";
             this.addProductLicenseMainToolStripDropDownBtn.Click += new System.EventHandler(this.addProductLicenseMainToolStripDropDownBtn_Click);
@@ -425,7 +407,7 @@
             this.createPacketMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("createPacketMainToolStripBtn.Image")));
             this.createPacketMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.createPacketMainToolStripBtn.Name = "createPacketMainToolStripBtn";
-            this.createPacketMainToolStripBtn.Size = new System.Drawing.Size(23, 22);
+            this.createPacketMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
             this.createPacketMainToolStripBtn.Text = "Generate License";
             this.createPacketMainToolStripBtn.ToolTipText = "Generate License Packet";
             this.createPacketMainToolStripBtn.Click += new System.EventHandler(this.createPacketMainToolStripBtn_Click);
@@ -465,7 +447,7 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
             // 
             // seekKeyToolStripButton
             // 
@@ -473,7 +455,7 @@
             this.seekKeyToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("seekKeyToolStripButton.Image")));
             this.seekKeyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.seekKeyToolStripButton.Name = "seekKeyToolStripButton";
-            this.seekKeyToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.seekKeyToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.seekKeyToolStripButton.Text = "Seek Hardware Key";
             this.seekKeyToolStripButton.Click += new System.EventHandler(this.seekKeyToolStripButton_Click);
             // 
@@ -483,7 +465,7 @@
             this.reserveHardwareKeyToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("reserveHardwareKeyToolStripButton.Image")));
             this.reserveHardwareKeyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.reserveHardwareKeyToolStripButton.Name = "reserveHardwareKeyToolStripButton";
-            this.reserveHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.reserveHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.reserveHardwareKeyToolStripButton.Text = "Reserve Hardware Key";
             this.reserveHardwareKeyToolStripButton.Click += new System.EventHandler(this.reserveHardwareKeyToolStripButton_Click);
             // 
@@ -493,7 +475,7 @@
             this.deactivateHardwareKeyToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("deactivateHardwareKeyToolStripButton.Image")));
             this.deactivateHardwareKeyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.deactivateHardwareKeyToolStripButton.Name = "deactivateHardwareKeyToolStripButton";
-            this.deactivateHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.deactivateHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.deactivateHardwareKeyToolStripButton.Text = "Deactivate Hardware Key";
             this.deactivateHardwareKeyToolStripButton.Click += new System.EventHandler(this.deactivateHardwareKeyToolStripButton_Click);
             // 
@@ -503,7 +485,7 @@
             this.newCustMainToolStripBtn.Image = ((System.Drawing.Image)(resources.GetObject("newCustMainToolStripBtn.Image")));
             this.newCustMainToolStripBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newCustMainToolStripBtn.Name = "newCustMainToolStripBtn";
-            this.newCustMainToolStripBtn.Size = new System.Drawing.Size(23, 22);
+            this.newCustMainToolStripBtn.Size = new System.Drawing.Size(23, 24);
             this.newCustMainToolStripBtn.Text = "Add New Customer";
             this.newCustMainToolStripBtn.Click += new System.EventHandler(this.newCustMainToolStripBtn_Click);
             // 
@@ -513,7 +495,7 @@
             this.activateHardwareKeyToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("activateHardwareKeyToolStripButton.Image")));
             this.activateHardwareKeyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.activateHardwareKeyToolStripButton.Name = "activateHardwareKeyToolStripButton";
-            this.activateHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.activateHardwareKeyToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.activateHardwareKeyToolStripButton.Text = "Activate Hardware Key";
             this.activateHardwareKeyToolStripButton.Click += new System.EventHandler(this.activateHardwareKeyToolStripButton_Click);
             // 
@@ -523,7 +505,7 @@
             this.clearKeyToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("clearKeyToolStripButton.Image")));
             this.clearKeyToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.clearKeyToolStripButton.Name = "clearKeyToolStripButton";
-            this.clearKeyToolStripButton.Size = new System.Drawing.Size(104, 22);
+            this.clearKeyToolStripButton.Size = new System.Drawing.Size(104, 24);
             this.clearKeyToolStripButton.Text = "Clear Attached Key";
             this.clearKeyToolStripButton.Visible = false;
             this.clearKeyToolStripButton.Click += new System.EventHandler(this.clearKeyToolStripButton_Click);
@@ -534,7 +516,7 @@
             this.printToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripButton.Image")));
             this.printToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.printToolStripButton.Name = "printToolStripButton";
-            this.printToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.printToolStripButton.Size = new System.Drawing.Size(23, 24);
             this.printToolStripButton.Text = "Print";
             this.printToolStripButton.Click += new System.EventHandler(this.printToolStripButton_Click);
             // 
@@ -841,7 +823,7 @@
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListViewToolStrip);
             this.DetailSplitContainer.Panel2.Controls.Add(this.loadingCircle1);
             this.DetailSplitContainer.Size = new System.Drawing.Size(636, 396);
-            this.DetailSplitContainer.SplitterDistance = 258;
+            this.DetailSplitContainer.SplitterDistance = 257;
             this.DetailSplitContainer.SplitterWidth = 2;
             this.DetailSplitContainer.TabIndex = 0;
             // 
@@ -853,7 +835,7 @@
             this.DetailPropertyGrid.Location = new System.Drawing.Point(0, 0);
             this.DetailPropertyGrid.Margin = new System.Windows.Forms.Padding(0);
             this.DetailPropertyGrid.Name = "DetailPropertyGrid";
-            this.DetailPropertyGrid.Size = new System.Drawing.Size(636, 258);
+            this.DetailPropertyGrid.Size = new System.Drawing.Size(636, 257);
             this.DetailPropertyGrid.TabIndex = 2;
             this.DetailPropertyGrid.ToolbarVisible = false;
             this.DetailPropertyGrid.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
@@ -872,7 +854,7 @@
             this.DetailListView.MultiSelect = false;
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
-            this.DetailListView.Size = new System.Drawing.Size(636, 111);
+            this.DetailListView.Size = new System.Drawing.Size(636, 112);
             this.DetailListView.SmallImageList = this.CreatorImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
@@ -963,7 +945,7 @@
             this.loadingCircle1.NumberSpoke = 9;
             this.loadingCircle1.OuterCircleRadius = 7;
             this.loadingCircle1.RotationSpeed = 100;
-            this.loadingCircle1.Size = new System.Drawing.Size(636, 136);
+            this.loadingCircle1.Size = new System.Drawing.Size(636, 137);
             this.loadingCircle1.SpokeThickness = 4;
             this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.Firefox;
             this.loadingCircle1.TabIndex = 6;
@@ -1085,7 +1067,7 @@
             this.PacketTabPage.ImageIndex = 26;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(636, 396);
+            this.PacketTabPage.Size = new System.Drawing.Size(636, 394);
             this.PacketTabPage.TabIndex = 2;
             this.PacketTabPage.Text = "Packets";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -1108,7 +1090,7 @@
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
             this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Size = new System.Drawing.Size(636, 371);
+            this.splitContainer1.Size = new System.Drawing.Size(636, 369);
             this.splitContainer1.SplitterDistance = 293;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
@@ -1131,7 +1113,7 @@
             this.LicensePacketListView.MultiSelect = false;
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(634, 369);
+            this.LicensePacketListView.Size = new System.Drawing.Size(634, 367);
             this.LicensePacketListView.SmallImageList = this.CreatorImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
@@ -1289,7 +1271,7 @@
             this.ReportTabPage.Location = new System.Drawing.Point(4, 22);
             this.ReportTabPage.Margin = new System.Windows.Forms.Padding(5);
             this.ReportTabPage.Name = "ReportTabPage";
-            this.ReportTabPage.Size = new System.Drawing.Size(981, 428);
+            this.ReportTabPage.Size = new System.Drawing.Size(981, 426);
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Reports";
             this.ReportTabPage.UseVisualStyleBackColor = true;
@@ -1307,7 +1289,7 @@
             // reportsSplitContainer.Panel2
             // 
             this.reportsSplitContainer.Panel2.Controls.Add(this.ReportListView);
-            this.reportsSplitContainer.Size = new System.Drawing.Size(981, 428);
+            this.reportsSplitContainer.Size = new System.Drawing.Size(981, 426);
             this.reportsSplitContainer.SplitterDistance = 233;
             this.reportsSplitContainer.TabIndex = 1;
             // 
@@ -1320,12 +1302,12 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode32.Name = "RootNode";
-            treeNode32.Text = "Reports";
+            treeNode72.Name = "RootNode";
+            treeNode72.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode32});
+            treeNode72});
             this.reportsTreeView.SelectedImageIndex = 34;
-            this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
+            this.reportsTreeView.Size = new System.Drawing.Size(233, 426);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
             this.reportsTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.reportsTreeView_MouseUp);
@@ -1341,7 +1323,7 @@
             this.ReportListView.HideSelection = false;
             this.ReportListView.Location = new System.Drawing.Point(0, 0);
             this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(744, 428);
+            this.ReportListView.Size = new System.Drawing.Size(744, 426);
             this.ReportListView.TabIndex = 0;
             this.ReportListView.UseCompatibleStateImageBehavior = false;
             this.ReportListView.View = System.Windows.Forms.View.Details;
@@ -1379,29 +1361,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode22.ImageIndex = 1;
-            treeNode22.Name = "LicenseNode";
-            treeNode22.SelectedImageIndex = 1;
-            treeNode22.Text = "Licenses";
-            treeNode28.ImageIndex = 2;
-            treeNode28.Name = "PacketNode";
-            treeNode28.SelectedImageIndex = 2;
-            treeNode28.Text = "Packets";
-            treeNode29.Name = "KeyNode";
-            treeNode29.Text = "Hardware Keys";
-            treeNode30.ImageIndex = 3;
-            treeNode30.Name = "CreatorRootNode";
-            treeNode30.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode30.SelectedImageIndex = 3;
-            treeNode30.Text = "Creator";
-            treeNode31.ImageIndex = 0;
-            treeNode31.Name = "ReportRootNode";
-            treeNode31.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode31.SelectedImageIndex = 0;
-            treeNode31.Text = "Reports";
+            treeNode62.ImageIndex = 1;
+            treeNode62.Name = "LicenseNode";
+            treeNode62.SelectedImageIndex = 1;
+            treeNode62.Text = "Licenses";
+            treeNode68.ImageIndex = 2;
+            treeNode68.Name = "PacketNode";
+            treeNode68.SelectedImageIndex = 2;
+            treeNode68.Text = "Packets";
+            treeNode69.Name = "KeyNode";
+            treeNode69.Text = "Hardware Keys";
+            treeNode70.ImageIndex = 3;
+            treeNode70.Name = "CreatorRootNode";
+            treeNode70.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode70.SelectedImageIndex = 3;
+            treeNode70.Text = "Creator";
+            treeNode71.ImageIndex = 0;
+            treeNode71.Name = "ReportRootNode";
+            treeNode71.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode71.SelectedImageIndex = 0;
+            treeNode71.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode30,
-            treeNode31});
+            treeNode70,
+            treeNode71});
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);
@@ -1671,7 +1653,7 @@
             // 
             this.expandAllToolStripMenuItem.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.expandAllToolStripMenuItem.Name = "expandAllToolStripMenuItem";
-            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.expandAllToolStripMenuItem.Text = "Expand All";
             this.expandAllToolStripMenuItem.Click += new System.EventHandler(this.expandAllToolStripMenuItem_Click);
             // 
@@ -1679,20 +1661,20 @@
             // 
             this.collapseToolStripMenuItem.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.collapseToolStripMenuItem.Name = "collapseToolStripMenuItem";
-            this.collapseToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.collapseToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.collapseToolStripMenuItem.Text = "Collapse";
             this.collapseToolStripMenuItem.Click += new System.EventHandler(this.collapseToolStripMenuItem_Click);
             // 
             // lcmToolStripSeparator1
             // 
             this.lcmToolStripSeparator1.Name = "lcmToolStripSeparator1";
-            this.lcmToolStripSeparator1.Size = new System.Drawing.Size(184, 6);
+            this.lcmToolStripSeparator1.Size = new System.Drawing.Size(203, 6);
             // 
             // checkOutToolStripMenuItem
             // 
             this.checkOutToolStripMenuItem.Name = "checkOutToolStripMenuItem";
             this.checkOutToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.checkOutToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.checkOutToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.checkOutToolStripMenuItem.Text = "Check Out...";
             this.checkOutToolStripMenuItem.Click += new System.EventHandler(this.checkOutToolStripMenuItem_Click);
             // 
@@ -1700,21 +1682,21 @@
             // 
             this.checkInToolStripMenuItem.Name = "checkInToolStripMenuItem";
             this.checkInToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
-            this.checkInToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.checkInToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.checkInToolStripMenuItem.Text = "Check In...";
             this.checkInToolStripMenuItem.Click += new System.EventHandler(this.checkInToolStripMenuItem_Click);
             // 
             // reactivateToolStripMenuItem
             // 
             this.reactivateToolStripMenuItem.Name = "reactivateToolStripMenuItem";
-            this.reactivateToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.reactivateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.reactivateToolStripMenuItem.Text = "Reactivate";
             this.reactivateToolStripMenuItem.Click += new System.EventHandler(this.reactivateToolStripMenuItem_Click);
             // 
             // deactivateToolStripMenuItem
             // 
             this.deactivateToolStripMenuItem.Name = "deactivateToolStripMenuItem";
-            this.deactivateToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.deactivateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.deactivateToolStripMenuItem.Text = "Deactivate";
             this.deactivateToolStripMenuItem.Click += new System.EventHandler(this.deactivateToolStripMenuItem_Click);
             // 
@@ -1722,21 +1704,21 @@
             // 
             this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
             // lcmToolStripSeparator2
             // 
             this.lcmToolStripSeparator2.Name = "lcmToolStripSeparator2";
-            this.lcmToolStripSeparator2.Size = new System.Drawing.Size(184, 6);
+            this.lcmToolStripSeparator2.Size = new System.Drawing.Size(203, 6);
             // 
             // newLicenseToolStripMenuItem
             // 
             this.newLicenseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("newLicenseToolStripMenuItem.Image")));
             this.newLicenseToolStripMenuItem.Name = "newLicenseToolStripMenuItem";
             this.newLicenseToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.newLicenseToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.newLicenseToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.newLicenseToolStripMenuItem.Text = "License Server";
             this.newLicenseToolStripMenuItem.Click += new System.EventHandler(this.newLicenseToolStripMenuItem_Click);
             // 
@@ -1745,14 +1727,14 @@
             this.newProductLicenseToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("newProductLicenseToolStripMenuItem.Image")));
             this.newProductLicenseToolStripMenuItem.Name = "newProductLicenseToolStripMenuItem";
             this.newProductLicenseToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Insert;
-            this.newProductLicenseToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.newProductLicenseToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.newProductLicenseToolStripMenuItem.Text = "Product License";
             this.newProductLicenseToolStripMenuItem.Click += new System.EventHandler(this.newProductLicenseToolStripMenuItem_Click);
             // 
             // cloneToolStripMenuItem
             // 
             this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.cloneToolStripMenuItem.Text = "Clone";
             this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
             // 
@@ -1762,7 +1744,7 @@
             this.verifiedToolStripMenuItem,
             this.unVerifiedToolStripMenuItem});
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(187, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(206, 22);
             this.toolStripMenuItem2.Text = "Transfer";
             // 
             // verifiedToolStripMenuItem
@@ -1785,7 +1767,7 @@
             this.toolStripSeparator3,
             this.markLostToolStripMenuItem});
             this.validationTokensToolStripMenuItem.Name = "validationTokensToolStripMenuItem";
-            this.validationTokensToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.validationTokensToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.validationTokensToolStripMenuItem.Text = "Validation Token";
             // 
             // newTokenToolStripMenuItem
@@ -1817,20 +1799,20 @@
             // lcmToolStripSeparator3
             // 
             this.lcmToolStripSeparator3.Name = "lcmToolStripSeparator3";
-            this.lcmToolStripSeparator3.Size = new System.Drawing.Size(184, 6);
+            this.lcmToolStripSeparator3.Size = new System.Drawing.Size(203, 6);
             // 
             // findToolStripMenuItem
             // 
             this.findToolStripMenuItem.Name = "findToolStripMenuItem";
             this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.findToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.findToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.findToolStripMenuItem.Text = "Find";
             this.findToolStripMenuItem.Click += new System.EventHandler(this.findToolStripMenuItem_Click);
             // 
             // lcmToolStripSeparator4
             // 
             this.lcmToolStripSeparator4.Name = "lcmToolStripSeparator4";
-            this.lcmToolStripSeparator4.Size = new System.Drawing.Size(184, 6);
+            this.lcmToolStripSeparator4.Size = new System.Drawing.Size(203, 6);
             // 
             // createPacketFileToolStripMenuItem
             // 
@@ -1894,6 +1876,26 @@
             // 
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
+            // 
+            // navigateHomeToolStripButton
+            // 
+            this.navigateHomeToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.navigateHomeToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("navigateHomeToolStripButton.Image")));
+            this.navigateHomeToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.navigateHomeToolStripButton.Name = "navigateHomeToolStripButton";
+            this.navigateHomeToolStripButton.Size = new System.Drawing.Size(23, 24);
+            this.navigateHomeToolStripButton.Text = "Return to customer list.";
+            this.navigateHomeToolStripButton.Click += new System.EventHandler(this.navigateHomeToolStripButton_Click);
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
             // 
             // CreatorForm
             // 
@@ -2051,7 +2053,6 @@
         private System.Windows.Forms.ToolStripMenuItem updateToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox moduleFilterToolStripComboBox;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripButton navigateBackToolStripButton;
         private System.Windows.Forms.ToolStripButton activateHardwareKeyToolStripButton;
         private System.Windows.Forms.ToolStripButton seekKeyToolStripButton;
         private System.Windows.Forms.ToolStripButton reserveHardwareKeyToolStripButton;
@@ -2070,7 +2071,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem customerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton navigateForwardToolStripButton;
         private System.Windows.Forms.ToolStrip ValidationKeyToolStrip;
         private System.Windows.Forms.ToolStripLabel ValidationKeyCustomerLabel;
         private System.Windows.Forms.ToolStripMenuItem updateVersionsToolStripMenuItem;
@@ -2135,6 +2135,9 @@
         private System.Windows.Forms.ToolStripButton addLicMainToolStripBtn;
         private System.Windows.Forms.ToolStripButton addProductLicenseMainToolStripDropDownBtn;
         private System.Windows.Forms.ToolStripMenuItem licensePacketReportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton navigateHomeToolStripButton;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
     }
 }
 

@@ -215,7 +215,6 @@ namespace Client.Creator
                     deactivateToolStripMenuItem.Visible = true;
                 else
                     deleteToolStripMenuItem.Visible = true;
-
             }
             lcmToolStripSeparator3.Visible = true;
             findToolStripMenuItem.Visible = true;
@@ -234,7 +233,7 @@ namespace Client.Creator
         {            
             ResetMainToolStripMenu();
             printToolStripButton.Enabled = true;
-            navigateBackToolStripButton.Enabled = true;
+            navigateHomeToolStripButton.Enabled = true;
             if (!searchToolStripTextBox.Visible) searchToolStripTextBox.Visible = true;
             if (!SearchToolStripLabel.Visible) SearchToolStripLabel.Visible = true;
             searchToolStripTextBox.Enabled = true;
@@ -382,29 +381,13 @@ namespace Client.Creator
             CreateStandardLicense();              
         }
 
-        private void navigateForwardToolStripButton_Click(object sender, EventArgs e)
-        {
-            if (MainTabControl.SelectedTab == LicensesTabPage)
-            {
-                CustomersListView.Visible = false;
-                CustomerToolStrip.Visible = true;
-                LoadDBLicenses("", "", _selectedLicenseCustomer.Name, false);
-                navigateBackToolStripButton.Enabled = true;
-                navigateForwardToolStripButton.Enabled = false;
-            }
-            else
-            {
-                SearchCurrentView(_selectedHardwareKeyCustomer);
-            }
-        }
-        private void navigateBackToolStripButton_Click(object sender, EventArgs e)
+        private void navigateHomeToolStripButton_Click(object sender, EventArgs e)
         {
             ResetMainToolStripMenu();
+            navigateHomeToolStripButton.Enabled = true;
             if (MainTabControl.SelectedTab == LicensesTabPage)
             {
                 CustomersListView.Visible = true;
-                navigateBackToolStripButton.Enabled = false;
-                navigateForwardToolStripButton.Enabled = true;
                 CustomerToolStrip.Visible = false;
             }
             else
@@ -923,7 +906,7 @@ namespace Client.Creator
 
         private void deactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(string.Format("Please confirm deactivation for {0}.", DetailTreeView.SelectedNode.Name), "Deactivate Confirmation",
+            DialogResult result = MessageBox.Show(string.Format("Please confirm deactivation for {0}.", DetailTreeView.SelectedNode.Name), "Deactivate",
                                       MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
@@ -1040,7 +1023,7 @@ namespace Client.Creator
 
         private void reactivateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(string.Format("Please confirm reactivation for {0}.", DetailTreeView.SelectedNode.Name), "Reactivate Confirmation",
+            DialogResult result = MessageBox.Show(string.Format("Please confirm reactivation of License Server : {0}.", DetailTreeView.SelectedNode.Name), "Reactivate License Server",
                                       MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
@@ -1086,7 +1069,7 @@ namespace Client.Creator
 
         private void markLostToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult result = MessageBox.Show(string.Format("Please confirm lost hardware token for {0}.", DetailTreeView.SelectedNode.Name), "Lost Confirmation",
+            DialogResult result = MessageBox.Show(string.Format("Please confirm lost hardware token for {0}.", DetailTreeView.SelectedNode.Name), "Lost Hardware Token",
                           MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
@@ -2297,7 +2280,7 @@ namespace Client.Creator
                 {
 
                     ReportProperty selectedReport = reportsTreeView.SelectedNode.Tag as ReportProperty;
-                    DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of report: {0}.", selectedReport.ID), "Delete Report Confirmation",
+                    DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of report: {0}.", selectedReport.ID), "Delete Report",
                                   MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                     if (result == DialogResult.OK)
                     {
@@ -2715,7 +2698,10 @@ namespace Client.Creator
                 newLicense.GroupID = client.GetNextGroupID(newLicense.CustID, newLicense.DestID);
             });
             newLicense.Permissions = m_Permissions;
-            CreateLicenseNode(newLicense);
+            DialogResult result = MessageBox.Show(string.Format("Please confirm creation of License Server : {0}.", newLicense.Name), "Create License Server",
+                          MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.OK)            
+                CreateLicenseNode(newLicense);
         }
         private void CreateLicenseEntity(LicenseServerProperty licProperties)
         {
@@ -2776,7 +2762,7 @@ namespace Client.Creator
             LicenseServerProperty selectedLicense = selectedLicenseNode.Tag as LicenseServerProperty;
             if (bVerify)
             {
-                DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of license: {0}.", selectedLicense.Name), "Delete License Confirmation",
+                DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of License Server : {0}.", selectedLicense.Name), "Delete License Server",
                                           MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                 if (result == DialogResult.OK)
                     bDelete = true;
@@ -2939,8 +2925,7 @@ namespace Client.Creator
                 DetailTreeView.Nodes.Add(emptyNode);
                 LicenseViewSplitContainer.Panel2Collapsed = true;
             }
-            navigateBackToolStripButton.Enabled = true;
-            navigateForwardToolStripButton.Enabled = false;
+            navigateHomeToolStripButton.Enabled = true;
             //selected node should be first node.
             if (DetailTreeView.Nodes.Count > 0)
             {
@@ -3173,7 +3158,7 @@ namespace Client.Creator
         private void RemoveValidationToken(LicenseServerProperty selectedLicense)
         {
             string hardwareTokenValue = "";
-            DialogResult dlgResult = MessageBox.Show("Clearing tokens will disable license. Click OK to continue with deletion of tokens.", "Delete Token Confirmation",
+            DialogResult dlgResult = MessageBox.Show("Clearing tokens will disable license. Click OK to continue with deletion of tokens.", "Delete Token(s)",
                         MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
             if (dlgResult == DialogResult.OK)
             {
@@ -3390,7 +3375,7 @@ namespace Client.Creator
                 if (bVerify)
                 {
                     bDeleteProductLicense = false;
-                    DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of product license: {0}.", plData.ID), "Delete Product License Confirmation",
+                    DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of product license: {0}.", plData.ID), "Delete Product License",
                                           MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
                     if (result == DialogResult.OK)
                         bDeleteProductLicense = true;
@@ -3780,7 +3765,7 @@ namespace Client.Creator
         {
             string custName = lvItem.SubItems[1].Text;
             int custID = Int32.Parse(lvItem.Text, System.Globalization.NumberStyles.HexNumber);
-            DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of customer: {0}.", custName), "Delete Customer Confirmation",
+            DialogResult result = MessageBox.Show(string.Format("Please confirm deletion of customer : {0}.", custName), "Delete Customer",
                           MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
             if (result == DialogResult.OK)
             {
@@ -4007,7 +3992,7 @@ namespace Client.Creator
         }
         private void EnableHardwareKeyView()
         {
-            navigateBackToolStripButton.Enabled = true;
+            navigateHomeToolStripButton.Enabled = true;
             seekKeyToolStripButton.Enabled = LicenseServerAvailable;
             reserveHardwareKeyToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value;
             searchToolStripTextBox.Visible = false;
@@ -4033,8 +4018,7 @@ namespace Client.Creator
             SearchToolStripLabel.Visible = true;
             searchToolStripTextBox.Enabled = true;
             SearchToolStripLabel.Enabled = true;
-            navigateBackToolStripButton.Enabled = false;
-            navigateForwardToolStripButton.Enabled = false;
+            navigateHomeToolStripButton.Enabled = false;
             seekKeyToolStripButton.Enabled = LicenseServerAvailable;
             reserveHardwareKeyToolStripButton.Enabled = false;
             deactivateHardwareKeyToolStripButton.Enabled = false;
@@ -4915,6 +4899,8 @@ namespace Client.Creator
             SetLicenseServerState(DetailTreeView.SelectedNode, false);
         }
         #endregion
+
+
 
 
     }
