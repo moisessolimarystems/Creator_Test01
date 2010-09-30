@@ -100,6 +100,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		bool bFirstTime;
 
 		//variables to help with sending out messages
+		//Pair used to store module ID and expiration date
 		typedef std::pair<int/*ModuleID*/, time_t> ModuleIdToExpirationDate;
 		typedef std::vector<ModuleIdToExpirationDate> ModuleIdToExpirationDateList;
 		struct ProductReminderClass
@@ -110,6 +111,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 			time_t swExpDate;
 			ModuleIdToExpirationDateList modIdToExpDateList;
 		};
+
+		//Map used to store expiration dates of a Product License, index by ProductID
 		typedef std::map<int/*ProductID*/, ProductReminderClass> ProductReminderMap;
 		struct SoftwareLicReminderClass
 		{
@@ -118,6 +121,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 			time_t softwareLicReminderClassLastRefresh;
 		};
 
+		//Map used to store expiration dates of a Software License, index by Software License Name
 		std::map<std::wstring/*SW Lic Name*/, SoftwareLicReminderClass> swLicReminderMap;
 		
 

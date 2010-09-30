@@ -285,6 +285,10 @@ wchar_t tmpbuf[BUF_SIZE];
 
 			tmpLicInfoList.erase(tmpLicInfoList.begin());
 		}
+
+		//CR.13684 - Clear out reminder list when forcing a refresh
+		if(bForceRefresh)
+			swLicReminderMap.clear();
 	}
 	catch(HRESULT &ehr)
 	{
@@ -3184,6 +3188,7 @@ wchar_t debug_buf[1024];
 				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
 				//}
 
+				//CR.13285 - Only generate messages if less than 14 days to expiring.
 				//Check on the closest expiration date, Change to not flood event log
 				//14 days to expiration or less, send reminder every 1 day
 				time_t sendReminderTimePeriod = 0;
@@ -3196,12 +3201,18 @@ wchar_t debug_buf[1024];
 				}
 
 				bool bSendReminder = false;
-				bSendReminder = prodReminderMapIt->second.lastReminderSent == -1;
-				if(!bSendReminder && sendReminderTimePeriod!=0)
+				if(sendReminderTimePeriod!=0)
 				{
-					//difftime returns the elapsed time in seconds, from timer0 to timer1 - double difftime(time_t timer1, time_t timer0 );
-					double timeSinceLastReminder = difftime(curTimeT, prodReminderMapIt->second.lastReminderSent);
-					bSendReminder = timeSinceLastReminder >= sendReminderTimePeriod;
+					if(prodReminderMapIt->second.lastReminderSent == -1)
+					{
+						bSendReminder = true;
+					}
+					else
+					{
+						//difftime returns the elapsed time in seconds, from timer0 to timer1 - double difftime(time_t timer1, time_t timer0 );
+						double timeSinceLastReminder = difftime(curTimeT, prodReminderMapIt->second.lastReminderSent);
+						bSendReminder = timeSinceLastReminder >= sendReminderTimePeriod;
+					}
 				}
 
 				if(bSendReminder)
