@@ -6,7 +6,9 @@
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
 #include "..\common\LicAttribsCPP\Sys_EventLogInfoAttribs.h"
 #include "..\common\TimeHelper.h"	//For TimeHelper
-const int BUFFER_SIZE = 1024*64;
+#include "StringUtils.h"				//For WstringToString
+#include <errno.h>
+const int BUFFER_SIZE = 1024*64*2;
 HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream)
 {
 	//OutputDebugStringW(L"EventLogHelper::ReadEventLog() - Start");
@@ -103,9 +105,18 @@ HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream
 				if(pTmpString != 0)
 				{
 					memcpy(pTmpString, (LPBYTE)pevlr + uOffset, dataSize);
-					tmpEventLogEntryInfo.message = std::wstring((wchar_t*)pTmpString);
+					std::wstring wTmpString = std::wstring((wchar_t*)pTmpString);
 					GlobalFree(pTmpString);
 					pTmpString = 0;
+
+					// CR.FIX.13703.v2 - It is possible for binary data to be in the msg.  In those cases, can not 
+					//get proper msg from event log.
+					long errorNo = 0;
+					StringUtils::WstringToString(wTmpString, &errorNo);
+					if(errorNo == EILSEQ)	//Cannot convert wide string to a multibyte character, assume binary data
+						tmpEventLogEntryInfo.message = std::wstring(L"Can not retrieve Event Log Message");
+					else
+						tmpEventLogEntryInfo.message = wTmpString;
 				}
 
 
@@ -136,24 +147,26 @@ HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream
 					pTmpString = 0;
 				}
 
-	
+
+				// CR.13703 - getting the SID is causing an error when streaming to xml.  SID does us
+				// to return to Solimar because we can't look it up.  Don't get it.
 				// User SID
-				if(pevlr->UserSidLength > 0)
-				{
-					uOffset = pevlr->UserSidOffset;
-					dataSize = pevlr->UserSidLength;
-					pTmpString = (LPBYTE)GlobalAlloc(GPTR, dataSize * sizeof(wchar_t));
-					if(pTmpString != 0)
-					{
-						memcpy(pTmpString, (LPBYTE)pevlr + uOffset, dataSize);
+				//if(pevlr->UserSidLength > 0)
+				//{
+				//	uOffset = pevlr->UserSidOffset;
+				//	dataSize = pevlr->UserSidLength;
+				//	pTmpString = (LPBYTE)GlobalAlloc(GPTR, dataSize * sizeof(wchar_t));
+				//	if(pTmpString != 0)
+				//	{
+				//		memcpy(pTmpString, (LPBYTE)pevlr + uOffset, dataSize);
 
-						// For testing, this will put the SID in the value
-						tmpEventLogEntryInfo.userName = std::wstring((wchar_t*)pTmpString);
+				//		// For testing, this will put the SID in the value
+				//		tmpEventLogEntryInfo.userName = std::wstring((wchar_t*)pTmpString);
 
-						GlobalFree(pTmpString);
-						pTmpString = 0;
-					}
-				}
+				//		GlobalFree(pTmpString);
+				//		pTmpString = 0;
+				//	}
+				//}
 
 				/*strcpy(lpszComputerName, (LPTSTR)((LPBYTE)pELR + uOffset));
 				dwComputerNameLen = strlen(lpszComputerName);*/

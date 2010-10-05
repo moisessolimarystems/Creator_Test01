@@ -12,8 +12,9 @@ class StringUtils
 		static std::wstring StringToWstring(const std::string &s)
 		{
 			size_t characters;
+			long errorNo;
 			#if _MSC_VER >= 1400	
-				mbstowcs_s(&characters, 0, 0, s.c_str(), 256);
+				errorNo = mbstowcs_s(&characters, 0, 0, s.c_str(), 256);
 			#else
 				characters = mbstowcs(0, s.c_str(), 256);
 			#endif
@@ -23,7 +24,7 @@ class StringUtils
 			
 			#if _MSC_VER >= 1400	
 				size_t tmpValue;
-				mbstowcs_s(	&tmpValue,
+				errorNo = mbstowcs_s(	&tmpValue,
 							ws, 
 							characters,	//size in words
 							s.c_str(),
@@ -37,11 +38,12 @@ class StringUtils
 			return ret;
 		}
 
-		static std::string WstringToString(const std::wstring &ws)
+		static std::string WstringToString(const std::wstring &ws, long* pErrorNo = 0)
 		{
 			size_t characters;
+			long errorNo = 0;
 			#if _MSC_VER >= 1400	
-				wcstombs_s(&characters, 0, 0, ws.c_str(), 256);
+				errorNo = wcstombs_s(&characters, 0, 0, ws.c_str(), 256);
 			#else
 				characters = wcstombs(0, ws.c_str(), 256);
 			#endif
@@ -51,7 +53,7 @@ class StringUtils
 			
 			#if _MSC_VER >= 1400	
 				size_t tmpValue;
-				wcstombs_s(	&tmpValue,
+				errorNo = wcstombs_s(	&tmpValue,
 							s, 
 							characters,	//size in words
 							ws.c_str(),
@@ -59,12 +61,15 @@ class StringUtils
 			#else
 				wcstombs(s,ws.c_str(),characters);
 			#endif
+
+			if(pErrorNo != 0)
+				*pErrorNo = errorNo;
 			s[characters]=0;
 			std::string ret = s;
 			delete [] s;
 			return ret;
 		}
-
+		
 		static _bstr_t BinaryToString(BYTE *pData, DWORD length)
 		{
 			size_t sizeOfStr = (length*2)+1;
