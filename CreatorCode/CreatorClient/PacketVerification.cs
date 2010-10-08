@@ -59,7 +59,7 @@ namespace Client.Creator
                 {
                     if (storedPacket.IsVerified)
                     {
-                        MessageBox.Show(_selectedPacketName + " has already been verified!", "Duplicate Verification", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Packet : " + storedPacket.PacketName + " has already been verified!", "Duplicate Verification - " + storedPacket.PacketName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                     else
                     {
