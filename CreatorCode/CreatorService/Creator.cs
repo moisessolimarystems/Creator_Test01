@@ -272,19 +272,21 @@ namespace Service.Creator
             //}
             //LicenseTable licRecord = LicenseTable.GetLicenseByName(licenseName, false);
             m_licServer.GenerateSoftwareLicPacket(lt.LicenseInfo, expDate, ref vCode, ref newByteArrayLicensePacket);
-            PacketTable newPacket = new PacketTable()
+            if (newByteArrayLicensePacket != null)
             {
-                PacketName = pktName,
-                LicenseID = lt.ID,
-                PacketVerificationCode = vCode,
-                DateCreated = DateTime.Now,
-                ExpiredDate = expDate,
-                IsVerified = false,
-                PacketComments = comments,
-                UserName = user
-                //want to attach all changes to transaction.
-            };   
-            CreatePacket(newPacket);
+                PacketTable newPacket = new PacketTable()
+                {
+                    PacketName = pktName,
+                    LicenseID = lt.ID,
+                    PacketVerificationCode = vCode,
+                    DateCreated = DateTime.Now,
+                    ExpiredDate = expDate,
+                    IsVerified = false,
+                    PacketComments = comments,
+                    UserName = user
+                };
+                CreatePacket(newPacket);
+            }
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
