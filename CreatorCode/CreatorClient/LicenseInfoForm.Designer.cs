@@ -98,6 +98,7 @@
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.topPanel.SuspendLayout();
             this.licInfoTabControl.SuspendLayout();
             this.TokenTabPage.SuspendLayout();
@@ -426,6 +427,7 @@
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
             this.packetOutputPathTextBox.Size = new System.Drawing.Size(306, 20);
             this.packetOutputPathTextBox.TabIndex = 6;
+            this.packetOutputPathTextBox.MouseHover += new System.EventHandler(this.packetOutputPathTextBox_MouseHover);
             // 
             // folderBrowseButton
             // 
@@ -883,6 +885,13 @@
             this.browseCSVOpenFileDialog.DefaultExt = "csv";
             this.browseCSVOpenFileDialog.Filter = "CSV Files|*.csv";
             // 
+            // toolTip
+            // 
+            this.toolTip.AutoPopDelay = 5000;
+            this.toolTip.InitialDelay = 500;
+            this.toolTip.ReshowDelay = 100;
+            this.toolTip.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            // 
             // LicenseInfoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1010,6 +1019,7 @@
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label longDateLabel;
+        private System.Windows.Forms.ToolTip toolTip;
 
 
     }

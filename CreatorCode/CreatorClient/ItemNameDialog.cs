@@ -115,17 +115,21 @@ namespace Client.Creator
         }
         public bool IsCustomerNameValid(string custName)
         {
-            bool bRetVal = false;
+            bool bRetVal = true;
             if(custName.Length > 0)
-            {
+            {   //Check Duplicates
                 CustomerTable custRec = null;
                 Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
                 {
                     custRec = client.GetCustomer(custName, false);
                 });
-                if (custRec == null)
-                    bRetVal = true;
+                if (custRec != null)
+                    bRetVal = false;
+                //Check Valid Characters
+                if (custName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) > -1)
+                    bRetVal = false;                
             }
+
             return bRetVal;
         }        
         public override string ToString()

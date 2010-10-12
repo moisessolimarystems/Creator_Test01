@@ -21,7 +21,6 @@ namespace Client.Creator
         private Object selectedObject;
         private CommunicationLink m_CommLink;
         private bool m_Validated;
-
         #region Properties
         public DateTime CurrentExpirationDate
         {
@@ -67,6 +66,8 @@ namespace Client.Creator
                 ValidateTokenForm();
             if (selectedObject is ProductLicenseDialogData)
                 ValidateProductLicenses();
+            if (selectedObject is PacketDialogData)
+                ValidatePacketPath();
         }
 
         private void LicenseInfoForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -363,10 +364,22 @@ namespace Client.Creator
         private void SavePacketTabPage(PacketDialogData packetData)
         {
             packetData.ExpDate = DateTime.Now.AddDays(14); 
-            packetData.SelectedDirectory = packetOutputPathTextBox.Text;
-            if (!Directory.Exists(packetData.SelectedDirectory))            
-                Directory.CreateDirectory(packetData.SelectedDirectory);            
+            packetData.SelectedDirectory = packetOutputPathTextBox.Text;       
             packetData.UserNotes = packetDescriptTextBox.Text;
+        }
+        private void ValidatePacketPath()
+        {
+            try
+            {
+                if (!Directory.Exists(packetOutputPathTextBox.Text))
+                    Directory.CreateDirectory(packetOutputPathTextBox.Text);
+                m_Validated = true;
+            }
+            catch(Exception e)
+            {
+                m_Validated = false;
+                MessageBox.Show(packetOutputPathTextBox.Text + " is an invalid path.", "Packet Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         #endregion
 
@@ -384,6 +397,11 @@ namespace Client.Creator
         private void packetDescriptTextBox_TextChanged(object sender, EventArgs e)
         {
             licPacketNotesLabel.Text = string.Format("{0} Characters Left(Limit is 255 characters)", 255 - packetDescriptTextBox.Text.Length);
+        }
+
+        private void packetOutputPathTextBox_MouseHover(object sender, EventArgs e)
+        {            
+            toolTip.Show(packetOutputPathTextBox.Text, packetOutputPathTextBox);
         }
 
         #endregion 
