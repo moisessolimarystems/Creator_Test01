@@ -1451,9 +1451,9 @@ namespace Client.Creator
             }
             if (node.Name != "Empty" && lsp != null)
             {
-                bool bIsActiveProductLicense = (plp != null) ? plp.IsActive : true;
-                if (!lsp.LockStatus)// || !lsp.IsActive || !bIsActiveProductLicense)
-                    DetailPropertyGrid.Enabled = false;
+                //bool bIsActiveProductLicense = (plp != null) ? plp.IsActive : true;                
+                if (!lsp.LockStatus || (lsp.UserLock.ToLower() != WindowsIdentity.GetCurrent().Name.ToLower()))// || !lsp.IsActive || !bIsActiveProductLicense)
+                    DetailPropertyGrid.Enabled = false;                              
                 DetailPropertyGrid.SelectedObject = node.Tag; //(!(node.Tag is ProductCollectionProperty)) ? node.Tag : null;
                 EnableToolStripMenu(node);
                 //major performance hit
@@ -1719,7 +1719,10 @@ namespace Client.Creator
         }
         private void DetailListView_KeyDown(object sender, KeyEventArgs e)
         {
-            if(m_Permissions.pt_create_modify_key.Value)
+            //need to know if values can be changed. 
+            //1) check if propertygrid is enabled -> LicenseServer has been loaded, which determines status
+            //      -> side effect may not refresh to reflect real time status
+            if(m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled)
             {
                 if(DetailListView.SelectedItems.Count > 0 && e.KeyCode.Equals(Keys.Delete))
                 {
@@ -3637,15 +3640,16 @@ namespace Client.Creator
         private void GenerateLicensePacket()
         {
             string packetName = string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            if (!(m_selectedDirectory.Length > 0))
-                m_selectedDirectory = Directory.GetCurrentDirectory();
-
+            //if (!(m_selectedDirectory.Length > 0))
+                m_selectedDirectory = string.Format("{0}\\{1}\\{2}.{3}.{4}", Directory.GetCurrentDirectory(), _selectedLicenseCustomer.Name, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
+            //  Directory\\Company\\Date
             using (LicenseInfoForm dlg = new LicenseInfoForm("Generate License Packet for " + DetailTreeView.SelectedNode.Name, ref s_CommLink))
             {
                 PacketDialogData data = new PacketDialogData(_selectedLicenseCustomer.Name, packetName, m_selectedDirectory);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    m_selectedDirectory = Path.GetFullPath(data.SelectedDirectory);
+                    //m_selectedDirectory = Path.GetFullPath(data.SelectedDirectory); 
+                    //if user chooses a directory 
                     GeneratePacket(packetName, DetailTreeView.SelectedNode.Name, data.ExpDate, data.UserNotes, data.SelectedDirectory);
                 }
             }
@@ -4801,10 +4805,11 @@ namespace Client.Creator
         }
         private void GeneratePacket(string packetName, string licenseName, DateTime expDate, string description, string outputPath)
         {
+            bool bSuccess = false;
             using (BackgroundWorker worker = new BackgroundWorker())
             {
-                worker.DoWork += ((sender, e) => GenerateDBPacket(packetName, licenseName, expDate, description, outputPath));
-                worker.RunWorkerCompleted += ((sender, e) => OnGeneratedPacket(licenseName));
+                worker.DoWork += ((sender, e) => bSuccess = GenerateDBPacket(packetName, licenseName, expDate, description, outputPath));
+                worker.RunWorkerCompleted += ((sender, e) => OnGeneratedPacket(licenseName, bSuccess));
                 worker.RunWorkerAsync();
             }
             loadingCircle1.Visible = true;
@@ -4814,8 +4819,9 @@ namespace Client.Creator
             loadingCircle1.NumberSpoke = 10;
             loadingCircle1.Active = true;
         }
-        private void GenerateDBPacket(string packetName, string licenseName, DateTime expDate, string description, string outputPath)
+        private bool GenerateDBPacket(string packetName, string licenseName, DateTime expDate, string description, string outputPath)
         {
+            bool bSuccess = false;
             Service<ICreator>.Use((client) => 
             {
                 Byte[] newByteArrayLicensePacket = null;
@@ -4830,73 +4836,83 @@ namespace Client.Creator
                                              ref verificationCode,
                                              ref newByteArrayLicensePacket,
                                              WindowsIdentity.GetCurrent().Name);
-                packet.SaveLicensePackage();               
-                PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCode);
-                if (storedPacket == null)
-                    return;
-                
-                //retrieve all transactions for a given license that doesnt have a packet id
-                //determine if any transactions are exp date, amount in days, or activations
-                //update extension count
-                //create transaction with type extension string Expires x/x/x x Activations/x Days value = Extension x
-                IList<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(licenseName);
-                List<int> extensionList = new List<int>();
-                //need to ignore deactivated pl transactions
-                foreach (TransactionTable recordedTransaction in transactionList)
-                {
-                    if((recordedTransaction.taType == (byte)TransactionType.ExpirationDate) ||
-                       (recordedTransaction.taType == (byte)TransactionType.ActivationTotal) ||
-                       (recordedTransaction.taType == (byte)TransactionType.ActivationAmount)) 
-                    {
-                        if(!extensionList.Contains(recordedTransaction.taOrderID.Value))
-                            extensionList.Add(recordedTransaction.taOrderID.Value);
-                    }
-                    recordedTransaction.taPacketID = storedPacket.ID;
-                    client.UpdateTransaction(recordedTransaction);
-                }
-                //if yes pull product license, retrieve current values                 
-                string txDescription = "";
-                foreach (int plID in extensionList)
-                {
-                    ProductLicenseTable plt = client.GetProductLicenseByID(plID);
-                    if (plt != null)
-                    {
-                        plt.Extensions += 1;
-                        if (plt.Activations == 0)
-                            txDescription = string.Format("Expires - {0}", plt.ExpirationDate.Value.ToShortDateString());
-                        else
-                            txDescription = string.Format("({0} Activations/{1} Days) Expires - {2}", plt.Activations, plt.ActivationAmount, plt.ExpirationDate.Value.ToShortDateString());
-                        //add extension entry with summary of the extension
-                        TransactionManager.CreateTransaction(TransactionType.Extension,
-                                          licenseName,
-                                          plt.plID,
-                                          txDescription,
-                                          string.Format("Extension {0}", plt.Extensions),
-                                          "");
-                        //bump up extension count
-                        client.UpdateProductLicense(plt);
-                    }
-                }
-                transactionList = client.GetNewTransactionsByLicenseName(licenseName);
-                foreach (TransactionTable recordedTransaction in transactionList)
-                {
-                    if ((recordedTransaction.taType == (byte)TransactionType.Extension))
-                    {
-                        recordedTransaction.taPacketID = storedPacket.ID;
-                        client.UpdateTransaction(recordedTransaction);
-                    }
-                }
+                packet.SaveLicensePackage();
                 if (newByteArrayLicensePacket != null)
+                {
                     File.WriteAllBytes(string.Format("{0}\\{1}.{2}", outputPath, packetName, "packet"), newByteArrayLicensePacket);
+                    if (File.Exists(string.Format("{0}\\{1}.{2}", outputPath, packetName, "packet")))
+                    {
+                        PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCode);
+                        if (storedPacket != null)
+                        {
+                            //retrieve all transactions for a given license that doesnt have a packet id
+                            //determine if any transactions are exp date, amount in days, or activations
+                            //update extension count
+                            //create transaction with type extension string Expires x/x/x x Activations/x Days value = Extension x
+                            IList<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(licenseName);
+                            List<int> extensionList = new List<int>();
+                            //need to ignore deactivated pl transactions
+                            foreach (TransactionTable recordedTransaction in transactionList)
+                            {
+                                if ((recordedTransaction.taType == (byte)TransactionType.ExpirationDate) ||
+                                   (recordedTransaction.taType == (byte)TransactionType.ActivationTotal) ||
+                                   (recordedTransaction.taType == (byte)TransactionType.ActivationAmount))
+                                {
+                                    if (!extensionList.Contains(recordedTransaction.taOrderID.Value))
+                                        extensionList.Add(recordedTransaction.taOrderID.Value);
+                                }
+                                recordedTransaction.taPacketID = storedPacket.ID;
+                                client.UpdateTransaction(recordedTransaction);
+                            }
+                            //if yes pull product license, retrieve current values                 
+                            string txDescription = "";
+                            foreach (int plID in extensionList)
+                            {
+                                ProductLicenseTable plt = client.GetProductLicenseByID(plID);
+                                if (plt != null)
+                                {
+                                    plt.Extensions += 1;
+                                    if (plt.Activations == 0)
+                                        txDescription = string.Format("Expires - {0}", plt.ExpirationDate.Value.ToShortDateString());
+                                    else
+                                        txDescription = string.Format("({0} Activations/{1} Days) Expires - {2}", plt.Activations, plt.ActivationAmount, plt.ExpirationDate.Value.ToShortDateString());
+                                    //add extension entry with summary of the extension
+                                    TransactionManager.CreateTransaction(TransactionType.Extension,
+                                                      licenseName,
+                                                      plt.plID,
+                                                      txDescription,
+                                                      string.Format("Extension {0}", plt.Extensions),
+                                                      "");
+                                    //bump up extension count
+                                    client.UpdateProductLicense(plt);
+                                }
+                            }
+                            transactionList = client.GetNewTransactionsByLicenseName(licenseName);
+                            foreach (TransactionTable recordedTransaction in transactionList)
+                            {
+                                if ((recordedTransaction.taType == (byte)TransactionType.Extension))
+                                {
+                                    recordedTransaction.taPacketID = storedPacket.ID;
+                                    client.UpdateTransaction(recordedTransaction);
+                                }
+                            }
+                            bSuccess = true;
+                        }
+                    }
+                }
             });
+            return bSuccess;
+            //TODO : utilize bSuccess in OnGeneratedPacket
         }
-        private void OnGeneratedPacket(string licenseName)
+        private void OnGeneratedPacket(string licenseName, bool bSuccess)
         {
             loadingCircle1.Active = false;
             loadingCircle1.Visible = false;
+            if (!bSuccess)
+                MessageBox.Show(string.Format("Failed to generate license packet for {0}", licenseName), "Generate License Packet");
             LoadTransactionItems(licenseName);
             LoadPacketItems(licenseName);
-            SetLicenseServerState(DetailTreeView.SelectedNode, false);
+            SetLicenseServerState(DetailTreeView.SelectedNode, false);                        
         }
         #endregion
 
