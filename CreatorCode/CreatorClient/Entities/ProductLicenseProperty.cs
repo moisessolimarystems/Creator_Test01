@@ -787,6 +787,7 @@ namespace Client.Creator
             string previousValue, moduleName;
             Service<ICreator>.Use((client) =>
             {
+                //Retrieve only modules belonging to Parent PL
                 List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
                 if (ModuleList != null)
@@ -802,6 +803,9 @@ namespace Client.Creator
                                 {
                                     previousValue = mt.Value.ToString();
                                     mt.Value += module.Value;
+                                    //bump product connection of parent module if it is currently 0
+                                    if (mt.Value > 0 && mt.AppInstance == 0)
+                                        mt.AppInstance = 1;
                                     updateModuleList.Add(mt);
                                     moduleName = _commLink.GetModuleName(ProductID, mt.ModID);    
                                     //Create transaction for add-on PL modules being merged into parent PL 
