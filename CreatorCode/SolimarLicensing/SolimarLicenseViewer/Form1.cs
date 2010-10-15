@@ -805,7 +805,7 @@ namespace SolimarLicenseViewer
         void tsGenLicArchiveMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem tmpToolStripItem = sender as ToolStripMenuItem;
-            if (tmpToolStripItem == null)
+            if (tmpToolStripItem != null)
             {
                 this.exportPktDialog.DefaultExt = "licArchive";
                 this.exportPktDialog.Filter = "License Archive|*.licArchive";
