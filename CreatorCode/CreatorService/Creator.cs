@@ -57,6 +57,7 @@ namespace Service.Creator
                     {"Module", "Module"},
                     {"ModuleValue", "ModuleValue"},
                     {"Notes", "Description"},
+                    {"Validation", "Validation"},
                     {"Verified", "Verified"}
                 };
 
@@ -520,7 +521,11 @@ namespace Service.Creator
                 value = userCondition.Value;
                 //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
-                {                    
+                {
+                    case ConditionName.Validation:
+                        string op = ((value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
+                        conditionString.Append(string.Format("LicenseTable.TokenTables.Where(TokenType {0} 1).Count() > 0", op));
+                        break;                  
                     case ConditionName.Verified: 
                         //verified requires zero not verified packets & non-zero packet count, not verified satisfied by non-zero not verified packets or no packets found
                         string op1 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "&&" : "||";
