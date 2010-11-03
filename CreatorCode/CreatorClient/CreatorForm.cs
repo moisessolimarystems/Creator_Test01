@@ -31,6 +31,10 @@ using System.ServiceProcess;
  *        - setup concurrency
  *        - figure out way to display tree with children without taking hit of load time
  */
+
+//given a List
+//MyList.ForEach(name => listView1.Columns.Add(name));
+//var myList = new List<string>() { "A", "B", "C" };  
 namespace Client.Creator
 {
     public partial class CreatorForm : Form
@@ -3661,8 +3665,7 @@ namespace Client.Creator
             //given license display transactions
             IList<PacketTable> packets = null;
             Service<ICreator>.Use((client) =>
-            {
-                //now two steps, given a license name, get all transactions for a license and sort by packet
+            {   //now two steps, given a license name, get all transactions for a license and sort by packet
                 packets = client.GetPacketsByLicenseName(licenseName);
             });
             //Need list view manager
@@ -3682,7 +3685,7 @@ namespace Client.Creator
                     packetItem.SubItems.Add(packet.UserName);
                     packetItem.SubItems.Add(packet.VerifiedBy);
                     //add to stored packet list
-                    storageListView.Items.Add(packetItem);//.Clone() as ListViewItem);
+                    storageListView.Items.Add(packetItem);
                 }
                 storageListView.Items[storageListView.Items.Count - 1].Font = new Font(this.Font, FontStyle.Bold);
                 storageListView.Items[storageListView.Items.Count - 1].ForeColor = Color.SteelBlue;
@@ -4154,7 +4157,7 @@ namespace Client.Creator
                 Image productImage = CreatorImageList.Images[Enums.GetIconIndex(s_CommLink.GetProductBaseName((byte)productData.ProductID))];
                 ImageToolStripLabel.Size = new Size(productImage.Width, productImage.Height);
                 ImageToolStripLabel.Image = productImage;
-                DetailListViewToolStripLabel.Text = string.Format("{0} Modules", s_CommLink.GetProductName(productData.ProductID));
+                DetailListViewToolStripLabel.Text = string.Format("{0} Module Summary", s_CommLink.GetProductName(productData.ProductID));
                 DetailListViewToolStripLabel2.Visible = true;
                 dlvAddToolStripButton.Visible = false;
                 dlvRemoveToolStripButton.Visible = false;
@@ -4376,15 +4379,18 @@ namespace Client.Creator
             IList<ProductLicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
             IList<PacketTable> packets = null;
+            IList<TokenTable> tokens = null;
+
             CustomerTable customer = null;
 
             string[] plSplit;
-            string verifiedStatus;
+            string verifiedStatus, validationType;
             Service<ICreator>.Use((client) =>
             {                //function to make values database friendly?
                 licenses = client.GetProductLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
                 packets = client.GetPacketsByLicenseName("");
                 customers = client.GetAllCustomers("", false);
+                tokens = client.GetAllTokens("", Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
             });
             PopulateReportListViewColumns(ReportProperty.ReportType.ProductLicense);
             ReportListView.BeginUpdate();
@@ -4414,6 +4420,15 @@ namespace Client.Creator
                     newItem.SubItems.Add(licenses[index].Activations.ToString());
                     newItem.SubItems.Add(licenses[index].ActivationAmount.ToString());
                     newItem.SubItems.Add(licenses[index].IsActive.ToString());
+                    
+                    //need link to licenses to product licenses
+                    //have product license list with access to modules
+                    
+                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware" : "Software";
+                    if (validationType == "Hardware")
+                        validationType = tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                    newItem.SubItems.Add(validationType);
+                    
                     verifiedStatus = (packets.Where(p => p.LicenseID == licenses[index].LicenseID && p.IsVerified == false).Count() == 0 && (packets.Where(p => p.LicenseID == licenses[index].LicenseID).Count() > 0)) ? bool.TrueString : bool.FalseString;
                     newItem.SubItems.Add(verifiedStatus);
                     newItem.SubItems.Add(licenses[index].Description);
@@ -4429,13 +4444,14 @@ namespace Client.Creator
         {
             IList<LicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
+            IList<TokenTable> tokens = null;
             CustomerTable customer = null;
             string[] plSplit;
             string validationType, verifiedStatus;
             Service<ICreator>.Use((client) =>
             {
                 licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
-                customers = client.GetAllCustomers("", false);                
+                customers = client.GetAllCustomers("", false);
             });
             PopulateReportListViewColumns(ReportProperty.ReportType.LicenseServer);
             ReportListView.BeginUpdate();
@@ -4584,7 +4600,7 @@ namespace Client.Creator
         {
             ReportListView.Columns.Clear();
             switch (_reportType)
-            {
+            {   //values loaded in column order
                 case ReportProperty.ReportType.LicenseServer:
                     ReportListView.Columns.Add("Customer");
                     ReportListView.Columns.Add("License Server");
@@ -4605,6 +4621,7 @@ namespace Client.Creator
                     ReportListView.Columns.Add("Activations");
                     ReportListView.Columns.Add("Activation Amount");
                     ReportListView.Columns.Add("Active");
+                    ReportListView.Columns.Add("Validation");
                     ReportListView.Columns.Add("Verified");
                     ReportListView.Columns.Add("Notes");
                     break;
@@ -4855,8 +4872,8 @@ namespace Client.Creator
                             foreach (TransactionTable recordedTransaction in transactionList)
                             {
                                 if ((recordedTransaction.taType == (byte)TransactionType.ExpirationDate) ||
-                                   (recordedTransaction.taType == (byte)TransactionType.ActivationTotal) ||
-                                   (recordedTransaction.taType == (byte)TransactionType.ActivationAmount))
+                                    (recordedTransaction.taType == (byte)TransactionType.ActivationTotal) ||
+                                    (recordedTransaction.taType == (byte)TransactionType.ActivationAmount))
                                 {
                                     if (!extensionList.Contains(recordedTransaction.taOrderID.Value))
                                         extensionList.Add(recordedTransaction.taOrderID.Value);
@@ -4867,10 +4884,10 @@ namespace Client.Creator
                             //if yes pull product license, retrieve current values                 
                             string txDescription = "";
                             foreach (int plID in extensionList)
-                            {
+                            {   
                                 ProductLicenseTable plt = client.GetProductLicenseByID(plID);
                                 if (plt != null)
-                                {
+                                {   //bump extension count if exp date has been updated.
                                     plt.Extensions += 1;
                                     if (plt.Activations == 0)
                                         txDescription = string.Format("Expires - {0}", plt.ExpirationDate.Value.ToShortDateString());

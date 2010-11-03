@@ -59,6 +59,7 @@ namespace Client.Creator
                     {"Product License", ConditionName.ProductLicense},
                     {"Product Version", ConditionName.ProductVersion},
                     {"State", ConditionName.State},
+                    {"Validation", ConditionName.Validation},
                     {"Verified", ConditionName.Verified}
                 };
 
@@ -408,6 +409,7 @@ namespace Client.Creator
                 filterOperators = _filterStringOperators;
             else
                 filterOperators = _filterOperators;
+          
             foreach (KeyValuePair<string, ConditionOperator> kvp in filterOperators)
             {
                 if (kvp.Value == userCondition.Operator)
