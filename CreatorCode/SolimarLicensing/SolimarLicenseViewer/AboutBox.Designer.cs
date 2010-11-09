@@ -103,7 +103,7 @@ namespace SolimarLicenseViewer
             this.labelCopyright.Name = "labelCopyright";
             this.labelCopyright.Size = new System.Drawing.Size(384, 17);
             this.labelCopyright.TabIndex = 31;
-            this.labelCopyright.Text = "© 1997-XXXX. Solimar Systems, Inc. All rights reserved.";
+            this.labelCopyright.Text = "© 1997-2011. Solimar Systems, Inc. All rights reserved.";
             // 
             // labelRightsReserved
             // 
