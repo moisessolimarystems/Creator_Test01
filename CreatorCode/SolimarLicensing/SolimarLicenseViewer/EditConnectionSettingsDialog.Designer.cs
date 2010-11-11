@@ -86,6 +86,7 @@
             this.Controls.Add(this.headerPanel);
             this.Name = "EditConnectionSettingsDialog";
             this.Text = "Edit Connection Settings";
+            this.Load += new System.EventHandler(this.EditConnectionSettingsDialog_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
             this.Controls.SetChildIndex(this.headerPanel, 0);
             this.Controls.SetChildIndex(this.mainPanel, 0);

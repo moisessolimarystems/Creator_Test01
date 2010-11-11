@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.softwareSpecViewerControl1 = new Shared.VisualComponents.SoftwareSpecViewerControl();
             this.SuspendLayout();
             // 
@@ -37,6 +38,7 @@
             this.softwareSpecViewerControl1.FullRowSelect = true;
             this.softwareSpecViewerControl1.Location = new System.Drawing.Point(0, 0);
             this.softwareSpecViewerControl1.Name = "softwareSpecViewerControl1";
+            this.softwareSpecViewerControl1.ShowLines = false;
             this.softwareSpecViewerControl1.ShowNodeToolTips = true;
             this.softwareSpecViewerControl1.Size = new System.Drawing.Size(507, 344);
             this.softwareSpecViewerControl1.TabIndex = 0;

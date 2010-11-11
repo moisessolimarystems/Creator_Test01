@@ -45,5 +45,10 @@ namespace SolimarLicenseViewer
         {
             General_KeyDown(sender, new KeyEventArgs(e.KeyData));
         }
+
+        private void EditConnectionSettingsDialog_Load(object sender, EventArgs e)
+        {
+            ActiveControl = singleProdPropertyGrid;
+        }
     }
 }

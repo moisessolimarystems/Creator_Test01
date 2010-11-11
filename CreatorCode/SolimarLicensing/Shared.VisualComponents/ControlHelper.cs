@@ -51,5 +51,14 @@ namespace Shared.VisualComponents
                 }
             }
         }
+
+        [System.Runtime.InteropServices.DllImport("uxtheme", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+        public extern static Int32 SetWindowTheme
+                (IntPtr hWnd, String textSubAppName, String textSubIdList);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public extern static IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+        public const int WM_CREATE = 0x1;
     }
 }

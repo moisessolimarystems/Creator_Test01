@@ -244,8 +244,10 @@
             // 
             this.leftTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.leftTreeView.FullRowSelect = true;
+            this.leftTreeView.HideSelection = false;
             this.leftTreeView.Location = new System.Drawing.Point(0, 0);
             this.leftTreeView.Name = "leftTreeView";
+            this.leftTreeView.ShowLines = false;
             this.leftTreeView.ShowNodeToolTips = true;
             this.leftTreeView.Size = new System.Drawing.Size(188, 474);
             this.leftTreeView.TabIndex = 10;
