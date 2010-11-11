@@ -42,7 +42,9 @@
             this.usageTreeView.FullRowSelect = true;
             this.usageTreeView.Location = new System.Drawing.Point(0, 0);
             this.usageTreeView.Name = "usageTreeView";
+            this.usageTreeView.ShowLines = false;
             this.usageTreeView.ShowNodeToolTips = true;
+            this.usageTreeView.ShowRootLines = false;
             this.usageTreeView.Size = new System.Drawing.Size(360, 298);
             this.usageTreeView.TabIndex = 0;
             this.usageTreeView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.General_MouseClick);
@@ -58,7 +60,7 @@
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
             this.copyToolStripMenuItem.Text = "Copy";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 

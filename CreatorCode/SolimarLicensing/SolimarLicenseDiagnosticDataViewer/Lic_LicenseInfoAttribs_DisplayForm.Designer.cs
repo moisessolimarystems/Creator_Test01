@@ -40,6 +40,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 			this.licenseInfoTreeView.FullRowSelect = true;
 			this.licenseInfoTreeView.Location = new System.Drawing.Point(0, 0);
 			this.licenseInfoTreeView.Name = "licenseInfoTreeView";
+			this.licenseInfoTreeView.ShowLines = false;
 			this.licenseInfoTreeView.ShowNodeToolTips = true;
 			this.licenseInfoTreeView.Size = new System.Drawing.Size(452, 302);
 			this.licenseInfoTreeView.TabIndex = 0;

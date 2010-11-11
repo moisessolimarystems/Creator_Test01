@@ -97,11 +97,13 @@ namespace Shared.VisualComponents
         private static extern IntPtr SendMessageITEM(IntPtr Handle, Int32 msg, IntPtr wParam, ref HDITEM lParam);
 
 
-		public NoFlickerListView()
-		{
-			InitializeComponent();
-			DoubleBuffered = true;
-		}
+        public NoFlickerListView()
+            : base()
+        {
+            InitializeComponent();
+            DoubleBuffered = true;
+        }
+
         private bool _gridLines = false;
         /// 
         /// Handle GridLines on our own because base.GridLines has to be switched on
@@ -187,6 +189,7 @@ namespace Shared.VisualComponents
         }
 
         //const int WM_ERASEBKGND = 0x14;
+        const int WM_CREATE = 0x1;
         const int WM_PAINT = 0x0F;
         protected override void WndProc(ref Message m)
         {
@@ -220,6 +223,11 @@ namespace Shared.VisualComponents
                 }
                 #endregion
             }
+            else if (m.Msg == WM_CREATE)
+            {
+                Shared.VisualComponents.ControlHelper.SetWindowTheme(this.Handle, "Explorer", null);
+            }
+     
         }
 	}
 }

@@ -14,6 +14,7 @@ namespace SolimarLicenseViewer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.DoEvents();
             Application.Run(new Form1());
         }
     }

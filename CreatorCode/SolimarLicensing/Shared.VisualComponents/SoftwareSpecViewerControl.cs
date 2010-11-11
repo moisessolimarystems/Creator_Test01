@@ -20,6 +20,16 @@ namespace Shared.VisualComponents
             this.ContextMenuStrip.Items.Add("Copy");
             this.ContextMenuStrip.Click += new EventHandler(ContextMenuStrip_Click);
         }
+        protected override void InitLayout()
+        {
+            Shared.VisualComponents.ControlHelper.SetWindowTheme(this.Handle, "Explorer", null);
+            //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
+            Shared.VisualComponents.ControlHelper.SendMessage(this.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+            //The treeviews also have the "auto-scroll" feature. You can enable this via the TVS_EX_AUTOHSCROLL [0x0020] extended style.
+            //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0020, (IntPtr)0x0020);
+            base.InitLayout();
+        }
+
         private void ContextMenuStrip_Click(object sender, EventArgs e)
         {
             if (sender != null)
