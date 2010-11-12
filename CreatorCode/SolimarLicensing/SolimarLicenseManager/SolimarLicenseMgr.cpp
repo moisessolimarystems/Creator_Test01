@@ -532,11 +532,6 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 	bool bConnectedToAtleastOneComputer = false;
 	try
 	{
-		LicenseSettings licSettings;
-		hr = licSettings.Initialize();
-		if(FAILED(hr))
-			throw S_OK;	//set to ok so try to connect to localhost
-
 		long calProdID = product;
 		if(bUseSharedLicenseServers == VARIANT_TRUE)
 		{
@@ -550,9 +545,27 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 		m_product = calProdID;
 
 		LicenseSettings::LicenseServerSettingsTwoPointZero licenseServerSettings;
-		hr = licSettings.GetLiceseServerByProduct(calProdID, &licenseServerSettings);
-		if(FAILED(hr))
-			throw hr;
+		try
+		{
+			LicenseSettings licSettings;
+			hr = licSettings.Initialize();
+			if(FAILED(hr))
+				throw S_OK;	//set to ok so try to connect to localhost
+			hr = licSettings.GetLiceseServerByProduct(calProdID, &licenseServerSettings);
+			if(FAILED(hr))
+				throw hr;
+		}
+		catch(HRESULT &eHr)
+		{
+			if(SUCCEEDED(eHr))
+			{
+				licenseServerSettings.serverName = L"localhost";
+				licenseServerSettings.backupServerName = L"";
+				licenseServerSettings.bIsTestDevLicensing = false;
+			}
+			else if(FAILED(eHr))
+				throw eHr;
+		}
 
 		long connectionFlags = CF_SOFTWARE_LICENSING;
 
