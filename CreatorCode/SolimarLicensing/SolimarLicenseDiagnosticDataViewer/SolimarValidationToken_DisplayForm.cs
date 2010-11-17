@@ -9,14 +9,14 @@ using System.Windows.Forms;
 using System.IO;
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class SolimarValidationToken_DisplayForm : Base_DisplayForm
+    public partial class SolimarValidationToken_DisplayForm : Base_DisplayForm<string>
     {
         public SolimarValidationToken_DisplayForm()
         {
             InitializeComponent();
         }
 
-        public void SetData(string _data)
+        public override void SetData(string _data)
         {
             if (_data != null)
             {
