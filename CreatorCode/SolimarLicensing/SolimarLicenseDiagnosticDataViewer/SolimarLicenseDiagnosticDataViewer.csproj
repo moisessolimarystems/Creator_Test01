@@ -128,9 +128,6 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Base_DisplayForm.resx">
-      <DependentUpon>Base_DisplayForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="ConnectionDialog.resx">
       <DependentUpon>ConnectionDialog.cs</DependentUpon>
     </EmbeddedResource>

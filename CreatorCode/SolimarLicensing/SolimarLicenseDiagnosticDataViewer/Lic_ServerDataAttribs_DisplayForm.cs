@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_ServerDataAttribs_DisplayForm : Base_DisplayForm
+    public partial class Lic_ServerDataAttribs_DisplayForm : Base_DisplayForm<Lic_ServerDataAttribs>
 	{
 		public Lic_ServerDataAttribs_DisplayForm()
 		{
@@ -21,7 +21,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 			//noFlickerListView1.ListViewItemSorter = new
 		}
 
-		public void SetData(Lic_ServerDataAttribs _data)
+		public override void SetData(Lic_ServerDataAttribs _data)
 		{
 			m_data = _data;
 			if (m_data != null)
