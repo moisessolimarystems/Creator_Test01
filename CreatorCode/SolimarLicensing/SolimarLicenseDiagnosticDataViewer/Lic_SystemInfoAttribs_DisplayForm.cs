@@ -10,14 +10,15 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-	public partial class Lic_SystemInfoAttribs_DisplayForm : Form
+    public partial class Lic_SystemInfoAttribs_DisplayForm : Base_DisplayForm<Lic_SystemInfoAttribs>
 	{
 		public Lic_SystemInfoAttribs_DisplayForm()
 		{
 			InitializeComponent();
+			Shared.VisualComponents.ControlHelper.SetWindowTheme(this.valTokenListView.Handle, "Explorer", null);
 		}
 
-		public void SetData(Lic_SystemInfoAttribs _data)
+		public override void SetData(Lic_SystemInfoAttribs _data)
 		{
 			if (_data != null)
 			{
@@ -88,23 +89,13 @@ namespace SolimarLicenseDiagnosticDataViewer
 			}
 		}
 
-		private const int CP_NOCLOSE_BUTTON = 0x200;
-		protected override CreateParams CreateParams
-		{
-			get
-			{
-				CreateParams cp = base.CreateParams;
-				cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-				return cp;
-			}
-		}
-
 		private void contextMenuStrip1_Click(object sender, EventArgs e)
 		{
 			string copyText = "";
-			if (sender is System.Windows.Forms.ContextMenuStrip)
+			ContextMenuStrip cMenuStrip = sender as System.Windows.Forms.ContextMenuStrip;
+			if (cMenuStrip != null)
 			{
-				if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is Panel)
+				if (cMenuStrip.SourceControl is Panel)
 				{
 					StringBuilder copyStrBuilder = new StringBuilder();
 					copyStrBuilder.Append(licenseServerVersionTitleLabel.Text);
@@ -112,8 +103,8 @@ namespace SolimarLicenseDiagnosticDataViewer
 					copyStrBuilder.Append(licenseServerVersionLabel.Text);
 					copyText = copyStrBuilder.ToString();
 				}
-				else if (((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) is ListView)
-					copyText = getCopyTextForListView(((sender as System.Windows.Forms.ContextMenuStrip).SourceControl) as ListView);
+				else if (cMenuStrip.SourceControl is ListView)
+					copyText = getCopyTextForListView(cMenuStrip.SourceControl as ListView);
 			}
 			if (copyText.Length != 0)
 				System.Windows.Forms.Clipboard.SetText(copyText);

@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Sys_EventLogInfoAttribs_DisplayForm : Form
+    public partial class Sys_EventLogInfoAttribs_DisplayForm : Base_DisplayForm<Sys_EventLogInfoAttribs>
     {
         public Sys_EventLogInfoAttribs_DisplayForm()
         {
@@ -28,20 +28,8 @@ namespace SolimarLicenseDiagnosticDataViewer
             msgListView.SetSortColumn(1, SortOrder.Descending);
         }
 
-
-        private const int CP_NOCLOSE_BUTTON = 0x200;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-                return cp;
-            }
-        }
-
         private Sys_EventLogInfoAttribs m_data = null;
-        public void SetData(Sys_EventLogInfoAttribs _data)
+        public override void SetData(Sys_EventLogInfoAttribs _data)
         {
             m_data = _data;
             if (m_data != null)

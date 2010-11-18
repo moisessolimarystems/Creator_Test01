@@ -851,7 +851,7 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 			}
 			catch (HRESULT &ehr)
 			{
-				throw gcnew System::Runtime::InteropServices::COMException(String::Format("License Server: {0} - ", server) + gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+				throw gcnew System::Runtime::InteropServices::COMException(String::Format("License Server: {0} - ", server) + gcnew String(LicenseServerError::GetErrorMessage(ehr).c_str()), ehr);
 			}
 		}
 

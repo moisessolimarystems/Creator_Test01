@@ -10,14 +10,20 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_UsageInfoAttribs_DisplayForm : Form
+    public partial class Lic_UsageInfoAttribs_DisplayForm : Base_DisplayForm<Lic_UsageInfoAttribs, DateTime>
     {
         public Lic_UsageInfoAttribs_DisplayForm()
         {
             InitializeComponent();
+            Shared.VisualComponents.ControlHelper.SetWindowTheme(this.usageTreeView.Handle, "Explorer", null);
+
+            //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
+            Shared.VisualComponents.ControlHelper.SendMessage(this.usageTreeView.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+            //The treeviews also have the "auto-scroll" feature. You can enable this via the TVS_EX_AUTOHSCROLL [0x0020] extended style.
+            //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0020, (IntPtr)0x0020);
         }
         private Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs g_softwareSpec = null;
-        public void SetData(Lic_UsageInfoAttribs _data, DateTime _createdDate)
+        public override void SetData(Lic_UsageInfoAttribs _data, DateTime _createdDate)
         {
             if (g_softwareSpec == null)
             {
@@ -98,17 +104,6 @@ namespace SolimarLicenseDiagnosticDataViewer
                 param_dataAttribs.moduleUsage.TVal);
             TreeNode tNode = new TreeNode(nodeText);
             InsertIntoTree_Alpha(param_refRootNode, tNode);
-        }
-
-        private const int CP_NOCLOSE_BUTTON = 0x200;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-                return cp;
-            }
         }
 
         private void usageTreeView_KeyDown(object sender, KeyEventArgs e)

@@ -63,6 +63,9 @@
     <Compile Include="..\common\LicAttribsCS\Lic_SystemInfoAttribs.cs">
       <Link>Lic_SystemInfoAttribs.cs</Link>
     </Compile>
+    <Compile Include="Base_DisplayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ConnectionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
