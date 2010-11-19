@@ -1078,6 +1078,12 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through 
 		for(SoftwareLicList::iterator swLicIt=softwareLicMgrMap.begin(); swLicIt!=softwareLicMgrMap.end(); swLicIt++)
 		{
 			hr = (*swLicIt).second->GetLicenseInfo(&licInfoAttribs);
+
+			//CR.13910 - When generating Diagnostic Data, get the status of the License Info Objects.
+			licInfoAttribs.diagDataErr = GetSoftwareLicenseStatus_ByLicense(BSTR(Lic_PackageAttribsHelper::GetDisplayLabel(&licInfoAttribs).c_str()));
+			if(FAILED(licInfoAttribs.diagDataErr))
+				licInfoAttribs.diagDataErrMsg = LicenseServerError::GetErrorMessage(licInfoAttribs.diagDataErr);
+
 			if(SUCCEEDED(hr))
 				licSystemAttribs.ListOfStreamed_InfoAttribs->push_back(licInfoAttribs.ToString());
 		}

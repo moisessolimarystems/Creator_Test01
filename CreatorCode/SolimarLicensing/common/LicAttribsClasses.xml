@@ -226,6 +226,8 @@
 			<attrib type="unsigned __int32" name="softwareGroupLicenseID" tagname="swI" default="0"/>
 			<attrib type="DateTime" name="modifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="bool" name="bLicClockViolation" tagname="lv" default="false" />
+			<attrib type="string" name="diagDataErrMsg" tagname="ddM" default=""/>
+			<attrib type="unsigned __int32" name="diagDataErr" tagname="ddE" default="0xffffff"/>
 
 			<!--License Activity Slot Info-->
 			<typedef type="class" name="Lic_ActivitySlotInfoAttribs">

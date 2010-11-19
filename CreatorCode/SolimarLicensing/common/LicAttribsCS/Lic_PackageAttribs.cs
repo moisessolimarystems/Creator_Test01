@@ -1233,6 +1233,8 @@ namespace Solimar
 					public AttribsMemberDWORD softwareGroupLicenseID = new AttribsMemberDWORD("swI", 0);
 					public AttribsMemberDateTime modifiedDate = new AttribsMemberDateTime("mDt", AttribFormat.ConvertStringToDateTime("1900-01-01 00:00:00.0000"));
 					public AttribsMemberBOOL bLicClockViolation = new AttribsMemberBOOL("lv", false);
+					public AttribsMemberString diagDataErrMsg = new AttribsMemberString("ddM", "");
+					public AttribsMemberDWORD diagDataErr = new AttribsMemberDWORD("ddE", 0xffffff);
 					public Lic_ActivitySlotInfoAttribsList activitySlotList = new Lic_ActivitySlotInfoAttribsList("aSLt", new ArrayList());
 					public Lic_ActivitySlotHistoryInfoAttribsList activitySlotHistoryList = new Lic_ActivitySlotHistoryInfoAttribsList("aSHLt", new ArrayList());
 					public Lic_ProductInfoAttribsList productList = new Lic_ProductInfoAttribsList("pLt", new ArrayList());

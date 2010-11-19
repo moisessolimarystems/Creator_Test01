@@ -1447,6 +1447,8 @@ public:
 		SpdAttribs::DwordAttrib softwareGroupLicenseID;
 		SpdAttribs::WStringAttrib modifiedDate;
 		SpdAttribs::BoolAttrib bLicClockViolation;
+		SpdAttribs::WStringAttrib diagDataErrMsg;
+		SpdAttribs::DwordAttrib diagDataErr;
 		Lic_ActivitySlotInfoAttribsList activitySlotList;
 		Lic_ActivitySlotHistoryInfoAttribsList activitySlotHistoryList;
 		Lic_ProductInfoAttribsList productList;
@@ -1461,6 +1463,8 @@ public:
 			softwareGroupLicenseID = c.softwareGroupLicenseID;
 			modifiedDate = c.modifiedDate;
 			bLicClockViolation = c.bLicClockViolation;
+			diagDataErrMsg = c.diagDataErrMsg;
+			diagDataErr = c.diagDataErr;
 			activitySlotList = c.activitySlotList;
 			activitySlotHistoryList = c.activitySlotHistoryList;
 			productList = c.productList;
@@ -1475,6 +1479,8 @@ public:
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
+			diagDataErrMsg(m_mapAttribObjs, L"ddM", SpdAttribs::WStringObj(L"")),
+			diagDataErr(m_mapAttribObjs, L"ddE", 0xffffff),
 			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
 			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj()),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
@@ -1487,6 +1493,8 @@ public:
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", c.softwareGroupLicenseID),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
+			diagDataErrMsg(m_mapAttribObjs, L"ddM", c.diagDataErrMsg),
+			diagDataErr(m_mapAttribObjs, L"ddE", c.diagDataErr),
 			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
 			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", c.activitySlotHistoryList),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
@@ -1499,6 +1507,8 @@ public:
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", 0),
 			modifiedDate(m_mapAttribObjs, L"mDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")),
 			bLicClockViolation(m_mapAttribObjs, L"lv", false),
+			diagDataErrMsg(m_mapAttribObjs, L"ddM", SpdAttribs::WStringObj(L"")),
+			diagDataErr(m_mapAttribObjs, L"ddE", 0xffffff),
 			activitySlotList(m_mapAttribObjs, L"aSLt", Vector_Lic_ActivitySlotInfoAttribsList_Obj()),
 			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", Vector_Lic_ActivitySlotHistoryInfoAttribsList_Obj()),
 			productList(m_mapAttribObjs, L"pLt", Vector_Lic_ProductInfoAttribsList_Obj()),
@@ -1511,6 +1521,8 @@ public:
 			softwareGroupLicenseID(m_mapAttribObjs, L"swI", c.softwareGroupLicenseID),
 			modifiedDate(m_mapAttribObjs, L"mDt", c.modifiedDate),
 			bLicClockViolation(m_mapAttribObjs, L"lv", c.bLicClockViolation),
+			diagDataErrMsg(m_mapAttribObjs, L"ddM", c.diagDataErrMsg),
+			diagDataErr(m_mapAttribObjs, L"ddE", c.diagDataErr),
 			activitySlotList(m_mapAttribObjs, L"aSLt", c.activitySlotList),
 			activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", c.activitySlotHistoryList),
 			productList(m_mapAttribObjs, L"pLt", c.productList),
@@ -1522,6 +1534,8 @@ public:
 			const SpdAttribs::DwordAttrib &param_softwareGroupLicenseID,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
+			const SpdAttribs::WStringAttrib &param_diagDataErrMsg,
+			const SpdAttribs::DwordAttrib &param_diagDataErr,
 			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
 			const Lic_ActivitySlotHistoryInfoAttribsList &param_activitySlotHistoryList,
 			const Lic_ProductInfoAttribsList &param_productList,
@@ -1532,6 +1546,8 @@ public:
 				softwareGroupLicenseID(m_mapAttribObjs, L"swI", param_softwareGroupLicenseID),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
+				diagDataErrMsg(m_mapAttribObjs, L"ddM", param_diagDataErrMsg),
+				diagDataErr(m_mapAttribObjs, L"ddE", param_diagDataErr),
 				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),
 				activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", param_activitySlotHistoryList),
 				productList(m_mapAttribObjs, L"pLt", param_productList),
@@ -1543,6 +1559,8 @@ public:
 			const SpdAttribs::DwordAttrib &param_softwareGroupLicenseID,
 			const SpdAttribs::WStringAttrib &param_modifiedDate,
 			const SpdAttribs::BoolAttrib &param_bLicClockViolation,
+			const SpdAttribs::WStringAttrib &param_diagDataErrMsg,
+			const SpdAttribs::DwordAttrib &param_diagDataErr,
 			const Lic_ActivitySlotInfoAttribsList &param_activitySlotList,
 			const Lic_ActivitySlotHistoryInfoAttribsList &param_activitySlotHistoryList,
 			const Lic_ProductInfoAttribsList &param_productList,
@@ -1553,6 +1571,8 @@ public:
 				softwareGroupLicenseID(m_mapAttribObjs, L"swI", param_softwareGroupLicenseID),
 				modifiedDate(m_mapAttribObjs, L"mDt", param_modifiedDate),
 				bLicClockViolation(m_mapAttribObjs, L"lv", param_bLicClockViolation),
+				diagDataErrMsg(m_mapAttribObjs, L"ddM", param_diagDataErrMsg),
+				diagDataErr(m_mapAttribObjs, L"ddE", param_diagDataErr),
 				activitySlotList(m_mapAttribObjs, L"aSLt", param_activitySlotList),
 				activitySlotHistoryList(m_mapAttribObjs, L"aSHLt", param_activitySlotHistoryList),
 				productList(m_mapAttribObjs, L"pLt", param_productList),

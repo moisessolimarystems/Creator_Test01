@@ -111,7 +111,21 @@ namespace SolimarLicenseViewer
                         bool bLicValid = false;
                         if (m_CommLink.bDiagnosticDateView)
                         {
-                            swLicNode.Text = string.Format("{0} (Diagnostic Data)", softwareLicense);
+                            if (licInfoAttrib.diagDataErr.TVal == 0xffffff) //Uninitialized License Status
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data (Status Unknown)", softwareLicense);
+                                swLicNode.ForeColor = System.Drawing.Color.Black;
+                            }
+                            else if (licInfoAttrib.diagDataErr.TVal == 0) //No Error
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data ({1})", softwareLicense, SolimarLicenseViewer.AppConstants.VerifiedStatus);
+                                swLicNode.ForeColor = System.Drawing.Color.Black;
+                            }
+                            else //License Error
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data - ({1})", softwareLicense, licInfoAttrib.diagDataErrMsg.TVal);
+                                swLicNode.ForeColor = System.Drawing.Color.Red;
+                            }
                         }
                         else
                         {
@@ -191,7 +205,7 @@ namespace SolimarLicenseViewer
 
                         toolTipBuilder = new StringBuilder();
                         toolTipBuilder.Append("License: ");
-                        toolTipBuilder.Append(softwareLicense);
+                        toolTipBuilder.Append(swLicNode.Text);
 
                         //toolTipBuilder.Append("\n");
                         //toolTipBuilder.Append(SolimarLicenseViewer.AppConstants.VerificationStatusHeader);
