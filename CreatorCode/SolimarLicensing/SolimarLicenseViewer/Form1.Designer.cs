@@ -37,6 +37,7 @@ namespace SolimarLicenseViewer
             this.treeView = new System.Windows.Forms.TreeView();
             this.productIconList = new System.Windows.Forms.ImageList(this.components);
             this.infoSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.noFlickerListView = new Shared.VisualComponents.NoFlickerListView();
             this.lvContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extendToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
@@ -47,6 +48,8 @@ namespace SolimarLicenseViewer
             this.testConnSelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.testConnToAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lvToolStrip = new System.Windows.Forms.ToolStrip();
+            this.bottomEventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
+            this.bottomNoFlickerListView = new Shared.VisualComponents.NoFlickerListView();
             this.bottomLvToolStrip = new System.Windows.Forms.ToolStrip();
             this.importPktDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportPktDialog = new System.Windows.Forms.SaveFileDialog();
@@ -85,9 +88,7 @@ namespace SolimarLicenseViewer
             this.remoteSvrTSLabel = new System.Windows.Forms.ToolStripLabel();
             this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
             this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
-            this.noFlickerListView = new Shared.VisualComponents.NoFlickerListView();
-            this.bottomEventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
-            this.bottomNoFlickerListView = new Shared.VisualComponents.NoFlickerListView();
+            this.testConnBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1.SuspendLayout();
             this.formSplitContainer.Panel1.SuspendLayout();
             this.formSplitContainer.Panel2.SuspendLayout();
@@ -153,6 +154,7 @@ namespace SolimarLicenseViewer
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
+            this.treeView.ShowLines = false;
             this.treeView.ShowNodeToolTips = true;
             this.treeView.Size = new System.Drawing.Size(188, 349);
             this.treeView.TabIndex = 0;
@@ -208,6 +210,23 @@ namespace SolimarLicenseViewer
             this.infoSplitContainer.Size = new System.Drawing.Size(463, 349);
             this.infoSplitContainer.SplitterDistance = 104;
             this.infoSplitContainer.TabIndex = 2;
+            // 
+            // noFlickerListView
+            // 
+            this.noFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
+            this.noFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.noFlickerListView.FullRowSelect = true;
+            this.noFlickerListView.HideSelection = false;
+            this.noFlickerListView.Location = new System.Drawing.Point(0, 0);
+            this.noFlickerListView.Name = "noFlickerListView";
+            this.noFlickerListView.ShowItemToolTips = true;
+            this.noFlickerListView.Size = new System.Drawing.Size(463, 349);
+            this.noFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.noFlickerListView.TabIndex = 3;
+            this.noFlickerListView.UseCompatibleStateImageBehavior = false;
+            this.noFlickerListView.View = System.Windows.Forms.View.Details;
+            this.noFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
+            this.noFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
             // 
             // lvContextMenuStrip
             // 
@@ -289,6 +308,31 @@ namespace SolimarLicenseViewer
             this.lvToolStrip.TabIndex = 2;
             this.lvToolStrip.Text = "toolStrip2";
             this.lvToolStrip.Visible = false;
+            // 
+            // bottomEventLogEntryControl1
+            // 
+            this.bottomEventLogEntryControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomEventLogEntryControl1.Location = new System.Drawing.Point(0, 0);
+            this.bottomEventLogEntryControl1.Name = "bottomEventLogEntryControl1";
+            this.bottomEventLogEntryControl1.Size = new System.Drawing.Size(150, 46);
+            this.bottomEventLogEntryControl1.TabIndex = 6;
+            // 
+            // bottomNoFlickerListView
+            // 
+            this.bottomNoFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
+            this.bottomNoFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomNoFlickerListView.FullRowSelect = true;
+            this.bottomNoFlickerListView.HideSelection = false;
+            this.bottomNoFlickerListView.Location = new System.Drawing.Point(0, 0);
+            this.bottomNoFlickerListView.Name = "bottomNoFlickerListView";
+            this.bottomNoFlickerListView.ShowItemToolTips = true;
+            this.bottomNoFlickerListView.Size = new System.Drawing.Size(150, 46);
+            this.bottomNoFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.bottomNoFlickerListView.TabIndex = 4;
+            this.bottomNoFlickerListView.UseCompatibleStateImageBehavior = false;
+            this.bottomNoFlickerListView.View = System.Windows.Forms.View.Details;
+            this.bottomNoFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
+            this.bottomNoFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
             // 
             // bottomLvToolStrip
             // 
@@ -596,47 +640,12 @@ namespace SolimarLicenseViewer
             this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
             this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // noFlickerListView
+            // testConnBackgroundWorker
             // 
-            this.noFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
-            this.noFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.noFlickerListView.FullRowSelect = true;
-            this.noFlickerListView.HideSelection = false;
-            this.noFlickerListView.Location = new System.Drawing.Point(0, 0);
-            this.noFlickerListView.Name = "noFlickerListView";
-            this.noFlickerListView.ShowItemToolTips = true;
-            this.noFlickerListView.Size = new System.Drawing.Size(463, 349);
-            this.noFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.noFlickerListView.TabIndex = 3;
-            this.noFlickerListView.UseCompatibleStateImageBehavior = false;
-            this.noFlickerListView.View = System.Windows.Forms.View.Details;
-            this.noFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
-            this.noFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
-            // 
-            // bottomEventLogEntryControl1
-            // 
-            this.bottomEventLogEntryControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomEventLogEntryControl1.Location = new System.Drawing.Point(0, 0);
-            this.bottomEventLogEntryControl1.Name = "bottomEventLogEntryControl1";
-            this.bottomEventLogEntryControl1.Size = new System.Drawing.Size(150, 46);
-            this.bottomEventLogEntryControl1.TabIndex = 6;
-            // 
-            // bottomNoFlickerListView
-            // 
-            this.bottomNoFlickerListView.ContextMenuStrip = this.lvContextMenuStrip;
-            this.bottomNoFlickerListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomNoFlickerListView.FullRowSelect = true;
-            this.bottomNoFlickerListView.HideSelection = false;
-            this.bottomNoFlickerListView.Location = new System.Drawing.Point(0, 0);
-            this.bottomNoFlickerListView.Name = "bottomNoFlickerListView";
-            this.bottomNoFlickerListView.ShowItemToolTips = true;
-            this.bottomNoFlickerListView.Size = new System.Drawing.Size(150, 46);
-            this.bottomNoFlickerListView.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.bottomNoFlickerListView.TabIndex = 4;
-            this.bottomNoFlickerListView.UseCompatibleStateImageBehavior = false;
-            this.bottomNoFlickerListView.View = System.Windows.Forms.View.Details;
-            this.bottomNoFlickerListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView_ColumnClick);
-            this.bottomNoFlickerListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.General_KeyDown);
+            this.testConnBackgroundWorker.WorkerReportsProgress = true;
+            this.testConnBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.testConnBackgroundWorker_DoWork);
+            this.testConnBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.testConnBackgroundWorker_RunWorkerCompleted);
+            this.testConnBackgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.testConnBackgroundWorker_ProgressChanged);
             // 
             // Form1
             // 
@@ -740,6 +749,7 @@ namespace SolimarLicenseViewer
         private System.Windows.Forms.ToolStrip diagnosticDataToolStrip;
         private System.Windows.Forms.ToolStripLabel diagnosticDataTSLabel;
         private Shared.VisualComponents.EventLogEntryControl bottomEventLogEntryControl1;
+        private System.ComponentModel.BackgroundWorker testConnBackgroundWorker;
 
     }
 }
