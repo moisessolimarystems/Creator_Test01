@@ -44,6 +44,13 @@
   </Target>
   -->
   <ItemGroup>
+    <Compile Include="BaseMessageDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BaseMessageDialog.designer.cs">
+      <DependentUpon>BaseMessageDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlHelper.cs" />
     <Compile Include="DialogBaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -56,6 +63,13 @@
     <Compile Include="DifferenceLicenseInfoControl.Designer.cs">
       <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="EventLogEntryControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="EventLogEntryControl.designer.cs">
+      <DependentUpon>EventLogEntryControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventLogMgr.cs" />
     <Compile Include="LicenseInfoViewerControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,6 +95,7 @@
     <Compile Include="NoFlickerListView.designer.cs">
       <DependentUpon>NoFlickerListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SoftwareSpecViewerControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,6 +111,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BaseMessageDialog.resx">
+      <DependentUpon>BaseMessageDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DialogBaseForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DialogBaseForm.cs</DependentUpon>
@@ -103,6 +121,9 @@
     <EmbeddedResource Include="DifferenceLicenseInfoControl.resx">
       <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EventLogEntryControl.resx">
+      <DependentUpon>EventLogEntryControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LicenseInfoViewerControl.resx">
       <DependentUpon>LicenseInfoViewerControl.cs</DependentUpon>

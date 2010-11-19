@@ -20,6 +20,16 @@ namespace Shared.VisualComponents
             this.ContextMenuStrip.Items.Add("Copy");
             this.ContextMenuStrip.Click += new EventHandler(ContextMenuStrip_Click);
         }
+        protected override void InitLayout()
+        {
+            Shared.VisualComponents.ControlHelper.SetWindowTheme(this.Handle, "Explorer", null);
+
+            //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
+            Shared.VisualComponents.ControlHelper.SendMessage(this.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+            //The treeviews also have the "auto-scroll" feature. You can enable this via the TVS_EX_AUTOHSCROLL [0x0020] extended style.
+            //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0020, (IntPtr)0x0020);
+            base.InitLayout();
+        }
 
         void ContextMenuStrip_Click(object sender, EventArgs e)
         {
@@ -52,9 +62,6 @@ namespace Shared.VisualComponents
         private Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs g_softwareSpec;
         public void SetData(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs param_softwareSpec, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licenseInfoAttribs, bool param_bClearAll)
         {
-            //this
-            //param_licenseInfoAttribs
-
             g_softwareSpec = param_softwareSpec;
             try
             {
@@ -62,12 +69,29 @@ namespace Shared.VisualComponents
                 if (param_bClearAll)
                     this.Nodes.Clear();
 
-                TreeNode rootNode = new TreeNode(Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(param_licenseInfoAttribs));
+                TreeNode rootNode = new TreeNode();
+                if (param_licenseInfoAttribs.diagDataErr.TVal == 0xffffff) //Uninitialized License Status
+                {
+                    rootNode.Text = string.Format("{0} (Status Unknown)", Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(param_licenseInfoAttribs));
+                    rootNode.ForeColor = System.Drawing.Color.Black;
+                }
+                else if (param_licenseInfoAttribs.diagDataErr.TVal == 0) //No Error
+                {
+                    rootNode.Text = string.Format("{0} (Verified)", Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(param_licenseInfoAttribs));
+                    rootNode.ForeColor = System.Drawing.Color.Black;
+                }
+                else //License Error
+                {
+                    rootNode.Text = string.Format("{0} ({1})", Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(param_licenseInfoAttribs), param_licenseInfoAttribs.diagDataErrMsg.TVal);
+                    rootNode.ForeColor = System.Drawing.Color.Red;
+                }
+                rootNode.ToolTipText = rootNode.Text;
+
                 Tree_Add_Lic_LicenseInfoAttribs(ref rootNode, param_licenseInfoAttribs);
                 this.Nodes.Add(rootNode);
                 rootNode.Expand();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             finally
@@ -92,6 +116,7 @@ namespace Shared.VisualComponents
                 param_refRootNode.LastNode.ForeColor = param_refRootNode.ForeColor;
 
                 TreeNode prodNode = new TreeNode("ProductList");
+                prodNode.ForeColor = param_refRootNode.ForeColor;
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in param_licInfoAttribs.productList.TVal)
                 {
                     Tree_Add_Lic_ProductInfoAttribs(ref prodNode, prodInfo);
@@ -116,18 +141,21 @@ namespace Shared.VisualComponents
             nodeText = string.Format("Product: {0} (0x{1:x})", Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal), param_prodInfoAttribs.productID.TVal);
             toolTipBuilder.Append("ProductName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(g_softwareSpec, param_prodInfoAttribs.productID.TVal) + "\r\n");
 
-            TreeNode prodNode = new TreeNode(nodeText);
+            TreeNode prodNode = new TreeNode(nodeText) { ForeColor = param_refRootNode.ForeColor };
 
             nodeText = string.Format("ProductID: {0} (0x{0:x})", param_prodInfoAttribs.productID.TVal);
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "ContractNumber: " + param_prodInfoAttribs.contractNumber.TVal;
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
             
             nodeText = "ProductAppInstance: " + System.Convert.ToInt32(param_prodInfoAttribs.productAppInstance.ToString(), 16).ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             System.Text.StringBuilder strBuilderIntro = new StringBuilder();
@@ -140,50 +168,62 @@ namespace Shared.VisualComponents
             //strBuilderIntro.Append(".");
             //strBuilderIntro.Append(param_prodInfoAttribs.product_SubMinor.ToString());
             prodNode.Nodes.Add(new TreeNode(strBuilderIntro.ToString()));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(strBuilderIntro.ToString() + "\r\n");
 
             nodeText = "bUseExpirationDate: " + param_prodInfoAttribs.bUseExpirationDate.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "ExpirationDate: " + param_prodInfoAttribs.expirationDate.TVal.ToLocalTime().ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "bUseActivations: " + param_prodInfoAttribs.bUseActivations.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "ActivationTotal: " + System.Convert.ToInt32(param_prodInfoAttribs.activationTotal.ToString(), 16).ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
             
             nodeText = "ActivationAmountInDays: " + System.Convert.ToInt32(param_prodInfoAttribs.activationAmountInDays.ToString(), 16).ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "ActivationCurrent: " + System.Convert.ToInt32(param_prodInfoAttribs.activationCurrent.ToString(), 16).ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
 
             nodeText = "ActivationCurrentExpirationDate: " + param_prodInfoAttribs.activationCurrentExpirationDate.TVal.ToLocalTime().ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n"); 
 
             nodeText = "bActivationOverrideCurrent: " + param_prodInfoAttribs.bActivationOverrideCurrent.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
             nodeText = "activationOverrideCurrent: " + param_prodInfoAttribs.activationOverrideCurrent.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
             nodeText = "bActivationOverrideCurrentHoursToExpire: " + param_prodInfoAttribs.bActivationOverrideCurrentHoursToExpire.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText + "\r\n");
             nodeText = "activationOverrideCurrentHoursToExpire: " + param_prodInfoAttribs.activationOverrideCurrentHoursToExpire.TVal.ToString();
             prodNode.Nodes.Add(new TreeNode(nodeText));
+            prodNode.LastNode.ForeColor = param_refRootNode.ForeColor;
             toolTipBuilder.Append(nodeText);
 
-            TreeNode modNode = new TreeNode("ModuleList");
+            TreeNode modNode = new TreeNode("ModuleList") { ForeColor = param_refRootNode.ForeColor };
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in param_prodInfoAttribs.moduleList.TVal)
                 Tree_Add_Lic_ModuleInfoAttribs(ref modNode, modInfo, param_prodInfoAttribs.productID);
             prodNode.Nodes.Add(modNode);
@@ -214,6 +254,7 @@ namespace Shared.VisualComponents
             //}
 
             modNode.Text = nodeText;
+            modNode.ForeColor = param_refRootNode.ForeColor;
             //modNode.Tag = new System.Collections.Generic.KeyValuePair<uint, DateTime>(param_modInfoAttribs.moduleID.TVal, param_modInfoAttribs.moduleExpirationDate.TVal);
 
             toolTipBuilder.Append("\r\nModuleName: " + Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetModuleName(g_softwareSpec, param_prodID, param_modInfoAttribs.moduleID.TVal));
@@ -287,8 +328,8 @@ namespace Shared.VisualComponents
 
         private void Tree_Add_Lic_VerificationAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationAttribs param_verificationAttribs, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licInfoAttribs)
         {
-            TreeNode verificationNode = new TreeNode("VerificationNode");
-            TreeNode verListNode = new TreeNode("ValidationList");
+            TreeNode verificationNode = new TreeNode("VerificationNode") { ForeColor = param_refRootNode.ForeColor };
+            TreeNode verListNode = new TreeNode("ValidationList") { ForeColor = param_refRootNode.ForeColor };
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs verToken in param_verificationAttribs.validationTokenList.TVal)
             {
                 Tree_Add_Lic_ValidationTokenAttribs(ref verListNode, verToken, param_licInfoAttribs);
@@ -297,7 +338,7 @@ namespace Shared.VisualComponents
             verListNode.Expand();
             verificationNode.Nodes.Add(verListNode);
 
-            TreeNode verHistListNode = new TreeNode("VerificationHistoryList");
+            TreeNode verHistListNode = new TreeNode("VerificationHistoryList") { ForeColor = param_refRootNode.ForeColor };
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs verCodeToken in param_verificationAttribs.verificationCodeHistoryList.TVal)
             {
                 Tree_Add_Lic_VerificationCodeAttribs(ref verHistListNode, verCodeToken);
@@ -313,7 +354,7 @@ namespace Shared.VisualComponents
             StringBuilder toolTipBuilder = new StringBuilder();
             string nodeText;
             bool bSuccess = false;
-            TreeNode verificationTokenNode = new TreeNode(ValidateToken(param_verificationTokenAttribs, param_licInfoAttribs, ref bSuccess));
+            TreeNode verificationTokenNode = new TreeNode(ValidateToken(param_verificationTokenAttribs, param_licInfoAttribs, ref bSuccess)) { ForeColor = param_refRootNode.ForeColor };
             TreeNode childNode = null;
 
             bSuccess = true;
@@ -346,7 +387,7 @@ namespace Shared.VisualComponents
             toolTipBuilder.Append(", VerificationCode: ");
             toolTipBuilder.Append(param_verificationCodeAttribs.verificationValue.TVal);
 
-            TreeNode verificationCodeTokenNode = new TreeNode(toolTipBuilder.ToString());
+            TreeNode verificationCodeTokenNode = new TreeNode(toolTipBuilder.ToString()) { ForeColor = param_refRootNode.ForeColor };
             param_refRootNode.Nodes.Add(verificationCodeTokenNode);
             verificationCodeTokenNode.ToolTipText = toolTipBuilder.ToString();
 
@@ -357,9 +398,9 @@ namespace Shared.VisualComponents
 
         private void Tree_Add_Lic_ActivitySlotAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs param_licInfoAttribs)
         {
-            TreeNode activitySlotNode = new TreeNode("ActivitySlotNode");
+            TreeNode activitySlotNode = new TreeNode("ActivitySlotNode") { ForeColor = param_refRootNode.ForeColor };
 
-            TreeNode activitySlotLayoutNode = new TreeNode("ActivitySlotLayoutList");
+            TreeNode activitySlotLayoutNode = new TreeNode("ActivitySlotLayoutList") { ForeColor = param_refRootNode.ForeColor };
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotInfoAttribs slotInfo in param_licInfoAttribs.activitySlotList.TVal)
             {
                 Tree_Add_Lic_ActivitySlotInfoAttribs(ref activitySlotLayoutNode, slotInfo);
@@ -367,7 +408,7 @@ namespace Shared.VisualComponents
             activitySlotNode.Nodes.Add(activitySlotLayoutNode);
 
 
-            TreeNode activitySlotHistoryNode = new TreeNode("ActivitySlotHistoryList");
+            TreeNode activitySlotHistoryNode = new TreeNode("ActivitySlotHistoryList") { ForeColor = param_refRootNode.ForeColor };
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotHistoryInfoAttribs historyInfo in param_licInfoAttribs.activitySlotHistoryList.TVal)
             {
                 Tree_Add_Lic_ActivitySlotHistoryInfoAttribs(ref activitySlotHistoryNode, historyInfo);
@@ -382,7 +423,7 @@ namespace Shared.VisualComponents
             if (param_activitySlotInfoAttribs != null)
             {
                 string nodeText = string.Format("Activity Slot: {0}, ContractNumber: {1}", param_activitySlotInfoAttribs.activitySlotID.TVal, param_activitySlotInfoAttribs.contractNumber.TVal);
-                TreeNode tmpNode = new TreeNode(nodeText);
+                TreeNode tmpNode = new TreeNode(nodeText) { ForeColor = param_refRootNode.ForeColor };
                 tmpNode.ToolTipText = nodeText;
                 param_refRootNode.Nodes.Add(tmpNode);
             }
@@ -392,7 +433,7 @@ namespace Shared.VisualComponents
             if (param_activitySlotHistoryInfoAttribs != null)
             {
                 string nodeText = string.Format("HistoryNumber: {0}", param_activitySlotHistoryInfoAttribs.historyNumber.TVal.ToString());
-                TreeNode tmpNode = new TreeNode(nodeText);
+                TreeNode tmpNode = new TreeNode(nodeText) { ForeColor = param_refRootNode.ForeColor };
                 tmpNode.ToolTipText = nodeText;
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ActivitySlotChangeInfoAttribs changeInfo in param_activitySlotHistoryInfoAttribs.activitySlotChangeInfoList.TVal)
                 {
@@ -411,7 +452,7 @@ namespace Shared.VisualComponents
 
                 nodeText = string.Format("Action: {0}, ContractNumber : {1}, param1: {2}, param2: {3}", param_activitySlotChangeInfoAttribs.actionType.GetAlias(), param_activitySlotChangeInfoAttribs.contractNumber.TVal, param_activitySlotChangeInfoAttribs.param1.TVal, param_activitySlotChangeInfoAttribs.param2.TVal);
 
-                tmpNode = new TreeNode(nodeText);
+                tmpNode = new TreeNode(nodeText) { ForeColor = param_refRootNode.ForeColor };
                 toolTipBuilder.Append(nodeText);
                 param_refRootNode.Nodes.Add(tmpNode);
 
@@ -460,4 +501,6 @@ namespace Shared.VisualComponents
             return retVal.ToString();
         }
     }
+
+
 }
