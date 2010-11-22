@@ -1695,8 +1695,10 @@ namespace SolimarLicenseViewer
                     //add a product node if there are app instances
                     if (prodInfo.productID.ToString() != "0")
                     {
-                        System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct((int)prodInfo.productID.TVal);
-                        if (usageMap.Count > 0)
+                        m_CommLink.SoftwareGetApplicationInstanceListByProduct((int)prodInfo.productID.TVal, ref generalStream);
+                        Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                        appList.SVal = generalStream;
+                        if (appList.TVal.Count > 0)
                         {
                             productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                             this.TheListView.Items.Add(productName);
@@ -1714,6 +1716,7 @@ namespace SolimarLicenseViewer
         /// </summary>
         public void LoadAppInstData()
         {
+            String generalStream = "";
             Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
             try
             {
@@ -1735,19 +1738,14 @@ namespace SolimarLicenseViewer
                 {
                     this.TheListViewToolStrip.Visible = false;
                 }
-
-                System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct(m_CommLink.GetProductID(m_TreeNode.Text));
-                if (usageMap.Count > 0)
+                m_CommLink.SoftwareGetApplicationInstanceListByProduct(m_CommLink.GetProductID(m_TreeNode.Text), ref generalStream);
+                appList.SVal = generalStream;
+                if (appList.TVal.Count > 0)
                 {
-                    foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
+                    foreach (string appInstance in appList.TVal)
                     {
-                        //string connectionType = "Unknown: ";
-                        //if (usagePair.Value.HasValue)
-                        //    connectionType = usagePair.Value.Value ? "Primary: " : "Failover: ";
-                        string connectionType = (usagePair.Value.HasValue && (usagePair.Value.Value == false)) ? "Failover: " : "";
-
                         ListViewItem lvItem = new ListViewItem();
-                        lvItem.Text = string.Format("{0}{1}", connectionType, usagePair.Key);
+                        lvItem.Text = appInstance;
                         //add another informative item
                         this.TheListView.Items.Add(lvItem);
                     }
@@ -1801,7 +1799,7 @@ namespace SolimarLicenseViewer
                         {
                             foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs appInstInfo in prodInfo.appInstanceList.TVal)
                             {
-                                if (string.Compare(appInstInfo.applicationInstance.TVal, m_TreeNode.Name, true) == 0)
+                                if (string.Compare(appInstInfo.applicationInstance.TVal, m_TreeNode.Text, true) == 0)
                                 {
                                     foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsModuleInfoAttribs modInfo in appInstInfo.moduleList.TVal)
                                     {
@@ -1827,7 +1825,7 @@ namespace SolimarLicenseViewer
                         productID = (int)prodInfo.productID.TVal;
                         if (string.Equals(m_CommLink.GetProductName(productID), _productName))
                         {
-                            m_CommLink.InitializeWrapper(m_TreeNode.Name, productID, (int)prodInfo.product_Major.TVal, (int)prodInfo.product_Minor.TVal);
+                            m_CommLink.InitializeWrapper(m_TreeNode.Text, productID, (int)prodInfo.product_Major.TVal, (int)prodInfo.product_Minor.TVal);
                             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                             {
                                 moduleID = (int)modInfo.moduleID.TVal;
