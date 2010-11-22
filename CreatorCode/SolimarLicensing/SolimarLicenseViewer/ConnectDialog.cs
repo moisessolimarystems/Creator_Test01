@@ -60,8 +60,20 @@ namespace SolimarLicenseViewer
             Cursor.Current = Cursors.WaitCursor;
             try
             {
-                m_CommLink.Connect(ServerNameComboBox.Text);
-                errorProvider1.SetError(this.ServerNameComboBox, "");
+                using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
+                {
+                    messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
+                    messageDialog.Show();
+
+                    messageDialog.SetMessage(string.Format("Connecting to {0}...", ServerNameComboBox.Text));
+                    messageDialog.Update();
+
+                    m_CommLink.Async_Connect(ServerNameComboBox.Text);
+                    errorProvider1.SetError(this.ServerNameComboBox, "");
+
+                    messageDialog.Hide();
+                }
+
                 this.DialogResult = DialogResult.OK;
             }
             catch (COMException ex)
