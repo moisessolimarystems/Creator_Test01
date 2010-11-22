@@ -11,41 +11,40 @@ namespace Solimar.Licensing.Common.Collections
         public Tuple() { }
         public Tuple(T1 _t1, T2 _t2)
         {
-            m_t1 = _t1;
-            m_t2 = _t2;
+            Item1 = _t1;
+            Item2 = _t2;
         }
 
         /// <summary>First Item</summary>
-        public T1 Item1
-        {
-            get { return m_t1; }
-            set { m_t1 = value; }
-        }
+        public T1 Item1 { get; set; }
 
         /// <summary>Second Item</summary>
-        public T2 Item2
-        {
-            get { return m_t2; }
-            set { m_t2 = value; }
-        }
-        protected T1 m_t1;
-        protected T2 m_t2;
+        public T2 Item2 { get; set; }
     }
 
     /// <summary>Represents a strongly typed triplet of objects</summary>
     public class Tuple<T1, T2, T3> : Tuple<T1, T2>
     {
-        public Tuple(T1 _t1, T2 _t2, T3 _t3) : base(_t1, _t2)
+        public Tuple(T1 _t1, T2 _t2, T3 _t3)
+            : base(_t1, _t2)
         {
-            m_t3 = _t3;
+            Item3 = _t3;
         }
 
         /// <summary>Third Item</summary>
-        public T3 Item3
+        public T3 Item3 { get; set; }
+    }
+
+    /// <summary>Represents a strongly typed quartet of objects</summary>
+    public class Tuple<T1, T2, T3, T4> : Tuple<T1, T2, T3>
+    {
+        public Tuple(T1 _t1, T2 _t2, T3 _t3, T4 _t4)
+            : base(_t1, _t2, _t3)
         {
-            get { return m_t3; }
-            set { m_t3 = value; }
+            Item4 = _t4;
         }
-        protected T3 m_t3;
+
+        /// <summary>Fourth Item</summary>
+        public T4 Item4 { get; set; }
     }
 }

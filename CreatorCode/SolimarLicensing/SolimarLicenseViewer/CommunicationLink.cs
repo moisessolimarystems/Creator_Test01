@@ -46,6 +46,7 @@ namespace SolimarLicenseViewer
             m_softwareSpec = globalSwSpec.softwareSpec;
             m_ServerName = "Not Connected";
         }
+
         #endregion
 
         #region IEventLog
@@ -64,6 +65,71 @@ namespace SolimarLicenseViewer
             }
             return eventLogList;
 
+        }
+        #endregion
+
+        #region Async Helpers
+        public delegate void DelParamVoidReturnsVoid();
+        public delegate void DelParamStringBoolReturnsVoid(string s1, bool b1);
+        public delegate void DelParamByteArrayReturnsVoid(Byte[] byteArray);
+        public delegate void DelParamByteArrayRefStringReturnsVoid(Byte[] byteArray, ref string refS1);
+        public delegate void DelParamRefByteArrayReturnsVoid(ref Byte[] refByteArray);
+        public delegate void DelParamStringRefByteArrayReturnsVoid(string s1, ref Byte[] refByteArray);
+        #endregion
+        #region Async Version of LicenseServerWrapper Methods
+        public void Async_Connect(String _serverName)
+        {
+            Async_Connect(_serverName, true);
+        }
+        public void Async_Connect(String _serverName, bool _bDisconnectOnError)
+        {
+            DelParamStringBoolReturnsVoid delFunction = new DelParamStringBoolReturnsVoid(Connect);
+
+            IAsyncResult result = delFunction.BeginInvoke(_serverName, _bDisconnectOnError, null, null);
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(result);
+        }
+        public void Async_EnterSoftwareLicArchive(Byte[] _byteArrayLicense)
+        {
+            DelParamByteArrayReturnsVoid delFunction = new DelParamByteArrayReturnsVoid(EnterSoftwareLicArchive);
+            IAsyncResult result = delFunction.BeginInvoke(_byteArrayLicense, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(result);
+        }
+        public void Async_EnterSoftwareLicPacket(Byte[] _byteLicPacket, ref String _refVerificationCode)
+        {
+            DelParamByteArrayRefStringReturnsVoid delFunction = new DelParamByteArrayRefStringReturnsVoid(EnterSoftwareLicPacket);
+            IAsyncResult result = delFunction.BeginInvoke(_byteLicPacket, ref _refVerificationCode, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _refVerificationCode, result);
+        }
+        public void Async_GenerateLicenseSystemData(ref Byte[] _newByteArrayLicense)
+        {
+            DelParamRefByteArrayReturnsVoid delFunction = new DelParamRefByteArrayReturnsVoid(GenerateLicenseSystemData);
+            IAsyncResult result = delFunction.BeginInvoke(ref _newByteArrayLicense, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _newByteArrayLicense, result);
+        }
+        public void Async_GenerateSoftwareLicArchive_ByLicense(string _softwareLicense, ref byte[] _refByteLicenseArchive)
+        {
+            DelParamStringRefByteArrayReturnsVoid delFunction = new DelParamStringRefByteArrayReturnsVoid(GenerateSoftwareLicArchive_ByLicense);
+            IAsyncResult result = delFunction.BeginInvoke(_softwareLicense, ref _refByteLicenseArchive, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _refByteLicenseArchive, result);
         }
         #endregion
 
@@ -201,7 +267,6 @@ namespace SolimarLicenseViewer
                                         m_protectionKeyCache = new List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo>();
                                     m_protectionKeyCache.Add(wrapperKeyInfo);
                                 }
-
                                 Solimar.Licensing.Attribs.AttribsMemberStringList streamedInfoList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                                 streamedInfoList.SVal = licInfoListStreamed;
                                 Solimar.Licensing.Attribs.AttribsMemberStringList softwareLicNameList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
@@ -214,7 +279,7 @@ namespace SolimarLicenseViewer
                                 {
                                     m_DiagnosticEventLogStreamed = Solimar.Licensing.Attribs.XMLDocumentHelper.GetDocumentElementFromString(eventLogListStreamed).InnerText;
                                 }
-
+                                
                                 m_DiagnosticDateCreatedDate = Solimar.Licensing.Attribs.AttribFormat.ConvertStringToDateTime(modifiedDateStreamed);
                                 foreach (string streamedInfo in streamedInfoList.TVal)
                                 {
@@ -224,7 +289,8 @@ namespace SolimarLicenseViewer
                                     softwareLicNameList.TVal.Add(licInfoName);
                                     m_softwareLicByLic_Cache[licInfoName] = streamedInfo;
                                 }
-                                m_allSoftwareLic_Cache = softwareLicNameList;
+                                //surround xml <stringList> around the softwareLicNameList
+                                m_allSoftwareLic_Cache = string.Format("<stringList>{0}</stringList>", softwareLicNameList);
                             }
                             catch (COMException)
                             {
