@@ -23,11 +23,21 @@ namespace SolimarLicenseViewer
         /// <summary>Function Signature: void Function(bool)</summary>
         public delegate void ParamBoolReturnsVoid(bool b1);
         public ParamBoolReturnsVoid DelUseWaitCursor = null;
+
+        public delegate void ParamListViewItemListReturnsVoid(IList<ListViewItem> lviList);
+        public ParamListViewItemListReturnsVoid DelTestConnection = null;
+        public void TestConnection(IList<ListViewItem> _lviList)
+        {
+            if (DelTestConnection != null)
+                DelTestConnection(_lviList);
+        }
+
         public void UseWaitCursor(bool _bUseWaitCursor)
         {
             if (DelUseWaitCursor != null)
                 DelUseWaitCursor(_bUseWaitCursor);
         }
+
 
         #region ListView Win32 Defines
         [StructLayout(LayoutKind.Sequential)]
@@ -105,6 +115,7 @@ namespace SolimarLicenseViewer
 
             InitializeToolStripItems();
         }
+
         public void InitializeToolStripItems()
         {
             List<ToolStripItem> tmpTSItemList = null;
@@ -719,7 +730,7 @@ namespace SolimarLicenseViewer
 			TheBottomListView.Columns.Add("");    //Extra Cell at the end
 			ResetListViewColumnSorter(TheBottomListView);
 			TheBottomListView.EndUpdate();
-		}
+        }
 
         #region License Section
         /// <summary>
@@ -1988,92 +1999,14 @@ namespace SolimarLicenseViewer
             System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
             foreach (ListViewItem lvi in this.TheListView.SelectedItems)
                 lvItemList.Add(lvi);
-            testConnectionToLicenseServer(lvItemList);
+            TestConnection(lvItemList);
         }
         public void prodConnTestConnAllTSButton_Click(object sender, EventArgs e)
         {
             System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
             foreach (ListViewItem lvi in this.TheListView.Items)
                 lvItemList.Add(lvi);
-            testConnectionToLicenseServer(lvItemList);
-        }
-
-        private void testConnectionToLicenseServer(System.Collections.Generic.List<ListViewItem> _listViewItemList)
-        {
-            ConnectionSettings2 connSettings = new ConnectionSettings2();
-            if (_listViewItemList.Count > 0)
-            {
-                _listViewItemList[0].ListView.BeginUpdate();
-                foreach (ListViewItem lvItem in _listViewItemList)
-                {
-                    connSettings.ProductID = (int)lvItem.Tag;
-                    connSettings.ServerName = lvItem.SubItems[1].Text;
-                    connSettings.BackupName = lvItem.SubItems[2].Text;
-                    connSettings.UseDevelopmentLic = System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0;
-                    try
-                    {
-                        testConnectionToLicenseServer(connSettings);
-                        lvItem.ForeColor = System.Drawing.Color.Green;
-                        lvItem.SubItems[4].Text = "Successfully connected to the License Server";
-                        lvItem.ToolTipText = string.Format("Connection Status: {0}", lvItem.SubItems[4].Text);
-                    }
-                    catch (Exception ex)
-                    {
-                        lvItem.ForeColor = System.Drawing.Color.Red;
-                        lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
-                        lvItem.ToolTipText = string.Format("Connection Error: {0}", lvItem.SubItems[4].Text);
-                    }
-                }
-                Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(_listViewItemList[0].ListView);
-                _listViewItemList[0].ListView.EndUpdate();
-            }
-        }
-        // throws an exception if fails to connect...
-        private void testConnectionToLicenseServer(ConnectionSettings2 _connectionSettings)
-        {
-            if (_connectionSettings != null)
-            {
-                try
-                {
-
-                    //this.TheListView.FindForm().Cursor = Cursors.WaitCursor;
-                    UseWaitCursor(true);
-                    //this.TheListView.FindForm().Enabled = false;
-
-                    using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
-                    {
-                        Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
-
-                        licWrapper.ConnectByProductEx((int)productID, false);
-
-                        licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
-                                                (int)productID, //product
-                                                0,              //prod_ver_major
-                                                1,              //prod_ver_minor - CR.FIX.12672 - Use version 0.1 instead of 0.0, 0.0 is not valid
-                                                false,          //single_key
-                                                "",             //specific_single_key_ident
-                                                false,          //lock_keys
-                                                0,              //ui_level
-                                                0,              //grace_period_minutes
-                                                false,          //application_instance_lock_keys
-                                                false);         //bypass_remote_key_restriction
-                        licWrapper.DisconnectEx();
-                        //licWrapper = null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    HandleExceptions.DisplayException(this.TheListView.FindForm(), ex, "Failed to connect to License Server", "Test Connection to License Server");
-                    throw;
-                }
-                finally
-                {
-
-                    //this.TheListView.FindForm().Enabled = true;
-                    //this.TheListView.FindForm().Cursor = Cursors.Default;
-                    UseWaitCursor(false);
-                }
-            }
+            TestConnection(lvItemList);
         }
         #endregion
 
@@ -2237,7 +2170,7 @@ namespace SolimarLicenseViewer
                 }
                 #endregion
 
-                int idx = 0;
+                //int idx = 0;
                 System.Collections.Generic.SortedList<string, int> sourceList = new SortedList<string, int>();
                 sourceList.Add(string.Empty, 0);
 
