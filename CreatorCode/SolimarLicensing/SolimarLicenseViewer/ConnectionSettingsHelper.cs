@@ -109,7 +109,11 @@ namespace SolimarLicenseViewer
                         {
                             if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSse, true) == 0)
                                 bInstalled = true;
-                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSse, true) == 0)
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSseSp, true) == 0)
+                                bInstalled = true;
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSse64, true) == 0)
+                                bInstalled = true;
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSseSp64, true) == 0)
                                 bInstalled = true;
                         }
                     }
