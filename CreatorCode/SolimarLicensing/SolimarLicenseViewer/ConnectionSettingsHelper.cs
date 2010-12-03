@@ -35,63 +35,44 @@ namespace SolimarLicenseViewer
                 System.Collections.Generic.Dictionary<int/*productID*/, ConnectionSettings2> tmpConnSettingsCache = LoadSettingsFromXML();
 
                 System.Collections.Generic.List<int> installedProductsList = new List<int>();
-                #region Read Registry for installed products
-                using (RegistryKey rkey = Registry.LocalMachine.OpenSubKey(AppConstants.SolimarRegKey))
-                {
-                    if (rkey != null)
-                    {
-                        foreach (String productName in rkey.GetSubKeyNames())
-                        {
-                            if (!productName.Equals(AppConstants.LicenseProduct))
-                            {
-                                int productID = m_CommLink.GetProductID(productName);
-                                if (productID >= 0)
-                                {
-                                    installedProductsList.Add(productID);
 
-                                    //Also add secondary product too...
-                                    if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer);
+                //Read Registry for installed products
+                //Read Registry for installed products for 32 bit products on a 64 bit machine
+                foreach (string solimarRegKeyLocation in new string[] { AppConstants.SolimarRegKey, AppConstants.SolimarRegKey32On64 })
+                {
+                    using (RegistryKey rkey = Registry.LocalMachine.OpenSubKey(solimarRegKeyLocation))
+                    {
+                        if (rkey != null)
+                        {
+                            foreach (String productName in rkey.GetSubKeyNames())
+                            {
+                                if (string.Compare(productName, AppConstants.LicenseProduct, true) != 0)
+                                {
+                                    int productID = m_CommLink.GetProductID(productName);
+                                    if (productID >= 0)
+                                    {
+                                        installedProductsList.Add(productID);
+
+                                        //Also add secondary product too...
+                                        if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
+                                            installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
+                                        else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
+                                            installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
+                                        else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
+                                            installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer);
+                                    }
+                                    else if (string.Compare(productName, AppConstants.RegKey_Sse, true) == 0)
+                                    {
+                                        if (IsSseSystemManagerInstalled(solimarRegKeyLocation))
+                                            installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner);
+                                    }
                                 }
                             }
+                            rkey.Close();
                         }
-                        rkey.Close();
                     }
                 }
-                #endregion
 
-                #region Read Registry for installed products for 32 bit products on a 64 bit machine
-                using (RegistryKey rkey = Registry.LocalMachine.OpenSubKey(AppConstants.SolimarRegKey32On64))
-                {
-                    if (rkey != null)
-                    {
-                        foreach (String productName in rkey.GetSubKeyNames())
-                        {
-                            if (!productName.Equals(AppConstants.LicenseProduct))
-                            {
-                                int productID = m_CommLink.GetProductID(productName);
-                                if (productID >= 0)
-                                {
-                                    installedProductsList.Add(productID);
-
-                                    //Also add secondary product too...
-                                    if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager);
-                                    else if (productID == (int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
-                                        installedProductsList.Add((int)Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer);
-                                }
-                            }
-                        }
-                        rkey.Close();
-                    }
-                }
-                #endregion
 
                 //Ensure that all installed products are in m_allConnectionSettings
                 foreach (int productID in installedProductsList)
@@ -108,11 +89,45 @@ namespace SolimarLicenseViewer
                 foreach (int productID in tmpConnSettingsCache.Keys)
                 {
                     if (installedProductsList.Contains(productID))  //Only display installed products
-                        m_allConnectionSettingsCache.Add(productID, tmpConnSettingsCache[productID]);
+                        m_allConnectionSettingsCache[productID] = tmpConnSettingsCache[productID];
                 }
             }
             return m_allConnectionSettingsCache;
         }
+        private bool IsSseSystemManagerInstalled(string _solimarRegKey)
+        {
+            bool bInstalled = false;
+            #region CR.13130 - Detect in SSE or SSE Single Plateform is on the system, add SDX Designer to be configured
+            try
+            {
+                string key = System.IO.Path.Combine(System.IO.Path.Combine(_solimarRegKey, AppConstants.RegKey_Sse), AppConstants.RegKey_SseInstallInfo);
+                using (RegistryKey subRkey = Registry.LocalMachine.OpenSubKey(System.IO.Path.Combine(System.IO.Path.Combine(_solimarRegKey, AppConstants.RegKey_Sse), AppConstants.RegKey_SseInstallInfo)))
+                {
+                    if (subRkey != null)
+                    {
+                        foreach (String sseInstalledProduct in subRkey.GetValueNames())
+                        {
+                            if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSse, true) == 0)
+                                bInstalled = true;
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSseSp, true) == 0)
+                                bInstalled = true;
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSse64, true) == 0)
+                                bInstalled = true;
+                            else if (string.Compare(sseInstalledProduct, AppConstants.RegKey_SseInstallInfoSseSp64, true) == 0)
+                                bInstalled = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            #endregion
+
+
+            return bInstalled;
+        }
+
         private CommunicationLink m_CommLink;
         private System.Collections.Generic.Dictionary<int/*productID*/, ConnectionSettings2> m_allConnectionSettingsCache;
 
