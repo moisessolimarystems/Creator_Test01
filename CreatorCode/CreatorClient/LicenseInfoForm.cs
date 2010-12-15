@@ -119,13 +119,14 @@ namespace Client.Creator
                 {
                     bool bSkip = false;
                     productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal).ToList();//client.GetProductLicensesByProduct(pltData.LicenseServerString, (byte)productSpec.productID.TVal);
-                    foreach (ProductLicenseTable pl in productLicenses)
+                    /*foreach (ProductLicenseTable pl in productLicenses)
                     {   //skip if client and not perm
                         if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
                            productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
                             bSkip = true;
                     }
                     if (!bSkip)
+                     */
                         productList.Add(productSpec.productName);
                 }
             });
@@ -519,17 +520,20 @@ namespace Client.Creator
             {
                 //get all orders for a given product
                 IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerString, (byte)m_CommLink.GetProductID(selectedProduct));
-                List<ProductLicenseTable> productLicenses;
+                //List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     if (productSpec.productName.TVal.Equals(selectedProduct))
                     {
-                        productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)m_CommLink.GetProductID(productSpec.productName.TVal)).ToList();//client.GetProductLicensesByProduct(storedObject.LicenseServerString, (byte)m_CommLink.GetProductID(productSpec.productName.TVal));
+                        /*productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)m_CommLink.GetProductID(productSpec.productName.TVal)).ToList();
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&
                             productLicenses.Count > 0))
                             ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
+                        */
+                        ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
+                         
                         break;
-                    }
+                     }
                 }
                 if (dbProductLicenses.Count > 0)
                 {
