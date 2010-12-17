@@ -236,44 +236,50 @@ namespace Client.Creator
             get
             {
                 SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_create_modify_key.Value);      
-                return _plRec.ProductConnection;
+                return _plRec.ProductConnection; //should match module's app instance
             }
             set
             {
-                //need appinstance to be set for each product license
+                //need product connection to be set for each product license
                 //non-client modules - 1
                 //add-on modules - always 0 unless total is 0 then 1
                 //client modules - matches product
                 //add-on modules - always 0 unless total is 0 then 1
-                if (IsActive)
+                if (value > 0)
                 {
-                    if (ModuleList != null)
-                    {
-                        foreach (ModuleTable module in _moduleList)
+                    if (IsActive)
+                    {   //only set by client products since it is exposed only to them
+                        if (ModuleList != null)
                         {
-                            //needs to update database
-                            module.AppInstance = (Status != ProductLicenseState.AddOn) ? value : (byte)0;
+                            foreach (ModuleTable module in _moduleList)
+                            {   //needs to update database
+                                //module.AppInstance = (Status != ProductLicenseState.AddOn ) ? value : (byte)0;
+                                if(module.Value > 0) 
+                                    module.AppInstance = value;
+                            }
                         }
+                        _plRec.ProductConnection = value;
+                        Service<ICreator>.Use((client) =>
+                        {
+                            client.UpdateAllModules(_moduleList);
+                            ProductLicenseTable plt = client.GetProductLicense(ID);
+                            if (plt != null)
+                            {
+                                TransactionManager.CreateTransaction(TransactionType.Status,
+                                                                      "",
+                                                                      ID,
+                                                                      string.Format("Edit {0} Product Connection", ProductName),
+                                                                      value.ToString(),
+                                                                      ProductConnection.ToString());
+                                plt.ProductConnection = _plRec.ProductConnection;
+                                client.UpdateProductLicense(plt);
+                                client.MarkDirty(LicenseServer);
+                            }
+                        });
                     }
-                    _plRec.ProductConnection = value;
-                    Service<ICreator>.Use((client) =>
-                    {
-                        client.UpdateAllModules(_moduleList);
-                        ProductLicenseTable plt = client.GetProductLicense(ID);
-                        if (plt != null)
-                        {
-                            TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                  "",
-                                                                  ID,
-                                                                  string.Format("Edit {0} Product Connection", ProductName),
-                                                                  value.ToString(),
-                                                                  ProductConnection.ToString());
-                            plt.ProductConnection = _plRec.ProductConnection;
-                            client.UpdateProductLicense(plt);
-                            client.MarkDirty(LicenseServer);
-                        }
-                    });
                 }
+                else
+                    throw new Exception("Product Connection must be a value greater then 0.");
             }
         }
 
@@ -660,6 +666,7 @@ namespace Client.Creator
                 }
             });
         }
+
         private void AddIntroducedModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
         {
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecList = CreatorForm.s_CommLink.GetModuleSpecList(ProductID);
@@ -713,6 +720,7 @@ namespace Client.Creator
                 client.CreateAllModules(addModuleList);
             });
         }
+
         public bool HasHardwareToken()
         {
             bool bRetVal = false;
@@ -724,6 +732,7 @@ namespace Client.Creator
             });
             return bRetVal;
         }
+
         public bool SetTrialToLicensed()
         {
             bool bRetVal = true;
@@ -748,6 +757,7 @@ namespace Client.Creator
             });
             return bRetVal;
         }
+
         public bool SetLicensedToTrial()
         {
             bool bRetVal = true;
@@ -786,8 +796,7 @@ namespace Client.Creator
             bool bRetVal = true;
             string previousValue, moduleName;
             Service<ICreator>.Use((client) =>
-            {
-                //Retrieve only modules belonging to Parent PL
+            {   //Retrieve only modules belonging to Parent PL
                 List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
                 if (ModuleList != null)
@@ -804,8 +813,15 @@ namespace Client.Creator
                                     previousValue = mt.Value.ToString();
                                     mt.Value += module.Value;
                                     //bump product connection of parent module if it is currently 0
-                                    if (mt.Value > 0 && mt.AppInstance == 0)
-                                        mt.AppInstance = 1;
+                                    if (_commLink.IsClientType(ProductID))
+                                    {    //client add-on must add product connections to modules and product license
+                                        mt.AppInstance += module.AppInstance;
+                                    }
+                                    else
+                                    {
+                                        if (mt.Value > 0 && mt.AppInstance == 0)
+                                            mt.AppInstance = 1;
+                                    }
                                     updateModuleList.Add(mt);
                                     moduleName = _commLink.GetModuleName(ProductID, mt.ModID);    
                                     //Create transaction for add-on PL modules being merged into parent PL 
@@ -820,8 +836,20 @@ namespace Client.Creator
                         }
                     }
                     if (updateModuleList.Count > 0)
+                    {   //update product license product connections if it is a client type
+                        if (_commLink.IsClientType(ProductID))
+                        {
+                            ProductLicenseTable plt = client.GetProductLicense(ParentID);
+                            if (plt != null)
+                            {
+                                plt.ProductConnection = updateModuleList[0].AppInstance;
+                                client.UpdateProductLicense(plt);
+                            }
+                        }
                         client.UpdateAllModules(updateModuleList);
+                    }
                     client.DeleteAllModulesByProductLicense(ProductLicenseDatabaseID);
+                    //update product license if add-on is client
                 }
             });
             return bRetVal;
@@ -915,7 +943,7 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            return (module.UnlimitedValue - totalModuleValue); //GetTotalModuleValue(module.ID));
+            return (module.UnlimitedValue - totalModuleValue);
         }
         //mo
         public bool SetModule(ModuleProperty module)
@@ -925,27 +953,42 @@ namespace Client.Creator
             if (module.Value > 0)
             {
                 if (totalModAppInstance == 0)
-                    module.AppInstance = 1;
-                else //>=1
                 {
-                    if (totalModAppInstance > 1)
+                    if (ProductConnection > 0)
+                        module.AppInstance = (_commLink.IsClientType(ProductID)) ? ProductConnection : (byte)1;
+                    else
+                        module.AppInstance = 1;
+                        
+                    //module.AppInstance = 1;
+                }
+                else //productconnections >= 1
+                {
+                    if (_commLink.IsClientType(ProductID))
                     {
-                        if (_commLink.IsClientType(ProductID) && Status != ProductLicenseState.AddOn)
-                            module.AppInstance = ProductConnection;
-                        else
-                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : 1);                        
+                        module.AppInstance = ProductConnection;
                     }
                     else
                     {
-                        if (Status == ProductLicenseState.AddOn)
+                        if (totalModAppInstance > 1)
                         {
-                            if(module.AppInstance != 1) //only set add-on product connection to 0 if parent product connection is >=1
-                                module.AppInstance = 0;
+                            //if (_commLink.IsClientType(ProductID)) //&& Status != ProductLicenseState.AddOn)
+                            //    module.AppInstance = ProductConnection;
+                            //else
+                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : 1);
                         }
                         else
                         {
-                            module.AppInstance = 1;
-                            DecrementAddOnModuleAppInstance(module.ID);
+                            if (Status == ProductLicenseState.AddOn)
+                            {
+                                //client + add-on should set app instance to ProductConnection
+                                if (module.AppInstance != 1) //only set add-on product connection to 0 if parent product connection is >=1
+                                    module.AppInstance = 0;
+                            }
+                            else
+                            {
+                                module.AppInstance = 1;
+                                DecrementAddOnModuleAppInstance(module.ID);
+                            }
                         }
                     }
                 }
