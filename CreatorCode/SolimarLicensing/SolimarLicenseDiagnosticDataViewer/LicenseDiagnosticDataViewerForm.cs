@@ -21,6 +21,8 @@ namespace SolimarLicenseDiagnosticDataViewer
         }
         private void Initialize()
         {
+            Shared.VisualComponents.ControlHelper.ReduceFlicker(this);
+
             m_solLicServerWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseServerWrapper();
             Shared.VisualComponents.ControlHelper.SetWindowTheme(this.leftTreeView.Handle, "Explorer", null);
             //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
@@ -230,7 +232,7 @@ namespace SolimarLicenseDiagnosticDataViewer
         private System.Windows.Forms.OpenFileDialog m_importPktDialog;
 		private Lic_LicenseSystemAttribs m_loadedLicSysAttribs;
 
-        private TestForm m_textDialog = null;
+        //private TestForm m_textDialog = null;
 		private System.Collections.Generic.Dictionary<string, Form> m_guidToFormMap = new Dictionary<string,Form>();
         #endregion
 

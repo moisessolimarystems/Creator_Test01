@@ -18,6 +18,9 @@ namespace SolimarLicenseViewer
         public Form1()
         {
             InitializeComponent();
+
+            Shared.VisualComponents.ControlHelper.ReduceFlicker(this);
+
             Shared.VisualComponents.ControlHelper.SetWindowTheme(this.treeView.Handle, "Explorer", null);
             //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
             Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
@@ -234,7 +237,7 @@ namespace SolimarLicenseViewer
                     {
                         if (!m_CommLink.IsConnected())
                         {
-                            licSvrVer = " - Licenese Server NOT installed";
+                            licSvrVer = string.Format(" - Licenese Server NOT installed{0}", m_CommLink.Exception != null ? (" - " + m_CommLink.Exception.Message) : "");
                         }
                         else
                         {

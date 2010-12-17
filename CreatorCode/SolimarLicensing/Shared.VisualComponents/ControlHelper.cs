@@ -60,5 +60,26 @@ namespace Shared.VisualComponents
         public extern static IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
         public const int WM_CREATE = 0x1;
+
+
+        /// <param name="control"></param>
+        /// <remarks>Call SetDoubleBuffered() anytime after InitializeComponent() in you Forms constructor.</remarks>
+        static private void SetDoubleBuffered(Control control)
+        {
+            // set instance non-public property with name "DoubleBuffered" to true
+            typeof(Control).InvokeMember("DoubleBuffered",
+              BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic,
+              null, control, new object[] { true });
+        }
+
+        /// <summary>Recursively calls all child controls of passed in control and enables double buffering for each control.</summary>
+        static public void ReduceFlicker(Control parent)
+        {
+            foreach (Control child in parent.Controls)
+            {
+                ReduceFlicker(child);
+            }
+            SetDoubleBuffered(parent);
+        }
     }
 }
