@@ -149,6 +149,11 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
+                    List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                   /* RemoveDeprecatedModules(ProductVersion); //for all modules
+                    AddIntroducedModules(ProductVersion, productLicenses); //for all product licenses
+                    */
+                    UpdateModules(ProductVersion, productLicenses);
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID);
                 });
                 return _moduleList;
@@ -218,8 +223,9 @@ namespace Client.Creator
                             }
                             client.MarkDirty(LicenseServer);
                         });
-                        RemoveDeprecatedModules(value); //for all modules
-                        AddIntroducedModules(value, productLicenses); //for all product licenses
+                        UpdateModules(value, productLicenses);
+                        //RemoveDeprecatedModules(value); //for all modules
+                        //AddIntroducedModules(value, productLicenses); //for all product licenses
                         _plRec.ProductVersion = value.ToString();
                         _version = value;
                     }
@@ -634,90 +640,114 @@ namespace Client.Creator
         #endregion
 
         #region Methods
-        private void RemoveDeprecatedModules(LicenseVersion version)
+        private void UpdateModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
         {
-            Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec = null;
-            List<ModuleTable> removeModuleList = new List<ModuleTable>();
             Service<ICreator>.Use((client) =>
             {
                 List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
-                foreach (ModuleTable module in dbModuleList)
+                RemoveDeprecatedModules(version, dbModuleList);
+                AddIntroducedModules(version, dbModuleList, pltList);
+            });
+        }
+        private void RemoveDeprecatedModules(LicenseVersion version, List<ModuleTable> dbModuleList)
+        {
+            Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec = null;
+            List<ModuleTable> removeModuleList = new List<ModuleTable>();
+            //List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
+            foreach (ModuleTable module in dbModuleList)
+            {
+                bool bDeprecated = false;
+                moduleSpec = CreatorForm.s_CommLink.GetModuleSpec(ProductID, module.ModID);
+                if (moduleSpec != null)
                 {
-                    bool bDeprecated = false;
-                    moduleSpec = CreatorForm.s_CommLink.GetModuleSpec(ProductID, module.ModID);
-                    if (moduleSpec != null)
+                    if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
                     {
-                        if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                        if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                            bDeprecated = true;
+                        else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
                         {
-                            if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                            if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
                                 bDeprecated = true;
-                            else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
-                            {
-                                if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
-                                    bDeprecated = true;
-                            }
                         }
                     }
-                    if (bDeprecated) removeModuleList.Add(module);
+                    if (version.Major < moduleSpec.moduleVersionIntroduced_Major)
+                        bDeprecated = true;
+                    else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
+                    {
+                        if (version.Minor < moduleSpec.moduleVersionIntroduced_Minor)
+                            bDeprecated = true;
+                    }
                 }
+                if (bDeprecated) removeModuleList.Add(module);
+            }
+            Service<ICreator>.Use((client) =>
+            {
                 foreach (ModuleTable mt in removeModuleList)
                 {
                     client.DeleteModule(mt);
                 }
+                if (removeModuleList.Count > 0)
+                    client.MarkDirty(LicenseServer);
             });
         }
 
-        private void AddIntroducedModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
+        private void AddIntroducedModules(LicenseVersion version, List<ModuleTable> dbModuleList, IList<ProductLicenseTable> pltList)
         {
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecList = CreatorForm.s_CommLink.GetModuleSpecList(ProductID);
             List<ModuleTable> addModuleList = new List<ModuleTable>();
             List<ModuleTable> removeModuleList = new List<ModuleTable>();
-            Service<ICreator>.Use((client) =>
+
+                //IList<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
             {
-                IList<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
+                if (pltList != null)
                 {
-                    if (pltList != null)
+                    foreach (ProductLicenseTable plt in pltList)
                     {
-                        foreach (ProductLicenseTable plt in pltList)
+                        bool bIntroduced = false, bDeprecated = false;
+                        if (dbModuleList.Where(m => (m.ModID == (short)moduleSpec.moduleID.TVal) && (m.ProductLicenseID == plt.ID)).Count() == 0)
                         {
-                            bool bIntroduced = false, bDeprecated = false;
-                            if (dbModuleList.Where(m => (m.ModID == (short)moduleSpec.moduleID.TVal) && (m.ProductLicenseID == plt.ID)).Count() == 0)
+                            if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
                             {
-                                if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                                if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                                    bDeprecated = true;
+                                else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
                                 {
-                                    if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
+                                    if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
                                         bDeprecated = true;
-                                    else if (version.Major == moduleSpec.moduleVersionDeprecated_Major)
-                                    {
-                                        if (version.Minor >= moduleSpec.moduleVersionDeprecated_Minor)
-                                            bDeprecated = true;
-                                    }
-                                }
-                                if (version.Major > moduleSpec.moduleVersionIntroduced_Major)
-                                    bIntroduced = true;
-                                else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
-                                {
-                                    if (version.Minor >= moduleSpec.moduleVersionIntroduced_Minor)
-                                        bIntroduced = true;
                                 }
                             }
-                            if (bIntroduced && !bDeprecated)
+                            if (version.Major > moduleSpec.moduleVersionIntroduced_Major)
+                                bIntroduced = true;
+                            else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
                             {
-                                short moduleValue = 0;
-                                if (Status == ProductLicenseState.Trial)
-                                    moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
-                                ModuleTable mt = new ModuleTable();
-                                mt.ModID = (short)moduleSpec.moduleID.TVal;
-                                mt.Value = moduleValue;
-                                mt.AppInstance = ProductConnection;
-                                mt.ProductLicenseID = plt.ID;
-                                addModuleList.Add(mt);
+                                if (version.Minor >= moduleSpec.moduleVersionIntroduced_Minor)
+                                    bIntroduced = true;
                             }
+                        }
+                        if (bIntroduced && !bDeprecated)
+                        {
+                            short moduleValue = 0;
+                            //if (Status == ProductLicenseState.Trial)
+                            if (plt.plState == (byte)ProductLicenseState.Trial)
+                                moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
+                            ModuleTable mt = new ModuleTable();
+                            mt.ModID = (short)moduleSpec.moduleID.TVal;
+                            mt.Value = moduleValue;
+                            mt.AppInstance = (moduleValue > 0) ? ProductConnection : (byte)0;
+                            mt.ProductLicenseID = plt.ID;
+                            addModuleList.Add(mt);
                         }
                     }
                 }
-                client.CreateAllModules(addModuleList);
+            }
+            Service<ICreator>.Use((client) =>
+            {
+                if (addModuleList.Count > 0)
+                {
+                    client.CreateAllModules(addModuleList);
+                    client.MarkDirty(LicenseServer);
+                }
             });
         }
 
