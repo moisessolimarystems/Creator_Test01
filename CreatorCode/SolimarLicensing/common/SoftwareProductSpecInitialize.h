@@ -590,7 +590,7 @@ void InititalizeProduct12()
 	pTmpProdSpec->softwareSpec_Major = 1;
 	pTmpProdSpec->softwareSpec_Minor = 0;
 	pTmpProdSpec->softwareSpec_SubMajor = 0;
-	pTmpProdSpec->softwareSpec_SubMinor = 0;
+	pTmpProdSpec->softwareSpec_SubMinor = 3;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -607,6 +607,15 @@ void InititalizeProduct12()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(25))->second);
 	pTmpModSpec->moduleID = 25;
 	pTmpModSpec->moduleName = std::wstring(L"Encryption");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(26, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(26))->second);
+	pTmpModSpec->moduleID = 26;
+	pTmpModSpec->moduleName = std::wstring(L"Annotation Stripper");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
