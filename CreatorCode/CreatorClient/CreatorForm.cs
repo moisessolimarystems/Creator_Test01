@@ -4177,7 +4177,7 @@ namespace Client.Creator
                     List<ListViewItem> lvItems = new List<ListViewItem>();
                     foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                     {
-                        bool bDeprecated = false;
+                        bool bDeprecated = false, bIntroduced = false;
                         if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
                         {
                             if (version.Major > moduleSpec.moduleVersionDeprecated_Major)
@@ -4188,7 +4188,15 @@ namespace Client.Creator
                                     bDeprecated = true;
                             }
                         }
-                        if (!bDeprecated)
+                        if (version.Major > moduleSpec.moduleVersionIntroduced_Major)
+                            bIntroduced = true;
+                        else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
+                        {
+                            if (version.Minor >= moduleSpec.moduleVersionIntroduced_Minor)
+                                bIntroduced = true;
+                        }
+                        if (bIntroduced && !bDeprecated)
+                        //if (!bDeprecated)
                         {
                             int modValue = 0, modAppInstance = 0;
                             foreach (ModuleTable mt in moduleList.Where(c => c.ModID == moduleSpec.moduleID.TVal))
@@ -4231,8 +4239,9 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {   //gets all modules for a given product license and add-on product licenses
                     string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
-                    List<ModuleTable> moduleList = client.GetAllModules(productLicense);
-                    foreach (ModuleTable module in moduleList.Where(c => c.ProductLicenseID == plData.ProductLicenseDatabaseID))
+                    List<ModuleTable> moduleList = plData.ModuleList;//client.GetAllModules(productLicense);
+                    //foreach (ModuleTable module in moduleList.Where(c => c.ProductLicenseID == plData.ProductLicenseDatabaseID))
+                    foreach (ModuleTable module in moduleList)
                     {   //totalValue = licensed module value + add-on module value;
                         //           = trial module value;
                         uint totalValue = 0;
