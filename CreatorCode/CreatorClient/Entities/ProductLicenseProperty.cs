@@ -10,6 +10,7 @@ using System.Reflection;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
 using System.Globalization;
+using System.Windows.Forms;
 
 namespace Client.Creator
 {
@@ -150,9 +151,6 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {
                     List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
-                   /* RemoveDeprecatedModules(ProductVersion); //for all modules
-                    AddIntroducedModules(ProductVersion, productLicenses); //for all product licenses
-                    */
                     UpdateModules(ProductVersion, productLicenses);
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID);
                 });
@@ -224,8 +222,6 @@ namespace Client.Creator
                             client.MarkDirty(LicenseServer);
                         });
                         UpdateModules(value, productLicenses);
-                        //RemoveDeprecatedModules(value); //for all modules
-                        //AddIntroducedModules(value, productLicenses); //for all product licenses
                         _plRec.ProductVersion = value.ToString();
                         _version = value;
                     }
@@ -309,25 +305,25 @@ namespace Client.Creator
                 {
                     if (!(_plRec.plState == (byte)value))
                     {
-                        System.Windows.Forms.DialogResult dlgResult = System.Windows.Forms.DialogResult.No;
+                        DialogResult dlgResult = DialogResult.No;
                         if (value != ProductLicenseState.AddOn)
-                            dlgResult = System.Windows.Forms.MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Information);
-                        if (dlgResult == System.Windows.Forms.DialogResult.Yes || value == ProductLicenseState.AddOn)
+                            dlgResult = MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        if (dlgResult == DialogResult.Yes || value == ProductLicenseState.AddOn)
                         {
                             string errorMsg = "";
                             switch (value)
                             {
-                                case ProductLicenseState.Licensed:
-                                    //was trial now licensed
-                                    //clear modules of non-defaults and set defaults           
-                                    //plstate is stored in terms of enums.productlicensestate
-                                    if (!SetTrialToLicensed())
-                                        errorMsg = "Failed to change status from trial to licensed";
+                                case ProductLicenseState.Licensed: //was trial now licensed       
+                                    bool bReset = true;
+                                    if (!IsTrialModuleValues()) //clear modules of non-defaults and set defaults    
+                                        if (MessageBox.Show("Keep the current module values?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                            bReset = false;
+                                    if (!SetTrialToLicensed(bReset))
+                                        errorMsg = "Failed to change status from trial to licensed.";
                                     break;
-                                case ProductLicenseState.Trial:
-                                    //was perm now trial
+                                case ProductLicenseState.Trial:  //was perm now trial
                                     if (!SetLicensedToTrial())
-                                        errorMsg = "Failed to change status from licensed";
+                                        errorMsg = "Failed to change status from licensed.";
                                     break;
                                 case ProductLicenseState.AddOn:
                                     if (ParentID == null)
@@ -335,7 +331,7 @@ namespace Client.Creator
                                     break;
                                 case ProductLicenseState.LicensedAddOn:
                                     if (!SetAddonToLicensed())
-                                        errorMsg = "Failed to change status from add-on to licensed";
+                                        errorMsg = "Failed to change status from add-on to licensed.";
                                     break;
                                 default:
                                     break;
@@ -346,7 +342,7 @@ namespace Client.Creator
                                 if (value == ProductLicenseState.Licensed)
                                 {
                                     if (!(ProductName.Contains("Test")) && HasHardwareToken() && ParentID == null)
-                                        if (System.Windows.Forms.MessageBox.Show("Clear Expiration Date?", "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                                        if (MessageBox.Show("Clear Expiration Date?", "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                                             ExpirationDate = null;
                                 }
                                 else
@@ -653,7 +649,6 @@ namespace Client.Creator
         {
             Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec = null;
             List<ModuleTable> removeModuleList = new List<ModuleTable>();
-            //List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
             foreach (ModuleTable module in dbModuleList)
             {
                 bool bDeprecated = false;
@@ -670,6 +665,7 @@ namespace Client.Creator
                                 bDeprecated = true;
                         }
                     }
+                    //version major < introduced
                     if (version.Major < moduleSpec.moduleVersionIntroduced_Major)
                         bDeprecated = true;
                     else if (version.Major == moduleSpec.moduleVersionIntroduced_Major)
@@ -697,7 +693,6 @@ namespace Client.Creator
             List<ModuleTable> addModuleList = new List<ModuleTable>();
             List<ModuleTable> removeModuleList = new List<ModuleTable>();
 
-                //IList<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
             foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
             {
                 if (pltList != null)
@@ -728,8 +723,7 @@ namespace Client.Creator
                         if (bIntroduced && !bDeprecated)
                         {
                             short moduleValue = 0;
-                            //if (Status == ProductLicenseState.Trial)
-                            if (plt.plState == (byte)ProductLicenseState.Trial)
+                            if(plt.plState == (byte)ProductLicenseState.Trial)
                                 moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
                             ModuleTable mt = new ModuleTable();
                             mt.ModID = (short)moduleSpec.moduleID.TVal;
@@ -763,28 +757,31 @@ namespace Client.Creator
             return bRetVal;
         }
 
-        public bool SetTrialToLicensed()
+        public bool SetTrialToLicensed(bool bResetModules)
         {
             bool bRetVal = true;
-            Service<ICreator>.Use((client) =>
+            if (bResetModules)
             {
-                List<ModuleTable> mtList = new List<ModuleTable>();
-                foreach (ModuleTable module in ModuleList)
+                Service<ICreator>.Use((client) =>
                 {
-                    short moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);                 
-                    ModuleTable mt = client.GetModule(ID, module.ModID);
-                    if (mt != null)
+                    List<ModuleTable> mtList = new List<ModuleTable>();
+                    foreach (ModuleTable module in ModuleList)
                     {
-                        mt.Value = moduleValue;
-                        if (moduleValue == 0) mt.AppInstance = 0;
-                        mtList.Add(mt);
+                        short moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);
+                        ModuleTable mt = client.GetModule(ID, module.ModID);
+                        if (mt != null)
+                        {
+                            mt.Value = moduleValue;
+                            if (moduleValue == 0) mt.AppInstance = 0;
+                            mtList.Add(mt);
+                        }
+                        else
+                            bRetVal = false;
                     }
-                    else
-                        bRetVal = false;
-                }
-                if (bRetVal)
-                    client.UpdateAllModules(mtList);
-            });
+                    if (bRetVal)
+                        client.UpdateAllModules(mtList);
+                });
+            }
             return bRetVal;
         }
 
@@ -1081,6 +1078,27 @@ namespace Client.Creator
             }
             return false;
         }
+
+        #region Helper Methods
+
+        bool IsTrialModuleValues()
+        {
+            bool bRetVal = true;
+            short moduleValue;
+            List<ModuleTable> mtList = new List<ModuleTable>();
+            foreach (ModuleTable module in ModuleList)
+            {
+                moduleValue = _commLink.GetModuleTrialValue(ProductID, module.ModID);
+                if (module.Value != moduleValue)
+                {
+                    bRetVal = false;
+                    break;
+                }
+                
+            }
+            return bRetVal;
+        }
+
         public bool CanIncrementModule(ModuleProperty module)
         {
             return GetAvailableModuleUnits(module, 0) > 0 && !_commLink.IsDefaultModule(ProductID, module.ID);
@@ -1104,8 +1122,11 @@ namespace Client.Creator
             isBrowsable.SetValue(attrib, value);
         }
         #endregion
+
+        #endregion
     }
 
+    #region Helper Classes
     public class LicenseVersion
     {
         private uint _major = 0;
@@ -1355,4 +1376,5 @@ namespace Client.Creator
             return new StandardValuesCollection(stateList);
         }
     }
+    #endregion
 }
