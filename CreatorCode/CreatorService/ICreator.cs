@@ -48,6 +48,9 @@ namespace Service.Creator
 
         #region License OperationContracts
         [OperationContract]
+        void CheckInUser(string user);
+
+        [OperationContract]
         IList<LicenseTable> GetLicensesByCustomer(string custName);
 
         [OperationContract]

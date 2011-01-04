@@ -185,6 +185,23 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void CheckInUser(string user)
+        {
+            IList<LicenseTable> lsList = LicenseTable.GetLicensesByCustomer("");
+            foreach (LicenseTable ls in lsList)
+            {
+                if (ls.UserLock != null)
+                {
+                    if (ls.UserLock.ToLower() == user.ToLower())
+                    {
+                        ls.UserLock = null;
+                        LicenseTable.UpdateLicense(ls);
+                    }
+                }
+            }
+        }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<string> GetModifiedLicensesByCustomer(string custName)
         {
             return LicenseTable.GetModifiedLicenseNamesByCustomer(custName);

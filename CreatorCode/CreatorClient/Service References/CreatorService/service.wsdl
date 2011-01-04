@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProduct" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProductResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_GetModulesByProductLicense_InputMessage">
     <wsdl:part name="parameters" element="tns:GetModulesByProductLicense" />
   </wsdl:message>
@@ -44,6 +50,12 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetLicenseServerVersion_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetLicenseServerVersionResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAvailableHardwareTokensByCustID_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAvailableHardwareTokensByCustID" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAvailableHardwareTokensByCustID_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAvailableHardwareTokensByCustIDResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetTokenByLicenseName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTokenByLicenseName" />
@@ -231,11 +243,11 @@
   <wsdl:message name="ICreator_GetAllModules_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllModulesResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProduct" />
+  <wsdl:message name="ICreator_CreatePacket_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreatePacket" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GetAllActiveModulesByProduct_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetAllActiveModulesByProductResponse" />
+  <wsdl:message name="ICreator_CreatePacket_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreatePacketResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_UpdatePacket_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdatePacket" />
@@ -423,12 +435,6 @@
   <wsdl:message name="ICreator_GetHardwareTokenByKeyValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetHardwareTokenByKeyValueResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_GetAvailableHardwareTokensByCustID_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetAvailableHardwareTokensByCustID" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_GetAvailableHardwareTokensByCustID_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetAvailableHardwareTokensByCustIDResponse" />
-  </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
   </wsdl:message>
@@ -476,6 +482,12 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetLastCustomerID_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetLastCustomerIDResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CheckInUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:CheckInUser" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CheckInUser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CheckInUserResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetLicensesByCustomer_InputMessage">
     <wsdl:part name="parameters" element="tns:GetLicensesByCustomer" />
@@ -615,13 +627,11 @@
   <wsdl:message name="ICreator_GenerateStreamByLicenseSystemData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GenerateStreamByLicenseSystemDataResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_CreatePacket_InputMessage">
-    <wsdl:part name="parameters" element="tns:CreatePacket" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_CreatePacket_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CreatePacketResponse" />
-  </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="GetAllActiveModulesByProduct">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" message="tns:ICreator_GetAllActiveModulesByProduct_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProductResponse" message="tns:ICreator_GetAllActiveModulesByProduct_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetModulesByProductLicense">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetModulesByProductLicense" message="tns:ICreator_GetModulesByProductLicense_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetModulesByProductLicenseResponse" message="tns:ICreator_GetModulesByProductLicense_OutputMessage" />
@@ -637,6 +647,10 @@
     <wsdl:operation name="GetLicenseServerVersion">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersion" message="tns:ICreator_GetLicenseServerVersion_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersionResponse" message="tns:ICreator_GetLicenseServerVersion_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAvailableHardwareTokensByCustID">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID" message="tns:ICreator_GetAvailableHardwareTokensByCustID_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustIDResponse" message="tns:ICreator_GetAvailableHardwareTokensByCustID_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetTokenByLicenseName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTokenByLicenseName" message="tns:ICreator_GetTokenByLicenseName_InputMessage" />
@@ -762,9 +776,9 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllModules" message="tns:ICreator_GetAllModules_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllModulesResponse" message="tns:ICreator_GetAllModules_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetAllActiveModulesByProduct">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" message="tns:ICreator_GetAllActiveModulesByProduct_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllActiveModulesByProductResponse" message="tns:ICreator_GetAllActiveModulesByProduct_OutputMessage" />
+    <wsdl:operation name="CreatePacket">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreatePacket" message="tns:ICreator_CreatePacket_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreatePacketResponse" message="tns:ICreator_CreatePacket_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="UpdatePacket">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdatePacket" message="tns:ICreator_UpdatePacket_InputMessage" />
@@ -890,10 +904,6 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetHardwareTokenByKeyValue" message="tns:ICreator_GetHardwareTokenByKeyValue_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetHardwareTokenByKeyValueResponse" message="tns:ICreator_GetHardwareTokenByKeyValue_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetAvailableHardwareTokensByCustID">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID" message="tns:ICreator_GetAvailableHardwareTokensByCustID_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustIDResponse" message="tns:ICreator_GetAvailableHardwareTokensByCustID_OutputMessage" />
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllCustomersResponse" message="tns:ICreator_GetAllCustomers_OutputMessage" />
@@ -925,6 +935,10 @@
     <wsdl:operation name="GetLastCustomerID">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetLastCustomerID" message="tns:ICreator_GetLastCustomerID_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetLastCustomerIDResponse" message="tns:ICreator_GetLastCustomerID_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CheckInUser">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CheckInUser" message="tns:ICreator_CheckInUser_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CheckInUserResponse" message="tns:ICreator_CheckInUser_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetLicensesByCustomer">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetLicensesByCustomer" message="tns:ICreator_GetLicensesByCustomer_InputMessage" />
@@ -1018,15 +1032,20 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemData" message="tns:ICreator_GenerateStreamByLicenseSystemData_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemDataResponse" message="tns:ICreator_GenerateStreamByLicenseSystemData_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="CreatePacket">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreatePacket" message="tns:ICreator_CreatePacket_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreatePacketResponse" message="tns:ICreator_CreatePacket_OutputMessage" />
-    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="CreatorServiceTcp" type="tns:ICreator">
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="GetAllActiveModulesByProduct">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="GetModulesByProductLicense">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetModulesByProductLicense" style="document" />
       <wsdl:input>
@@ -1056,6 +1075,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetLicenseServerVersion">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetLicenseServerVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAvailableHardwareTokensByCustID">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1342,8 +1370,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetAllActiveModulesByProduct">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllActiveModulesByProduct" style="document" />
+    <wsdl:operation name="CreatePacket">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreatePacket" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1630,15 +1658,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetAvailableHardwareTokensByCustID">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAvailableHardwareTokensByCustID" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllCustomers" style="document" />
       <wsdl:input>
@@ -1704,6 +1723,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetLastCustomerID">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetLastCustomerID" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CheckInUser">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CheckInUser" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1911,15 +1939,6 @@
     </wsdl:operation>
     <wsdl:operation name="GenerateStreamByLicenseSystemData">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GenerateStreamByLicenseSystemData" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CreatePacket">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/CreatePacket" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

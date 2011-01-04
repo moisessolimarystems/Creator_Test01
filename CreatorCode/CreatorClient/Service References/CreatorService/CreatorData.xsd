@@ -16,6 +16,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ModuleTable" nillable="true" type="tns:ModuleTable" />
+  <xs:complexType name="ArrayOfTokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TokenTable" nillable="true" type="tns:TokenTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTokenTable" nillable="true" type="tns:ArrayOfTokenTable" />
   <xs:complexType name="TokenTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -159,12 +165,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ProductLicenseTable" nillable="true" type="tns:ProductLicenseTable" />
-  <xs:complexType name="ArrayOfTokenTable">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="TokenTable" nillable="true" type="tns:TokenTable" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfTokenTable" nillable="true" type="tns:ArrayOfTokenTable" />
   <xs:complexType name="ArrayOfCustomerTable">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="CustomerTable" nillable="true" type="tns:CustomerTable" />
