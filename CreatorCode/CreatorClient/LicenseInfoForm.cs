@@ -310,20 +310,24 @@ namespace Client.Creator
                             foreach (LicenseTable licServer in licServerList)
                             {
                                 bool bMatch = false; 
-                                foreach (TokenTable token in tokenDBList.Where(t => t.LicenseID == licServer.ID))
+                                //loop thru each active token for 
+                                foreach (TokenTable tokenDB in tokenDBList.Where(t => t.LicenseID == licServer.ID && t.TokenStatus != (byte)TokenStatus.Deactivated))
                                 {
-                                    tokenName = ((Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType).ToString();
+                                    tokenName = ((Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)tokenDB.TokenType).ToString();
+                                    //tokenlistview = user input tokens
                                     foundTokens = tokenListView.Items.Find(tokenName, false);                                        
                                     if (foundTokens.Count() > 0)
                                     {
                                         tokenValue = foundTokens[0].SubItems[1].Text;
-                                        if (token.TokenValue != tokenValue)
+                                        if (tokenDB.TokenValue != tokenValue)
                                         {
                                             bMatch = false;
                                             break;
                                         }
                                         else
+                                        {
                                             bMatch = true;
+                                        }
                                     }
                                 }
                                 if (licServer.LicenseName != selectedLicense.Name)
