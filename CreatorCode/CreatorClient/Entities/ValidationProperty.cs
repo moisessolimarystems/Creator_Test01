@@ -28,7 +28,7 @@ namespace Client.Creator
             _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
             _token.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType ;
             _token.tokenValue.TVal = token.TokenValue;
-            _status = "Active";
+            _status = ((TokenStatus)token.TokenStatus).ToString(); //"Active";
         }
         #endregion 
 

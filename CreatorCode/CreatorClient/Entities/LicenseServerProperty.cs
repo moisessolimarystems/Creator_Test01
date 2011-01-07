@@ -163,8 +163,9 @@ namespace Client.Creator
                     LicenseTable lt = client.GetLicenseByName(Name, false);
                     if (lt != null)
                     {
-                        _userLock = lt.UserLock;
-                        if (lt.UserLock == null) bLocked = false;
+                        if (lt.UserLock == null) 
+                            bLocked = false;                        
+                        _userLock = (lt.UserLock != null) ? lt.UserLock.ToLower() : null;
                     }
                 });
                 return bLocked;
@@ -175,7 +176,7 @@ namespace Client.Creator
                 {
                     LicenseTable lt = client.GetLicenseByName(Name, false);
                     if (lt != null)
-                        lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name : null;
+                        lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name.ToLower() : null;
                     client.UpdateLicense(lt, false);
                 });
             }
