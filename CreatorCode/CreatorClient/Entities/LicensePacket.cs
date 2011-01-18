@@ -14,7 +14,7 @@ namespace Client.Creator
         private Lic_PackageAttribs _licPackage;
         private LicenseTable _licenseTable;
         private string _licenseServer;
-        private uint _highestProductRevision;   //set by determining from the included products in a packet.
+        private uint _highestModuleRevision;   //set by determining from the included products in a packet.
         #endregion
 
         #region Constructor
@@ -27,7 +27,7 @@ namespace Client.Creator
             _licPackage = new Lic_PackageAttribs();
             _licenseTable = null;
             _licenseServer = licenseServer;
-            _highestProductRevision = 0;
+            _highestModuleRevision = 0;
         }
         #endregion 
 
@@ -74,7 +74,7 @@ namespace Client.Creator
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Major.TVal = (uint)major;
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Minor.TVal = (uint)minor;
                         _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMajor.TVal = (uint)buildVersion;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestProductRevision;   //value determined from included products highest revision
+                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestModuleRevision;   //value determined from included products highest revision
                         _licenseTable.LicenseInfo = _licPackage.Stream;
                         bRetVal = true;
                     }
@@ -121,7 +121,7 @@ namespace Client.Creator
                 {
                     string tokenName = Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), token.TokenType);
                     SoftwareTokenTable st = softwareTokens.First(t => t.TokenType == tokenName);
-                    if (st.Status == 0)
+                    if (st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated)
                         continue;
                 }
                 Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
@@ -138,7 +138,7 @@ namespace Client.Creator
         private bool PopulateProductInfo()
         {
             bool bRetVal = false;
-            uint currentProductRevision;
+            uint currentModuleRevision = 0;
             Service<ICreator>.Use((client) =>
             {
                 List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer,false);
@@ -179,13 +179,12 @@ namespace Client.Creator
                             mod.moduleID.TVal = (uint)module.ModID;
                             mod.moduleValue.TVal = (uint)module.Value;
                             mod.moduleAppInstance.TVal = module.AppInstance;
+                            currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);                     //get revision by setting to highest product revision while adding
+                            _highestModuleRevision = (currentModuleRevision > _highestModuleRevision) ? currentModuleRevision : _highestModuleRevision;
                             product.moduleList.TVal.Add(mod);
                         }
                     }
                     _licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(product);
-                    //get revision by setting to highest product revision while adding
-                    currentProductRevision = CreatorForm.s_CommLink.GetProductSpecRevision(plt.ProductID);
-                    _highestProductRevision = (currentProductRevision > _highestProductRevision) ? currentProductRevision : _highestProductRevision;
                 }
                 bRetVal = true;
             });

@@ -265,15 +265,19 @@ namespace Client.Creator
             return null;
         }
 
-        public uint GetProductSpecRevision(ushort productID)
+        public uint GetModuleSpecRevision(ushort productID, ushort modID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
-                        return GetProductSpecRevision((ushort)productSpec.sameModSpecProductID.TVal);
-                    return productSpec.softwareSpec_SubMinor.TVal;                    
+                        return GetModuleSpecRevision((ushort)productSpec.sameModSpecProductID.TVal, modID);
+                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                    {
+                        if (moduleSpec.moduleID.TVal == modID)
+                            return moduleSpec.moduleVersionIntroduced_SubMinor.TVal;                            
+                    }         
                 }
             }
             return 0;
