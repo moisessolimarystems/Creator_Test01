@@ -179,8 +179,11 @@ namespace Client.Creator
                             mod.moduleID.TVal = (uint)module.ModID;
                             mod.moduleValue.TVal = (uint)module.Value;
                             mod.moduleAppInstance.TVal = module.AppInstance;
-                            currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);                     //get revision by setting to highest product revision while adding
-                            _highestModuleRevision = (currentModuleRevision > _highestModuleRevision) ? currentModuleRevision : _highestModuleRevision;
+                            if (module.Value > 0) //only modules with value count towards spec revision
+                            {
+                                currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);                     //get revision by setting to highest product revision while adding
+                                _highestModuleRevision = (currentModuleRevision > _highestModuleRevision) ? currentModuleRevision : _highestModuleRevision;
+                            }
                             product.moduleList.TVal.Add(mod);
                         }
                     }
