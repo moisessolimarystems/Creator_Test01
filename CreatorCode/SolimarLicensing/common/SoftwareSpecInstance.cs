@@ -255,7 +255,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleID.TVal = 1;
 			tmpModSpec.moduleName.TVal = "LUA";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
-			tmpModSpec.moduleTrialLicense.TVal = 512;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 128;
 			tmpModSpec.moduleDefaultLicense.TVal = 15;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -350,7 +350,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleID.TVal = 128;
 			tmpModSpec.moduleName.TVal = "Max LU";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
-			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.moduleTrialLicense.TVal = 512;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;

@@ -187,7 +187,7 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
 	pTmpModSpec->moduleName = std::wstring(L"LUA");
-	pTmpModSpec->moduleTrialLicense = 512;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->modulePoolModuleID = 128;
 	pTmpModSpec->moduleDefaultLicense = 15;
 	
@@ -225,7 +225,7 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(128))->second);
 	pTmpModSpec->moduleID = 128;
 	pTmpModSpec->moduleName = std::wstring(L"Max LU");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 512;
 	pTmpModSpec->bModuleIsPool = true;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(13, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));

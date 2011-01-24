@@ -135,7 +135,7 @@
 	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15" moduleTrialLicense="512"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events"/>
@@ -166,7 +166,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="Max LU" bModuleIsPool="true"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="Max LU" moduleTrialLicense="512" bModuleIsPool="true"/>
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
