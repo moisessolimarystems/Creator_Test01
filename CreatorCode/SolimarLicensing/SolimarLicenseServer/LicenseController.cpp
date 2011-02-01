@@ -53,6 +53,9 @@ LicenseController::LicenseController() :
 
 	_tzset();
 
+	//CR.FIX.14360 - Delay the usb notification until after the class member finish initializing.
+	this->StartUSBNotification();
+
 	//keyserver.Initialize(this.d);
 
 	//this.keyserver.Initialize(&this.driver);
