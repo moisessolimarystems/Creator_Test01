@@ -8,6 +8,7 @@ class USBNotification
 public:
 	USBNotification(LPVOID pContext);
 	virtual ~USBNotification();
+	void StartUSBNotification();
 	
 	virtual void USBEventCallback(LPVOID pContext) = 0;
 	

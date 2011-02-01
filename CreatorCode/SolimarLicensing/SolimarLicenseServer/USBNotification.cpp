@@ -9,11 +9,14 @@ USBNotification::USBNotification(LPVOID pContext) :
 	m_USBNotifyThreadTerminateEvent(CreateEvent(0,TRUE,FALSE,0)),
 	m_USBNotifyThread(0)
 {
+}
 
-	HRESULT hr = S_OK;
-	 
-    // launch a thread to drive the message pump for the window
-	m_USBNotifyThread = CreateThread(0, 0, USBNotifyThreadProc, this, 0, 0);
+//CR.FIX.14360 - Delay the usb notification until after the class member finish initializing.
+void USBNotification::StartUSBNotification()
+{
+	// launch a thread to drive the message pump for the window
+	if(!m_USBNotifyThread)
+		m_USBNotifyThread = CreateThread(0, 0, USBNotifyThreadProc, this, 0, 0);
 }
 
 USBNotification::~USBNotification()
