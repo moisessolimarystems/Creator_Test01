@@ -132,11 +132,12 @@ namespace SolimarLicenseViewer
 
                 Byte[] licBytes = System.IO.File.ReadAllBytes(m_newSwLicFileNameHash[softwareLicense]);
                 string verificationCode = "";
+                bool bDisplayReturnDiagnosticData = false;
                 using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
                 {
                     messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
                     messageDialog.Show();
-
+                    
                     switch (m_LicUpdateHelperData.action)
                     {
                         case LicenseUpdateActionEnum.luaeImportNewKeyPasswordPackage:
@@ -157,6 +158,7 @@ namespace SolimarLicenseViewer
                             messageDialog.SetMessage(string.Format("Applying {0}...", licenseType));
                             messageDialog.Update();
                             m_CommLink.Async_EnterSoftwareLicPacket(licBytes, ref verificationCode);
+                            bDisplayReturnDiagnosticData = true;
                             break;
                         default:
                             throw new ArgumentException();
@@ -165,8 +167,12 @@ namespace SolimarLicenseViewer
                     messageDialog.Hide();
                 }
                 bSuccess = true;
-                MessageBox.Show(this, "Applied " + licenseType + " successfully.", "Apply " + licenseType, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                //CR.FIX.13989 - Add messaging to prompt customers to return a verification file
+                string msg = bDisplayReturnDiagnosticData
+                    ? string.Format("Applied {0} successfully. Please generate a License Diagnostic Data file and return to Solimar for verification.", licenseType)
+                    : string.Format("Applied {0} successfully.", licenseType);
+                MessageBox.Show(this, msg, "Apply " + licenseType, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (System.Runtime.InteropServices.COMException cEx)
             {
