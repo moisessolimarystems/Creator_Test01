@@ -51,15 +51,47 @@ namespace ValidationTokenRetriever
 			this.globalErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
 			this.globalSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
 			this.bottomPanel = new System.Windows.Forms.Panel();
-			this.mainBackPanel = new System.Windows.Forms.Panel();
+			this.generateFileBackPanel = new System.Windows.Forms.Panel();
 			this.propertiesPanel = new System.Windows.Forms.Panel();
 			this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
+			this.mainBackPanel = new System.Windows.Forms.Panel();
+			this.mainTabControl = new System.Windows.Forms.TabControl();
+			this.idLicenseSvrTabPage = new System.Windows.Forms.TabPage();
+			this.idLicenseSvrBackPanel = new System.Windows.Forms.Panel();
+			this.label1 = new System.Windows.Forms.Label();
+			this.panel1 = new System.Windows.Forms.Panel();
+			this.idLicenseSvrTextBox = new System.Windows.Forms.TextBox();
+			this.idLicenseSvrTitleLabel = new System.Windows.Forms.Label();
+			this.idLicenseSvrButton = new System.Windows.Forms.Button();
+			this.wrongLicenseSvrTabPage = new System.Windows.Forms.TabPage();
+			this.wrongLicenseSvrBackPanel = new System.Windows.Forms.Panel();
+			this.wrongLicenseSvrLabel = new System.Windows.Forms.Label();
+			this.panel2 = new System.Windows.Forms.Panel();
+			this.closeButton = new System.Windows.Forms.Button();
+			this.generateFileTabPage = new System.Windows.Forms.TabPage();
+			this.warningTabPage = new System.Windows.Forms.TabPage();
+			this.warningButtonPanel = new System.Windows.Forms.Panel();
+			this.warningButton = new System.Windows.Forms.Button();
+			this.warningRichTextBox = new System.Windows.Forms.RichTextBox();
+			this.warningBackPanel = new System.Windows.Forms.Panel();
 			this.menuStrip1.SuspendLayout();
 			this.mainButtonPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.globalErrorProvider)).BeginInit();
 			this.bottomPanel.SuspendLayout();
-			this.mainBackPanel.SuspendLayout();
+			this.generateFileBackPanel.SuspendLayout();
 			this.propertiesPanel.SuspendLayout();
+			this.mainBackPanel.SuspendLayout();
+			this.mainTabControl.SuspendLayout();
+			this.idLicenseSvrTabPage.SuspendLayout();
+			this.idLicenseSvrBackPanel.SuspendLayout();
+			this.panel1.SuspendLayout();
+			this.wrongLicenseSvrTabPage.SuspendLayout();
+			this.wrongLicenseSvrBackPanel.SuspendLayout();
+			this.panel2.SuspendLayout();
+			this.generateFileTabPage.SuspendLayout();
+			this.warningTabPage.SuspendLayout();
+			this.warningButtonPanel.SuspendLayout();
+			this.warningBackPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
@@ -69,7 +101,7 @@ namespace ValidationTokenRetriever
             this.exportToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(519, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(737, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -96,6 +128,7 @@ namespace ValidationTokenRetriever
 			this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
 			this.exportToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
 			this.exportToolStripMenuItem.Text = "&Export";
+			this.exportToolStripMenuItem.Visible = false;
 			// 
 			// generateFileForSolimarSystemsToolStripMenuItem
 			// 
@@ -126,7 +159,7 @@ namespace ValidationTokenRetriever
 			this.mainButtonPanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.mainButtonPanel.Location = new System.Drawing.Point(0, 0);
 			this.mainButtonPanel.Name = "mainButtonPanel";
-			this.mainButtonPanel.Size = new System.Drawing.Size(519, 33);
+			this.mainButtonPanel.Size = new System.Drawing.Size(467, 33);
 			this.mainButtonPanel.TabIndex = 1;
 			// 
 			// uuidLabel
@@ -146,7 +179,7 @@ namespace ValidationTokenRetriever
 			this.uuidTextBox.Location = new System.Drawing.Point(146, 97);
 			this.uuidTextBox.Name = "uuidTextBox";
 			this.uuidTextBox.ReadOnly = true;
-			this.uuidTextBox.Size = new System.Drawing.Size(361, 20);
+			this.uuidTextBox.Size = new System.Drawing.Size(309, 20);
 			this.uuidTextBox.TabIndex = 11;
 			this.uuidTextBox.TabStop = false;
 			this.uuidTextBox.Visible = false;
@@ -166,7 +199,7 @@ namespace ValidationTokenRetriever
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.companyTextBox.Location = new System.Drawing.Point(99, 7);
 			this.companyTextBox.Name = "companyTextBox";
-			this.companyTextBox.Size = new System.Drawing.Size(408, 20);
+			this.companyTextBox.Size = new System.Drawing.Size(356, 20);
 			this.companyTextBox.TabIndex = 0;
 			this.companyTextBox.TextChanged += new System.EventHandler(this.companyTextBox_TextChanged);
 			// 
@@ -207,7 +240,7 @@ namespace ValidationTokenRetriever
 			this.biosTextBox.Location = new System.Drawing.Point(146, 124);
 			this.biosTextBox.Name = "biosTextBox";
 			this.biosTextBox.ReadOnly = true;
-			this.biosTextBox.Size = new System.Drawing.Size(361, 20);
+			this.biosTextBox.Size = new System.Drawing.Size(309, 20);
 			this.biosTextBox.TabIndex = 3;
 			this.biosTextBox.TabStop = false;
 			this.biosTextBox.Visible = false;
@@ -219,7 +252,7 @@ namespace ValidationTokenRetriever
 			this.macTextBox.Location = new System.Drawing.Point(146, 71);
 			this.macTextBox.Name = "macTextBox";
 			this.macTextBox.ReadOnly = true;
-			this.macTextBox.Size = new System.Drawing.Size(361, 20);
+			this.macTextBox.Size = new System.Drawing.Size(309, 20);
 			this.macTextBox.TabIndex = 2;
 			this.macTextBox.TabStop = false;
 			this.macTextBox.Visible = false;
@@ -231,7 +264,7 @@ namespace ValidationTokenRetriever
 			this.compNameTextBox.Location = new System.Drawing.Point(146, 45);
 			this.compNameTextBox.Name = "compNameTextBox";
 			this.compNameTextBox.ReadOnly = true;
-			this.compNameTextBox.Size = new System.Drawing.Size(361, 20);
+			this.compNameTextBox.Size = new System.Drawing.Size(309, 20);
 			this.compNameTextBox.TabIndex = 1;
 			this.compNameTextBox.TabStop = false;
 			this.compNameTextBox.Visible = false;
@@ -260,20 +293,20 @@ namespace ValidationTokenRetriever
 			// 
 			this.bottomPanel.Controls.Add(this.genButton);
 			this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.bottomPanel.Location = new System.Drawing.Point(0, 207);
+			this.bottomPanel.Location = new System.Drawing.Point(0, 193);
 			this.bottomPanel.Name = "bottomPanel";
-			this.bottomPanel.Size = new System.Drawing.Size(519, 38);
+			this.bottomPanel.Size = new System.Drawing.Size(467, 38);
 			this.bottomPanel.TabIndex = 13;
 			// 
-			// mainBackPanel
+			// generateFileBackPanel
 			// 
-			this.mainBackPanel.Controls.Add(this.propertiesPanel);
-			this.mainBackPanel.Controls.Add(this.bottomPanel);
-			this.mainBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.mainBackPanel.Location = new System.Drawing.Point(0, 24);
-			this.mainBackPanel.Name = "mainBackPanel";
-			this.mainBackPanel.Size = new System.Drawing.Size(519, 245);
-			this.mainBackPanel.TabIndex = 13;
+			this.generateFileBackPanel.Controls.Add(this.propertiesPanel);
+			this.generateFileBackPanel.Controls.Add(this.bottomPanel);
+			this.generateFileBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.generateFileBackPanel.Location = new System.Drawing.Point(3, 3);
+			this.generateFileBackPanel.Name = "generateFileBackPanel";
+			this.generateFileBackPanel.Size = new System.Drawing.Size(467, 231);
+			this.generateFileBackPanel.TabIndex = 13;
 			// 
 			// propertiesPanel
 			// 
@@ -282,7 +315,7 @@ namespace ValidationTokenRetriever
 			this.propertiesPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.propertiesPanel.Location = new System.Drawing.Point(0, 0);
 			this.propertiesPanel.Name = "propertiesPanel";
-			this.propertiesPanel.Size = new System.Drawing.Size(519, 207);
+			this.propertiesPanel.Size = new System.Drawing.Size(467, 193);
 			this.propertiesPanel.TabIndex = 14;
 			// 
 			// propertyGrid1
@@ -292,29 +325,268 @@ namespace ValidationTokenRetriever
 			this.propertyGrid1.Location = new System.Drawing.Point(0, 33);
 			this.propertyGrid1.Name = "propertyGrid1";
 			this.propertyGrid1.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-			this.propertyGrid1.Size = new System.Drawing.Size(519, 174);
+			this.propertyGrid1.Size = new System.Drawing.Size(467, 160);
 			this.propertyGrid1.TabIndex = 2;
 			this.propertyGrid1.ToolbarVisible = false;
+			this.propertyGrid1.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+			// 
+			// mainBackPanel
+			// 
+			this.mainBackPanel.Controls.Add(this.mainTabControl);
+			this.mainBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.mainBackPanel.Location = new System.Drawing.Point(0, 24);
+			this.mainBackPanel.Name = "mainBackPanel";
+			this.mainBackPanel.Size = new System.Drawing.Size(737, 397);
+			this.mainBackPanel.TabIndex = 14;
+			// 
+			// mainTabControl
+			// 
+			this.mainTabControl.Alignment = System.Windows.Forms.TabAlignment.Left;
+			this.mainTabControl.Controls.Add(this.warningTabPage);
+			this.mainTabControl.Controls.Add(this.idLicenseSvrTabPage);
+			this.mainTabControl.Controls.Add(this.wrongLicenseSvrTabPage);
+			this.mainTabControl.Controls.Add(this.generateFileTabPage);
+			this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.mainTabControl.Location = new System.Drawing.Point(0, 0);
+			this.mainTabControl.Multiline = true;
+			this.mainTabControl.Name = "mainTabControl";
+			this.mainTabControl.SelectedIndex = 0;
+			this.mainTabControl.Size = new System.Drawing.Size(737, 397);
+			this.mainTabControl.TabIndex = 0;
+			this.mainTabControl.Visible = false;
+			// 
+			// idLicenseSvrTabPage
+			// 
+			this.idLicenseSvrTabPage.Controls.Add(this.idLicenseSvrBackPanel);
+			this.idLicenseSvrTabPage.Location = new System.Drawing.Point(23, 4);
+			this.idLicenseSvrTabPage.Name = "idLicenseSvrTabPage";
+			this.idLicenseSvrTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.idLicenseSvrTabPage.Size = new System.Drawing.Size(710, 389);
+			this.idLicenseSvrTabPage.TabIndex = 0;
+			this.idLicenseSvrTabPage.Text = "idLicenseSvr";
+			this.idLicenseSvrTabPage.UseVisualStyleBackColor = true;
+			// 
+			// idLicenseSvrBackPanel
+			// 
+			this.idLicenseSvrBackPanel.Controls.Add(this.label1);
+			this.idLicenseSvrBackPanel.Controls.Add(this.panel1);
+			this.idLicenseSvrBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.idLicenseSvrBackPanel.Location = new System.Drawing.Point(3, 3);
+			this.idLicenseSvrBackPanel.Name = "idLicenseSvrBackPanel";
+			this.idLicenseSvrBackPanel.Size = new System.Drawing.Size(704, 383);
+			this.idLicenseSvrBackPanel.TabIndex = 15;
+			// 
+			// label1
+			// 
+			this.label1.BackColor = System.Drawing.SystemColors.Window;
+			this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label1.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.label1.Location = new System.Drawing.Point(0, 0);
+			this.label1.Name = "label1";
+			this.label1.Padding = new System.Windows.Forms.Padding(5);
+			this.label1.Size = new System.Drawing.Size(704, 345);
+			this.label1.TabIndex = 15;
+			this.label1.Text = resources.GetString("label1.Text");
+			// 
+			// panel1
+			// 
+			this.panel1.Controls.Add(this.idLicenseSvrTextBox);
+			this.panel1.Controls.Add(this.idLicenseSvrTitleLabel);
+			this.panel1.Controls.Add(this.idLicenseSvrButton);
+			this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.panel1.Location = new System.Drawing.Point(0, 345);
+			this.panel1.Name = "panel1";
+			this.panel1.Size = new System.Drawing.Size(704, 38);
+			this.panel1.TabIndex = 14;
+			// 
+			// idLicenseSvrTextBox
+			// 
+			this.idLicenseSvrTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.idLicenseSvrTextBox.Location = new System.Drawing.Point(174, 8);
+			this.idLicenseSvrTextBox.Name = "idLicenseSvrTextBox";
+			this.idLicenseSvrTextBox.Size = new System.Drawing.Size(444, 20);
+			this.idLicenseSvrTextBox.TabIndex = 0;
+			this.idLicenseSvrTextBox.TextChanged += new System.EventHandler(this.idLicenseSvrTextBox_TextChanged);
+			this.idLicenseSvrTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.idLicenseSvrTextBox_KeyDown);
+			// 
+			// idLicenseSvrTitleLabel
+			// 
+			this.idLicenseSvrTitleLabel.AutoSize = true;
+			this.idLicenseSvrTitleLabel.Location = new System.Drawing.Point(3, 11);
+			this.idLicenseSvrTitleLabel.Name = "idLicenseSvrTitleLabel";
+			this.idLicenseSvrTitleLabel.Size = new System.Drawing.Size(165, 13);
+			this.idLicenseSvrTitleLabel.TabIndex = 10;
+			this.idLicenseSvrTitleLabel.Text = "Solimar License Server computer:";
+			// 
+			// idLicenseSvrButton
+			// 
+			this.idLicenseSvrButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.idLicenseSvrButton.Enabled = false;
+			this.idLicenseSvrButton.Location = new System.Drawing.Point(624, 6);
+			this.idLicenseSvrButton.Name = "idLicenseSvrButton";
+			this.idLicenseSvrButton.Size = new System.Drawing.Size(75, 23);
+			this.idLicenseSvrButton.TabIndex = 1;
+			this.idLicenseSvrButton.Text = "Continue";
+			this.idLicenseSvrButton.UseVisualStyleBackColor = true;
+			this.idLicenseSvrButton.Click += new System.EventHandler(this.idLicenseSvrButton_Click);
+			// 
+			// wrongLicenseSvrTabPage
+			// 
+			this.wrongLicenseSvrTabPage.Controls.Add(this.wrongLicenseSvrBackPanel);
+			this.wrongLicenseSvrTabPage.Location = new System.Drawing.Point(42, 4);
+			this.wrongLicenseSvrTabPage.Name = "wrongLicenseSvrTabPage";
+			this.wrongLicenseSvrTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.wrongLicenseSvrTabPage.Size = new System.Drawing.Size(473, 237);
+			this.wrongLicenseSvrTabPage.TabIndex = 1;
+			this.wrongLicenseSvrTabPage.Text = "wrongLicenseSvr";
+			this.wrongLicenseSvrTabPage.UseVisualStyleBackColor = true;
+			// 
+			// wrongLicenseSvrBackPanel
+			// 
+			this.wrongLicenseSvrBackPanel.Controls.Add(this.wrongLicenseSvrLabel);
+			this.wrongLicenseSvrBackPanel.Controls.Add(this.panel2);
+			this.wrongLicenseSvrBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.wrongLicenseSvrBackPanel.Location = new System.Drawing.Point(3, 3);
+			this.wrongLicenseSvrBackPanel.Name = "wrongLicenseSvrBackPanel";
+			this.wrongLicenseSvrBackPanel.Size = new System.Drawing.Size(467, 231);
+			this.wrongLicenseSvrBackPanel.TabIndex = 15;
+			// 
+			// wrongLicenseSvrLabel
+			// 
+			this.wrongLicenseSvrLabel.BackColor = System.Drawing.SystemColors.Window;
+			this.wrongLicenseSvrLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.wrongLicenseSvrLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.wrongLicenseSvrLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.wrongLicenseSvrLabel.ForeColor = System.Drawing.SystemColors.WindowText;
+			this.wrongLicenseSvrLabel.Location = new System.Drawing.Point(0, 0);
+			this.wrongLicenseSvrLabel.Name = "wrongLicenseSvrLabel";
+			this.wrongLicenseSvrLabel.Padding = new System.Windows.Forms.Padding(5);
+			this.wrongLicenseSvrLabel.Size = new System.Drawing.Size(467, 193);
+			this.wrongLicenseSvrLabel.TabIndex = 16;
+			this.wrongLicenseSvrLabel.Text = resources.GetString("wrongLicenseSvrLabel.Text");
+			// 
+			// panel2
+			// 
+			this.panel2.Controls.Add(this.closeButton);
+			this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.panel2.Location = new System.Drawing.Point(0, 193);
+			this.panel2.Name = "panel2";
+			this.panel2.Size = new System.Drawing.Size(467, 38);
+			this.panel2.TabIndex = 14;
+			// 
+			// closeButton
+			// 
+			this.closeButton.Location = new System.Drawing.Point(3, 6);
+			this.closeButton.Name = "closeButton";
+			this.closeButton.Size = new System.Drawing.Size(75, 23);
+			this.closeButton.TabIndex = 9;
+			this.closeButton.Text = "Close";
+			this.closeButton.UseVisualStyleBackColor = true;
+			this.closeButton.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			// 
+			// generateFileTabPage
+			// 
+			this.generateFileTabPage.Controls.Add(this.generateFileBackPanel);
+			this.generateFileTabPage.Location = new System.Drawing.Point(42, 4);
+			this.generateFileTabPage.Name = "generateFileTabPage";
+			this.generateFileTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.generateFileTabPage.Size = new System.Drawing.Size(473, 237);
+			this.generateFileTabPage.TabIndex = 2;
+			this.generateFileTabPage.Text = "generateFile";
+			this.generateFileTabPage.UseVisualStyleBackColor = true;
+			// 
+			// warningTabPage
+			// 
+			this.warningTabPage.Controls.Add(this.warningBackPanel);
+			this.warningTabPage.Location = new System.Drawing.Point(23, 4);
+			this.warningTabPage.Name = "warningTabPage";
+			this.warningTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.warningTabPage.Size = new System.Drawing.Size(710, 389);
+			this.warningTabPage.TabIndex = 3;
+			this.warningTabPage.Text = "warningTabPage";
+			this.warningTabPage.UseVisualStyleBackColor = true;
+			// 
+			// warningButtonPanel
+			// 
+			this.warningButtonPanel.Controls.Add(this.warningButton);
+			this.warningButtonPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.warningButtonPanel.Location = new System.Drawing.Point(0, 345);
+			this.warningButtonPanel.Name = "warningButtonPanel";
+			this.warningButtonPanel.Size = new System.Drawing.Size(704, 38);
+			this.warningButtonPanel.TabIndex = 15;
+			// 
+			// warningButton
+			// 
+			this.warningButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.warningButton.Location = new System.Drawing.Point(584, 6);
+			this.warningButton.Name = "warningButton";
+			this.warningButton.Size = new System.Drawing.Size(115, 23);
+			this.warningButton.TabIndex = 1;
+			this.warningButton.Text = "Accept && Continue";
+			this.warningButton.UseVisualStyleBackColor = true;
+			this.warningButton.Click += new System.EventHandler(this.warningButton_Click);
+			// 
+			// warningRichTextBox
+			// 
+			this.warningRichTextBox.BackColor = System.Drawing.Color.White;
+			this.warningRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.warningRichTextBox.Location = new System.Drawing.Point(0, 0);
+			this.warningRichTextBox.Name = "warningRichTextBox";
+			this.warningRichTextBox.ReadOnly = true;
+			this.warningRichTextBox.Size = new System.Drawing.Size(704, 345);
+			this.warningRichTextBox.TabIndex = 16;
+			this.warningRichTextBox.Text = "";
+			this.warningRichTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.warningRichTextBox_LinkClicked);
+			// 
+			// warningBackPanel
+			// 
+			this.warningBackPanel.Controls.Add(this.warningRichTextBox);
+			this.warningBackPanel.Controls.Add(this.warningButtonPanel);
+			this.warningBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.warningBackPanel.Location = new System.Drawing.Point(3, 3);
+			this.warningBackPanel.Name = "warningBackPanel";
+			this.warningBackPanel.Size = new System.Drawing.Size(704, 383);
+			this.warningBackPanel.TabIndex = 17;
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(519, 269);
+			this.ClientSize = new System.Drawing.Size(737, 421);
 			this.Controls.Add(this.mainBackPanel);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MainMenuStrip = this.menuStrip1;
+			this.MinimumSize = new System.Drawing.Size(520, 300);
 			this.Name = "Form1";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Solimar Validation Token Retriever";
+			this.Load += new System.EventHandler(this.Form1_Load);
+			this.Shown += new System.EventHandler(this.Form1_Shown);
 			this.menuStrip1.ResumeLayout(false);
 			this.menuStrip1.PerformLayout();
 			this.mainButtonPanel.ResumeLayout(false);
 			this.mainButtonPanel.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.globalErrorProvider)).EndInit();
 			this.bottomPanel.ResumeLayout(false);
-			this.mainBackPanel.ResumeLayout(false);
+			this.generateFileBackPanel.ResumeLayout(false);
 			this.propertiesPanel.ResumeLayout(false);
+			this.mainBackPanel.ResumeLayout(false);
+			this.mainTabControl.ResumeLayout(false);
+			this.idLicenseSvrTabPage.ResumeLayout(false);
+			this.idLicenseSvrBackPanel.ResumeLayout(false);
+			this.panel1.ResumeLayout(false);
+			this.panel1.PerformLayout();
+			this.wrongLicenseSvrTabPage.ResumeLayout(false);
+			this.wrongLicenseSvrBackPanel.ResumeLayout(false);
+			this.panel2.ResumeLayout(false);
+			this.generateFileTabPage.ResumeLayout(false);
+			this.warningTabPage.ResumeLayout(false);
+			this.warningButtonPanel.ResumeLayout(false);
+			this.warningBackPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -343,9 +615,29 @@ namespace ValidationTokenRetriever
 		private System.Windows.Forms.ToolStripMenuItem generateFileForSolimarSystemsToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem copyAllContentsToClipboardToolStripMenuItem;
 		private System.Windows.Forms.Panel bottomPanel;
-		private System.Windows.Forms.Panel mainBackPanel;
+		private System.Windows.Forms.Panel generateFileBackPanel;
 		private System.Windows.Forms.Panel propertiesPanel;
 		private System.Windows.Forms.PropertyGrid propertyGrid1;
+		private System.Windows.Forms.Panel mainBackPanel;
+		private System.Windows.Forms.TabControl mainTabControl;
+		private System.Windows.Forms.TabPage idLicenseSvrTabPage;
+		private System.Windows.Forms.Panel panel1;
+		private System.Windows.Forms.TabPage wrongLicenseSvrTabPage;
+		private System.Windows.Forms.Panel panel2;
+		private System.Windows.Forms.Button closeButton;
+		private System.Windows.Forms.TabPage generateFileTabPage;
+		private System.Windows.Forms.TextBox idLicenseSvrTextBox;
+		private System.Windows.Forms.Label idLicenseSvrTitleLabel;
+		private System.Windows.Forms.Button idLicenseSvrButton;
+		private System.Windows.Forms.Panel idLicenseSvrBackPanel;
+		private System.Windows.Forms.Panel wrongLicenseSvrBackPanel;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label wrongLicenseSvrLabel;
+		private System.Windows.Forms.TabPage warningTabPage;
+		private System.Windows.Forms.RichTextBox warningRichTextBox;
+		private System.Windows.Forms.Panel warningButtonPanel;
+		private System.Windows.Forms.Button warningButton;
+		private System.Windows.Forms.Panel warningBackPanel;
 	}
 }
 
