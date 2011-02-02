@@ -69,6 +69,11 @@ namespace ValidationTokenRetriever
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.closeButton = new System.Windows.Forms.Button();
 			this.generateFileTabPage = new System.Windows.Forms.TabPage();
+			this.warningTabPage = new System.Windows.Forms.TabPage();
+			this.warningButtonPanel = new System.Windows.Forms.Panel();
+			this.warningButton = new System.Windows.Forms.Button();
+			this.warningRichTextBox = new System.Windows.Forms.RichTextBox();
+			this.warningBackPanel = new System.Windows.Forms.Panel();
 			this.menuStrip1.SuspendLayout();
 			this.mainButtonPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.globalErrorProvider)).BeginInit();
@@ -84,6 +89,9 @@ namespace ValidationTokenRetriever
 			this.wrongLicenseSvrBackPanel.SuspendLayout();
 			this.panel2.SuspendLayout();
 			this.generateFileTabPage.SuspendLayout();
+			this.warningTabPage.SuspendLayout();
+			this.warningButtonPanel.SuspendLayout();
+			this.warningBackPanel.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
@@ -93,7 +101,7 @@ namespace ValidationTokenRetriever
             this.exportToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
 			this.menuStrip1.Name = "menuStrip1";
-			this.menuStrip1.Size = new System.Drawing.Size(519, 24);
+			this.menuStrip1.Size = new System.Drawing.Size(737, 24);
 			this.menuStrip1.TabIndex = 0;
 			this.menuStrip1.Text = "menuStrip1";
 			// 
@@ -328,12 +336,13 @@ namespace ValidationTokenRetriever
 			this.mainBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.mainBackPanel.Location = new System.Drawing.Point(0, 24);
 			this.mainBackPanel.Name = "mainBackPanel";
-			this.mainBackPanel.Size = new System.Drawing.Size(519, 245);
+			this.mainBackPanel.Size = new System.Drawing.Size(737, 397);
 			this.mainBackPanel.TabIndex = 14;
 			// 
 			// mainTabControl
 			// 
 			this.mainTabControl.Alignment = System.Windows.Forms.TabAlignment.Left;
+			this.mainTabControl.Controls.Add(this.warningTabPage);
 			this.mainTabControl.Controls.Add(this.idLicenseSvrTabPage);
 			this.mainTabControl.Controls.Add(this.wrongLicenseSvrTabPage);
 			this.mainTabControl.Controls.Add(this.generateFileTabPage);
@@ -342,17 +351,17 @@ namespace ValidationTokenRetriever
 			this.mainTabControl.Multiline = true;
 			this.mainTabControl.Name = "mainTabControl";
 			this.mainTabControl.SelectedIndex = 0;
-			this.mainTabControl.Size = new System.Drawing.Size(519, 245);
+			this.mainTabControl.Size = new System.Drawing.Size(737, 397);
 			this.mainTabControl.TabIndex = 0;
 			this.mainTabControl.Visible = false;
 			// 
 			// idLicenseSvrTabPage
 			// 
 			this.idLicenseSvrTabPage.Controls.Add(this.idLicenseSvrBackPanel);
-			this.idLicenseSvrTabPage.Location = new System.Drawing.Point(42, 4);
+			this.idLicenseSvrTabPage.Location = new System.Drawing.Point(23, 4);
 			this.idLicenseSvrTabPage.Name = "idLicenseSvrTabPage";
 			this.idLicenseSvrTabPage.Padding = new System.Windows.Forms.Padding(3);
-			this.idLicenseSvrTabPage.Size = new System.Drawing.Size(473, 237);
+			this.idLicenseSvrTabPage.Size = new System.Drawing.Size(710, 389);
 			this.idLicenseSvrTabPage.TabIndex = 0;
 			this.idLicenseSvrTabPage.Text = "idLicenseSvr";
 			this.idLicenseSvrTabPage.UseVisualStyleBackColor = true;
@@ -364,7 +373,7 @@ namespace ValidationTokenRetriever
 			this.idLicenseSvrBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.idLicenseSvrBackPanel.Location = new System.Drawing.Point(3, 3);
 			this.idLicenseSvrBackPanel.Name = "idLicenseSvrBackPanel";
-			this.idLicenseSvrBackPanel.Size = new System.Drawing.Size(467, 231);
+			this.idLicenseSvrBackPanel.Size = new System.Drawing.Size(704, 383);
 			this.idLicenseSvrBackPanel.TabIndex = 15;
 			// 
 			// label1
@@ -377,7 +386,7 @@ namespace ValidationTokenRetriever
 			this.label1.Location = new System.Drawing.Point(0, 0);
 			this.label1.Name = "label1";
 			this.label1.Padding = new System.Windows.Forms.Padding(5);
-			this.label1.Size = new System.Drawing.Size(467, 193);
+			this.label1.Size = new System.Drawing.Size(704, 345);
 			this.label1.TabIndex = 15;
 			this.label1.Text = resources.GetString("label1.Text");
 			// 
@@ -387,9 +396,9 @@ namespace ValidationTokenRetriever
 			this.panel1.Controls.Add(this.idLicenseSvrTitleLabel);
 			this.panel1.Controls.Add(this.idLicenseSvrButton);
 			this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.panel1.Location = new System.Drawing.Point(0, 193);
+			this.panel1.Location = new System.Drawing.Point(0, 345);
 			this.panel1.Name = "panel1";
-			this.panel1.Size = new System.Drawing.Size(467, 38);
+			this.panel1.Size = new System.Drawing.Size(704, 38);
 			this.panel1.TabIndex = 14;
 			// 
 			// idLicenseSvrTextBox
@@ -398,7 +407,7 @@ namespace ValidationTokenRetriever
 						| System.Windows.Forms.AnchorStyles.Right)));
 			this.idLicenseSvrTextBox.Location = new System.Drawing.Point(174, 8);
 			this.idLicenseSvrTextBox.Name = "idLicenseSvrTextBox";
-			this.idLicenseSvrTextBox.Size = new System.Drawing.Size(207, 20);
+			this.idLicenseSvrTextBox.Size = new System.Drawing.Size(444, 20);
 			this.idLicenseSvrTextBox.TabIndex = 0;
 			this.idLicenseSvrTextBox.TextChanged += new System.EventHandler(this.idLicenseSvrTextBox_TextChanged);
 			this.idLicenseSvrTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.idLicenseSvrTextBox_KeyDown);
@@ -416,7 +425,7 @@ namespace ValidationTokenRetriever
 			// 
 			this.idLicenseSvrButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.idLicenseSvrButton.Enabled = false;
-			this.idLicenseSvrButton.Location = new System.Drawing.Point(387, 6);
+			this.idLicenseSvrButton.Location = new System.Drawing.Point(624, 6);
 			this.idLicenseSvrButton.Name = "idLicenseSvrButton";
 			this.idLicenseSvrButton.Size = new System.Drawing.Size(75, 23);
 			this.idLicenseSvrButton.TabIndex = 1;
@@ -489,11 +498,64 @@ namespace ValidationTokenRetriever
 			this.generateFileTabPage.Text = "generateFile";
 			this.generateFileTabPage.UseVisualStyleBackColor = true;
 			// 
+			// warningTabPage
+			// 
+			this.warningTabPage.Controls.Add(this.warningBackPanel);
+			this.warningTabPage.Location = new System.Drawing.Point(23, 4);
+			this.warningTabPage.Name = "warningTabPage";
+			this.warningTabPage.Padding = new System.Windows.Forms.Padding(3);
+			this.warningTabPage.Size = new System.Drawing.Size(710, 389);
+			this.warningTabPage.TabIndex = 3;
+			this.warningTabPage.Text = "warningTabPage";
+			this.warningTabPage.UseVisualStyleBackColor = true;
+			// 
+			// warningButtonPanel
+			// 
+			this.warningButtonPanel.Controls.Add(this.warningButton);
+			this.warningButtonPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+			this.warningButtonPanel.Location = new System.Drawing.Point(0, 345);
+			this.warningButtonPanel.Name = "warningButtonPanel";
+			this.warningButtonPanel.Size = new System.Drawing.Size(704, 38);
+			this.warningButtonPanel.TabIndex = 15;
+			// 
+			// warningButton
+			// 
+			this.warningButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.warningButton.Location = new System.Drawing.Point(584, 6);
+			this.warningButton.Name = "warningButton";
+			this.warningButton.Size = new System.Drawing.Size(115, 23);
+			this.warningButton.TabIndex = 1;
+			this.warningButton.Text = "Accept && Continue";
+			this.warningButton.UseVisualStyleBackColor = true;
+			this.warningButton.Click += new System.EventHandler(this.warningButton_Click);
+			// 
+			// warningRichTextBox
+			// 
+			this.warningRichTextBox.BackColor = System.Drawing.Color.White;
+			this.warningRichTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.warningRichTextBox.Location = new System.Drawing.Point(0, 0);
+			this.warningRichTextBox.Name = "warningRichTextBox";
+			this.warningRichTextBox.ReadOnly = true;
+			this.warningRichTextBox.Size = new System.Drawing.Size(704, 345);
+			this.warningRichTextBox.TabIndex = 16;
+			this.warningRichTextBox.Text = "";
+			this.warningRichTextBox.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.warningRichTextBox_LinkClicked);
+			// 
+			// warningBackPanel
+			// 
+			this.warningBackPanel.Controls.Add(this.warningRichTextBox);
+			this.warningBackPanel.Controls.Add(this.warningButtonPanel);
+			this.warningBackPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.warningBackPanel.Location = new System.Drawing.Point(3, 3);
+			this.warningBackPanel.Name = "warningBackPanel";
+			this.warningBackPanel.Size = new System.Drawing.Size(704, 383);
+			this.warningBackPanel.TabIndex = 17;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(519, 269);
+			this.ClientSize = new System.Drawing.Size(737, 421);
 			this.Controls.Add(this.mainBackPanel);
 			this.Controls.Add(this.menuStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -522,6 +584,9 @@ namespace ValidationTokenRetriever
 			this.wrongLicenseSvrBackPanel.ResumeLayout(false);
 			this.panel2.ResumeLayout(false);
 			this.generateFileTabPage.ResumeLayout(false);
+			this.warningTabPage.ResumeLayout(false);
+			this.warningButtonPanel.ResumeLayout(false);
+			this.warningBackPanel.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -568,6 +633,11 @@ namespace ValidationTokenRetriever
 		private System.Windows.Forms.Panel wrongLicenseSvrBackPanel;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label wrongLicenseSvrLabel;
+		private System.Windows.Forms.TabPage warningTabPage;
+		private System.Windows.Forms.RichTextBox warningRichTextBox;
+		private System.Windows.Forms.Panel warningButtonPanel;
+		private System.Windows.Forms.Button warningButton;
+		private System.Windows.Forms.Panel warningBackPanel;
 	}
 }
 
