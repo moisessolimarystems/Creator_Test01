@@ -1,5 +1,59 @@
 #ifndef _WEBSERVICE_RUL_
-#define _WEBSERVICE_RUL_  
+#define _WEBSERVICE_RUL_      
+                          
+////////////////////////////////////////////////////////////////////////
+// Function: CheckIISExists
+// Purpose:  Checks for the existence (and major version) of IIS
+//    Returns -1 if not found OR major version number if found
+//    Example:  Server 2003 would return 6 if IIS is installed
+////////////////////////////////////////////////////////////////////////
+function NUMBER CheckIISExists()
+ NUMBER  nvType, nResult, nvIISVer, nvSize;
+ STRING  szKey, szIISVersion, szPathWWWRoot;
+ begin 
+ 
+ 	RegDBSetDefaultRoot ( HKEY_LOCAL_MACHINE );
+    nvIISVer = -1;
+	nvType = REGDB_NUMBER;
+	szKey = "\\SOFTWARE\\Microsoft\\InetStp";
+	nResult = RegDBKeyExist(szKey);
+	if (nResult = 1) then
+		nResult = RegDBGetKeyValueEx(szKey, "MajorVersion", nvType, szIISVersion, nvSize);
+		if (nResult = 0) && (szIISVersion != "") then
+			nResult = RegDBGetKeyValueEx(szKey, "PathWWWRoot", nvType, szPathWWWRoot, nvSize);
+			if(nResult < 0) then //PathWWWRoot key value determines whether IIS is installed.
+				return -1;
+			endif;
+			StrToNum(nvIISVer, szIISVersion);
+		endif;
+	endif;
+ 
+    return nvIISVer;
+ end;    
+ 
+ function NUMBER CheckIIS6Compatibility()
+ NUMBER  nvType, nResult, nvEnabled, nvSize;
+ STRING  szKey, szEnabled;
+ begin 
+ 	if(SYSINFO.bIsWow64) then
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
+	endif; 
+ 	RegDBSetDefaultRoot ( HKEY_LOCAL_MACHINE );
+    nvEnabled = 0;	
+	szKey = "\\SOFTWARE\\Microsoft\\InetStp\\Components";
+	nResult = RegDBKeyExist(szKey);
+	if (nResult = 1) then                       
+		nResult = RegDBGetKeyValueEx(szKey, "LegacyScripts", nvType, szEnabled, nvSize);
+		if (nResult = 0) && (szEnabled != "") then
+        	StrToNum(nvEnabled, szEnabled);          
+		endif;
+	endif;
+    if(SYSINFO.bIsWow64) then
+ 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
+ 	endif;	
+    return nvEnabled;
+ end;
+                        
 //////////////////////////////////////////////////////////////////////////
 //various webservice functions
 //////////////////////////////////////////////////////////////////////////
@@ -36,6 +90,49 @@ begin
 	return nvReturn;
 end;
 
+function BOOL IsValidWebsite(szWebSiteName, nvSiteID)
+	NUMBER nSiteID, nResult; 
+    OBJECT  objWebService;
+    OBJECT  objWebSite;
+    VARIANT __varEnumHolder;    //Hold IEnumVariant during the ForEachLoop, don't use OBJECT type, this is an IUnknown!!
+    BOOL bFound;
+begin
+    bFound = FALSE;
+    nResult = UseDLL (SUPPORTDIR ^ "IsGetObj.dll"); 
+    if (UseDLL (SUPPORTDIR ^ "IsGetObj.dll") < 0) then 
+    	WriteErrorToLog(nResult, "UseDLL failed.\n\nCouldn't load " + SUPPORTDIR ^ "IsGetObj.dll"); 
+        abort; 
+    endif; 
+    
+    set objWebService = CoGetObject("IIS://Localhost/W3svc", "");
+    if IsObject( objWebService ) then
+    	try
+     	   ForEachStart(objWebService, __varEnumHolder);
+           nResult = ForEachGetNextItem(__varEnumHolder, objWebSite); 
+           while ( nResult = ERROR_SUCCESS )
+      	       if IsObject( objWebSite ) then
+       		       if objWebSite.class = "IIsWebServer" then
+                       if(objWebSite.ServerComment == szWebSiteName) then
+                            nvSiteID =  objWebSite.Name;
+                            bFound = TRUE; 
+                       endif;
+                   endif;
+               endif; 
+               nResult = ForEachGetNextItem(__varEnumHolder, objWebSite); 
+            endwhile;
+        catch
+        	WriteErrorToLog(-1, "An exception has ocurred...");
+        endcatch;
+    else
+    	WriteErrorToLog(-1, "Could not get the IISRoot object.");
+    endif;       		       
+     
+    if (UnUseDLL (SUPPORTDIR ^ "IsGetObj.dll") < 0) then 
+		WriteErrorToLog(nResult, "UnUseDLL failed.\n\n." + SUPPORTDIR ^ "IsGetObj.dll" + "still in memory.");
+    endif; 
+
+  	return bFound;  
+end;
 
 ///////////////////////////////////////////////
 // get the next available Site id
@@ -57,17 +154,18 @@ begin
 	nSiteID = 1;
 	set objW3SVC = CoGetObject("IIS://LocalHost/W3SVC", "");
 	if (IsObject(objW3SVC)) then
-		//MessageBox("Success getting objW3SVC object\nWebRoot Name: " +objW3SVC.Name, INFORMATION); 
+		MessageBox("Success getting objW3SVC object\nWebRoot Name: " +objW3SVC.Name, INFORMATION); 
 		while (bTrue==FALSE)
 			NumToStr(szSiteID, nSiteID);
+			MessageBox("Site ID : " + szSiteID, INFORMATION);
 			try 
 				set objSite = CoGetObject("IIS://LocalHost/W3SVC/"+szSiteID, "");
 				if (IsObject(objSite)) then
-					//MessageBox("Success getting objSite object\nWebRoot Name: " +objSite.ServerComment, INFORMATION);
+					MessageBox("Success getting objSite object\nWebRoot Name: " +objSite.ServerComment, INFORMATION);
 					//is this website already installed? if so, use it if the user has passed a value
 					if (szWebSiteName != "") then 
 						if (objSite.ServerComment == szWebSiteName) then
-							//MessageBox(objSite.ServerComment + " found! Will upgrade this site", INFORMATION);
+							MessageBox(objSite.ServerComment + " found! Will upgrade this site", INFORMATION);
 							bFound = TRUE;
 							bTrue = TRUE;
 						endif;
@@ -81,14 +179,14 @@ begin
 				try 
 					set objSite = objW3SVC.GetObject("IIsWebServer", nSiteID); //nvSiteIndex);
 					if (IsObject(objSite)) then
-						//MessageBox("Success getting objSite object", INFORMATION); 
+						MessageBox("Success getting objSite object", INFORMATION); 
 						nSiteID = nSiteID + 1;
 					else
 						MessageBox("Couldn't get objSite object", INFORMATION); 
 					endif; 
 				catch
 					szMsg = "SiteID: " + szSiteID + " doesn't exist - we'll use this";
-					//MessageBoxEx(szMsg, "IIS Configuration Error", INFORMATION);
+					MessageBoxEx(szMsg, "IIS Configuration Error", INFORMATION);
 					//set the flag to say we've found our next available site id
 					bTrue = TRUE;
 				endcatch;
@@ -342,7 +440,8 @@ begin
 	return nvReturn;
 
 end;        
-
+   
+ 
 //////////////////////////////////////////////////////////
 // create a virtual directory using the siteid
 //////////////////////////////////////////////////////////
