@@ -1109,7 +1109,6 @@ const std::wstring wsEscapedStrings[][2] =
    { std::wstring(L""),    std::wstring(L"")  } // array terminator.
 } ;
 
-
 // XmlEscapeString()
 //-----------------------------------------------------------------------------
 SPDUTILS_IMP_EXP std::wstring __stdcall SpdUtils::XmlEscapeString(const std::wstring &wsXmlUnescapedString)
@@ -1164,6 +1163,97 @@ SPDUTILS_IMP_EXP std::wstring __stdcall SpdUtils::XmlEscapeString(const std::wst
    return wsRetVal ;
 }
 
+//
+// This 2-D array contains XML escape sequences and there corresponding un-escaped values.
+//
+const std::wstring wsNonPrintableStrings[][2] = 
+{
+	{ std::wstring(L"&#x1"), std::wstring(1, (wchar_t)1) },
+	{ std::wstring(L"&#x2"), std::wstring(1, (wchar_t)2) },
+	{ std::wstring(L"&#x3"), std::wstring(1, (wchar_t)3) },
+	{ std::wstring(L"&#x4"), std::wstring(1, (wchar_t)4) },
+	{ std::wstring(L"&#x5"), std::wstring(1, (wchar_t)5) },
+	{ std::wstring(L"&#x6"), std::wstring(1, (wchar_t)6) },
+	{ std::wstring(L"&#x7"), std::wstring(1, (wchar_t)7) },
+	{ std::wstring(L"&#x8"), std::wstring(1, (wchar_t)8) },
+	//{ std::wstring(L"&#x9"), std::wstring(1, (wchar_t)9) },
+	//{ std::wstring(L"&#xA"), std::wstring(1, (wchar_t)10) },
+	{ std::wstring(L"&#xB"), std::wstring(1, (wchar_t)11) },
+	{ std::wstring(L"&#xC"), std::wstring(1, (wchar_t)12) },
+	//{ std::wstring(L"&#xD"), std::wstring(1, (wchar_t)13) },
+	{ std::wstring(L"&#xE"), std::wstring(1, (wchar_t)14) },
+	{ std::wstring(L"&#xF"), std::wstring(1, (wchar_t)15) },
+	{ std::wstring(L"&#x10"), std::wstring(1, (wchar_t)16) },
+	{ std::wstring(L"&#x11"), std::wstring(1, (wchar_t)17) },
+	{ std::wstring(L"&#x12"), std::wstring(1, (wchar_t)18) },
+	{ std::wstring(L"&#x13"), std::wstring(1, (wchar_t)19) },
+	{ std::wstring(L"&#x14"), std::wstring(1, (wchar_t)20) },
+	{ std::wstring(L"&#x15"), std::wstring(1, (wchar_t)21) },
+	{ std::wstring(L"&#x16"), std::wstring(1, (wchar_t)22) },
+	{ std::wstring(L"&#x17"), std::wstring(1, (wchar_t)23) },
+	{ std::wstring(L"&#x18"), std::wstring(1, (wchar_t)24) },
+	{ std::wstring(L"&#x19"), std::wstring(1, (wchar_t)25) },
+	{ std::wstring(L"&#x1A"), std::wstring(1, (wchar_t)26) },
+	{ std::wstring(L"&#x1B"), std::wstring(1, (wchar_t)27) },
+	{ std::wstring(L"&#x1C"), std::wstring(1, (wchar_t)28) },
+	{ std::wstring(L"&#x1D"), std::wstring(1, (wchar_t)29) },
+	{ std::wstring(L"&#x1E"), std::wstring(1, (wchar_t)30) },
+	{ std::wstring(L"&#x1F"), std::wstring(1, (wchar_t)31) },
+   { std::wstring(L""),    std::wstring(L"")  } // array terminator.
+} ;
+// ConvertNonPrintableToHex()
+//-----------------------------------------------------------------------------
+SPDUTILS_IMP_EXP std::wstring __stdcall SpdUtils::ConvertNonPrintableToHex(const std::wstring &wsRawString)
+{
+   std::wstring wsRetVal ;
+   size_t i(0) ;
+   //
+   // begin search and replace.
+   //
+   wsRetVal = wsRawString ;
+   for (
+      i=0 ; 
+      wsNonPrintableStrings[i][1].length() ;
+      i++
+      )
+   {
+      size_t stEscapePos(0) ;
+      //
+      // special char which needs to be escaped has been determined...  the loop 
+      // variable, i, does this.
+      //
+      // The following loop searches for all instances of this char...
+      // (wsEscapedStrings[i][1]).  When this char is found, it is replaced
+      // with the corresponding escaped string.
+      //
+      for (
+         stEscapePos = wsRetVal.find(wsNonPrintableStrings[i][1]) ;
+         stEscapePos != std::wstring::npos ;
+         stEscapePos = wsRetVal.find(wsNonPrintableStrings[i][1], stEscapePos)
+         )
+      {
+         //
+         // At the position where the special char was found, replace the
+         // char with the corresponding escape string (wsEscapedStrings[i][0])
+         //
+         wsRetVal.replace(
+            stEscapePos, 
+            wsNonPrintableStrings[i][1].length(),
+            wsNonPrintableStrings[i][0]
+            ) ;
+         //
+         // update the search position to be beyond the replacement string.
+         //
+         stEscapePos += wsNonPrintableStrings[i][0].length() ;
+      }
+      //
+      // All instances of the current special char have been replaced.
+      // continue to search and replace the next escape string.
+      //
+   }
+   
+   return wsRetVal ;
+}
 
 // XmlUnescapeString()
 //-----------------------------------------------------------------------------
