@@ -19,7 +19,8 @@ namespace Shared.VisualComponents
         {
             if (_eventLogEntry != null)
             {
-                this.richTextBox1.Text = _eventLogEntry.message.TVal;
+                //CR.FIX.14448 - Event log messages are xml encoded
+                this.richTextBox1.Text = Solimar.Licensing.Attribs.AttribFormat.ConvertStringToRawString(_eventLogEntry.message.TVal);
                 this.evtLogComputer.Text = _eventLogEntry.machineName.TVal;
                 this.evtLogEventId.Text = _eventLogEntry.instanceId.TVal.ToString();
                 this.evtLogLevel.Text = ((System.Diagnostics.EventLogEntryType)_eventLogEntry.entryType.TVal).ToString();

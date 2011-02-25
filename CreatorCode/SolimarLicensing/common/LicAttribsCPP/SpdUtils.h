@@ -170,6 +170,9 @@ namespace SpdUtils
    SPDUTILS_IMP_EXP std::wstring __stdcall XmlUnescapeString(
       const std::wstring &wsXmlEscapedString
       ) ;
+   SPDUTILS_IMP_EXP std::wstring __stdcall ConvertNonPrintableToHex(
+      const std::wstring &wsRawString
+      ) ;
    SPDUTILS_IMP_EXP void __stdcall GetWin32ErrorMessage(
       std::wstring &wsMsg, 
       DWORD dwNtErr

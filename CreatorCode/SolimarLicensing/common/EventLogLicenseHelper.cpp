@@ -116,7 +116,7 @@ HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream
 					if(errorNo == EILSEQ)	//Cannot convert wide string to a multibyte character, assume binary data
 						tmpEventLogEntryInfo.message = std::wstring(L"Can not retrieve Event Log Message");
 					else
-						tmpEventLogEntryInfo.message = wTmpString;
+						tmpEventLogEntryInfo.message = SpdUtils::XmlEscapeString(SpdUtils::ConvertNonPrintableToHex(wTmpString));
 				}
 
 

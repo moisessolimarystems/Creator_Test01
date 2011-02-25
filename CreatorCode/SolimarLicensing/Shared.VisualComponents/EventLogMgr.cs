@@ -42,7 +42,9 @@ namespace Shared.VisualComponents
                 sysEventLogInfo.index.TVal = (uint)eventLogEntry.Index;
                 sysEventLogInfo.instanceId.TVal = (uint)eventLogEntry.InstanceId;
                 sysEventLogInfo.machineName.TVal = eventLogEntry.MachineName;
-                sysEventLogInfo.message.TVal = eventLogEntry.Message;
+
+                //CR.FIX.14448 - Event log messages are xml encoded
+                sysEventLogInfo.message.TVal = Solimar.Licensing.Attribs.AttribFormat.ConvertRawStringToString(eventLogEntry.Message);
                 //sysEventLogInfo.replacementStrings.TVal = eventLogEntry.ReplacementStrings;
                 sysEventLogInfo.source.TVal = eventLogEntry.Source;
                 sysEventLogInfo.timeGenerated.TVal = eventLogEntry.TimeGenerated;
