@@ -71,25 +71,25 @@ namespace Client.Creator
                     string index = control.Name.Substring(control.Name.Length - 1, 1);
                     CreatorService.Condition newCondition = new CreatorService.Condition();
                     newCondition.Name = _reportData.Report.GetFilterName(cb.SelectedItem.ToString()); 
-                    ReportProperty.ConditionNameType cnt = _reportData.Report.GetConditionNameType(newCondition.Name);
+                    Report.ConditionNameType cnt = _reportData.Report.GetConditionNameType(newCondition.Name);
                     //Eval Operator
                     controlIndex = groupBox1.Controls.IndexOfKey(string.Format("evalComboBox{0}", index));
                     cb = (ComboBox)groupBox1.Controls[controlIndex];
                     int evalIndex = cb.SelectedIndex;
                     newCondition.Operator = _reportData.Report.GetFilterOperator(newCondition.Name, cb.SelectedItem.ToString());                                        
-                    if(cnt== ReportProperty.ConditionNameType.Number || cnt == ReportProperty.ConditionNameType.String)
+                    if(cnt== Report.ConditionNameType.Number || cnt == Report.ConditionNameType.String)
                     {
                         controlIndex = groupBox1.Controls.IndexOfKey(string.Format("valueTextBox{0}", index));
                         tb = (TextBox)groupBox1.Controls[controlIndex];
                         newCondition.Value = tb.Text;
                     }
-                    else if(cnt == ReportProperty.ConditionNameType.Defined)
+                    else if(cnt == Report.ConditionNameType.Defined)
                     {
                         controlIndex = groupBox1.Controls.IndexOfKey(string.Format("definedValueComboBox{0}", index));
                         cb = (ComboBox)groupBox1.Controls[controlIndex];
                         newCondition.Value = cb.SelectedItem.ToString();
                     }
-                    else if (cnt == ReportProperty.ConditionNameType.Bool)
+                    else if (cnt == Report.ConditionNameType.Bool)
                     { 
                         controlIndex = groupBox1.Controls.IndexOfKey(string.Format("evalComboBox{0}", index));
                         newCondition.Value = (evalIndex == 0) ? bool.TrueString : bool.FalseString;
@@ -135,8 +135,8 @@ namespace Client.Creator
                 if (evalComboBox.Items.Count > 0)
                 {
                     evalComboBox.SelectedIndex = 0;
-                    ReportProperty.ConditionNameType cnt = _reportData.Report.GetConditionNameType(cn);
-                    if (cnt == ReportProperty.ConditionNameType.Defined)
+                    Report.ConditionNameType cnt = _reportData.Report.GetConditionNameType(cn);
+                    if (cnt == Report.ConditionNameType.Defined)
                     {
                         controlIndex = groupBox1.Controls.IndexOfKey(string.Format("definedValueComboBox{0}", conditionIndex));
                         ComboBox cb = (ComboBox)groupBox1.Controls[controlIndex];
@@ -146,7 +146,7 @@ namespace Client.Creator
                     {
                         controlIndex = groupBox1.Controls.IndexOfKey(string.Format("valueTextBox{0}", conditionIndex));
                         TextBox tb = (TextBox)groupBox1.Controls[controlIndex];
-                        if (cnt == ReportProperty.ConditionNameType.Date)
+                        if (cnt == Report.ConditionNameType.Date)
                             tb.Text = DateTime.Today.ToShortDateString();
                         else
                             tb.Text = "";
@@ -166,20 +166,20 @@ namespace Client.Creator
             int conditionNameIndex = groupBox1.Controls.IndexOfKey(string.Format("conditionComboBox{0}", conditionIndex));   
             ComboBox cb = (ComboBox)groupBox1.Controls[conditionNameIndex];
             Client.Creator.CreatorService.ConditionName cn = _reportData.Report.GetFilterName(cb.SelectedItem.ToString());
-            ReportProperty.ConditionNameType cnt = _reportData.Report.GetConditionNameType(cn);
+            Report.ConditionNameType cnt = _reportData.Report.GetConditionNameType(cn);
             TextBox valueTB = (TextBox)groupBox1.Controls[conditionValueIndex];
             valueTB.Visible = false;
             ComboBox valueTypeCB = (ComboBox)groupBox1.Controls[conditionValueTypeIndex];
             valueTypeCB.Visible = false;
             ComboBox valueCB = (ComboBox)groupBox1.Controls[conditionValueComboBoxIndex];
             valueCB.Visible = false;
-            if (cnt == ReportProperty.ConditionNameType.String || cnt == ReportProperty.ConditionNameType.Number)
+            if (cnt == Report.ConditionNameType.String || cnt == Report.ConditionNameType.Number)
             {
                 valueTB.Visible = true;
                 valueTB.Size = conditionValueComboBox.Size;                
                 //valueTB.Text = "";
             }
-            else if (cnt == ReportProperty.ConditionNameType.Defined)
+            else if (cnt == Report.ConditionNameType.Defined)
             {
                 valueCB.Visible = true;
                 ComboBox definedCB = (ComboBox)valueCB;
@@ -188,7 +188,7 @@ namespace Client.Creator
                 definedCB.Items.AddRange(_reportData.Report.GetDefinedValues(cn));
                 definedCB.SelectedIndex = (currentIndex < 0) ? 0 : currentIndex;
             }
-            else if(cnt == ReportProperty.ConditionNameType.Date)
+            else if(cnt == Report.ConditionNameType.Date)
             { //date
                 valueTB.Visible = true;
                 string selectedOperator = selectedComboBox.SelectedItem.ToString();
@@ -198,7 +198,7 @@ namespace Client.Creator
                 {
                     valueTypeCB.Visible = true;
                     valueTB.Size = conditionValueTextBox.Size;
-                    valueTypeCB.Items.AddRange(Enum.GetNames(typeof(ReportProperty.ExpirationValueType)));
+                    valueTypeCB.Items.AddRange(Enum.GetNames(typeof(Report.ExpirationValueType)));
                     if(valueTypeCB.SelectedItem == null) valueTypeCB.SelectedIndex = 0;
                     int userValue;
                     if (!Int32.TryParse(valueTB.Text, out userValue)) valueTB.Text = "1";
@@ -393,24 +393,24 @@ namespace Client.Creator
     #region ReportDlgData class
     public class ReportDlgData : Shared.VisualComponents.DialogData
     {
-        private ReportProperty _report;
+        private Report _report;
         private CommunicationLink _commLink;
 
         #region Constructors
         public ReportDlgData()
         {
             _commLink = new CommunicationLink();
-            _report = new ReportProperty(_commLink);
+            _report = new Report(_commLink);
         }
 
         public ReportDlgData(CommunicationLink commLink)
         {
-            _report = new ReportProperty(commLink);            
+            _report = new Report(commLink);            
         }
 
-        public ReportDlgData(ReportProperty newReport, CommunicationLink commLink)
+        public ReportDlgData(Report newReport, CommunicationLink commLink)
         {
-            _report = new ReportProperty(commLink);
+            _report = new Report(commLink);
             _report.ID = newReport.ID;
             _report.Conditions = newReport.Conditions;            
         }
@@ -418,7 +418,7 @@ namespace Client.Creator
 
         #region Properties
 
-        public ReportProperty Report
+        public Report Report
         {
             get { return _report; }
             set { _report = value; }

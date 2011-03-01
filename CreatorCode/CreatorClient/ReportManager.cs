@@ -19,20 +19,20 @@ namespace Client.Creator
             _commLink = commLink;
         }
 
-        public void DeleteReport(ReportProperty report)
+        public void DeleteReport(Report report)
         {
             int findIndex;
-            List<ReportProperty> reports = LoadReportsFromXML();
+            List<Report> reports = LoadReportsFromXML();
             findIndex = reports.FindIndex(r => r.ID == report.ID);
             if (findIndex >= 0)
                 reports.RemoveAt(findIndex);
             SaveReportsToXML(reports);
         }
 
-        public void SaveReport(ReportProperty report)
+        public void SaveReport(Report report)
         {
             int findIndex;
-            List<ReportProperty> reports = LoadReportsFromXML();
+            List<Report> reports = LoadReportsFromXML();
             findIndex = reports.FindIndex(r => r.ID == report.ID);
             if (findIndex >= 0)
                 reports.RemoveAt(findIndex);            
@@ -40,7 +40,7 @@ namespace Client.Creator
             SaveReportsToXML(reports);
         }
 
-        public List<ReportProperty> GetReports()
+        public List<Report> GetReports()
         {
             return LoadReportsFromXML();
         }
@@ -69,9 +69,9 @@ namespace Client.Creator
         }
         
         #region Save/Load from XML
-        private List<ReportProperty> LoadReportsFromXML()
+        private List<Report> LoadReportsFromXML()
         {           
-            List<ReportProperty> reportList = new List<ReportProperty>();
+            List<Report> reportList = new List<Report>();
             String filePath = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                                             AppConstants.LocalConnectionFilePath,
                                             AppConstants.LocalConnectionFile);
@@ -93,12 +93,12 @@ namespace Client.Creator
                         tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.IdAttrib);
                         if (tmpString == null)
                             continue;
-                        ReportProperty newReport = new ReportProperty(_commLink);
+                        Report newReport = new Report(_commLink);
                         newReport.ID = tmpString;
                         tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.TypeAttrib);
                         if (tmpString == null)
                             continue;
-                        newReport.Type = (ReportProperty.ReportType)Enum.Parse(typeof(ReportProperty.ReportType), tmpString);
+                        newReport.Type = (Report.ReportType)Enum.Parse(typeof(Report.ReportType), tmpString);
                         tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.MatchAttrib);
                         if (tmpString == null)
                             newReport.MatchAll = true;
@@ -142,7 +142,7 @@ namespace Client.Creator
         }
 
         //returns false if there is a problem saving to XML
-        private bool SaveReportsToXML(List<ReportProperty> reportList)
+        private bool SaveReportsToXML(List<Report> reportList)
         {
             bool bRetVal = false;
             String path = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), AppConstants.LocalConnectionFilePath, "");
@@ -168,7 +168,7 @@ namespace Client.Creator
             writer.WriteStartElement(AppConstants.ReportXMLTags.ReportStructureElement);  //ReportStructureElement
             if (reportList.Count > 0)
             {
-                foreach (ReportProperty rp in reportList)
+                foreach (Report rp in reportList)
                 {
                     writer.WriteStartElement(AppConstants.ReportXMLTags.ReportElement);   //Report Element
                     writer.WriteAttributeString(AppConstants.ReportXMLTags.IdAttrib, rp.ID);

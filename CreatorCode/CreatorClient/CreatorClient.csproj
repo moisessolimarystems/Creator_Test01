@@ -106,7 +106,7 @@
     <Compile Include="AppConstants.cs" />
     <Compile Include="Entities\CustomerManager.cs" />
     <Compile Include="Entities\LicensePacket.cs" />
-    <Compile Include="Entities\ProductCollectionProperty.cs" />
+    <Compile Include="Entities\ProductCollection.cs" />
     <Compile Include="Entities\TransactionManager.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ExportListViewManager.cs" />
@@ -118,7 +118,7 @@
     </Compile>
     <Compile Include="Entities\BaseGridItem.cs" />
     <Compile Include="Collections\GenericCollectionPropertyDescriptor.cs" />
-    <Compile Include="Entities\ModuleProperty.cs" />
+    <Compile Include="Entities\Module.cs" />
     <Compile Include="Collections\PropertySorterTypeConverter.cs" />
     <Compile Include="ConnectDialog.cs">
       <SubType>Form</SubType>
@@ -126,18 +126,18 @@
     <Compile Include="ConnectDialog.designer.cs">
       <DependentUpon>ConnectDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Entities\CustomerProperty.cs" />
+    <Compile Include="Entities\Customer.cs" />
     <Compile Include="CreatorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="CreatorForm.Designer.cs">
       <DependentUpon>CreatorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Entities\LicenseServerProperty.cs" />
-    <Compile Include="Entities\PermissionProperty.cs" />
+    <Compile Include="Entities\LicenseServer.cs" />
+    <Compile Include="Entities\Permission.cs" />
     <Compile Include="Collections\SortableCollection.cs" />
-    <Compile Include="Entities\ReportProperty.cs" />
-    <Compile Include="Entities\ProductLicenseProperty.cs" />
+    <Compile Include="Entities\Report.cs" />
+    <Compile Include="Entities\ProductLicense.cs" />
     <Compile Include="EditDestinationName.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,7 +219,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Entities\ValidationProperty.cs" />
+    <Compile Include="Entities\Validation.cs" />
     <Compile Include="ReportDlg.cs">
       <SubType>Form</SubType>
     </Compile>

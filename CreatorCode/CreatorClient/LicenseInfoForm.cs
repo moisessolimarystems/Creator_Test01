@@ -256,7 +256,7 @@ namespace Client.Creator
             m_Validated = true;
             Service<ICreator>.Use((client) =>
             {
-                LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+                LicenseServer selectedLicense = selectedObject as LicenseServer;
                 Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType selectedType;
                 if (hardwareRadioButton.Checked)
                 {
@@ -415,7 +415,7 @@ namespace Client.Creator
 
         private void browseTokenFileButton_Click(object sender, EventArgs e)
         {
-            LicenseServerProperty selectedLicense = selectedObject as LicenseServerProperty;
+            LicenseServer selectedLicense = selectedObject as LicenseServer;
             //if software use browse csv dialog
             if (this.browseCSVOpenFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -469,7 +469,7 @@ namespace Client.Creator
         //hide browse button
         private void hardwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
+            LicenseServer selectedOrder = selectedObject as LicenseServer;
             TokenDescriptionLabel.Text = "Please select from the available hardware tokens.";
             browseTokenFileButton.Visible = false;
             tokenListView.Items.Clear();
@@ -501,7 +501,7 @@ namespace Client.Creator
         //enable browse button, ask for 
         private void softwareRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            LicenseServerProperty selectedOrder = selectedObject as LicenseServerProperty;
+            LicenseServer selectedOrder = selectedObject as LicenseServer;
             TokenDescriptionLabel.Text = string.Format("Please browse to the csv file containing {0} validation tokens.", selectedOrder.DestName);
             browseTokenFileButton.Visible = true;
             tokenListView.Items.Clear();
@@ -760,12 +760,12 @@ namespace Client.Creator
     #region TokenDialogData class
     public class TokenDialogData : Shared.VisualComponents.DialogData
     {        
-        private LicenseServerProperty m_LicInfo;
+        private LicenseServer m_LicInfo;
         private List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs> m_TokenList;
 
         #region Constructors
 
-        public TokenDialogData(LicenseServerProperty licInfo)
+        public TokenDialogData(LicenseServer licInfo)
         {
             m_LicInfo = licInfo;
             m_TokenList = new List<Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs>();
@@ -774,7 +774,7 @@ namespace Client.Creator
 
         #region Properties
 
-        public LicenseServerProperty LicInfo
+        public LicenseServer LicInfo
         {
             get { return this.m_LicInfo; }
             set { this.m_LicInfo = value; }
