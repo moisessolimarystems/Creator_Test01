@@ -228,6 +228,17 @@ namespace Client.Creator
             return Lic_LicenseInfoAttribsHelper.GetModuleList(m_softwareSpec, productID);
         }
 
+        public List<String> GetModuleNameList(uint productID)
+        {
+            List<String> moduleList = new List<string>();
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecList = GetModuleSpecList(productID);
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
+            {
+                moduleList.Add(moduleSpec.moduleName.TVal);
+            }
+            return moduleList;
+        }
+
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(byte productID)
         {
             string productName = "Test/Dev/DR " + GetProductName(productID);
