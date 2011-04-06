@@ -120,6 +120,26 @@ void InititalizeProduct118()
 	pTmpProdSpec->sameModSpecProductID = 18;
 }
 
+void InititalizeProduct20()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:20, ProdName: Library Services
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(20, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(20))->second);
+	pTmpProdSpec->productID = 20;
+	pTmpProdSpec->productName = std::wstring(L"Library Services");
+
+	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
+	pTmpModSpec->moduleID = 0;
+	pTmpModSpec->moduleName = std::wstring(L"File Rendering Manager");
+	pTmpModSpec->moduleTrialLicense = 127;
+}
+
 void InititalizeProduct7()
 {
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
@@ -467,6 +487,19 @@ void InititalizeProduct8()
 	pTmpModSpec->moduleName = std::wstring(L"Net Folders");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
+}
+
+void InititalizeProduct120()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:120, ProdName: Test/Dev/DR Library Services
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(120, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(120))->second);
+	pTmpProdSpec->productID = 120;
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Library Services");
+	pTmpProdSpec->sameModSpecProductID = 20;
 }
 
 void InititalizeProduct108()

@@ -93,6 +93,32 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
+			#region ProdID:20, ProdName: Library Services
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 20;
+			tmpProdSpec.productName.TVal = "Library Services";
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 0;
+			tmpModSpec.moduleName.TVal = "File Rendering Manager";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
 			#region ProdID:7, ProdName: iCONVERT
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 7;
@@ -1024,6 +1050,14 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
+			#region ProdID:120, ProdName: Test/Dev/DR Library Services
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 120;
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Library Services";
+			tmpProdSpec.sameModSpecProductID.TVal = 20;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
 			#region ProdID:108, ProdName: Test/Dev/DR SOLsearcher Enterprise

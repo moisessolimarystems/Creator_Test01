@@ -29,6 +29,7 @@
 <enum name="pid_RubikaProcessBuilder" value="17" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
 <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
 <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
+<enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -377,6 +378,11 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
+	<Lic_ProductSoftwareSpecAttribs productID="20" productName="Library Services">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="File Rendering Manager"/>
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -401,6 +407,8 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="119" productName="Test/Dev/DR SPDE Queue Manager" sameModSpecProductID="19" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="120" productName="Test/Dev/DR Library Services" sameModSpecProductID="20">
+  </Lic_ProductSoftwareSpecAttribs>
 </Lic_SoftwareSpecAttribs>
 
 
