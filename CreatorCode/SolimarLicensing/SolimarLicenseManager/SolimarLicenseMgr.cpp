@@ -615,6 +615,8 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 				m_product = Lic_PackageAttribs::pid_TestDevSpdeQueueManager;
 			else if(m_product == Lic_PackageAttribs::pid_SolsearcherSp)
 				m_product = Lic_PackageAttribs::pid_TestDevSseSp;
+			else if(m_product == Lic_PackageAttribs::pid_SOLitrack)	//CR.14543 - Add Test/Dev for SOLitrack
+				m_product = Lic_PackageAttribs::pid_TestDevSOLitrack;
 		}
 		bConnectedToAtleastOneComputer = true;
 	}
@@ -1241,6 +1243,9 @@ void CSolimarLicenseMgr::InternalCalculateLegacyProtectionKeyInfo(long _productI
 		case Lic_PackageAttribs::pid_TestDevSseSp:
 			m_productKeyID = Lic_PackageAttribs::pid_SolsearcherEnt;
 			break;
+		case Lic_PackageAttribs::pid_TestDevSOLitrack://CR.14543 - Add Test/Dev for SOLitrack
+			m_productKeyID = Lic_PackageAttribs::pid_SOLitrack;
+			break;
 		default:
 			m_productKeyID = _productID;
 			break;
@@ -1486,7 +1491,7 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseInternal(VARIANT_BOOL *license_valid,
 
 	if(FAILED(hrPrimaryServers) && FAILED(hr))	// Means there was a error contacting both primary and backup license servers, return error from primary
 		hr = hrPrimaryServers;
-//OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseInternal return: 0x%08x", hr);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseInternal return: 0x%08x, license_valid: %d", hr, *license_valid == VARIANT_TRUE);
 	return hr;
 }
 
@@ -1824,12 +1829,19 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseRelease(long module_id, long count
 
 	// record that the licenses were released
 	m_allocated_licenses[module_id] -= count;
-	
+
 	// perform the license de-allocation
-	RefreshLicenses();	//don't return the state of the manager
+	//m_bUsingBackupServers = false;	//CR.FIX.14599 - Try to Re-use non-Backup Servers.
+	//RefreshLicenses();	//don't return the state of the manager
+
+	//CR.FIX.14599 - Incase licenses are freeded, call ValidateLicenseInternal
+	VARIANT_BOOL licensing_valid = VARIANT_FALSE;
+	ValidateLicenseInternal(&licensing_valid, true, false);
+
 //_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::ModuleLicenseRelease AppID: %s, module_id: %d, count: %d - Leave)", (wchar_t*)m_applicationInstance, module_id, count);
 //OutputDebugStringW(debug_buf);
 	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GenerateErrorMessage(hr), __uuidof(CSolimarLicenseMgr), __uuidof(ISolimarLicenseMgr7));
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ModuleLicenseRelease(%d, %d) - returns: 0x%08x", module_id, count, hr);
 	return S_OK;
 }
 
@@ -4091,7 +4103,9 @@ HRESULT CSolimarLicenseMgr::AddKeyToCache(ServerInfo* pServerInfo, BSTR bstrKeyI
 // checks that all licenses checked out are accounted for by some key
 HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_licenses)
 {
-//OutputFormattedDebugString(L"CSolimarLicenseMgr::ValidateLicenseCache() - Enter");
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L"CSolimarLicenseMgr::ValidateLicenseCache() - Enter - m_bUsingBackupServers: %d", m_bUsingBackupServers);
+//OutputDebugString(tmpbuf);
 	ENSURE_INITIALIZED;
 	SafeMutex mutex(ServerListLock);	
 	
@@ -4108,7 +4122,8 @@ HRESULT CSolimarLicenseMgr::ValidateLicenseCache(ModuleLicenseMap &outstanding_l
 			// for each module
 			for (ModuleLicenseMap::iterator m = outstanding_licenses.begin(); m != outstanding_licenses.end(); ++m)
 			{
-				if(server->second.bValidLicensing)
+				//CR.FIX.14599 - add modules to release to the outstanding_licenses, even if not valid licensing
+				if(server->second.bValidLicensing || (m->second - server->second.software_license.licenses_allocated[m->first]) < 0)
 					m->second -= server->second.software_license.licenses_allocated[m->first];
 			}
 		}
@@ -4165,31 +4180,34 @@ HRESULT CSolimarLicenseMgr::RefreshLicenses()
 			m_dtRefreshLicenses = time(NULL);
 	}
 
-	if (FAILED(hr)) {	return hr;}
+	if (FAILED(hr)) {	return hr; }
 	
 	// check to see if there is a difference between 
 	// the number of licenses obtained and those backed up by keys
 	ModuleLicenseMap outstanding_licenses;
 	hr = ValidateLicenseCache(outstanding_licenses);
-	if (FAILED(hr))	{	return hr;}
+	if (FAILED(hr)) {	return hr; }
 	
 	// obtain and release licenses where appropriate
+	HRESULT tempHr = hr;
 	for (ModuleLicenseMap::iterator module = outstanding_licenses.begin(); module != outstanding_licenses.end(); ++module)
 	{
-		if (module->second>0)
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseMgr::RefreshLicenses() - moduleID: %d, amount: %d", module->first, module->second);
+//OutputDebugStringW(debug_buf);
+		if (module->second>0 && !m_bInViolationPeriod)
 		{	
-			hr = ObtainLicensesInternal(module->first, module->second);
-			if (FAILED(hr)) 
-			{
-				return hr;
-			}
+			tempHr = ObtainLicensesInternal(module->first, module->second);
+			if (FAILED(tempHr) && SUCCEEDED(hr)) 
+				hr = tempHr;
 		}
 		else if (module->second<0)
 		{
-			hr = ReleaseLicensesInternal(module->first, -1*module->second);
-			if (FAILED(hr)) return hr;
+			tempHr = ReleaseLicensesInternal(module->first, -1*module->second);
+			if (FAILED(tempHr) && SUCCEEDED(hr)) 
+				hr = tempHr;
 		}
 	}
+
 	
 	return hr;
 }
@@ -4278,6 +4296,7 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 	//xxx need a way to transfer licenses from the single key to a different single key if needed in case the first one fills up
 	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
 	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+	bool bOnlyOneServer = m_bUsingBackupServers ? (m_backupServers.size()) == 1 : (m_servers.size() == 1);
 	
 	try
 	{
@@ -4292,9 +4311,10 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 					ModuleLicenseTotalInternal(module_id, &totalLicense);
 					long software_licenses_available = totalLicense - server->second.software_license.licenses_inuse[module_id];
 					//long software_licenses_available = server->second.software_license.licenses_total[module_id] - server->second.software_license.licenses_inuse[module_id];
-					long software_licenses_to_obtain = min(licenses_to_obtain - licenses_obtained, software_licenses_available);
+					long software_licenses_to_obtain = bOnlyOneServer ? license_count : min(licenses_to_obtain - licenses_obtained, software_licenses_available);
 		OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal totalLicense=%d, software_licenses_available=%d, software_licenses_to_obtain=%d", totalLicense, software_licenses_available, software_licenses_to_obtain);
-					if(software_licenses_available == 0)
+					if(software_licenses_available == 0 ||
+						(bOnlyOneServer && software_licenses_available <software_licenses_to_obtain))
 					{
 						hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 
@@ -4307,11 +4327,12 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 								wstrModuleName = modSpecIt->second.moduleName;
 						}
 						wchar_t errorBuf[1024];
-						swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d",
+						swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Amount to Obtain: %d",
 							wstrModuleName.c_str(),
 							module_id,
 							totalLicense,
-							server->second.software_license.licenses_inuse[module_id]
+							server->second.software_license.licenses_inuse[module_id],
+							software_licenses_to_obtain
 							);
 						LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, std::wstring(errorBuf), __uuidof(0), __uuidof(0));
 					}
@@ -4411,12 +4432,12 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 	{
 		hr = e.Error();
 	}
-	if(hr == E_FAIL)
+	if((licenses_obtained != licenses_to_obtain) || (hr == E_FAIL))
 		hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 	LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE(hr, LicenseServerError::GetErrorMessage(hr), __uuidof(0), __uuidof(0));
-	//OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal - Leave - moduleID=%d, licenseCount=%d, licenses_obtained: %d, licenses_to_obtain: %d, hr: 0x%x", module_id, license_count, licenses_obtained, licenses_to_obtain, hr);
-	return (licenses_obtained == licenses_to_obtain ? S_OK : hr);
-	//return (licenses_obtained == licenses_to_obtain ? S_OK : LicenseServerError::EHR_LICENSE_INSUFFICIENT);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ObtainLicensesInternal - Leave - moduleID=%d, licenseCount=%d, licenses_obtained: %d, licenses_to_obtain: %d, hr: 0x%x", module_id, license_count, licenses_obtained, licenses_to_obtain, hr);
+	//return (licenses_obtained == licenses_to_obtain ? S_OK : hr);
+	return hr;
 }
 
 
@@ -4542,6 +4563,7 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 	{
 		hr = e.Error();
 	}
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::ReleaseLicensesInternal(%d, %d) - licenses_released(%d) == licenses_to_release(%d)", module_id, license_count, licenses_released, licenses_to_release);
 	return (licenses_released == licenses_to_release ? S_OK : E_FAIL);
 }
 
