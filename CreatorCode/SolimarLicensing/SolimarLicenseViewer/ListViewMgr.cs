@@ -7,11 +7,38 @@ using System.Runtime.InteropServices;
 using System.Configuration;
 using System.Drawing;
 using System.Net;
+using Shared.VisualComponents;
 
 namespace SolimarLicenseViewer
 {
+    using DisplayNameAndEventType = Solimar.Licensing.Common.Collections.Tuple<string, System.Diagnostics.EventLogEntryType>;
+    using EventTypeToEventCounterList = SortedList<string, Solimar.Licensing.Common.Collections.Tuple<ToolStripItem, int, string>>;
+    using EventTypeToEventCounterPair = KeyValuePair<string, Solimar.Licensing.Common.Collections.Tuple<ToolStripItem, int, string>>;
+
+    /// <summary>Tracks Number of Events seen of a given Event Type</summary>
+    using EventCounter = Solimar.Licensing.Common.Collections.Tuple<ToolStripItem, int/*Count Seen*/, string>;
+
     public class ListViewMgr
     {
+        /// <summary>Function Signature: void Function(bool)</summary>
+        public delegate void ParamBoolReturnsVoid(bool b1);
+        public ParamBoolReturnsVoid DelUseWaitCursor = null;
+
+        public delegate void ParamListViewItemListReturnsVoid(IList<ListViewItem> lviList);
+        public ParamListViewItemListReturnsVoid DelTestConnection = null;
+        public void TestConnection(IList<ListViewItem> _lviList)
+        {
+            if (DelTestConnection != null)
+                DelTestConnection(_lviList);
+        }
+
+        public void UseWaitCursor(bool _bUseWaitCursor)
+        {
+            if (DelUseWaitCursor != null)
+                DelUseWaitCursor(_bUseWaitCursor);
+        }
+
+
         #region ListView Win32 Defines
         [StructLayout(LayoutKind.Sequential)]
         public struct HDITEM
@@ -60,6 +87,7 @@ namespace SolimarLicenseViewer
             ToolStrip lvTs,
             Shared.VisualComponents.NoFlickerListView bottomLv,
             ToolStrip bottomLvTs,
+            Shared.VisualComponents.EventLogEntryControl eventLogEntryControl,
             CommunicationLink commlink)
         {
             TheSplitControl = splitCntl;
@@ -67,6 +95,7 @@ namespace SolimarLicenseViewer
             TheListViewToolStrip = lvTs;
             TheBottomListView = bottomLv;
             TheBottomListViewToolStrip = bottomLvTs;
+            TheEventLogEntryControl = eventLogEntryControl;
             m_CommLink = commlink;
             m_TreeNode = null;
             m_connSettingsHelper = new ConnectionSettingsHelper(m_CommLink);
@@ -86,12 +115,14 @@ namespace SolimarLicenseViewer
 
             InitializeToolStripItems();
         }
+
         public void InitializeToolStripItems()
         {
             List<ToolStripItem> tmpTSItemList = null;
             ToolStripButton tmpTSB = null;
             ToolStripSeparator tmpTSS = null;
             ToolStripLabel tmpTSL = null;
+            ToolStripComboBox tmpTCB = null;
 
             #region Items for AppConstants.LicenseRootNode
             tmpTSItemList = new List<ToolStripItem>();
@@ -188,6 +219,90 @@ namespace SolimarLicenseViewer
             tmpTSItemList.Add(tmpTSB);
 
             #endregion
+
+            #region Items for AppConstants.EventLogRootNode
+            tmpTSItemList = new List<ToolStripItem>();
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Text = AppConstants.EventLogFilterErrorTSB;
+            tmpTSB.ToolTipText = AppConstants.EventLogFilterErrorToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.eventLogError;
+            tmpTSB.Tag = new DisplayNameAndEventType(AppConstants.EventLogFilterErrorTSB, System.Diagnostics.EventLogEntryType.Error);
+            tmpTSB.CheckOnClick = true;
+            tmpTSB.CheckState = CheckState.Checked;
+            tmpTSB.Click += new EventHandler(RefreshEventLogData);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator());
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Text = AppConstants.EventLogFilterInfoTSB;
+            tmpTSB.ToolTipText = AppConstants.EventLogFilterInfoToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.eventLogInfo;
+            tmpTSB.Tag = new DisplayNameAndEventType(AppConstants.EventLogFilterInfoTSB, System.Diagnostics.EventLogEntryType.Information);
+            tmpTSB.CheckOnClick = true;
+            tmpTSB.CheckState = CheckState.Checked;
+            tmpTSB.Click += new EventHandler(RefreshEventLogData);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator());
+
+            tmpTSB = new ToolStripButton();
+            tmpTSB.Text = AppConstants.EventLogFilterWarningTSB;
+            tmpTSB.ToolTipText = AppConstants.EventLogFilterWarningToolTipTSB;
+            tmpTSB.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tmpTSB.Image = global::SolimarLicenseViewer.Properties.Resources.eventLogWarning;
+            tmpTSB.Tag = new DisplayNameAndEventType(AppConstants.EventLogFilterWarningTSB, System.Diagnostics.EventLogEntryType.Warning);
+            tmpTSB.CheckOnClick = true;
+            tmpTSB.CheckState = CheckState.Checked;
+            tmpTSB.Click += new EventHandler(RefreshEventLogData);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator());
+
+            tmpTSItemList.Add(new ToolStripLabel(AppConstants.EventLogSourceLabel + ": "));
+
+            tmpTCB = new ToolStripComboBox();
+            tmpTCB.Sorted = true;
+            tmpTCB.DropDownStyle = ComboBoxStyle.DropDownList;
+            //tmpTCB.FlatStyle = FlatStyle.Standard;
+            tmpTCB.Items.Add(new EventLog_ComboSourceItem());
+            tmpTCB.SelectedIndex = 0;
+            //tmpTCB.Tag = ;
+            //tmpTCB.Dock = DockStyle.Fill;
+            tmpTCB.AutoToolTip = true;
+            tmpTCB.SelectedIndexChanged += new EventHandler(RefreshEventLogData);
+            //tmpTCB.
+            //tmpTCB.AutoSize = true;
+            tmpTCB.Width = 200;
+            tmpTCB.ToolTipText = AppConstants.EventLogSourceToolTip;
+            tmpTSItemList.Add(tmpTCB);
+
+            //The Custom Solimar Product Filter...
+            tmpTSItemList.Add(new ToolStripSeparator(){Tag = typeof(bool), Visible = false});
+            tmpTSItemList.Add(new ToolStripLabel("Solimar Product: ") { Tag = typeof(bool), Visible = false });
+            tmpTCB = new ToolStripComboBox();
+            tmpTCB.Sorted = true;
+            tmpTCB.DropDownStyle = ComboBoxStyle.DropDownList;
+            //tmpTCB.FlatStyle = FlatStyle.Standard;
+            tmpTCB.Items.Add(new EventLog_ComboSolLicSvrProductItem());
+            tmpTCB.Visible = false;
+            tmpTCB.SelectedIndex = 0;
+            tmpTCB.Tag = typeof(bool);
+            //tmpTCB.Dock = DockStyle.Fill;
+            tmpTCB.AutoToolTip = true;
+            tmpTCB.SelectedIndexChanged += new EventHandler(RefreshEventLogData);
+            //tmpTCB.
+            //tmpTCB.AutoSize = true;
+            tmpTCB.Width = 200;
+            tmpTCB.ToolTipText = AppConstants.EventLogSourceToolTip;
+            tmpTSItemList.Add(tmpTCB);
+
+            m_toolStripList.Add(AppConstants.EventLogRootNode, tmpTSItemList);
+
+            #endregion
         }
 
         void m_moduleFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -201,6 +316,7 @@ namespace SolimarLicenseViewer
         /// </summary>
         public void PopulateView()
         {
+//System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - Start");
             //Clear items in listview
             this.TheListView.BeginUpdate();
             this.TheListView.MultiSelect = true;
@@ -211,13 +327,15 @@ namespace SolimarLicenseViewer
             this.TheBottomListView.Items.Clear();
             this.TheBottomListView.Groups.Clear();
             this.TheBottomListView.Reset_NoItemsMessage();
+
+            this.TheEventLogEntryControl.Visible = false;
+            this.TheBottomListView.Visible = true;
             try
             {
-                this.TheListView.SelectedIndexChanged -= new EventHandler(prodConn_SelectedIndexChanged);
-                this.TheListView.KeyDown -= new KeyEventHandler(prodConn_KeyDown);
-                this.TheListView.DoubleClick -= new EventHandler(prodConn_EditConnSettings);
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "DoubleClick");
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "KeyDown");
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "SelectedIndexChanged");
 
-                this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
                 TheSplitControl.Panel2Collapsed = true;
                 switch (SelectedNode.Level)
                 {
@@ -230,6 +348,8 @@ namespace SolimarLicenseViewer
                             LoadUsageData();
                         else if (SelectedNode.Name == AppConstants.ProductConnectionSettingsRootNode)
                             LoadProductConnectionData();
+                        else if (SelectedNode.Name == AppConstants.EventLogRootNode)
+                            LoadEventLogData();
                         break;
                     case 1:
                         if (SelectedNode.Name == AppConstants.HistoryNode)
@@ -253,9 +373,13 @@ namespace SolimarLicenseViewer
                     TheListView.GridLines = true;
                 else
                     TheListView.GridLines = false;
-                TheListView.Sort();
-                TheBottomListView.Sort();
+                //System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - PopulateViewColumns()");
                 PopulateViewColumns();
+                //System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - TheListView.Sort()");
+                TheListView.Sort();
+                //System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - TheBottomListView.Sort()");
+                TheBottomListView.Sort();
+                //System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - TheBottomListView.Sort() - Ebd");
             }
             catch (Exception)
             {
@@ -268,7 +392,7 @@ namespace SolimarLicenseViewer
                 this.TheBottomListView.EndUpdate();
                 this.TheListView.EndUpdate();
             }
-
+//System.Diagnostics.Trace.WriteLine("SolimarLicenseViewer.PopulateListView() - End");
         }
 
         /// <summary>
@@ -276,11 +400,15 @@ namespace SolimarLicenseViewer
         /// </summary>
         private void PopulateViewColumns()
         {
+            //System.Diagnostics.Trace.WriteLine("PopulateViewColumns() - Start");
             TheListView.BeginUpdate();
             TheListView.SuspendLayout();
             TheListView.Columns.Clear();
             TheBottomListView.Columns.Clear();
             ColumnHeader colHeader = null;
+            ListView defaultListView = null;
+            int defaultColIdx = -1;
+            SortOrder defaultSortOrder = SortOrder.None;
             switch (SelectedNode.Level)
             {
                 case 0:
@@ -364,6 +492,31 @@ namespace SolimarLicenseViewer
                         }
                     }
                     #endregion
+                    else if (SelectedNode.Name == AppConstants.EventLogRootNode)
+                    {
+                        List<ColumnHeader> colHeaderList = new List<ColumnHeader>();
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EventLogLevelHeader });
+                        colHeaderList.Add(new ColumnHeader()
+                        {
+                            Text = AppConstants.EventLogDateTimeHeader,
+                            Tag = typeof(DateTime)
+                        });
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EventLogSourceHeader });
+                        colHeaderList.Add(new ColumnHeader()
+                        {
+                            Text = AppConstants.EventLogEventIdHeader,
+                            Tag = typeof(int),
+                            TextAlign = HorizontalAlignment.Right
+                        });
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EventLogTaskCategoryHeader });
+
+                        TheListView.Columns.AddRange(colHeaderList.ToArray());
+
+                        //Sort by DateTime Default
+                        defaultListView = TheListView;
+                        defaultColIdx = 1;
+                        defaultSortOrder = SortOrder.Descending;
+                    }
                     break;
                 case 1:
                     #region if (SelectedNode.Name == AppConstants.HistoryNode)
@@ -518,8 +671,11 @@ namespace SolimarLicenseViewer
             TheBottomListView.Columns.Add("");    //Extra Cell at the end
             ResetListViewColumnSorter(TheListView);
             ResetListViewColumnSorter(TheBottomListView);
+            if (defaultListView != null)
+                SetListViewColumnSorter(defaultListView, defaultColIdx, defaultSortOrder);
             TheListView.ResumeLayout();
             TheListView.EndUpdate();
+            //System.Diagnostics.Trace.WriteLine("PopulateViewColumns() - End");
         }
 
 		private void PopulateBottomViewColumns_ModuleInfo(bool _bDisplayDetails)
@@ -574,7 +730,7 @@ namespace SolimarLicenseViewer
 			TheBottomListView.Columns.Add("");    //Extra Cell at the end
 			ResetListViewColumnSorter(TheBottomListView);
 			TheBottomListView.EndUpdate();
-		}
+        }
 
         #region License Section
         /// <summary>
@@ -737,11 +893,14 @@ namespace SolimarLicenseViewer
                 licInfoAttrib.AssignMembersFromStream(generalStream);
                 foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
                 {
-                    //
                     string productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
-                    ListViewItem lvItem = FindListViewItem(this.TheListView.Items, productName);
-                    if (lvItem == null)
-                        lvItem = FindListViewItem(lviList, productName);
+
+                    ListViewItem lvItem = FindListViewItem(this.TheListView.Items, productName) ?? FindListViewItem(lviList, productName);
+                    // Line above is same as commented out code
+                    //ListViewItem lvItem = FindListViewItem(this.TheListView.Items, productName);
+                    //if (lvItem == null)
+                    //    lvItem = FindListViewItem(lviList, productName);
+                    
                     bool bNewItem = (lvItem == null);
                     if (bNewItem == true)
                     {
@@ -837,7 +996,7 @@ namespace SolimarLicenseViewer
                 }
 
                 this.TheListView.MultiSelect = false;
-                this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "SelectedIndexChanged");
                 this.TheListView.SelectedIndexChanged += new EventHandler(TheListView_SelectedIndexChanged);
 
                 m_CommLink.GetSoftwareLicenseInfoByLicense(m_TreeNode.Parent.Name, ref generalStream);
@@ -1101,7 +1260,10 @@ namespace SolimarLicenseViewer
                                     moduleID = (int)modInfo.moduleID.TVal;
                                     lvItem.Text = m_CommLink.GetModuleName(productID, moduleID);
                                     if (bExpired)
+                                    {
                                         lvItem.ForeColor = System.Drawing.Color.Red;
+                                        lvItem.ToolTipText = string.Format("Module Expired on: {0}", expirationDateText);
+                                    }
                                     else
                                         lvItem.ForeColor = m_TreeNode.ForeColor;
 
@@ -1282,7 +1444,7 @@ namespace SolimarLicenseViewer
                 //this.TheListView.BeginUpdate();
                 //this.TheListView.Items.Clear();
                 this.TheListView.MultiSelect = false;
-                this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "SelectedIndexChanged");
                 this.TheListView.SelectedIndexChanged += new EventHandler(TheListView_SelectedIndexChanged);
 
                 foreach (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo in m_CommLink.KeyEnumerate())
@@ -1302,6 +1464,10 @@ namespace SolimarLicenseViewer
                         {
                             lvItem.Font = new System.Drawing.Font(lvItem.Font, System.Drawing.FontStyle.Italic);
                             lvItem.ForeColor = System.Drawing.Color.Red;
+                            if (keyInfo.IsKeyTypeDevelopment() && keyInfo.hoursLeft == 0)
+                                lvItem.ToolTipText = string.Format("Test\\Dev Protection Key {0} expired: 0 hours left", keyInfo.keyName);
+                            else
+                                lvItem.ToolTipText = string.Format("Protection Key {0} expired on: {1}", keyInfo.keyName, keyInfo.expirationDate.ToString());
                         }
 
                         lvItem.Text = keyInfo.keyTypeName;
@@ -1381,6 +1547,20 @@ namespace SolimarLicenseViewer
                                 LoadProtectionKeyModulesData("");
                                 TheSplitControl.Panel2Collapsed = true;
                             }
+                        }
+                        #endregion
+                        #region if (SelectedNode.Text == AppConstants.EventLogRootNode)
+                        else if (SelectedNode.Text == AppConstants.EventLogRootNode)
+                        {
+                            TheEventLogEntryControl.Visible = true;
+                            TheBottomListView.Visible = false;
+                            TheBottomListViewToolStrip.Visible = false;
+
+                            TheSplitControl.Panel2Collapsed = false;
+                            if (lView.SelectedItems.Count > 0)
+                                LoadEventLogEntryData(lView.SelectedItems[0].Tag as Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs);
+                            else
+                                LoadEventLogEntryData(null);
                         }
                         #endregion
                         else
@@ -1515,10 +1695,8 @@ namespace SolimarLicenseViewer
                     //add a product node if there are app instances
                     if (prodInfo.productID.ToString() != "0")
                     {
-                        m_CommLink.SoftwareGetApplicationInstanceListByProduct((int)prodInfo.productID.TVal, ref generalStream);
-                        Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
-                        appList.SVal = generalStream;
-                        if (appList.TVal.Count > 0)
+                        System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct((int)prodInfo.productID.TVal);
+                        if (usageMap.Count > 0)
                         {
                             productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                             this.TheListView.Items.Add(productName);
@@ -1536,7 +1714,6 @@ namespace SolimarLicenseViewer
         /// </summary>
         public void LoadAppInstData()
         {
-            String generalStream = "";
             Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
             try
             {
@@ -1558,14 +1735,19 @@ namespace SolimarLicenseViewer
                 {
                     this.TheListViewToolStrip.Visible = false;
                 }
-                m_CommLink.SoftwareGetApplicationInstanceListByProduct(m_CommLink.GetProductID(m_TreeNode.Text), ref generalStream);
-                appList.SVal = generalStream;
-                if (appList.TVal.Count > 0)
+
+                System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct(m_CommLink.GetProductID(m_TreeNode.Text));
+                if (usageMap.Count > 0)
                 {
-                    foreach (string appInstance in appList.TVal)
+                    foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
                     {
+                        //string connectionType = "Unknown: ";
+                        //if (usagePair.Value.HasValue)
+                        //    connectionType = usagePair.Value.Value ? "Primary: " : "Failover: ";
+                        string connectionType = (usagePair.Value.HasValue && (usagePair.Value.Value == false)) ? "Failover: " : "";
+
                         ListViewItem lvItem = new ListViewItem();
-                        lvItem.Text = appInstance;
+                        lvItem.Text = string.Format("{0}{1}", connectionType, usagePair.Key);
                         //add another informative item
                         this.TheListView.Items.Add(lvItem);
                     }
@@ -1619,7 +1801,7 @@ namespace SolimarLicenseViewer
                         {
                             foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs appInstInfo in prodInfo.appInstanceList.TVal)
                             {
-                                if (string.Compare(appInstInfo.applicationInstance.TVal, m_TreeNode.Text, true) == 0)
+                                if (string.Compare(appInstInfo.applicationInstance.TVal, m_TreeNode.Name, true) == 0)
                                 {
                                     foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsModuleInfoAttribs modInfo in appInstInfo.moduleList.TVal)
                                     {
@@ -1645,7 +1827,7 @@ namespace SolimarLicenseViewer
                         productID = (int)prodInfo.productID.TVal;
                         if (string.Equals(m_CommLink.GetProductName(productID), _productName))
                         {
-                            m_CommLink.InitializeWrapper(m_TreeNode.Text, productID, (int)prodInfo.product_Major.TVal, (int)prodInfo.product_Minor.TVal);
+                            m_CommLink.InitializeWrapper(m_TreeNode.Name, productID, (int)prodInfo.product_Major.TVal, (int)prodInfo.product_Minor.TVal);
                             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleInfoAttribs modInfo in prodInfo.moduleList.TVal)
                             {
                                 moduleID = (int)modInfo.moduleID.TVal;
@@ -1712,8 +1894,6 @@ namespace SolimarLicenseViewer
                 this.TheListView.NoItemsMessage = "This can only be set when connected to the localhost";
             }
         }
-
-
 
         ///key into ListView where _productID is unique, display_connectionSettings.  If _productID is new then add
         ///_connectionSettings.  If _productID is already there, update existing item.
@@ -1821,117 +2001,355 @@ namespace SolimarLicenseViewer
             System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
             foreach (ListViewItem lvi in this.TheListView.SelectedItems)
                 lvItemList.Add(lvi);
-            testConnectionToLicenseServer(lvItemList);
+            TestConnection(lvItemList);
         }
         public void prodConnTestConnAllTSButton_Click(object sender, EventArgs e)
         {
             System.Collections.Generic.List<ListViewItem> lvItemList = new List<ListViewItem>();
             foreach (ListViewItem lvi in this.TheListView.Items)
                 lvItemList.Add(lvi);
-            testConnectionToLicenseServer(lvItemList);
-        }
-
-        private void testConnectionToLicenseServer(System.Collections.Generic.List<ListViewItem> _listViewItemList)
-        {
-            ConnectionSettings2 connSettings = new ConnectionSettings2();
-            if (_listViewItemList.Count > 0)
-            {
-                _listViewItemList[0].ListView.BeginUpdate();
-                foreach (ListViewItem lvItem in _listViewItemList)
-                {
-                    connSettings.ProductID = (int)lvItem.Tag;
-                    connSettings.ServerName = lvItem.SubItems[1].Text;
-                    connSettings.BackupName = lvItem.SubItems[2].Text;
-                    connSettings.UseDevelopmentLic = System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0;
-                    try
-                    {
-                        testConnectionToLicenseServer(connSettings);
-                        lvItem.ForeColor = System.Drawing.Color.Green;
-                        lvItem.SubItems[4].Text = "Successfully connected to the License Server";
-                    }
-                    catch (Exception ex)
-                    {
-                        lvItem.ForeColor = System.Drawing.Color.Red;
-                        lvItem.SubItems[4].Text = ex.Message.Replace('\r', ' ').Replace('\n', ' ');
-                    }
-                }
-                Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(_listViewItemList[0].ListView);
-                _listViewItemList[0].ListView.EndUpdate();
-            }
-        }
-        // throws an exception if fails to connect...
-        private void testConnectionToLicenseServer(ConnectionSettings2 _connectionSettings)
-        {
-            if (_connectionSettings != null)
-            {
-                try
-                {
-
-                    this.TheListView.FindForm().Cursor = Cursors.WaitCursor;
-                    //this.TheListView.FindForm().Enabled = false;
-
-                    using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
-                    {
-                        Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
-                        if (_connectionSettings.UseDevelopmentLic == true)
-                        {
-                            //Successfully connected, use a different product ID for the Test/Dev licensing
-                            if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Iconvert)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevIconvert;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Rubika)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubika;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_RubikaProcessBuilder)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevRubikaProcessBuilder;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SdxDesigner)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSdxDesigner;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolIndexer)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolIndexer;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolFusion)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolfusionSp;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolScript)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolScript;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherEnt)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSolsearcherEp;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_Spde)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpde;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SpdeQueueManager)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSpdeQueueManager;
-                            else if (productID == Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_SolsearcherSp)
-                                productID = Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID.pid_TestDevSseSp;
-                        }
-                        licWrapper.ConnectByProductEx((int)productID, false);
-
-                        licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
-                                                (int)productID, //product
-                                                0,              //prod_ver_major
-                                                0,              //prod_ver_minor
-                                                false,          //single_key
-                                                "",             //specific_single_key_ident
-                                                false,          //lock_keys
-                                                0,              //ui_level
-                                                0,              //grace_period_minutes
-                                                false,          //application_instance_lock_keys
-                                                false);         //bypass_remote_key_restriction
-                        licWrapper.DisconnectEx();
-                        //licWrapper = null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    HandleExceptions.DisplayException(this.TheListView.FindForm(), ex, "Failed to connect to License Server", "Test Connection to License Server");
-                    throw;
-                }
-                finally
-                {
-
-                    //this.TheListView.FindForm().Enabled = true;
-                    this.TheListView.FindForm().Cursor = Cursors.Default;
-                }
-            }
+            TestConnection(lvItemList);
         }
         #endregion
 
+        #region Event Log Section
+        public void LoadEventLogData()
+        {
+            //EventLogMgr eventLogMgr = new EventLogMgr();
+            //PopulateEventLogView(eventLogMgr);
+            
+            PopulateEventLogView();
+
+            RefreshEventLogData(null, null);
+        }
+        //public void PopulateEventLogView(Shared.VisualComponents.IEventLog iEventLogObj)
+        public void PopulateEventLogView()
+        {
+            //System.Diagnostics.Trace.WriteLine(string.Format("PopulateEventLogView() - Enter - MachineName: {0}", iEventLogObj.GetMachineName()));
+            //System.Diagnostics.Trace.WriteLine(string.Format("{0} - PopulateEventLogView() - Enter", (new System.Diagnostics.StackTrace()).FrameCount));
+            try
+            {
+                this.TheListViewToolStrip.Visible = true;
+                this.TheListViewToolStrip.Items.Clear();
+                this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.EventLogRootNode].ToArray());
+                
+                //this.TheListView.FindForm().Cursor = Cursors.WaitCursor;
+                this.TheListView.BeginUpdate();
+                this.TheListView.Items.Clear();
+                this.TheListView.MultiSelect = false;
+
+                //this.TheListView.SelectedIndexChanged -= new EventHandler(TheListView_SelectedIndexChanged);
+                Shared.VisualComponents.ControlHelper.RemoveEvents(this.TheListView, "SelectedIndexChanged");
+                this.TheListView.SelectedIndexChanged += new EventHandler(TheListView_SelectedIndexChanged);
+                TheListView_SelectedIndexChanged(this.TheListView, null);
+                //this.bottomInfoPanel.visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.TheListView.NoItemsMessage = ex.Message;
+            }
+            finally
+            {
+                this.TheListView.EndUpdate();
+                //this.TheListView.FindForm().Cursor = Cursors.Default;
+            }
+            //System.Diagnostics.Trace.WriteLine("PopulateEventLogView() - Leave");
+        }
+
+        public void RefreshEventLogData(object sender, EventArgs e)
+        {
+            
+            ////if (!IsLocalMachine(m_CommLink.ServerName))
+            //if (IsLocalMachine(m_CommLink.ServerName))
+            //    RefreshEventLogData(new EventLogMgr());
+            //else if (m_CommLink.bDiagnosticDateView == true)
+            //{
+            //    RefreshEventLogData(new EventLogMgr_LicenseSvr(m_CommLink));
+            //}
+            //else
+            //{
+            //    // For remote Event Log usage, use license server in the future...
+            //    //RefreshEventLogData(new RemoteEventLogMgr(m_CommLink.ServerName));
+            //    RefreshEventLogData(new EventLogMgr_LicenseSvr(m_CommLink));
+            //}
+
+            bool bResetProductComboBox = false;
+            if (sender is ToolStripComboBox)
+                bResetProductComboBox = (sender as ToolStripComboBox).SelectedItem is EventLog_ComboSourceItem;
+
+            if (m_CommLink.bDiagnosticDateView == true)
+            {
+                //RefreshEventLogData(new EventLogMgr_LicenseSvr(m_CommLink), bResetProductComboBox);
+                RefreshEventLogData(m_CommLink, bResetProductComboBox);
+            }
+            //else if (!IsLocalMachine(m_CommLink.ServerName))
+            else if (IsLocalMachine(m_CommLink.ServerName))
+            {
+                RefreshEventLogData(new EventLogMgr(), bResetProductComboBox);
+            }
+            else
+            {
+                // For remote Event Log usage, use license server in the future...
+                //RefreshEventLogData(new RemoteEventLogMgr(m_CommLink.ServerName));
+                //RefreshEventLogData(new EventLogMgr_LicenseSvr(m_CommLink), bResetProductComboBox);
+                RefreshEventLogData(m_CommLink, bResetProductComboBox);
+            }
+        }
+
+        /// <summary>Refreshes the List of eventlog messages on a given PC.</summary>
+        public void RefreshEventLogData(Shared.VisualComponents.IEventLog _iEventLogObj, bool _bResetProductComboBox)
+        {
+            //System.Diagnostics.Trace.WriteLine(string.Format("RefreshEventLogData() - Enter - MachineName: {0}, Type: {1}", _iEventLogObj.GetMachineName(), _iEventLogObj.GetType().ToString()));
+            try
+            {
+                UseWaitCursor(true);
+                //System.IO.FileSystemWatcher
+                //Track Previously selected item
+                int? selEventIdx = null;
+                if (this.TheListView.SelectedItems.Count > 0 && this.TheListView.SelectedItems[0].Tag is Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs)
+                    selEventIdx = (int)(this.TheListView.SelectedItems[0].Tag as Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs).index.TVal;
+                ListViewItem newSelLvi = null;
+
+                this.TheListView.BeginUpdate();
+                this.TheListView.Items.Clear();
+                System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
+                //System.Diagnostics.Trace.WriteLine("RefreshEventLogData() - foreach() - Start");
+                //SortedList<string, Solimar.Licensing.Common.Collections.Tuple<ToolStripItem, int, string>> eventTypeFilterHash = // Dictionary of EventLogType Filters
+                //    new SortedList<
+                //        string,  // EventLog Type
+                //        Solimar.Licensing.Common.Collections.Tuple<
+                //            ToolStripItem,  // ToolStrip
+                //            int,            // Count Seen
+                //            string>>();     // Text
+                EventTypeToEventCounterList eventTypeFilterHash = new EventTypeToEventCounterList();
+
+                ToolStripComboBox toolStripSourceComboBox = null;
+                ToolStripComboBox toolStripSolEventProductComboBox = null;
+                List<ToolStripItem> optionalyShownControl = new List<ToolStripItem>();
+                
+                EventLog_ComboSourceItem filterItem = null;
+                EventLog_ComboSolLicSvrProductItem solEventFilterItem = null;
+                string filterSource = string.Empty;
+                #region foreach (ToolStripItem tsItem in this.TheListViewToolStrip.Items)
+                foreach (ToolStripItem tsItem in this.TheListViewToolStrip.Items)
+                {
+                    if (tsItem is ToolStripButton)
+                    {
+                        tsItem.Text = ((DisplayNameAndEventType)tsItem.Tag).Item1;
+                        if((tsItem as ToolStripButton).Checked == true)
+                            eventTypeFilterHash.Add(((DisplayNameAndEventType)tsItem.Tag).Item2.ToString(), new EventCounter(tsItem, 0, ((Solimar.Licensing.Common.Collections.Tuple<string, System.Diagnostics.EventLogEntryType>)tsItem.Tag).Item1));
+                    }
+                    else if (tsItem is ToolStripComboBox && filterItem == null)
+                    {
+                        toolStripSourceComboBox = tsItem as ToolStripComboBox;
+                        filterItem = toolStripSourceComboBox.SelectedItem as EventLog_ComboSourceItem;
+                        filterSource = filterItem != null ? filterItem.source : string.Empty;
+                        toolStripSourceComboBox.Items.Clear();
+                    }
+                    else if (tsItem.Tag == typeof(bool))
+                    {
+                        tsItem.Visible = false;
+                        optionalyShownControl.Add(tsItem);
+                    }
+                }
+
+                //See if Solimar License Server is selected...
+                if (string.Compare(filterSource, AppConstants.LicenseServer, true) == 0)
+                {
+                    foreach (ToolStripItem tsItem in optionalyShownControl)
+                    {
+                        tsItem.Visible = true;
+                        if (tsItem is ToolStripComboBox && solEventFilterItem == null)
+                        {
+                            toolStripSolEventProductComboBox = (tsItem as ToolStripComboBox);
+                            if (_bResetProductComboBox && toolStripSolEventProductComboBox.Items.Count > 0)
+                                solEventFilterItem = toolStripSolEventProductComboBox.Items[0] as EventLog_ComboSolLicSvrProductItem;
+                            else
+                                solEventFilterItem = toolStripSolEventProductComboBox.SelectedItem as EventLog_ComboSolLicSvrProductItem;
+                        }
+                        
+                    }
+                }
+                #endregion
+
+                //int idx = 0;
+                System.Collections.Generic.SortedList<string, int> sourceList = new SortedList<string, int>();
+                sourceList.Add(string.Empty, 0);
+
+                System.Collections.Generic.SortedList<long/*ProdID*/, int/*CountSeen*/> productList = new SortedList<long, int>();
+                productList.Add(-1, 0);
+                //
+
+                #region foreach (System.Diagnostics.EventLogEntry eventLogEntry in iEventLogObj.GetAllEntries())
+                IList<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs> eventLogEntryList = _iEventLogObj.GetAllEntries();
+                if(eventLogEntryList!=null)
+                {
+                    foreach (Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs eventLogEntry in eventLogEntryList)
+                    {
+                        string key = ((System.Diagnostics.EventLogEntryType)eventLogEntry.entryType.TVal).ToString();
+                        bool pastAllFilter = false;
+                        bool pastSourceFilter = true;
+                        if (filterSource != string.Empty)
+                            pastSourceFilter = (string.Compare(filterSource, eventLogEntry.source.TVal, true) == 0);
+
+                        pastAllFilter = pastSourceFilter;
+                        if (pastAllFilter && solEventFilterItem != null)
+                            pastAllFilter = solEventFilterItem.Match(eventLogEntry.eventID);
+
+                        if (!sourceList.ContainsKey(eventLogEntry.source.TVal))
+                            sourceList.Add(eventLogEntry.source.TVal, 0);
+                        if (eventTypeFilterHash.ContainsKey(key) == true)
+                            sourceList[eventLogEntry.source.TVal]++;
+
+                        long productId = EventLog_ComboSolLicSvrProductItem.GetProductID((long)eventLogEntry.eventID.TVal);
+                        if (pastSourceFilter && !productList.ContainsKey(productId))
+                            productList.Add(productId, 0);
+                        if (pastSourceFilter && eventTypeFilterHash.ContainsKey(key) == true)
+                            productList[productId]++;
+
+                        if (eventTypeFilterHash.ContainsKey(key) == true && pastAllFilter == true)
+                        {
+                            ListViewItem lvi = new ListViewItem();
+                            lvi.Text = key;
+                            lvi.Tag = eventLogEntry;
+                            lvi.SubItems.Add(eventLogEntry.timeGenerated.TVal.ToString());
+                            lvi.SubItems.Add(eventLogEntry.source.TVal);
+                            lvi.SubItems.Add(eventLogEntry.instanceId.TVal.ToString());
+                            lvi.SubItems.Add(eventLogEntry.categoryNumber.TVal == 0 ? "None" : eventLogEntry.category.TVal);
+                            lviList.Add(lvi);
+                            //if(!sourceList.ContainsKey(eventLogEntry.Source))
+                            //    sourceList.Add(eventLogEntry.Source, 0);
+                            //sourceList[eventLogEntry.Source]++;
+
+                            if (newSelLvi == null && selEventIdx.HasValue && selEventIdx == eventLogEntry.index.TVal)
+                                newSelLvi = lvi;
+
+                            //if (++idx > 100)    //For testing use top 500
+                            //    break;
+                            eventTypeFilterHash[key].Item2++;
+                        }
+                    }
+                }
+                #endregion
+                //System.Diagnostics.Trace.WriteLine("RefreshEventLogData() - foreach() - End");
+
+                foreach (EventTypeToEventCounterPair kvPair in eventTypeFilterHash)
+                {
+                    if (kvPair.Value.Item1 is ToolStripButton)
+                        (kvPair.Value.Item1 as ToolStripButton).Text = string.Format("{0} {1}", kvPair.Value.Item2, kvPair.Value.Item3);
+                }
+
+                #region if (toolStripSourceComboBox != null)
+                if (toolStripSourceComboBox != null)
+                {
+                    EventLog_ComboSourceItem selectedItem = null;
+                    List<EventLog_ComboSourceItem> tmpList = new List<EventLog_ComboSourceItem>();
+                    foreach (KeyValuePair<string, int> kvPair in sourceList)
+                    {
+                        EventLog_ComboSourceItem entry = new EventLog_ComboSourceItem() { source = kvPair.Key, itemCount = kvPair.Value };
+                        tmpList.Add(entry);
+                        if (selectedItem == null && filterItem.CompareTo(entry) == 0)
+                            selectedItem = entry;
+                    }
+                    toolStripSourceComboBox.Items.AddRange(tmpList.ToArray());
+                    
+                    toolStripSourceComboBox.SelectedIndexChanged -= new EventHandler(RefreshEventLogData);
+                    toolStripSourceComboBox.SelectedItem = selectedItem;
+                    toolStripSourceComboBox.SelectedIndexChanged += new EventHandler(RefreshEventLogData);
+                }
+                #endregion
+
+                #region if (toolStripSolEventProductComboBox != null)
+                if (toolStripSolEventProductComboBox != null)
+                {
+                    EventLog_ComboSolLicSvrProductItem selectedItem = null;
+                    List<EventLog_ComboSolLicSvrProductItem> tmpList = new List<EventLog_ComboSolLicSvrProductItem>();
+                    foreach (KeyValuePair<long, int> kvPair in productList)
+                    {
+                        EventLog_ComboSolLicSvrProductItem entry = new EventLog_ComboSolLicSvrProductItem(kvPair.Key) { itemCount = kvPair.Value};
+                        entry.source = (kvPair.Key == 0) ? AppConstants.LicenseServerNoProduct : m_CommLink.GetProductName((int)kvPair.Key);
+
+                        tmpList.Add(entry);
+                        if (selectedItem == null && solEventFilterItem.CompareTo(entry) == 0)
+                            selectedItem = entry;
+                    }
+                    toolStripSolEventProductComboBox.Items.Clear();
+                    toolStripSolEventProductComboBox.Items.AddRange(tmpList.ToArray());
+
+                    toolStripSolEventProductComboBox.SelectedIndexChanged -= new EventHandler(RefreshEventLogData);
+                    toolStripSolEventProductComboBox.SelectedItem = selectedItem;
+                    toolStripSolEventProductComboBox.SelectedIndexChanged += new EventHandler(RefreshEventLogData);
+                }
+                #endregion
+
+                //System.Diagnostics.Trace.WriteLine("RefreshEventLogData() - AddRange() - Start");
+                this.TheListView.Items.AddRange(lviList.ToArray());
+                if (newSelLvi == null && this.TheListView.Items.Count > 0)
+                    newSelLvi = this.TheListView.Items[0];
+
+                if (newSelLvi != null)
+                {
+                    newSelLvi.Selected = true;
+                    newSelLvi.EnsureVisible();
+                }
+                else
+                    LoadEventLogEntryData(null);
+
+                //System.Diagnostics.Trace.WriteLine("RefreshEventLogData() - AddRange() - End");
+            }
+            catch (Exception ex)
+            {
+                this.TheListView.NoItemsMessage = ex.Message;
+
+                COMException comEx = ex as COMException;
+                if (comEx != null)
+                {
+                    if (((uint)comEx.ErrorCode) == 0x80004001)
+                    {
+                        this.TheListView.NoItemsMessage = string.Format("Upgrade License Server for this functionality - {0}", comEx.Message);
+                        this.TheListView.Columns.Clear();
+                        TheSplitControl.Panel2Collapsed = true;
+                        this.TheListViewToolStrip.Items.Clear();
+                        this.TheListViewToolStrip.Items.Add(AppConstants.EventLogRootNode);
+                    }
+                }
+            }
+            finally
+            {
+                this.TheListView.EndUpdate();
+                UseWaitCursor(false);
+            }
+            //System.Diagnostics.Trace.WriteLine("RefreshEventLogData() - Leave");
+        }
+
+        public void LoadEventLogEntryData(Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs _eventLogEntry)
+        {
+            //System.Diagnostics.Trace.WriteLine("LoadEventLogEntryData() - Enter");
+            this.TheEventLogEntryControl.SetData(_eventLogEntry);
+            //System.Diagnostics.Trace.WriteLine("LoadEventLogEntryData() - Leave");
+        }
+
+        #endregion
+
         #region ListViewColumn Methods
+        /// <summary>
+        /// Force the ListView to be sorted by a given column and sortOrder
+        /// </summary>
+        public void SetListViewColumnSorter(ListView listView, int columnIndex, SortOrder sortOrder)
+        {
+            ListViewColumnSorter lvSorter = null;
+            if (listView.ListViewItemSorter is ListViewColumnSorter)
+            {
+                lvSorter = (listView.ListViewItemSorter as ListViewColumnSorter);
+                SetSortIcons(listView, lvSorter.SortColumn, columnIndex);
+                lvSorter.SortColumn = columnIndex;
+                lvSorter.Order = sortOrder;
+            }
+            if (columnIndex <= listView.Columns.Count - 1)
+                lvSorter.SortType = (System.Type)listView.Columns[columnIndex].Tag;
+            SetSortIcons(listView, lvSorter.SortColumn, columnIndex);
+            SetSelectedColumnColor(listView, columnIndex);
+        }
         /// <summary>
         /// Initializes the ListViewColumnSorter with options based upon currently selected column. 
         /// <param name="columnIndex"> index of the column to sort </param>
@@ -1939,7 +2357,6 @@ namespace SolimarLicenseViewer
         public void SetListViewColumnSorter(ListView listView, int columnIndex)
         {
             // Determine if clicked column is already the column that is being sorted.
-            //listView.ListViewItemSorter
             ListViewColumnSorter lvSorter = null;
             if (listView.ListViewItemSorter is ListViewColumnSorter)
                 lvSorter = (listView.ListViewItemSorter as ListViewColumnSorter);
@@ -2134,6 +2551,7 @@ namespace SolimarLicenseViewer
         /// Specifies the ListView from the MainForm
         /// </summary>
         private Shared.VisualComponents.NoFlickerListView TheListView;
+        private Shared.VisualComponents.EventLogEntryControl TheEventLogEntryControl;
         private SplitContainer TheSplitControl;
         private ToolStrip TheListViewToolStrip;
         private ToolStrip TheBottomListViewToolStrip;
@@ -2347,6 +2765,61 @@ namespace SolimarLicenseViewer
         }
         private string m_prodLicNumber;
         public string ProdLicNum { get { return m_prodLicNumber; } }
+    }
+
+    public class EventLog_ComboSourceItem : System.IComparable
+    {
+        public string source = string.Empty;
+        public int itemCount = 0;
+
+        public int CompareTo(Object _obj) { return CompareTo(_obj as EventLog_ComboSourceItem); }
+        public int CompareTo(EventLog_ComboSourceItem _srcItem) { return string.Compare(this.source, _srcItem.source, true); }
+        public override string ToString() 
+        {
+            return (this.source == string.Empty)
+                ? " <All>"
+                : string.Format("{0} ({1})", this.source, this.itemCount);
+        }
+    }
+
+    public class EventLog_ComboSolLicSvrProductItem : System.IComparable
+    {
+        public EventLog_ComboSolLicSvrProductItem() {}
+        public EventLog_ComboSolLicSvrProductItem(long _productID)
+        {
+            productID = _productID;
+            //Software
+            //Look in Software Spec for Product Name
+            if (productID != -1)
+            {
+                //source = ;
+            }
+        }
+        static public long GetProductID(long _eventID)
+        {
+            return (_eventID / 1000);
+        }
+        public bool Match(long _eventID)
+        {
+            bool bMatch = false;
+            if (productID == -1)
+                bMatch = true;
+            else
+                bMatch = GetProductID(_eventID) == productID;
+            return bMatch;
+        }
+        public long productID = -1;
+        public string source = string.Empty;
+        public int itemCount = 0;
+
+        public int CompareTo(Object _obj) { return CompareTo(_obj as EventLog_ComboSolLicSvrProductItem); }
+        public int CompareTo(EventLog_ComboSolLicSvrProductItem _srcItem) { return (int)(this.productID - _srcItem.productID); }
+        public override string ToString()
+        {
+            return (string.IsNullOrEmpty(this.source))
+                ? " <All>"
+                : string.Format("{0} ({1})", this.source, this.itemCount);
+        }
     }
     //public class ProductLicenseNumberComparer : IComparer, IComparer<string>
     //{

@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-	public partial class Lic_ServerDataAttribs_DisplayForm : Form
+    public partial class Lic_ServerDataAttribs_DisplayForm : Base_DisplayForm
 	{
 		public Lic_ServerDataAttribs_DisplayForm()
 		{
@@ -78,16 +78,6 @@ namespace SolimarLicenseDiagnosticDataViewer
 			licenseInfoListView.SetSortColumn(m_lastColumn, m_sortOrder);
 		}
 
-		private const int CP_NOCLOSE_BUTTON = 0x200;
-		protected override CreateParams CreateParams
-		{
-			get
-			{
-				CreateParams cp = base.CreateParams;
-				cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-				return cp;
-			}
-		}
 		private void contextMenuStrip1_Click(object sender, EventArgs e)
 		{
 			string copyText = "";

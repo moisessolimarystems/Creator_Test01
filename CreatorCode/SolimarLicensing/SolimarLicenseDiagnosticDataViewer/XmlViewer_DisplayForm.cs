@@ -9,13 +9,12 @@ using System.Windows.Forms;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class XmlViewer_DisplayForm : Form
+    public partial class XmlViewer_DisplayForm : Base_DisplayForm
     {
-        public XmlViewer_DisplayForm()
+        public XmlViewer_DisplayForm() : base()
         {
             InitializeComponent();
         }
-
         public void SetData(string _data)
         {
             if (_data != null)
@@ -24,17 +23,6 @@ namespace SolimarLicenseDiagnosticDataViewer
                 textBox1.SelectionStart = 0;
                 textBox1.SelectionLength = 0;
                 TSSLabel1.Text = textBox1.Text.Length.ToString();
-            }
-        }
-
-        private const int CP_NOCLOSE_BUTTON = 0x200;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-                return cp;
             }
         }
 

@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-	public partial class Lic_KeyAttribs_DisplayForm : Form
+    public partial class Lic_KeyAttribs_DisplayForm : Base_DisplayForm/*<Lic_KeyAttribs>*/
 	{
 		public Lic_KeyAttribs_DisplayForm()
 		{
@@ -20,11 +20,13 @@ namespace SolimarLicenseDiagnosticDataViewer
 		public void Initialize()
 		{
 			m_heightPanel = keyListView.Height;
+			Shared.VisualComponents.ControlHelper.SetWindowTheme(this.keyListView.Handle, "Explorer", null);
 			ToogleControl(false);
 			//this.Height -= m_heightPanel;
 		}
 		private int m_heightPanel;
-		public void SetData(Lic_KeyAttribs _data)
+		//public override void SetData(Lic_KeyAttribs _data)
+        public void SetData(Lic_KeyAttribs _data)
 		{
 			if (_data != null)
 			{
@@ -112,18 +114,6 @@ namespace SolimarLicenseDiagnosticDataViewer
 			}
 		}
 
-
-		private const int CP_NOCLOSE_BUTTON = 0x200;
-		protected override CreateParams CreateParams
-		{
-			get
-			{
-				CreateParams cp = base.CreateParams;
-				cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-				return cp;
-			}
-		}
-
 		private void ToogleControl(bool _bShow)
 		{
 			if (_bShow) // show
@@ -168,7 +158,6 @@ namespace SolimarLicenseDiagnosticDataViewer
 		private void contextMenuStrip1_Click(object sender, EventArgs e)
 		{
 		}
-
 
 		private void general_KeyDown(object sender, KeyEventArgs e)
 		{

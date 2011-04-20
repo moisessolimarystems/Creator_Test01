@@ -179,9 +179,23 @@ __interface ISolimarSoftwareLicenseSvr : IDispatch
 	[id(112),helpstring("method GenerateStream_ByLicenseSystemData")] HRESULT GenerateStream_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out,retval] BSTR *pBstrLicSysDataAttribsStream);
 	[id(113),helpstring("method GenerateStreamData_ByLicenseSystemData")] HRESULT GenerateStreamData_ByLicenseSystemData([in] VARIANT vtLicSysDataPacket, [out] BSTR *pBstrCreatedDateStreamed, [out] BSTR *pBstrKeyAttribsListStream, [out] BSTR *pBstrLicUsageDataAttribsStream, [out] BSTR *pBstrConnectionAttribsListStream, [out] BSTR *pBstrEventLogAttribsListStream, [out,retval] BSTR *pBstrLicInfoDataAttribsListStream);
 	[id(114),helpstring("method GetEventLogEntries_ForLicenseServer")] HRESULT GetEventLogList_ForLicenseServer([out,retval] BSTR *pBstrEventLogAttribsListStream);
-
-
 };
+
+// ISolimarSoftwareLicenseSvr2
+[
+	object,
+	uuid("3295BF3C-D692-435a-86AF-DC559094FD86"),
+	dual,	helpstring("ISolimarSoftwareLicenseSvr2 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarSoftwareLicenseSvr2 : ISolimarSoftwareLicenseSvr
+{
+   [id(115),helpstring("method SoftwareAddApplicationInstanceByProduct2")] HRESULT SoftwareAddApplicationInstanceByProduct2([in] long productID, [in] BSTR applicationInstance, [in] long flags);
+   [id(116),helpstring("method SoftwareGetApplicationInstanceListByProduct2")] HRESULT SoftwareGetApplicationInstanceListByProduct2([in] long productID, [out,retval] BSTR *pBstrListUsAppInstInfoAttribs);
+   
+   //[id(116),helpstring("method SoftwareGetApplicationInstanceListByProduct2")] HRESULT SoftwareGetApplicationInstanceListByProduct2([in] long productID, [out] BSTR *pBstrListAppInstStream, [out,retval] BSTR *pBstrListAppInstFlagsStream);
+};
+
 
 [
 	object,
@@ -209,7 +223,7 @@ __interface ISolimarConversionToSoftwareLicenseSvr : IDispatch
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
 	public ISolimarLicenseSvr4, 
-	public ISolimarSoftwareLicenseSvr,
+	public ISolimarSoftwareLicenseSvr2,
 	public ISolimarConversionToSoftwareLicenseSvr,
 	public IObjectAuthentication,
 	public ILicensingMessage,
@@ -227,6 +241,7 @@ public:
 	{
 //wchar_t debug_buf[1024];
 //_snwprintf(debug_buf, 1024, L"CSolimarLicenseSvr::FinalConstruct() ThreadID: %d", GetCurrentThreadId());
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseSvr::FinalConstruct() - Enter");
 //OutputDebugStringW(debug_buf);
 
 		OLECHAR buffer[128];
@@ -311,7 +326,8 @@ public:
 			}
 		}
 		#endif
-
+//_snwprintf(debug_buf, 1024, L"CSolimarLicenseSvr::FinalConstruct() - Leave");
+//OutputDebugStringW(debug_buf);
 		return hr;
 		//return E_FAIL;
 		//return S_OK;
@@ -446,10 +462,19 @@ public:
 
 	STDMETHOD(SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber)(BSTR softwareLicense, BSTR contractNumber);
 
+	// ISolimarSoftwareLicenseSvr2
+	STDMETHOD(SoftwareAddApplicationInstanceByProduct2)(long productID, BSTR applicationInstance, long flags);
+	STDMETHOD(SoftwareGetApplicationInstanceListByProduct2)(long productID, BSTR *pBstrListUsAppInstInfoAttribs);
+
 	// ISolimarConversionToSoftwareLicenseSvr
 	//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one then will create new license file.
 	STDMETHOD(ConvertProtectionKeyToSoftwareLicense)(BSTR softwareLicense, BSTR keyIdent);
 private:
+
+	// Connection to the License Server via CocreateInstance will have a different m_licenseId.
+	// m_licenseId is used to track all of the licensing usage for a given connection. It is possible 
+	// to have multiple connections with the same ApplicationInstance name, but each connection 
+	// will have a different m_licenseId
 	_bstr_t m_licenseId;
 	static BYTE challenge_key_server_thisauthuser_public[];
 	static BYTE challenge_key_server_userauththis_private[];
