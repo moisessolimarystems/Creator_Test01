@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Sys_EventLogInfoAttribs_DisplayForm : Base_DisplayForm<Sys_EventLogInfoAttribs>
+    public partial class Sys_EventLogInfoAttribs_DisplayForm : Base_DisplayForm
     {
         public Sys_EventLogInfoAttribs_DisplayForm()
         {
@@ -29,7 +29,7 @@ namespace SolimarLicenseDiagnosticDataViewer
         }
 
         private Sys_EventLogInfoAttribs m_data = null;
-        public override void SetData(Sys_EventLogInfoAttribs _data)
+        public void SetData(Sys_EventLogInfoAttribs _data)
         {
             m_data = _data;
             if (m_data != null)
@@ -116,6 +116,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 
                         if (strHash.ContainsKey(key) == true && pastSourceFilter == true)
                         {
+                            //eventLogEntry.message.TVal = Solimar.Licensing.Attribs.AttribFormat.ConvertStringToRawString(eventLogEntry.message.TVal);
                             ListViewItem lvi = new ListViewItem();
                             //lvi.Text = eventLogEntry.Index.ToString();
                             //lvi.Text = eventLogEntry.entryType.ToString();

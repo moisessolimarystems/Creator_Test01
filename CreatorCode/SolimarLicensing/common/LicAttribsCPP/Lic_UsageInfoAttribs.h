@@ -134,11 +134,18 @@ public:
 			InitFromString(wsData);
 			return *this ;
 		}
+		typedef enum {
+			ufNone = 0,
+			ufUsePrimaryLic = 1,
+			ufUseFailoverLic = 2,
+		} TUsageFlag;
+		
 		typedef std::vector< Lic_UsModuleInfoAttribs > TVector_Lic_UsModuleInfoAttribsList;
 		typedef SpdAttribs::CStreamableVectors< TVector_Lic_UsModuleInfoAttribsList  > Vector_Lic_UsModuleInfoAttribsList_Obj;
 		typedef SpdAttribs::CAttribMemberBaseU< Vector_Lic_UsModuleInfoAttribsList_Obj, TVector_Lic_UsModuleInfoAttribsList > Lic_UsModuleInfoAttribsList;
 			
 		SpdAttribs::WStringAttrib applicationInstance;
+		SpdAttribs::AttribEnumTypeMember<TUsageFlag> usageFlag;
 		Lic_UsModuleInfoAttribsList moduleList;
 	
 		
@@ -146,6 +153,7 @@ public:
 		Lic_UsAppInstanceInfoAttribs& operator =(const Lic_UsAppInstanceInfoAttribs &c)
 		{
 			applicationInstance = c.applicationInstance;
+			usageFlag = c.usageFlag;
 			moduleList = c.moduleList;
 			return *this ;
 		}
@@ -153,35 +161,43 @@ public:
 		Lic_UsAppInstanceInfoAttribs() : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			applicationInstance(m_mapAttribObjs, L"aI", SpdAttribs::WStringObj(L"")),
+			usageFlag(m_mapAttribObjs, L"uF", ufNone),
 			moduleList(m_mapAttribObjs, L"mLt", Vector_Lic_UsModuleInfoAttribsList_Obj()){;}
 		
 		Lic_UsAppInstanceInfoAttribs(const Lic_UsAppInstanceInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(GetAttribsClassName()),
 			applicationInstance(m_mapAttribObjs, L"aI", c.applicationInstance),
+			usageFlag(m_mapAttribObjs, L"uF", c.usageFlag),
 			moduleList(m_mapAttribObjs, L"mLt", c.moduleList){;}
 		
 		Lic_UsAppInstanceInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			applicationInstance(m_mapAttribObjs, L"aI", SpdAttribs::WStringObj(L"")),
+			usageFlag(m_mapAttribObjs, L"uF", ufNone),
 			moduleList(m_mapAttribObjs, L"mLt", Vector_Lic_UsModuleInfoAttribsList_Obj()){;}
 		
 		Lic_UsAppInstanceInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_UsAppInstanceInfoAttribs &c) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			applicationInstance(m_mapAttribObjs, L"aI", c.applicationInstance),
+			usageFlag(m_mapAttribObjs, L"uF", c.usageFlag),
 			moduleList(m_mapAttribObjs, L"mLt", c.moduleList){;}
 		
 		Lic_UsAppInstanceInfoAttribs(const CWStringStream &wsAttribsClassName,
 			const SpdAttribs::WStringAttrib &param_applicationInstance,
+			const TUsageFlag &param_usageFlag,
 			const Lic_UsModuleInfoAttribsList &param_moduleList) : 
 				SpdAttribs::CAttribsBase(wsAttribsClassName),
 				applicationInstance(m_mapAttribObjs, L"aI", param_applicationInstance),
+				usageFlag(m_mapAttribObjs, L"uF", param_usageFlag),
 				moduleList(m_mapAttribObjs, L"mLt", param_moduleList){;}
 		
 		Lic_UsAppInstanceInfoAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 			const SpdAttribs::WStringAttrib &param_applicationInstance,
+			const TUsageFlag &param_usageFlag,
 			const Lic_UsModuleInfoAttribsList &param_moduleList) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 				applicationInstance(m_mapAttribObjs, L"aI", param_applicationInstance),
+				usageFlag(m_mapAttribObjs, L"uF", param_usageFlag),
 				moduleList(m_mapAttribObjs, L"mLt", param_moduleList){;}
 		
 	

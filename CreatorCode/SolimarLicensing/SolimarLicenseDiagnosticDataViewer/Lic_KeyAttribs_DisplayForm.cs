@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_KeyAttribs_DisplayForm : Base_DisplayForm<Lic_KeyAttribs>
+    public partial class Lic_KeyAttribs_DisplayForm : Base_DisplayForm/*<Lic_KeyAttribs>*/
 	{
 		public Lic_KeyAttribs_DisplayForm()
 		{
@@ -25,7 +25,8 @@ namespace SolimarLicenseDiagnosticDataViewer
 			//this.Height -= m_heightPanel;
 		}
 		private int m_heightPanel;
-		public override void SetData(Lic_KeyAttribs _data)
+		//public override void SetData(Lic_KeyAttribs _data)
+        public void SetData(Lic_KeyAttribs _data)
 		{
 			if (_data != null)
 			{

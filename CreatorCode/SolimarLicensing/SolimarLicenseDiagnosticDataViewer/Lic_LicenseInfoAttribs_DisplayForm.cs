@@ -10,14 +10,14 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_LicenseInfoAttribs_DisplayForm : Base_DisplayForm<Lic_PackageAttribs.Lic_LicenseInfoAttribs>
+    public partial class Lic_LicenseInfoAttribs_DisplayForm : Base_DisplayForm
     {
-        public Lic_LicenseInfoAttribs_DisplayForm()
+        public Lic_LicenseInfoAttribs_DisplayForm() : base()
         {
             InitializeComponent();
 
         }
-        public override void SetData(Lic_PackageAttribs.Lic_LicenseInfoAttribs _data)
+        public void SetData(Lic_PackageAttribs.Lic_LicenseInfoAttribs _data)
         {
             if (_data != null)
             {

@@ -9,13 +9,13 @@ using System.Windows.Forms;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class XmlViewer_DisplayForm : Base_DisplayForm<string>
+    public partial class XmlViewer_DisplayForm : Base_DisplayForm
     {
-        public XmlViewer_DisplayForm()
+        public XmlViewer_DisplayForm() : base()
         {
             InitializeComponent();
         }
-        public override void SetData(string _data)
+        public void SetData(string _data)
         {
             if (_data != null)
             {
