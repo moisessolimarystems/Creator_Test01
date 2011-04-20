@@ -443,7 +443,7 @@ private:
 	// removes all keys from the cache, and disassociates all keys with the given Application Instance to empty...
 	HRESULT FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
-	HRESULT AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError);
+	HRESULT AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bFailOver, bool bLogError);
 	HRESULT FreeAllSoftwareLicenseFromCache(ServerInfo* pServerInfo, bool bLogError);
 
 	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.

@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_SystemInfoAttribs_DisplayForm : Base_DisplayForm<Lic_SystemInfoAttribs>
+    public partial class Lic_SystemInfoAttribs_DisplayForm : Base_DisplayForm
 	{
 		public Lic_SystemInfoAttribs_DisplayForm()
 		{
@@ -18,7 +18,7 @@ namespace SolimarLicenseDiagnosticDataViewer
 			Shared.VisualComponents.ControlHelper.SetWindowTheme(this.valTokenListView.Handle, "Explorer", null);
 		}
 
-		public override void SetData(Lic_SystemInfoAttribs _data)
+		public void SetData(Lic_SystemInfoAttribs _data)
 		{
 			if (_data != null)
 			{

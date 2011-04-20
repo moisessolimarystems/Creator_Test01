@@ -16,9 +16,10 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 
 		HRESULT Initialize(KeyServer* pKeyServer, RainbowDriver* pDriver);
 	
-		HRESULT AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
+		HRESULT AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance, long flags);
 		HRESULT RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
 		HRESULT GetApplicationInstanceList(long productID, BSTR license_id, BSTR *pBstrListAppInstStream);
+		HRESULT GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs);
 
 		HRESULT ResynchronizeSoftwareLicenses(bool bForceRefresh = false);
 
