@@ -667,6 +667,13 @@ namespace SolimarLicenseViewer
                 aboutBox.ShowDialog(this);
             }
         }
+        private void solimarLicenseManualToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string manualFullPath = System.IO.Path.Combine(
+                System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath),
+                "Manuals\\Solimar Licensing Manual.pdf");
+            System.Diagnostics.Process.Start(manualFullPath);
+        }
         #endregion
 
         #endregion
@@ -1130,6 +1137,8 @@ namespace SolimarLicenseViewer
             }
             loadDiagnosticDataToolStripMenuItem.Visible = !m_bIsChildForm;
             remoteServerToolStripMenuItem.Visible = !m_bIsChildForm;
+            solimarLicenseManualToolStripMenuItem.Visible = !m_bIsChildForm;
+            helpToolStripSepMenuItem1.Visible = !m_bIsChildForm;
             this.ShowInTaskbar = !m_bIsChildForm;
             this.parentForm = _sender as Form;
             this.MinimizeBox = false;
@@ -1380,6 +1389,8 @@ namespace SolimarLicenseViewer
             }
         }
         #endregion
+
+
     }
 
     //Was lazy, this should be in it's own file - JWL... 
