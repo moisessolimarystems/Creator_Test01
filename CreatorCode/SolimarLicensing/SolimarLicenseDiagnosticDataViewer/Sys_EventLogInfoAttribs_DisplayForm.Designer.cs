@@ -30,7 +30,13 @@
         {
             this.mainBackPanel = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.msgListView = new Shared.VisualComponents.NoFlickerListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.eventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
             this.msgToolStrip = new System.Windows.Forms.ToolStrip();
             this.tsErrorButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -40,20 +46,14 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsSourceLabel = new System.Windows.Forms.ToolStripLabel();
             this.tsSourceComboBox = new System.Windows.Forms.ToolStripComboBox();
-            this.msgListView = new Shared.VisualComponents.NoFlickerListView();
-            this.eventLogEntryControl1 = new Shared.VisualComponents.EventLogEntryControl();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tssItemLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainBackPanel.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.msgToolStrip.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainBackPanel
@@ -84,15 +84,60 @@
             this.splitContainer1.SplitterDistance = 172;
             this.splitContainer1.TabIndex = 0;
             // 
-            // statusStrip1
+            // msgListView
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tssItemLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 392);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(712, 22);
-            this.statusStrip1.TabIndex = 1;
-            this.statusStrip1.Text = "statusStrip1";
+            this.msgListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.msgListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.msgListView.FullRowSelect = true;
+            this.msgListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.msgListView.HideSelection = false;
+            this.msgListView.Location = new System.Drawing.Point(0, 0);
+            this.msgListView.MultiSelect = false;
+            this.msgListView.Name = "msgListView";
+            this.msgListView.Size = new System.Drawing.Size(712, 172);
+            this.msgListView.TabIndex = 0;
+            this.msgListView.UseCompatibleStateImageBehavior = false;
+            this.msgListView.View = System.Windows.Forms.View.Details;
+            this.msgListView.SelectedIndexChanged += new System.EventHandler(this.msgListView_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Level";
+            this.columnHeader1.Width = 90;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Date and Time";
+            this.columnHeader2.Width = 190;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Source";
+            this.columnHeader3.Width = 170;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Event ID";
+            this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.columnHeader4.Width = 90;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Task Category";
+            this.columnHeader5.Width = 125;
+            // 
+            // eventLogEntryControl1
+            // 
+            this.eventLogEntryControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.eventLogEntryControl1.Location = new System.Drawing.Point(0, 0);
+            this.eventLogEntryControl1.Name = "eventLogEntryControl1";
+            this.eventLogEntryControl1.Size = new System.Drawing.Size(712, 191);
+            this.eventLogEntryControl1.TabIndex = 0;
             // 
             // msgToolStrip
             // 
@@ -108,6 +153,7 @@
             this.tsSourceComboBox});
             this.msgToolStrip.Location = new System.Drawing.Point(0, 0);
             this.msgToolStrip.Name = "msgToolStrip";
+            this.msgToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.msgToolStrip.Size = new System.Drawing.Size(712, 25);
             this.msgToolStrip.TabIndex = 0;
             this.msgToolStrip.Text = "toolStrip1";
@@ -180,60 +226,15 @@
             this.tsSourceComboBox.Size = new System.Drawing.Size(200, 25);
             this.tsSourceComboBox.DropDownStyleChanged += new System.EventHandler(this.RefreshUI);
             // 
-            // msgListView
+            // statusStrip1
             // 
-            this.msgListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5});
-            this.msgListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msgListView.FullRowSelect = true;
-            this.msgListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.msgListView.HideSelection = false;
-            this.msgListView.Location = new System.Drawing.Point(0, 0);
-            this.msgListView.MultiSelect = false;
-            this.msgListView.Name = "msgListView";
-            this.msgListView.Size = new System.Drawing.Size(712, 172);
-            this.msgListView.TabIndex = 0;
-            this.msgListView.UseCompatibleStateImageBehavior = false;
-            this.msgListView.View = System.Windows.Forms.View.Details;
-            this.msgListView.SelectedIndexChanged += new System.EventHandler(this.msgListView_SelectedIndexChanged);
-            // 
-            // eventLogEntryControl1
-            // 
-            this.eventLogEntryControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.eventLogEntryControl1.Location = new System.Drawing.Point(0, 0);
-            this.eventLogEntryControl1.Name = "eventLogEntryControl1";
-            this.eventLogEntryControl1.Size = new System.Drawing.Size(712, 191);
-            this.eventLogEntryControl1.TabIndex = 0;
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Level";
-            this.columnHeader1.Width = 90;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Date and Time";
-            this.columnHeader2.Width = 190;
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Source";
-            this.columnHeader3.Width = 170;
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Event ID";
-            this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.columnHeader4.Width = 90;
-            // 
-            // columnHeader5
-            // 
-            this.columnHeader5.Text = "Task Category";
-            this.columnHeader5.Width = 125;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tssItemLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 392);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(712, 22);
+            this.statusStrip1.TabIndex = 1;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // tssItemLabel
             // 
@@ -249,17 +250,16 @@
             this.Controls.Add(this.mainBackPanel);
             this.Controls.Add(this.statusStrip1);
             this.Name = "Sys_EventLogInfoAttribs_DisplayForm";
-            this.ShowIcon = false;
             this.Text = "Sys_EventLogInfoAttribs";
             this.mainBackPanel.ResumeLayout(false);
             this.mainBackPanel.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.msgToolStrip.ResumeLayout(false);
             this.msgToolStrip.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

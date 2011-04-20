@@ -7,9 +7,9 @@ namespace Solimar
         public class VersionInfo
         {
             public static int MAJOR_REVISION_NUMBER = 3;
-            public static int MINOR_REVISION_NUMBER = 0;
+            public static int MINOR_REVISION_NUMBER = 1;
             public static int BUILD_NUMBER = 9999;
-            public const string PRODUCT_VERSION = "3.0.9999.0";
+            public const string PRODUCT_VERSION = "3.1.9999.0";
         }
 
         public class InstanceVersionInfo
