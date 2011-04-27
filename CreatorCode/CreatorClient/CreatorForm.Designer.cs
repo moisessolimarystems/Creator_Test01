@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode2,
-            treeNode3,
-            treeNode4});
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode47 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode37 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode43 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode44 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode45 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode37,
+            treeNode43,
+            treeNode44});
+            System.Windows.Forms.TreeNode treeNode46 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -174,13 +174,13 @@
             this.lcmToolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.checkOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkInToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reactivateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deactivateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lcmToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.newLicenseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newProductLicenseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cloneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.verifiedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unVerifiedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -724,6 +724,7 @@
             this.DetailTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.DetailTreeView_AfterSelect);
             this.DetailTreeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseDown);
             this.DetailTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DetailTreeView_KeyDown);
+            this.DetailTreeView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.DetailTreeView_ItemDrag);
             // 
             // CreatorImageList
             // 
@@ -1322,10 +1323,10 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode1.Name = "RootNode";
-            treeNode1.Text = "Reports";
+            treeNode47.Name = "RootNode";
+            treeNode47.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode47});
             this.reportsTreeView.SelectedImageIndex = 34;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
@@ -1381,29 +1382,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode2.ImageIndex = 1;
-            treeNode2.Name = "LicenseNode";
-            treeNode2.SelectedImageIndex = 1;
-            treeNode2.Text = "Licenses";
-            treeNode3.ImageIndex = 2;
-            treeNode3.Name = "PacketNode";
-            treeNode3.SelectedImageIndex = 2;
-            treeNode3.Text = "Packets";
-            treeNode4.Name = "KeyNode";
-            treeNode4.Text = "Hardware Keys";
-            treeNode5.ImageIndex = 3;
-            treeNode5.Name = "CreatorRootNode";
-            treeNode5.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode5.SelectedImageIndex = 3;
-            treeNode5.Text = "Creator";
-            treeNode6.ImageIndex = 0;
-            treeNode6.Name = "ReportRootNode";
-            treeNode6.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode6.SelectedImageIndex = 0;
-            treeNode6.Text = "Reports";
+            treeNode37.ImageIndex = 1;
+            treeNode37.Name = "LicenseNode";
+            treeNode37.SelectedImageIndex = 1;
+            treeNode37.Text = "Licenses";
+            treeNode43.ImageIndex = 2;
+            treeNode43.Name = "PacketNode";
+            treeNode43.SelectedImageIndex = 2;
+            treeNode43.Text = "Packets";
+            treeNode44.Name = "KeyNode";
+            treeNode44.Text = "Hardware Keys";
+            treeNode45.ImageIndex = 3;
+            treeNode45.Name = "CreatorRootNode";
+            treeNode45.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode45.SelectedImageIndex = 3;
+            treeNode45.Text = "Creator";
+            treeNode46.ImageIndex = 0;
+            treeNode46.Name = "ReportRootNode";
+            treeNode46.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode46.SelectedImageIndex = 0;
+            treeNode46.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode5,
-            treeNode6});
+            treeNode45,
+            treeNode46});
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);
@@ -1652,13 +1653,13 @@
             this.lcmToolStripSeparator1,
             this.checkOutToolStripMenuItem,
             this.checkInToolStripMenuItem,
+            this.cloneToolStripMenuItem,
             this.reactivateToolStripMenuItem,
             this.deactivateToolStripMenuItem,
             this.deleteToolStripMenuItem,
             this.lcmToolStripSeparator2,
             this.newLicenseToolStripMenuItem,
             this.newProductLicenseToolStripMenuItem,
-            this.cloneToolStripMenuItem,
             this.toolStripMenuItem2,
             this.validationTokensToolStripMenuItem,
             this.lcmToolStripSeparator3,
@@ -1706,6 +1707,13 @@
             this.checkInToolStripMenuItem.Text = "Check In...";
             this.checkInToolStripMenuItem.Click += new System.EventHandler(this.checkInToolStripMenuItem_Click);
             // 
+            // cloneToolStripMenuItem
+            // 
+            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
+            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.cloneToolStripMenuItem.Text = "Copy";
+            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
+            // 
             // reactivateToolStripMenuItem
             // 
             this.reactivateToolStripMenuItem.Name = "reactivateToolStripMenuItem";
@@ -1716,6 +1724,7 @@
             // deactivateToolStripMenuItem
             // 
             this.deactivateToolStripMenuItem.Name = "deactivateToolStripMenuItem";
+            this.deactivateToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this.deactivateToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.deactivateToolStripMenuItem.Text = "Deactivate";
             this.deactivateToolStripMenuItem.Click += new System.EventHandler(this.deactivateToolStripMenuItem_Click);
@@ -1724,6 +1733,7 @@
             // 
             this.deleteToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteToolStripMenuItem.Image")));
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
@@ -1750,13 +1760,6 @@
             this.newProductLicenseToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.newProductLicenseToolStripMenuItem.Text = "Product License";
             this.newProductLicenseToolStripMenuItem.Click += new System.EventHandler(this.newProductLicenseToolStripMenuItem_Click);
-            // 
-            // cloneToolStripMenuItem
-            // 
-            this.cloneToolStripMenuItem.Name = "cloneToolStripMenuItem";
-            this.cloneToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
-            this.cloneToolStripMenuItem.Text = "Clone";
-            this.cloneToolStripMenuItem.Click += new System.EventHandler(this.cloneToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
