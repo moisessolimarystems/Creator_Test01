@@ -34,7 +34,7 @@ namespace SolimarLicenseViewer
         public bool bIsProgrammed;
         public long applicationInstance;
     }
-    public class CommunicationLink
+    public class CommunicationLink : Shared.VisualComponents.IEventLog
     {
         #region Constructor
         public CommunicationLink()
@@ -45,6 +45,91 @@ namespace SolimarLicenseViewer
             Solimar.Licensing.GlobalSoftwareSpec globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
             m_softwareSpec = globalSwSpec.softwareSpec;
             m_ServerName = "Not Connected";
+        }
+
+        #endregion
+
+        #region IEventLog
+        public string GetMachineName() { return this.ServerName; }
+        public System.Collections.Generic.IList<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs> GetAllEntries()
+        {
+            string streamedEventLog = this.GetEventLogList_ForLicenseServer();
+
+            System.Collections.Generic.IList<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs> eventLogList = new System.Collections.Generic.List<Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs>();
+            Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs sysEventLogInfo = new Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs();
+            sysEventLogInfo.AssignMembersFromStream(streamedEventLog);
+
+            foreach (Solimar.Licensing.Attribs.Sys_EventLogInfoAttribs.Sys_EventLogEntriesInfoAttribs eventEntryInfo in sysEventLogInfo.entryList.TVal)
+            {
+                eventLogList.Add(eventEntryInfo);
+            }
+            return eventLogList;
+
+        }
+        #endregion
+
+        #region Async Helpers
+        public delegate void DelParamVoidReturnsVoid();
+        public delegate void DelParamStringBoolReturnsVoid(string s1, bool b1);
+        public delegate void DelParamByteArrayReturnsVoid(Byte[] byteArray);
+        public delegate void DelParamByteArrayRefStringReturnsVoid(Byte[] byteArray, ref string refS1);
+        public delegate void DelParamRefByteArrayReturnsVoid(ref Byte[] refByteArray);
+        public delegate void DelParamStringRefByteArrayReturnsVoid(string s1, ref Byte[] refByteArray);
+        #endregion
+        #region Async Version of LicenseServerWrapper Methods
+        public void Async_Connect(String _serverName)
+        {
+            Async_Connect(_serverName, true);
+        }
+        public void Async_Connect(String _serverName, bool _bDisconnectOnError)
+        {
+            DelParamStringBoolReturnsVoid delFunction = new DelParamStringBoolReturnsVoid(Connect);
+
+            IAsyncResult result = delFunction.BeginInvoke(_serverName, _bDisconnectOnError, null, null);
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(result);
+        }
+        public void Async_EnterSoftwareLicArchive(Byte[] _byteArrayLicense)
+        {
+            DelParamByteArrayReturnsVoid delFunction = new DelParamByteArrayReturnsVoid(EnterSoftwareLicArchive);
+            IAsyncResult result = delFunction.BeginInvoke(_byteArrayLicense, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(result);
+        }
+        public void Async_EnterSoftwareLicPacket(Byte[] _byteLicPacket, ref String _refVerificationCode)
+        {
+            DelParamByteArrayRefStringReturnsVoid delFunction = new DelParamByteArrayRefStringReturnsVoid(EnterSoftwareLicPacket);
+            IAsyncResult result = delFunction.BeginInvoke(_byteLicPacket, ref _refVerificationCode, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _refVerificationCode, result);
+        }
+        public void Async_GenerateLicenseSystemData(ref Byte[] _newByteArrayLicense)
+        {
+            DelParamRefByteArrayReturnsVoid delFunction = new DelParamRefByteArrayReturnsVoid(GenerateLicenseSystemData);
+            IAsyncResult result = delFunction.BeginInvoke(ref _newByteArrayLicense, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _newByteArrayLicense, result);
+        }
+        public void Async_GenerateSoftwareLicArchive_ByLicense(string _softwareLicense, ref byte[] _refByteLicenseArchive)
+        {
+            DelParamStringRefByteArrayReturnsVoid delFunction = new DelParamStringRefByteArrayReturnsVoid(GenerateSoftwareLicArchive_ByLicense);
+            IAsyncResult result = delFunction.BeginInvoke(_softwareLicense, ref _refByteLicenseArchive, null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(ref _refByteLicenseArchive, result);
         }
         #endregion
 
@@ -64,7 +149,7 @@ namespace SolimarLicenseViewer
                 {
                     throw innerEx; 
                 }
-                if(m_licServer == null)
+                if (m_licServer == null)
                     m_licServer = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseServerWrapper();
 
                 try { m_licServer.Connect(serverName); }
@@ -74,6 +159,40 @@ namespace SolimarLicenseViewer
                     throw innerEx;
                 }
                 m_ServerName = serverName;
+
+                //CR.FIX.13048 - Try to retrieve software spec from license server, use it if
+                //it is newer than source version.
+
+                //Calling GetSoftwareSpec() will cause the license server to crash in pre 3.0.276 and below.
+                //1 option, try to call GetSoftwareSpecByProduct(), if E_NOTIMPL is returned, then
+                //calling GetSoftwareSpec() will crash license server
+                int svrMajor = 0;
+                int svrMinor = 0;
+                int svrBuild = 0;
+                GetVersionLicenseServer(serverName, ref svrMajor, ref svrMinor, ref svrBuild);
+                InstanceVersionInfo verInfo = new InstanceVersionInfo(svrMajor, svrMinor, svrBuild);
+                if (verInfo.CompareTo(new InstanceVersionInfo(3, 0, 276)) > 0)
+                {
+                    string str = m_licServer.GetSoftwareSpec();
+                    Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
+                    tmpSpec.AssignMembersFromStream(str);
+
+                    bool? bReplaceSoftwareSpec = null;
+                    if(tmpSpec.softwareSpec_Major.TVal != m_softwareSpec.softwareSpec_Major.TVal)
+                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Major.TVal > m_softwareSpec.softwareSpec_Major.TVal);
+                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_Minor.TVal != m_softwareSpec.softwareSpec_Minor.TVal))
+                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Minor.TVal > m_softwareSpec.softwareSpec_Minor.TVal);
+                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMajor.TVal != m_softwareSpec.softwareSpec_SubMajor.TVal))
+                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMajor.TVal > m_softwareSpec.softwareSpec_SubMajor.TVal);
+                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMinor.TVal != m_softwareSpec.softwareSpec_SubMinor.TVal))
+                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMinor.TVal > m_softwareSpec.softwareSpec_SubMinor.TVal);
+
+                    if ((bReplaceSoftwareSpec.HasValue == true) && (bReplaceSoftwareSpec.Value == true))
+                    {
+                        m_softwareSpec = tmpSpec;
+                        tmpSpec = null;
+                    }
+                }
             }
             catch (COMException ex)
             {
@@ -82,7 +201,6 @@ namespace SolimarLicenseViewer
                     Disconnect();
                 else
                     m_ServerName = serverName;
-
                 throw;
             }
         }
@@ -182,7 +300,6 @@ namespace SolimarLicenseViewer
                                         m_protectionKeyCache = new List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo>();
                                     m_protectionKeyCache.Add(wrapperKeyInfo);
                                 }
-
                                 Solimar.Licensing.Attribs.AttribsMemberStringList streamedInfoList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                                 streamedInfoList.SVal = licInfoListStreamed;
                                 Solimar.Licensing.Attribs.AttribsMemberStringList softwareLicNameList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
@@ -191,6 +308,11 @@ namespace SolimarLicenseViewer
                                     try { m_usageAttribs.AssignMembersFromStream(Solimar.Licensing.Attribs.XMLDocumentHelper.GetDocumentElementFromString(usageInfoStreamed).InnerText); }
                                     catch (Exception) { }
                                 }
+                                if(eventLogListStreamed.Length != 0)
+                                {
+                                    m_DiagnosticEventLogStreamed = Solimar.Licensing.Attribs.XMLDocumentHelper.GetDocumentElementFromString(eventLogListStreamed).InnerText;
+                                }
+                                
                                 m_DiagnosticDateCreatedDate = Solimar.Licensing.Attribs.AttribFormat.ConvertStringToDateTime(modifiedDateStreamed);
                                 foreach (string streamedInfo in streamedInfoList.TVal)
                                 {
@@ -200,7 +322,8 @@ namespace SolimarLicenseViewer
                                     softwareLicNameList.TVal.Add(licInfoName);
                                     m_softwareLicByLic_Cache[licInfoName] = streamedInfo;
                                 }
-                                m_allSoftwareLic_Cache = softwareLicNameList;
+                                //surround xml <stringList> around the softwareLicNameList
+                                m_allSoftwareLic_Cache = string.Format("<stringList>{0}</stringList>", softwareLicNameList);
                             }
                             catch (COMException)
                             {
@@ -319,6 +442,78 @@ namespace SolimarLicenseViewer
             {
                 throw new COMException("SoftwareGetApplicationInstanceListByProduct Failed", ex);
             }
+        }
+        public void SoftwareGetApplicationInstanceListByProduct2(int prodID, ref String generalStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView)
+                {
+                    generalStream = string.Empty;
+                    foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs usProdInfo in m_usageAttribs.productList.TVal)
+                    {
+                        if (usProdInfo.productID.TVal == prodID)
+                        {
+                            generalStream = string.Format("<aLt>{0}</aLt>", usProdInfo.appInstanceList.SVal);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    generalStream = m_licServer.SoftwareGetApplicationInstanceListByProduct2(prodID);
+                }
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("SoftwareGetApplicationInstanceListByProduct Failed", ex);
+            }
+        }
+        public System.Collections.Generic.Dictionary<string, bool?> GetAppInstToUsageMap_ByProduct(int prodID)
+        {
+            System.Collections.Generic.Dictionary<string, bool?> usageMap = new Dictionary<string, bool?>();
+            String generalStream = "";
+
+            Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs.Lic_UsAppInstanceInfoAttribsList usageAppList = null;
+            Solimar.Licensing.Attribs.AttribsMemberStringList appList = null;
+            try
+            {
+                SoftwareGetApplicationInstanceListByProduct2(prodID, ref generalStream);
+                if (!string.IsNullOrEmpty(generalStream))
+                {
+                    usageAppList = new Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs.Lic_UsAppInstanceInfoAttribsList("aLt", new System.Collections.ArrayList());
+                    usageAppList.SVal = generalStream;
+                }
+                else
+                    throw new Exception();
+            }
+            catch (Exception)
+            {
+                usageAppList = null;
+                SoftwareGetApplicationInstanceListByProduct(prodID, ref generalStream);
+                appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                appList.SVal = generalStream;
+            }
+
+            if (usageAppList != null && usageAppList.TVal.Count > 0)
+            {
+                foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs usageInfo in usageAppList.TVal)
+                {
+                    bool? bUsage = null;
+                    if (usageInfo.usageFlag.TVal == Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs.TUsageFlag.ufUsePrimaryLic)
+                        bUsage = true;
+                    else if (usageInfo.usageFlag.TVal == Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs.TUsageFlag.ufUseFailoverLic)
+                        bUsage = false;
+                    usageMap.Add(usageInfo.applicationInstance.TVal, bUsage);
+                }
+            }
+            else if (appList != null && appList.TVal.Count > 0)
+            {
+                foreach (string appInstance in appList.TVal)
+                    usageMap.Add(appInstance, null);
+            }
+
+            return usageMap;
         }
 
         public void VerifyTokenByLicense(String softwareLicense, int validationTokenType, String verificationValue)
@@ -507,6 +702,23 @@ namespace SolimarLicenseViewer
             {
                 throw;
             }
+        }
+
+        public string GetEventLogList_ForLicenseServer()
+        {
+            string streamedEventLog = string.Empty;
+            try
+            {
+                if (this.bDiagnosticDateView == false)
+                    streamedEventLog = m_licServer.GetEventLogList_ForLicenseServer();
+                else
+                    streamedEventLog = m_DiagnosticEventLogStreamed;
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+            return streamedEventLog;
         }
 
         //Cache for Protection Key Info - m_protectionKeyCache
@@ -745,6 +957,7 @@ namespace SolimarLicenseViewer
         private Byte[] m_DiagnosticDateByteArray = null;
         private Exception m_exception = null;
         private Solimar.Licensing.Attribs.Lic_UsageInfoAttribs m_usageAttribs = new Solimar.Licensing.Attribs.Lic_UsageInfoAttribs();
+        private string m_DiagnosticEventLogStreamed = string.Empty;
         #endregion
         public bool bDiagnosticDateView { get { return m_bDiagnosticDateView; } }
         public DateTime? diagnosticDateCreatedDate { get { return m_DiagnosticDateCreatedDate; } }
