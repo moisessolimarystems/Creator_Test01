@@ -617,6 +617,9 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 				m_product = Lic_PackageAttribs::pid_TestDevSseSp;
 			else if(m_product == Lic_PackageAttribs::pid_SOLitrack)	//CR.14543 - Add Test/Dev for SOLitrack
 				m_product = Lic_PackageAttribs::pid_TestDevSOLitrack;
+			else if(m_product == Lic_PackageAttribs::pid_LibraryServices)
+				m_product = Lic_PackageAttribs::pid_TestDevLibraryServices;
+			
 		}
 		bConnectedToAtleastOneComputer = true;
 	}
@@ -1245,6 +1248,9 @@ void CSolimarLicenseMgr::InternalCalculateLegacyProtectionKeyInfo(long _productI
 			break;
 		case Lic_PackageAttribs::pid_TestDevSOLitrack://CR.14543 - Add Test/Dev for SOLitrack
 			m_productKeyID = Lic_PackageAttribs::pid_SOLitrack;
+			break;
+		case Lic_PackageAttribs::pid_TestDevLibraryServices:
+			m_productKeyID = Lic_PackageAttribs::pid_LibraryServices;
 			break;
 		default:
 			m_productKeyID = _productID;
