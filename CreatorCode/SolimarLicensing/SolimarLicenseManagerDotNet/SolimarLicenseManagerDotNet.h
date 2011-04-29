@@ -296,6 +296,9 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			//returns appInstListStream
 			String^ SoftwareGetApplicationInstanceListByProduct(long productID);
 
+			//returns a streamed Lic_UsProductInfoAttribs
+			String^ SoftwareGetApplicationInstanceListByProduct2(long productID);
+
 			//throws an exception on a failure
 			void GenerateSoftwareLicPacket(String^ licPackageAttribsStream, DateTime expirationDate, String^% refVerificationCode, array<Byte>^% refByteLicensePacket);
 			//returns VerificationCode
