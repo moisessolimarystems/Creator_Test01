@@ -93,6 +93,7 @@
       <enum name="pid_RubikaProcessBuilder" value="17" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
       <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
+      <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -105,8 +106,9 @@
       <enum name="pid_TestDevRubikaProcessBuilder" value="117" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
       <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
+      <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
 		<!-- Dont include, these typedefs can never change, not sure what this is...
-			<enum name="pid_NumberOfProducts" value="22" alias="NUMBER_OF_PRODUCTS"/>
+			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 		</typedef>
@@ -435,6 +437,14 @@
 		<typedef type="class" name="Lic_UsAppInstanceInfoAttribs">
 		<AttribsClass code_class_name="Lic_UsAppInstanceInfoAttribs" name="L_UAA" descriptive_name="License Information - Usage App Instance Attributes" base="">
 			<attrib type="string" name="applicationInstance" tagname="aI" default=""/>
+			
+			<typedef type="enum" name="TUsageFlag">
+				<enum name="ufNone" value="0" alias="None"/>
+				<enum name="ufUsePrimaryLic" value="1" alias="Using Primary Licensing"/>
+				<enum name="ufUseFailoverLic" value="2" alias="Using Failover Licensing"/>
+			</typedef>
+			<attrib type="TUsageFlag" name="usageFlag" tagname="uF" default="ufNone"/>
+			
 			<typedef type="collection" name="Lic_UsModuleInfoAttribsList">
 				<List value_type="Lic_UsModuleInfoAttribs"/>
 			</typedef>
