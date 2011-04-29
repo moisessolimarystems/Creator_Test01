@@ -553,9 +553,7 @@ OutputDebugString(L"SoftwareServer::GetSoftwareSpecByProduct() - SafeMutex mutex
 HRESULT SoftwareServer::GetSoftwareSpec(BSTR *pBstrSoftwareSpecAttribsStream)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	//int c = softwareLicMgrMap.size();
-	*pBstrSoftwareSpecAttribsStream = SysAllocString(pSoftwareSpec->ToString().c_str());
-	//*pBstrSoftwareSpecAttribsStream = SysAllocString(L"Hello");
+	*pBstrSoftwareSpecAttribsStream = SysAllocString(g_pSoftwareSpec->GetSoftwareSpec().ToString().c_str());
 	return S_OK;
 }
 

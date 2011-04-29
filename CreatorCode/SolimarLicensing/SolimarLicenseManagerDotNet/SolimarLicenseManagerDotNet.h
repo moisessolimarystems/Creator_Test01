@@ -9,7 +9,9 @@ using namespace System;
 
 namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper 
 {
-	//This wrapper exposes all the functionality in License Wrapper.cpp/.h for managed code
+	///<summary>
+	///This wrapper exposes all the functionality in License Wrapper.cpp/.h for managed code
+	///</summary>
 	public ref class SolimarLicenseWrapper
 	{
 		public:
@@ -37,8 +39,13 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			
 			~SolimarLicenseWrapper();	//Destructor for cleaning up managed resources
 			!SolimarLicenseWrapper();	//Finalizer for cleaning up unmanaged resources
+
+			///<summary>
+			///Connect to the License Server on the given Machine.
+			///</summary>
 			bool Connect(String^ server);
 			bool Connect(String^ server, bool bUseOnlySharedLicenses, bool bUseAsBackup);
+
 			bool ConnectByProduct(long product, bool bUseSharedLicenseServers);
 			bool Disconnect();
 			bool Initialize(long product, long prodVerMajor, long prodVerMinor, bool singleKey, String^ specificSingleKeyIdent, bool lockKeys, LICENSE_LEVEL uiLevel, unsigned long gracePeriodMinutes);
@@ -283,6 +290,8 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 
 			//HRESULT GetSoftwareSpecByProduct(long productID, String^% refProductSoftwareSpecAttribs);
 			//HRESULT GetSoftwareSpec(String^% refSoftwareSpecAttribsStream);
+			String^ GetSoftwareSpecByProduct(long productID);
+			String^ GetSoftwareSpec();
 
 			//returns appInstListStream
 			String^ SoftwareGetApplicationInstanceListByProduct(long productID);

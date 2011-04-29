@@ -135,7 +135,6 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 
 		//free BSTR
 		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
-
 		return bResult;
 	}
 
@@ -1034,6 +1033,32 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 
 		return ;
+	}
+
+	String^ SolimarLicenseServerWrapper::GetSoftwareSpecByProduct(long productID)
+	{
+		String^ refProductSoftwareSpecAttribs;
+		BSTR bstrStream;
+		HRESULT hrResult = m_pLicenseServerWrapper->GetSoftwareSpecByProduct(productID, &bstrStream);
+		refProductSoftwareSpecAttribs = gcnew String(bstrStream);
+		SysFreeString(bstrStream);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return refProductSoftwareSpecAttribs;
+	}
+
+	String^ SolimarLicenseServerWrapper::GetSoftwareSpec()
+	{
+		String^ refSoftwareSpecAttribsStream;
+		BSTR bstrStream;
+		HRESULT hrResult = m_pLicenseServerWrapper->GetSoftwareSpec(&bstrStream);
+		refSoftwareSpecAttribsStream = gcnew String(bstrStream);
+		SysFreeString(bstrStream);
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return refSoftwareSpecAttribsStream;
 	}
 
 	//HRESULT SolimarLicenseServerWrapper::GetSoftwareSpecByProduct(long productID, String^% refProductSoftwareSpecAttribs)
