@@ -149,7 +149,7 @@ namespace SolimarLicenseViewer
                 {
                     throw innerEx; 
                 }
-                if(m_licServer == null)
+                if (m_licServer == null)
                     m_licServer = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseServerWrapper();
 
                 try { m_licServer.Connect(serverName); }
@@ -442,6 +442,78 @@ namespace SolimarLicenseViewer
             {
                 throw new COMException("SoftwareGetApplicationInstanceListByProduct Failed", ex);
             }
+        }
+        public void SoftwareGetApplicationInstanceListByProduct2(int prodID, ref String generalStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView)
+                {
+                    generalStream = string.Empty;
+                    foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs usProdInfo in m_usageAttribs.productList.TVal)
+                    {
+                        if (usProdInfo.productID.TVal == prodID)
+                        {
+                            generalStream = string.Format("<aLt>{0}</aLt>", usProdInfo.appInstanceList.SVal);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    generalStream = m_licServer.SoftwareGetApplicationInstanceListByProduct2(prodID);
+                }
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("SoftwareGetApplicationInstanceListByProduct Failed", ex);
+            }
+        }
+        public System.Collections.Generic.Dictionary<string, bool?> GetAppInstToUsageMap_ByProduct(int prodID)
+        {
+            System.Collections.Generic.Dictionary<string, bool?> usageMap = new Dictionary<string, bool?>();
+            String generalStream = "";
+
+            Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs.Lic_UsAppInstanceInfoAttribsList usageAppList = null;
+            Solimar.Licensing.Attribs.AttribsMemberStringList appList = null;
+            try
+            {
+                SoftwareGetApplicationInstanceListByProduct2(prodID, ref generalStream);
+                if (!string.IsNullOrEmpty(generalStream))
+                {
+                    usageAppList = new Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs.Lic_UsAppInstanceInfoAttribsList("aLt", new System.Collections.ArrayList());
+                    usageAppList.SVal = generalStream;
+                }
+                else
+                    throw new Exception();
+            }
+            catch (Exception)
+            {
+                usageAppList = null;
+                SoftwareGetApplicationInstanceListByProduct(prodID, ref generalStream);
+                appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                appList.SVal = generalStream;
+            }
+
+            if (usageAppList != null && usageAppList.TVal.Count > 0)
+            {
+                foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs usageInfo in usageAppList.TVal)
+                {
+                    bool? bUsage = null;
+                    if (usageInfo.usageFlag.TVal == Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs.TUsageFlag.ufUsePrimaryLic)
+                        bUsage = true;
+                    else if (usageInfo.usageFlag.TVal == Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsAppInstanceInfoAttribs.TUsageFlag.ufUseFailoverLic)
+                        bUsage = false;
+                    usageMap.Add(usageInfo.applicationInstance.TVal, bUsage);
+                }
+            }
+            else if (appList != null && appList.TVal.Count > 0)
+            {
+                foreach (string appInstance in appList.TVal)
+                    usageMap.Add(appInstance, null);
+            }
+
+            return usageMap;
         }
 
         public void VerifyTokenByLicense(String softwareLicense, int validationTokenType, String verificationValue)
