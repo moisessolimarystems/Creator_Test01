@@ -15,7 +15,6 @@
 #include "..\SolimarLicenseServer\KeyMessages.h"
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_GenericAttribs.h"
-#include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"   //For Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::TUsageFlag
 #include "..\Common\SoftwareSpecInstance.h"	//ForGlobalSoftwareSpec::GlobalSoftwareSpec & g_pSoftwareSpec
 #include "resource.h"
 #include <string>
@@ -620,8 +619,6 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 				m_product = Lic_PackageAttribs::pid_TestDevSOLitrack;
 			else if(m_product == Lic_PackageAttribs::pid_LibraryServices)
 				m_product = Lic_PackageAttribs::pid_TestDevLibraryServices;
-			else if(m_product < 100) //Default Case, currently all products are below 100, and test/dev for a given product is product# + 100
-				m_product += 100;
 			
 		}
 		bConnectedToAtleastOneComputer = true;
@@ -1256,10 +1253,7 @@ void CSolimarLicenseMgr::InternalCalculateLegacyProtectionKeyInfo(long _productI
 			m_productKeyID = Lic_PackageAttribs::pid_LibraryServices;
 			break;
 		default:
-			if(_productID >= 100) //Default Case, currently all products are below 100, and test/dev for a given product is product# + 100
-				m_productKeyID -= 100;
-			else
-				m_productKeyID = _productID;
+			m_productKeyID = _productID;
 			break;
 	}
 
@@ -2628,7 +2622,7 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 				if (	Version::ModuleVersion(prodAttribs.product_Major, prodAttribs.product_Minor, prodAttribs.product_SubMajor, prodAttribs.product_SubMinor) >= 
 						(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)))
 				{
-					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, m_bUsingBackupServers, _bLogError);
+					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, _bLogError);
 					if(SUCCEEDED(hr))
 						bFoundProductAndVersion = true;
 
@@ -4260,22 +4254,15 @@ HRESULT CSolimarLicenseMgr::RemoveObsoleteKeysFromCache()
 	return S_OK;
 }
 
+
+
 //Software server
-HRESULT CSolimarLicenseMgr::AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bFailOver, bool bLogError)
+HRESULT CSolimarLicenseMgr::AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError)
 {
 	HRESULT hr(S_OK);
 	if(!m_bViewLicenseOnly && pServerInfo != NULL)
 	{
-		try
-		{
-			SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr2, (*pServerInfo), SoftwareAddApplicationInstanceByProduct2, (m_product, appInstance, bFailOver ? Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::ufUseFailoverLic : Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::ufUsePrimaryLic), hr);
-		}
-		catch(HRESULT &eHr)
-		{
-			hr = eHr;
-			if(hr == E_NOINTERFACE) //ISolimarSoftwareLicenseSvr2 doesn't exist, call the older interface.
-				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareAddApplicationInstanceByProduct, (m_product, appInstance), hr);
-		}
+		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareAddApplicationInstanceByProduct, (m_product, appInstance), hr);
 	}
 	return hr;
 }
