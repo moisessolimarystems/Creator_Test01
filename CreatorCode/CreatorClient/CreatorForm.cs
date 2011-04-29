@@ -1021,9 +1021,10 @@ namespace Client.Creator
                                 {
                                     ModID = mt.ModID,
                                     AppInstance = mt.AppInstance,
-                                    ProductLicenseID = clonedPLT.ID,
+                                    ProductLicenseID = dbPLT.ID,
                                     Value = mt.Value
                                 };
+ //quesiton why doesn't it keep the latest module value
                                 newModules.Add(newModule);
                             }
                             client.CreateAllModules(newModules);
@@ -5254,7 +5255,19 @@ namespace Client.Creator
             dragString.Append("\n");
             if (node.Tag is LicenseServer)
             {
-                dragString.Append((node.Tag as LicenseServer).Name);              
+                LicenseServer ls = node.Tag as LicenseServer;
+                Service<ICreator>.Use(client =>
+                {
+                    List<ProductLicenseTable> plList = client.GetProductLicenses(ls.Name, true);
+                    foreach (ProductLicenseTable plt in plList.OrderBy(p => p.ProductID))
+                    {
+                        dragString.Append(s_CommLink.GetProductName(plt.ProductID));
+                        dragString.Append(" ");
+                        dragString.Append(plt.plID);
+                        dragString.Append("\n");
+                    }
+                });
+                //need to copy all product licenses also
             }
             else if (node.Tag is ProductCollection)
             { 
@@ -5276,9 +5289,14 @@ namespace Client.Creator
                 ProductLicense pl = node.Tag as ProductLicense;
                 dragString.Append(pl.ProductName);
                 dragString.Append(" ");
-                dragString.Append(pl.ID);
+                dragString.Append(pl.ID);                
             }
-            DoDragDrop(dragString.ToString(), DragDropEffects.Copy | DragDropEffects.Move);
+            //RichTextBox rtf = new RichTextBox()
+            //{
+            //    Font = new Font("Arial", 10.0f),
+            //    Text = dragString.ToString()
+            //};
+            DoDragDrop(/*rtf.Rtf*/ dragString.ToString(), DragDropEffects.Copy | DragDropEffects.Move);            
         }
     }
 }
