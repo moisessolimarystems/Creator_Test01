@@ -47,6 +47,7 @@ public:
 		pid_RubikaProcessBuilder = 17,
 		pid_SdxDesigner = 18,
 		pid_SpdeQueueManager = 19,
+		pid_LibraryServices = 20,
 		pid_TestDevIconvert = 107,
 		pid_TestDevSolsearcherEp = 108,
 		pid_TestDevSolScript = 109,
@@ -59,6 +60,7 @@ public:
 		pid_TestDevRubikaProcessBuilder = 117,
 		pid_TestDevSdxDesigner = 118,
 		pid_TestDevSpdeQueueManager = 119,
+		pid_TestDevLibraryServices = 120,
 		pid_UnknownProduct = 0xFFFF,
 	} TLic_ProductID;
 	
