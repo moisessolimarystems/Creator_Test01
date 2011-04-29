@@ -133,11 +133,24 @@ void InititalizeProduct20()
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
+	pTmpModSpec->moduleID = 1;
+	pTmpModSpec->moduleName = std::wstring(L"PDF Renderer");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 4;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
 	pTmpModSpec->moduleID = 0;
-	pTmpModSpec->moduleName = std::wstring(L"File Rendering Manager");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleName = std::wstring(L"PDF Tools");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 4;
 }
 
 void InititalizeProduct7()
