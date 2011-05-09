@@ -155,10 +155,10 @@ HRESULT SoftwareServer::Initialize(KeyServer* _pKeyServer, RainbowDriver* _pDriv
 	return hr;
 }
 
-HRESULT SoftwareServer::AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance, long flags)
+HRESULT SoftwareServer::AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	return licCache.AddApplicationInstance(productID, license_id, application_instance, flags);
+	return licCache.AddApplicationInstance(productID, license_id, application_instance);
 }
 HRESULT SoftwareServer::RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance)
 {
@@ -170,11 +170,9 @@ HRESULT SoftwareServer::GetApplicationInstanceList(long productID, BSTR license_
 	SafeMutex mutex(SoftwareLicenseLock);
 	return licCache.GetApplicationInstanceList(productID, license_id, pBstrListAppInstStream);
 }
-HRESULT SoftwareServer::GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs)
-{
-	SafeMutex mutex(SoftwareLicenseLock);
-	return licCache.GetApplicationInstanceList2(productID, license_id, pBstrListUsAppInstInfoAttribs);
-}
+
+
+
 
 HRESULT SoftwareServer::ResynchronizeSoftwareLicenses(bool bForceRefresh)
 {
@@ -192,8 +190,8 @@ HRESULT SoftwareServer::ResynchronizeSoftwareLicenses(bool bForceRefresh)
 }
 HRESULT SoftwareServer::ResynchronizeSoftwareLicensesInternal(bool bForceRefresh)
 {
-//const int BUF_SIZE = 1024;
-//wchar_t tmpbuf[BUF_SIZE];
+const int BUF_SIZE = 1024;
+wchar_t tmpbuf[BUF_SIZE];
 //if(bFirstTime)
 //{
 //	swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter, ThreadID: %d", GetCurrentThreadId());
@@ -271,25 +269,6 @@ HRESULT SoftwareServer::ResynchronizeSoftwareLicensesInternal(bool bForceRefresh
 			hr = (*swLicIt).second->GetLicenseInfo(&tmpLicInfoAttribs);
 			if(SUCCEEDED(hr))
 				tmpLicInfoList.insert(tmpLicInfoList.end(), new Lic_PackageAttribs::Lic_LicenseInfoAttribs(tmpLicInfoAttribs));
-
-			//CR.FIX.14675 - Track the latest version of the Software Spec.
-			Lic_PackageAttribs::Lic_SoftwareSpecAttribs tmpSoftwareSpec;
-			if (SUCCEEDED((*swLicIt).second->GetSoftwareSpec(&tmpSoftwareSpec)))
-			{
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - g_pSoftwareSpec: %d.%d.%d.%d", (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Major, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Minor, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMajor, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor);
-//OutputDebugString(tmpbuf);
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - tmpSoftwareSpec: %d.%d.%d.%d", (int)tmpSoftwareSpec.softwareSpec_Major, (int)tmpSoftwareSpec.softwareSpec_Minor, (int)tmpSoftwareSpec.softwareSpec_SubMajor, (int)tmpSoftwareSpec.softwareSpec_SubMinor);
-//OutputDebugString(tmpbuf);
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - tmpSoftwareSpec.productSpecMap->count: %u", tmpSoftwareSpec.productSpecMap->size());
-//OutputDebugString(tmpbuf);
-				if ((tmpSoftwareSpec.productSpecMap->size() > 0) 
-					&& ((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpSoftwareSpec.softwareSpec_SubMinor))
-				{
-//OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Use a new version of the SoftwareSpec");
-					g_pSoftwareSpec->SetSoftwareSpec(tmpSoftwareSpec);
-					licCache.RefreshSoftwareSpec(&(g_pSoftwareSpec->GetSoftwareSpec()));
-				}
-			}
 		}
 
 		}	//End scope of SafeMutex mutex(SoftwareLicenseLock);
@@ -592,11 +571,7 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 
 
 	Lic_PackageAttribs licensePackageAttribs;
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Pre licensePackageAttribs.InitFromString()");
-//OutputDebugString(tmpbuf);
 	licensePackageAttribs.InitFromString(bstrLicPackageAttribsStream);
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post licensePackageAttribs.InitFromString()");
-//OutputDebugString(tmpbuf);
 	if(FAILED(hr))
 		throw hr;
 
@@ -614,11 +589,7 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 	tmpValTokenAttribs.tokenValue = std::wstring(L"true");
 	licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs);
 
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Pre licensePackageAttribs.ToString()");
-//OutputDebugString(tmpbuf);
 	BSTR bstrLicAttribsStream = SysAllocString(licensePackageAttribs.ToString().c_str());
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post licensePackageAttribs.ToString()");
-//OutputDebugString(tmpbuf);
 
 	wchar_t buffer[64];	
 	_bstr_t packet_string;
@@ -696,9 +667,6 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 
 	unsigned char* pCompressedStream = FlateHelper::CompressStream((char*)(data.c_str()), (long)data.length(), &compressedStreamSize);
 
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post FlateHelper::CompressStream - compressedStreamSize: %d", compressedStreamSize);
-//OutputDebugString(tmpbuf);
-
 	//long compressedStreamSize(0);
 	//unsigned char* pCompressedStream = FlateHelper::CompressStream((char*)(std::wstring(packet_string).c_str()), packet_string.length()*sizeof(wchar_t), &compressedStreamSize);
 	if(pCompressedStream != NULL)
@@ -722,9 +690,6 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 	}
 
 	SafeArrayUnaccessData(pVtLicensePacket->parray);
-
-//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Leave");
-//OutputDebugString(tmpbuf);
 
 	return hr;
 }
@@ -2134,13 +2099,9 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -TimeHelper::ONE_DAY_IN_SECONDS)
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_PACKET;
 
-		//CR.FIX.14675 - If the packet has a full software spec, allow lower version software specs to apply to the license server
-		//CR.FIX.14884 - Use licReplaceSoftwareSpecAttribs for productSpecMap->size(), and licSoftwareSpecAttribs for softwareSpec_SubMinor
-		if ((tmpLicPackageAttribs.licReplaceSoftwareSpecAttribs.productSpecMap->size() == 0)	//No Replacement Software Spec
-			&& ((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpLicPackageAttribs.licSoftwareSpecAttribs.softwareSpec_SubMinor)) //License Server Software Spec Version is below Packet Software Spec Version
-		{
+		//Verify that the software spec version of the packet is not higher than the license server sotfware spec version.
+		if((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpLicPackageAttribs.licSoftwareSpecAttribs.softwareSpec_SubMinor)
 			throw LicenseServerError::EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE;
-		}
 
 		SoftwareLicenseMgr* pSoftwareLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(_bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&tmpLicPackageAttribs.licLicenseInfoAttribs).c_str()));
 
