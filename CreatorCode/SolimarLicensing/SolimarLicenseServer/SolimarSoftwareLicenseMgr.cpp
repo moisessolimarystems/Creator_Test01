@@ -972,6 +972,13 @@ HRESULT SoftwareLicenseMgr::GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAt
 	*pLicenseInfo = m_licenseFileAttribs.licLicenseInfoAttribs;
 	return S_OK;
 }
+HRESULT SoftwareLicenseMgr::GetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec)
+{
+	SafeMutex mutex(softwareLicenseMgrLock);
+	*pSoftwareSpec = m_licenseFileAttribs.licSoftwareSpecAttribs;
+	return S_OK;
+}
+
 
 HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs)
 {
@@ -2151,7 +2158,7 @@ wchar_t debug_buf[1024];
 			if(expirationDateInSeconds_TimeT < newKeyExpireDateTimeT)
 			{
 				newKeyExpireDateTimeT = expirationDateInSeconds_TimeT;
-				newKeyHoursToExpire = (expirationDateInSeconds_TimeT-curExpiresDateTimeT) / TimeHelper::ONE_HOUR_IN_SECONDS;
+				newKeyHoursToExpire = (unsigned short)((expirationDateInSeconds_TimeT-curExpiresDateTimeT) / TimeHelper::ONE_HOUR_IN_SECONDS);
 			}
 		}
 		newExpiresDateTimeT = newKeyExpireDateTimeT;
