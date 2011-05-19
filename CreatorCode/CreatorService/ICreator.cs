@@ -375,7 +375,9 @@ namespace Service.Creator
         [EnumMember]
         VerifiedBy,
         [EnumMember]
-        LicensePacket
+        LicensePacket,
+        [EnumMember]
+        Token
     }
 
     [DataContract]

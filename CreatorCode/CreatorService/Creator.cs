@@ -22,56 +22,57 @@ namespace Service.Creator
         private static readonly IDictionary<string, string>
             _filterLSNames = new Dictionary<string, string>
                 {            
-                    {"Customer", "CustomerTable.SCRname"},
-                    {"LicenseServer", "LicenseName"},
-                    {"Active", "IsActive"},
-                    {"Notes", "LicenseComments"},
-                    {"Validation", "Validation"},
-                    {"Verified", "Verified"}
+                    {"Customer", "CustomerTable.SCRname"},  //Cust Table
+                    {"LicenseServer", "LicenseName"},   //License Table
+                    {"Active", "IsActive"},         //License Table
+                    {"Notes", "LicenseComments"},   //License Table
+                    {"Validation", "Validation"},   //License Table
+                    {"Verified", "Verified"},        //License Table
+                    {"Token", "Token"}
                 };
 
         private static readonly IDictionary<string, string>
             _filterHTNames = new Dictionary<string, string>
                 {            
-                    {"Customer", "CustID"},
-                    {"HardwareID", "ID"},
-                    {"LicenseServer", "LicenseTable.LicenseName"},
-                    {"State", "TokenStatus"},
-                    {"ActivatedDate", "ActivatedDate"},
-                    {"DeactivatedDate", "DeactivatedDate"}
+                    {"Customer", "CustID"}, //Customer Table
+                    {"HardwareID", "ID"},   //Token Table
+                    {"LicenseServer", "LicenseTable.LicenseName"},  //License Table
+                    {"State", "TokenStatus"},   //Token Table
+                    {"ActivatedDate", "ActivatedDate"}, //Token Table
+                    {"DeactivatedDate", "DeactivatedDate"} //Token Table
                 };
 
         private static readonly IDictionary<string, string>
             _filterPLNames = new Dictionary<string, string>
                 {            
-                    {"Customer", "LicenseTable.CustomerTable.SCRname"},
-                    {"ProductLicense", "plID"},
-                    {"ExpirationDate", "ExpirationDate"},
-                    {"Product", "ProductID"},
-                    {"ProductVersion", "ProductVersion"},
-                    {"State", "plState"},
-                    {"Active", "IsActive"},
-                    {"Extension","Extensions"},
-                    {"Activation","Activations"},
-                    {"ActivationAmount","ActivationAmount"},
-                    {"Module", "Module"},
-                    {"ModuleValue", "ModuleValue"},
-                    {"Notes", "Description"},
-                    {"Validation", "Validation"},
+                    {"Customer", "LicenseTable.CustomerTable.SCRname"}, //Customer table
+                    {"ProductLicense", "plID"},                         //PLT
+                    {"ExpirationDate", "ExpirationDate"},               //PLT
+                    {"Product", "ProductID"},                           //PLT
+                    {"ProductVersion", "ProductVersion"},               //PLT
+                    {"State", "plState"},                               //PLT
+                    {"Active", "IsActive"},                             //PLT
+                    {"Extension","Extensions"},                         //PLT
+                    {"Activation","Activations"},                       //PLT
+                    {"ActivationAmount","ActivationAmount"},            //PLT
+                    {"Module", "Module"},                               //MT
+                    {"ModuleValue", "ModuleValue"},                     //MT
+                    {"Notes", "Description"},                           //PLT
+                    {"Validation", "Validation"},                       //Packet Table
                     {"Verified", "Verified"}
                 };
 
         private static readonly IDictionary<string, string>
             _filterLPNames = new Dictionary<string, string>
                 {     
-                    {"Customer", "LicenseTable.CustomerTable.SCRname"},
-                    {"LicensePacket", "PacketName"},
-                    {"DateCreated", "DateCreated"},
-                    {"ExpirationDate", "ExpiredDate"},
-                    {"LicenseServer", "LicenseTable.LicenseName"},
-                    {"Verified", "IsVerified"},
-                    {"VerifiedBy", "VerifiedBy"},
-                    {"Notes","PacketComments"}
+                    {"Customer", "LicenseTable.CustomerTable.SCRname"}, //Customer Table
+                    {"LicensePacket", "PacketName"},        //Packet Table
+                    {"DateCreated", "DateCreated"},         //Packet Table
+                    {"ExpirationDate", "ExpiredDate"},      //Packet Table
+                    {"LicenseServer", "LicenseTable.LicenseName"},  //License Table
+                    {"Verified", "IsVerified"},     //Packet Table
+                    {"VerifiedBy", "VerifiedBy"},   //Packet Table
+                    {"Notes","PacketComments"}  //Packet Table
                 };
 
         private static readonly IDictionary<string, string>
@@ -222,9 +223,7 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll)
         {
-            String value;
             int result;
-            bool bValue;
             StringBuilder conditionString = new StringBuilder();
             foreach (Condition userCondition in cl)
             {
@@ -235,12 +234,16 @@ namespace Service.Creator
                     else
                         conditionString.Append(" or ");
                 }
-                value = userCondition.Value;
-                //create a condition string from condition list using dictionary to translate condition to conditionstring
                 switch (userCondition.Name)
                 {
+                    case ConditionName.Token:
+                        if (userCondition.Operator == ConditionOperator.Contains) //contains TokenValue.Contains("2")
+                            conditionString.Append(string.Format("TokenTables.Where(TokenValue.{0}(\"{1}\")).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
+                        else                        // is, is not -> =, !=
+                            conditionString.Append(string.Format("TokenTables.Where(TokenValue{0}\"{1}\").Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
+                        break;
                     case ConditionName.Validation:
-                        string op = ((value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
+                        string op = ((userCondition.Value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (userCondition.Value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
                         conditionString.Append(string.Format("TokenTables.Where(TokenType {0} 1).Count() > 0", op));
                         break;
                     case ConditionName.Verified:
@@ -251,8 +254,9 @@ namespace Service.Creator
                         conditionString.Append(string.Format("(PacketTables.Where(IsVerified=False).Count(){0}0 {1} PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
                         break;
                     default:
+                        string value = userCondition.Value;
                         conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
-                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        if (userCondition.Operator == ConditionOperator.Contains)
                         {
                             conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                         }
@@ -406,7 +410,7 @@ namespace Service.Creator
                         break;
                     default:
                         conditionString.Append(_filterLPNames[userCondition.Name.ToString()]);
-                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        if (userCondition.Operator == ConditionOperator.Contains)
                         {
                             conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                         }
@@ -523,9 +527,10 @@ namespace Service.Creator
         public IList<ProductLicenseTable> GetProductLicensesByConditions(IList<Condition> cl, bool matchAll)
         {
             String value;
-            int result;
+            int result, productID, moduleID;
+            string[] moduleValue;
             StringBuilder conditionString = new StringBuilder();
-          
+            //pull out any modids from conditions
             foreach (Condition userCondition in cl)
             {
                 if (conditionString.Length != 0)
@@ -550,18 +555,35 @@ namespace Service.Creator
                         string op2 = (_filterOperators[userCondition.Operator.ToString()]) == "=" ? "!=" : "=";
                         conditionString.Append(string.Format("(LicenseTable.PacketTables.Where(IsVerified=False).Count(){0}0 {1} LicenseTable.PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
                         break;
-                    case ConditionName.Module:
-                        int productID = 0, moduleID = 0;
-                        string[] moduleValue = userCondition.Value.Split(",".ToCharArray());
+                    case ConditionName.Module:  //is, is not, contains
+                        productID = 0; moduleID = 0;
+                        moduleValue = userCondition.Value.Split(",".ToCharArray());
                         if (moduleValue.Count() == 2)
                         {
                             Int32.TryParse(moduleValue[0], out productID);
                             Int32.TryParse(moduleValue[1], out moduleID);
                         }
-                        conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID == {1}).Count() > 0", productID, moduleID));
+                        conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID{1}{2} && Value>0).Count() > 0", productID, _filterOperators[userCondition.Operator.ToString()], moduleID));
                         break;
-                    case ConditionName.ModuleValue:
-                        conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
+                    case ConditionName.ModuleValue: //requires both module and value to be set
+                        //if module ids defined then attach to mod value condition
+                        List<Condition> moduleConditions = cl.Where(c => c.Name == ConditionName.Module).ToList();
+                        if (moduleConditions.Count > 0)
+                        {
+                            foreach (Condition modCondition in moduleConditions)
+                            {
+                                productID = 0; moduleID = 0;
+                                moduleValue = modCondition.Value.Split(",".ToCharArray());
+                                if (moduleValue.Count() == 2)
+                                {
+                                    Int32.TryParse(moduleValue[0], out productID);
+                                    Int32.TryParse(moduleValue[1], out moduleID);
+                                }
+                                conditionString.Append(string.Format("ModuleTables.Where(ProductLicenseTable.ProductID == {0} && ModID == {1} && Value{2}{3}).Count() > 0", productID, moduleID, _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
+                            }
+                        }
+                        else
+                            conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
                         break;
                     case ConditionName.ExpirationDate:
                         string opStr = _filterOperators[userCondition.Operator.ToString()];
@@ -602,7 +624,7 @@ namespace Service.Creator
                         break;
                     default:
                         conditionString.Append(_filterPLNames[userCondition.Name.ToString()]);                        
-                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        if (userCondition.Operator == ConditionOperator.Contains)
                         {
                             conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                         }
@@ -778,7 +800,7 @@ namespace Service.Creator
                         break;
                     default:
                         conditionString.Append(_filterHTNames[userCondition.Name.ToString()]);
-                        if (_filterOperators[userCondition.Operator.ToString()] == "Contains")
+                        if (userCondition.Operator == ConditionOperator.Contains)
                         {
                             conditionString.Append(".").Append(_filterOperators[userCondition.Operator.ToString()]).Append("(\"").Append(value).Append("\")");
                         }
