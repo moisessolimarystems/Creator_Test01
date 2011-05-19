@@ -1210,6 +1210,9 @@ namespace Client.Creator.CreatorService {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
         LicensePacket = 22,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Token = 23,
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "3.0.0.0")]

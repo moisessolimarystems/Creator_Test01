@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Client.Creator.CreatorService;
 
 namespace Client.Creator
 {
@@ -127,7 +128,7 @@ namespace Client.Creator
             {
                 ComboBox evalComboBox = (ComboBox)groupBox1.Controls[controlIndex];
                 evalComboBox.Items.Clear();
-                Client.Creator.CreatorService.ConditionName cn = _reportData.Report.GetFilterName(selectedComboBox.SelectedItem.ToString());//(Client.Creator.CreatorService.ConditionName)Enum.Parse(typeof(Client.Creator.CreatorService.ConditionName), selectedComboBox.SelectedItem.ToString());
+                ConditionName cn = _reportData.Report.GetFilterName(selectedComboBox.SelectedItem.ToString());
                 foreach (string key in _reportData.Report.GetOperatorKeys(cn))
                 {
                     evalComboBox.Items.Add(key);
@@ -151,7 +152,6 @@ namespace Client.Creator
                         else
                             tb.Text = "";
                     }
-                    //set initial values for each value control
                 }
             }
         }
