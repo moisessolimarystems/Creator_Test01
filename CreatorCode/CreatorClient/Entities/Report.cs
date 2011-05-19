@@ -40,7 +40,8 @@ namespace Client.Creator
                     {"License Server", ConditionName.LicenseServer},                   
                     {"Notes", ConditionName.Notes},
                     {"Validation", ConditionName.Validation},
-                    {"Verified", ConditionName.Verified}
+                    {"Verified", ConditionName.Verified},
+                    {"Token", ConditionName.Token}
                 };
 
         public static readonly IDictionary<string, ConditionName>
@@ -195,7 +196,7 @@ namespace Client.Creator
                 }
                 else if (_type == ReportType.ProductLicense)
                 {
-                    if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                    if (userCondition.Name == ConditionName.State)
                     {
                         try
                         {
@@ -213,11 +214,11 @@ namespace Client.Creator
                         }
                         catch (Exception) { }
                     }
-                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Product)
+                    else if (userCondition.Name == ConditionName.Product)
                     {
                         strVal = _commLink.GetProductID(userCondition.Value).ToString();
                     }
-                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Module)
+                    else if (userCondition.Name == ConditionName.Module)
                     {
                         //module = productid, modid
                         //issue don't know the product the module is associated with by knowning just the modID
@@ -227,7 +228,7 @@ namespace Client.Creator
                 }
                 else //HardwareToken
                 {
-                    if (userCondition.Name == Client.Creator.CreatorService.ConditionName.Customer)
+                    if (userCondition.Name == ConditionName.Customer)
                     {
                         ServiceProxy.Service<CreatorService.ICreator>.Use((client) =>
                         {
@@ -236,7 +237,7 @@ namespace Client.Creator
                                 strVal = dbCustomer.SCRnumber.ToString();
                         });
                     }
-                    else if (userCondition.Name == Client.Creator.CreatorService.ConditionName.State)
+                    else if (userCondition.Name == ConditionName.State)
                     {
                         try
                         {
@@ -277,11 +278,12 @@ namespace Client.Creator
                 case ConditionName.HardwareID:
                 case ConditionName.LicenseServer:
                 case ConditionName.LicensePacket:
-                case ConditionName.Module:
                 case ConditionName.Notes:
                 case ConditionName.ProductLicense:
                 case ConditionName.ProductVersion:
                 case ConditionName.VerifiedBy:
+                case ConditionName.Token:
+                case ConditionName.Module:
                     return ConditionNameType.String;
                     break;
                 case ConditionName.Active:
@@ -305,12 +307,7 @@ namespace Client.Creator
             else if (cn == ConditionName.Validation)
             {
                 definedValueList.AddRange(Enum.GetNames(typeof(ValidationType)));
-            }/*
-            else if (cn == ConditionName.Module)
-            {
-                //load definedValueList with modules from 
-                definedValueList.AddRange(_commLink.GetModuleNameList(0));
-            }*/
+            }
             else
             {
                 if (_type == ReportType.ProductLicense)
@@ -376,7 +373,7 @@ namespace Client.Creator
             return conditionOp;
         }
 
-        public string GetFilterKey(CreatorService.Condition userCondition)
+        public string GetFilterKey(Condition userCondition)
         {
             string conditionString = "";
             IDictionary<string, ConditionName> filterNames = null;
@@ -399,9 +396,9 @@ namespace Client.Creator
             return conditionString;
         }
 
-        public string GetOperatorKey(CreatorService.Condition userCondition)
-        {
-            ConditionNameType cnt = GetConditionNameType(userCondition.Name);
+        public string GetOperatorKey(Condition userCondition)
+        {            
+            ConditionNameType cnt = GetConditionNameType(userCondition.Name); //
             IDictionary<string, ConditionOperator> filterOperators = null;
             string conditionString = "";
             if (cnt == ConditionNameType.Date)
@@ -410,8 +407,8 @@ namespace Client.Creator
                 filterOperators = _filterBoolOperators;
             else if (cnt == ConditionNameType.Number)
                 filterOperators = _filterNumberOperators;
-            else if (cnt == ConditionNameType.String)
-                filterOperators = _filterStringOperators;
+            else if (cnt == ConditionNameType.String)            //special case for modules that are a string type, but can't use "contain" operator
+                filterOperators = _filterStringOperators;            
             else
                 filterOperators = _filterOperators;
           
@@ -427,7 +424,7 @@ namespace Client.Creator
         }
 
         public ICollection<string> GetOperatorKeys(ConditionName cn)
-        {
+        {            
             ConditionNameType cnt = GetConditionNameType(cn);
             ICollection<string> operatorCollection = _filterOperators.Keys;
             switch(cnt)
@@ -442,7 +439,10 @@ namespace Client.Creator
                     return _filterNumberOperators.Keys;
                     break;
                 case ConditionNameType.String:
-                    return _filterStringOperators.Keys;
+                    if (cn == ConditionName.Module) //special case for modules, can't use "Contain" op
+                        return _filterOperators.Keys;
+                    else
+                        return _filterStringOperators.Keys;
                 default: break; //return string operators
             }
             return operatorCollection;
