@@ -11,10 +11,10 @@ namespace Client.Creator
     class LicensePacket
     {
         #region Fields
-        private Lic_PackageAttribs _licPackage;
-        private LicenseTable _licenseTable;
-        private string _licenseServer;
-        private uint _highestModuleRevision;   //set by determining from the included products in a packet.
+        Lic_PackageAttribs _licPackage;
+        LicenseTable _licenseTable;
+        string _licenseServer;
+        CommunicationLink _commLink;
         #endregion
 
         #region Constructor
@@ -22,12 +22,12 @@ namespace Client.Creator
         /// Initializes a new instance of the LicensePacket class.
         /// </summary>
         /// <param name="licenseServer">The license server name that belongs to the license packet.</param>
-        public LicensePacket(string licenseServer)        
+        public LicensePacket(CommunicationLink commLink, string licenseServer)        
         {            
             _licPackage = new Lic_PackageAttribs();
             _licenseTable = null;
             _licenseServer = licenseServer;
-            _highestModuleRevision = 0;
+            _commLink = commLink;
         }
         #endregion 
 
@@ -57,7 +57,7 @@ namespace Client.Creator
             bool bRetVal = false;
             int major = 0, minor = 0, buildVersion = 0;
             Service<ICreator>.Use((client) =>
-            {
+            {                
                 _licenseTable = client.GetLicenseByName(_licenseServer, false);
                 client.GetLicenseServerVersion(ref major, ref minor, ref buildVersion);
             });
@@ -65,16 +65,14 @@ namespace Client.Creator
             {
                 _licPackage.Stream = _licenseTable.LicenseInfo;
                 if (PopulateValidationTokens()) //add tokens to _licPackage 
-                {
+                {                    
                     if (PopulateProductInfo())  //add products,productlicenses,modules to _licPackage
                     {   //set software spec version based on the spec built with Creator
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
+                        //add current software spec
+                        _licPackage.licSoftwareSpecAttribs.TVal = _commLink.SoftwareSpec;
                         Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
                         _licPackage.licLicenseInfoAttribs.TVal = licInfo;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Major.TVal = (uint)major;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Minor.TVal = (uint)minor;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMajor.TVal = (uint)buildVersion;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestModuleRevision;   //value determined from included products highest revision
                         _licenseTable.LicenseInfo = _licPackage.Stream;
                         bRetVal = true;
                     }
@@ -90,6 +88,7 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = LicPackage.licLicenseInfoAttribs;
             licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
             licInfo.productList.TVal.Clear();
+            LicPackage.licSoftwareSpecAttribs.TVal = new Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
             Service<ICreator>.Use((client) =>
             {
                 _licenseTable.LicenseInfo = LicPackage.Stream;
@@ -138,7 +137,6 @@ namespace Client.Creator
         private bool PopulateProductInfo()
         {
             bool bRetVal = false;
-            uint currentModuleRevision = 0;
             Service<ICreator>.Use((client) =>
             {
                 List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer,false);
@@ -179,11 +177,6 @@ namespace Client.Creator
                             mod.moduleID.TVal = (uint)module.ModID;
                             mod.moduleValue.TVal = (uint)module.Value;
                             mod.moduleAppInstance.TVal = module.AppInstance;
-                            if (module.Value > 0) //only modules with value count towards spec revision
-                            {
-                                currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);                     //get revision by setting to highest product revision while adding
-                                _highestModuleRevision = (currentModuleRevision > _highestModuleRevision) ? currentModuleRevision : _highestModuleRevision;
-                            }
                             product.moduleList.TVal.Add(mod);
                         }
                     }
