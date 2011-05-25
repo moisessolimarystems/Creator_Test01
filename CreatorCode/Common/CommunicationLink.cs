@@ -544,6 +544,11 @@ namespace Client.Creator
             get { return m_ServerName; }
             set { m_ServerName = value; }
         }
+
+        public Lic_PackageAttribs.Lic_SoftwareSpecAttribs SoftwareSpec
+        {
+            get { return m_softwareSpec; }
+        }
         #endregion
 
         #region Private Variables
