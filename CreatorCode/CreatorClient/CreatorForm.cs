@@ -1381,12 +1381,11 @@ namespace Client.Creator
                             }
                         }
                         TransactionManager.CreateTransaction(TransactionType.LicenseServer,
-                                          lsProperty.Name,
-                                          "",
-                                          "Lost Hardware Token",
-                                          lostTokenName,
-                                          ""
-                                          );
+                                                             lsProperty.Name,
+                                                             "",
+                                                             "Lost Hardware Token",
+                                                             lostTokenName,
+                                                             "");
                     });
                     DetailPropertyGrid.SelectedObject = DetailTreeView.SelectedNode.Tag;
                     SetLicenseServerState(DetailTreeView.SelectedNode, false);
@@ -1427,18 +1426,16 @@ namespace Client.Creator
             lvItem.Font = this.Font;
             if (plp.ExpirationDate.HasValue && plp.ExpirationDate.Value.CompareTo(new DateTime(1900, 1, 1)) != 0)
             {
-                if (plp.ExpirationDate.Value.ToLocalTime().CompareTo(CurrentExpirationDate) < 0)
-                    lvItem.ForeColor = System.Drawing.Color.Red;
+                lvItem.ForeColor = (plp.ExpirationDate.Value.ToLocalTime().CompareTo(CurrentExpirationDate) < 0) ? Color.Red : this.ForeColor;
             }
-            else
-            {                    //permanent - blue
-                if (plp.Status == ProductLicenseState.Licensed)
-                    lvItem.ForeColor = System.Drawing.Color.SteelBlue;
+            else //perm - blue
+            {
+                lvItem.ForeColor = (plp.Status == ProductLicenseState.Licensed) ? Color.SteelBlue : this.ForeColor;
             }
             if (module.Value == 0 && module.AppInstance == 0)
             {
-                lvItem.ForeColor = System.Drawing.Color.SlateGray;
-                lvItem.Font = new System.Drawing.Font(lvItem.Font, System.Drawing.FontStyle.Italic);
+                lvItem.ForeColor = Color.SlateGray;
+                lvItem.Font = new Font(lvItem.Font, FontStyle.Italic);
             }
         }
 
@@ -3086,7 +3083,7 @@ namespace Client.Creator
                 {   //selectednode = licenseName
                     productName = s_CommLink.GetProductName(plt.ProductID);
                     if (!licenseNode.Nodes.ContainsKey(productName))
-                    {
+                    {                    
                         productNode = new TreeNode(productName);
                         productNode.Name = productName;
                         productNode.ImageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(productName));
@@ -4154,17 +4151,18 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 client.CreateCustomer(newCustRec);
-                //need to retrieve custRec again for updated scrnumber
                 newCustRec = client.GetCustomer(custName, false);
                 if (newCustRec == null)
                 {
                     MessageBox.Show(string.Format("Failed to create new customer : {0}", custName), "Create New Customer");
                     return;
                 }
-                DestinationNameTable destRec = new DestinationNameTable();
-                destRec.CustID = newCustRec.SCRnumber;
-                destRec.DestID = 0; //Initial Destination ID is 0
-                destRec.DestName = newCustRec.SCRname;
+                DestinationNameTable destRec = new DestinationNameTable()
+                {
+                    CustID = newCustRec.SCRnumber,
+                    DestID = 0, //Initial Destination ID is 0
+                    DestName = newCustRec.SCRname
+                };
                 client.CreateDestinationName(destRec);
             });
             ListViewItem lvItem = new ListViewItem(string.Format("{0:x}", newCustRec.SCRnumber));
@@ -4197,9 +4195,7 @@ namespace Client.Creator
                         ListViewItem item = new ListViewItem();
                         item.Name = item.Text = tokens[index].TokenValue;
                         license = client.GetLicenseByID(tokens[index].LicenseID, false);
-                        licenseName = "";
-                        if (license != null)
-                            licenseName = license.LicenseName;
+                        licenseName = (license != null) ? license.LicenseName : "";
                         item.SubItems.Add(licenseName);
                         item.SubItems.Add(((TokenStatus)tokens[index].TokenStatus).ToString());                        
                         string activatedDate = (tokens[index].ActivatedDate.HasValue) ? tokens[index].ActivatedDate.Value.ToString() : "";
@@ -4307,6 +4303,7 @@ namespace Client.Creator
             ValidationKeyToolStrip.Visible = true;
             ValidationKeyCustomerLabel.Text = _selectedHardwareKeyCustomer;
         }
+
         private void EnableHardwareCustomerView()
         {
             searchToolStripTextBox.Visible = true;
@@ -5158,7 +5155,7 @@ namespace Client.Creator
             {
                 Byte[] newByteArrayLicensePacket = null;
                 string verificationCode = "";
-                LicensePacket packet = new LicensePacket(licenseName);
+                LicensePacket packet = new LicensePacket(s_CommLink, licenseName);
                 packet.BuildLicensePackage();
                 //strip license of deactivated product licenses
                 client.GenerateLicensePacket(packetName,
