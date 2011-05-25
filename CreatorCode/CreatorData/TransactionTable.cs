@@ -70,6 +70,18 @@ namespace CreatorData
             }
         }
 
+        public static void UpdateAllTransactions(IList<TransactionTable> transactions)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                foreach (TransactionTable transaction in transactions)
+                {
+                    db.TransactionTables.Attach(transaction, true);
+                    db.SubmitChanges();
+                }
+            }
+        }
+
         public static void DeleteTransaction(TransactionTable transaction)
         {
             using (CreatorDataContext db = new CreatorDataContext())
