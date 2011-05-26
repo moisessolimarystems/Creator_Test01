@@ -513,6 +513,13 @@ namespace Service.Creator
         {
             TransactionTable.UpdateTransaction(tt);
         }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void UpdateAllTransactions(IList<TransactionTable> tt)
+        {
+            TransactionTable.UpdateAllTransactions(tt);
+        }
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void DeleteTransaction(TransactionTable tt)
         {
@@ -1016,13 +1023,13 @@ namespace Service.Creator
         public ModuleTable GetModule(string productLicenseName, short modID)
         { return ModuleTable.GetModule(productLicenseName, modID); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<ModuleTable> GetAllModules(string productLicenseName)
-        { return ModuleTable.GetAllModules(productLicenseName); }
+        public IList<ModuleTable> GetAllModules(string licenseName)
+        { return ModuleTable.GetAllModules(licenseName); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID)
         { return ModuleTable.GetAllActiveModulesByProduct(licenseServer, productID); }
-        public IList<ModuleTable> GetModulesByProductLicense(string productLicenseName)
-        { return ModuleTable.GetModulesByProductLicense(productLicenseName); }
+        public IList<ModuleTable> GetModulesByProductLicense(string productLicenseName, bool bAll)
+        { return ModuleTable.GetModulesByProductLicense(productLicenseName, bAll); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public short GetTotalModuleValue(string productLicenseID, byte productID, short modID)
         {

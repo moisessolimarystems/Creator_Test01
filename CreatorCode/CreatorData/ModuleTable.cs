@@ -7,21 +7,27 @@ namespace CreatorData
 {
     public partial class ModuleTable
     {
-        public static IList<ModuleTable> GetModulesByProductLicense(string productLicenseName)
+        public static IList<ModuleTable> GetModulesByProductLicense(string productLicenseName, bool bAll)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ModuleTables.Where(c => c.ProductLicenseTable.plID == productLicenseName).ToList();
+                if(!bAll)
+                    return db.ModuleTables.Where(c => c.ProductLicenseTable.plID == productLicenseName).ToList();
+                return db.ModuleTables.Where(c => (c.ProductLicenseTable.plID == productLicenseName ||
+                                                   c.ProductLicenseTable.ParentProductLicenseID == productLicenseName)).ToList();
             }
         }
-        public static IList<ModuleTable> GetAllModules(string productLicenseName)
+
+        public static IList<ModuleTable> GetAllModules(string licenseName)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ModuleTables.Where(c => (c.ProductLicenseTable.plID == productLicenseName || 
-                                                   c.ProductLicenseTable.ParentProductLicenseID == productLicenseName)).ToList();
+                LicenseTable licenseTable = db.LicenseTables.Where(l => l.LicenseName == licenseName).FirstOrDefault();
+                if (licenseTable != null)
+                    return db.ModuleTables.Where(c => (c.ProductLicenseTable.LicenseID == licenseTable.ID)).ToList();                
+                return null;
             }
         }
 

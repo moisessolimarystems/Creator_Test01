@@ -157,6 +157,9 @@ namespace Service.Creator
         void UpdateTransaction(TransactionTable tt);
 
         [OperationContract()]
+        void UpdateAllTransactions(IList<TransactionTable> tt);
+
+        [OperationContract()]
         void DeleteTransaction(TransactionTable tt);
         #endregion
 
@@ -311,11 +314,11 @@ namespace Service.Creator
         [OperationContract]
         ModuleTable GetModule(string productLicenseName, short modID);
         [OperationContract]
-        IList<ModuleTable> GetAllModules(string productLicenseName);
+        IList<ModuleTable> GetAllModules(string licenseName);
         [OperationContract]
         IList<ModuleTable> GetAllActiveModulesByProduct(string licenseServer, byte productID);
         [OperationContract]
-        IList<ModuleTable> GetModulesByProductLicense(string productLicenseName);
+        IList<ModuleTable> GetModulesByProductLicense(string productLicenseName, bool bAll);
         [OperationContract]
         short GetTotalModuleValue(string licenseServer, byte productID, short modID);
         #endregion
