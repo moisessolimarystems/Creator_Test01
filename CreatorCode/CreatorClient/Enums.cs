@@ -56,6 +56,7 @@ namespace Client.Creator
             SPDE,
             SOLITRACK,
             SPD,
+            LIBRARYSERVICES,
             CUSTOMER,
             LICENSE,
             LICENSEUPDATE,
@@ -73,9 +74,18 @@ namespace Client.Creator
             TTHARDWAREKEYID,
             TTMACADDRESS,
             TTBIOSSERIALNUMBER,
+            TTDOMAINNAME,
+            TTOPERATINGSYSTEM,
+            TTPARTOFDOMAIN,
+            TTSYSTEMMANUFACTURER,
+            TTSYSTEMMODEL,
+            TTSYSTEMTYPE,
+            TTSYSTEMUUID,
             TTLICENSECODE,
             MODULE,
-            VALIDATIONTOKENS
+            VALIDATIONTOKENS,
+            VERSIONTAB,
+            TOKENTAB
         }
 
         public enum LicenseServerType

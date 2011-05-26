@@ -14,10 +14,14 @@ namespace Client.Creator
 {
     public partial class PacketVerification : Shared.VisualComponents.DialogBaseForm
     {
-        private bool _validVerificationCode;
-        private string _selectedPacketName;
-        private string _licenseName;
-        private PacketVerificationDialogData _pktData;
+        #region Fields
+
+        bool _validVerificationCode;
+        string _selectedPacketName, _licenseName, _licenseCode;      
+        PacketVerificationDialogData _pktData;
+
+        #endregion
+
         public PacketVerification()
         {
             _validVerificationCode = false;
@@ -54,7 +58,7 @@ namespace Client.Creator
         {
             Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
             {
-                PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCodeTextBox.Text);
+                PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCodeTextBox.Text);                
                 if (storedPacket != null)
                 {
                     if (storedPacket.IsVerified)
@@ -78,8 +82,28 @@ namespace Client.Creator
                                     packet.VerifiedBy = WindowsIdentity.GetCurrent().Name;
                                     modifiedPacketList.Add(packet);
                                 }
-                            }
+                            }                            
                             client.UpdatePackets(modifiedPacketList);
+                            if (_licenseCode.Length > 0) //store licenseCode to allow reset when generating packets.
+                            {
+                                TokenTable licCodeToken = client.GetTokenByLicenseName(_licenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
+                                if (licCodeToken != null)
+                                {
+                                    licCodeToken.TokenValue = _licenseCode;
+                                    client.UpdateToken(licCodeToken);
+                                }
+                                else
+                                {
+                                    licCodeToken = new TokenTable()
+                                    {
+                                        CustID = lt.SCRnumber,
+                                        LicenseID = lt.ID,
+                                        TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode,
+                                        TokenValue = _licenseCode
+                                    };
+                                    client.CreateToken(licCodeToken);
+                                }
+                            }
                         }
                         MessageBox.Show("Verified packet " + _selectedPacketName, 
                                         "Successful Verification",
@@ -111,13 +135,21 @@ namespace Client.Creator
                     Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
                     {
                         licStream = client.GenerateStreamByLicenseSystemData(ref licPktBytes);
-                    });
+                    });                    
                     Lic_LicenseSystemAttribs loadedLicSysAttribs = new Lic_LicenseSystemAttribs();
                     loadedLicSysAttribs.Stream = licStream;
                     foreach (string keyInfo in loadedLicSysAttribs.ListOfStreamed_InfoAttribs.TVal)
-                    {
+                    {                        
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfoAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
                         tmpLicInfoAttribs.Stream = keyInfo;
+                        foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tmpLicInfoAttribs.licVerificationAttribs.TVal.validationTokenList.TVal)
+                        {
+                            if (token.tokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
+                            {
+                                _licenseCode = token.tokenValue;
+                                break;
+                            }
+                        }
                         string licenseName = Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicInfoAttribs);
                         if (licenseName == _pktData.LicenseName)
                         {

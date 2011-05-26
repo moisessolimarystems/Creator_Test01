@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PacketVerification));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.verificationCodeTextBox = new System.Windows.Forms.TextBox();
@@ -45,7 +46,7 @@
             this.tableLayoutPanel1.ColumnCount = 3;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 40.57508F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 59.42492F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 33F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 34F));
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.verificationCodeTextBox, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.VerificationFileBrowseButton, 2, 0);
@@ -76,19 +77,19 @@
             this.verificationCodeTextBox.Location = new System.Drawing.Point(128, 16);
             this.verificationCodeTextBox.Margin = new System.Windows.Forms.Padding(3, 10, 0, 3);
             this.verificationCodeTextBox.Name = "verificationCodeTextBox";
-            this.verificationCodeTextBox.Size = new System.Drawing.Size(181, 22);
+            this.verificationCodeTextBox.Size = new System.Drawing.Size(180, 22);
             this.verificationCodeTextBox.TabIndex = 1;
             // 
             // VerificationFileBrowseButton
             // 
             this.VerificationFileBrowseButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.VerificationFileBrowseButton.BackColor = System.Drawing.SystemColors.Control;
-            this.VerificationFileBrowseButton.Location = new System.Drawing.Point(309, 16);
-            this.VerificationFileBrowseButton.Margin = new System.Windows.Forms.Padding(0, 10, 3, 3);
+            this.VerificationFileBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("VerificationFileBrowseButton.Image")));
+            this.VerificationFileBrowseButton.Location = new System.Drawing.Point(311, 16);
+            this.VerificationFileBrowseButton.Margin = new System.Windows.Forms.Padding(3, 10, 3, 3);
             this.VerificationFileBrowseButton.Name = "VerificationFileBrowseButton";
             this.VerificationFileBrowseButton.Size = new System.Drawing.Size(25, 23);
             this.VerificationFileBrowseButton.TabIndex = 2;
-            this.VerificationFileBrowseButton.Text = "...";
             this.VerificationFileBrowseButton.UseVisualStyleBackColor = false;
             this.VerificationFileBrowseButton.Click += new System.EventHandler(this.VerificationFileBrowseButton_Click);
             // 

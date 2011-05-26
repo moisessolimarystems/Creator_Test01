@@ -98,6 +98,7 @@ namespace Client.Creator
                     plt.plIndex = pltData.NextLicenseServerIndex;
                     plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, pltData.NextLicenseServerIndex);
                     pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex + 1;                    
+                    //can loop through and 
                     MessageBox.Show(string.Format("{0} already exists! {0} will be updated to {1}. Please try again.", previousID, plt.plID), "Error", MessageBoxButtons.OK);
                     m_Validated = false;
                     InitializeProductLicenseTabPage(plt);
@@ -365,12 +366,18 @@ namespace Client.Creator
             licPacketAttribsGroupBox.Text = packetData.PacketName + ".packet";
             licPacketDescriptionLabel.Text = string.Format("This packet will expire on {0}. Please choose a location for the license packet to be generated.", DateTime.Now.AddDays(14).ToLongDateString());
             packetOutputPathTextBox.Text = packetData.SelectedDirectory;                       
+            Service<ICreator>.Use((client) => 
+            {
+                TokenTable token = client.GetTokenByLicenseName(packetData.LicenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
+                clearLicenseCodeCheckBox.Enabled = (token != null);
+            });
         }
         private void SavePacketTabPage(PacketDialogData packetData)
-        {
+        {           
             packetData.ExpDate = DateTime.Now.AddDays(14); 
             packetData.SelectedDirectory = packetOutputPathTextBox.Text;       
             packetData.UserNotes = packetDescriptTextBox.Text;
+            packetData.ClearLicenseCode = clearLicenseCodeCheckBox.Checked;
         }
         private void ValidatePacketPath()
         {
@@ -706,52 +713,53 @@ namespace Client.Creator
     #region PacketDialogData class
     public class PacketDialogData : Shared.VisualComponents.DialogData
     {
-        string _packetName;
-        DateTime _expDate;
-        string _customerName;
-        string _selectedDirectory;
-        string _userNotes;
-
         #region Constructors
 
-        public PacketDialogData(string customerName, string packetName, string selectedDirectory)
-        {
-            _customerName = customerName;
-            _packetName = packetName;
-            _selectedDirectory = selectedDirectory;
-        }
+        public PacketDialogData() {}
+
         #endregion
 
         #region Properties
 
         public string PacketName
         {
-            get { return _packetName; }
-            set { _packetName = value; }            
+            get;
+            set;
+        }
+
+        public string LicenseName
+        {
+            get;
+            set;
         }
 
         public string SelectedDirectory
         {
-            get { return _selectedDirectory; }
-            set { _selectedDirectory = value; }
+            get;
+            set;
         }
 
         public DateTime ExpDate
         {
-            get { return _expDate; }
-            set { _expDate = value; }
+            get;
+            set;
         }
 
         public string CustomerName
         {
-            get { return _customerName; }
-            set { _customerName = value; }
+            get;
+            set;
         }
 
         public string UserNotes
         {
-            get { return _userNotes; }
-            set { _userNotes = value; }
+            get;
+            set;
+        }
+        public bool ClearLicenseCode
+        {
+            get;
+            set;
         }
         #endregion
     }

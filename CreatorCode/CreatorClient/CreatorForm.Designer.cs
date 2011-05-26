@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode47 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode37 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode43 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode44 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode45 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode37,
-            treeNode43,
-            treeNode44});
-            System.Windows.Forms.TreeNode treeNode46 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode62 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode57 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode58 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode59 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode60 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode57,
+            treeNode58,
+            treeNode59});
+            System.Windows.Forms.TreeNode treeNode61 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,10 +46,8 @@
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.updateVersionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.softwareTokenPreferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainToolStrip = new System.Windows.Forms.ToolStrip();
@@ -250,7 +248,6 @@
             this.MainMenuStrip.BackColor = System.Drawing.SystemColors.Control;
             this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.viewToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
@@ -302,35 +299,21 @@
             this.exitMainToolStripMenuItem.Text = "E&xit";
             this.exitMainToolStripMenuItem.Click += new System.EventHandler(this.exitMainToolStripMenuItem_Click);
             // 
-            // viewToolStripMenuItem
-            // 
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
-            this.viewToolStripMenuItem.Text = "View";
-            // 
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.updateVersionsToolStripMenuItem,
-            this.softwareTokenPreferencesToolStripMenuItem});
+            this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             this.toolsToolStripMenuItem.DropDownOpening += new System.EventHandler(this.toolsToolStripMenuItem_DropDownOpening);
             // 
-            // updateVersionsToolStripMenuItem
+            // optionsToolStripMenuItem
             // 
-            this.updateVersionsToolStripMenuItem.Name = "updateVersionsToolStripMenuItem";
-            this.updateVersionsToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
-            this.updateVersionsToolStripMenuItem.Text = "Update Product Version...";
-            this.updateVersionsToolStripMenuItem.Click += new System.EventHandler(this.updateVersionsToolStripMenuItem_Click);
-            // 
-            // softwareTokenPreferencesToolStripMenuItem
-            // 
-            this.softwareTokenPreferencesToolStripMenuItem.Name = "softwareTokenPreferencesToolStripMenuItem";
-            this.softwareTokenPreferencesToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
-            this.softwareTokenPreferencesToolStripMenuItem.Text = "Software Token Preferences...";
-            this.softwareTokenPreferencesToolStripMenuItem.Click += new System.EventHandler(this.softwareTokenPreferencesToolStripMenuItem_Click);
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+            this.optionsToolStripMenuItem.Text = "&Options";
+            this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -708,7 +691,6 @@
             // DetailTreeView
             // 
             this.DetailTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DetailTreeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DetailTreeView.HideSelection = false;
             this.DetailTreeView.ImageIndex = 0;
             this.DetailTreeView.ImageList = this.CreatorImageList;
@@ -744,27 +726,35 @@
             this.CreatorImageList.Images.SetKeyName(11, "spde32.ico");
             this.CreatorImageList.Images.SetKeyName(12, "SOLitrack32.png");
             this.CreatorImageList.Images.SetKeyName(13, "SPDNT.ICO");
-            this.CreatorImageList.Images.SetKeyName(14, "Customer.ico");
-            this.CreatorImageList.Images.SetKeyName(15, "License.ico");
-            this.CreatorImageList.Images.SetKeyName(16, "LicenseUpdate.ico");
-            this.CreatorImageList.Images.SetKeyName(17, "LicenseDisabled.ico");
-            this.CreatorImageList.Images.SetKeyName(18, "LicenseDeactivated.ico");
-            this.CreatorImageList.Images.SetKeyName(19, "Order.ico");
-            this.CreatorImageList.Images.SetKeyName(20, "AppInstance.ico");
-            this.CreatorImageList.Images.SetKeyName(21, "Empty.ico");
-            this.CreatorImageList.Images.SetKeyName(22, "pass64.ico");
-            this.CreatorImageList.Images.SetKeyName(23, "fail64.ico");
-            this.CreatorImageList.Images.SetKeyName(24, "listbullets.png");
-            this.CreatorImageList.Images.SetKeyName(25, "transaction_logfile.ico");
-            this.CreatorImageList.Images.SetKeyName(26, "zippedFile.png");
-            this.CreatorImageList.Images.SetKeyName(27, "ttCompuer.png");
-            this.CreatorImageList.Images.SetKeyName(28, "ttHardwareKeyID.ico");
-            this.CreatorImageList.Images.SetKeyName(29, "ttMacAddress.png");
-            this.CreatorImageList.Images.SetKeyName(30, "ttBiosSerialNumber.png");
-            this.CreatorImageList.Images.SetKeyName(31, "ttLicenseCode.png");
-            this.CreatorImageList.Images.SetKeyName(32, "Module.ico");
-            this.CreatorImageList.Images.SetKeyName(33, "ValidationTokens.png");
-            this.CreatorImageList.Images.SetKeyName(34, "sdx_report32.ico");
+            this.CreatorImageList.Images.SetKeyName(14, "LibraryServices.ico");
+            this.CreatorImageList.Images.SetKeyName(15, "Customer.ico");
+            this.CreatorImageList.Images.SetKeyName(16, "License.ico");
+            this.CreatorImageList.Images.SetKeyName(17, "LicenseUpdate.ico");
+            this.CreatorImageList.Images.SetKeyName(18, "LicenseDisabled.ico");
+            this.CreatorImageList.Images.SetKeyName(19, "LicenseDeactivated.ico");
+            this.CreatorImageList.Images.SetKeyName(20, "Order.ico");
+            this.CreatorImageList.Images.SetKeyName(21, "AppInstance.ico");
+            this.CreatorImageList.Images.SetKeyName(22, "Empty.ico");
+            this.CreatorImageList.Images.SetKeyName(23, "pass64.ico");
+            this.CreatorImageList.Images.SetKeyName(24, "fail64.ico");
+            this.CreatorImageList.Images.SetKeyName(25, "Explorer-32.png");
+            this.CreatorImageList.Images.SetKeyName(26, "Notepad-32.png");
+            this.CreatorImageList.Images.SetKeyName(27, "Dropbox-32.png");
+            this.CreatorImageList.Images.SetKeyName(28, "my computer-32.png");
+            this.CreatorImageList.Images.SetKeyName(29, "ttHardwareKeyID.ico");
+            this.CreatorImageList.Images.SetKeyName(30, "ttMacAddress.png");
+            this.CreatorImageList.Images.SetKeyName(31, "Bios-32.png");
+            this.CreatorImageList.Images.SetKeyName(32, "File-server-32.png");
+            this.CreatorImageList.Images.SetKeyName(33, "Windows-32.png");
+            this.CreatorImageList.Images.SetKeyName(34, "ttPartOfDomain.png");
+            this.CreatorImageList.Images.SetKeyName(35, "server-32.png");
+            this.CreatorImageList.Images.SetKeyName(36, "server-Vista_32.png");
+            this.CreatorImageList.Images.SetKeyName(37, "FileServer-Drive_32.png");
+            this.CreatorImageList.Images.SetKeyName(38, "Hard-Drive-blue-32.png");
+            this.CreatorImageList.Images.SetKeyName(39, "ttLicenseCode.png");
+            this.CreatorImageList.Images.SetKeyName(40, "Module.ico");
+            this.CreatorImageList.Images.SetKeyName(41, "ValidationTokens.png");
+            this.CreatorImageList.Images.SetKeyName(42, "Custom-reports-32.png");
             // 
             // CustomerToolStrip
             // 
@@ -817,7 +807,7 @@
             // PropertyGridTabPage
             // 
             this.PropertyGridTabPage.Controls.Add(this.DetailSplitContainer);
-            this.PropertyGridTabPage.ImageIndex = 24;
+            this.PropertyGridTabPage.ImageIndex = 25;
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
@@ -976,7 +966,7 @@
             // 
             this.TransactionsTabPage.Controls.Add(this.TransactionListView);
             this.TransactionsTabPage.Controls.Add(this.TransactionsToolStrip);
-            this.TransactionsTabPage.ImageIndex = 25;
+            this.TransactionsTabPage.ImageIndex = 26;
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
@@ -1085,7 +1075,7 @@
             // 
             this.PacketTabPage.Controls.Add(this.splitContainer1);
             this.PacketTabPage.Controls.Add(this.PacketListToolStrip);
-            this.PacketTabPage.ImageIndex = 26;
+            this.PacketTabPage.ImageIndex = 27;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
             this.PacketTabPage.Size = new System.Drawing.Size(636, 396);
@@ -1318,16 +1308,17 @@
             // 
             this.reportsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.reportsTreeView.HideSelection = false;
-            this.reportsTreeView.ImageIndex = 34;
+            this.reportsTreeView.ImageIndex = 42;
             this.reportsTreeView.ImageList = this.CreatorImageList;
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode47.Name = "RootNode";
-            treeNode47.Text = "Reports";
+            treeNode62.ImageIndex = 42;
+            treeNode62.Name = "RootNode";
+            treeNode62.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode47});
-            this.reportsTreeView.SelectedImageIndex = 34;
+            treeNode62});
+            this.reportsTreeView.SelectedImageIndex = 42;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
@@ -1382,29 +1373,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode37.ImageIndex = 1;
-            treeNode37.Name = "LicenseNode";
-            treeNode37.SelectedImageIndex = 1;
-            treeNode37.Text = "Licenses";
-            treeNode43.ImageIndex = 2;
-            treeNode43.Name = "PacketNode";
-            treeNode43.SelectedImageIndex = 2;
-            treeNode43.Text = "Packets";
-            treeNode44.Name = "KeyNode";
-            treeNode44.Text = "Hardware Keys";
-            treeNode45.ImageIndex = 3;
-            treeNode45.Name = "CreatorRootNode";
-            treeNode45.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode45.SelectedImageIndex = 3;
-            treeNode45.Text = "Creator";
-            treeNode46.ImageIndex = 0;
-            treeNode46.Name = "ReportRootNode";
-            treeNode46.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode46.SelectedImageIndex = 0;
-            treeNode46.Text = "Reports";
+            treeNode57.ImageIndex = 1;
+            treeNode57.Name = "LicenseNode";
+            treeNode57.SelectedImageIndex = 1;
+            treeNode57.Text = "Licenses";
+            treeNode58.ImageIndex = 2;
+            treeNode58.Name = "PacketNode";
+            treeNode58.SelectedImageIndex = 2;
+            treeNode58.Text = "Packets";
+            treeNode59.Name = "KeyNode";
+            treeNode59.Text = "Hardware Keys";
+            treeNode60.ImageIndex = 3;
+            treeNode60.Name = "CreatorRootNode";
+            treeNode60.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode60.SelectedImageIndex = 3;
+            treeNode60.Text = "Creator";
+            treeNode61.ImageIndex = 0;
+            treeNode61.Name = "ReportRootNode";
+            treeNode61.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode61.SelectedImageIndex = 0;
+            treeNode61.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode45,
-            treeNode46});
+            treeNode60,
+            treeNode61});
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);
@@ -1979,6 +1970,7 @@
 
         #endregion
 
+        private System.Windows.Forms.ImageList CreatorImageList;
         private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.ToolStrip MainToolStrip;
         private System.Windows.Forms.ToolStripTextBox searchToolStripTextBox;
@@ -2004,7 +1996,6 @@
         private System.Windows.Forms.ColumnHeader UserColumnHeader;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitMainToolStripMenuItem;
-        private System.Windows.Forms.ImageList CreatorImageList;
         private System.Windows.Forms.SplitContainer DetailSplitContainer;
         private System.Windows.Forms.PropertyGrid DetailPropertyGrid;
         private System.Windows.Forms.ContextMenuStrip DetailListViewContextMenuStrip;
@@ -2073,10 +2064,9 @@
         private System.Windows.Forms.ToolStripMenuItem deleteCustomerToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem customerToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.ToolStrip ValidationKeyToolStrip;
         private System.Windows.Forms.ToolStripLabel ValidationKeyCustomerLabel;
-        private System.Windows.Forms.ToolStripMenuItem updateVersionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel customerToolStripStatusLabel;
         private System.Windows.Forms.ToolStripMenuItem checkOutToolStripMenuItem;
@@ -2088,7 +2078,6 @@
         private System.Windows.Forms.ToolStripMenuItem newReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem lsReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem plReportToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem softwareTokenPreferencesToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader TypeColumnHeader;
         private System.Windows.Forms.ColumnHeader PrevValueColumnHeader;
         private System.Windows.Forms.ColumnHeader PacketColumnHeader;

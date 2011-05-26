@@ -52,6 +52,7 @@
             this.licPacketNotesLabel = new System.Windows.Forms.Label();
             this.packetDescriptTextBox = new System.Windows.Forms.TextBox();
             this.licPacketAttribsGroupBox = new System.Windows.Forms.GroupBox();
+            this.clearLicenseCodeCheckBox = new System.Windows.Forms.CheckBox();
             this.licPacketDescriptionLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.packetOutputPathTextBox = new System.Windows.Forms.TextBox();
@@ -85,16 +86,9 @@
             this.ProductLicenseTypeComboBox = new System.Windows.Forms.ComboBox();
             this.productLicenseVersionMaskedTextBox = new System.Windows.Forms.MaskedTextBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.label4 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label9 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -122,11 +116,6 @@
             this.productLicenseNotesGroupBox.SuspendLayout();
             this.productLicenseAttribsGroupBox.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -359,9 +348,9 @@
             // 
             this.groupBox4.Controls.Add(this.licPacketNotesLabel);
             this.groupBox4.Controls.Add(this.packetDescriptTextBox);
-            this.groupBox4.Location = new System.Drawing.Point(26, 129);
+            this.groupBox4.Location = new System.Drawing.Point(18, 148);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(401, 118);
+            this.groupBox4.Size = new System.Drawing.Size(411, 105);
             this.groupBox4.TabIndex = 1;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Notes";
@@ -370,7 +359,7 @@
             // 
             this.licPacketNotesLabel.AutoSize = true;
             this.licPacketNotesLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.licPacketNotesLabel.Location = new System.Drawing.Point(19, 92);
+            this.licPacketNotesLabel.Location = new System.Drawing.Point(23, 80);
             this.licPacketNotesLabel.Name = "licPacketNotesLabel";
             this.licPacketNotesLabel.Size = new System.Drawing.Size(211, 13);
             this.licPacketNotesLabel.TabIndex = 8;
@@ -378,31 +367,42 @@
             // 
             // packetDescriptTextBox
             // 
-            this.packetDescriptTextBox.Location = new System.Drawing.Point(21, 21);
+            this.packetDescriptTextBox.Location = new System.Drawing.Point(25, 21);
             this.packetDescriptTextBox.Margin = new System.Windows.Forms.Padding(40, 5, 5, 5);
             this.packetDescriptTextBox.MaxLength = 255;
             this.packetDescriptTextBox.Multiline = true;
             this.packetDescriptTextBox.Name = "packetDescriptTextBox";
-            this.packetDescriptTextBox.Size = new System.Drawing.Size(360, 67);
+            this.packetDescriptTextBox.Size = new System.Drawing.Size(360, 55);
             this.packetDescriptTextBox.TabIndex = 7;
             this.packetDescriptTextBox.TextChanged += new System.EventHandler(this.packetDescriptTextBox_TextChanged);
             // 
             // licPacketAttribsGroupBox
             // 
+            this.licPacketAttribsGroupBox.Controls.Add(this.clearLicenseCodeCheckBox);
             this.licPacketAttribsGroupBox.Controls.Add(this.licPacketDescriptionLabel);
             this.licPacketAttribsGroupBox.Controls.Add(this.label3);
             this.licPacketAttribsGroupBox.Controls.Add(this.packetOutputPathTextBox);
             this.licPacketAttribsGroupBox.Controls.Add(this.folderBrowseButton);
-            this.licPacketAttribsGroupBox.Location = new System.Drawing.Point(26, 3);
+            this.licPacketAttribsGroupBox.Location = new System.Drawing.Point(18, 3);
             this.licPacketAttribsGroupBox.Name = "licPacketAttribsGroupBox";
-            this.licPacketAttribsGroupBox.Size = new System.Drawing.Size(401, 120);
+            this.licPacketAttribsGroupBox.Size = new System.Drawing.Size(411, 145);
             this.licPacketAttribsGroupBox.TabIndex = 0;
             this.licPacketAttribsGroupBox.TabStop = false;
             this.licPacketAttribsGroupBox.Text = "[Edit]";
             // 
+            // clearLicenseCodeCheckBox
+            // 
+            this.clearLicenseCodeCheckBox.AutoSize = true;
+            this.clearLicenseCodeCheckBox.Location = new System.Drawing.Point(26, 120);
+            this.clearLicenseCodeCheckBox.Name = "clearLicenseCodeCheckBox";
+            this.clearLicenseCodeCheckBox.Size = new System.Drawing.Size(115, 17);
+            this.clearLicenseCodeCheckBox.TabIndex = 10;
+            this.clearLicenseCodeCheckBox.Text = "Clear LicenseCode";
+            this.clearLicenseCodeCheckBox.UseVisualStyleBackColor = true;
+            // 
             // licPacketDescriptionLabel
             // 
-            this.licPacketDescriptionLabel.Location = new System.Drawing.Point(19, 22);
+            this.licPacketDescriptionLabel.Location = new System.Drawing.Point(23, 20);
             this.licPacketDescriptionLabel.Name = "licPacketDescriptionLabel";
             this.licPacketDescriptionLabel.Size = new System.Drawing.Size(362, 34);
             this.licPacketDescriptionLabel.TabIndex = 9;
@@ -413,7 +413,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(18, 63);
+            this.label3.Location = new System.Drawing.Point(26, 54);
             this.label3.Margin = new System.Windows.Forms.Padding(40, 0, 3, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 13);
@@ -422,21 +422,23 @@
             // 
             // packetOutputPathTextBox
             // 
-            this.packetOutputPathTextBox.Location = new System.Drawing.Point(75, 60);
+            this.packetOutputPathTextBox.Location = new System.Drawing.Point(26, 69);
             this.packetOutputPathTextBox.Margin = new System.Windows.Forms.Padding(40, 5, 5, 5);
+            this.packetOutputPathTextBox.Multiline = true;
             this.packetOutputPathTextBox.Name = "packetOutputPathTextBox";
-            this.packetOutputPathTextBox.Size = new System.Drawing.Size(306, 20);
+            this.packetOutputPathTextBox.ReadOnly = true;
+            this.packetOutputPathTextBox.Size = new System.Drawing.Size(330, 45);
             this.packetOutputPathTextBox.TabIndex = 6;
             this.packetOutputPathTextBox.MouseHover += new System.EventHandler(this.packetOutputPathTextBox_MouseHover);
             // 
             // folderBrowseButton
             // 
-            this.folderBrowseButton.Location = new System.Drawing.Point(316, 86);
+            this.folderBrowseButton.Image = ((System.Drawing.Image)(resources.GetObject("folderBrowseButton.Image")));
+            this.folderBrowseButton.Location = new System.Drawing.Point(360, 67);
             this.folderBrowseButton.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.folderBrowseButton.Name = "folderBrowseButton";
-            this.folderBrowseButton.Size = new System.Drawing.Size(65, 23);
+            this.folderBrowseButton.Size = new System.Drawing.Size(25, 25);
             this.folderBrowseButton.TabIndex = 8;
-            this.folderBrowseButton.Text = "Browse...";
             this.folderBrowseButton.UseVisualStyleBackColor = true;
             this.folderBrowseButton.Click += new System.EventHandler(this.folderBrowseButton_Click);
             // 
@@ -755,126 +757,35 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.tabPage1.Controls.Add(this.splitContainer1);
+            this.tabPage1.BackColor = System.Drawing.SystemColors.Window;
+            this.tabPage1.Controls.Add(this.listView1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(10);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Size = new System.Drawing.Size(437, 273);
             this.tabPage1.TabIndex = 5;
             this.tabPage1.Text = "tabPage1";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // splitContainer1
+            // listView1
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3,
+            this.columnHeader4});
+            this.listView1.Location = new System.Drawing.Point(19, 14);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(395, 239);
+            this.listView1.TabIndex = 0;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
             // 
-            // splitContainer1.Panel1
+            // columnHeader3
             // 
-            this.splitContainer1.Panel1.BackColor = System.Drawing.SystemColors.Window;
-            this.splitContainer1.Panel1.Controls.Add(this.label4);
+            this.columnHeader3.Text = "Product";
             // 
-            // splitContainer1.Panel2
+            // columnHeader4
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
-            this.splitContainer1.Panel2.Controls.Add(this.groupBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(437, 273);
-            this.splitContainer1.SplitterDistance = 35;
-            this.splitContainer1.TabIndex = 0;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.ForeColor = System.Drawing.Color.SteelBlue;
-            this.label4.Location = new System.Drawing.Point(8, 9);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(138, 16);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "License Packet Setup";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.label13);
-            this.groupBox2.Controls.Add(this.richTextBox1);
-            this.groupBox2.Location = new System.Drawing.Point(26, 117);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(15, 10, 15, 10);
-            this.groupBox2.Size = new System.Drawing.Size(401, 98);
-            this.groupBox2.TabIndex = 11;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Notes";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.BackColor = System.Drawing.Color.Transparent;
-            this.label13.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.label13.Location = new System.Drawing.Point(18, 77);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(211, 13);
-            this.label13.TabIndex = 1;
-            this.label13.Text = "255 Characters Left(Limit is 255 characters)";
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Location = new System.Drawing.Point(21, 23);
-            this.richTextBox1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 5);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(360, 49);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.Controls.Add(this.label9);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.label8);
-            this.groupBox1.Location = new System.Drawing.Point(26, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(401, 108);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "101-00-000-1-12-1-0-1-4-5.pkt";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(306, 79);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Browse...";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // label9
-            // 
-            this.label9.Location = new System.Drawing.Point(18, 21);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(363, 29);
-            this.label9.TabIndex = 3;
-            this.label9.Text = "This packet will expire on Friday, July 16, 2010. Please choose a location for th" +
-                "e license packet to be generated.";
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(80, 56);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(301, 20);
-            this.textBox1.TabIndex = 2;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.Location = new System.Drawing.Point(18, 59);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(56, 13);
-            this.label8.TabIndex = 1;
-            this.label8.Text = "Location";
+            this.columnHeader4.Text = "Version";
+            this.columnHeader4.Width = 158;
             // 
             // errorProvider1
             // 
@@ -936,14 +847,6 @@
             this.productLicenseAttribsGroupBox.ResumeLayout(false);
             this.productLicenseAttribsGroupBox.PerformLayout();
             this.tabPage1.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            this.splitContainer1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
 
@@ -995,21 +898,11 @@
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Label TokenDescriptionLabel;
         private System.Windows.Forms.Button browseTokenFileButton;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.SplitContainer productLicenseSplitContainer;
         private System.Windows.Forms.GroupBox productLicenseNotesGroupBox;
         private System.Windows.Forms.GroupBox productLicenseAttribsGroupBox;
         private System.Windows.Forms.SplitContainer licPktSplitContainer;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox licPacketAttribsGroupBox;
         private System.Windows.Forms.Label licPacketNotesLabel;
@@ -1020,6 +913,10 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label longDateLabel;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.CheckBox clearLicenseCodeCheckBox;
 
 
     }
