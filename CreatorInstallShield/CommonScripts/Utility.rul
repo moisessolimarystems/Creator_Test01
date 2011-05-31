@@ -130,12 +130,13 @@ function RegAsmUnRegister(svFilePath, svSystemPath, bHasTypeLib)
 	NUMBER nvExitCode;
 begin 
 	svRegAsmPath = svSystemPath ^ "Microsoft.Net\\Framework\\v2.0.50727\\regasm.exe";
+	LongPathToQuote(svFilePath,TRUE); 	
 	if(bHasTypeLib) then		
 		svCmdLine = "/unregister /tlb /codebase " + svFilePath;
 	else
 		svCmdLine = "/unregister /codebase " + svFilePath;
 	endif;
-	LongPathToQuote(svFilePath,TRUE); 
+
 	if(Is(FILE_EXISTS, svFilePath)) then 	
 		WriteLog("UnRegistering " + svFilePath);            	
 		if (_LaunchAppEx(svRegAsmPath,
