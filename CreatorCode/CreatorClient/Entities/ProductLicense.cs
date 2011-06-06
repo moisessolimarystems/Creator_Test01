@@ -11,6 +11,7 @@ using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
 using System.Globalization;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace Client.Creator
 {
@@ -152,7 +153,7 @@ namespace Client.Creator
                 {
                     List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
                     UpdateModules(ProductVersion, productLicenses);
-                    _moduleList = client.GetModulesByProductLicense(_plRec.plID);
+                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                 });
                 return _moduleList;
             }
@@ -824,7 +825,7 @@ namespace Client.Creator
             string previousValue, moduleName;
             Service<ICreator>.Use((client) =>
             {   //Retrieve only modules belonging to Parent PL
-                List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID);
+                List<ModuleTable> mtList = client.GetModulesByProductLicense(ParentID, false);
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
                 if (ModuleList != null)
                 {   //add-on module list = _moduleList, parent module list = mtlist
@@ -888,7 +889,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
-                List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                List<ModuleTable> moduleList = client.GetModulesByProductLicense(stdProductLicense, false);
                 foreach (ModuleTable module in moduleList.Where(m => m.ProductLicenseID != ProductLicenseDatabaseID && m.ModID == modID))
                 {
                     totalValue += module.AppInstance;
@@ -903,7 +904,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
-                List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                List<ModuleTable> moduleList = client.GetModulesByProductLicense(stdProductLicense, false);
                 foreach (ModuleTable module in moduleList.Where(m => m.ModID == modID))
                 {
                     totalValue += module.AppInstance;
@@ -917,7 +918,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
-                List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                List<ModuleTable> moduleList = client.GetModulesByProductLicense(stdProductLicense, false);
                 //Get AddOn modules with modID and set them to 0;
                 foreach (ModuleTable module in moduleList.Where(m => m.ProductLicenseID != ProductLicenseDatabaseID && m.ModID == modID))
                 {
@@ -931,7 +932,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 string stdProductLicense = (Status != ProductLicenseState.AddOn) ? ID : ParentID;
-                List<ModuleTable> moduleList = client.GetAllModules(stdProductLicense);
+                List<ModuleTable> moduleList = client.GetModulesByProductLicense(stdProductLicense, false);
                 List<int> updatedModuleList = new List<int>(); //list to keep track of one set of modules to increment product connection.
                 //increment should occur for only 1 add-on module set not all add-on module sets
                 foreach (ModuleTable module in moduleList.Where(m => m.ProductLicenseID != ProductLicenseDatabaseID && m.ModID == modID))
@@ -1131,6 +1132,7 @@ namespace Client.Creator
     }
 
     #region Helper Classes
+    [TypeConverter(typeof(VersionConverter))]
     public class LicenseVersion
     {
         private uint _major = 0;
@@ -1160,11 +1162,22 @@ namespace Client.Creator
             set { _minor = value; }
         }
 
+        public static bool IsValid(string version)
+        {
+            Regex reg = new Regex(@"^\d+\.\d+$");
+            if (!reg.IsMatch(version))
+                return false;
+            return true;
+        }
+
         public override bool Equals(Object lv)
         {
             LicenseVersion _lv = lv as LicenseVersion;
-            if (_lv.Major == _major && _lv.Minor == _minor)
-                return true;
+            if (_lv != null)
+            {
+                if (_lv.Major == _major && _lv.Minor == _minor)
+                    return true;
+            }
             return false;
         }
 
@@ -1202,7 +1215,7 @@ namespace Client.Creator
             {
                 return 0;
             }
-            return ((Byte)value).ToString();
+            return ((Byte)value).ToString();            
         }
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -1272,6 +1285,19 @@ namespace Client.Creator
         }
     }
 
+    internal class VersionConverterTest : ExpandableObjectConverter
+    {
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destType)
+        {
+            if (destType == typeof(string) && value is LicenseVersion)
+            {
+                LicenseVersion version = value as LicenseVersion;
+                return version.Major + "." + version.Minor;
+            }
+            return base.ConvertTo(context, culture, value, destType);
+        }
+    }
+
     internal class VersionConverter : TypeConverter
     {
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
@@ -1301,10 +1327,13 @@ namespace Client.Creator
             //Debug.WriteLine("ConvertFrom: ");
             if (value is String)
             {
-                string[] versionString = value.ToString().Split(".".ToCharArray());
-                if (versionString.Count() != 2)
+                Regex reg = new Regex(@"^\d+\.\d+$");
+                string version = value.ToString();
+                if (!reg.IsMatch(version))
+                {
                     throw new Exception("Please enter a valid version!");
-                return new LicenseVersion(UInt32.Parse(versionString[0]), UInt32.Parse(versionString[1]));
+                }
+                return new LicenseVersion(version);
             }
             return base.ConvertFrom(context, info, value);
         }
