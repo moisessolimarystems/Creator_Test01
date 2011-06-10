@@ -1524,7 +1524,7 @@ HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs
 
 
 // For Software Server to access Validation Keys, will only work on keys of version 1
-HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate)
+HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceCurrentDateUpdate, bool bForceActivitySlotUpdate)
 {
 	HRESULT hr = S_OK;
 	SafeMutex mutex(KeyListLock);
@@ -1566,7 +1566,7 @@ HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, 
 			hr = pKeyV1->GetHistoryNumber(&historyNumber);
 			if(FAILED(hr)) throw hr;
 
-			if(bForceActivitySlotUpdate || historyNumber < keyAttribs.historyNumber)
+			if(bForceCurrentDateUpdate || bForceActivitySlotUpdate || historyNumber < keyAttribs.historyNumber)
 			{
 				if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(keyAttribs.currentDate)).c_str(), tmpDateSystime))
 				throw(E_FAIL);
@@ -1577,20 +1577,23 @@ HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, 
 				hr = pKeyV1->SetSoftwareCurrentDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
 				if(FAILED(hr)) throw hr;
 
-				//replace all activity slots on key with values in keyAttribs
-				for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actSlotIt = keyAttribs.activationInfoList->begin();
-					actSlotIt != keyAttribs.activationInfoList->end();
-					actSlotIt++)
+				if(bForceActivitySlotUpdate || historyNumber < keyAttribs.historyNumber)
 				{
-					hr = pKeyV1->SetSoftwareActivitySlotCurrentActivation(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotCurrentActivation));
-					//if(FAILED(hr))
-					//	throw hr;
-					hr = pKeyV1->SetSoftwareActivitySlotHoursToExpiration(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotHoursToExpire));
-					//if(FAILED(hr))
-					//	throw hr;
+					//replace all activity slots on key with values in keyAttribs
+					for(Lic_KeyAttribs::TVector_Lic_ActivationInfoAttribsList::iterator actSlotIt = keyAttribs.activationInfoList->begin();
+						actSlotIt != keyAttribs.activationInfoList->end();
+						actSlotIt++)
+					{
+						hr = pKeyV1->SetSoftwareActivitySlotCurrentActivation(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotCurrentActivation));
+						//if(FAILED(hr))
+						//	throw hr;
+						hr = pKeyV1->SetSoftwareActivitySlotHoursToExpiration(unsigned short(actSlotIt->activationSlotId), unsigned short(actSlotIt->activationSlotHoursToExpire));
+						//if(FAILED(hr))
+						//	throw hr;
+					}
+					hr = pKeyV1->SetHistoryNumber(unsigned short(keyAttribs.historyNumber));
+						if(FAILED(hr)) throw hr;
 				}
-				hr = pKeyV1->SetHistoryNumber(unsigned short(keyAttribs.historyNumber));
-					if(FAILED(hr)) throw hr;
 			}
 
 			//cycle through activation list, if there are any overrides, then overide value on key.
