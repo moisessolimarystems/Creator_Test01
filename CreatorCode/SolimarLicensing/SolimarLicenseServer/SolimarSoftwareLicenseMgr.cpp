@@ -972,13 +972,6 @@ HRESULT SoftwareLicenseMgr::GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAt
 	*pLicenseInfo = m_licenseFileAttribs.licLicenseInfoAttribs;
 	return S_OK;
 }
-HRESULT SoftwareLicenseMgr::GetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec)
-{
-	SafeMutex mutex(softwareLicenseMgrLock);
-	*pSoftwareSpec = m_licenseFileAttribs.licSoftwareSpecAttribs;
-	return S_OK;
-}
-
 
 HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs)
 {
