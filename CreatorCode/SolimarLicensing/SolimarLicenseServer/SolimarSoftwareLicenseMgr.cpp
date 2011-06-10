@@ -1192,6 +1192,7 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 	BSTR bstrLicPacketStream = SysAllocString(pLicPacket->ToString().c_str());	//Use a copy of...
 	try
 	{
+		bool bResetCurrentDateToNow = false; //To reset clock violations, who accidently set their clock ahead, then back 
 		Lic_PackageAttribs tmpPacketNewLicenseFileAttribs;
 		tmpPacketNewLicenseFileAttribs.InitFromString(bstrLicPacketStream);
 
@@ -1429,6 +1430,44 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 			if(FAILED(hr))
 				bFoundKeyInfo = false;
 		}
+
+		//
+		//CR.FIX.14842
+		//For customers who enter a clock violation because of putting the system clock ahead in time (accidently in the future), then reseting the system clock back 
+		//to the current time. 
+		//If the License Packet has a licenseID, and it matches the License ID for a given softwareLicMgr, then reset its LastTouchDate to now, and also reset
+		//the LastTouchDate on the SoftwareServerDataMgr
+		//Calculate and set bResetCurrentDateToNow
+
+		std::wstring packetLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
+		std::wstring currentLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(m_licenseFileAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
+
+		bResetCurrentDateToNow = (_wcsicmp(packetLicenseCode.c_str(), currentLicenseCode.c_str()) == 0);
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - packetLicenseCode: %s, currentLicenseCode: %s", packetLicenseCode.c_str(), currentLicenseCode.c_str());
+//OutputDebugString(tmpbuf);
+//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - bResetCurrentDateToNow: %s", bResetCurrentDateToNow ? L"TRUE" : L"FALSE");
+//OutputDebugString(tmpbuf);
+
+		if(bResetCurrentDateToNow)
+		{
+			//Set the current date to NOW, rounding down to the nearest hour.
+			time_t currentTimeT = int(time(NULL) / TimeHelper::ONE_HOUR_IN_SECONDS) * TimeHelper::ONE_HOUR_IN_SECONDS;
+			SYSTEMTIME tmpSystime;
+			VARIANT tmpVt;
+			tmpVt = TimeHelper::TimeTToVariant(currentTimeT);
+			VariantTimeToSystemTime(tmpVt.date, &tmpSystime);
+			wchar_t timestamp[256];
+			TimeHelper::SystemTimeToString(timestamp, _countof(timestamp), tmpSystime);
+			keyAttrib.currentDate = std::wstring(timestamp);
+//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - keyAttrib.currentDate: %s", std::wstring(keyAttrib.currentDate).c_str());
+//OutputDebugString(tmpbuf);
+
+		}
+
+////Testing...
+//throw LicenseServerError::EHR_LIC_CLOCK_LIC_PACKET;
+
 		//if keyAttrib is initialized, convert activity slots to product license expiration.
 		if(bFoundKeyInfo)
 		{
@@ -1769,7 +1808,7 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 			//Update the USB Key
 			if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )
 			{
-				m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, keyAttrib);
+				m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, keyAttrib, bResetCurrentDateToNow, false);
 			}
 
 			}
@@ -1783,6 +1822,12 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - m_bstrLicenseName: %s", (wchar_t*)m_bstrLicenseName);
 //OutputDebugString(tmpbuf);
+
+		if(bResetCurrentDateToNow)
+		{
+			//CR.FIX.14842 - Reset Clock violations
+			m_pLicServerDataMgr->Touch(true);
+		}
 
 		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
 		{
@@ -2238,7 +2283,7 @@ wchar_t debug_buf[1024];
 		if(_wcsicmp(wstrHardwareKeyID.c_str(), L"") != 0 )
 		{
 			keyAttribs.licenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
-			m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), keyAttribs, true/*force activity slot update*/);
+			m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), keyAttribs, true/*force current date update*/, true/*force activity slot update*/);
 		}
 
 		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
