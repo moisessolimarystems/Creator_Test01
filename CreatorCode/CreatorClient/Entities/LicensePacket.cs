@@ -52,7 +52,7 @@ namespace Client.Creator
         /// <summary>
         /// Builds a license package object by retrieving information from the database. Stores resulting object into _licenseTable[FIELD].
         /// </summary>
-        public bool BuildLicensePackage()
+        public bool BuildLicensePackage(PacketDialogData data)
         {
             bool bRetVal = false;
             int major = 0, minor = 0, buildVersion = 0;
@@ -64,7 +64,7 @@ namespace Client.Creator
             if (_licenseTable != null)
             {
                 _licPackage.Stream = _licenseTable.LicenseInfo;
-                if (PopulateValidationTokens()) //add tokens to _licPackage 
+                if (PopulateValidationTokens(data)) //add tokens to _licPackage 
                 {                    
                     if (PopulateProductInfo())  //add products,productlicenses,modules to _licPackage
                     {   //set software spec version based on the spec built with Creator
@@ -99,7 +99,7 @@ namespace Client.Creator
         /// <summary>
         /// Retrieves all validation tokens in the database for a license server and stores them the _licPackage object with the tokens.
         /// </summary>
-        private bool PopulateValidationTokens()
+        private bool PopulateValidationTokens(PacketDialogData data)
         {
             bool bRetVal = true;
             IList<SoftwareTokenTable> softwareTokens = null;
@@ -109,24 +109,37 @@ namespace Client.Creator
                 softwareTokens = client.GetAllSoftwareTokens();
                 tokenList = client.GetTokensByLicenseName(_licenseServer);
             });
-            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
-            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-            licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
-            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken);            
+            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();           
             //add validation tokens for licinfo object
+            //tokentable may contain licensecode
             foreach (TokenTable token in tokenList)
             {
                 if (tokenList.Count > 1)
-                {
+                {   //not found in software token table -> ttlicensecode
                     string tokenName = Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), token.TokenType);
-                    SoftwareTokenTable st = softwareTokens.First(t => t.TokenType == tokenName);
-                    if (st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated)
-                        continue;
+                    SoftwareTokenTable st = softwareTokens.FirstOrDefault(t => t.TokenType == tokenName);
+                    if (st != null)
+                    {
+                        if(st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated) //skip licenseCode if user doesn't select ClearLicenseCode
+                            continue; 
+                    }
+                    else
+                    {
+                        if (!data.ClearLicenseCode && token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
+                            continue;
+                    }    
                 }
                 Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                 newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType;
                 newToken.tokenValue.TVal = token.TokenValue;
                 _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
+            }
+            //add empty licensecode token if it hasn't been added
+            if(tokenList.SingleOrDefault(t => t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode) == null)
+            {
+                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
+                _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken); 
             }
             return bRetVal;
         }
@@ -140,6 +153,8 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer,false);
+                List<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(_licenseServer);
+                List<ModuleTable> moduleList = client.GetAllModules(_licenseServer);
                 foreach (ProductLicenseTable plt in pltList.Where(pl => pl.IsActive == true))
                 {
                     Lic_PackageAttribs.Lic_ProductInfoAttribs product = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
@@ -163,15 +178,14 @@ namespace Client.Creator
                     product.activationTotal.TVal = plt.Activations;
                     product.activationAmountInDays.TVal = plt.ActivationAmount;
                     product.bUseActivations.TVal = (plt.Activations > 0);
-                    List<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(_licenseServer);
                     product.bActivationOverrideCurrent.TVal = (transactionList.Where(t => t.taOrderID == plt.ID &&
                                                                                          (t.taType == (byte)TransactionType.ActivationAmount ||
                                                                                           t.taType == (byte)TransactionType.ActivationTotal ||
                                                                                           t.taType == (byte)TransactionType.ExpirationDate)).Count() > 0);
-                    List<ModuleTable> moduleList = client.GetModulesByProductLicense(plt.plID);
-                    if (moduleList.Count > 0)
+                    List<ModuleTable> currentModules = moduleList.Where(m => m.ProductLicenseID == plt.ID).ToList();                  
+                    if (currentModules.Count > 0)
                     {
-                        foreach (ModuleTable module in moduleList)
+                        foreach (ModuleTable module in currentModules)
                         {                            
                             Lic_PackageAttribs.Lic_ModuleInfoAttribs mod = new Lic_PackageAttribs.Lic_ModuleInfoAttribs();
                             mod.moduleID.TVal = (uint)module.ModID;
