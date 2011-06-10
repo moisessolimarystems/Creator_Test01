@@ -165,7 +165,7 @@ HRESULT SoftwareServerDataMgr::SetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_
 	return hr;
 }
 
-HRESULT SoftwareServerDataMgr::Touch()
+HRESULT SoftwareServerDataMgr::Touch(bool bForceCurrentDateUpdate)
 {
 	HRESULT hr(S_OK);
 	try
@@ -177,6 +177,10 @@ HRESULT SoftwareServerDataMgr::Touch()
 		if(FAILED(hr))
 			throw hr;
 
+		//CR.FIX.14842 - Reset Clock violations
+		if (bForceCurrentDateUpdate)
+			lastTouchDateTimeT = time(NULL);
+
 		time_t timeNowTimeT = time(NULL);	//Retrieves Universal Time
 		double timeDiffSeconds = difftime(timeNowTimeT, lastTouchDateTimeT);
 		bool bUpdateLastTouch(false);
@@ -185,7 +189,7 @@ HRESULT SoftwareServerDataMgr::Touch()
 		bool bLogWarning_ClockViolation(false);
 		bool bSaveToFile(true);
 
-		if(timeDiffSeconds > (60.0 * 5))
+		if(bForceCurrentDateUpdate || (timeDiffSeconds > (60.0 * 5)))
 		{
 			//Don't touch if have touched within last 5 minutes...
 			bUpdateLastTouch = true;
@@ -634,8 +638,7 @@ HRESULT SoftwareLicenseFile::LoadFromLicenseFile(_bstr_t licenseFileName, BSTR* 
 //	GetLastAccessTime
 //wchar_t debug_buf[1024];
 //_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseFile::LoadFromLicenseFile() - Enter - licenseFileName: %s", (wchar_t*)licenseFileName);
-//OutputDebugStringW(debug_buf);	
-
+//OutputDebugStringW(debug_buf);
 
 //	SafeMutex mutex(softwareLicenseFileLock);
 	HRESULT hr(S_OK);
@@ -682,7 +685,6 @@ HRESULT SoftwareLicenseFile::LoadFromLicenseFile(_bstr_t licenseFileName, BSTR* 
 		CloseHandle(hFile);
 		buffer[buffersize]='\0';
 
-
 		VARIANT vtByteArray;
 		VariantInit(&vtByteArray);
 
@@ -724,7 +726,7 @@ HRESULT SoftwareLicenseFile::LoadFromLicenseFile(_bstr_t licenseFileName, BSTR* 
 	{
 		hr = E_FAIL;
 	}
-//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseFile::LoadFromLicenseFile() - Leave - licenseFileName: %s", (wchar_t*)*pBstrSoftwareStream);
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseFile::LoadFromLicenseFile() - Leave - hr: 0x%08x", hr);
 //OutputDebugStringW(debug_buf);	
 	return hr;
 }

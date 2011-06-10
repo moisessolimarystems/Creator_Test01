@@ -100,7 +100,8 @@ public:
 	// For Software Server to access Validation Keys
 	HRESULT GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs);
 	// For Software Server to access Validation Keys, will only work on keys of version 1
-	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceActivitySlotUpdate=false);
+	// bForceActivitySlotUpdate = true will also update the currentDate, even if bForceCurrentDateUpdate = false;
+	HRESULT SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, bool bForceCurrentDateUpdate, bool bForceActivitySlotUpdate);
 
 	HRESULT CheckHealth(unsigned int timeout);
 private:
