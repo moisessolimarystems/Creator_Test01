@@ -973,15 +973,6 @@ HRESULT SoftwareLicenseMgr::GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAt
 	return S_OK;
 }
 
-HRESULT SoftwareLicenseMgr::GetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec)
-{
-	SafeMutex mutex(softwareLicenseMgrLock);
-	//CR.14884 - Use licReplaceSoftwareSpecAttribs instead of licSoftwareSpecAttribs
-	*pSoftwareSpec = m_licenseFileAttribs.licReplaceSoftwareSpecAttribs;
-	return S_OK;
-}
-
-
 HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs)
 {
 //wchar_t debug_buf[1024];
