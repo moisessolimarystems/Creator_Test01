@@ -46,8 +46,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ReportViewer.Common, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.ReportViewer.WinForms, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Shared.VisualComponents, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\SolimarLicensing\Image\Shared.VisualComponents.dll</HintPath>
@@ -73,19 +71,9 @@
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Common\CommunicationLink.cs">
@@ -104,6 +92,7 @@
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Collections\CustomPropertyCollection.cs" />
     <Compile Include="Entities\CustomerManager.cs" />
     <Compile Include="Entities\LicensePacket.cs" />
     <Compile Include="Entities\ProductCollection.cs" />
@@ -201,9 +190,6 @@
       <DependentUpon>ReportDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SoftwareTokenOptions.resx">
-      <DependentUpon>SoftwareTokenOptions.cs</DependentUpon>
-    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -234,11 +220,11 @@
     </Compile>
     <Compile Include="ServiceProxy\MyUIService.cs" />
     <Compile Include="ServiceProxy\Service.cs" />
-    <Compile Include="SoftwareTokenOptions.cs">
-      <SubType>Form</SubType>
+    <Compile Include="StaticImageList.cs">
+      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="SoftwareTokenOptions.Designer.cs">
-      <DependentUpon>SoftwareTokenOptions.cs</DependentUpon>
+    <Compile Include="StaticImageList.Designer.cs">
+      <DependentUpon>StaticImageList.cs</DependentUpon>
     </Compile>
     <Compile Include="VirtualTreeNode.cs" />
   </ItemGroup>
