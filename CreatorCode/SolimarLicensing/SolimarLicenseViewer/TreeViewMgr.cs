@@ -37,6 +37,7 @@ namespace SolimarLicenseViewer
             PRODUCTCONNECTIONSETTINGS,
             SOLITRACK,
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
+            LIBRARYSERVICES,
             EVENTLOG,
         }
 
