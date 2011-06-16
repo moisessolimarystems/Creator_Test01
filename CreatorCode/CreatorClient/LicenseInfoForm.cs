@@ -861,8 +861,8 @@ namespace Client.Creator
 
         public HardwareKeyDialogData()
         {
-            _customerName = "";
-            _keyValue = "";
+            _customerName = string.Empty;
+            _keyValue = string.Empty;
         }
 
         public HardwareKeyDialogData(string custName, string keyValue)

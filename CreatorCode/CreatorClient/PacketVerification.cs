@@ -131,7 +131,7 @@ namespace Client.Creator
                 try
                 {
                     Byte[] licPktBytes = System.IO.File.ReadAllBytes(this.openFileDialog.FileName);
-                    string licStream = "";
+                    string licStream = string.Empty;
                     Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
                     {
                         licStream = client.GenerateStreamByLicenseSystemData(ref licPktBytes);
@@ -180,7 +180,7 @@ namespace Client.Creator
 
         public PacketVerificationDialogData()
         {
-            _packetName = "";
+            _packetName = string.Empty;
             _verified = false;
         }
         #endregion

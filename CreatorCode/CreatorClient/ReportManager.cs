@@ -124,7 +124,7 @@ namespace Client.Creator
                             newCondition.Value = tmpString;
                             tmpString = reader.GetAttribute(AppConstants.ReportXMLTags.TypeAttrib);
                             if (tmpString == null)
-                                tmpString = "";
+                                tmpString = string.Empty;
                             newCondition.ValueType = tmpString;
 
                             newReport.Conditions.Add(newCondition);
@@ -145,7 +145,7 @@ namespace Client.Creator
         private bool SaveReportsToXML(List<Report> reportList)
         {
             bool bRetVal = false;
-            String path = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), AppConstants.LocalConnectionFilePath, "");
+            String path = String.Concat(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), AppConstants.LocalConnectionFilePath, string.Empty);
             DirectoryInfo di = new DirectoryInfo(path);
             try
             {

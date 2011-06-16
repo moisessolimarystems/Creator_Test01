@@ -74,7 +74,7 @@ namespace Client.Creator
             });            
             productVersionDataGridView.DataSource = productList;
             productVersionDataGridView.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCellsExceptHeader;
-            productVersionDataGridView.Columns[0].HeaderText = "";
+            productVersionDataGridView.Columns[0].HeaderText = string.Empty;
             productVersionDataGridView.ColumnHeadersBorderStyle = ProperColumnHeadersBorderStyle;
         }
 

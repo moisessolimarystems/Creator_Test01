@@ -159,7 +159,7 @@ namespace Client.Creator
                                            prodMajor,
                                            prodMinor,
                                            false,
-                                           "",
+                                           string.Empty,
                                            false,
                                            Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper.LICENSE_LEVEL.UI_LEVEL_ALL,
                                            0,
@@ -301,7 +301,8 @@ namespace Client.Creator
             {
                 foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs module in productSpec.moduleSpecMap.TVal.Values)
                 {
-                    if (module.moduleName.TVal.ToLower() == moduleName.ToLower())
+                    //if (module.moduleName.TVal.ToLower() == moduleName.ToLower())
+                    if (string.Compare(module.moduleName.TVal, moduleName, true) == 0)
                     {
                         productID = productSpec.productID.TVal;
                         break;
@@ -335,7 +336,7 @@ namespace Client.Creator
         public string GetProductBaseName(string productName)
         {
             if (productName.Contains("Test"))
-                productName = productName.Replace("Test/Dev/DR", "").Trim();            
+                productName = productName.Replace("Test/Dev/DR", string.Empty).Trim();            
             return productName;        
         }
 
@@ -343,7 +344,7 @@ namespace Client.Creator
         {
             string productName = GetProductName(productID);
             if (productName.Contains("Test"))
-                productName = productName.Replace("Test/Dev/DR", "").Trim();
+                productName = productName.Replace("Test/Dev/DR", string.Empty).Trim();
             return productName;
         }
 
@@ -379,7 +380,8 @@ namespace Client.Creator
         {            
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (productSpec.productName.TVal.ToLower() == productName.ToLower())
+                //if (productSpec.productName.TVal.ToLower() == productName.ToLower())
+                if (string.Compare(productSpec.productName.TVal, productName, true) == 0)
                     return (short)productSpec.productID.TVal;
             }
             //need to return a valid bad value
@@ -393,7 +395,8 @@ namespace Client.Creator
             {
                 foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
                 {
-                    if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                    //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                    if (string.Compare(moduleSpec.moduleName.TVal, moduleName, true) == 0)
                         return (short)moduleSpec.moduleID.TVal;
                 }
             }   
@@ -438,7 +441,8 @@ namespace Client.Creator
                     {
                         foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
                         {
-                            if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                            //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                            if(string.Compare(moduleSpec.moduleName.TVal,  moduleName, true) == 0)
                             {
                                 if (moduleSpec.moduleDefaultLicense.TVal > 0)
                                     return true;

@@ -375,7 +375,7 @@ namespace Client.Creator
 
         public string GetFilterKey(Condition userCondition)
         {
-            string conditionString = "";
+            string conditionString = string.Empty;
             IDictionary<string, ConditionName> filterNames = null;
             if (Type == ReportType.LicenseServer)
                 filterNames = _filterLSNames;
@@ -400,7 +400,7 @@ namespace Client.Creator
         {            
             ConditionNameType cnt = GetConditionNameType(userCondition.Name); //
             IDictionary<string, ConditionOperator> filterOperators = null;
-            string conditionString = "";
+            string conditionString = string.Empty;
             if (cnt == ConditionNameType.Date)
                 filterOperators = _filterDateOperators;
             else if (cnt == ConditionNameType.Bool)

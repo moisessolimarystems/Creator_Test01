@@ -206,7 +206,7 @@ namespace Client.Creator
                         {
                             if (value.ToString() != ProductVersion.ToString())
                                 TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                      "",
+                                                                      string.Empty,
                                                                       ID,
                                                                       string.Format("Edit {0} Version", ProductName),
                                                                       value.ToString(),
@@ -269,7 +269,7 @@ namespace Client.Creator
                             if (plt != null)
                             {
                                 TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                      "",
+                                                                      string.Empty,
                                                                       ID,
                                                                       string.Format("Edit {0} Product Connection", ProductName),
                                                                       value.ToString(),
@@ -311,7 +311,7 @@ namespace Client.Creator
                             dlgResult = MessageBox.Show(string.Format("Please Verify Status Change from {0} to {1}.", Status.ToString(), value.ToString()), "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                         if (dlgResult == DialogResult.Yes || value == ProductLicenseState.AddOn)
                         {
-                            string errorMsg = "";
+                            string errorMsg = string.Empty;
                             switch (value)
                             {
                                 case ProductLicenseState.Licensed: //was trial now licensed       
@@ -354,7 +354,7 @@ namespace Client.Creator
                                     if (plt != null)
                                     {
                                         TransactionManager.CreateTransaction(TransactionType.Status,
-                                                                              "",
+                                                                              string.Empty,
                                                                               ID,
                                                                               string.Format("Edit {0} Status", ProductName),
                                                                               ((ProductLicenseState)value).ToString(),
@@ -394,7 +394,7 @@ namespace Client.Creator
                 {
                     if (_plRec.ExpirationDate != value)
                     {
-                        string errorMsg = "";
+                        string errorMsg = string.Empty;
                         if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
                             !value.HasValue && !HasHardwareToken())
                             errorMsg = "Can't remove expiration date for non-hardware token validation.";
@@ -415,7 +415,7 @@ namespace Client.Creator
                                     if (value.HasValue)
                                         newValue = value.Value.ToShortDateString();
                                     TransactionManager.CreateTransaction(TransactionType.ExpirationDate,
-                                                      "",
+                                                      string.Empty,
                                                       ID,
                                                       string.Format("Modify {0} Expiration Date", ProductName),
                                                       newValue,
@@ -482,7 +482,7 @@ namespace Client.Creator
                             if (plt != null)
                             {
                                 TransactionManager.CreateTransaction(TransactionType.ActivationTotal,
-                                                                     "",
+                                                                     string.Empty,
                                                                      ID,
                                                                      string.Format("Modify {0} Activation Total", ProductName),
                                                                      value.ToString(),
@@ -535,7 +535,7 @@ namespace Client.Creator
                                 if (plt != null)
                                 {
                                     TransactionManager.CreateTransaction(TransactionType.ActivationAmount,
-                                                                         "",
+                                                                         string.Empty,
                                                                          ID,
                                                                          string.Format("Modify {0} Activation Amount in Days", ProductName),
                                                                          value.ToString(),
@@ -605,7 +605,7 @@ namespace Client.Creator
                     string[] notes = _plRec.Description.Split("|".ToCharArray());
                     return notes[1];
                 }
-                return "";
+                return string.Empty;
             }
             set
             {
@@ -854,7 +854,7 @@ namespace Client.Creator
                                     moduleName = _commLink.GetModuleName(ProductID, mt.ModID);    
                                     //Create transaction for add-on PL modules being merged into parent PL 
                                     TransactionManager.CreateTransaction(TransactionType.Module,
-                                                                          "",
+                                                                          string.Empty,
                                                                           ParentID,
                                                                           string.Format("Merge {0} - {1} [{2}]", ProductName, moduleName, ID),
                                                                           mt.Value.ToString(),
@@ -1039,7 +1039,7 @@ namespace Client.Creator
                 {
                     string previousValue = (module != null) ? mt.Value.ToString() : "0";
                     TransactionManager.CreateTransaction(TransactionType.Module,
-                                                          "",
+                                                          string.Empty,
                                                           ID,
                                                           string.Format("Modify {0} - {1}", ProductName, module.Name),
                                                           module.Value.ToString(),
@@ -1193,7 +1193,7 @@ namespace Client.Creator
         public override object ConvertFrom(ITypeDescriptorContext context,
             System.Globalization.CultureInfo culture, object value)
         {
-            if (value.ToString() == "")
+            if (value.ToString() == string.Empty)
                 return null;
             else
             {
@@ -1210,7 +1210,7 @@ namespace Client.Creator
         
         public override object ConvertTo(ITypeDescriptorContext context,
             System.Globalization.CultureInfo culture, object value, Type destinationType)
-        {
+        {            
             if (value == null)
             {
                 return 0;
@@ -1241,7 +1241,7 @@ namespace Client.Creator
         public override object ConvertFrom(ITypeDescriptorContext context,
             System.Globalization.CultureInfo culture, object value)
         {
-            if (value.ToString() == "")            
+            if (value.ToString() == string.Empty)            
                 return null;            
             else
             {
@@ -1263,7 +1263,7 @@ namespace Client.Creator
         {
             if (value == null)
             {
-                return "";
+                return string.Empty;
             }
             return (value as DateTime?).Value.ToLongDateString();
         }

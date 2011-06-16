@@ -136,7 +136,7 @@ namespace Client.Creator
                 IconList iconIndex;
                 try
                 {
-                    iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", ""), true);
+                    iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", string.Empty), true);
                 }
                 catch (Exception ex)
                 {
@@ -165,7 +165,7 @@ namespace Client.Creator
 
             public static String GetLicenseServerPrefix(LicenseServerType licType)
             {
-                String prefix = "";
+                String prefix = string.Empty;
                 if (licType != LicenseServerType.Deactivated)
                     prefix = licType.ToString().Substring(0, 1);
                 return prefix;

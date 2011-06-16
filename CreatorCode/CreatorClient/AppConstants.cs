@@ -18,9 +18,20 @@ namespace Client.Creator
         public static readonly int MaxActivationAmountInDays = 170;
         public static readonly int MaxProductLicenses = 20;
 
+        //License Object Type Names
         public const String LicenseServerObjectName = "LicenseServer";
         public const String ProductCollectionObjectName = "ProductCollection";
         public const String ProductLicenseObjectName = "ProductLicense";
+
+        //License Properties Tab Page Names
+        public const String PropertyGridTabPage = "PropertyGridTabPage";
+        public const String TransactionsTabPage = "TransactionsTabPage";
+        public const String PacketTabPage = "PacketTabPage";
+
+        //LicenseView Tab Page Names
+        public const String LicensesTabPage = "LicensesTabPage";
+        public const String ValidationKeysTabPage = "ValidationKeysTabPage";
+        public const String ReportTabPage = "ReportTabPage";
 
         public class ReportXMLTags
         {

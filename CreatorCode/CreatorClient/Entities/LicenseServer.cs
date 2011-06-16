@@ -144,7 +144,7 @@ namespace Client.Creator
         public string UserLock
         {
             //LS locked if userlock is not "", current user has lock if userlock == current user
-            get { return _userLock ?? ""; } //side effect...requires call of LockStatus to get value           
+            get { return _userLock ?? string.Empty; } //side effect...requires call of LockStatus to get value           
         }
 
         /// <summary>
@@ -286,7 +286,7 @@ namespace Client.Creator
         [Browsable(false)]
         public string Comments
         {
-            get { return _comments ?? ""; }
+            get { return _comments ?? string.Empty; }
             set
             {
                 if (_comments != value)
@@ -389,7 +389,7 @@ namespace Client.Creator
                     string[] notes = Comments.Split("|".ToCharArray());
                     return notes[1];
                 }
-                return "";
+                return string.Empty;
             }
             set
             {
@@ -416,9 +416,10 @@ namespace Client.Creator
         {
             //lock status, 
         }
+
         public bool LockedByCurrentUser()
         {
-            return UserLock == WindowsIdentity.GetCurrent().Name.ToLower();
+            return (string.Compare(UserLock, WindowsIdentity.GetCurrent().Name, true) == 0);// UserLock == WindowsIdentity.GetCurrent().Name.ToLower();
         }
 
         public bool LockedByAnyUser()

@@ -12,9 +12,9 @@ namespace Client.Creator
 {
     public partial class ItemNameDialog : Shared.VisualComponents.DialogBaseForm
     {
-        private string _name = "";
-        private bool _bValidItem = true;
-        private Object _selectedObject;        
+        string _name = string.Empty;
+        bool _bValidItem = true;
+        Object _selectedObject;        
 
         public string Name
         {
@@ -107,7 +107,7 @@ namespace Client.Creator
 
         public CustomerDialogData()
         {
-            _customerName = "";
+            _customerName = string.Empty;
         }
         public CustomerDialogData(string custName)
         {
@@ -159,7 +159,7 @@ namespace Client.Creator
 
         public DestNameDialogData(uint custID)
         {
-            _destName = "";
+            _destName = string.Empty;
             _custID = custID;
         }
         public DestNameDialogData(string destName, uint custID)
