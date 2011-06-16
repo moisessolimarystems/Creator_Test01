@@ -24,7 +24,7 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                if (licenseName != "")
+                if (licenseName != string.Empty)
                 {
                     return db.PacketTables.Where(c => c.LicenseTable.LicenseName.Equals(licenseName)).OrderBy(d => d.ID).ToList();
                 }
