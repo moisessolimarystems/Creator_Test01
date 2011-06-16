@@ -193,7 +193,7 @@ namespace Service.Creator
             {
                 if (ls.UserLock != null)
                 {
-                    if (ls.UserLock.ToLower() == user.ToLower())
+                    if (string.Compare(ls.UserLock, user, true) == 0) //ls.UserLock.ToLower() == user.ToLower())
                     {
                         ls.UserLock = null;
                         LicenseTable.UpdateLicense(ls);
