@@ -10,13 +10,13 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_SoftwareSpecAttribs_DisplayForm : Base_DisplayForm<Lic_PackageAttribs.Lic_SoftwareSpecAttribs>
+    public partial class Lic_SoftwareSpecAttribs_DisplayForm : Base_DisplayForm
     {
         public Lic_SoftwareSpecAttribs_DisplayForm()
         {
             InitializeComponent();
         }
-        public override void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data)
+        public void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data)
         {
             SetData(_data, string.Empty);
         }
