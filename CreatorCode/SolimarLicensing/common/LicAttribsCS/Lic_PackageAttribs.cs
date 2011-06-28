@@ -1276,6 +1276,7 @@ namespace Solimar
 					
 				public AttribsMemberAttribsClass_Lic_LicenseInfoAttribs licLicenseInfoAttribs = new AttribsMemberAttribsClass_Lic_LicenseInfoAttribs("lIA", new Lic_LicenseInfoAttribs());
 				public AttribsMemberAttribsClass_Lic_SoftwareSpecAttribs licSoftwareSpecAttribs = new AttribsMemberAttribsClass_Lic_SoftwareSpecAttribs("lSA", new Lic_SoftwareSpecAttribs());
+				public AttribsMemberAttribsClass_Lic_SoftwareSpecAttribs licReplaceSoftwareSpecAttribs = new AttribsMemberAttribsClass_Lic_SoftwareSpecAttribs("lRSA", new Lic_SoftwareSpecAttribs());
 			
 			};
 			

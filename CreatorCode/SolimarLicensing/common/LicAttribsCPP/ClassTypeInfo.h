@@ -136,6 +136,7 @@ namespace Solimar
 			{
 					map_class_base[L"L_PkgA"] = new ClassInfoBase(L"L_PkgA",L"",L"License Validation Attributes");
 					map_base_classes.insert(std::make_pair(L"",L"L_PkgA"));
+					map_class_base[L"L_PkgA"]->attribs[L"licReplaceSoftwareSpecAttribs"] = AttribInfo(L"licReplaceSoftwareSpecAttribs",L"",L"");
 					map_class_base[L"L_PkgA"]->attribs[L"licLicenseInfoAttribs"] = AttribInfo(L"licLicenseInfoAttribs",L"",L"");
 					map_class_base[L"L_PkgA"]->attribs[L"licSoftwareSpecAttribs"] = AttribInfo(L"licSoftwareSpecAttribs",L"",L"");
 			}

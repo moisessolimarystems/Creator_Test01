@@ -18,6 +18,12 @@ namespace SolimarLicenseDiagnosticDataViewer
         }
         public override void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data)
         {
+            SetData(_data, string.Empty);
+        }
+        public void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data, string _title)
+        {
+            if(!string.IsNullOrEmpty(_title))
+                this.Text = _title;
             softwareSpecViewerControl1.SetData(_data);
         }
     }

@@ -94,6 +94,7 @@ namespace Solimar
 				map_class_base["L_PkgA"] = new ClassInfoBase("L_PkgA","","License Validation Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("L_PkgA");
+				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licReplaceSoftwareSpecAttribs"] = new AttribInfo("licReplaceSoftwareSpecAttribs","","");
 				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licLicenseInfoAttribs"] = new AttribInfo("licLicenseInfoAttribs","","");
 				((ClassInfoBase)map_class_base["L_PkgA"]).attribs["licSoftwareSpecAttribs"] = new AttribInfo("licSoftwareSpecAttribs","","");
 				map_class_base["L_SysInA"] = new ClassInfoBase("L_SysInA","","System Info Attributes");

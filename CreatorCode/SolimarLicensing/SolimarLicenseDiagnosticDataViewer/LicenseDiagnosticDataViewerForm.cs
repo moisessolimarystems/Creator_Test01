@@ -655,13 +655,37 @@ namespace SolimarLicenseDiagnosticDataViewer
                     TreeNode childNode = new TreeNode(softwareLicense);
                     childNode.Tag = Guid.NewGuid().ToString();
                     childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
-
                     Lic_LicenseInfoAttribs_DisplayForm licInfoAttribsForm = new Lic_LicenseInfoAttribs_DisplayForm();
                     licInfoAttribsForm.SetData(tmpLicPackage.licLicenseInfoAttribs);
                     licInfoAttribsForm.MdiParent = this;
                     licInfoAttribsForm.Show();
                     m_guidToFormMap.Add(childNode.Tag as string, licInfoAttribsForm);
                     rootNode.Nodes.Add(childNode);
+
+                    childNode = new TreeNode("Lic_SoftwareSpecAttribs");
+                    childNode.Tag = Guid.NewGuid().ToString();
+                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    Lic_SoftwareSpecAttribs_DisplayForm licSoftwareSpecAttribsForm = new Lic_SoftwareSpecAttribs_DisplayForm();
+                    licSoftwareSpecAttribsForm.Tag = childNode.Tag;
+                    licSoftwareSpecAttribsForm.SetData(tmpLicPackage.licSoftwareSpecAttribs, "Lic_SoftwareSpecAttribs");
+                    licSoftwareSpecAttribsForm.MdiParent = this;
+                    licSoftwareSpecAttribsForm.Show();
+                    licSoftwareSpecAttribsForm.Activated += new EventHandler(General_MdiChildActivate);
+                    m_guidToFormMap.Add(childNode.Tag as string, licSoftwareSpecAttribsForm);
+                    rootNode.Nodes.Add(childNode);
+
+                    childNode = new TreeNode("Lic_ReplaceSoftwareSpecAttribs");
+                    childNode.Tag = Guid.NewGuid().ToString();
+                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    Lic_SoftwareSpecAttribs_DisplayForm licReplaceSoftwareSpecAttribsForm = new Lic_SoftwareSpecAttribs_DisplayForm();
+                    licReplaceSoftwareSpecAttribsForm.Tag = childNode.Tag;
+                    licReplaceSoftwareSpecAttribsForm.SetData(tmpLicPackage.licReplaceSoftwareSpecAttribs, "Lic_ReplaceSoftwareSpecAttribs");
+                    licReplaceSoftwareSpecAttribsForm.MdiParent = this;
+                    licReplaceSoftwareSpecAttribsForm.Show();
+                    licReplaceSoftwareSpecAttribsForm.Activated += new EventHandler(General_MdiChildActivate);
+                    m_guidToFormMap.Add(childNode.Tag as string, licReplaceSoftwareSpecAttribsForm);
+                    rootNode.Nodes.Add(childNode);
+                    //softwareSpec_SubMinor
 
                     childNode = new TreeNode("Raw XML");
                     childNode.Tag = Guid.NewGuid().ToString();

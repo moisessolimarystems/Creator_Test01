@@ -1586,6 +1586,7 @@ public:
 		
 	Lic_LicenseInfoAttribs licLicenseInfoAttribs;
 	Lic_SoftwareSpecAttribs licSoftwareSpecAttribs;
+	Lic_SoftwareSpecAttribs licReplaceSoftwareSpecAttribs;
 
 	
 
@@ -1593,42 +1594,51 @@ public:
 	{
 		licLicenseInfoAttribs = c.licLicenseInfoAttribs;
 		licSoftwareSpecAttribs = c.licSoftwareSpecAttribs;
+		licReplaceSoftwareSpecAttribs = c.licReplaceSoftwareSpecAttribs;
 		return *this ;
 	}
 
 	Lic_PackageAttribs() : 
 		SpdAttribs::CAttribsBase(GetAttribsClassName()),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", Lic_LicenseInfoAttribs()),
-		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()){;}
+		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()),
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()){;}
 	
 	Lic_PackageAttribs(const Lic_PackageAttribs &c) : 
 		SpdAttribs::CAttribsBase(GetAttribsClassName()),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", c.licLicenseInfoAttribs),
-		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs){;}
+		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs),
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", Lic_LicenseInfoAttribs()),
-		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()){;}
+		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", Lic_SoftwareSpecAttribs()),
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", Lic_SoftwareSpecAttribs()){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_PackageAttribs &c) : 
 		SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 		licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", c.licLicenseInfoAttribs),
-		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs){;}
+		licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", c.licSoftwareSpecAttribs),
+		licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", c.licReplaceSoftwareSpecAttribs){;}
 	
 	Lic_PackageAttribs(const CWStringStream &wsAttribsClassName,
 		const Lic_LicenseInfoAttribs &param_licLicenseInfoAttribs,
-		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs) : 
+		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs,
+		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs) : 
 			SpdAttribs::CAttribsBase(wsAttribsClassName),
 			licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", param_licLicenseInfoAttribs),
-			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs){;}
+			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs),
+			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs){;}
 	
 	Lic_PackageAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 		const Lic_LicenseInfoAttribs &param_licLicenseInfoAttribs,
-		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs) : 
+		const Lic_SoftwareSpecAttribs &param_licSoftwareSpecAttribs,
+		const Lic_SoftwareSpecAttribs &param_licReplaceSoftwareSpecAttribs) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			licLicenseInfoAttribs(m_mapAttribObjs, L"L_LIA", L"lIA", param_licLicenseInfoAttribs),
-			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs){;}
+			licSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lSA", param_licSoftwareSpecAttribs),
+			licReplaceSoftwareSpecAttribs(m_mapAttribObjs, L"L_SwSpA", L"lRSA", param_licReplaceSoftwareSpecAttribs){;}
 	
 
 };

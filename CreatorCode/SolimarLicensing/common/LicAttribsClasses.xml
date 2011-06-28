@@ -337,6 +337,7 @@
 		
 		<attrib type="Lic_LicenseInfoAttribs" name="licLicenseInfoAttribs" tagname="lIA" default="Lic_LicenseInfoAttribs"/>
 		<attrib type="Lic_SoftwareSpecAttribs" name="licSoftwareSpecAttribs" tagname="lSA" default="Lic_SoftwareSpecAttribs"/>
+		<attrib type="Lic_SoftwareSpecAttribs" name="licReplaceSoftwareSpecAttribs" tagname="lRSA" default="Lic_SoftwareSpecAttribs"/>
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_ServerDataAttribs" name="L_SvrDtA" descriptive_name="License Server Data Attributes" base="" filename="Lic_ServerDataAttribs">
