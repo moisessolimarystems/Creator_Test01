@@ -93,6 +93,7 @@
       <enum name="pid_RubikaProcessBuilder" value="17" alias="RUBIKA_PROCESS_BUILDER_PRODUCT"/>
       <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
+      <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -105,8 +106,9 @@
       <enum name="pid_TestDevRubikaProcessBuilder" value="117" alias="TEST_DEV_RUBIKA_PROCESS_BUILDER_PRODUCT"/>
       <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
+      <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
 		<!-- Dont include, these typedefs can never change, not sure what this is...
-			<enum name="pid_NumberOfProducts" value="22" alias="NUMBER_OF_PRODUCTS"/>
+			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 		</typedef>
@@ -146,6 +148,10 @@
 			<attrib type="unsigned __int32" name="sameModSpecProductID" tagname="sMSpPI" default="0"/>
 			<attrib type="unsigned __int32" name="prevSharedProductID" tagname="pSPI" default="0"/>
 			<attrib type="string" name="productName" tagname="pN" default=""/>
+			<attrib type="unsigned __int32" name="softwareSpec_Major" tagname="vMj" default="0"/>
+			<attrib type="unsigned __int32" name="softwareSpec_Minor" tagname="vMn" default="0"/>
+			<attrib type="unsigned __int32" name="softwareSpec_SubMajor" tagname="vSMj" default="0"/>
+			<attrib type="unsigned __int32" name="softwareSpec_SubMinor" tagname="vSMn" default="0"/>
 			<typedef type="collection" name="Lic_ModuleSoftwareSpecAttribsMap">
 			<Map key_type="unsigned __int32" value_type="Lic_ModuleSoftwareSpecAttribs"/>
 			</typedef>
@@ -222,6 +228,8 @@
 			<attrib type="unsigned __int32" name="softwareGroupLicenseID" tagname="swI" default="0"/>
 			<attrib type="DateTime" name="modifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
 			<attrib type="bool" name="bLicClockViolation" tagname="lv" default="false" />
+			<attrib type="string" name="diagDataErrMsg" tagname="ddM" default=""/>
+			<attrib type="unsigned __int32" name="diagDataErr" tagname="ddE" default="0xffffff"/>
 
 			<!--License Activity Slot Info-->
 			<typedef type="class" name="Lic_ActivitySlotInfoAttribs">
@@ -329,6 +337,7 @@
 		
 		<attrib type="Lic_LicenseInfoAttribs" name="licLicenseInfoAttribs" tagname="lIA" default="Lic_LicenseInfoAttribs"/>
 		<attrib type="Lic_SoftwareSpecAttribs" name="licSoftwareSpecAttribs" tagname="lSA" default="Lic_SoftwareSpecAttribs"/>
+		<attrib type="Lic_SoftwareSpecAttribs" name="licReplaceSoftwareSpecAttribs" tagname="lRSA" default="Lic_SoftwareSpecAttribs"/>
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_ServerDataAttribs" name="L_SvrDtA" descriptive_name="License Server Data Attributes" base="" filename="Lic_ServerDataAttribs">
@@ -348,7 +357,7 @@
 				<attrib type="string" name="LicFileLicenseCode" tagname="fV" default=""/>
 				<attrib type="string" name="LicName" tagname="lB" default=""/>
 				<attrib type="DateTime" name="LicModifiedDate" tagname="mDt" default="1900-01-01 00:00:00.0000"/>
-
+				<attrib type="bool" name="bHideFromUI" tagname="bHide" default="false" />
 				<attrib type="DateTime" name="LicCurrentDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 				<typedef type="class" name="Lic_ActivationInfoAttribs">
 					<AttribsClass code_class_name="Lic_ActivationInfoAttribs" name="ai" descriptive_name="Activation Slot Info Attributes" base="">
@@ -429,6 +438,14 @@
 		<typedef type="class" name="Lic_UsAppInstanceInfoAttribs">
 		<AttribsClass code_class_name="Lic_UsAppInstanceInfoAttribs" name="L_UAA" descriptive_name="License Information - Usage App Instance Attributes" base="">
 			<attrib type="string" name="applicationInstance" tagname="aI" default=""/>
+			
+			<typedef type="enum" name="TUsageFlag">
+				<enum name="ufNone" value="0" alias="None"/>
+				<enum name="ufUsePrimaryLic" value="1" alias="Using Primary Licensing"/>
+				<enum name="ufUseFailoverLic" value="2" alias="Using Failover Licensing"/>
+			</typedef>
+			<attrib type="TUsageFlag" name="usageFlag" tagname="uF" default="ufNone"/>
+			
 			<typedef type="collection" name="Lic_UsModuleInfoAttribsList">
 				<List value_type="Lic_UsModuleInfoAttribs"/>
 			</typedef>
@@ -451,12 +468,46 @@
 		</typedef>
 		<attrib type="Lic_UsProductInfoAttribsList" name="productList" tagname="pLt" default="" />
 	</AttribsClass>
+	
+	<AttribsClass code_class_name="Sys_EventLogInfoAttribs" name="S_ElInA" descriptive_name="System Event Log Info Attributes" base="" filename="Sys_EventLogInfoAttribs">
+		<typedef type="class" name="Sys_EventLogEntriesInfoAttribs">
+		<AttribsClass code_class_name="Sys_EventLogEntriesInfoAttribs" name="S_EEA" descriptive_name="System - Event Log Entries Info Attributes" base="">
+			<attrib type="string" name="category" tagname="c" default=""/>
+			<attrib type="unsigned __int32" name="categoryNumber" tagname="cN" default="0"/>
+			<attrib type="byte[]" name="data" tagname="d" default="" />
+			<attrib type="unsigned __int32" name="entryType" tagname="eT" default="0"/>
+			<attrib type="unsigned __int32" name="eventID" tagname="eI" default="0"/>
+			<attrib type="unsigned __int32" name="index" tagname="i" default="0"/>
+			<attrib type="unsigned __int32" name="instanceId" tagname="iI" default="0"/>
+			<attrib type="string" name="machineName" tagname="mN" default=""/>
+			<attrib type="string" name="message" tagname="mG" default=""/>
+			<attrib type="list(string)" name="replacementStrings" tagname="rLt" default="" />
+			<attrib type="string" name="source" tagname="sR" default=""/>
+			<attrib type="DateTime" name="timeGenerated" tagname="tG" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="DateTime" name="timeWritten" tagname="tW" default="1900-01-01 00:00:00.0000"/>
+			<attrib type="string" name="userName" tagname="uN" default=""/>
+		</AttribsClass>
+		</typedef>
+		<typedef type="collection" name="Sys_EventLogEntriesInfoAttribsList">
+			<List value_type="Sys_EventLogEntriesInfoAttribs"/>
+		</typedef>
+		<attrib type="Sys_EventLogEntriesInfoAttribsList" name="entryList" tagname="eLt" default="" />
+		<attrib type="string" name="log" tagname="l" default=""/>
+		<attrib type="string" name="logName" tagname="lN" default=""/>
+		<attrib type="string" name="machineName" tagname="mN" default=""/>
+		<attrib type="unsigned __int32" name="maximumKilobytes" tagname="mK" default="0"/>
+		<attrib type="unsigned __int32" name="minimumRetentionDays" tagname="mR" default="0"/>
+		<attrib type="unsigned __int32" name="enumOverflowAction" tagname="oA" default="0"/>
+		<attrib type="string" name="source" tagname="s" default=""/>
+	</AttribsClass>
+	
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
 		<attrib type="string" name="Streamed_ServerDataAttribs" tagname="sD" default="" />
 		<attrib type="string" name="Streamed_SystemInfoAttribs" tagname="sI" default="" />
 		<attrib type="string" name="Streamed_SoftwareSpecAttribs" tagname="sS" default="" />
 		<attrib type="string" name="Streamed_UsageInfoAttribs" tagname="sU" default="" />
+		<attrib type="string" name="Streamed_SystemEventLogInfoAttribs" tagname="sE" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>
