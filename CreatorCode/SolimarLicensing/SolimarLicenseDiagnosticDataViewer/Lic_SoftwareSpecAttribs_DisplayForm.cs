@@ -10,7 +10,7 @@ using Solimar.Licensing.Attribs;
 
 namespace SolimarLicenseDiagnosticDataViewer
 {
-    public partial class Lic_SoftwareSpecAttribs_DisplayForm : Form
+    public partial class Lic_SoftwareSpecAttribs_DisplayForm : Base_DisplayForm
     {
         public Lic_SoftwareSpecAttribs_DisplayForm()
         {
@@ -18,17 +18,13 @@ namespace SolimarLicenseDiagnosticDataViewer
         }
         public void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data)
         {
+            SetData(_data, string.Empty);
+        }
+        public void SetData(Lic_PackageAttribs.Lic_SoftwareSpecAttribs _data, string _title)
+        {
+            if(!string.IsNullOrEmpty(_title))
+                this.Text = _title;
             softwareSpecViewerControl1.SetData(_data);
         }
-        private const int CP_NOCLOSE_BUTTON = 0x200;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CP_NOCLOSE_BUTTON;	// Disable Close button
-                return cp;
-            }
-        } 
     }
 }
