@@ -1273,7 +1273,7 @@ namespace Solimar
 						}
 						else
 						{
-							val = AttribFormat.ConvertStringToT(m_KeyType,child.ChildNodes[1].InnerXml);
+							val = AttribFormat.ConvertStringToT(m_ValueType,child.ChildNodes[1].InnerXml);
 						}
 						
 						((SortedList)m_tVal).Add(key, val);
