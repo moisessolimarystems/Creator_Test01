@@ -1273,7 +1273,7 @@ namespace Solimar
 						}
 						else
 						{
-							val = AttribFormat.ConvertStringToT(m_KeyType,child.ChildNodes[1].InnerXml);
+							val = AttribFormat.ConvertStringToT(m_ValueType,child.ChildNodes[1].InnerXml);
 						}
 						
 						((SortedList)m_tVal).Add(key, val);
@@ -1800,9 +1800,19 @@ namespace Solimar
 				public static System.Xml.XmlElement GetDocumentElementFromString(string xml)
 				{
 					System.Xml.XmlDocument xml_reader_doc = new System.Xml.XmlDocument();
-					xml_reader_doc.LoadXml(xml);
-					// how to disable returning whitespace nodes?
-					// xml_reader.WhitespaceHandling = System.Xml.WhitespaceHandling.None;
+
+					try
+					{
+						xml_reader_doc.LoadXml(xml);
+					}
+					catch (System.Xml.XmlException)
+					{
+						//Replace non-escaped non-printable char that cause exceptions in the XML Parser
+						foreach (char replaceChar in new char[] { '\x0001', '\x0002', '\x0003', '\x0004', '\x0005', '\x0006', '\x0007', '\x0008', '\x000B', '\x000C', '\x000E', '\x000F',
+						 '\x0010', '\x0011', '\x0012', '\x0013', '\x0014', '\x0015', '\x0016', '\x0017', '\x0018', '\x0019', '\x001A', '\x001B', '\x001C', '\x001D', '\x001E', '\x001F'})
+							xml = xml.Replace(replaceChar, '.');
+						xml_reader_doc.LoadXml(xml);
+					}
 					return xml_reader_doc.DocumentElement;
 				}
 			}
