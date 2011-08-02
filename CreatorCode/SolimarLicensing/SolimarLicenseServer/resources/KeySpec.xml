@@ -546,27 +546,27 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
 				<Module id="0"	offset="0x08c" bits="4" name="APPC - ***Deprecated***" pool="128"/>
 				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
 				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
-				<Module id="8"	offset="0x0ac" bits="4" name="iCONVERT Job Events"/>
-				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d Barcode"/>
-				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
-				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
-				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PostScript"/>
-				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF"/>
-				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event - ***Deprecated***"/>
-				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes - ***Deprecated***"/>
-				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL - ***Deprecated***"/>
-				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF - ***Deprecated***"/>
-				<Module id="34"	offset="0x104" bits="4" name="AFP::PS - ***Deprecated***"/>
-				<Module id="35"	offset="0x100" bits="4" name="AFP::TIFF - ***Deprecated***"/>
-				<Module id="40"	offset="0x12c" bits="4" name="iCONVERT Encryption - ***Deprecated***"/>
-				<Module id="41"	offset="0x128" bits="4" name="iCONVERT URL - ***Deprecated***"/>
-				<Module id="42"	offset="0x124" bits="4" name="iCONVERT Overlay"/>
-				<Module id="43"	offset="0x120" bits="4" name="iCONVERT Type 1"/>
-				<Module id="48"	offset="0x14c" bits="4" name="AFPEncryption - ***Deprecated***"/>
-				<Module id="49"	offset="0x148" bits="4" name="AFPURL - ***Deprecated***"/>
-				<Module id="50"	offset="0x144" bits="4" name="AFPOverlay - ***Deprecated***"/>
-				<Module id="51"	offset="0x140" bits="4" name="AFPType1 - ***Deprecated***"/>
-				<Module id="56"	offset="0x16c" bits="4" name="Emailer - ***Deprecated***"/>
+				<Module id="8"	offset="0x0ac" bits="4" name="iCONVERT Job Events" unlimited="1"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="iCONVERT::2d Barcode" unlimited="1"/>
+				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL" unlimited="1"/>
+				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF" unlimited="1"/>
+				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PostScript" unlimited="1"/>
+				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF" unlimited="1"/>
+				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event - ***Deprecated***" unlimited="1"/>
+				<Module id="30"	offset="0x0f4" bits="4" name="AFP::2dBarCodes - ***Deprecated***" unlimited="1"/>
+				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL - ***Deprecated***" unlimited="1"/>
+				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF - ***Deprecated***" unlimited="1"/>
+				<Module id="34"	offset="0x104" bits="4" name="AFP::PS - ***Deprecated***" unlimited="1"/>
+				<Module id="35"	offset="0x100" bits="4" name="AFP::TIFF - ***Deprecated***" unlimited="1"/>
+				<Module id="40"	offset="0x12c" bits="4" name="iCONVERT Encryption - ***Deprecated***" unlimited="1"/>
+				<Module id="41"	offset="0x128" bits="4" name="iCONVERT URL - ***Deprecated***" unlimited="1"/>
+				<Module id="42"	offset="0x124" bits="4" name="iCONVERT Overlay" unlimited="1"/>
+				<Module id="43"	offset="0x120" bits="4" name="iCONVERT Type 1" unlimited="1"/>
+				<Module id="48"	offset="0x14c" bits="4" name="AFPEncryption - ***Deprecated***" unlimited="1"/>
+				<Module id="49"	offset="0x148" bits="4" name="AFPURL - ***Deprecated***" unlimited="1"/>
+				<Module id="50"	offset="0x144" bits="4" name="AFPOverlay - ***Deprecated***" unlimited="1"/>
+				<Module id="51"	offset="0x140" bits="4" name="AFPType1 - ***Deprecated***" unlimited="1"/>
+				<Module id="56"	offset="0x16c" bits="4" name="Emailer - ***Deprecated***" unlimited="1"/>
 				<!-- Max LU pool cell -->
 				<Module id="128" offset="0x280" bits="16" name="Max LU" isPool="true"/>
 			</ModuleList>
@@ -907,6 +907,9 @@ Add a way to take in to account enumeration types or multiplied fields (eg.: Con
     </KeyLayout>
     <KeyLayout name="VerificationKey">
       <ModuleList>
+        <Module id="0"	offset="0x2e0" bits="32" name="Last Packet Applied Creation DateTime"/>
+        <Module id="1"	offset="0x300" bits="128" name="GUID"/>
+        <Module id="100"	offset="0x080" bits="32" name="Current DateTime"/>
       </ModuleList>
       <ProductList>
         <Product id="255" name="Software Verification Key">
