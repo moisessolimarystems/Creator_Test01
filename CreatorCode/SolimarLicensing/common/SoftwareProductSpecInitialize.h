@@ -137,7 +137,8 @@ void InititalizeProduct20()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
 	pTmpModSpec->moduleName = std::wstring(L"PDF Renderer");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 4;
@@ -145,9 +146,8 @@ void InititalizeProduct20()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
 	pTmpModSpec->moduleID = 0;
-	pTmpModSpec->moduleName = std::wstring(L"PDF Tools");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleName = std::wstring(L"PDF Rip");
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 4;
@@ -1238,11 +1238,13 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(107, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(107))->second);
 	pTmpModSpec->moduleID = 107;
-	pTmpModSpec->moduleName = std::wstring(L"Image Viewer");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleName = std::wstring(L"Viewer");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 5;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 6;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(104, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(104))->second);
