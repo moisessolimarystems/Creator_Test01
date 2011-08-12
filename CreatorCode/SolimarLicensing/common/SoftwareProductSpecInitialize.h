@@ -170,11 +170,7 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(56))->second);
 	pTmpModSpec->moduleID = 56;
 	pTmpModSpec->moduleName = std::wstring(L"Emailer");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionDeprecated_Major = 9;
 	pTmpModSpec->moduleVersionDeprecated_Minor = 7;
 	
@@ -182,71 +178,43 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(43))->second);
 	pTmpModSpec->moduleID = 43;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT Type 1");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(48, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(48))->second);
 	pTmpModSpec->moduleID = 48;
 	pTmpModSpec->moduleName = std::wstring(L"AFPEncryption");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(49, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(49))->second);
 	pTmpModSpec->moduleID = 49;
 	pTmpModSpec->moduleName = std::wstring(L"AFPURL");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(42, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(42))->second);
 	pTmpModSpec->moduleID = 42;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT Overlay");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(29, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(29))->second);
 	pTmpModSpec->moduleID = 29;
 	pTmpModSpec->moduleName = std::wstring(L"AFP Job Event");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(40, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(40))->second);
 	pTmpModSpec->moduleID = 40;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT Encryption");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(41, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(41))->second);
 	pTmpModSpec->moduleID = 41;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT URL");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
@@ -278,21 +246,13 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(9))->second);
 	pTmpModSpec->moduleID = 9;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT::2D Barcode");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(8, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(8))->second);
 	pTmpModSpec->moduleID = 8;
 	pTmpModSpec->moduleName = std::wstring(L"iCONVERT Job Events");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(128, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(128))->second);
@@ -305,111 +265,67 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(13))->second);
 	pTmpModSpec->moduleID = 13;
 	pTmpModSpec->moduleName = std::wstring(L"IPDS::PDF");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(12, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(12))->second);
 	pTmpModSpec->moduleID = 12;
 	pTmpModSpec->moduleName = std::wstring(L"IPDS::PCL");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(15, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(15))->second);
 	pTmpModSpec->moduleID = 15;
 	pTmpModSpec->moduleName = std::wstring(L"IPDS::TIFF");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(14, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(14))->second);
 	pTmpModSpec->moduleID = 14;
 	pTmpModSpec->moduleName = std::wstring(L"IPDS::PostScript");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(33, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(33))->second);
 	pTmpModSpec->moduleID = 33;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PDF");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(32, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(32))->second);
 	pTmpModSpec->moduleID = 32;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PCL");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(30, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(30))->second);
 	pTmpModSpec->moduleID = 30;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::2dBarcodes");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(51, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(51))->second);
 	pTmpModSpec->moduleID = 51;
 	pTmpModSpec->moduleName = std::wstring(L"AFPType1");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(50, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(50))->second);
 	pTmpModSpec->moduleID = 50;
 	pTmpModSpec->moduleName = std::wstring(L"AFPOverlay");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(35, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(35))->second);
 	pTmpModSpec->moduleID = 35;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::TIFF");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(34, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(34))->second);
 	pTmpModSpec->moduleID = 34;
 	pTmpModSpec->moduleName = std::wstring(L"AFP::PS");
-	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
-	pTmpModSpec->moduleVersionIntroduced_Major = 0;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
 }
 
 void InititalizeProduct9()

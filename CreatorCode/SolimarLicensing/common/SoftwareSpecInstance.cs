@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 7;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 6;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -147,8 +147,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 56;
 			tmpModSpec.moduleName.TVal = "Emailer";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -156,7 +156,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 9;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 7;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -166,8 +166,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 43;
 			tmpModSpec.moduleName.TVal = "iCONVERT Type 1";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -175,7 +175,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -185,7 +185,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 48;
 			tmpModSpec.moduleName.TVal = "AFPEncryption";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -194,7 +194,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -204,7 +204,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 49;
 			tmpModSpec.moduleName.TVal = "AFPURL";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -213,7 +213,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -223,8 +223,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 42;
 			tmpModSpec.moduleName.TVal = "iCONVERT Overlay";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -232,7 +232,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -242,7 +242,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 29;
 			tmpModSpec.moduleName.TVal = "AFP Job Event";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -251,7 +251,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -261,8 +261,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 40;
 			tmpModSpec.moduleName.TVal = "iCONVERT Encryption";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -270,7 +270,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -280,8 +280,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 41;
 			tmpModSpec.moduleName.TVal = "iCONVERT URL";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -289,7 +289,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -356,8 +356,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 9;
 			tmpModSpec.moduleName.TVal = "iCONVERT::2D Barcode";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -365,7 +365,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -375,8 +375,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 8;
 			tmpModSpec.moduleName.TVal = "iCONVERT Job Events";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -384,7 +384,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -413,8 +413,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 13;
 			tmpModSpec.moduleName.TVal = "IPDS::PDF";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -422,7 +422,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -432,8 +432,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 12;
 			tmpModSpec.moduleName.TVal = "IPDS::PCL";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -441,7 +441,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -451,8 +451,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 15;
 			tmpModSpec.moduleName.TVal = "IPDS::TIFF";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -460,7 +460,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -470,8 +470,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 14;
 			tmpModSpec.moduleName.TVal = "IPDS::PostScript";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -479,7 +479,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -489,7 +489,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 33;
 			tmpModSpec.moduleName.TVal = "AFP::PDF";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -498,7 +498,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -508,7 +508,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 32;
 			tmpModSpec.moduleName.TVal = "AFP::PCL";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -517,7 +517,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -527,7 +527,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 30;
 			tmpModSpec.moduleName.TVal = "AFP::2dBarcodes";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -536,7 +536,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -546,7 +546,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 51;
 			tmpModSpec.moduleName.TVal = "AFPType1";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -555,7 +555,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -565,7 +565,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 50;
 			tmpModSpec.moduleName.TVal = "AFPOverlay";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -574,7 +574,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -584,7 +584,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 35;
 			tmpModSpec.moduleName.TVal = "AFP::TIFF";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -593,7 +593,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -603,7 +603,7 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 34;
 			tmpModSpec.moduleName.TVal = "AFP::PS";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 0;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
@@ -612,7 +612,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
