@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="6">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="7">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -140,33 +140,33 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2D Barcode"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="iCONVERT::2D Barcode" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PostScript"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="IPDS::TIFF"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="IPDS::PCL" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="IPDS::PDF" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="IPDS::PostScript" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="IPDS::TIFF" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarcodes" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="AFP Job Event" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="AFP::2dBarcodes" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="AFP::PCL" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="AFP::PDF" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="AFP::PS" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="35" moduleName="AFP::TIFF" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="iCONVERT Encryption"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="iCONVERT URL"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="iCONVERT Overlay"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="iCONVERT Type 1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="40" moduleName="iCONVERT Encryption" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="41" moduleName="iCONVERT URL" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="42" moduleName="iCONVERT Overlay" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="43" moduleName="iCONVERT Type 1" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay" moduleTrialLicense="0"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1" moduleTrialLicense="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="48" moduleName="AFPEncryption" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="AFPURL" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="AFPOverlay" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="AFPType1" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="Emailer" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="128" moduleName="Max LU" moduleTrialLicense="512" bModuleIsPool="true"/>
 			
