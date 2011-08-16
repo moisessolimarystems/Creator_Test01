@@ -162,8 +162,7 @@ namespace Client.Creator
                 bool bLockStatus = licData.LockStatus; // DB - 1
                 bLicenseServerEnabled = licData.IsEnabled; // DB - 2
                 if (m_Permissions.pt_extension_pwd.Value && m_Permissions.pt_version_pwd.Value)
-                {
-                    //license items
+                {                    //license items
                     checkOutToolStripMenuItem.Visible = true;
                     checkOutToolStripMenuItem.Enabled = !licData.LockedByAnyUser();
                     checkInToolStripMenuItem.Visible = true;                    
@@ -2473,7 +2472,6 @@ namespace Client.Creator
         #region Form Methods
         private int ConnectServer()
         {
-            //using keyword forces scope onto object, so it will be disposed after it is done.
             using (ConnectDialog cd = new ConnectDialog())
             {
                 customerToolStripStatusLabel.Text = string.Empty;
@@ -2499,12 +2497,9 @@ namespace Client.Creator
                     catch (COMException ex)
                     {
                     }
-                }
-                //save server list into settings again 
-                //String[] serverList = new string[data.ServerList.Count];
-                //data.ServerList.CopyTo(serverList, 0);
+                }                //save server list into settings again 
                 m_ServerList.Clear();
-                m_ServerList.AddRange(data.ServerList);//serverList);
+                m_ServerList.AddRange(data.ServerList);
             }
             return 0;
         }
@@ -2988,7 +2983,7 @@ namespace Client.Creator
             //get destination from string or.....store in tag?
             string[] lsString = selectedLicense.Split("-".ToCharArray());
             int custID = Int32.Parse(lsString[0], System.Globalization.NumberStyles.HexNumber);
-            int destID = Int32.Parse(lsString[1]);
+            int destID = Int32.Parse(lsString[1], System.Globalization.NumberStyles.HexNumber);
             //1)custid 2)destid 3) number 
             Service<ICreator>.Use((client) =>
             {
@@ -4956,7 +4951,6 @@ namespace Client.Creator
                 dragString.Append(" ");
                 dragString.Append(pl.ID);                
             }
-
             DoDragDrop(dragString.ToString(), DragDropEffects.Copy | DragDropEffects.Move);            
         }
     }
