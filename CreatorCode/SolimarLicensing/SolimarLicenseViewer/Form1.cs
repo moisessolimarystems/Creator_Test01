@@ -1043,7 +1043,7 @@ namespace SolimarLicenseViewer
             else
             {
                 message = string.Format(
-                        "You are on activation {0} of {1} for Product License: {2}. The Current Activation will be valid until: {3}. Are you sure you want to use an Activation?",
+                        "You are currently on activation {0} of {1} for Product License: {2}. If you choose to apply another activation it will be valid until: {3}. Do you want to apply another activation now?",
                         _activationCurrent,
                         _activationTotal,
                         _productLicenseNumber,
