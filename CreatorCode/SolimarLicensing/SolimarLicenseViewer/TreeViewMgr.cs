@@ -37,6 +37,8 @@ namespace SolimarLicenseViewer
             PRODUCTCONNECTIONSETTINGS,
             SOLITRACK,
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
+            LIBRARYSERVICES,
+            EVENTLOG,
         }
 
 
@@ -73,7 +75,7 @@ namespace SolimarLicenseViewer
         #endregion
 
         #region License Node
-        private TreeNode GenerateLicenseNode()
+        private TreeNode GenerateLicenseNode(bool _bHideEmptyNode)
         {
             TreeNode rootNode = null;
             try
@@ -110,7 +112,21 @@ namespace SolimarLicenseViewer
                         bool bLicValid = false;
                         if (m_CommLink.bDiagnosticDateView)
                         {
-                            swLicNode.Text = string.Format("{0} (Diagnostic Data)", softwareLicense);
+                            if (licInfoAttrib.diagDataErr.TVal == 0xffffff) //Uninitialized License Status
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data (Status Unknown)", softwareLicense);
+                                swLicNode.ForeColor = System.Drawing.Color.Black;
+                            }
+                            else if (licInfoAttrib.diagDataErr.TVal == 0) //No Error
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data ({1})", softwareLicense, SolimarLicenseViewer.AppConstants.VerifiedStatus);
+                                swLicNode.ForeColor = System.Drawing.Color.Black;
+                            }
+                            else //License Error
+                            {
+                                swLicNode.Text = string.Format("{0} Diagnostic Data - ({1})", softwareLicense, licInfoAttrib.diagDataErrMsg.TVal);
+                                swLicNode.ForeColor = System.Drawing.Color.Red;
+                            }
                         }
                         else
                         {
@@ -137,6 +153,8 @@ namespace SolimarLicenseViewer
 
                             if (bNewNode == true)
                             {
+                                if (string.IsNullOrEmpty(productName))
+                                    productName = string.Format("Unknown Product {0}", (int)prodInfo.productID.TVal);
                                 prodNode = new TreeNode(productName);
                                 prodNode.ImageIndex = GetIconIndex(productName);
                                 prodNode.SelectedImageIndex = prodNode.ImageIndex;
@@ -190,7 +208,7 @@ namespace SolimarLicenseViewer
 
                         toolTipBuilder = new StringBuilder();
                         toolTipBuilder.Append("License: ");
-                        toolTipBuilder.Append(softwareLicense);
+                        toolTipBuilder.Append(swLicNode.Text);
 
                         //toolTipBuilder.Append("\n");
                         //toolTipBuilder.Append(SolimarLicenseViewer.AppConstants.VerificationStatusHeader);
@@ -198,7 +216,8 @@ namespace SolimarLicenseViewer
                         //toolTipBuilder.Append(bLicValid ? SolimarLicenseViewer.AppConstants.VerifiedStatus : errorMessage);
 
                         swLicNode.ToolTipText = toolTipBuilder.ToString();
-                        InsertIntoTree_Alpha(rootNode, swLicNode);
+                        if ((_bHideEmptyNode && swLicNode.Nodes.Count > 0) || !_bHideEmptyNode)
+                            InsertIntoTree_Alpha(rootNode, swLicNode);
                     }
                     #endregion
                     if (rootNode.Nodes.Count > 0)
@@ -266,10 +285,9 @@ namespace SolimarLicenseViewer
                         //add a product node if there are app instances
                         if (prodInfo.productID.ToString() != "0")
                         {
-                            m_CommLink.SoftwareGetApplicationInstanceListByProduct((int)prodInfo.productID.TVal, ref generalStream);
-                            Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
-                            appList.SVal = generalStream;
-                            if (appList.TVal.Count > 0)
+                            System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct((int)prodInfo.productID.TVal);
+
+                            if (usageMap.Count > 0)
                             {
                                 productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                                 TreeNode prodNode = new TreeNode(productName);
@@ -281,13 +299,18 @@ namespace SolimarLicenseViewer
                                 toolTipBuilder.Append(": ");
                                 toolTipBuilder.Append(productName);
                                 prodNode.ToolTipText = toolTipBuilder.ToString();
-                                #region foreach (string appInstance in appList.TVal)
-                                foreach (string appInstance in appList.TVal)
+
+                                #region foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
+                                foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
                                 {
-                                    TreeNode appInstNode = new TreeNode(appInstance);
+                                    //string connectionType = "Unknown: ";
+                                    //if (usagePair.Value.HasValue)
+                                    //    connectionType = usagePair.Value.Value ? "Primary: " : "Failover: ";
+                                    string connectionType = (usagePair.Value.HasValue && (usagePair.Value.Value == false)) ? "Failover: " : "";
+                                    TreeNode appInstNode = new TreeNode(string.Format("{0}{1}", connectionType, usagePair.Key));
                                     appInstNode.ImageIndex = GetIconIndex("AppInstance");
                                     appInstNode.SelectedImageIndex = appInstNode.ImageIndex;
-                                    appInstNode.Name = appInstNode.Text;
+                                    appInstNode.Name = usagePair.Key;   //Name is the Application Instance Name
                                     toolTipBuilder = new StringBuilder();
                                     toolTipBuilder.Append(AppConstants.UsageProductHeader);
                                     toolTipBuilder.Append(": ");
@@ -295,7 +318,9 @@ namespace SolimarLicenseViewer
                                     toolTipBuilder.Append("\n");
                                     toolTipBuilder.Append(AppConstants.UsageAppInstanceHeader);
                                     toolTipBuilder.Append(": ");
-                                    toolTipBuilder.Append(appInstance);
+                                    toolTipBuilder.Append(usagePair.Key);
+                                    if((usagePair.Value.HasValue && (usagePair.Value.Value == false)))
+                                        toolTipBuilder.Append("\nFailover");
                                     appInstNode.ToolTipText = toolTipBuilder.ToString();
                                     prodNode.Nodes.Add(appInstNode);
                                 }
@@ -317,6 +342,19 @@ namespace SolimarLicenseViewer
         }
         #endregion
 
+        #region Event Log Node
+        private TreeNode GenerateEventLogNode()
+        {
+            TreeNode rootNode = null;
+            rootNode = new TreeNode(SolimarLicenseViewer.AppConstants.EventLogRootNode);
+            rootNode.ImageIndex = GetIconIndex("eventLog");
+            rootNode.SelectedImageIndex = rootNode.ImageIndex;
+            rootNode.Name = SolimarLicenseViewer.AppConstants.EventLogRootNode;
+            //rootNode.ToolTipText = rootNode.Text;
+            return rootNode;
+        }
+        #endregion
+
         #region Product Connection Settings Node
         private TreeNode GenerateProductConnectionSettingsNode()
         {
@@ -332,7 +370,7 @@ namespace SolimarLicenseViewer
         /// This method populates the TreeView with License, Protection Key, Usage and Product Connection information.
         /// Information is displayed on 2 tree levels. Application Instances, and Modules.
         /// </summary>
-        public void PopulateView()
+        public void PopulateView(bool _bHideEmptyNode)
         {
             string selectedNodeText = "";
             if (this.TheTreeView.SelectedNode != null)
@@ -340,7 +378,7 @@ namespace SolimarLicenseViewer
             this.TheTreeView.Nodes.Clear();
 
             TreeNode tmpNode = null;
-            tmpNode = GenerateLicenseNode();
+            tmpNode = GenerateLicenseNode(_bHideEmptyNode);
             if (tmpNode != null)
                 this.TheTreeView.Nodes.Add(tmpNode);
 
@@ -358,6 +396,10 @@ namespace SolimarLicenseViewer
                 if (tmpNode != null)
                     this.TheTreeView.Nodes.Add(tmpNode);
             }
+
+            tmpNode = GenerateEventLogNode();
+            if (tmpNode != null)
+                this.TheTreeView.Nodes.Add(tmpNode);
 
             this.TheTreeView.ShowRootLines = this.TheTreeView.Nodes.Count > 1;
             this.TheTreeView.ExpandAll();

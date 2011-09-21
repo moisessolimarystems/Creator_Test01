@@ -18,6 +18,15 @@ namespace SolimarLicenseViewer
         public Form1()
         {
             InitializeComponent();
+
+            Shared.VisualComponents.ControlHelper.ReduceFlicker(this);
+
+            Shared.VisualComponents.ControlHelper.SetWindowTheme(this.treeView.Handle, "Explorer", null);
+            //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
+            Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+            //The treeviews also have the "auto-scroll" feature. You can enable this via the TVS_EX_AUTOHSCROLL [0x0020] extended style.
+            //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0020, (IntPtr)0x0020);
+
             //Disable form items
             EnableFormItems(false);
             //create connection to license wrapper
@@ -29,9 +38,9 @@ namespace SolimarLicenseViewer
         private void PopulateAllViews()
         {
             Cursor.Current = Cursors.WaitCursor;
-            this.noFlickerListView.BeginUpdate();
-            this.noFlickerListView.Items.Clear();
-            this.noFlickerListView.EndUpdate();
+            //this.noFlickerListView.BeginUpdate();
+            //this.noFlickerListView.Items.Clear();
+            //this.noFlickerListView.EndUpdate();
             PopulateTreeView();
             Cursor.Current = Cursors.Default;
         }
@@ -39,7 +48,7 @@ namespace SolimarLicenseViewer
         private void PopulateTreeView()
         {
             Cursor.Current = Cursors.WaitCursor;
-            m_treeViewMgr.PopulateView();
+            m_treeViewMgr.PopulateView(hideEmptyLicServersToolStripMenuItem.Checked);
             if (m_listViewMgr.SelectedNode != null)
             {
                 TreeNode[] foundNodes = this.treeView.Nodes.Find(m_listViewMgr.SelectedNode.Name, true);
@@ -53,7 +62,8 @@ namespace SolimarLicenseViewer
                 if (string.Compare(this.treeView.Nodes[0].Text, "Licenses") == 0)
                     this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes.Count > 0 ? this.treeView.Nodes[0].Nodes[0] : this.treeView.Nodes[0];
                 else
-                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 1];
+                    //this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 1];
+                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 2];
             }
             Cursor.Current = Cursors.Default;
         }
@@ -61,12 +71,45 @@ namespace SolimarLicenseViewer
         private void PopulateListView()
         {
             //System.Diagnostics.Trace.WriteLine("PopulateListView() - Start");
-            Cursor.Current = Cursors.WaitCursor;
-            this.noFlickerListView.BeginUpdate();
-            m_listViewMgr.PopulateView();
-            this.noFlickerListView.EndUpdate();
-            Cursor.Current = Cursors.Default;
+            try
+            {
+                //Application.UseWaitCursor = true;
+                SetWaitCursor(true);
+                //this.Enabled = false;
+                //Cursor.Current = Cursors.WaitCursor;
+                //this.noFlickerListView.BeginUpdate();
+                //Application.DoEvents();
+                m_listViewMgr.PopulateView();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                //this.noFlickerListView.EndUpdate();
+                this.Enabled = true;
+                SetWaitCursor(false);
+                //Application.UseWaitCursor = false;
+                //Cursor.Current = Cursors.Default;
+            }
+            
             //System.Diagnostics.Trace.WriteLine("PopulateListView() - End");
+        }
+        private void SetWaitCursor(bool _bUseWaitCursor)
+        {
+            //System.Diagnostics.Trace.WriteLine(string.Format("UseWaitCursor({1}) - Pre - this.Cursor: {0}", this.Cursor.ToString(), _bUseWaitCursor));
+            if (this.InvokeRequired == true)
+            {
+                this.Invoke(new ListViewMgr.ParamBoolReturnsVoid(this.SetWaitCursor), new object[] { _bUseWaitCursor });
+            }
+            else
+            {
+                this.Enabled = !_bUseWaitCursor;
+                Application.UseWaitCursor = _bUseWaitCursor;
+                //this.UseWaitCursor = _bUseWaitCursor;
+                Application.DoEvents();
+            }
+            //System.Diagnostics.Trace.WriteLine(string.Format("UseWaitCursor({1}) - Post - this.Cursor: {0}", this.Cursor.ToString(), _bUseWaitCursor));
         }
 
         private void DisconnectServer()
@@ -158,74 +201,86 @@ namespace SolimarLicenseViewer
             }
             #endregion
 
-            try
+            using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
             {
-                if (m_bViewDiagnosticData)
-                    this.Text = string.Format("Loading Diagnostic Data[{0}]...", m_diagnosticDataFileName);
-                else
-                    this.Text = string.Format("Connecting to [{0}]...", m_CommLink.ServerName);
+                messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
+                messageDialog.Show();
 
-                //create treeview manager
-                m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, this.bottomLvToolStrip, m_CommLink);
-                //create listview manager
-                m_treeViewMgr = new TreeViewMgr(this.treeView, m_CommLink);
-                //fill listview/treeview
-                PopulateAllViews();
-                //Enable Menu Items
-                EnableFormItems(true);
-                //Update Status
-                ConnectionStatusLabel.Text = String.Empty;
-
-                int majorVer = 0;
-                int minorVer = 0;
-                int buildVer = 0;
-                string licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
                 try
                 {
-                    if (!m_CommLink.IsConnected())
+                    if (m_bViewDiagnosticData)
+                        this.Text = string.Format("Loading Diagnostic Data[{0}]...", m_diagnosticDataFileName);
+                    else
+                        this.Text = string.Format("Connecting to [{0}]...", m_CommLink.ServerName);
+
+                    messageDialog.SetMessage(this.Text);
+                    messageDialog.Update();
+
+                    //create treeview manager
+                    m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, this.bottomLvToolStrip, this.bottomEventLogEntryControl1, m_CommLink);
+                    m_listViewMgr.DelUseWaitCursor += new ListViewMgr.ParamBoolReturnsVoid(this.SetWaitCursor);
+                    m_listViewMgr.DelTestConnection += new ListViewMgr.ParamListViewItemListReturnsVoid(this.TestConnection);
+                    //create listview manager
+                    m_treeViewMgr = new TreeViewMgr(this.treeView, m_CommLink);
+                    //fill listview/treeview
+                    PopulateAllViews();
+                    //Enable Menu Items
+                    EnableFormItems(true);
+                    //Update Status
+                    ConnectionStatusLabel.Text = String.Empty;
+
+                    int majorVer = 0;
+                    int minorVer = 0;
+                    int buildVer = 0;
+                    string licSvrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                    try
                     {
-                        licSvrVer = " - Licenese Server NOT installed";
+                        if (!m_CommLink.IsConnected())
+                        {
+                            licSvrVer = string.Format(" - Licenese Server NOT installed{0}", m_CommLink.Exception != null ? (" - " + m_CommLink.Exception.Message) : "");
+                        }
+                        else
+                        {
+                            m_CommLink.GetVersionLicenseServer(m_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
+                            licSvrVer = string.Format(" - version: {0}.{1}.{2}", majorVer, minorVer, buildVer);
+                        }
+                    }
+                    catch (COMException)
+                    {
+                        majorVer = 0;
+                        minorVer = 0;
+                        buildVer = 0;
+                        licSvrVer = "";
+                    }
+
+                    if (!m_bViewDiagnosticData)
+                    {
+                        this.Text = string.Format("{0} [{1}]{2}",
+                            AppConstants.FormTitle,
+                            m_CommLink.ServerName,
+                            licSvrVer.Length == 0 ? "" : licSvrVer);
                     }
                     else
                     {
-                        m_CommLink.GetVersionLicenseServer(m_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);
-                        licSvrVer = string.Format(" - version: {0}.{1}.{2}", majorVer, minorVer, buildVer);
+                        this.Text = string.Format("{0} [{1}] - created date: {2}",
+                            AppConstants.DiagnosticDataTitle,
+                            m_diagnosticDataFileName,
+                            m_CommLink.diagnosticDateCreatedDate.Value.ToLocalTime().ToString()
+                            );
+
+                    }
+
+                    if (m_CommLink.Exception != null)
+                    {
+                        //Failed to connect to a license server, disable all license settings.
+                        fileLicenseToolStripMenuItem.Visible = false;
+                        diagnosticDataToolStripMenuItem.Visible = false;
                     }
                 }
                 catch (COMException)
                 {
-                    majorVer = 0;
-                    minorVer = 0;
-                    buildVer = 0;
-                    licSvrVer = "";
                 }
-
-                if (!m_bViewDiagnosticData)
-                {
-                    this.Text = string.Format("{0} [{1}]{2}",
-                        AppConstants.FormTitle,
-                        m_CommLink.ServerName,
-                        licSvrVer.Length == 0 ? "" : licSvrVer);
-                }
-                else
-                {
-                    this.Text = string.Format("{0} [{1}] - created date: {2}",
-                        AppConstants.DiagnosticDataTitle,
-                        m_diagnosticDataFileName,
-                        m_CommLink.diagnosticDateCreatedDate.Value.ToLocalTime().ToString()
-                        );
-
-                }
-
-                if (m_CommLink.Exception != null)
-                {
-                    //Failed to connect to a license server, disable all license settings.
-                    fileLicenseToolStripMenuItem.Visible = false;
-                    diagnosticDataToolStripMenuItem.Visible = false;
-                }
-            }
-            catch (COMException)
-            {
+                messageDialog.Hide();
             }
             return 0;
         }
@@ -296,7 +351,7 @@ namespace SolimarLicenseViewer
                 catch (COMException ex)
                 {
                     //alert user of failure
-                    HandleExceptions.DisplayException(this, ex, "Failed to apply license password!", "Apply License Password");
+                    HandleExceptions.DisplayException(this, ex, "Invalid Password - Failed to apply license password", "Apply License Password");
                 }
                 finally
                 {
@@ -350,9 +405,9 @@ namespace SolimarLicenseViewer
         {
             //Alan, you might want to move this into your ListViewMgr.cs, I just threw it in here because I needed some
             //copying behavior - Jeff 10-10-08
-            if (sender is ListView)
+            ListView tmpListView = sender as ListView;
+            if (tmpListView != null)
             {
-                ListView tmpListView = sender as ListView;
                 if (e.KeyCode == Keys.C && e.Control)
                 {
                     StringBuilder strBuilder = new StringBuilder();
@@ -398,6 +453,11 @@ namespace SolimarLicenseViewer
                 m_listViewMgr.SelectedNode = treeView.SelectedNode;
             PopulateAllViews();
             this.Cursor = storedCursor;
+        }
+        private void hideEmptyLicServersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            hideEmptyLicServersToolStripMenuItem.Checked = !hideEmptyLicServersToolStripMenuItem.Checked;
+            refreshToolStripButton_Click(null, null);
         }
 
         #endregion
@@ -578,8 +638,19 @@ namespace SolimarLicenseViewer
                 int majorVer = 0;
                 int minorVer = 0;
                 int buildVer = 0;
-                m_CommLink.GetVersionLicenseManager(ref majorVer, ref minorVer, ref buildVer);
-                string licMgrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                string licMgrVer = "";
+                try
+                {
+                    m_CommLink.GetVersionLicenseManager(ref majorVer, ref minorVer, ref buildVer);
+                    licMgrVer = string.Format("{0}.{1}.{2}", majorVer, minorVer, buildVer);
+                }
+                catch (COMException)
+                {
+                    majorVer = 0;
+                    minorVer = 0;
+                    buildVer = 0;
+                    licMgrVer = string.Format("Not Installed");
+                }
                 aboutBox.SetManagerVersion(licMgrVer);
                 aboutBox.SetManagerName(System.Environment.MachineName.ToLower());
 
@@ -600,6 +671,13 @@ namespace SolimarLicenseViewer
                 aboutBox.SetServerName(m_CommLink.ServerName);
                 aboutBox.ShowDialog(this);
             }
+        }
+        private void solimarLicenseManualToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string manualFullPath = System.IO.Path.Combine(
+                System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath),
+                "Manuals\\Solimar Licensing Manual.pdf");
+            System.Diagnostics.Process.Start(manualFullPath);
         }
         #endregion
 
@@ -648,6 +726,8 @@ namespace SolimarLicenseViewer
             {
                 m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             }
+
+            hideEmptyLicServersToolStripMenuItem.Checked = Settings.Default.HideEmptyLicServers;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -655,7 +735,7 @@ namespace SolimarLicenseViewer
             if (!m_bIsChildForm)
             {
                 // Copy window location to app settings
-                if(this.Location.X > 0 && this.Location.Y > 0)
+                if (this.Location.X > 0 && this.Location.Y > 0)
                     Settings.Default.WindowLocation = this.Location;
 
                 // Copy window size to app settings
@@ -669,6 +749,7 @@ namespace SolimarLicenseViewer
                 }
 
                 Settings.Default.SelectedDirectory = m_selectedDirectory;
+                Settings.Default.HideEmptyLicServers = hideEmptyLicServersToolStripMenuItem.Checked;
 
                 // Save settings
                 Settings.Default.Save();
@@ -758,10 +839,9 @@ namespace SolimarLicenseViewer
 
         void tsGenLicArchiveMenuItem_Click(object sender, EventArgs e)
         {
-            if (sender is ToolStripMenuItem)
+            ToolStripMenuItem tmpToolStripItem = sender as ToolStripMenuItem;
+            if (tmpToolStripItem != null)
             {
-                ToolStripMenuItem tmpToolStripItem = sender as ToolStripMenuItem;
-
                 this.exportPktDialog.DefaultExt = "licArchive";
                 this.exportPktDialog.Filter = "License Archive|*.licArchive";
                 this.exportPktDialog.Title = "Generate License Archive";
@@ -774,7 +854,17 @@ namespace SolimarLicenseViewer
                         this.Cursor = Cursors.WaitCursor;
                         m_selectedDirectory = System.IO.Path.GetDirectoryName(this.exportPktDialog.FileName);
                         Byte[] newByteArrayLicense = null;
-                        m_CommLink.GenerateSoftwareLicArchive_ByLicense(tmpToolStripItem.Text, ref newByteArrayLicense);
+                        using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
+                        {
+                            messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
+                            messageDialog.Show();
+
+                            messageDialog.SetMessage(string.Format("Generating License Archive..."));
+                            messageDialog.Update();
+                            m_CommLink.Async_GenerateSoftwareLicArchive_ByLicense(tmpToolStripItem.Text, ref newByteArrayLicense);
+
+                            messageDialog.Hide();
+                        }
                         if (newByteArrayLicense != null)
                         {
                             File.WriteAllBytes(exportPktDialog.FileName, newByteArrayLicense);
@@ -883,7 +973,17 @@ namespace SolimarLicenseViewer
                         this.Cursor = Cursors.WaitCursor;
                         m_selectedDirectory = System.IO.Path.GetDirectoryName(this.exportPktDialog.FileName);
                         Byte[] newByteArrayLicense = null;
-                        m_CommLink.GenerateLicenseSystemData(ref newByteArrayLicense);
+                        using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
+                        {
+                            messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
+                            messageDialog.Show();
+
+                            messageDialog.SetMessage(string.Format("Generating Diagnostic Data..."));
+                            messageDialog.Update();
+                            m_CommLink.Async_GenerateLicenseSystemData(ref newByteArrayLicense);
+
+                            messageDialog.Hide();
+                        }
                         if (newByteArrayLicense != null)
                             File.WriteAllBytes(exportPktDialog.FileName, newByteArrayLicense);
                     }
@@ -935,7 +1035,7 @@ namespace SolimarLicenseViewer
             //    _activationOverallExpirationDate.ToLocalTime().ToString(),
             //    currDateTime.ToLocalTime().ToString()
             //    );
-            
+
             if (currDateTime.CompareTo(_activationCurrentExpirationDate) < 0)
                 currDateTime = _activationCurrentExpirationDate;
             DateTime newExpDate = currDateTime.AddDays(_activationAmountInDays);
@@ -951,7 +1051,7 @@ namespace SolimarLicenseViewer
             else
             {
                 message = string.Format(
-                        "You are on activation {0} of {1} for Product License: {2}. The Current Activation will be valid until: {3}. Are you sure you want to use an Activation?",
+                        "You are currently on activation {0} of {1} for Product License: {2}. If you choose to apply another activation it will be valid until: {3}. Do you want to apply another activation now?",
                         _activationCurrent,
                         _activationTotal,
                         _productLicenseNumber,
@@ -1005,6 +1105,7 @@ namespace SolimarLicenseViewer
         private CommunicationLink m_CommLink;
         private string m_selectedDirectory;
         private bool m_bIsChildForm = false;
+        public Shared.VisualComponents.BaseMessageDialog messageDialog = null;
 
         #endregion
 
@@ -1044,6 +1145,8 @@ namespace SolimarLicenseViewer
             }
             loadDiagnosticDataToolStripMenuItem.Visible = !m_bIsChildForm;
             remoteServerToolStripMenuItem.Visible = !m_bIsChildForm;
+            solimarLicenseManualToolStripMenuItem.Visible = !m_bIsChildForm;
+            helpToolStripSepMenuItem1.Visible = !m_bIsChildForm;
             this.ShowInTaskbar = !m_bIsChildForm;
             this.parentForm = _sender as Form;
             this.MinimizeBox = false;
@@ -1055,50 +1158,63 @@ namespace SolimarLicenseViewer
             ToolStripMenuItem tsItem = new ToolStripMenuItem(_serverName);
             tsItem.Tag = _sender;
             tsItem.Name = tsItem.Text;
+            tsItem.TextAlign = ContentAlignment.MiddleLeft;
             tsItem.Click += new EventHandler(FindRemoteLicenseViewUI_Click);
+
+            string[] strList = _serverName.Split('\\');
+            ToolStripMenuItem tsItem2 = new ToolStripMenuItem(strList[strList.Length - 1])
+            {
+                Name = _serverName,
+                Tag = _sender,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            tsItem2.Click += new EventHandler(FindRemoteLicenseViewUI_Click);
+
             if (bRemoteServer)
             {
                 remoteServerToolStripMenuItem.DropDownItems.Add(tsItem);
                 remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
+
+                tsItem2.ToolTipText = string.Format("Goto Solimar License Viewer on \'{0}\'", _serverName);
+                remoteSvrToolStrip.Items.Add(tsItem2);
+                remoteSvrToolStrip.Visible = true;
             }
             else
             {
                 diagnosticDataToolStripMenuItem.DropDownItems.Add(tsItem);
                 diagnosticDataToolStripMenuSeparator.Visible = diagnosticDataToolStripMenuItem.DropDownItems.Count > 3;
+
+                tsItem2.ToolTipText = string.Format("Goto \'{0}\'", _serverName);
+                diagnosticDataToolStrip.Items.Add(tsItem2);
+                diagnosticDataToolStrip.Visible = true;
             }
         }
         public void childFormClose(object _sender, string _serverName)
         {
+            RemoveItemFromToolStripCollection(_sender, remoteServerToolStripMenuItem.DropDownItems);
+            RemoveItemFromToolStripCollection(_sender, diagnosticDataToolStripMenuItem.DropDownItems);
+            RemoveItemFromToolStripCollection(_sender, remoteSvrToolStrip.Items);
+            RemoveItemFromToolStripCollection(_sender, diagnosticDataToolStrip.Items);
+
+            remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
+            diagnosticDataToolStripMenuSeparator.Visible = diagnosticDataToolStripMenuItem.DropDownItems.Count > 3;
+            remoteSvrToolStrip.Visible = remoteSvrToolStrip.Items.Count > 2;
+            diagnosticDataToolStrip.Visible = diagnosticDataToolStrip.Items.Count > 2;
+        }
+        public void RemoveItemFromToolStripCollection(object _tag, ToolStripItemCollection _tsItemCollection)
+        {
             ToolStripMenuItem removeTsItem = null;
-            for (int idx = 0; idx < remoteServerToolStripMenuItem.DropDownItems.Count; idx++)
+            for (int idx = 0; idx < _tsItemCollection.Count; idx++)
             {
-                if (remoteServerToolStripMenuItem.DropDownItems[idx] is ToolStripMenuItem &&
-                    remoteServerToolStripMenuItem.DropDownItems[idx].Tag == _sender)
+                if (_tsItemCollection[idx] is ToolStripMenuItem &&
+                    _tsItemCollection[idx].Tag == _tag)
                 {
-                    removeTsItem = remoteServerToolStripMenuItem.DropDownItems[idx] as ToolStripMenuItem;
+                    removeTsItem = _tsItemCollection[idx] as ToolStripMenuItem;
                     break;
                 }
             }
             if (removeTsItem != null)
-                remoteServerToolStripMenuItem.DropDownItems.Remove(removeTsItem);
-
-            if (removeTsItem == null)
-            {
-                for (int idx = 0; idx < diagnosticDataToolStripMenuItem.DropDownItems.Count; idx++)
-                {
-                    if (diagnosticDataToolStripMenuItem.DropDownItems[idx] is ToolStripMenuItem &&
-                        diagnosticDataToolStripMenuItem.DropDownItems[idx].Tag == _sender)
-                    {
-                        removeTsItem = diagnosticDataToolStripMenuItem.DropDownItems[idx] as ToolStripMenuItem;
-                        break;
-                    }
-                }
-                if (removeTsItem != null)
-                    diagnosticDataToolStripMenuItem.DropDownItems.Remove(removeTsItem);
-            }
-
-            remoteConnectToolStripMenuSeparator.Visible = remoteServerToolStripMenuItem.DropDownItems.Count > 2;
-            diagnosticDataToolStripMenuSeparator.Visible = diagnosticDataToolStripMenuItem.DropDownItems.Count > 3;
+                _tsItemCollection.Remove(removeTsItem);
         }
 
         //Use this to view the license info diagnostic data
@@ -1122,6 +1238,166 @@ namespace SolimarLicenseViewer
             }
         }
         private Form parentForm = null;
+
+
+        #region Background Worker - testConnBackgroundWorker
+        private void TestConnection(IList<ListViewItem> _lviList)
+        {
+            this.UseWaitCursor = true;
+            try
+            {
+                if (messageDialog == null)
+                    messageDialog = new Shared.VisualComponents.BaseMessageDialog();
+
+                messageDialog.Show();
+                messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
+                messageDialog.SetMessage("Testing Product Connection");
+                messageDialog.Update();
+                testConnBackgroundWorker.RunWorkerAsync(_lviList);
+            }
+            catch (Exception)
+            {
+                this.UseWaitCursor = false;
+            }
+        }
+
+        private void testConnBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            IList<ListViewItem> lviList = e.Argument as IList<ListViewItem>;
+            if (lviList != null && lviList.Count > 0)
+            {
+                foreach (ListViewItem lvItem in lviList)
+                {
+                    testConnBackgroundWorker.ReportProgress(0, lvItem);
+                    Exception lastEx = null;
+                    try
+                    {
+                        testConnectionToLicenseServer(new ConnectionSettings2()
+                            {
+                                ProductID = (int)lvItem.Tag,
+                                ServerName = lvItem.SubItems[1].Text,
+                                BackupName = lvItem.SubItems[2].Text,
+                                UseDevelopmentLic = (System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0),
+                            });
+                    }
+                    catch (Exception ex)
+                    {
+                        lastEx = ex;
+                    }
+                    testConnBackgroundWorker.ReportProgress(0, new Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception>(lvItem, lastEx));
+                }
+            }
+            e.Result = lviList;
+        }
+        // throws an exception if fails to connect...
+        private void testConnectionToLicenseServer(ConnectionSettings2 _connectionSettings)
+        {
+            if (_connectionSettings != null)
+            {
+                using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
+                {
+                    Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
+                    licWrapper.ConnectByProductEx((int)productID, false);
+                    try
+                    {
+                        licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
+                                                (int)productID, //product
+                                                0,              //prod_ver_major
+                                                1,              //prod_ver_minor - CR.FIX.12672 - Use version 0.1 instead of 0.0, 0.0 is not valid
+                                                false,          //single_key
+                                                "",             //specific_single_key_ident
+                                                false,          //lock_keys
+                                                0,              //ui_level
+                                                0,              //grace_period_minutes
+                                                false,          //application_instance_lock_keys
+                                                false);         //bypass_remote_key_restriction
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        licWrapper.DisconnectEx();
+                    }
+                }
+            }
+        }
+
+        private void testConnBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new System.ComponentModel.ProgressChangedEventHandler(testConnBackgroundWorker_ProgressChanged), new object[] { sender, e });
+            }
+            else
+            {
+                //Update UI
+                #region if (e.UserState is Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception>)
+                if (e.UserState is Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception>)
+                {
+                    Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception> updateItem = e.UserState as Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception>;
+                    try
+                    {
+                        updateItem.Item1.ListView.BeginUpdate();
+                        if (updateItem.Item2 == null)
+                        {
+                            updateItem.Item1.ForeColor = System.Drawing.Color.Green;
+                            updateItem.Item1.SubItems[4].Text = "Successfully connected to the License Server";
+                            updateItem.Item1.ToolTipText = string.Format("Connection Status: {0}", updateItem.Item1.SubItems[4].Text);
+                            messageDialog.SetMessage(string.Format("Product: {0}, License Server: {1}, {2}", updateItem.Item1.SubItems[0].Text, updateItem.Item1.SubItems[1].Text, updateItem.Item1.ToolTipText));
+                        }
+                        else
+                        {
+                            updateItem.Item1.ForeColor = System.Drawing.Color.Red;
+                            updateItem.Item1.SubItems[4].Text = updateItem.Item2.Message.Replace('\r', ' ').Replace('\n', ' ');
+                            updateItem.Item1.ToolTipText = string.Format("Connection Error: {0}", updateItem.Item1.SubItems[4].Text);
+                            messageDialog.SetMessage(updateItem.Item1.ToolTipText);
+                        }
+
+                        messageDialog.Update();
+                        Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(updateItem.Item1.ListView);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    finally
+                    {
+                        updateItem.Item1.ListView.EndUpdate();
+                    }
+                }
+                #endregion
+                #region else if (e.UserState is ListViewItem)
+                else if (e.UserState is ListViewItem)
+                {
+                    ListViewItem lvi = e.UserState as ListViewItem;
+                    try
+                    {
+                        messageDialog.SetMessage(string.Format("Product: {0}, trying to connect to License Server: {1}", lvi.SubItems[0].Text, lvi.SubItems[1].Text));
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                #endregion
+            }
+        }
+
+        private void testConnBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new System.ComponentModel.RunWorkerCompletedEventHandler(testConnBackgroundWorker_RunWorkerCompleted), new object[] { sender, e });
+            }
+            else
+            {
+                if(messageDialog != null)
+                    messageDialog.Hide();
+                this.UseWaitCursor = false;
+            }
+        }
+        #endregion
+
     }
 
     //Was lazy, this should be in it's own file - JWL... 
