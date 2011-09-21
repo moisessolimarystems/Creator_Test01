@@ -48,7 +48,7 @@ namespace SolimarLicenseViewer
         private void PopulateTreeView()
         {
             Cursor.Current = Cursors.WaitCursor;
-            m_treeViewMgr.PopulateView();
+            m_treeViewMgr.PopulateView(hideEmptyLicServersToolStripMenuItem.Checked);
             if (m_listViewMgr.SelectedNode != null)
             {
                 TreeNode[] foundNodes = this.treeView.Nodes.Find(m_listViewMgr.SelectedNode.Name, true);
@@ -454,6 +454,11 @@ namespace SolimarLicenseViewer
             PopulateAllViews();
             this.Cursor = storedCursor;
         }
+        private void hideEmptyLicServersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            hideEmptyLicServersToolStripMenuItem.Checked = !hideEmptyLicServersToolStripMenuItem.Checked;
+            refreshToolStripButton_Click(null, null);
+        }
 
         #endregion
 
@@ -721,6 +726,8 @@ namespace SolimarLicenseViewer
             {
                 m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             }
+
+            hideEmptyLicServersToolStripMenuItem.Checked = Settings.Default.HideEmptyLicServers;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -742,6 +749,7 @@ namespace SolimarLicenseViewer
                 }
 
                 Settings.Default.SelectedDirectory = m_selectedDirectory;
+                Settings.Default.HideEmptyLicServers = hideEmptyLicServersToolStripMenuItem.Checked;
 
                 // Save settings
                 Settings.Default.Save();
@@ -1043,7 +1051,7 @@ namespace SolimarLicenseViewer
             else
             {
                 message = string.Format(
-                        "You are on activation {0} of {1} for Product License: {2}. The Current Activation will be valid until: {3}. Are you sure you want to use an Activation?",
+                        "You are currently on activation {0} of {1} for Product License: {2}. If you choose to apply another activation it will be valid until: {3}. Do you want to apply another activation now?",
                         _activationCurrent,
                         _activationTotal,
                         _productLicenseNumber,
@@ -1389,7 +1397,6 @@ namespace SolimarLicenseViewer
             }
         }
         #endregion
-
 
     }
 
