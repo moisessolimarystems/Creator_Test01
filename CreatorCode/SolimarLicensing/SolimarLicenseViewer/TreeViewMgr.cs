@@ -285,10 +285,9 @@ namespace SolimarLicenseViewer
                         //add a product node if there are app instances
                         if (prodInfo.productID.ToString() != "0")
                         {
-                            m_CommLink.SoftwareGetApplicationInstanceListByProduct((int)prodInfo.productID.TVal, ref generalStream);
-                            Solimar.Licensing.Attribs.AttribsMemberStringList appList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
-                            appList.SVal = generalStream;
-                            if (appList.TVal.Count > 0)
+                            System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct((int)prodInfo.productID.TVal);
+
+                            if (usageMap.Count > 0)
                             {
                                 productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
                                 TreeNode prodNode = new TreeNode(productName);
@@ -300,13 +299,18 @@ namespace SolimarLicenseViewer
                                 toolTipBuilder.Append(": ");
                                 toolTipBuilder.Append(productName);
                                 prodNode.ToolTipText = toolTipBuilder.ToString();
-                                #region foreach (string appInstance in appList.TVal)
-                                foreach (string appInstance in appList.TVal)
+
+                                #region foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
+                                foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
                                 {
-                                    TreeNode appInstNode = new TreeNode(appInstance);
+                                    //string connectionType = "Unknown: ";
+                                    //if (usagePair.Value.HasValue)
+                                    //    connectionType = usagePair.Value.Value ? "Primary: " : "Failover: ";
+                                    string connectionType = (usagePair.Value.HasValue && (usagePair.Value.Value == false)) ? "Failover: " : "";
+                                    TreeNode appInstNode = new TreeNode(string.Format("{0}{1}", connectionType, usagePair.Key));
                                     appInstNode.ImageIndex = GetIconIndex("AppInstance");
                                     appInstNode.SelectedImageIndex = appInstNode.ImageIndex;
-                                    appInstNode.Name = appInstNode.Text;
+                                    appInstNode.Name = usagePair.Key;   //Name is the Application Instance Name
                                     toolTipBuilder = new StringBuilder();
                                     toolTipBuilder.Append(AppConstants.UsageProductHeader);
                                     toolTipBuilder.Append(": ");
@@ -314,7 +318,9 @@ namespace SolimarLicenseViewer
                                     toolTipBuilder.Append("\n");
                                     toolTipBuilder.Append(AppConstants.UsageAppInstanceHeader);
                                     toolTipBuilder.Append(": ");
-                                    toolTipBuilder.Append(appInstance);
+                                    toolTipBuilder.Append(usagePair.Key);
+                                    if((usagePair.Value.HasValue && (usagePair.Value.Value == false)))
+                                        toolTipBuilder.Append("\nFailover");
                                     appInstNode.ToolTipText = toolTipBuilder.ToString();
                                     prodNode.Nodes.Add(appInstNode);
                                 }
