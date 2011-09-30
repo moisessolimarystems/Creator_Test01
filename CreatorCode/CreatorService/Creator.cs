@@ -148,9 +148,9 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetLicensesByCustomer(string custName)
+        public IList<LicenseTable> GetLicensesByCustomer(string custName, bool bLoadOptions)
         {
-            return LicenseTable.GetLicensesByCustomer(custName);
+            return LicenseTable.GetLicensesByCustomer(custName, bLoadOptions);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -188,7 +188,7 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void CheckInUser(string user)
         {
-            IList<LicenseTable> lsList = LicenseTable.GetLicensesByCustomer("");
+            IList<LicenseTable> lsList = LicenseTable.GetLicensesByCustomer("", false);
             foreach (LicenseTable ls in lsList)
             {
                 if (ls.UserLock != null)
@@ -221,7 +221,7 @@ namespace Service.Creator
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll)
+        public IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll, bool bLoadOptions)
         {
             int result;
             StringBuilder conditionString = new StringBuilder();
@@ -243,8 +243,8 @@ namespace Service.Creator
                             conditionString.Append(string.Format("TokenTables.Where(TokenValue{0}\"{1}\").Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
                         break;
                     case ConditionName.Validation:
-                        string op = ((userCondition.Value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (userCondition.Value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
-                        conditionString.Append(string.Format("TokenTables.Where(TokenType {0} 1).Count() > 0", op));
+                        string op = ((userCondition.Value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (userCondition.Value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "<" : ">";  //Hardware enum value = 1, Software enum value != 0
+                        conditionString.Append(string.Format("TokenTables.Where(TokenType {0} 2).Count() > 0", op));
                         break;
                     case ConditionName.Verified:
                         //if true not verified count should be  = 0 and packet counts > 0
@@ -278,7 +278,7 @@ namespace Service.Creator
                         break;
                 };             
             }
-            return LicenseTable.GetLicensesByConditions(conditionString.ToString());
+            return LicenseTable.GetLicensesByConditions(conditionString.ToString(), bLoadOptions);
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
