@@ -2146,7 +2146,7 @@ namespace Client.Creator.CreatorService {
         void CheckInUser(string user);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicensesByCustomer", ReplyAction="http://tempuri.org/ICreator/GetLicensesByCustomerResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByCustomer(string custName);
+        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByCustomer(string custName, bool bLoadOptions);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicensesByDestination", ReplyAction="http://tempuri.org/ICreator/GetLicensesByDestinationResponse")]
         System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions);
@@ -2164,7 +2164,7 @@ namespace Client.Creator.CreatorService {
         int GetLicenseCountByDestName(uint custID, uint destID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/GetLicensesByConditions", ReplyAction="http://tempuri.org/ICreator/GetLicensesByConditionsResponse")]
-        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll);
+        System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll, bool bLoadOptions);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICreator/IsLicenseModified", ReplyAction="http://tempuri.org/ICreator/IsLicenseModifiedResponse")]
         bool IsLicenseModified(string licName);
@@ -2558,8 +2558,8 @@ namespace Client.Creator.CreatorService {
             base.Channel.CheckInUser(user);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByCustomer(string custName) {
-            return base.Channel.GetLicensesByCustomer(custName);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByCustomer(string custName, bool bLoadOptions) {
+            return base.Channel.GetLicensesByCustomer(custName, bLoadOptions);
         }
         
         public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions) {
@@ -2582,8 +2582,8 @@ namespace Client.Creator.CreatorService {
             return base.Channel.GetLicenseCountByDestName(custID, destID);
         }
         
-        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll) {
-            return base.Channel.GetLicensesByConditions(cl, matchAll);
+        public System.Collections.Generic.List<Client.Creator.CreatorService.LicenseTable> GetLicensesByConditions(System.Collections.Generic.List<Client.Creator.CreatorService.Condition> cl, bool matchAll, bool bLoadOptions) {
+            return base.Channel.GetLicensesByConditions(cl, matchAll, bLoadOptions);
         }
         
         public bool IsLicenseModified(string licName) {

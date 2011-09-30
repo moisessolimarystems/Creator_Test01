@@ -1070,6 +1070,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="custName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="bLoadOptions" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -1162,6 +1163,7 @@
       <xs:sequence>
         <xs:element xmlns:q72="http://schemas.datacontract.org/2004/07/Service.Creator" minOccurs="0" name="cl" nillable="true" type="q72:ArrayOfCondition" />
         <xs:element minOccurs="0" name="matchAll" type="xs:boolean" />
+        <xs:element minOccurs="0" name="bLoadOptions" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
