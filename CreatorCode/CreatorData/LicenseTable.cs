@@ -8,17 +8,18 @@ namespace CreatorData
 {
     public partial class LicenseTable
     {
-        public static IList<LicenseTable> GetLicensesByConditions(string conditionStrings)
+        public static IList<LicenseTable> GetLicensesByConditions(string conditionStrings, bool enableLoadOptions)
         {
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                DataLoadOptions dlo = new DataLoadOptions();
-                dlo.LoadWith<LicenseTable>(id => id.PacketTables);
-                dlo.LoadWith<LicenseTable>(id => id.TokenTables);
-                db.LoadOptions = dlo;
-                var licenses = db.LicenseTables.Where(conditionStrings).ToList();                                
-                return licenses;
+                if (enableLoadOptions)
+                {
+                    DataLoadOptions dlo = new DataLoadOptions();
+                    dlo.LoadWith<LicenseTable>(id => id.LicenseInfo);
+                    db.LoadOptions = dlo;
+                }
+                return db.LicenseTables.Where(conditionStrings).ToList(); ;
             }
         }
 
@@ -30,7 +31,7 @@ namespace CreatorData
                 if (enableLoadOptions)
                 {
                     DataLoadOptions dlo = new DataLoadOptions();
-                    dlo.LoadWith<LicenseTable>(id => id.TransactionTables);
+                    dlo.LoadWith<LicenseTable>(id => id.LicenseInfo);                    
                     db.LoadOptions = dlo;
                 }
                 return (LicenseTable)db.LicenseTables.Where(c => c.LicenseName.Equals(licenseName)).SingleOrDefault();
@@ -45,19 +46,26 @@ namespace CreatorData
                 if (enableLoadOptions)
                 {
                     DataLoadOptions dlo = new DataLoadOptions();
-                    dlo.LoadWith<LicenseTable>(id => id.TransactionTables);
+                    dlo.LoadWith<LicenseTable>(id => id.LicenseInfo);
                     db.LoadOptions = dlo;
                 }
                 return (LicenseTable)db.LicenseTables.Where(c => c.ID.Equals(licID)).SingleOrDefault();
             }
         }
 
-        public static IList<LicenseTable> GetLicensesByCustomer(string custName)
+        public static IList<LicenseTable> GetLicensesByCustomer(string custName, bool enableLoadOptions)
         {
+            //need to exclude LicenseInfo column, 
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 IList<LicenseTable> licenseList = null;
                 db.ObjectTrackingEnabled = false;
+                if (enableLoadOptions)
+                {
+                    DataLoadOptions dlo = new DataLoadOptions();
+                    dlo.LoadWith<LicenseTable>(id => id.LicenseInfo);
+                    db.LoadOptions = dlo;
+                }
                 //need to be able to translate destid to destname from searchstring
                 if (custName.Length == 0)
                     licenseList = db.LicenseTables.ToList();
@@ -75,7 +83,7 @@ namespace CreatorData
                 if (enableLoadOptions)
                 {
                     DataLoadOptions dlo = new DataLoadOptions();
-                    dlo.LoadWith<LicenseTable>(id => id.PacketTables);
+                    dlo.LoadWith<LicenseTable>(id => id.LicenseInfo);
                     db.LoadOptions = dlo;
                 }
                 //need to be able to translate destid to destname from searchstring

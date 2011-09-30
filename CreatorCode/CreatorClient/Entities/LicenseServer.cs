@@ -46,7 +46,8 @@ namespace Client.Creator
         public LicenseServer(LicenseTable license, PermissionsTable permissions)
         {
             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
-            licPackage.Stream = license.LicenseInfo;            
+            if(license.LicenseInfo != null)
+                licPackage.Stream = license.LicenseInfo;            
             _licInfo = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
             _licInfo = licPackage.licLicenseInfoAttribs;
             _isActive = license.IsActive;
@@ -163,8 +164,7 @@ namespace Client.Creator
                     {
                         if (lt.UserLock == null) 
                             bLocked = false;                        
-                        //_userLock = (lt.UserLock != null) ? lt.UserLock.ToLower() : null;
-                        _userLock = lt.UserLock ?? null; //set ToLower()
+                        _userLock = lt.UserLock ?? null;
                     }
                 });
                 return bLocked;

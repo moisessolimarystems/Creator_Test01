@@ -51,7 +51,7 @@ namespace Service.Creator
         void CheckInUser(string user);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByCustomer(string custName);
+        IList<LicenseTable> GetLicensesByCustomer(string custName, bool bLoadOptions);
 
         [OperationContract]
         IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions);
@@ -69,7 +69,7 @@ namespace Service.Creator
         int GetLicenseCountByDestName(uint custID, uint destID);
 
         [OperationContract]
-        IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll);
+        IList<LicenseTable> GetLicensesByConditions(IList<Condition> cl, bool matchAll, bool bLoadOptions);
 
         [OperationContract]
         bool IsLicenseModified(string licName);

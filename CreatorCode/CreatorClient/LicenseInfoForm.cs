@@ -306,7 +306,7 @@ namespace Client.Creator
                         CustomerTable customerDB = client.GetCustomer(selectedLicense.CustID.ToString(), false);
                         if (customerDB != null)
                         {
-                            IList<LicenseTable> licServerList = client.GetLicensesByCustomer(customerDB.SCRname);
+                            IList<LicenseTable> licServerList = client.GetLicensesByCustomer(customerDB.SCRname, false);
                             IList<TokenTable> tokenDBList = client.GetTokensByCustomerID(customerDB.SCRnumber);
                             foreach (LicenseTable licServer in licServerList)
                             {

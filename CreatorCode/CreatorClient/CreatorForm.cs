@@ -1079,7 +1079,7 @@ namespace Client.Creator
                             plt.IsActive = false;
                             client.UpdateProductLicense(plt);                            
                             //Deactivate product
-                            LicenseTable storedLicense = client.GetLicenseByID(plt.LicenseID, false);
+                            LicenseTable storedLicense = client.GetLicenseByID(plt.LicenseID, true);
                             Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                             licPackage.Stream = storedLicense.LicenseInfo;
                             foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
@@ -1377,7 +1377,7 @@ namespace Client.Creator
                     //LoadLicenseServers(DestNameComboBox.Text);
                     //how to get choose the selected license server to highlight
                     //what resets _selectedtreenodekey
-                    LoadDBLicenses(string.Empty, _selectedTreeNodeKey, DestNameComboBox.Text, false);
+                    LoadDBLicenses(string.Empty, _selectedTreeNodeKey, DestNameComboBox.Text, true);
                     _selectedTreeNodeKey = string.Empty;
                 }
             });
@@ -2670,7 +2670,7 @@ namespace Client.Creator
                 if (CustomersListView.Visible)
                     LoadDBCustomers(searchString, false);
                 else
-                    LoadDBLicenses(searchString, string.Empty, DestNameComboBox.Text, false);
+                    LoadDBLicenses(searchString, string.Empty, DestNameComboBox.Text, true);
                 searchToolStripTextBox.Focus();
             }
             else if (MainTabControl.SelectedTab == ValidationKeysTabPage)
@@ -2781,7 +2781,7 @@ namespace Client.Creator
         {
             CreateLicenseEntity(lsp);
             //resort tree
-            LoadDBLicenses(string.Empty, lsp.Name, lsp.DestName, false);
+            LoadDBLicenses(string.Empty, lsp.Name, lsp.DestName, true);
         }
         private void DeleteLicenseNode(TreeNode selectedLicenseNode)//, bool bVerify)
         {
@@ -2821,7 +2821,7 @@ namespace Client.Creator
             List<ProductLicenseTable> pltList = null;
             Service<ICreator>.Use((client) =>
             {
-                license = client.GetLicenseByName(licenseNode.Name, false); // db - 1             
+                license = client.GetLicenseByName(licenseNode.Name, true); // db - 1             
                 if (license != null)
                 {
                     licenseNode.Text = (license.UserLock != null) ? license.LicenseName + " - " + license.UserLock : license.LicenseName;
@@ -3046,7 +3046,7 @@ namespace Client.Creator
                     DestNameComboBox.SelectedIndex = DestNameComboBox.Items.IndexOf(dnt.DestName);
             }
             else
-                LoadDBLicenses(string.Empty, string.Empty, string.Empty, false);
+                LoadDBLicenses(string.Empty, string.Empty, string.Empty, true);
         }
         private void SetLicenseServerState(TreeNode currentNode, bool bAllLicenseServers)
         {
@@ -3418,8 +3418,13 @@ namespace Client.Creator
                     }
                     else
                     {
-                        selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
-                        DetailTreeView.SelectedNode = productNode.Nodes[selectedIndex];                        
+                        if (plNode.Parent.Nodes.Count > 1)
+                        {   
+                            selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
+                            DetailTreeView.SelectedNode = productNode.Nodes[selectedIndex];
+                        }
+                        else //delete last addon -> go to parent PL
+                            DetailTreeView.SelectedNode = plNode.Parent;
                     }
                     if (DetailTreeView.SelectedNode != null)
                         SetLicenseServerState(DetailTreeView.SelectedNode, true);                    
@@ -3456,7 +3461,7 @@ namespace Client.Creator
                         }
                     }
                 }
-                storedLicense = client.GetLicenseByID(plt.LicenseID, false);
+                storedLicense = client.GetLicenseByID(plt.LicenseID, true);
                 if (storedLicense == null)
                 {
                     MessageBox.Show("Failed to find license server for " + plt.plID, "Delete Produce License");
@@ -3732,7 +3737,7 @@ namespace Client.Creator
         {
             Service<ICreator>.Use((client) =>
             {
-                IList<LicenseTable> ltList = client.GetLicensesByCustomer(custName);
+                IList<LicenseTable> ltList = client.GetLicensesByCustomer(custName, false);
                 client.DeleteAllDestinationNames(custID);
                 foreach (LicenseTable lt in ltList)
                 {
@@ -4418,13 +4423,17 @@ namespace Client.Creator
         {
             IList<LicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
+            IList<TokenTable> tokens = null;
+            IList<PacketTable> packets = null;
             CustomerTable customer = null;
             string[] plSplit;
             string validationType, verifiedStatus;
             Service<ICreator>.Use((client) =>
             {
-                licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
+                licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll, false);              
                 customers = client.GetAllCustomers(string.Empty, false);
+                packets = client.GetPacketsByLicenseName(string.Empty);
+                tokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
             });
             PopulateReportListViewColumns(Report.ReportType.LicenseServer);
             ReportListView.BeginUpdate();
@@ -4443,11 +4452,11 @@ namespace Client.Creator
                         newItem.Text = "Unknown";
                     newItem.SubItems.Add(licenses[index].LicenseName);
                     newItem.SubItems.Add(licenses[index].IsActive.ToString());
-                    validationType = (licenses[index].TokenTables.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware": "Software";
+                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware": "Software";
                     if (validationType == "Hardware")
-                        validationType = licenses[index].TokenTables.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                        validationType = tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
                     newItem.SubItems.Add(validationType);
-                    verifiedStatus = (licenses[index].PacketTables.Where(t => t.LicenseID == licenses[index].ID && t.IsVerified == false).Count() == 0 && licenses[index].PacketTables.Where(t => t.LicenseID == licenses[index].ID).Count() > 0) ? bool.TrueString : bool.FalseString;
+                    verifiedStatus = (packets.Where(t => t.LicenseID == licenses[index].ID && t.IsVerified == false).Count() == 0 && packets.Where(t => t.LicenseID == licenses[index].ID).Count() > 0) ? bool.TrueString : bool.FalseString;
                     newItem.SubItems.Add(verifiedStatus);
                     newItem.SubItems.Add(licenses[index].LicenseComments);
                     lvItems[index] = newItem;
@@ -4516,7 +4525,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 packets = client.GetPacketsByConditions(rp.DatabaseConditions, rp.MatchAll);
-                licenses = client.GetLicensesByCustomer(string.Empty);
+                licenses = client.GetLicensesByCustomer(string.Empty, false);
                 customers = client.GetAllCustomers(string.Empty, false);
                 if (packets != null)
                 {

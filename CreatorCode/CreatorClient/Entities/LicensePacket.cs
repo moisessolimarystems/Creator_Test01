@@ -60,7 +60,7 @@ namespace Client.Creator
             int major = 0, minor = 0, buildVersion = 0;
             Service<ICreator>.Use((client) =>
             {                
-                _licenseTable = client.GetLicenseByName(_licenseServer, false);
+                _licenseTable = client.GetLicenseByName(_licenseServer, true);
                 client.GetLicenseServerVersion(ref major, ref minor, ref buildVersion);
             });
             if (_licenseTable != null)

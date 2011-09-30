@@ -82,17 +82,24 @@ namespace Client.Creator
         /// <param name="productLicense">ProductLicense object to remove</param>
         public void RemoveProductProperty(ProductLicense productLicense)
         {
-            ProductLicense selectedProductLicense = null;
+            List<ProductLicense> selectedProductLicense = new List<ProductLicense>();
             foreach (ProductLicense plp in _productCollection)
             {
-                if (plp.ID == productLicense.ID)
+                if (plp.ID == productLicense.ID || plp.ParentID == productLicense.ID)
                 {
-                    selectedProductLicense = plp;
-                    break;
+                    //selectedProductLicense = plp;
+                    //break;
+                    selectedProductLicense.Add(plp);
+
                 }
             }
-            if (selectedProductLicense != null)
+            foreach (ProductLicense selectedPL in selectedProductLicense)
+            {
+                _productCollection.Remove(selectedPL);
+            }
+            /*if (selectedProductLicense != null)
                 _productCollection.Remove(selectedProductLicense);
+             */
         }
         #endregion
     }
