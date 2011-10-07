@@ -37,6 +37,7 @@ namespace SolimarLicenseViewer
             PRODUCTCONNECTIONSETTINGS,
             SOLITRACK,
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
+            LIBRARYSERVICES,
             EVENTLOG,
         }
 
@@ -74,7 +75,7 @@ namespace SolimarLicenseViewer
         #endregion
 
         #region License Node
-        private TreeNode GenerateLicenseNode()
+        private TreeNode GenerateLicenseNode(bool _bHideEmptyNode)
         {
             TreeNode rootNode = null;
             try
@@ -152,6 +153,8 @@ namespace SolimarLicenseViewer
 
                             if (bNewNode == true)
                             {
+                                if (string.IsNullOrEmpty(productName))
+                                    productName = string.Format("Unknown Product {0}", (int)prodInfo.productID.TVal);
                                 prodNode = new TreeNode(productName);
                                 prodNode.ImageIndex = GetIconIndex(productName);
                                 prodNode.SelectedImageIndex = prodNode.ImageIndex;
@@ -213,7 +216,8 @@ namespace SolimarLicenseViewer
                         //toolTipBuilder.Append(bLicValid ? SolimarLicenseViewer.AppConstants.VerifiedStatus : errorMessage);
 
                         swLicNode.ToolTipText = toolTipBuilder.ToString();
-                        InsertIntoTree_Alpha(rootNode, swLicNode);
+                        if ((_bHideEmptyNode && swLicNode.Nodes.Count > 0) || !_bHideEmptyNode)
+                            InsertIntoTree_Alpha(rootNode, swLicNode);
                     }
                     #endregion
                     if (rootNode.Nodes.Count > 0)
@@ -360,7 +364,7 @@ namespace SolimarLicenseViewer
         /// This method populates the TreeView with License, Protection Key, Usage and Product Connection information.
         /// Information is displayed on 2 tree levels. Application Instances, and Modules.
         /// </summary>
-        public void PopulateView()
+        public void PopulateView(bool _bHideEmptyNode)
         {
             string selectedNodeText = "";
             if (this.TheTreeView.SelectedNode != null)
@@ -368,7 +372,7 @@ namespace SolimarLicenseViewer
             this.TheTreeView.Nodes.Clear();
 
             TreeNode tmpNode = null;
-            tmpNode = GenerateLicenseNode();
+            tmpNode = GenerateLicenseNode(_bHideEmptyNode);
             if (tmpNode != null)
                 this.TheTreeView.Nodes.Add(tmpNode);
 
