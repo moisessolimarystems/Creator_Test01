@@ -66,9 +66,9 @@ namespace Client.Creator
             if (_licenseTable != null)
             {
                 _licPackage.Stream = _licenseTable.LicenseInfo;
-                if (PopulateValidationTokens(data)) //add tokens to _licPackage 
+                if (PopulateProductInfo())  //add products, productlicenses, modules to _licPackage                
                 {                    
-                    if (PopulateProductInfo())  //add products,productlicenses,modules to _licPackage
+                    if (PopulateValidationTokens(data)) //add tokens to _licPackage 
                     {   //set software spec version based on the spec built with Creator
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
                         _licPackage.licReplaceSoftwareSpecAttribs.TVal = _commLink.SoftwareSpec;
@@ -110,47 +110,48 @@ namespace Client.Creator
             bool bRetVal = true;
             IList<SoftwareTokenTable> softwareTokens = null;
             IList<TokenTable> tokenList = null;
-            Service<ICreator>.Use((client) =>
-            {               
-                softwareTokens = client.GetAllSoftwareTokens();
-                tokenList = client.GetTokensByLicenseName(_licenseServer);
-            });
             _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();           
-            //add validation tokens for licinfo object
-            //tokentable may contain licensecode
-            foreach (TokenTable token in tokenList)
+            if (_licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Count > 0)  //leave tokens empty if product list is empty            
             {
-                if (tokenList.Count > 1)
-                {   //not found in software token table -> ttlicensecode
-                    string tokenName = Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), token.TokenType);
-                    SoftwareTokenTable st = softwareTokens.FirstOrDefault(t => t.TokenType == tokenName);
-                    if (st != null)
-                    {
-                        if(st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated) //skip licenseCode if user doesn't select ClearLicenseCode
-                            continue; 
+                Service<ICreator>.Use((client) =>
+                {
+                    softwareTokens = client.GetAllSoftwareTokens();
+                    tokenList = client.GetTokensByLicenseName(_licenseServer);
+                });
+                foreach (TokenTable token in tokenList)  //add validation tokens for licinfo object, tokentable may contain licensecode
+                {
+                    if (tokenList.Count > 1)
+                    {   //not found in software token table -> ttlicensecode
+                        string tokenName = Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), token.TokenType);
+                        SoftwareTokenTable st = softwareTokens.FirstOrDefault(t => t.TokenType == tokenName);
+                        if (st != null)
+                        {
+                            if (st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated) //skip licenseCode if user doesn't select ClearLicenseCode
+                                continue;
+                        }
+                        else
+                        {
+                            if (!data.ClearLicenseCode && token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
+                                continue;
+                        }
                     }
-                    else
-                    {
-                        if (!data.ClearLicenseCode && token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
-                            continue;
-                    }    
+                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                    newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType;
+                    newToken.tokenValue.TVal = token.TokenValue;
+                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
                 }
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-                newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType;
-                newToken.tokenValue.TVal = token.TokenValue;
-                _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
-            }
-            bool bExistLicenseCode = false;
-            foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
-            {
-                if (token.tokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
-                    bExistLicenseCode = true;
-            }
-            if (!bExistLicenseCode)  //add empty licensecode token if it hasn't been added
-            {
-                Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-                licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
-                _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken); 
+                bool bExistLicenseCode = false;
+                foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
+                {
+                    if (token.tokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
+                        bExistLicenseCode = true;
+                }
+                if (!bExistLicenseCode)  //add empty licensecode token if it hasn't been added
+                {
+                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                    licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
+                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken);
+                }
             }
             return bRetVal;
         }

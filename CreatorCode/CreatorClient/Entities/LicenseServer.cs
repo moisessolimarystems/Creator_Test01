@@ -431,6 +431,24 @@ namespace Client.Creator
         {
             return LockedByAnyUser() && _permissions.pt_permanent_pwd.Value;
         }
+
+        public bool HasActiveProductLicense()
+        {
+            bool bRetVal = false;
+            Service<ICreator>.Use((client) =>
+            {
+                IList<ProductLicenseTable> pltList = client.GetProductLicenses(Name, false);
+                foreach (ProductLicenseTable plt in pltList)
+                {
+                    if (plt.IsActive)
+                    {
+                        bRetVal = true;
+                        break;
+                    }
+                }
+            });
+            return bRetVal;
+        }
         #endregion
     }
 }
