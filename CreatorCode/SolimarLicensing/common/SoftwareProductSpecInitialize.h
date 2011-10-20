@@ -1444,6 +1444,16 @@ void InititalizeProduct16()
 	pTmpModSpec->moduleName = std::wstring(L"Devices");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(3, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
+	pTmpModSpec->moduleID = 3;
+	pTmpModSpec->moduleName = std::wstring(L"Sites");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 7;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
