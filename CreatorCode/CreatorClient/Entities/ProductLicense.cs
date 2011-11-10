@@ -639,12 +639,15 @@ namespace Client.Creator
         #region Methods
         private void UpdateModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
         {
-            Service<ICreator>.Use((client) =>
+            if (IsActive)
             {
-                List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
-                RemoveDeprecatedModules(version, dbModuleList);
-                AddIntroducedModules(version, dbModuleList, pltList);
-            });
+                Service<ICreator>.Use((client) =>
+                {
+                    List<ModuleTable> dbModuleList = client.GetAllActiveModulesByProduct(LicenseServer, ProductID);
+                    RemoveDeprecatedModules(version, dbModuleList);
+                    AddIntroducedModules(version, dbModuleList, pltList);
+                });
+            }
         }
         private void RemoveDeprecatedModules(LicenseVersion version, List<ModuleTable> dbModuleList)
         {

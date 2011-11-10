@@ -84,11 +84,9 @@ namespace Client.Creator
         {
             List<ProductLicense> selectedProductLicense = new List<ProductLicense>();
             foreach (ProductLicense plp in _productCollection)
-            {
+            {   //remove product license and any add-ons
                 if (plp.ID == productLicense.ID || plp.ParentID == productLicense.ID)
                 {
-                    //selectedProductLicense = plp;
-                    //break;
                     selectedProductLicense.Add(plp);
 
                 }
@@ -97,9 +95,6 @@ namespace Client.Creator
             {
                 _productCollection.Remove(selectedPL);
             }
-            /*if (selectedProductLicense != null)
-                _productCollection.Remove(selectedProductLicense);
-             */
         }
         #endregion
     }

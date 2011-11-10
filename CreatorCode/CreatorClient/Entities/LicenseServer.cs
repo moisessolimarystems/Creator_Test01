@@ -438,14 +438,19 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 IList<ProductLicenseTable> pltList = client.GetProductLicenses(Name, false);
-                foreach (ProductLicenseTable plt in pltList)
+                if (pltList.Count > 0)
                 {
-                    if (plt.IsActive)
+                    foreach (ProductLicenseTable plt in pltList)
                     {
-                        bRetVal = true;
-                        break;
+                        if (plt.IsActive)
+                        {
+                            bRetVal = true;
+                            break;
+                        }
                     }
                 }
+                else
+                    bRetVal = true;
             });
             return bRetVal;
         }
