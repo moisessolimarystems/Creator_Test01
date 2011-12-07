@@ -101,8 +101,8 @@ begin
    		szSubTitle = "Specify the user account to be used by " + @PRODUCT_NAME + ". User accounts must be in the format DOMAIN\\Username.";
    	endif;
 	if(StrLength(szMsg) = 0) then
-	   	szMsg = "We recommend that you create a dedicated domain user account for " + @PRODUCT_NAME + " services " + 
-	   			"and specify its login information here. This user must have administrative rights on " +       
+	   	szMsg = "We recommend that you create a dedicated domain user account for " + @PRODUCT_NAME + 
+	   			" and specify its login information here. This user must have administrative rights on " +       
 	   			"the " + @PRODUCT_NAME + " computer and be authorized to access the network directories relevant to your workflow.";
    	endif;   	// Initialize the indicator used to control the while loop. 
    	bDone = FALSE;   	
@@ -210,8 +210,8 @@ begin
    		szSubTitle = "Specify the user account to be used by " + @PRODUCT_NAME + ". User accounts must be in the format DOMAIN\\Username.";
    	endif;
 	if(StrLength(szMsg) = 0) then
-	   	szMsg = "We recommend that you create a dedicated domain user account for " + @PRODUCT_NAME + " services " + 
-	   			"and specify its login information here. This user must have administrative rights on " +       
+	   	szMsg = "We recommend that you create a dedicated domain user account for " + @PRODUCT_NAME + 
+	   			" and specify its login information here. This user must have administrative rights on " +       
 	   			"the " + @PRODUCT_NAME + " computer and be authorized to access the network directories relevant to your workflow.";
    	endif;   	// Initialize the indicator used to control the while loop. 
    	bDone = FALSE;   	
