@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 8;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 9;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
