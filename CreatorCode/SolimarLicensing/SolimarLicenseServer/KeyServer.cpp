@@ -1708,15 +1708,34 @@ HRESULT KeyServer::TimesUp()
 	//OutputDebugString(tmpbuf);
 									if (SUCCEEDED(hr))
 									{
-										tk->second.key_obtained = false;
-										tk->second.last_decrement = cur_time;
-
 										unsigned short key_version(0);
 										hr = key->second->GetKeyVersion(&key_version);
 										//Check for key version, if key version 0 then send current message
-										if(key_version == 0)
+										if (key_version == 0)
+										{
+											tk->second.key_obtained = false;
+											tk->second.last_decrement = cur_time;
 											g_licenseController.GenerateMessage((wchar_t*)tk->first, MT_INFO, hr, cur_time, MessageTempKeyDecrementing);
-										//if key version 1 then send no message
+										}
+										else if(key_version == 1)
+										{
+											//if key version 1 then send no message
+
+											//There is no reason to do the following for version 1 keys
+											//tk->second.key_obtained = false;
+											//tk->second.last_decrement = cur_time;
+										}
+										
+									}
+									else	//if (FAILED(hr))
+									{
+										g_licenseController.GenerateMessage(
+											(wchar_t*)tk->first, 
+											MT_ERROR, 
+											hr, 
+											cur_time, 
+											MessageGenericError, 
+											L"Failed to write to USB Token, please contact Solimar Systems, Inc.");
 									}
 								}
 							}
