@@ -70,7 +70,7 @@ HRESULT ProtectionKey_Version1::DecrementTrialHours()
 	// and last touch.  If an hour hasn't passed, return E_FAIL
 	HRESULT hr(E_FAIL);
 	SafeMutex mutex(license_use_lock);
-wchar_t debug_buf[1024];
+//wchar_t debug_buf[1024];
 	try
 	{
 		//YYY Reset to zero
@@ -163,7 +163,9 @@ wchar_t debug_buf[1024];
 	{
 		hr = e.Error();
 	}
-	hr = E_FAIL;	//Reset to E_FAIL 
+
+	//CR.FIX.15610 - No longer set to E_FAIL
+	//hr = E_FAIL;	//Reset to E_FAIL 
 	return hr;
 }
 
