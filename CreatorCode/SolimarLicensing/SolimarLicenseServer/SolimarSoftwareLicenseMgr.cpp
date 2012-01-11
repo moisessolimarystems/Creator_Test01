@@ -973,6 +973,15 @@ HRESULT SoftwareLicenseMgr::GetLicenseInfo(Lic_PackageAttribs::Lic_LicenseInfoAt
 	return S_OK;
 }
 
+HRESULT SoftwareLicenseMgr::GetSoftwareSpec(Lic_PackageAttribs::Lic_SoftwareSpecAttribs* pSoftwareSpec)
+{
+	SafeMutex mutex(softwareLicenseMgrLock);
+	//CR.14884 - Use licReplaceSoftwareSpecAttribs instead of licSoftwareSpecAttribs
+	*pSoftwareSpec = m_licenseFileAttribs.licReplaceSoftwareSpecAttribs;
+	return S_OK;
+}
+
+
 HRESULT SoftwareLicenseMgr::GetProtectionKeyModifiedDate(time_t* pTimeTModifiedDate, Lic_PackageAttribs* pLicenseFileAttribs)
 {
 //wchar_t debug_buf[1024];
@@ -1769,72 +1778,109 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 //OutputDebugStringW(debug_buf);
 
 //YYY - hard break
-//throw E_NOTIMPL;	
+//throw E_NOTIMPL;
+
+		//CR.15610 - All code below here; treate the Updating of all system resources like a transaction where if any failure happens
+		//updating any resource, then rollback all change resource back to their original state.
+		//All code below here has to rollback any changes to the
+		bool bSuccessfullyChangedLicFile = false;
+		bool bSuccessfullyChangedUsbToken = false;
+		//bool bSuccessfullyChangedLicSvrMgrFile = false; //This is currently not needed because it is the last resource touched.
+
+		BSTR bstrOriginalSoftwareStream;
+		SoftwareLicenseFile::LoadFromLicenseFile(m_bstrLicenseFile, &bstrOriginalSoftwareStream);
+
+		Lic_KeyAttribs originalLicKeyAttribs;
+		
 		//Replace on disk
 		hr = SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrLicPacketStream);
-		if(FAILED(hr))
-			throw hr;
-
-		//On success, see if there is a hardware key, if so find right one and update its ttLicenseCode & Modified Date
-		if(_wcsicmp(newLicenseGUID, L"")!=0)
+		if(SUCCEEDED(hr))
 		{
-			// Configure keyAttrib to have all the right info
-			if(!bFoundKeyInfo)	//New license, make key info
+			bSuccessfullyChangedLicFile = true;
+
+			//On success, see if there is a hardware key, if so find right one and update its ttLicenseCode & Modified Date
+			if(_wcsicmp(newLicenseGUID, L"")!=0)
 			{
-				//must create keyAttrib
-				keyAttrib.historyNumber = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size();
-				keyAttrib.keyVersion = 1;
-				for(unsigned short idx=0; idx<20; idx++)
+				//get - original KeyInfo
+				if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )
+					hr = m_pKeyServer->GetKeyInfoAttribs(bstrHardwareKeyID, &originalLicKeyAttribs);
+
+				// Configure keyAttrib to have all the right info
+				if(!bFoundKeyInfo)	//New license, make key info
 				{
-					Lic_KeyAttribs::Lic_ActivationInfoAttribs newLicInfoAttribs;
-					newLicInfoAttribs.activationSlotId = idx;
-					newLicInfoAttribs.activationSlotCurrentActivation = 0;
-					newLicInfoAttribs.activationSlotHoursToExpire = 0;
-					keyAttrib.activationInfoList->push_back(newLicInfoAttribs);
+					//must create keyAttrib
+					keyAttrib.historyNumber = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size();
+					keyAttrib.keyVersion = 1;
+					for(unsigned short idx=0; idx<20; idx++)
+					{
+						Lic_KeyAttribs::Lic_ActivationInfoAttribs newLicInfoAttribs;
+						newLicInfoAttribs.activationSlotId = idx;
+						newLicInfoAttribs.activationSlotCurrentActivation = 0;
+						newLicInfoAttribs.activationSlotHoursToExpire = 0;
+						keyAttrib.activationInfoList->push_back(newLicInfoAttribs);
+					}
+				}
+
+				{
+				keyAttrib.licenseCode = std::wstring(newLicenseGUID);
+				keyAttrib.packetCreationDate = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
+
+				//Update the USB Key
+				if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )
+				{
+					hr = m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, keyAttrib, bResetCurrentDateToNow, false);
+					if(SUCCEEDED(hr))
+						bSuccessfullyChangedUsbToken = true;
+				}
+
 				}
 			}
+		}
 
-			{
-			keyAttrib.licenseCode = std::wstring(newLicenseGUID);
-			keyAttrib.packetCreationDate = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
+		if(SUCCEEDED(hr))
+		{
+			m_licenseFileAttribs.InitFromString(bstrLicPacketStream);
+			m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
 
-			//Update the USB Key
-			if(_wcsicmp(bstrHardwareKeyID, L"") != 0 )
+	//wchar_t tmpbuf[1024];
+	//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - m_bstrLicenseName: %s", (wchar_t*)m_bstrLicenseName);
+	//OutputDebugString(tmpbuf);
+
+			if(bResetCurrentDateToNow)
 			{
-				m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, keyAttrib, bResetCurrentDateToNow, false);
+				//CR.FIX.14842 - Reset Clock violations
+				m_pLicServerDataMgr->Touch(true);
 			}
 
+			if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
+			{
+				Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
+				tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
+				tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+				tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
+				tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
+				keyAttrib.keyName = std::wstring(m_bstrLicenseName);
+				tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttrib.ToString());
+				hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
 			}
 		}
-		if(FAILED(hr))
-			throw hr;
-	
-		m_licenseFileAttribs.InitFromString(bstrLicPacketStream);
-		m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
 
-//wchar_t tmpbuf[1024];
-//swprintf_s(tmpbuf, 1024, L" SoftwareLicenseMgr::ApplyLicensePacket - m_bstrLicenseName: %s", (wchar_t*)m_bstrLicenseName);
-//OutputDebugString(tmpbuf);
-
-		if(bResetCurrentDateToNow)
+		//CR.15610 - If there is an error, rollback values to their original
+		if (FAILED(hr))
 		{
-			//CR.FIX.14842 - Reset Clock violations
-			m_pLicServerDataMgr->Touch(true);
+			if (bSuccessfullyChangedLicFile)
+			{
+				SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrOriginalSoftwareStream);
+				m_licenseFileAttribs.InitFromString(bstrOriginalSoftwareStream);
+				m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
+			}
+			if (bSuccessfullyChangedUsbToken)
+				m_pKeyServer->SetKeyInfoAttribs(bstrHardwareKeyID, originalLicKeyAttribs, true, true);
 		}
 
-		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
-		{
-			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
-			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
-			tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
-			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
-			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			keyAttrib.keyName = std::wstring(m_bstrLicenseName);
-			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttrib.ToString());
-			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
-			if(FAILED(hr))
-				throw hr;
-		}
+		//Clean up
+		SysFreeString(bstrOriginalSoftwareStream);
+		bstrOriginalSoftwareStream = NULL;
 	}
 	catch(HRESULT &eHr)
 	{
@@ -1956,9 +2002,12 @@ HRESULT SoftwareLicenseMgr::EnterLicenseArchive(Lic_PackageAttribs* pLicPacket)
 		
 		bstrLicStream = SysAllocString(tmpLicPacket.ToString().c_str());
 		hr = SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrLicStream);
-
 		if(FAILED(hr))
+		{
+			SysFreeString(bstrLicStream);
+			bstrLicStream = NULL;
 			throw hr;
+		}
 
 		m_licenseFileAttribs.InitFromString(bstrLicStream);
 		m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
@@ -2061,7 +2110,7 @@ HRESULT SoftwareLicenseMgr::InternalUpdate(Lic_PackageAttribs* _pLicPacAttribs, 
 
 HRESULT SoftwareLicenseMgr::UseActivationToExtendTime(_bstr_t bstrContractNumber)
 {
-wchar_t debug_buf[1024];		
+//wchar_t debug_buf[1024];		
 //_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseMgr::UseActivationToExtendTime() - Enter");
 //OutputDebugStringW(debug_buf);
 	SafeMutex mutex(softwareLicenseMgrLock);
@@ -2266,31 +2315,71 @@ wchar_t debug_buf[1024];
 		TimeHelper::SystemTimeToString(wchCurrentTimestamp, _countof(wchCurrentTimestamp), currentSystime);
 		m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate = std::wstring(wchCurrentTimestamp);
 
+		
+		//CR.15610 - All code below here; treate the Updating of all system resources like a transaction where if any failure happens
+		//updating any resource, then rollback all change resource back to their original state.
+		//All code below here has to rollback any changes to the
+		bool bSuccessfullyChangedLicFile = false;
+		bool bSuccessfullyChangedUsbToken = false;
+		//bool bSuccessfullyChangedLicSvrMgrFile = false; //This is currently not needed because it is the last resource touched.
+
+		BSTR bstrOriginalSoftwareStream;
+		SoftwareLicenseFile::LoadFromLicenseFile(m_bstrLicenseFile, &bstrOriginalSoftwareStream);
+
+		Lic_KeyAttribs originalLicKeyAttribs;
+
 		BSTR bstrLicPacketStream = SysAllocString(m_licenseFileAttribs.ToString().c_str());
 		hr = SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrLicPacketStream);
 		SysFreeString(bstrLicPacketStream);
-		if(FAILED(hr))
-			throw hr;
 
-		//Update the USB Key
-		if(_wcsicmp(wstrHardwareKeyID.c_str(), L"") != 0 )
+		if(SUCCEEDED(hr))
 		{
-			keyAttribs.licenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
-			m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), keyAttribs, true/*force current date update*/, true/*force activity slot update*/);
+			bSuccessfullyChangedLicFile = true;
+
+			//Update the USB Key
+			if(_wcsicmp(wstrHardwareKeyID.c_str(), L"") != 0 )
+			{
+				bool bTmpFoundKeyInfo(false);
+				//Get Keyinfo from the usb key or system
+				hr = m_pKeyServer->GetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), &originalLicKeyAttribs);
+
+				keyAttribs.licenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+				hr = m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), keyAttribs, true/*force current date update*/, true/*force activity slot update*/);
+				if(SUCCEEDED(hr))
+					bSuccessfullyChangedUsbToken = true;
+			}
 		}
 
-		if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
+		if(SUCCEEDED(hr))
 		{
-			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
-			tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
-			tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
-			tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
-			tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
-			tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
-			hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
-			if(FAILED(hr))
-				throw hr;
+			if(m_pLicServerDataMgr!=NULL)		//Update LicenseServerDataMgr with new verification code...
+			{
+				Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs tmpFileInfo;
+				tmpFileInfo.LicFileName = std::wstring(SpdAttribs::WStringObj(m_bstrLicenseFile));
+				tmpFileInfo.LicFileLicenseCode = std::wstring(SpdAttribs::WStringObj(newLicenseGUID));
+				tmpFileInfo.LicName = std::wstring(SpdAttribs::WStringObj(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs)));
+				tmpFileInfo.LicModifiedDate = m_licenseFileAttribs.licLicenseInfoAttribs.modifiedDate;
+				tmpFileInfo.Streamed_ActivationAttribs = std::wstring(keyAttribs.ToString());
+				hr = m_pLicServerDataMgr->SetFileInfoFor(std::wstring(SpdAttribs::WStringObj(tmpFileInfo.LicName)).c_str(), &tmpFileInfo);
+			}
 		}
+
+		//CR.15610 - If there is an error, rollback values to their original
+		if (FAILED(hr))
+		{
+			if (bSuccessfullyChangedLicFile)
+			{
+				SoftwareLicenseFile::SaveToLicenseFile(m_bstrLicenseFile, bstrOriginalSoftwareStream);
+				m_licenseFileAttribs.InitFromString(bstrOriginalSoftwareStream);
+				m_bstrLicenseName = bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&m_licenseFileAttribs.licLicenseInfoAttribs).c_str());
+			}
+			if (bSuccessfullyChangedUsbToken)
+				m_pKeyServer->SetKeyInfoAttribs(_bstr_t(wstrHardwareKeyID.c_str()), originalLicKeyAttribs, true, true);
+		}
+
+		//Clean up
+		SysFreeString(bstrOriginalSoftwareStream);
+		bstrOriginalSoftwareStream = NULL;
 	}
 	catch(HRESULT &eHr)
 	{
