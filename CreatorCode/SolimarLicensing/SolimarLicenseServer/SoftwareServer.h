@@ -16,9 +16,10 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 
 		HRESULT Initialize(KeyServer* pKeyServer, RainbowDriver* pDriver);
 	
-		HRESULT AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
+		HRESULT AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance, long flags);
 		HRESULT RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance);
 		HRESULT GetApplicationInstanceList(long productID, BSTR license_id, BSTR *pBstrListAppInstStream);
+		HRESULT GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs);
 
 		HRESULT ResynchronizeSoftwareLicenses(bool bForceRefresh = false);
 
@@ -26,8 +27,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, BSTR *pBstrVerificationCode);
 		HRESULT EnterLicensePacket(VARIANT vtPasswordPacket, BSTR *pBstrVerificationCode);
 
-		//Licensing functions
-		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
+		//Licensing functions - Ensure that the inuse to the total values are correct
+		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid);
 		
 		
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
@@ -71,6 +72,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
 		// Only for Interal License Servers
 		HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
+		HRESULT GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream);
 
 		HRESULT ValidateToken_ByLicense(BSTR softwareLicense, long validationTokenType, BSTR validationValue);
 
@@ -78,6 +80,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 
 		//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one will create new license file.
 		HRESULT ConvertProtectionKeyToSoftwareLicense(BSTR softwareLicense, BSTR keyIdent);
+
+		HRESULT GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance);
 
 		HRESULT TimesUp();
 		HRESULT CheckHealth(unsigned int timeout);
@@ -99,6 +103,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		bool bFirstTime;
 
 		//variables to help with sending out messages
+		//Pair used to store module ID and expiration date
 		typedef std::pair<int/*ModuleID*/, time_t> ModuleIdToExpirationDate;
 		typedef std::vector<ModuleIdToExpirationDate> ModuleIdToExpirationDateList;
 		struct ProductReminderClass
@@ -109,6 +114,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 			time_t swExpDate;
 			ModuleIdToExpirationDateList modIdToExpDateList;
 		};
+
+		//Map used to store expiration dates of a Product License, index by ProductID
 		typedef std::map<int/*ProductID*/, ProductReminderClass> ProductReminderMap;
 		struct SoftwareLicReminderClass
 		{
@@ -117,6 +124,7 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 			time_t softwareLicReminderClassLastRefresh;
 		};
 
+		//Map used to store expiration dates of a Software License, index by Software License Name
 		std::map<std::wstring/*SW Lic Name*/, SoftwareLicReminderClass> swLicReminderMap;
 		
 
@@ -127,6 +135,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		typedef std::map<_bstr_t, SoftwareLicenseMgr*> SoftwareLicList; //map<_bstr_t(licenseFileName, SoftwareLicenseMgr*>
 
 		SoftwareLicList softwareLicMgrMap; 
+
+		HRESULT ResynchronizeSoftwareLicensesInternal(bool bForceRefresh = false);
 
 		HRESULT ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStream, _bstr_t bstrVerificationCode);
 		HRESULT ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionKey* pKey, _bstr_t bstrVerificationKey, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pLicenseInfoAttribs);
