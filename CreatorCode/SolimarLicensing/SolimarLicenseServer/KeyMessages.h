@@ -85,6 +85,10 @@ static const unsigned int MessageViolationLeave = 40;
 static const unsigned int MessageValidInitialize = 41;
 static const unsigned int MessageGenericError = 42;
 
+//misc
+static const unsigned int MessageClientTimeoutProductAndAppInst = 43;
+
+
 // Do not change the order of these items!!!!
 // Only append items to the end of the list, do not delete or insert items anywhere else!!!!
 // Doing so will cause the lookup numbers above to return the wrong strings.
@@ -113,7 +117,7 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageTempKeyExpiresToday*/ L"Your temporary license expires today.",
 	/*MessageTempKeyExpired*/ L"Your temporary license has expired.",
 	/*MessageTempKeyNotActive*/ L"Key has not been activated.", //"Do you wish to activate the %hd day " "temporary license for this key?"
-	/*MessageTempKeyDecrementing*/ L"Key trial hours has been decremented.",
+	/*MessageTempKeyDecrementing*/ L"Key trial hours have been decremented.",
 
 // entering passwords
 	/*MessagePasswordPermanent*/ L"Password Correct. You now have a permanent license to use this key.",
@@ -161,6 +165,9 @@ static const wchar_t* LicensingMessageStringTable[256] =
 	/*MessageViolationLeave*/ L"%s",
 	/*MessageValidInitialize*/ L"%s",
 	/*MessageGenericError*/ L"%s",
+
+//Misc
+	/*MessageClientTimeoutProductAndAppInst*/ L"%s",
 
 // general errors
 	/*MessageRpcError*/// L"A client has timed out in responding to the key server. That client's licenses are revoked.",
