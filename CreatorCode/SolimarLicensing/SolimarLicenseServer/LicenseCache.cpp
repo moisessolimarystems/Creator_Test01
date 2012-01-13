@@ -105,6 +105,7 @@ HRESULT LicenseCacheByProduct::GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoA
 		{
 			Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInInfo;
 			usAppInInfo.applicationInstance = appInstance;
+			usAppInInfo.usageFlag = (licenseToAppInstFlagsList.find(licenseToModUseListIt->first) != licenseToAppInstFlagsList.end()) ? (Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::TUsageFlag)licenseToAppInstFlagsList[licenseToModUseListIt->first] : Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::ufNone;
 			pProdUsageInfo->appInstanceList->push_back(usAppInInfo);
 			usAppInIt = pProdUsageInfo->appInstanceList->end();
 			usAppInIt--;
@@ -292,7 +293,7 @@ HRESULT LicenseCacheByProduct::ClearCache_Totals()
 	productExpirationDateString = std::wstring(L"1900-01-01 00:00:00.0000");
 	return hr;
 }
-HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR applicationInstance)
+HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR applicationInstance, long flags)
 {
 //wchar_t tmpbuf[1024];
 //swprintf_s(tmpbuf, _countof(tmpbuf), L" LicenseCacheByProduct::AddApplicationInstance() - LicenseID: %s, AppInstance: %s", (wchar_t*)licenseID, (wchar_t*)applicationInstance);
@@ -329,6 +330,7 @@ HRESULT LicenseCacheByProduct::AddApplicationInstance(BSTR licenseID, BSTR appli
 	if(bAddEntry)
 	{
 		licenseToAppInstList[_bstr_t(licenseID,true)] = _bstr_t(applicationInstance,true);
+		licenseToAppInstFlagsList[_bstr_t(licenseID,true)] = flags;
 		hr = S_OK;
 	}
 
@@ -382,6 +384,9 @@ HRESULT LicenseCacheByProduct::RemoveApplicationInstance(BSTR licenseID, BSTR ap
 	if(licAppIt != licenseToAppInstList.end())
 		licenseToAppInstList.erase(licAppIt);
 
+	LicenseToApplicationInstanceFlagsList::iterator licAppFlagsIt = licenseToAppInstFlagsList.find(_bstr_t(licenseID,true));
+	if(licAppFlagsIt != licenseToAppInstFlagsList.end())
+		licenseToAppInstFlagsList.erase(licAppFlagsIt);
 
 	return hr;
 }
@@ -417,6 +422,60 @@ HRESULT LicenseCacheByProduct::GetApplicationInstanceList(BSTR licenseID, BSTR *
 	return hr;
 }
 
+HRESULT LicenseCacheByProduct::GetApplicationInstanceList2(BSTR licenseID, BSTR *pBstrListUsAppInstInfoAttribs)
+{
+//wchar_t tmpbuf[1024];
+//swprintf_s(tmpbuf, 1024, L" LicenseCacheByProduct::GetApplicationInstanceList2() - LicenseID: %s", (wchar_t*)licenseID);
+//OutputDebugString(tmpbuf);
+	HRESULT hr(S_OK);
+	SafeMutex mutex(licenseUseCacheByProductLock);
+
+	std::map<_bstr_t, long> numberOfUniqueAppInstMap;	//key is appInst, value is nothing...
+	// See if appInstance is already in the list... also store flags
+	for(LicenseToApplicationInstanceList::iterator licAppIt = licenseToAppInstList.begin();
+		licAppIt != licenseToAppInstList.end();
+		licAppIt++)
+	{
+		numberOfUniqueAppInstMap[_bstr_t(licAppIt->second, true)] = licenseToAppInstFlagsList.find(_bstr_t(licAppIt->first)) != licenseToAppInstFlagsList.end() ? licenseToAppInstFlagsList[_bstr_t(licAppIt->first)] : 0;	// this structure will store flags
+	}
+
+	Lic_UsAppInstanceInfoAttribsListAttribs list;
+	for(std::map<_bstr_t, long>::iterator uniqueLicAppIt = numberOfUniqueAppInstMap.begin();
+		uniqueLicAppIt != numberOfUniqueAppInstMap.end();
+		uniqueLicAppIt++)
+	{
+//swprintf_s(tmpbuf, 1024, L" LicenseCacheByProduct::GetApplicationInstanceList2() - AppID: %s", (wchar_t*)uniqueLicAppIt->first);
+//OutputDebugString(tmpbuf);
+		Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs usAppInst;
+		usAppInst.applicationInstance = std::wstring(SpdAttribs::WStringObj(uniqueLicAppIt->first));
+		usAppInst.usageFlag = (Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::TUsageFlag)uniqueLicAppIt->second; 
+		list.attrList->push_back(usAppInst);
+	}
+	*pBstrListUsAppInstInfoAttribs = SysAllocString(list.attrList.ToString().c_str());
+//swprintf_s(tmpbuf, 1024, L" LicenseCacheByProduct::GetApplicationInstanceList2() - pBstrListUsAppInstInfoAttribs: %s", (wchar_t*)*pBstrListUsAppInstInfoAttribs);
+//OutputDebugString(tmpbuf);	
+	return hr;
+}
+
+HRESULT LicenseCacheByProduct::GetApplicationInstanceByLicenseID(BSTR licenseID, BSTR *pBstrApplicationInstance)
+{
+	HRESULT hr(S_OK);
+	SafeMutex mutex(licenseUseCacheByProductLock);
+
+	// From a given licenseID, find its appInstanceName
+	LicenseToApplicationInstanceList::iterator licAppIt = licenseToAppInstList.find(_bstr_t(licenseID,true));
+	if(licAppIt == licenseToAppInstList.end())
+	{
+			hr = E_INVALIDARG;	//Unknown Application Instance...
+	}
+	else
+	{
+		*pBstrApplicationInstance = SysAllocString(licAppIt->second);
+	}
+
+	return hr;
+}
+
 HRESULT LicenseCacheByProduct::ModuleLicenseTotalForAll(long moduleIdent, long* pLicenseCount)
 {
 	HRESULT hr(S_OK);
@@ -429,6 +488,7 @@ HRESULT LicenseCacheByProduct::ModuleLicenseTotalForAll(long moduleIdent, long* 
 		*pLicenseCount = 0;
 	return hr;
 }
+
 HRESULT LicenseCacheByProduct::ModuleLicenseInUseForAll(long moduleIdent, long* pLicenseCount)
 {
 	HRESULT hr(S_OK);
@@ -619,7 +679,7 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 				hr = LicenseServerError::EHR_LIC_MOD_NO_FREE_APP_INSTANCE;
 				//hr = E_FAIL;	//Change to custom error...
 				wchar_t errorBuf[1024];
-				swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Product Connections - Licensed: %d, In Use: %d, Amount to Obtain: 1",
+				swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Product Connections - Licensed: %d, In Use: %d, Number to Obtain: 1",
 					wstrModuleName.c_str(),
 					moduleIdent,
 					licensesAppInstanceTotalMap[moduleIdent],
@@ -661,7 +721,7 @@ HRESULT LicenseCacheByProduct::ModuleLicenseObtainByApp(BSTR licenseID, long mod
 			//Not enough licenses for the module
 			hr = LicenseServerError::EHR_LICENSE_INSUFFICIENT;
 			wchar_t errorBuf[1024];
-			swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Amount to Obtain: %d ",
+			swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Number to Obtain: %d ",
 					wstrModuleName.c_str(),
 					moduleIdent,
 					licensesTotalMap[moduleIdent],
@@ -856,13 +916,13 @@ LicenseCache::~LicenseCache()
 	}
 }
 
-HRESULT LicenseCache::AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance)
+HRESULT LicenseCache::AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance, long flags)
 {
 	SafeMutex mutex(licenseUseCacheLock);
 	HRESULT hr(S_OK);
 	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
 	if(prodCacheMapIt != productCacheMap.end())
-		hr = prodCacheMapIt->second->AddApplicationInstance(licenseID, applicationInstance);
+		hr = prodCacheMapIt->second->AddApplicationInstance(licenseID, applicationInstance, flags);
 	else
 		hr = E_INVALIDARG;
 
@@ -907,7 +967,36 @@ HRESULT LicenseCache::GetApplicationInstanceList(long productID, BSTR licenseID,
 		hr = E_INVALIDARG;
 	return hr;
 }
+HRESULT LicenseCache::GetApplicationInstanceList2(long productID, BSTR licenseID, BSTR *pBstrListUsAppInstInfoAttribs)
+{
+	SafeMutex mutex(licenseUseCacheLock);
+	HRESULT hr(S_OK);
+	LicenseCacheByProductMap::iterator prodCacheMapIt = productCacheMap.find(productID);
+	if(prodCacheMapIt != productCacheMap.end())
+		hr = prodCacheMapIt->second->GetApplicationInstanceList2(licenseID, pBstrListUsAppInstInfoAttribs);
+	else
+		hr = E_INVALIDARG;
+	return hr;
+}
+HRESULT LicenseCache::GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance)
+{
+	SafeMutex mutex(licenseUseCacheLock);
+	HRESULT hr(S_OK);
 
+	for(	LicenseCacheByProductMap::iterator prodCacheMapIt= productCacheMap.begin();
+				prodCacheMapIt != productCacheMap.end();
+				prodCacheMapIt++)
+	{
+		hr = prodCacheMapIt->second->GetApplicationInstanceByLicenseID(licenseID, pBstrApplicationInstance);
+		if (SUCCEEDED(hr))
+		{
+			//When you find one, leave loop
+			*pIntProductID = prodCacheMapIt->first;
+			break;
+		}
+	}
+	return hr;
+}
 
 HRESULT LicenseCache::RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation)
 {
