@@ -6,13 +6,19 @@
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
 
+/// <summary>Software Licensing, Cache used to track licensing total/usage on a product level</summary>
 class LicenseCacheByProduct
 {
 	public:
 		LicenseCacheByProduct();
 		~LicenseCacheByProduct();
 
+		//
+		// Summary:
+		//   Summary of GetCache
 		HRESULT GetCache(Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
+
+		/// <summary>Populates an usage object</summary>
 		HRESULT GetUsage(Lic_UsageInfoAttribs::Lic_UsProductInfoAttribs* pProdUsageInfo);
 
 		// bLicSvrClockViolation is true when the current system time is before the last touch time, user has set their system clock backwards in time.
@@ -20,20 +26,38 @@ class LicenseCacheByProduct
 		HRESULT RefreshSoftwareSpec(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pSoftwareSpec);
 		HRESULT ClearCache_Totals();
 
-		//LicenseCacheByProduct(int productID);
+		//
+		// Summary: 
+		//   Add the licenseID and applicationInstance to the LicenseCacheByProduct.
+		//   Returns FAILED(hr) if not licensed for enough applicatinInstances.
+		HRESULT AddApplicationInstance(BSTR licenseID, BSTR applicationInstance, long flags);
 
-		//int GetProductID() {return m_productID;}
-		HRESULT AddApplicationInstance(BSTR licenseID, BSTR applicationInstance);
-
-		//Side Effect: will free all the licenses obtained to the licenseID.
+		// Side Effect: will free all the licenses obtained to the licenseID.
 		HRESULT RemoveApplicationInstance(BSTR licenseID, BSTR applicationInstance);
+
+		// Summary:
+		//   Populates a list of string that are all Application Instances that have modules obtained
+		//   Params: BSTR* pBstrListAppInstStream - streamed value of Lic_StringListAttribs
 		HRESULT GetApplicationInstanceList(BSTR licenseID, BSTR *pBstrListAppInstStream);
+
+		// Summary:
+		//   Populates a list of string that are all Application Instances that have modules obtained
+		//   Params: BSTR* pBstrListUsAppInstInfoAttribs - streamed value of Lic_UsAppInstanceInfoAttribsList
+		HRESULT GetApplicationInstanceList2(BSTR licenseID, BSTR *pBstrListUsAppInstInfoAttribs);
+
+		// Summary:
+		//   Populates a that is the Application Instances that is tied to licenseID
+		//   Params: BSTR* pBstrApplicationInstance
+		//	  Returns: E_INVALIDARG if there is no Application Instance for the given licenseID
+		HRESULT GetApplicationInstanceByLicenseID(BSTR licenseID, BSTR *pBstrApplicationInstance);
 
 		HRESULT ModuleLicenseTotalForAll(long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long moduleIdent, long* pLicenseCount);
 
+		// Ensures that the InUse for modules are less than Total count for entire product regardless of licenseID
+		HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+
 		//Results based on the licenseID.
-		//HRESULT ValidateLicense(BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseObtainByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseReleaseByApp(BSTR licenseID, long moduleIdent, long licenseCount);
 		HRESULT ModuleLicenseDecrementCounterByApp(BSTR licenseID, long moduleIdent, long licenseCount);
@@ -52,14 +76,25 @@ class LicenseCacheByProduct
 		int productMajorVersion;
 		int productMinorVersion;
 
-		typedef std::map<long, long> ModuleLicenseMap;
+		// CR.12672 - For the product licenses that don't get added to the cache because they have expired, use these
+		// variables to track earliest expiration date and type
+		bool bProductUseActivations;
+		time_t productActivationCurrentExpirationDateTimeT;
+		SpdAttribs::WStringAttrib productActivationCurrentExpirationDateString;
+		bool bProductUseProdLicExpirationDate;
+		time_t productExpirationDateTimeT;
+		SpdAttribs::WStringAttrib productExpirationDateString;
+
+		typedef std::map<long, long> ModuleLicenseMap;										// map<long[[modID], long[modInUse]>>
 		typedef std::list<_bstr_t> ApplicationList;                                // list of application names
 		typedef std::map<unsigned int, ApplicationList> ModuleApplicationUseList;	// map of modules and which application instances are associated
 		typedef std::map<_bstr_t, _bstr_t> LicenseToApplicationInstanceList;			// maps license identifier guid to application instance names
+		typedef std::map<_bstr_t, long> LicenseToApplicationInstanceFlagsList;	   // maps license identifier guid to application instance flags
 		typedef std::map<_bstr_t, ModuleLicenseMap> LicenseToModuleUseList;			// maps license identifier guid to modules it is using
 		
 		ModuleApplicationUseList moduleAppInstUseList;			// map<long[modID], list<appInst>> - List of AppInstances for a given modID
 		LicenseToApplicationInstanceList licenseToAppInstList;// map<bstr[licID], bstr[appInst]> - multiple licID can all share the same appInst...
+		LicenseToApplicationInstanceFlagsList licenseToAppInstFlagsList;// map<bstr[licID], long[flag]> - multiple licID can all share the same appInst...
 		LicenseToModuleUseList licenseToModUseList;				// map<bstr[licID], map<long[[modID], long[modInUse]>>
 		
 		ModuleLicenseMap licensesAppInstanceTotalMap;	// map<long[modID], long[appInstForTheModule]>
@@ -80,19 +115,28 @@ class LicenseCacheByProduct
 		HANDLE licenseUseCacheByProductLock;
 };
 
+
+/// <summary>Software Licensing, Cache used to track licensing total/usage for all products</summary>
 class LicenseCache
 {
 	public:
 		LicenseCache();
 		~LicenseCache();
-		HRESULT AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance);
+		HRESULT AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance, long flags);
 
 		
 		//Side Effect: will free all the licenses obtained to the licenseID for a given productID
 		//if productID = -1, remove licenseID from all products
 		HRESULT RemoveApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance);
 		HRESULT GetApplicationInstanceList(long productID, BSTR licenseID, BSTR *pBstrListAppInstStream);
-		
+		HRESULT GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs);
+
+		// Summary:
+		//   Populates a that is the Application Instances and ProductID that is tied to licenseID
+		//   Params: BSTR* pBstrApplicationInstance
+		//           int* pIntProductID
+		//	  Returns: E_INVALIDARG if there is no Application Instance for the given licenseID
+		HRESULT GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance);
 
 		HRESULT RefreshCache(std::list<Lic_PackageAttribs::Lic_LicenseInfoAttribs*>* pLicInfoList, bool bLicSvrClockViolation);
 		HRESULT GetCache_ByProduct(long productID, Lic_PackageAttribs::Lic_ProductInfoAttribs* pProdInfo);
@@ -106,8 +150,10 @@ class LicenseCache
 		HRESULT ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseForAll(long productID, long moduleIdent, long* pLicenseCount);
 
+		//Ensures that the InUse for modules are less than Total count for entire product regardless of licenseID
+		HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
+
 		//Results based on the licenseID.
-		//HRESULT ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pBLicenseValid);
 		HRESULT ModuleLicenseInUseByApp(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseInUseByLicenseID(long productID, BSTR licenseID, long moduleIdent, long* pLicenseCount);
 		HRESULT ModuleLicenseObtainByApp(long productID, BSTR licenseID, long moduleIdent, long licenseCount);
