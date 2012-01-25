@@ -99,11 +99,10 @@ begin
 	endif;   				
 end; 
 
-function RegAsmRegister(svFilePath, svSystemPath, bHasTypeLib)
-	STRING szCmdLine, svRegAsmPath;
+function RegAsmRegister(svRegAsmPath, svFilePath, bHasTypeLib)
+	STRING szCmdLine;
 	NUMBER nvExitCode;
 begin
-	svRegAsmPath = svSystemPath ^ "..\\Microsoft.Net\\Framework\\v2.0.50727\\regasm.exe";
 	LongPathToQuote(svFilePath,TRUE);  
 	if(bHasTypeLib) then
 		szCmdLine = " /tlb /codebase " + svFilePath;
@@ -125,11 +124,10 @@ begin
 	endif;	
 end;   
 
-function RegAsmUnRegister(svFilePath, svSystemPath, bHasTypeLib)
-	STRING svRegAsmPath, svCmdLine;
+function RegAsmUnRegister(svRegAsmPath, svFilePath, bHasTypeLib)
+	STRING svCmdLine;
 	NUMBER nvExitCode;
 begin 
-	svRegAsmPath = svSystemPath ^ "Microsoft.Net\\Framework\\v2.0.50727\\regasm.exe";
 	LongPathToQuote(svFilePath,TRUE); 	
 	if(bHasTypeLib) then		
 		svCmdLine = "/unregister /tlb /codebase " + svFilePath;
