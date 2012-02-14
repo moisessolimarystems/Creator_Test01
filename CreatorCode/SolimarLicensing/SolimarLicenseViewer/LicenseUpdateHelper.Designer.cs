@@ -39,6 +39,8 @@
             this.directoryFindButton = new System.Windows.Forms.Button();
             this.directoryTextBox = new System.Windows.Forms.TextBox();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.displayFilterLabel = new System.Windows.Forms.Label();
+            this.displayFilterComboBox = new System.Windows.Forms.ComboBox();
             this.MainPanel.SuspendLayout();
             this.topHeaderPanel.SuspendLayout();
             this.SuspendLayout();
@@ -101,6 +103,8 @@
             // 
             // topHeaderPanel
             // 
+            this.topHeaderPanel.Controls.Add(this.displayFilterComboBox);
+            this.topHeaderPanel.Controls.Add(this.displayFilterLabel);
             this.topHeaderPanel.Controls.Add(this.refreshButton);
             this.topHeaderPanel.Controls.Add(this.directoryLabelTitle);
             this.topHeaderPanel.Controls.Add(this.directoryFindButton);
@@ -153,6 +157,30 @@
             this.directoryTextBox.TabIndex = 0;
             this.directoryTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.directoryTextBox_KeyDown);
             // 
+            // displayFilterLabel
+            // 
+            this.displayFilterLabel.AutoSize = true;
+            this.displayFilterLabel.Location = new System.Drawing.Point(153, 35);
+            this.displayFilterLabel.Name = "displayFilterLabel";
+            this.displayFilterLabel.Size = new System.Drawing.Size(32, 13);
+            this.displayFilterLabel.TabIndex = 7;
+            this.displayFilterLabel.Text = "Filter:";
+            this.displayFilterLabel.Visible = false;
+            // 
+            // displayFilterComboBox
+            // 
+            this.displayFilterComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.displayFilterComboBox.FormattingEnabled = true;
+            this.displayFilterComboBox.Items.AddRange(new object[] {
+            "All Packets",
+            "Packets for License Server"});
+            this.displayFilterComboBox.Location = new System.Drawing.Point(191, 32);
+            this.displayFilterComboBox.Name = "displayFilterComboBox";
+            this.displayFilterComboBox.Size = new System.Drawing.Size(191, 21);
+            this.displayFilterComboBox.TabIndex = 8;
+            this.displayFilterComboBox.Visible = false;
+            this.displayFilterComboBox.SelectedIndexChanged += new System.EventHandler(this.displayFilterComboBox_SelectedIndexChanged);
+            // 
             // LicenseUpdateHelper
             // 
             this.AcceptButton = null;
@@ -185,6 +213,8 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button refreshButton;
         private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ComboBox displayFilterComboBox;
+        private System.Windows.Forms.Label displayFilterLabel;
 
 
     }

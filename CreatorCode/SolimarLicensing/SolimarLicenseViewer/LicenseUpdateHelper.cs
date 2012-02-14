@@ -40,6 +40,10 @@ namespace SolimarLicenseViewer
         private System.Collections.Generic.Dictionary<string, Solimar.Licensing.Attribs.Lic_PackageAttribs> m_newSwLicPackageHash = new Dictionary<string, Solimar.Licensing.Attribs.Lic_PackageAttribs>();
         private System.Collections.Generic.Dictionary<string, string> m_newSwLicFileNameHash = new Dictionary<string,string>();
         #endregion
+
+        private const int FILTER_ALL = 0;
+        private const int FILTER_LICENSE_SERVER = 1;
+
         public LicenseUpdateHelper()
         {
             InitializeComponent();
@@ -59,6 +63,7 @@ namespace SolimarLicenseViewer
             m_CommLink = _commLink;
             m_LicUpdateHelperData = _data;
             directoryTextBox.Text = m_LicUpdateHelperData.directory;
+            bool bShowFilter = false;
             string caption = "";
             switch (m_LicUpdateHelperData.action)
             {
@@ -67,9 +72,11 @@ namespace SolimarLicenseViewer
                     break;
                 case LicenseUpdateActionEnum.luaeImportNewLicPackage:
                     caption = "Add new Software License from License Package";
+                    bShowFilter = true;
                     break;
                 case LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage:
                     caption = "Update current Software License from License Package";
+                    bShowFilter = true;
                     break;
                 case LicenseUpdateActionEnum.luaeImportNewKeyPasswordPackage:
                     caption = "Apply Protection Key Password Package";
@@ -78,6 +85,10 @@ namespace SolimarLicenseViewer
                     caption = "Unknown";
                     break;
             }
+            displayFilterLabel.Visible = bShowFilter;
+            displayFilterComboBox.Visible = bShowFilter;
+            
+
             this.Text = caption;
 
             //Populate m_existingSwLicHash
@@ -101,8 +112,10 @@ namespace SolimarLicenseViewer
                     m_existingSwLicInfoHash.Add(softwareLicense, licInfoAttrib);
             }
 
-
-            RefreshLicenseListView();
+            if (bShowFilter)
+                displayFilterComboBox.SelectedIndex = FILTER_LICENSE_SERVER;
+            else
+                RefreshLicenseListView();
             licSelectionListView_SelectedIndexChanged(licSelectionListView, new EventArgs());
         }
 
@@ -125,12 +138,25 @@ namespace SolimarLicenseViewer
                 this.Cursor = Cursors.WaitCursor;
                 if (licSelectionListView.SelectedItems.Count == 0)
                     throw new ArgumentException();
-                string softwareLicense = licSelectionListView.SelectedItems[0].Text;
+                
+                Byte[] licBytes = null;
+                if ((displayFilterComboBox.Visible) &&
+                    (displayFilterComboBox.SelectedIndex == FILTER_ALL) &&
+                    ((m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage) || (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)))
+                {
+                    
+                    licBytes = System.IO.File.ReadAllBytes(System.IO.Path.Combine(this.directoryTextBox.Text, licSelectionListView.SelectedItems[0].Text));
+                }
+                else
+                {
+                    string softwareLicense = licSelectionListView.SelectedItems[0].Text;
+                    if (m_newSwLicFileNameHash.ContainsKey(softwareLicense) == false)
+                        throw new ArgumentException();
 
-                if (m_newSwLicFileNameHash.ContainsKey(softwareLicense) == false)
-                    throw new ArgumentException();
+                    licBytes = System.IO.File.ReadAllBytes(m_newSwLicFileNameHash[softwareLicense]);
+                }
 
-                Byte[] licBytes = System.IO.File.ReadAllBytes(m_newSwLicFileNameHash[softwareLicense]);
+                
                 string verificationCode = "";
                 bool bDisplayReturnDiagnosticData = false;
                 using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
@@ -243,133 +269,266 @@ namespace SolimarLicenseViewer
                         {
                             licSelectionListView.BeginUpdate();
                             licSelectionListView.Items.Clear();
+                            licSelectionListView.Columns.Clear();
+
                             m_newSwLicPackageHash.Clear();
                             m_newSwLicFileNameHash.Clear();
 
                             string[] fileEntries = System.IO.Directory.GetFiles(directoryTextBox.Text, ext);
-                            foreach (string fileName in fileEntries)
+                            #region Display All Files
+
+                            if ((displayFilterComboBox.Visible) &&
+                                (displayFilterComboBox.SelectedIndex == FILTER_ALL) &&
+                                ((m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage) || (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)))
                             {
-                                try
+                                List<ListViewItem> lviList = new List<ListViewItem>();
+
+                                licSelectionListView.Columns.AddRange(new ColumnHeader[] { 
+                                    new ColumnHeader() { Text = "Filename" },
+                                    new ColumnHeader() { Text = "Software License" },
+                                    new ColumnHeader() { Text = "Modified Date" },
+                                    new ColumnHeader() { Text = "Status" },
+                                });
+
+                                foreach (string fileName in fileEntries)
                                 {
-                                    Byte[] licPktBytes = System.IO.File.ReadAllBytes(fileName);
-                                    string licStream = "";
-                                    if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage ||
-                                        m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
+                                    ListViewItem lvi = new ListViewItem(System.IO.Path.GetFileName(fileName));
+                                    lvi.Tag = true;
+                                    lvi.SubItems.Add("");
+                                    lvi.SubItems.Add("");
+                                    lvi.SubItems.Add("");
+                                    string errorMsg = string.Empty;
+                                    try
                                     {
-                                        m_CommLink.GenerateLicPackage_BySoftwareLicPacket(licPktBytes, ref licStream);
-                                    }
-                                    else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
-                                    {
-                                        m_CommLink.GenerateLicPackage_BySoftwareLicArchive(licPktBytes, ref licStream);
-                                    }
+                                        Byte[] licPktBytes = System.IO.File.ReadAllBytes(fileName);
 
-                                    Solimar.Licensing.Attribs.Lic_PackageAttribs tmpLicPackageAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs();
-                                    tmpLicPackageAttrib.AssignMembersFromStream(licStream);
-                                    string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicPackageAttrib.licLicenseInfoAttribs);
-
-                                    bool bAddItem = false;
-                                    if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage)
-                                    {
-                                        bAddItem = (m_existingSwLicInfoHash.ContainsKey(softwareLicense) == false);
-                                    }
-                                    else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
-                                    {
-                                        bAddItem = true;
-                                    }
-                                    else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
-                                    {
-                                        bAddItem = (m_existingSwLicInfoHash.ContainsKey(softwareLicense) == true);
-                                    }
-                                    else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewKeyPasswordPackage)
-                                    {
-                                        bAddItem = true;
-                                    }
-                                    //System.Diagnostics.Trace.WriteLine(softwareLicense + ", " + tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString());
-
-                                    if (bAddItem)
-                                    {
-                                        if (m_newSwLicPackageHash.ContainsKey(softwareLicense) == false)
+                                        string licStream = "";
+                                        if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage ||
+                                            m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
                                         {
-                                            m_newSwLicPackageHash.Add(softwareLicense, tmpLicPackageAttrib);
-                                            m_newSwLicFileNameHash.Add(softwareLicense, fileName);
+                                            m_CommLink.GenerateLicPackage_BySoftwareLicPacket(licPktBytes, ref licStream);
                                         }
-                                        else
+                                        else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
                                         {
-                                            if (DateTime.Compare(tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal, m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal) > 0)
+                                            m_CommLink.GenerateLicPackage_BySoftwareLicArchive(licPktBytes, ref licStream);
+                                        }
+
+                                        licPktBytes = null;
+
+                                        Solimar.Licensing.Attribs.Lic_PackageAttribs tmpLicPackageAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs();
+                                        tmpLicPackageAttrib.AssignMembersFromStream(licStream);
+                                        string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicPackageAttrib.licLicenseInfoAttribs);
+
+                                        lvi.SubItems[1].Text = softwareLicense;
+                                        lvi.SubItems[2].Text = tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString();
+                                        lvi.SubItems[3].Text = "Found";
+
+                                        foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs verToken in tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
+                                        {
+                                            //if validation token is computer, only add if computer name is correct.
+                                            //if validation token is hardware id, add, but show in red and don't allow selection if key is not on system.
+                                            if ((verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName) ||
+                                                (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID))
                                             {
-                                                m_newSwLicPackageHash[softwareLicense] = tmpLicPackageAttrib;
-                                                m_newSwLicFileNameHash[softwareLicense] = fileName;
+                                                if ((verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName))
+                                                {
+                                                    
+                                                    if (string.Compare(m_CommLink.ServerName, verToken.tokenValue.TVal, true) != 0)
+                                                    {
+                                                        errorMsg = "Validation Failed: License Package can only be applied to Server: " + verToken.tokenValue.TVal.ToString() + ".";
+                                                    }
+                                                }
+                                                else if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                                                {
+                                                    errorMsg = "Validation Failed: License Package requires Validation Key " + verToken.tokenValue.TVal.ToString() + " on License Server, key was not found.";
+                                                    foreach (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo in m_CommLink.KeyEnumerate())
+                                                    {
+                                                        if (string.Compare(keyInfo.keyName, verToken.tokenValue.TVal.ToString(), true) == 0)
+                                                        {
+                                                            errorMsg = string.Empty;
+                                                        }
+                                                    }
+                                                }
+
+                                                if (string.IsNullOrEmpty(errorMsg))
+                                                {
+                                                    if ((m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage) &&
+                                                        (m_existingSwLicInfoHash.ContainsKey(softwareLicense)))
+                                                    {
+                                                        errorMsg = string.Format("Can't Import : Use Option \"Update existing license from License Packet\"");
+                                                    }
+                                                    else if ((m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage) &&
+                                                        (!m_existingSwLicInfoHash.ContainsKey(softwareLicense)))
+                                                    {
+                                                        errorMsg = string.Format("Can't Update: Use Option \"Import new license from License Packet\"");
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                    continue;
-                                }
-                            }
 
-
-                            foreach (string softwareLicense in m_newSwLicPackageHash.Keys)
-                            {
-                                bool bAddToDisplay = true;
-                                ListViewItem lvi = new ListViewItem(softwareLicense);
-
-                                lvi.Tag = true;
-                                lvi.SubItems.Add(m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString());
-                                string validation = "Found";
-                                foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs verToken in m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
-                                {
-                                    //if validation token is computer, only add if computer name is correct.
-                                    //if validation token is hardware id, add, but show in red and don't allow selection if key is not on system.
-                                    if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName)
-                                    {
-                                        bAddToDisplay = string.Compare(m_CommLink.ServerName, verToken.tokenValue.TVal, true) == 0;
-                                    }
-                                    else if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
-                                    {
-                                        lvi.Tag = false;
-                                        lvi.ForeColor = System.Drawing.Color.Red;
-                                        string licenseType = "";
-                                        if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
-                                            licenseType = "License Archive";
-                                        else
-                                            licenseType = "License Package";
-
-                                        validation = "Validation Failed: " + licenseType + " requires Validation Key " + verToken.tokenValue.TVal.ToString() + " on License Server, key was not found.";
-                                        foreach (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo in m_CommLink.KeyEnumerate())
+                                        if (m_existingSwLicInfoHash.ContainsKey(softwareLicense))
                                         {
-                                            if (string.Compare(keyInfo.keyName, verToken.tokenValue.TVal.ToString(), true) == 0)
+                                            if (DateTime.Compare(m_existingSwLicInfoHash[softwareLicense].modifiedDate.TVal, tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal) >= 0)
                                             {
-                                                validation = "Found";
-                                                lvi.ForeColor = System.Drawing.SystemColors.WindowText;
-                                                lvi.Tag = true;
+                                                errorMsg = "Validation Failed: License Package has already been applied to License Server.";
                                             }
                                         }
+                                        tmpLicPackageAttrib = null;
                                     }
-                                }
 
-                                if (m_existingSwLicInfoHash.ContainsKey(softwareLicense))
-                                {
-                                    if (DateTime.Compare(m_existingSwLicInfoHash[softwareLicense].modifiedDate.TVal, m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal) >= 0)
+                                    catch (Exception ex)
                                     {
-                                        string licenseType = "";
-                                        if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
-                                            licenseType = "License Archive";
-                                        else
-                                            licenseType = "License Package";
-                                        validation = "Validation Failed: " + licenseType + " has already been applied to License Server.";
+                                        errorMsg = ex.Message;
+                                        continue;
+                                    }
+                                    if (!string.IsNullOrEmpty(errorMsg))
+                                    {
+                                        lvi.SubItems[3].Text = errorMsg;
                                         lvi.Tag = false;
                                         lvi.ForeColor = System.Drawing.Color.Red;
                                     }
+                                    lviList.Add(lvi);
                                 }
 
-                                lvi.SubItems.Add(validation);
-                                if (bAddToDisplay)
+                                licSelectionListView.Items.AddRange(lviList.ToArray());
+                            }
+                            #endregion
+                            #region Display only for this License Server
+                            else
+                            {
+                                licSelectionListView.Columns.AddRange(new ColumnHeader[] { 
+                                    new ColumnHeader() { Text = "Software License" },
+                                    new ColumnHeader() { Text = "Modified Date" },
+                                    new ColumnHeader() { Text = "Status" },
+                                });
+
+                                foreach (string fileName in fileEntries)
                                 {
-                                    licSelectionListView.Items.Add(lvi);
+                                    try
+                                    {
+                                        Byte[] licPktBytes = System.IO.File.ReadAllBytes(fileName);
+                                        string licStream = "";
+                                        if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage ||
+                                            m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
+                                        {
+                                            m_CommLink.GenerateLicPackage_BySoftwareLicPacket(licPktBytes, ref licStream);
+                                        }
+                                        else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
+                                        {
+                                            m_CommLink.GenerateLicPackage_BySoftwareLicArchive(licPktBytes, ref licStream);
+                                        }
+
+
+                                        Solimar.Licensing.Attribs.Lic_PackageAttribs tmpLicPackageAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs();
+                                        tmpLicPackageAttrib.AssignMembersFromStream(licStream);
+                                        string softwareLicense = Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicPackageAttrib.licLicenseInfoAttribs);
+
+                                        //bool bAddItem = true;
+                                        bool bAddItem = false;
+                                        if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage)
+                                        {
+                                            bAddItem = (m_existingSwLicInfoHash.ContainsKey(softwareLicense) == false);
+                                        }
+                                        else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
+                                        {
+                                            bAddItem = true;
+                                        }
+                                        else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
+                                        {
+                                            bAddItem = (m_existingSwLicInfoHash.ContainsKey(softwareLicense) == true);
+                                        }
+                                        else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewKeyPasswordPackage)
+                                        {
+                                            bAddItem = true;
+                                        }
+
+                                        //System.Diagnostics.Trace.WriteLine(softwareLicense + ", " + tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString());
+
+                                        if (bAddItem)
+                                        {
+                                            if (m_newSwLicPackageHash.ContainsKey(softwareLicense) == false)
+                                            {
+                                                m_newSwLicPackageHash.Add(softwareLicense, tmpLicPackageAttrib);
+                                                m_newSwLicFileNameHash.Add(softwareLicense, fileName);
+                                            }
+                                            else
+                                            {
+                                                if (DateTime.Compare(tmpLicPackageAttrib.licLicenseInfoAttribs.TVal.modifiedDate.TVal, m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal) > 0)
+                                                {
+                                                    m_newSwLicPackageHash[softwareLicense] = tmpLicPackageAttrib;
+                                                    m_newSwLicFileNameHash[softwareLicense] = fileName;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception)
+                                    {
+                                        continue;
+                                    }
+                                }
+
+
+                                foreach (string softwareLicense in m_newSwLicPackageHash.Keys)
+                                {
+                                    bool bAddToDisplay = true;
+                                    ListViewItem lvi = new ListViewItem(softwareLicense);
+
+                                    lvi.Tag = true;
+                                    lvi.SubItems.Add(m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal.ToLocalTime().ToString());
+                                    string validation = "Found";
+                                    foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs verToken in m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
+                                    {
+                                        //if validation token is computer, only add if computer name is correct.
+                                        //if validation token is hardware id, add, but show in red and don't allow selection if key is not on system.
+                                        if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName)
+                                        {
+                                            bAddToDisplay = string.Compare(m_CommLink.ServerName, verToken.tokenValue.TVal, true) == 0;
+                                        }
+                                        else if (verToken.tokenType == Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                                        {
+                                            lvi.Tag = false;
+                                            lvi.ForeColor = System.Drawing.Color.Red;
+                                            string licenseType = "";
+                                            if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
+                                                licenseType = "License Archive";
+                                            else
+                                                licenseType = "License Package";
+
+                                            validation = "Validation Failed: " + licenseType + " requires Validation Key " + verToken.tokenValue.TVal.ToString() + " on License Server, key was not found.";
+                                            foreach (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo keyInfo in m_CommLink.KeyEnumerate())
+                                            {
+                                                if (string.Compare(keyInfo.keyName, verToken.tokenValue.TVal.ToString(), true) == 0)
+                                                {
+                                                    validation = "Found";
+                                                    lvi.ForeColor = System.Drawing.SystemColors.WindowText;
+                                                    lvi.Tag = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (m_existingSwLicInfoHash.ContainsKey(softwareLicense))
+                                    {
+                                        if (DateTime.Compare(m_existingSwLicInfoHash[softwareLicense].modifiedDate.TVal, m_newSwLicPackageHash[softwareLicense].licLicenseInfoAttribs.TVal.modifiedDate.TVal) >= 0)
+                                        {
+                                            string licenseType = "";
+                                            if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
+                                                licenseType = "License Archive";
+                                            else
+                                                licenseType = "License Package";
+                                            validation = "Validation Failed: " + licenseType + " has already been applied to License Server.";
+                                            lvi.Tag = false;
+                                            lvi.ForeColor = System.Drawing.Color.Red;
+                                        }
+                                    }
+
+                                    lvi.SubItems.Add(validation);
+                                    if (bAddToDisplay)
+                                    {
+                                        licSelectionListView.Items.Add(lvi);
+                                    }
                                 }
                             }
+                            #endregion
                         }
                         catch (Exception)
                         {
@@ -397,6 +556,11 @@ namespace SolimarLicenseViewer
                 bEnable = (licSelectionListView.SelectedItems[0].Tag is bool) && (((bool)licSelectionListView.SelectedItems[0].Tag) == true);
 
             btnOk.Enabled = bEnable;
+        }
+
+        private void displayFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RefreshLicenseListView();
         }
 
     }
