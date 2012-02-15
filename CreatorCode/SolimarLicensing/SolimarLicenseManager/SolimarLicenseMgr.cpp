@@ -15,6 +15,7 @@
 #include "..\SolimarLicenseServer\KeyMessages.h"
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_GenericAttribs.h"
+#include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"   //For Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::TUsageFlag
 #include "..\Common\SoftwareSpecInstance.h"	//ForGlobalSoftwareSpec::GlobalSoftwareSpec & g_pSoftwareSpec
 #include "resource.h"
 #include <string>
@@ -619,6 +620,8 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 				m_product = Lic_PackageAttribs::pid_TestDevSOLitrack;
 			else if(m_product == Lic_PackageAttribs::pid_LibraryServices)
 				m_product = Lic_PackageAttribs::pid_TestDevLibraryServices;
+			else if(m_product < 100) //Default Case, currently all products are below 100, and test/dev for a given product is product# + 100
+				m_product += 100;
 			
 		}
 		bConnectedToAtleastOneComputer = true;
@@ -1098,13 +1101,16 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 
 //OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Pre");
 		hr = RefreshLicenses();
-		if(FAILED(hr) && m_backupServers.size() > 0)
-		{
-			m_bUsingBackupServers = true;
-			hr = RefreshLicenses(); //try to use backup license server.
-			if(FAILED(hr))	//if backup failed, use primary and log the error.
-				m_bUsingBackupServers = false;
-		}
+
+		//CR.FIX.15778 - If can't successfully initialize against primary server for any reason, don't 
+		//try to initialize against backup.
+		//if(FAILED(hr) && m_backupServers.size() > 0)
+		//{
+		//	m_bUsingBackupServers = true;
+		//	hr = RefreshLicenses(); //try to use backup license server.
+		//	if(FAILED(hr))	//if backup failed, use primary and log the error.
+		//		m_bUsingBackupServers = false;
+		//}
 //OutputDebugString(L"CSolimarLicenseMgr::Initialize3 - RefreshLicenses() - Post");
 
 		//if(!m_bConfiguredForSoftwareLicense)
@@ -1253,7 +1259,10 @@ void CSolimarLicenseMgr::InternalCalculateLegacyProtectionKeyInfo(long _productI
 			m_productKeyID = Lic_PackageAttribs::pid_LibraryServices;
 			break;
 		default:
-			m_productKeyID = _productID;
+			if(_productID >= 100) //Default Case, currently all products are below 100, and test/dev for a given product is product# + 100
+				m_productKeyID -= 100;
+			else
+				m_productKeyID = _productID;
 			break;
 	}
 
@@ -2622,7 +2631,7 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 				if (	Version::ModuleVersion(prodAttribs.product_Major, prodAttribs.product_Minor, prodAttribs.product_SubMajor, prodAttribs.product_SubMinor) >= 
 						(Version::ModuleVersion(m_prod_ver_major, m_prod_ver_minor, 0, 0)))
 				{
-					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, _bLogError);
+					hr = AssociateAppInstanceToSoftwareServer(&(serverIt->second), m_applicationInstance, m_bUsingBackupServers, _bLogError);
 					if(SUCCEEDED(hr))
 						bFoundProductAndVersion = true;
 
@@ -4256,15 +4265,22 @@ HRESULT CSolimarLicenseMgr::RemoveObsoleteKeysFromCache()
 	return S_OK;
 }
 
-
-
 //Software server
-HRESULT CSolimarLicenseMgr::AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError)
+HRESULT CSolimarLicenseMgr::AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bFailOver, bool bLogError)
 {
 	HRESULT hr(S_OK);
 	if(!m_bViewLicenseOnly && pServerInfo != NULL)
 	{
-		SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareAddApplicationInstanceByProduct, (m_product, appInstance), hr);
+		try
+		{
+			SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr2, (*pServerInfo), SoftwareAddApplicationInstanceByProduct2, (m_product, appInstance, bFailOver ? Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::ufUseFailoverLic : Lic_UsageInfoAttribs::Lic_UsAppInstanceInfoAttribs::ufUsePrimaryLic), hr);
+		}
+		catch(HRESULT &eHr)
+		{
+			hr = eHr;
+			if(hr == E_NOINTERFACE) //ISolimarSoftwareLicenseSvr2 doesn't exist, call the older interface.
+				SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), SoftwareAddApplicationInstanceByProduct, (m_product, appInstance), hr);
+		}
 	}
 	return hr;
 }
@@ -4335,7 +4351,7 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 								wstrModuleName = modSpecIt->second.moduleName;
 						}
 						wchar_t errorBuf[1024];
-						swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Amount to Obtain: %d",
+						swprintf_s(errorBuf, _countof(errorBuf), L"Module: %s (%d) - Licensed: %d, In Use: %d, Number to Obtain: %d",
 							wstrModuleName.c_str(),
 							module_id,
 							totalLicense,
@@ -4622,7 +4638,7 @@ void CSolimarLicenseMgr::StartGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = time(NULL);
       }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_WARNING, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
 	}
 }
 void CSolimarLicenseMgr::StopGracePeriod()
@@ -4634,7 +4650,7 @@ void CSolimarLicenseMgr::StopGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = 0;
 	   }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_WARNING, 0, MessageGracePeriodEnded);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0, MessageGracePeriodEnded);
 	}
 }
 
