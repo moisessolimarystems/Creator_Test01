@@ -10,21 +10,27 @@ namespace Shared.VisualComponents
         // Display either the full column header or entire data, which ever is bigger
         static public void ResizeListViewHeadersToMaxOfDataAndHeader(ListView _listView)
         {
-            if (_listView != null)
+            if (_listView != null && Application.RenderWithVisualStyles)
             {
+                //Will resize to the larger of headers or content
                 _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-                List<int> headerMinSize = new List<int>();
-                for (int colIdx = 0; colIdx < _listView.Columns.Count; colIdx++)
-                    headerMinSize.Add((_listView.Columns[colIdx].Text!=string.Empty) ? _listView.Columns[colIdx].Width : 0);
-                _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                for (int colIdx = 0; colIdx < _listView.Columns.Count; colIdx++)
-                {
-                    if (headerMinSize[colIdx] == 0)
-                        _listView.Columns[colIdx].Width = 0;
-                    else if (headerMinSize[colIdx] > _listView.Columns[colIdx].Width)
-                        _listView.Columns[colIdx].Width = headerMinSize[colIdx];
-                }
             }
+            else if (_listView != null)
+            {
+                //Only do this if the OS has the directional carrot after the column words
+                //Such as XP or Server OS's.  Should be able to look at visual style render.
+                int padWidth = TextRenderer.MeasureText(" ", _listView.Font).Width * 4;
+                //System.Diagnostics.Trace.WriteLine(string.Format("PadWith: {0}", padWidth));
+                List<int> colContentSizeList = new List<int>();
+                _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                foreach (ColumnHeader cHeader in _listView.Columns)
+                    colContentSizeList.Add(cHeader.Width);
+
+                _listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                for (int idx = 0; idx < _listView.Columns.Count; idx++)
+                    _listView.Columns[idx].Width = Math.Max(colContentSizeList[idx], _listView.Columns[idx].Width + padWidth);
+            }
+            return;
         }
 
         static public void ListView_KeyDown(object sender, KeyEventArgs e)
