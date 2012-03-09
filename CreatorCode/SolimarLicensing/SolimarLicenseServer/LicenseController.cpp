@@ -5,6 +5,7 @@
 #include "LicenseController.h"
 #include "..\common\LicenseError.h"
 #include "..\common\TimeHelper.h"
+#include "..\common\LicAttribsCPP\Lic_PackageAttribsHelper.h"
 
 void LicenseController::CheckHealthThreadFunction(void* pvThis)
 {
@@ -53,6 +54,9 @@ LicenseController::LicenseController() :
 
 	_tzset();
 
+	//CR.FIX.14360 - Delay the usb notification until after the class member finish initializing.
+	this->StartUSBNotification();
+
 	//keyserver.Initialize(this.d);
 
 	//this.keyserver.Initialize(&this.driver);
@@ -66,6 +70,7 @@ LicenseController::LicenseController() :
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod, InitTimerThreadCB, this);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod, InitTimerThreadCB, this);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod, InitTimerThreadCB, this);
+	
 	//UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
 	//HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
 	//TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod);
@@ -89,6 +94,11 @@ LicenseController::LicenseController() :
 	UpdateKeysThread->RevEnable(10, 30, 20);
 
 	UpdateKeysThread->Invoke();
+
+	//CR.FIX.15863 - Packet creation date returns incorrect value - Use Invoke on the thread to force function call.
+	//CR.FIX.15850 - Update the last touch date on service startup, fixes the problem that is takes 1 minute before the TimesUpThread fires, and an activation being used in that time
+	//period leading to the wrong new expiration date being calculated.
+	TimesUpThread->Invoke();
 }
 
 // APCTimerInitialize()
@@ -251,57 +261,62 @@ void LicenseController::GenerateMessageInternal(const wchar_t* license_source, b
 		_snwprintf_s(event_log_msg, sizeof(event_log_msg)/sizeof(wchar_t), MAX_MESSAGE_SIZE, L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\n\r\nLicense: %s\r\n%08x %s\r\n\r\n%s",
 			license_source,
 			error,
-			str_error_message,
+			(wchar_t*)str_error_message,
 			message);
 		break;
 	}
 	
 	unsigned int event_type = EVENTLOG_INFORMATION_TYPE;
-	if (error & 0x8000000) 
+	if (message_type == MT_ERROR) 
 		event_type = EVENTLOG_ERROR_TYPE;
 	else if(message_type == MT_WARNING)
 		event_type = EVENTLOG_WARNING_TYPE;
-	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID);
+	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID, productID);
 	
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
 	
-	try
+	//CR.FIX.13371 - Don't pass MessageClientTimeout message back to the various License Managers.
+	// Software style Messages use a MessageGeneric, so can't filter those messages the same way.
+	if(MessageLookupID != MessageClientTimeout)
 	{
-		if(bGenerateSoftwareLicMsg)
+		try
 		{
-			LicensingSoftwareMessage softwareLicMsg(
-				std::wstring(server_host_name), 
-				std::wstring(license_source), 
-				productID,
-				message_type,
-				MessageLookupID, 
-				vtTimestamp, 
-				std::wstring(message), 
-				error);
-			for (SoftwareMessageClientList::iterator clientIt = message_software_clients.begin(); clientIt != message_software_clients.end(); ++clientIt)
+			if(bGenerateSoftwareLicMsg)
 			{
-				clientIt->second.push_back(softwareLicMsg);
+				LicensingSoftwareMessage softwareLicMsg(
+					std::wstring(server_host_name), 
+					std::wstring(license_source), 
+					productID,
+					message_type,
+					MessageLookupID, 
+					vtTimestamp, 
+					std::wstring(message), 
+					error);
+				for (SoftwareMessageClientList::iterator clientIt = message_software_clients.begin(); clientIt != message_software_clients.end(); ++clientIt)
+				{
+					clientIt->second.push_back(softwareLicMsg);
+				}
+			}
+			else	//Generate a standard Licensing Message
+			{
+				//xxx might need to make this asynchronous
+				//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
+				//zzz add message to the message lists for all clients
+				//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
+				LicensingMessage m(std::wstring(server_host_name), std::wstring(license_source), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
+				for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
+				{
+					c->second.push_back(m);
+					//xxx make sure that the message backlog is not excessive.
+					//xxx if it is, cull some of the older messages
+				}
 			}
 		}
-		else	//Generate a standard Licensing Message
+		catch (_com_error &e)
 		{
-			//xxx might need to make this asynchronous
-			//yyy client->second->DispatchLicenseMessage(_bstr_t(key_ident), message_type, error, vtTimestamp, _bstr_t(message));
-			//zzz add message to the message lists for all clients
-			//xxx need to pass in the message id that indicates which message this is (eg. "trial key expired" "cannot write to key", etc.)
-			LicensingMessage m(std::wstring(server_host_name), std::wstring(license_source), vtTimestamp, message_type, MessageLookupID, std::wstring(message), error, 0, _variant_t(0.0,VT_DATE), 0);
-			for (MessageClientList::iterator c = message_clients.begin(); c != message_clients.end(); ++c)
-			{
-				c->second.push_back(m);
-				//xxx make sure that the message backlog is not excessive.
-				//xxx if it is, cull some of the older messages
-			}
+			e.Error();
 		}
-	}
-	catch (_com_error &e)
-	{
-		e.Error();
 	}
 }
 
@@ -392,7 +407,6 @@ HRESULT LicenseController::CheckHealth()
 		LicenseServerError::WriteEventLog(event_log_msg, EVENTLOG_ERROR_TYPE, MessageGenericError);
 		ExitProcess(hr);
 	}
-
 	return hr;
 }
 
@@ -419,15 +433,39 @@ void LicenseController::HeartbeatCheck()
 
 		if (heartbeat->second + HeartbeatKillClientPeriod < cur_time)
 		{
-			//xxx debug
-			wchar_t debug_buf[1024];
-			//_snwprintf(debug_buf, 1024, L"LicenseServerError::EHR_CLIENT_TIMEOUT (%s) (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (BSTR)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			//_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT  (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - LicenseID: %s - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (wchar_t*)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
-			debug_buf[1023] = 0;
-			OutputDebugStringW(debug_buf);
 
-			GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
+			int productID = 0;
+			BSTR bstrAppInstance = NULL;
+			hr = softwareServer.GetProductIdAndApplicationInstanceByLicenseID(
+				heartbeat->first, //LicenseID
+				&productID,
+				&bstrAppInstance);
+
+			if (SUCCEEDED(hr))
+			{
+				std::wstring wstrProductName = Lic_PackageAttribsHelper::GetProductName(&(g_pSoftwareSpec->GetSoftwareSpec()), productID);
+
+				//xxx debug
+				//wchar_t debug_buf[1024];
+				//_snwprintf_s(debug_buf, sizeof(debug_buf)/sizeof(wchar_t), L"LicenseServerError::EHR_CLIENT_TIMEOUT - LicenseID: %s - (heartbeat->second %d + HeartbeatKillClientPeriod %d < cur_time %d)", (wchar_t*)heartbeat->first, heartbeat->second, HeartbeatKillClientPeriod, cur_time);
+				//debug_buf[1023] = 0;
+				//OutputDebugStringW(debug_buf);
+
+				wchar_t tmp_buf[1024];
+				_snwprintf_s(tmp_buf, sizeof(tmp_buf)/sizeof(wchar_t), L"Product: %s, Product Connection: %s, has timed out in responding to the license server. That client's licenses are revoked.", wstrProductName.c_str(), (wchar_t*)bstrAppInstance);
+				tmp_buf[1023] = 0;
+				OutputDebugStringW(tmp_buf);
+				GenerateSoftwareLicenseMessage(L"", productID, MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeoutProductAndAppInst, tmp_buf);
+
+				// Clean up
+				SysFreeString(bstrAppInstance);
+				bstrAppInstance = NULL;
+			}
+			else
+			{
+				// For Legacy
+				GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
+			}
 						
 			hr = RemoveFromNotification(heartbeat->first);
 		}
