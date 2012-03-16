@@ -649,6 +649,7 @@ namespace Client.Creator
                 });
             }
         }
+
         private void RemoveDeprecatedModules(LicenseVersion version, List<ModuleTable> dbModuleList)
         {
             Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec = null;
@@ -1106,7 +1107,7 @@ namespace Client.Creator
 
         public bool CanIncrementModule(Module module)
         {
-            return GetAvailableModuleUnits(module, 0) > 0 && !_commLink.IsDefaultModule(ProductID, module.ID);
+            return GetAvailableModuleUnits(module) > 0 && !_commLink.IsDefaultModule(ProductID, module.ID);
         }
 
         public bool CanDecrementModule(Module module)
