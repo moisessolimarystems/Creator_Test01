@@ -1300,42 +1300,42 @@ namespace Client.Creator
                 if (DetailListView.SelectedItems.Count > 0)
                 {
                     ushort oldValue, newValue;
-                    ListViewItem selectedItem = DetailListView.SelectedItems[0];
-                    Module module = selectedItem.Tag as Module;
-                    oldValue = (ushort)module.Value;
                     ProductLicense plp = DetailPropertyGrid.SelectedObject as ProductLicense;
-                    string errorMsg = string.Empty;
-                    if (s_CommLink.IsDefaultModule(plp.ProductID, module.ID))
-                        errorMsg = "Default modules can not be modified.";
-                    else if (!ushort.TryParse(setModuleToolStripTextBox.Text, out newValue))
-                        errorMsg = "Invalid format for {0} value";
-                    else
+                    foreach (ListViewItem selectedItem in DetailListView.SelectedItems)
                     {
-                        if (oldValue != newValue)
+                        Module module = selectedItem.Tag as Module;
+                        oldValue = (ushort)module.Value;
+                        string errorMsg = string.Empty;
+                        if (!ushort.TryParse(setModuleToolStripTextBox.Text, out newValue))
+                            errorMsg = "Invalid format for {0} value";
+                        else
                         {
-                            if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
-                                errorMsg = "Specified value exceeds the available units allowed for {0}";
-                            else
+                            if (oldValue != newValue)
                             {
-                                module.Value = (short)newValue;
-                                if (plp.SetModule(module))
+                                if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
+                                    errorMsg = "Specified value exceeds the available units allowed for {0}";
+                                else
                                 {
-                                    selectedItem.SubItems[1].Text = module.Value.ToString();
-                                    if (selectedItem.SubItems[2].Text != "Unlimited")
-                                        selectedItem.SubItems[2].Text = plp.GetAvailableModuleUnits(module).ToString();
-                                    SetModuleState(plp, selectedItem);
-                                    DetailListViewContextMenuStrip.Close();
+                                    module.Value = (short)newValue;
+                                    if (plp.SetModule(module))
+                                    {
+                                        selectedItem.SubItems[1].Text = module.Value.ToString();
+                                        if (selectedItem.SubItems[2].Text != "Unlimited")
+                                            selectedItem.SubItems[2].Text = plp.GetAvailableModuleUnits(module).ToString();
+                                        SetModuleState(plp, selectedItem);
+                                        DetailListViewContextMenuStrip.Close();
+                                    }
                                 }
                             }
+                            else
+                                return;
                         }
-                        else
-                            return;
-                    }
-                    if (errorMsg.Length > 0)
-                    {
-                        module.Value = (short)oldValue;
-                        MessageBox.Show(string.Format(errorMsg, module.Name), "Set Module Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        setModuleToolStripTextBox.SelectAll();
+                        if (errorMsg.Length > 0)
+                        {
+                            module.Value = (short)oldValue;
+                            MessageBox.Show(string.Format(errorMsg, module.Name), "Set Module Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            setModuleToolStripTextBox.SelectAll();
+                        }
                     }
                 }
             }
@@ -1693,6 +1693,7 @@ namespace Client.Creator
         #endregion
 
         #region DetailListView Events
+
         private void DetailListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {        
             switch (DetailTreeView.SelectedNode.Level)
@@ -1715,13 +1716,7 @@ namespace Client.Creator
                     info = sb.ToString();
                     if (info.Length > 0) info = info.Remove(info.Length - 1, 1);
                     e.Item.ToolTipText = info;
-                    break;
-                case 2: //Product License, Add On License
-                case 3:
-                    //initialize buttons for DetailListView - Modules
-                    dlvAddToolStripButton.Visible = false;
-                    dlvRemoveToolStripButton.Enabled = e.IsSelected & (DetailPropertyGrid.SelectedObject as ProductLicense).IsAllowedRemoveModule((e.Item.Tag as Module).ID);
-                    break;
+                    break;                  
                 default: break;
             }
         }
@@ -4093,6 +4088,8 @@ namespace Client.Creator
                 dlvAddToolStripButton.Visible = true;
                 dlvRemoveToolStripButton.Visible = true;
                 moduleFilterToolStripComboBox.Visible = false;
+                totalModuleListToolStripButton.Visible = false;
+                defaultModuleListToolStripButton.Visible = false;
                 ListViewItem lvItem;        
                 TokenTable hardwareToken = null;
                // retrieve tokens from database not license info object
@@ -4159,6 +4156,8 @@ namespace Client.Creator
                 dlvAddToolStripButton.Visible = false;
                 dlvRemoveToolStripButton.Visible = false;
                 moduleFilterToolStripComboBox.Visible = false;
+                totalModuleListToolStripButton.Visible = false;
+                defaultModuleListToolStripButton.Visible = false;
                 //needs to skip any product,modules that are deactivated            
                 LicenseServer lsp = DetailTreeView.SelectedNode.Parent.Tag as LicenseServer;
                 Service<ICreator>.Use((client) =>
@@ -4233,6 +4232,10 @@ namespace Client.Creator
                 dlvAddToolStripButton.Enabled = true;
                 dlvRemoveToolStripButton.Visible = false;
                 moduleFilterToolStripComboBox.Visible = true;
+                totalModuleListToolStripButton.Visible = true;
+                defaultModuleListToolStripButton.Visible = true;
+                totalModuleListToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled;
+                defaultModuleListToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled;
                 //need to set plData read-only attributes
                 //gets all modules for a given product license and add-on product licenses
                 string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
@@ -4986,5 +4989,68 @@ namespace Client.Creator
             }
             DoDragDrop(dragString.ToString(), DragDropEffects.Copy | DragDropEffects.Move);            
         }
+
+        private void totalModuleListToolStripButton_Click(object sender, EventArgs e)
+        {
+            if(DetailTreeView.SelectedNode.Tag is ProductLicense)
+            {
+                ProductLicense productLicense = DetailTreeView.SelectedNode.Tag as ProductLicense;
+                if (MessageBox.Show(string.Format("Please confirm setting maximum units to {0} module list.",productLicense.ProductName),
+                                    "Set Maximum Module List Units",
+                                    MessageBoxButtons.OKCancel,
+                                    MessageBoxIcon.Exclamation) == DialogResult.OK)
+                {
+                    productLicense.SetLicensedToTrial();
+                    Service<ICreator>.Use((client) =>
+                    {
+                        ProductLicenseTable plt = client.GetProductLicense(productLicense.ID);
+                        if (plt != null)
+                        {
+                            TransactionManager.CreateTransaction(TransactionType.Module,
+                                                                  string.Empty,
+                                                                  productLicense.ID,
+                                                                  string.Format("Set Module List to Maximum Units", ProductName),
+                                                                  "",
+                                                                  "");
+                            client.MarkDirty(productLicense.LicenseServer);
+                        }
+                    });
+                    SetLicenseServerState(DetailTreeView.SelectedNode, false);
+                    PopulateDetailListView(DetailPropertyGrid.SelectedObject);
+                }
+            }
+        }
+
+        private void defaultModuleListToolStripButton_Click(object sender, EventArgs e)
+        {
+            if(DetailTreeView.SelectedNode.Tag is ProductLicense)
+            {
+                ProductLicense productLicense = DetailTreeView.SelectedNode.Tag as ProductLicense;
+                if (MessageBox.Show(string.Format("Please confirm setting default units to {0} module list.", productLicense.ProductName),
+                                    "Set Default Module List Units",
+                                    MessageBoxButtons.OKCancel,
+                                    MessageBoxIcon.Exclamation) == DialogResult.OK)
+                {
+                    productLicense.SetTrialToLicensed(true);
+                    Service<ICreator>.Use((client) =>
+                    {
+                        ProductLicenseTable plt = client.GetProductLicense(productLicense.ID);
+                        if (plt != null)
+                        {
+                            TransactionManager.CreateTransaction(TransactionType.Module,
+                                                                  string.Empty,
+                                                                  productLicense.ID,
+                                                                  string.Format("Set Module List to Default Units", ProductName),
+                                                                  "",
+                                                                  "");
+                            client.MarkDirty(productLicense.LicenseServer);
+                        }
+                    });
+                    SetLicenseServerState(DetailTreeView.SelectedNode, false);
+                    PopulateDetailListView(DetailPropertyGrid.SelectedObject);
+                }
+            }
+        }
+
     }
 }
