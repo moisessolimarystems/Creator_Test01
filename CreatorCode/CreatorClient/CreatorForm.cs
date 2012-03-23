@@ -1986,24 +1986,27 @@ namespace Client.Creator
                 //must remove add-on product license and set selectednode to parent
                 if (DetailTreeView.SelectedNode.Level == 3)
                 {
-                    ProductLicenseState oldStatus = (ProductLicenseState)e.OldValue;
-                    ProductLicenseState newStatus = (ProductLicenseState)e.ChangedItem.Value;
-                    if (oldStatus == ProductLicenseState.AddOn && newStatus == ProductLicenseState.LicensedAddOn)
+                    if (e.OldValue is ProductLicenseState)
                     {
-                        TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
-                        ProductCollection pcp = productNode.Tag as ProductCollection;
-                        pcp.RemoveProductProperty(DetailTreeView.SelectedNode.Tag as ProductLicense);
-                        //remove from product collection
-                        int selectedIndex = DetailTreeView.SelectedNode.Index;
-                        //set status of add-on to inactive.
-                        //inactive add-on gets removed from tree, collection, but not deleted.
-                        if (DetailTreeView.SelectedNode.Nodes.Count > 1)
+                        ProductLicenseState oldStatus = (ProductLicenseState)e.OldValue;
+                        ProductLicenseState newStatus = (ProductLicenseState)e.ChangedItem.Value;
+                        if (oldStatus == ProductLicenseState.AddOn && newStatus == ProductLicenseState.LicensedAddOn)
                         {
-                            selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
-                            DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent.Nodes[selectedIndex];
+                            TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
+                            ProductCollection pcp = productNode.Tag as ProductCollection;
+                            pcp.RemoveProductProperty(DetailTreeView.SelectedNode.Tag as ProductLicense);
+                            //remove from product collection
+                            int selectedIndex = DetailTreeView.SelectedNode.Index;
+                            //set status of add-on to inactive.
+                            //inactive add-on gets removed from tree, collection, but not deleted.
+                            if (DetailTreeView.SelectedNode.Nodes.Count > 1)
+                            {
+                                selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
+                                DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent.Nodes[selectedIndex];
+                            }
+                            else
+                                DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent;
                         }
-                        else
-                            DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent;
                     }
                 }
             }
