@@ -552,8 +552,8 @@ namespace Service.Creator
                 switch (userCondition.Name)
                 {
                     case ConditionName.Validation:
-                        string op = ((value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "=" : "!=";  //Hardware enum value = 1, Software enum value != 0
-                        conditionString.Append(string.Format("LicenseTable.TokenTables.Where(TokenType {0} 1).Count() > 0", op));
+                        string op = ((value == "Hardware" && userCondition.Operator == ConditionOperator.Equal) != (value == "Software" && userCondition.Operator == ConditionOperator.NotEqual)) ? "<" : ">";  //Hardware enum value = 1, Software enum value != 0
+                        conditionString.Append(string.Format("LicenseTable.TokenTables.Where(TokenType {0} 2).Count() > 0", op));
                         break;                  
                     case ConditionName.Verified: 
                         //verified requires zero not verified packets & non-zero packet count, not verified satisfied by non-zero not verified packets or no packets found

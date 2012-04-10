@@ -4433,9 +4433,9 @@ namespace Client.Creator
                     //need link to licenses to product licenses
                     //have product license list with access to modules
                     
-                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware" : "Software";
+                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware" : "Software";
                     if (validationType == "Hardware")
-                        validationType = tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                        validationType = tokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
                     newItem.SubItems.Add(validationType);
                     
                     verifiedStatus = (packets.Where(p => p.LicenseID == licenses[index].LicenseID && p.IsVerified == false).Count() == 0 && (packets.Where(p => p.LicenseID == licenses[index].LicenseID).Count() > 0)) ? bool.TrueString : bool.FalseString;
