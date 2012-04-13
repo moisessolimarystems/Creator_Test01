@@ -36,7 +36,8 @@ namespace Client.Creator
             _filterLSNames = new Dictionary<string, ConditionName>
                 {  
                     {"Active", ConditionName.Active},
-                    {"Customer", ConditionName.Customer},        
+                    {"Customer", ConditionName.Customer}, 
+                    {"Date Created", ConditionName.DateCreated},        
                     {"License Server", ConditionName.LicenseServer},                   
                     {"Notes", ConditionName.Notes},
                     {"Validation", ConditionName.Validation},
@@ -50,7 +51,8 @@ namespace Client.Creator
                     {"Activation Amount",ConditionName.ActivationAmount}, 
                     {"Activation Total", ConditionName.Activation},
                     {"Active", ConditionName.Active},        
-                    {"Customer", ConditionName.Customer},  
+                    {"Customer", ConditionName.Customer}, 
+                    {"Date Created", ConditionName.DateCreated},  
                     {"Extension Count", ConditionName.Extension},
                     {"Expiration Date", ConditionName.ExpirationDate},
                     {"Module", ConditionName.Module},
