@@ -4418,6 +4418,10 @@ namespace Client.Creator
                         newItem.Text = "Unknown";
                     //1. id 2) product 3) version 4) state 5) expdate - extension 6)activation 7) activation amount 8) active 9) description
                     newItem.SubItems.Add(licenses[index].plID);
+                    if (licenses[index].DateCreated.HasValue)
+                        newItem.SubItems.Add(licenses[index].DateCreated.Value.ToShortDateString());
+                    else
+                        newItem.SubItems.Add(string.Empty);
                     newItem.SubItems.Add(s_CommLink.GetProductName(licenses[index].ProductID));
                     newItem.SubItems.Add(licenses[index].ProductVersion);
                     newItem.SubItems.Add(Enums.GetEnumDescription((ProductLicenseState)licenses[index].plState));
@@ -4481,6 +4485,10 @@ namespace Client.Creator
                     else
                         newItem.Text = "Unknown";
                     newItem.SubItems.Add(licenses[index].LicenseName);
+                    if (licenses[index].DateCreated.HasValue)
+                        newItem.SubItems.Add(licenses[index].DateCreated.Value.ToShortDateString());
+                    else
+                        newItem.SubItems.Add(string.Empty);
                     newItem.SubItems.Add(licenses[index].IsActive.ToString());
                     validationType = (tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware": "Software";
                     if (validationType == "Hardware")
@@ -4616,6 +4624,7 @@ namespace Client.Creator
                 case Report.ReportType.LicenseServer:
                     ReportListView.Columns.Add("Customer");
                     ReportListView.Columns.Add("License Server");
+                    ReportListView.Columns.Add("DateCreated");
                     ReportListView.Columns.Add("Active");
                     ReportListView.Columns.Add("Validation");
                     ReportListView.Columns.Add("Verified");
@@ -4625,6 +4634,7 @@ namespace Client.Creator
                     //1. id 2) product 3) version 4) state 5) extension 6)activation 7) activation amount 8) active 9) description
                     ReportListView.Columns.Add("Customer");
                     ReportListView.Columns.Add("ID");
+                    ReportListView.Columns.Add("DateCreated");
                     ReportListView.Columns.Add("Product");
                     ReportListView.Columns.Add("Version");
                     ReportListView.Columns.Add("State");
