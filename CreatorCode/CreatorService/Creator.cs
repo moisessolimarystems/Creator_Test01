@@ -28,7 +28,8 @@ namespace Service.Creator
                     {"Notes", "LicenseComments"},   //License Table
                     {"Validation", "Validation"},   //License Table
                     {"Verified", "Verified"},        //License Table
-                    {"Token", "Token"}
+                    {"Token", "Token"},
+                    {"DateCreated", "DateCreated"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -59,7 +60,8 @@ namespace Service.Creator
                     {"ModuleValue", "ModuleValue"},                     //MT
                     {"Notes", "Description"},                           //PLT
                     {"Validation", "Validation"},                       //Packet Table
-                    {"Verified", "Verified"}
+                    {"Verified", "Verified"},
+                    {"DateCreated", "DateCreated"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -234,8 +236,52 @@ namespace Service.Creator
                     else
                         conditionString.Append(" or ");
                 }
+                string value = userCondition.Value;
                 switch (userCondition.Name)
                 {
+                    case ConditionName.DateCreated:
+                        string opStr = _filterOperators[userCondition.Operator.ToString()];
+                        DateTime date;
+                        int parseValue;
+                        if (opStr == "IsInTheLast" || opStr == "IsInTheNext")
+                        {
+                            if (Int32.TryParse(value, out parseValue))
+                            {
+                                if (opStr == "IsInTheLast")
+                                    parseValue = -parseValue;
+                                if (userCondition.ValueType == "days")
+                                    date = DateTime.Today.AddDays(parseValue);
+                                else if (userCondition.ValueType == "weeks")
+                                    date = DateTime.Today.AddDays(parseValue * 7);
+                                else
+                                    date = DateTime.Today.AddMonths(parseValue);
+                                DateTime baseDate = DateTime.Today.AddDays(1);
+                                if (opStr == "IsInTheLast")
+                                {   //Add 1 day to today for "IsInTheLast" date function to include today in results
+                                    conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
+                                                                         _filterLSNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
+                                else
+                                {   //Add 1 day to today and user date for "IsInTheNext" date function to not include today in results
+                                    date = date.AddDays(1);
+                                    conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
+                                                                         _filterLSNames[userCondition.Name.ToString()],
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (DateTime.TryParse(value, out date))
+                                conditionString.Append(string.Format("{0}.Value.Date{1}{2}",
+                                                                     _filterLPNames[userCondition.Name.ToString()],
+                                                                     _filterOperators[userCondition.Operator.ToString()],
+                                                                     string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                        }
+                        break;
                     case ConditionName.Token:
                         if (userCondition.Operator == ConditionOperator.Contains) //contains TokenValue.Contains("2")
                             conditionString.Append(string.Format("TokenTables.Where(TokenValue.{0}(\"{1}\")).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
@@ -254,7 +300,6 @@ namespace Service.Creator
                         conditionString.Append(string.Format("(PacketTables.Where(IsVerified=False).Count(){0}0 {1} PacketTables.Count(){2}0)", _filterOperators[userCondition.Operator.ToString()], op1, op2));
                         break;
                     default:
-                        string value = userCondition.Value;
                         conditionString.Append(_filterLSNames[userCondition.Name.ToString()]);
                         if (userCondition.Operator == ConditionOperator.Contains)
                         {
@@ -387,16 +432,22 @@ namespace Service.Creator
                                     date = DateTime.Today.AddDays(parseValue * 7);
                                 else
                                     date = DateTime.Today.AddMonths(parseValue);
+                                DateTime baseDate = DateTime.Today.AddDays(1);
                                 if (opStr == "IsInTheLast")
+                                {   //Add 1 day to today's date for "IsInTheLast" date function to include today in results.
                                     conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
                                                                          _filterLPNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
                                                                          string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
                                 else
+                                {   //Add 1 day to today's and users date to not include today in results for "IsInTheNext" date function.
+                                    date = date.AddDays(1);
                                     conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
                                                                          _filterLPNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
                                                                          string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
                             }
                         }
                         else
@@ -593,6 +644,7 @@ namespace Service.Creator
                             conditionString.Append(string.Format("ModuleTables.Where(Value{0}{1}).Count() > 0", _filterOperators[userCondition.Operator.ToString()], userCondition.Value));
                         break;
                     case ConditionName.ExpirationDate:
+                    case ConditionName.DateCreated:
                         string opStr = _filterOperators[userCondition.Operator.ToString()];
                         DateTime date;                      
                         int parseValue;
@@ -608,25 +660,31 @@ namespace Service.Creator
                                     date = DateTime.Today.AddDays(parseValue * 7);
                                 else
                                     date = DateTime.Today.AddMonths(parseValue);
-                                if(opStr == "IsInTheLast")
+                                DateTime baseDate = DateTime.Today.AddDays(1);
+                                if (opStr == "IsInTheLast")
+                                {   //without adding 1 to the Todays date, results will not include todays date.
                                     conditionString.Append(string.Format("{0}<={1} && {0}>{2}",
                                                                          _filterPLNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
                                 else
+                                {   //without adding 1 to today's date and user date, results will include todays date
+                                    date = date.AddDays(1);
                                     conditionString.Append(string.Format("{0}>{1} && {0}<={2}",
                                                                          _filterPLNames[userCondition.Name.ToString()],
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 18, 0, 0),
-                                                                         string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                         string.Format("DateTime({0},{1},{2})", baseDate.Year, baseDate.Month, baseDate.Day),
+                                                                         string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
+                                }
                             }
                         }
                         else
                         {
                             if (DateTime.TryParse(value, out date))
-                                conditionString.Append(string.Format("{0}{1}{2}", 
+                                conditionString.Append(string.Format("{0}.Value.Date{1}{2}", 
                                                                      _filterPLNames[userCondition.Name.ToString()],
                                                                      _filterOperators[userCondition.Operator.ToString()],
-                                                                     string.Format("DateTime({0},{1},{2},{3},{4},{5})", date.Year, date.Month, date.Day, 18, 0, 0)));
+                                                                     string.Format("DateTime({0},{1},{2})", date.Year, date.Month, date.Day)));
                         }
                         break;
                     default:
