@@ -22,28 +22,7 @@ BYTE SolimarLicenseManagerWrapper::LicensingWrapper::challenge_key_manager_thisa
 
 KeySpec SolimarLicenseManagerWrapper::LicensingWrapper::keyspec;
 
-SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() :
-	ChallengeResponseHelper(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private) / sizeof(BYTE), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public) / sizeof(BYTE)),
-	m_license_message_callback_context(0),
-	m_license_message_callback(0),
-	m_license_invalid_callback_context(0),
-	m_license_invalid_callback(0),
-	m_MessageDispatchThread(0),
-	m_LicenseValidityThread(0),
-	m_validityCheck_LastHr(S_OK),
-	m_constructorHR(S_OK),
-	m_MemberLock(CreateMutex(0, FALSE, 0)),
-	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
-{
-	Initialize(L"", L"", L"", 0, 0);
-}
-
-SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(
-	std::wstring domain,
-	std::wstring username,
-	std::wstring password,
-	long authenticationLevel,
-	long impersonationLevel) :
+SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper() : 
 	ChallengeResponseHelper(challenge_key_manager_thisauthuser_private, sizeof(challenge_key_manager_thisauthuser_private)/sizeof(BYTE), challenge_key_manager_userauththis_public, sizeof(challenge_key_manager_userauththis_public)/sizeof(BYTE)),
 	m_license_message_callback_context(0),
 	m_license_message_callback(0),
@@ -56,39 +35,14 @@ SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper(
 	m_MemberLock(CreateMutex(0, FALSE, 0)),
 	m_ThreadKillEvent(CreateEvent(0, TRUE, FALSE, 0))
 {
-	Initialize(
-		domain,
-		username,
-		password,
-		authenticationLevel,
-		impersonationLevel);
-}
-
-void SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(
-	std::wstring domain,
-	std::wstring username,
-	std::wstring password,
-	long authenticationLevel,
-	long impersonationLevel)
-{
-	ISolimarLicenseMgr8* pLocalLicenseMgr = NULL;
-	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr8), (void**)&pLocalLicenseMgr);
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Enter");
+	ISolimarLicenseMgr7* pLocalLicenseMgr = NULL;
+	HRESULT hr = CoCreateInstance(__uuidof(CSolimarLicenseMgr), NULL, CLSCTX_INPROC_SERVER, __uuidof(ISolimarLicenseMgr7), (void**)&pLocalLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
 		hr = m_licenseManagerPtr.Attach(pLocalLicenseMgr);
 		if (SUCCEEDED(hr))
 		{
-			if (username.length() > 0)
-			{
-				BSTR bstrDomain = SysAllocString(domain.c_str());
-				BSTR bstrUsername = SysAllocString(username.c_str());
-				BSTR bstrPassword = SysAllocString(password.c_str());
-				m_licenseManagerPtr->InitializeAuthInfo(bstrDomain, bstrUsername, bstrPassword, authenticationLevel, impersonationLevel);
-				SysFreeString(bstrDomain);
-				SysFreeString(bstrUsername);
-				SysFreeString(bstrPassword);
-			}
-
 			ILicensingMessage* pLocalLicenseMessage = NULL;
 			hr = m_licenseManagerPtr->QueryInterface(__uuidof(ILicensingMessage), (void**)&pLocalLicenseMessage);
 			if (SUCCEEDED(hr))
@@ -106,6 +60,7 @@ void SolimarLicenseManagerWrapper::LicensingWrapper::Initialize(
 			pLocalLicenseMgr->Release();
 		}
 	}
+//OutputDebugStringW(L"LicensingWrapper::LicensingWrapper() - Leave");
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::LicensingWrapper()", hr);
 	m_constructorHR = hr;
 }
@@ -197,7 +152,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
 	// authenticate
-	ISolimarLicenseMgr8* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -217,7 +172,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(std::wstring s
 					(bUseOnlyLicenseViewer * CF_ONLY_LICENSE_VIEWER));	//Use only License Viewer
 				SysFreeString(bstrServer);
 			}
-		}
+		}	
 		pISolimarLicenseMgr->Release();
 	}
 	LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx()", hr);
@@ -231,7 +186,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ConnectByProductEx(long 
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 	
 	// authenticate
-	ISolimarLicenseMgr8* pISolimarLicenseMgr = NULL;
+	ISolimarLicenseMgr7* pISolimarLicenseMgr = NULL;
 	HRESULT hr = m_licenseManagerPtr.CopyTo(&pISolimarLicenseMgr);
 	if (SUCCEEDED(hr))
 	{
@@ -504,6 +459,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 	
 //wchar_t tmpbuf[1024];
 	HRESULT hr = S_OK;
+	
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
 
@@ -524,13 +480,15 @@ LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchTh
 	if (vtMessageList.vt & VT_ARRAY)
 		message_list = vtMessageList;
 	VariantClear(&vtMessageList);
-
+	
 	if (m_license_message_callback)
 	{
+
 		for (LicensingMessageList::iterator m = message_list.begin(); m != message_list.end(); ++m)
 		{
 //swprintf_s(tmpbuf, 1024, L"LicensingWrapper::MessageDispatchThreadProc message: %s", m->message.c_str());
 //OutputDebugStringW(tmpbuf); 
+
 			m_license_message_callback(m_license_message_callback_context, m->key_ident.c_str(), m->message_type, m->error, &m->timestamp, m->message.c_str());
 		}
 	}
