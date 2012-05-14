@@ -193,6 +193,7 @@ CSolimarLicenseMgr::CSolimarLicenseMgr() :
 	m_dtGracePeriodStart(0),
 	m_dtGracePeriod(0),
 	m_dtRefreshLicenses(0),
+	m_lastHeartBeatTime(0),
 	//m_bConfiguredForSoftwareLicense(false),
 	m_bUsingBackupServers(false),
 	m_bInViolationPeriod(false),
@@ -2225,8 +2226,11 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 				try
 				{
 					SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ILicensingMessage, server->second, GetLicenseMessageList, (VARIANT_TRUE, &vtServerMessageList), hr);
-					LicensingMessageList server_messages(vtServerMessageList);
-					licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
+					if (SUCCEEDED(hr))
+					{
+						LicensingMessageList server_messages(vtServerMessageList);
+						licensing_message_cache.insert(licensing_message_cache.end(), server_messages.begin(), server_messages.end());
+					}
 				}
 				catch (_com_error &e)
 				{
@@ -2342,29 +2346,34 @@ STDMETHODIMP CSolimarLicenseMgr::DispatchLicenseMessageList(VARIANT_BOOL clear_m
 void CSolimarLicenseMgr::SendHeartbeat()
 {
 	HRESULT hr = S_OK;
-
 	SafeMutex mutex(ServerListLock);
-	ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
-	ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
 
-	// foreach server
-	for (;server != serverEnd; ++server)
+	DWORD curTime = (DWORD)time(0);
+	if ((m_lastHeartBeatTime == 0) || (curTime > m_lastHeartBeatTime + heartBeartDontSentPeriod))
 	{
-		try 
+		ServerList::iterator server = m_bUsingBackupServers ? m_backupServers.begin() : m_servers.begin();
+		ServerList::iterator serverEnd = m_bUsingBackupServers ? m_backupServers.end() : m_servers.end();
+
+		// foreach server
+		for (;server != serverEnd; ++server)
 		{
-//OutputFormattedDebugString(L"CSolimarLicenseMgr::SendHeartbeat() - Server: %s, Start", (wchar_t*)server->first);
-			SS_SLSERVER_FTCALL_HR(server->second, Heartbeat, (), hr);
-//OutputFormattedDebugString(L"CSolimarLicenseMgr::SendHeartbeat() - Server: %s, Stop: 0x%x", (wchar_t*)server->first, hr);
-		}
-		catch (_com_error &e) 
-		{
-			if(SS_RPC_FAILED(e.Error()))
+			try 
 			{
-				//Log Message about RPC failure to Key
-				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::SendHeartbeat() - Server: %s, Start", (wchar_t*)server->first);
+				SS_SLSERVER_FTCALL_HR(server->second, Heartbeat, (), hr);
+//OutputFormattedDebugString(L"CSolimarLicenseMgr::SendHeartbeat() - Server: %s, Stop: 0x%x", (wchar_t*)server->first, hr);
+			}
+			catch (_com_error &e) 
+			{
+				if(SS_RPC_FAILED(e.Error()))
+				{
+					//Log Message about RPC failure to Key
+					SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
+					SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+				}
 			}
 		}
+		UpdateLastHeartBeatTime();
 	}
 }
 

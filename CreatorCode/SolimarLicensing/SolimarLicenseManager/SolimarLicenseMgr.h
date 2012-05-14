@@ -556,7 +556,12 @@ private:
 	void StopGracePeriod();
 	std::map<unsigned int, int> appInstanceInUseModuleCacheMap;
 
-	
+	// For CR.16076 - only send a heartbeast if a heartbeat hasn't been sent in the last heartBeartDontSentPeriod
+	// heartBeartDontSentPeriod = 20seconds
+	DWORD m_lastHeartBeatTime;	
+	static const unsigned int heartBeartDontSentPeriod = 20; // seconds to not sent heartbeat again.
+	void UpdateLastHeartBeatTime() { SafeMutex mutex(ServerListLock); m_lastHeartBeatTime = (DWORD)time(0);}
+
 		
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
