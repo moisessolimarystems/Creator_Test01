@@ -456,7 +456,6 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThre
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages)
 {
 //OutputDebugStringW(L"HRESULT LicensingWrapper::MessageDispatchThreadProc(ILicensingMessage* pLicenseMessages) - Enter"); 
-
 	
 //wchar_t tmpbuf[1024];
 	HRESULT hr = S_OK;
@@ -466,13 +465,15 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadPro
 
 	if(m_licenseMessagePtr == NULL)
 		return S_FALSE;
+
+	if(m_license_message_callback == 0)
+		return S_FALSE;
 	
 	LicensingMessageList message_list;
 	VARIANT vtMessageList;
 	VariantInit(&vtMessageList);
 	//hr = pLicenseMessages->GetLicenseMessageList(VARIANT_TRUE, &vtMessageList);
 	hr = m_licenseMessagePtr->GetLicenseMessageList(VARIANT_TRUE, &vtMessageList);
-	
 
 LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc() - GetLicenseMessageList()", hr);
 	if (FAILED(hr)) return hr;
@@ -502,7 +503,7 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThre
 	HRESULT hr = S_OK;
 	DWORD thread_kill(0);
 	int count(0);
-	int invokeTime(200); //in 100 MilliSeconds //200 == 20000 milliseconds
+	int invokeTime(600); //in 100 MilliSeconds //600 == 60000 milliseconds = 60 seconds
 	while(1)
 	{
 		// check whether the thread should terminate
@@ -531,6 +532,9 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadPro
 {
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
+
+	if(m_license_invalid_callback == 0)
+		return S_FALSE;
 
 	bool bValid = false;
 	HRESULT hr = ValidateLicenseEx(&bValid);

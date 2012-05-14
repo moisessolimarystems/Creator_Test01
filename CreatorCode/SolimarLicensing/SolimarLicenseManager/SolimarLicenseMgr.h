@@ -372,6 +372,7 @@ private:
 		bool bUseOnlySharedLicenses;
 		bool bUseSoftwareLicensing;	//Not used yet, maybe not needed
 		bool bUseOnlyLicenseViewer;
+		bool bValidLicensing;
 		typedef std::map<_bstr_t, KeyInfo> KeyList;
 		SoftwareLicenseInfo software_license;
 		KeyList keys;
@@ -442,7 +443,7 @@ private:
 	// removes all keys from the cache, and disassociates all keys with the given Application Instance to empty...
 	HRESULT FreeAllKeys(ServerInfo* pServerInfo, VARIANT *pvtKeyList, long count, bool bLogError);
 
-	HRESULT AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bLogError);
+	HRESULT AssociateAppInstanceToSoftwareServer(ServerInfo* pServerInfo, _bstr_t appInstance, bool bFailOver, bool bLogError);
 	HRESULT FreeAllSoftwareLicenseFromCache(ServerInfo* pServerInfo, bool bLogError);
 
 	// Sets the appropiate modules on keys to be unlimited.  Calculate: #of base keys X unlimited number for modules.
@@ -555,7 +556,12 @@ private:
 	void StopGracePeriod();
 	std::map<unsigned int, int> appInstanceInUseModuleCacheMap;
 
-	
+	// For CR.16076 - only send a heartbeast if a heartbeat hasn't been sent in the last heartBeartDontSentPeriod
+	// heartBeartDontSentPeriod = 20seconds
+	DWORD m_lastHeartBeatTime;	
+	static const unsigned int heartBeartDontSentPeriod = 20; // seconds to not sent heartbeat again.
+	void UpdateLastHeartBeatTime() { SafeMutex mutex(ServerListLock); m_lastHeartBeatTime = (DWORD)time(0);}
+
 		
 	// default key event/message handlers
 	static bool MessageQualifiesForAutoDispatch(DWORD ui_level, long message_type);
