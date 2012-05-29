@@ -1569,6 +1569,24 @@ HRESULT SoftwareLicenseMgr::ApplyLicensePacket(Lic_PackageAttribs* pLicPacket, _
 //			}
 
 			unsigned short keyHistoryNumber = unsigned short(keyAttrib.historyNumber);
+
+			//CR.FIX.16124 - The activation list gets corrupted and completely removed.  Not sure
+			//why this is happening, looking at the code it should not be possible to delete list.
+			//Most probable reason is when keyAttribs in being initialized from a stream, or when keyAttribs
+			//is being converted to a stream, the activation list and info are being lost.  I can't reproduce this
+			//problem, but have seen 2 license servers at solimar without an activation list.
+			if(keyAttrib.activationInfoList->size() == 0)
+			{
+				for(unsigned short idx=0; idx<20; idx++)
+				{
+					Lic_KeyAttribs::Lic_ActivationInfoAttribs newLicInfoAttribs;
+					newLicInfoAttribs.activationSlotId = idx;
+					newLicInfoAttribs.activationSlotCurrentActivation = 0;
+					newLicInfoAttribs.activationSlotHoursToExpire = 0;
+					keyAttrib.activationInfoList->push_back(newLicInfoAttribs);
+				}
+			}
+
 			//Process history number changes to key  -- if(keyAttrib.historyNumber == tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->size())
 			for(	Lic_PackageAttribs::Lic_LicenseInfoAttribs::TVector_Lic_ActivitySlotHistoryInfoAttribsList::iterator histSlotInfoIt = tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->begin();
 					histSlotInfoIt != tmpPacketNewLicenseFileAttribs.licLicenseInfoAttribs.activitySlotHistoryList->end();
