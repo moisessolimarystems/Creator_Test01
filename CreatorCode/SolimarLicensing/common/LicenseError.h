@@ -3,8 +3,8 @@
 
 #include <windows.h>
 #include <string>
-#include <atlbase.h>	// For AtlReportError
 #if _MSC_VER >= 1400
+#include <atlbase.h>	// For AtlReportError
 #include <atlcom.h>	// For AtlReportError
 #endif
 namespace LicenseServerError
@@ -117,6 +117,8 @@ namespace LicenseServerError
 	const unsigned long EC_LIC_CLOCK_LIC_PACKET = ITF_LIC_SVR_OFFSET+47;
 	const unsigned long EC_LIC_CLOCK_LIC_ARCHIVE = ITF_LIC_SVR_OFFSET+48;
 	const unsigned long EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC = ITF_LIC_SVR_OFFSET+49;
+	const unsigned long EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE = ITF_LIC_SVR_OFFSET+50;
+	const unsigned long EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED = ITF_LIC_SVR_OFFSET+51;
 
 	// Rainbow driver errors
 	const unsigned long EC_SP_INVALID_FUNCTION_CODE = ITF_LIC_RNBO_OFFSET+SP_INVALID_FUNCTION_CODE;
@@ -215,6 +217,8 @@ namespace LicenseServerError
 	const HRESULT EHR_LIC_CLOCK_LIC_PACKET = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_CLOCK_LIC_PACKET);
 	const HRESULT EHR_LIC_CLOCK_LIC_ARCHIVE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_CLOCK_LIC_ARCHIVE);
 	const HRESULT EHR_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_VALIDATION_FAILED_GENERIC);
+	const HRESULT EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE);
+	const HRESULT EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED);
 
 	const HRESULT EHR_SP_INVALID_FUNCTION_CODE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_INVALID_FUNCTION_CODE);
 	const HRESULT EHR_SP_INVALID_PACKET = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_ITF, EC_SP_INVALID_PACKET);
@@ -302,7 +306,7 @@ namespace LicenseServerError
 	}
 
 	HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id);
-
+	HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id, long product_id);
 	HRESULT TReadEventLog();
 
 	/*
@@ -329,7 +333,7 @@ namespace LicenseServerError
 	*/
 
 	#define SL_IS_LIC_HR(hr) \
-		((hr) & ITF_LIC_MIN)
+		(((hr) & ITF_LIC_MIN) == ITF_LIC_MIN)
 	/*
 	* SL_EC_FROM_EHR()
 	*
