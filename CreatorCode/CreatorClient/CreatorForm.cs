@@ -132,7 +132,7 @@ namespace Client.Creator
         //CONTACT DB : 4
         private void EnableLicenseContextMenu(bool value)
         {
-            bool bLicenseServerEnabled, bHasActiveHardwareToken;
+            bool bHasValidTokens, bHasActiveHardwareToken;
             LicenseServer licData = null;
             if (DetailTreeView.SelectedNode != null)
                 licData = DetailTreeView.SelectedNode.Tag as LicenseServer;
@@ -161,7 +161,7 @@ namespace Client.Creator
             if (licData != null)
             {   
                 bool bLockStatus = licData.LockStatus; // DB - 1
-                bLicenseServerEnabled = licData.IsEnabled; // DB - 2
+                bHasValidTokens = licData.HasValidTokens; // DB - 2
                 if (m_Permissions.pt_extension_pwd.Value && m_Permissions.pt_version_pwd.Value)
                 {                    //license items
                     checkOutToolStripMenuItem.Visible = true;
@@ -177,9 +177,7 @@ namespace Client.Creator
                     if (!licData.IsActive)
                     {
                         deleteToolStripMenuItem.Visible = true;
-                        //if (licData.HasLostToken) //DB 3
-                        if(!licData.IsActive)
-                            reactivateToolStripMenuItem.Visible = true;
+                        reactivateToolStripMenuItem.Visible = true;
                     }
                     else
                         deactivateToolStripMenuItem.Visible = true;
@@ -190,16 +188,14 @@ namespace Client.Creator
                         deleteToolStripMenuItem.Enabled = true;
                         newProductLicenseToolStripMenuItem.Enabled = licData.IsActive;
                         validationTokensToolStripMenuItem.Enabled = licData.IsActive;
-                        newTokenToolStripMenuItem.Enabled = !bLicenseServerEnabled;
-                        clearToolStripMenuItem.Enabled = bLicenseServerEnabled && !bHasActiveHardwareToken;
+                        newTokenToolStripMenuItem.Enabled = !bHasValidTokens;
+                        clearToolStripMenuItem.Enabled = bHasValidTokens && !bHasActiveHardwareToken;
                         markLostToolStripMenuItem.Enabled = bHasActiveHardwareToken;
                         deactivateToolStripMenuItem.Enabled = true;
                         reactivateToolStripMenuItem.Enabled = true;
                     }
                 }
-                //disallow if active LS and has active PL without tokens 
-                if (m_Permissions.pt_version_pwd.Value && !(licData.IsActive && licData.HasActiveProductLicense() && !bLicenseServerEnabled)) 
-                    createPacketFileToolStripMenuItem.Enabled = true;
+                createPacketFileToolStripMenuItem.Enabled = (licData.HasActiveProductLicense()) ? m_Permissions.pt_permanent_pwd.Value && bHasValidTokens : m_Permissions.pt_permanent_pwd.Value;
             }   
         }
 
@@ -256,7 +252,7 @@ namespace Client.Creator
                 if (!lsp.LockStatus) //DB - 1             
                     addProductLicenseMainToolStripDropDownBtn.Enabled = lsp.LockedByCurrentUser() && lsp.IsActive && m_Permissions.pt_create_modify_key.Value;                
                 //disallow packet generation for active LS, active PL, 0 tokens, no permissions
-                createPacketMainToolStripBtn.Enabled = !(!lsp.IsEnabled && lsp.IsActive && lsp.HasActiveProductLicense()) && m_Permissions.pt_version_pwd.Value;
+                createPacketMainToolStripBtn.Enabled = (lsp.HasActiveProductLicense()) ? m_Permissions.pt_permanent_pwd.Value && lsp.HasValidTokens : m_Permissions.pt_permanent_pwd.Value;
             }          
         }
 
@@ -1032,7 +1028,11 @@ namespace Client.Creator
                                 client.UpdateToken(token);
                             }
                             else
-                                client.DeleteToken(token);
+                            {
+                                token.TokenStatus = (byte)TokenStatus.Deactivated;
+                                client.UpdateToken(token);
+                                //client.DeleteToken(token);
+                            }
                         }
                     }
                     List<ProductLicenseTable> plList = client.GetProductLicenses(lsProperty.Name, true); // db - 2
@@ -1479,7 +1479,7 @@ namespace Client.Creator
                     if (DetailTreeView.SelectedNode.Tag is LicenseServer)
                     {
                         LicenseServer lsp = DetailTreeView.SelectedNode.Tag as LicenseServer;
-                        if (lsp.IsEnabled && m_Permissions.pt_version_pwd.Value && lsp.IsActive)
+                        if (lsp.HasValidTokens && m_Permissions.pt_version_pwd.Value && lsp.IsActive)
                             GenerateLicensePacket();
                     }
                     break;

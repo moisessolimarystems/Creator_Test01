@@ -111,11 +111,11 @@ namespace Client.Creator
         /// Gets the enabled status for the license server. Enabled if valid tokens have been set for the license server.
         /// </summary>
         [Browsable(false)]
-        public bool IsEnabled
+        public bool HasValidTokens
         {
             get
             {
-                bool bEnabled = true;
+                bool bEnabled = false;
                 Service<ICreator>.Use((client) =>
                 {
                     IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
@@ -125,14 +125,20 @@ namespace Client.Creator
                         {
                             if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                             {
-                                if (token.TokenStatus != (byte)TokenStatus.Active)
-                                    bEnabled = false;
+                                if (token.TokenStatus == (byte)TokenStatus.Active)
+                                    bEnabled = true;
                                 break;
+                            }
+                            else
+                            {
+                                if (token.TokenStatus == (byte)TokenStatus.Reserved)
+                                {
+                                    bEnabled = true;
+                                    break; //found SW token that is active.
+                                }
                             }
                         }
                     }
-                    else
-                        bEnabled = false;
                 });
                 return bEnabled;
             }
