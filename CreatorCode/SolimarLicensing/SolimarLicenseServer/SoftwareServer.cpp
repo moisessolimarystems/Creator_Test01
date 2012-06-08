@@ -12,7 +12,8 @@
 #include "..\common\LicAttribsCPP\Lic_LicenseSystemAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_SystemInfoAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h"
-
+#include "..\common\LicAttribsCPP\Sys_EventLogInfoAttribs.h"
+#include "..\common\EventLogLicenseHelper.h"
 
 #include <shlobj.h> //For SHGetFolderPath
 #include <shlwapi.h> //For PathAppend
@@ -127,7 +128,6 @@ SoftwareServer::SoftwareServer():
 		g_pSoftwareSpec = new GlobalSoftwareSpec();
 	//Use Global SoftwareSpec - Only need to do once
 	licCache.RefreshSoftwareSpec(&(g_pSoftwareSpec->GetSoftwareSpec()));
-	;	
 }
 
 SoftwareServer::~SoftwareServer()
@@ -155,10 +155,10 @@ HRESULT SoftwareServer::Initialize(KeyServer* _pKeyServer, RainbowDriver* _pDriv
 	return hr;
 }
 
-HRESULT SoftwareServer::AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance)
+HRESULT SoftwareServer::AddApplicationInstance(long productID, BSTR license_id, BSTR application_instance, long flags)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	return licCache.AddApplicationInstance(productID, license_id, application_instance);
+	return licCache.AddApplicationInstance(productID, license_id, application_instance, flags);
 }
 HRESULT SoftwareServer::RemoveApplicationInstance(long productID, BSTR license_id, BSTR application_instance)
 {
@@ -170,17 +170,33 @@ HRESULT SoftwareServer::GetApplicationInstanceList(long productID, BSTR license_
 	SafeMutex mutex(SoftwareLicenseLock);
 	return licCache.GetApplicationInstanceList(productID, license_id, pBstrListAppInstStream);
 }
-
-
-
+HRESULT SoftwareServer::GetApplicationInstanceList2(long productID, BSTR license_id, BSTR *pBstrListUsAppInstInfoAttribs)
+{
+	SafeMutex mutex(SoftwareLicenseLock);
+	return licCache.GetApplicationInstanceList2(productID, license_id, pBstrListUsAppInstInfoAttribs);
+}
 
 HRESULT SoftwareServer::ResynchronizeSoftwareLicenses(bool bForceRefresh)
 {
+	HRESULT hr(S_OK);
+	if(bFirstTime)	//CR.13563 - Block whole call of initializing software licensing, first time.
+	{
+		SafeMutex mutex(SoftwareLicenseLock);
+		hr = ResynchronizeSoftwareLicensesInternal(bForceRefresh);
+	}
+	else
+	{
+		hr = ResynchronizeSoftwareLicensesInternal(bForceRefresh);
+	}
+	return hr;
+}
+HRESULT SoftwareServer::ResynchronizeSoftwareLicensesInternal(bool bForceRefresh)
+{
 const int BUF_SIZE = 1024;
-wchar_t tmpbuf[BUF_SIZE];
+//wchar_t tmpbuf[BUF_SIZE];
 //if(bFirstTime)
 //{
-//	swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter");
+//	swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter, ThreadID: %d", GetCurrentThreadId());
 //	OutputDebugString(tmpbuf);
 //}
 //OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Enter");
@@ -255,6 +271,25 @@ wchar_t tmpbuf[BUF_SIZE];
 			hr = (*swLicIt).second->GetLicenseInfo(&tmpLicInfoAttribs);
 			if(SUCCEEDED(hr))
 				tmpLicInfoList.insert(tmpLicInfoList.end(), new Lic_PackageAttribs::Lic_LicenseInfoAttribs(tmpLicInfoAttribs));
+
+			//CR.FIX.14675 - Track the latest version of the Software Spec.
+			Lic_PackageAttribs::Lic_SoftwareSpecAttribs tmpSoftwareSpec;
+			if (SUCCEEDED((*swLicIt).second->GetSoftwareSpec(&tmpSoftwareSpec)))
+			{
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - g_pSoftwareSpec: %d.%d.%d.%d", (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Major, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Minor, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMajor, (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor);
+//OutputDebugString(tmpbuf);
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - tmpSoftwareSpec: %d.%d.%d.%d", (int)tmpSoftwareSpec.softwareSpec_Major, (int)tmpSoftwareSpec.softwareSpec_Minor, (int)tmpSoftwareSpec.softwareSpec_SubMajor, (int)tmpSoftwareSpec.softwareSpec_SubMinor);
+//OutputDebugString(tmpbuf);
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::ResynchronizeSoftwareLicenses() - tmpSoftwareSpec.productSpecMap->count: %u", tmpSoftwareSpec.productSpecMap->size());
+//OutputDebugString(tmpbuf);
+				if ((tmpSoftwareSpec.productSpecMap->size() > 0) 
+					&& ((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpSoftwareSpec.softwareSpec_SubMinor))
+				{
+//OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Use a new version of the SoftwareSpec");
+					g_pSoftwareSpec->SetSoftwareSpec(tmpSoftwareSpec);
+					licCache.RefreshSoftwareSpec(&(g_pSoftwareSpec->GetSoftwareSpec()));
+				}
+			}
 		}
 
 		}	//End scope of SafeMutex mutex(SoftwareLicenseLock);
@@ -271,6 +306,19 @@ wchar_t tmpbuf[BUF_SIZE];
 
 			tmpLicInfoList.erase(tmpLicInfoList.begin());
 		}
+
+		//CR.13684 - Clear out reminder list when forcing a refresh
+		if(bForceRefresh)
+		{
+			// CR.16165 - Don't clear once a day limit of message
+			for (	std::map<std::wstring, SoftwareLicReminderClass>::iterator swLicReminderMapIt = swLicReminderMap.begin();
+					swLicReminderMapIt != swLicReminderMap.end();
+					swLicReminderMapIt++
+				)
+			{
+				swLicReminderMapIt->second.softwareLicReminderClassLastRefresh = -1;
+			}
+		}
 	}
 	catch(HRESULT &ehr)
 	{
@@ -286,12 +334,12 @@ OutputDebugString(L"SoftwareServer::ResynchronizeSoftwareLicenses() - Caught une
 }
 
 
-//HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
-//{
-////OutputDebugString(L"SoftwareServer::ValidateLicense()");
-//	SafeMutex mutex(SoftwareLicenseLock);
-//	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
-//}
+HRESULT SoftwareServer::ValidateLicense(long productID, BSTR licenseID, VARIANT_BOOL *pbLicenseValid)
+{
+//OutputDebugString(L"SoftwareServer::ValidateLicense()");
+	SafeMutex mutex(SoftwareLicenseLock);
+	return licCache.ValidateLicense(productID, licenseID, pbLicenseValid);
+}
 HRESULT SoftwareServer::ModuleLicenseTotalForAll(long productID, long moduleIdent, long* pLicenseCount)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
@@ -535,9 +583,7 @@ OutputDebugString(L"SoftwareServer::GetSoftwareSpecByProduct() - SafeMutex mutex
 HRESULT SoftwareServer::GetSoftwareSpec(BSTR *pBstrSoftwareSpecAttribsStream)
 {
 	SafeMutex mutex(SoftwareLicenseLock);
-	//int c = softwareLicMgrMap.size();
-	*pBstrSoftwareSpecAttribsStream = SysAllocString(pSoftwareSpec->ToString().c_str());
-	//*pBstrSoftwareSpecAttribsStream = SysAllocString(L"Hello");
+	*pBstrSoftwareSpecAttribsStream = SysAllocString(g_pSoftwareSpec->GetSoftwareSpec().ToString().c_str());
 	return S_OK;
 }
 
@@ -555,7 +601,11 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 
 
 	Lic_PackageAttribs licensePackageAttribs;
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Pre licensePackageAttribs.InitFromString()");
+//OutputDebugString(tmpbuf);
 	licensePackageAttribs.InitFromString(bstrLicPackageAttribsStream);
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post licensePackageAttribs.InitFromString()");
+//OutputDebugString(tmpbuf);
 	if(FAILED(hr))
 		throw hr;
 
@@ -573,7 +623,11 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 	tmpValTokenAttribs.tokenValue = std::wstring(L"true");
 	licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList->push_back(tmpValTokenAttribs);
 
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Pre licensePackageAttribs.ToString()");
+//OutputDebugString(tmpbuf);
 	BSTR bstrLicAttribsStream = SysAllocString(licensePackageAttribs.ToString().c_str());
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post licensePackageAttribs.ToString()");
+//OutputDebugString(tmpbuf);
 
 	wchar_t buffer[64];	
 	_bstr_t packet_string;
@@ -651,6 +705,9 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 
 	unsigned char* pCompressedStream = FlateHelper::CompressStream((char*)(data.c_str()), (long)data.length(), &compressedStreamSize);
 
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Post FlateHelper::CompressStream - compressedStreamSize: %d", compressedStreamSize);
+//OutputDebugString(tmpbuf);
+
 	//long compressedStreamSize(0);
 	//unsigned char* pCompressedStream = FlateHelper::CompressStream((char*)(std::wstring(packet_string).c_str()), packet_string.length()*sizeof(wchar_t), &compressedStreamSize);
 	if(pCompressedStream != NULL)
@@ -674,6 +731,9 @@ HRESULT SoftwareServer::GenerateSoftwareLicPacket(BSTR bstrLicPackageAttribsStre
 	}
 
 	SafeArrayUnaccessData(pVtLicensePacket->parray);
+
+//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::GenerateSoftwareLicPacket() - Leave");
+//OutputDebugString(tmpbuf);
 
 	return hr;
 }
@@ -706,6 +766,7 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		//Must inflate first...
 		unsigned char* uncompressedBuf = NULL;
 		long uncompressedBufSize(0);
+		unsigned char* uncompressedBufNullTerm = NULL;
 		DWORD password_packet_length = vtLicensePacket.parray->rgsabound[0].cElements;
 
 	//swprintf_s(tmpbuf, BUF_SIZE, L"SoftwareServer::EnterSoftwareLicPacket() - Pre context.DecryptData - password_packet_length: %d", password_packet_length);
@@ -753,7 +814,12 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		//pPacket = 0;
 		//delete [] uncompressedBuf;
 
-		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBuf).c_str();
+		uncompressedBufNullTerm = new unsigned char[uncompressedBufSize+1];
+		memcpy(uncompressedBufNullTerm, uncompressedBuf, (uncompressedBufSize)*sizeof(unsigned char));
+		uncompressedBufNullTerm[uncompressedBufSize] = '\0';
+
+		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBufNullTerm).c_str();
+
 		//
 		// decrypt the password packet (two copies)
 		// this copy is used for strtok
@@ -765,6 +831,7 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		memcpy(pPacketString1, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		memcpy(pPacketString2, tmpString.c_str(), (uncompressedBufSize)*sizeof(wchar_t));
 		delete [] uncompressedBuf;
+		delete [] uncompressedBufNullTerm;
 		
 		// compute the verification code
 		{
@@ -1053,6 +1120,12 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Cycle through 
 		for(SoftwareLicList::iterator swLicIt=softwareLicMgrMap.begin(); swLicIt!=softwareLicMgrMap.end(); swLicIt++)
 		{
 			hr = (*swLicIt).second->GetLicenseInfo(&licInfoAttribs);
+
+			//CR.13910 - When generating Diagnostic Data, get the status of the License Info Objects.
+			licInfoAttribs.diagDataErr = GetSoftwareLicenseStatus_ByLicense(BSTR(Lic_PackageAttribsHelper::GetDisplayLabel(&licInfoAttribs).c_str()));
+			if(FAILED(licInfoAttribs.diagDataErr))
+				licInfoAttribs.diagDataErrMsg = LicenseServerError::GetErrorMessage(licInfoAttribs.diagDataErr);
+
 			if(SUCCEEDED(hr))
 				licSystemAttribs.ListOfStreamed_InfoAttribs->push_back(licInfoAttribs.ToString());
 		}
@@ -1095,13 +1168,16 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 			if(SUCCEEDED(hr))
 			{
 				// gather processor information
-				// Hide the string so it doesn't appear in the strings of the image - "SELECT MACAddress FROM Win32_NetworkAdapterConfiguration Where IPEnabled = True
+				// Ignore Loopback Adapter, servicename='msloop' for loopback adapter
+				// Hide the string so it doesn't appear in the strings of the image - SELECT MACAddress FROM Win32_NetworkAdapterConfiguration Where IPEnabled = True AND ServiceName <> 'msloop'
 				BYTE wmiQuery_MacAddressByte[] = {
 					0x53, 0x00, 0x45, 0x00, 0x4c, 0x00, 0x45, 0x00, 0x43, 0x00, 0x54, 0x00, 0x20, 0x00, 0x4d, 0x00, 0x41, 0x00, 0x43, 0x00, 0x41, 0x00, 0x64, 0x00, 0x64, 0x00, 0x72, 0x00, 0x65, 0x00, 0x73, 0x00,
 					0x73, 0x00, 0x20, 0x00, 0x46, 0x00, 0x52, 0x00, 0x4f, 0x00, 0x4d, 0x00, 0x20, 0x00, 0x57, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x33, 0x00, 0x32, 0x00, 0x5f, 0x00, 0x4e, 0x00, 0x65, 0x00, 0x74, 0x00,
 					0x77, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6b, 0x00, 0x41, 0x00, 0x64, 0x00, 0x61, 0x00, 0x70, 0x00, 0x74, 0x00, 0x65, 0x00, 0x72, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x66, 0x00, 0x69, 0x00,
 					0x67, 0x00, 0x75, 0x00, 0x72, 0x00, 0x61, 0x00, 0x74, 0x00, 0x69, 0x00, 0x6f, 0x00, 0x6e, 0x00, 0x20, 0x00, 0x57, 0x00, 0x68, 0x00, 0x65, 0x00, 0x72, 0x00, 0x65, 0x00, 0x20, 0x00, 0x49, 0x00,
-					0x50, 0x00, 0x45, 0x00, 0x6e, 0x00, 0x61, 0x00, 0x62, 0x00, 0x6c, 0x00, 0x65, 0x00, 0x64, 0x00, 0x20, 0x00, 0x3d, 0x00, 0x20, 0x00, 0x54, 0x00, 0x72, 0x00, 0x75, 0x00, 0x65, 0x00, 0x00, 0x00
+					0x50, 0x00, 0x45, 0x00, 0x6e, 0x00, 0x61, 0x00, 0x62, 0x00, 0x6c, 0x00, 0x65, 0x00, 0x64, 0x00, 0x20, 0x00, 0x3d, 0x00, 0x20, 0x00, 0x54, 0x00, 0x72, 0x00, 0x75, 0x00, 0x65, 0x00, 0x20, 0x00,
+					0x41, 0x00, 0x4e, 0x00, 0x44, 0x00, 0x20, 0x00, 0x53, 0x00, 0x65, 0x00, 0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x4e, 0x00, 0x61, 0x00, 0x6d, 0x00, 0x65, 0x00, 0x20, 0x00,
+					0x3c, 0x00, 0x3e, 0x00, 0x20, 0x00, 0x27, 0x00, 0x6d, 0x00, 0x73, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x6f, 0x00, 0x70, 0x00, 0x27, 0x00, 0x00, 0x00
 				};
 				hr = wmi.ExecuteQuery((wchar_t*)wmiQuery_MacAddressByte, NetworkAdaptersList);
 				if(SUCCEEDED(hr) && NetworkAdaptersList.size()>0)
@@ -1370,6 +1446,19 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpe
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - g_pSoftwareSpec->GetSoftwareSpec().ToString() - end");
 		licSystemAttribs.Streamed_SystemInfoAttribs = std::wstring(sysInfoAttribs.ToString());
 
+
+		BSTR tmpStreamedEventLog;
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - EventLogLicenseHelper::ReadEventLog() - start");
+		hr = EventLogLicenseHelper::ReadEventLog(&tmpStreamedEventLog);
+OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - EventLogLicenseHelper::ReadEventLog() - end");
+		if(SUCCEEDED(hr))
+		{
+			licSystemAttribs.Streamed_SystemEventLogInfoAttribs = std::wstring(tmpStreamedEventLog);
+			SysFreeString(tmpStreamedEventLog);
+		}
+
+		//licSystemAttribs.Streamed_SystemEventLogInfoAttribs = 
+
 		licSystemAttribs.Streamed_UsageInfoAttribs = std::wstring(usageInfoAttribs.ToString());
 OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - licSystemAttribs.ToString() - start");
 		BSTR bstrLicAttribsStream = SysAllocString(licSystemAttribs.ToString().c_str());
@@ -1458,8 +1547,8 @@ HRESULT SoftwareServer::GenerateStreamData_ByLicenseSystemData(
 			//Do not implement returning connection settings
 			*pBstrConnectionAttribsListStream = SysAllocString(L"");
 
-			//Do not implement returning event log list for License Server Entries
-			*pBstrEventLogAttribsListStream = SysAllocString(L"");
+			//Returning event log list for License Server Entries
+			*pBstrEventLogAttribsListStream = SysAllocString(std::wstring(tmpLicSysAttribs.Streamed_SystemEventLogInfoAttribs.ToString()).c_str());
 
 //OutputDebugString(L"SoftwareServer::GenerateLicInfoListStream_ByLicenseSystemData() - Erase empty modules;");
 //			//yyy - testing start
@@ -2054,6 +2143,14 @@ HRESULT SoftwareServer::ApplyLicensePacketInternal(BSTR bstrLicPackageAttribsStr
 		if(difftime(currentTimeDateTimeT, packetCreateDateTimeT) < -TimeHelper::ONE_DAY_IN_SECONDS)
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_PACKET;
 
+		//CR.FIX.14675 - If the packet has a full software spec, allow lower version software specs to apply to the license server
+		//CR.FIX.14884 - Use licReplaceSoftwareSpecAttribs for productSpecMap->size(), and licSoftwareSpecAttribs for softwareSpec_SubMinor
+		if ((tmpLicPackageAttribs.licReplaceSoftwareSpecAttribs.productSpecMap->size() == 0)	//No Replacement Software Spec
+			&& ((int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor < (int)tmpLicPackageAttribs.licSoftwareSpecAttribs.softwareSpec_SubMinor)) //License Server Software Spec Version is below Packet Software Spec Version
+		{
+			throw LicenseServerError::EHR_LIC_SOFTWARE_LIC_PACKET_LIC_SERVER_UPGRADE;
+		}
+
 		SoftwareLicenseMgr* pSoftwareLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(_bstr_t(Lic_PackageAttribsHelper::GetDisplayLabel(&tmpLicPackageAttribs.licLicenseInfoAttribs).c_str()));
 
 		WCHAR szPath[MAX_PATH];
@@ -2357,6 +2454,11 @@ SoftwareLicenseMgr* SoftwareServer::GetSoftwareLicenseMgr_ByLicenseInternal(BSTR
 		}
 	}
 	return retVal;
+}
+
+HRESULT SoftwareServer::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream)
+{
+	return EventLogLicenseHelper::ReadEventLog(pBstrEventLogAttribsListStream);
 }
 
 //HRESULT SoftwareServer::RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense)
@@ -2819,6 +2921,12 @@ HRESULT SoftwareServer::ConvertProtectionKeyToLicInfoAttribsInternal(ProtectionK
 //	}
 //	return hr;
 }
+
+HRESULT SoftwareServer::GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance)
+{
+	SafeMutex mutex(SoftwareLicenseLock);
+	return licCache.GetProductIdAndApplicationInstanceByLicenseID(licenseID, pIntProductID, pBstrApplicationInstance);
+}
 //
 HRESULT SoftwareServer::MergeLicInfoAttribsInternal(Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeFromLicenseInfoAttribs, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeToLicenseInfoAttribs)
 {
@@ -2945,6 +3053,15 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 	HRESULT hr(S_OK);
 	try
 	{
+		// CR.16165 - Don't clear once a day limit of message
+		std::map<int/*ProductID*/, time_t> origExpirationList;
+		for(	ProductReminderMap::iterator prodReminderMapIt = pProdReminderMap->begin();
+				prodReminderMapIt != pProdReminderMap->end();
+				prodReminderMapIt++)
+		{
+			origExpirationList[prodReminderMapIt->first] = prodReminderMapIt->second.lastReminderSent;
+		}
+		
 		(*pProdReminderMap).clear();
 		if(pLicInfoAttribs != NULL)
 		{
@@ -2953,16 +3070,16 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 					prodIt != pLicInfoAttribs->productList->end();
 					prodIt++)
 			{
-				if(prodIt->bUseExpirationDate || prodIt->bUseActivations)
+				if((prodIt->bUseExpirationDate==true) || (prodIt->bUseActivations==true))
 				{
 					//Convert SoftwareLicense ExpirationDate to time_t
 					SYSTEMTIME swProdLicExpiresDateSystime;
-					if(prodIt->bUseActivations)
+					if(prodIt->bUseActivations == true)
 					{
 						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->activationCurrentExpirationDate)).c_str(), swProdLicExpiresDateSystime))
 							throw E_FAIL;
 					}
-					else if(prodIt->bUseExpirationDate)
+					else if(prodIt->bUseExpirationDate == true)
 					{
 						if(!TimeHelper::StringToSystemTime(std::wstring(SpdAttribs::WStringObj(prodIt->expirationDate)).c_str(), swProdLicExpiresDateSystime))
 							throw E_FAIL;
@@ -2978,9 +3095,15 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 							modIt != prodIt->moduleList->end();
 							modIt++)
 					{
-						tmpModToExpDateList.push_back(ModuleIdToExpirationDate(modIt->moduleID, swProdLicExpiresDateTimeT));
+						//CR.FIX.14706 - Only include modules that are licensed.
+						if (modIt->moduleValue != 0)
+							tmpModToExpDateList.push_back(ModuleIdToExpirationDate(modIt->moduleID, swProdLicExpiresDateTimeT));
 					}
 					(*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList = tmpModToExpDateList;
+
+					// CR.16165 - Don't clear once a day limit of message
+					if (origExpirationList.find((*prodIt).productID) !=origExpirationList.end())
+						(*pProdReminderMap)[(*prodIt).productID].lastReminderSent = origExpirationList.find((*prodIt).productID)->second;
 				}
 				
 			}
@@ -3012,7 +3135,7 @@ HRESULT SoftwareServer::TimesUp()
 		VariantTimeToSystemTime(currentTimeVT.date, &currentSystime);
 		wchar_t currentTimestamp[256];
 		TimeHelper::SystemTimeToString(currentTimestamp, _countof(currentTimestamp), currentSystime);
-wchar_t debug_buf[1024];
+//wchar_t debug_buf[1024];
 //_snwprintf_s(debug_buf, 1024, L"SoftwareServer::TimesUp() - currentTimestamp: %s", currentTimestamp);
 //OutputDebugStringW(debug_buf);
 
@@ -3026,7 +3149,7 @@ wchar_t debug_buf[1024];
 		}
 		if(SUCCEEDED(hr))
 		{
-			SoftwareLicenseMgr* pNewSwLicMgr;
+			//SoftwareLicenseMgr* pNewSwLicMgr;
 			for(	Lic_ServerDataAttribs::TVector_Lic_ServerDataFileInfoAttribsList::iterator licSrvFileInfoListIt = tmpFileInfoList->begin();
 					licSrvFileInfoListIt != tmpFileInfoList->end();
 					licSrvFileInfoListIt++)
@@ -3114,36 +3237,55 @@ wchar_t debug_buf[1024];
 					prodReminderMapIt != swLicReminderMap[wstrSoftwareLicenseName].prodReminderMap.end();
 					prodReminderMapIt++)
 			{
-				//Check on the closest expiration date, 
-				//14 days to expiration, send reminder every 12 hours
-				//7 days to expiration, send reminder every 4 hours
-				//3 days to expiration, send reminder every 1 hours
+				//// Remove these checks, now only do one a day...
+				////Check on the closest expiration date, 
+				////14 days to expiration, send reminder every 12 hours
+				////7 days to expiration, send reminder every 4 hours
+				////3 days to expiration, send reminder every 1 hours
 
+				//time_t sendReminderTimePeriod = 0;
+				//if(prodReminderMapIt->second.closestExpDate == -1)
+				//	sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//else if(prodReminderMapIt->second.closestExpDate < curTimeT)
+				//	sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//else	//if(prodReminderMapIt->second.closestExpDate > curTimeT)
+				//{
+				//	double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTimeT);
+				//	if(timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 14)
+				//		sendReminderTimePeriod = 0;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 14 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 7)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 12;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 7 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 3)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 4;
+				//	else if(TimeHelper::ONE_DAY_IN_SECONDS * 3 >= timeTillExpiration && timeTillExpiration > 0)
+				//		sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+				//}
+
+				//CR.13285 - Only generate messages if less than 14 days to expiring.
+				//Check on the closest expiration date, Change to not flood event log
+				//14 days to expiration or less, send reminder every 1 day
 				time_t sendReminderTimePeriod = 0;
-				if(prodReminderMapIt->second.closestExpDate == -1)
-					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
-				else if(prodReminderMapIt->second.closestExpDate < curTimeT)
-					sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
-				else	//if(prodReminderMapIt->second.closestExpDate > curTimeT)
+				if((prodReminderMapIt->second.closestExpDate == -1) || 
+					(prodReminderMapIt->second.closestExpDate < curTimeT) || 
+					((prodReminderMapIt->second.closestExpDate > curTimeT) && (difftime(prodReminderMapIt->second.closestExpDate, curTimeT) <= TimeHelper::ONE_DAY_IN_SECONDS * 14))
+					)
 				{
-					double timeTillExpiration = difftime(prodReminderMapIt->second.closestExpDate, curTimeT);
-					if(timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 14)
-						sendReminderTimePeriod = 0;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 14 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 7)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 12;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 7 >= timeTillExpiration && timeTillExpiration > TimeHelper::ONE_DAY_IN_SECONDS * 3)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS * 4;
-					else if(TimeHelper::ONE_DAY_IN_SECONDS * 3 >= timeTillExpiration && timeTillExpiration > 0)
-						sendReminderTimePeriod = TimeHelper::ONE_HOUR_IN_SECONDS;
+					sendReminderTimePeriod = TimeHelper::ONE_DAY_IN_SECONDS;
 				}
 
 				bool bSendReminder = false;
-				bSendReminder = prodReminderMapIt->second.lastReminderSent == -1;
-				if(!bSendReminder && sendReminderTimePeriod!=0)
+				if(sendReminderTimePeriod!=0)
 				{
-					//difftime returns the elapsed time in seconds, from timer0 to timer1 - double difftime(time_t timer1, time_t timer0 );
-					double timeSinceLastReminder = difftime(curTimeT, prodReminderMapIt->second.lastReminderSent);
-					bSendReminder = timeSinceLastReminder >= sendReminderTimePeriod;
+					if(prodReminderMapIt->second.lastReminderSent == -1)
+					{
+						bSendReminder = true;
+					}
+					else
+					{
+						//difftime returns the elapsed time in seconds, from timer0 to timer1 - double difftime(time_t timer1, time_t timer0 );
+						double timeSinceLastReminder = difftime(curTimeT, prodReminderMapIt->second.lastReminderSent);
+						bSendReminder = timeSinceLastReminder >= sendReminderTimePeriod;
+					}
 				}
 
 				if(bSendReminder)
