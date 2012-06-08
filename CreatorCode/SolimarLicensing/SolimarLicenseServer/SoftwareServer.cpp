@@ -309,7 +309,16 @@ const int BUF_SIZE = 1024;
 
 		//CR.13684 - Clear out reminder list when forcing a refresh
 		if(bForceRefresh)
-			swLicReminderMap.clear();
+		{
+			// CR.16165 - Don't clear once a day limit of message
+			for (	std::map<std::wstring, SoftwareLicReminderClass>::iterator swLicReminderMapIt = swLicReminderMap.begin();
+					swLicReminderMapIt != swLicReminderMap.end();
+					swLicReminderMapIt++
+				)
+			{
+				swLicReminderMapIt->second.softwareLicReminderClassLastRefresh = -1;
+			}
+		}
 	}
 	catch(HRESULT &ehr)
 	{
@@ -3044,6 +3053,15 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 	HRESULT hr(S_OK);
 	try
 	{
+		// CR.16165 - Don't clear once a day limit of message
+		std::map<int/*ProductID*/, time_t> origExpirationList;
+		for(	ProductReminderMap::iterator prodReminderMapIt = pProdReminderMap->begin();
+				prodReminderMapIt != pProdReminderMap->end();
+				prodReminderMapIt++)
+		{
+			origExpirationList[prodReminderMapIt->first] = prodReminderMapIt->second.lastReminderSent;
+		}
+		
 		(*pProdReminderMap).clear();
 		if(pLicInfoAttribs != NULL)
 		{
@@ -3082,6 +3100,10 @@ HRESULT SoftwareServer::PopulateProductReminderMap(Lic_PackageAttribs::Lic_Licen
 							tmpModToExpDateList.push_back(ModuleIdToExpirationDate(modIt->moduleID, swProdLicExpiresDateTimeT));
 					}
 					(*pProdReminderMap)[(*prodIt).productID].modIdToExpDateList = tmpModToExpDateList;
+
+					// CR.16165 - Don't clear once a day limit of message
+					if (origExpirationList.find((*prodIt).productID) !=origExpirationList.end())
+						(*pProdReminderMap)[(*prodIt).productID].lastReminderSent = origExpirationList.find((*prodIt).productID)->second;
 				}
 				
 			}
