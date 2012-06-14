@@ -195,7 +195,7 @@ namespace Client.Creator
                         reactivateToolStripMenuItem.Enabled = true;
                     }
                 }
-                createPacketFileToolStripMenuItem.Enabled = (licData.HasActiveProductLicense()) ? m_Permissions.pt_permanent_pwd.Value && bHasValidTokens : m_Permissions.pt_permanent_pwd.Value;
+                createPacketFileToolStripMenuItem.Enabled = (licData.HasActiveProductLicense()) ? m_Permissions.pt_version_pwd.Value && bHasValidTokens : m_Permissions.pt_version_pwd.Value;
             }   
         }
 
@@ -252,7 +252,7 @@ namespace Client.Creator
                 if (!lsp.LockStatus) //DB - 1             
                     addProductLicenseMainToolStripDropDownBtn.Enabled = lsp.LockedByCurrentUser() && lsp.IsActive && m_Permissions.pt_create_modify_key.Value;                
                 //disallow packet generation for active LS, active PL, 0 tokens, no permissions
-                createPacketMainToolStripBtn.Enabled = (lsp.HasActiveProductLicense()) ? m_Permissions.pt_permanent_pwd.Value && lsp.HasValidTokens : m_Permissions.pt_permanent_pwd.Value;
+                createPacketMainToolStripBtn.Enabled = (lsp.HasActiveProductLicense()) ? m_Permissions.pt_version_pwd.Value && lsp.HasValidTokens : m_Permissions.pt_version_pwd.Value;
             }          
         }
 
