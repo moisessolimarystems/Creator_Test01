@@ -333,7 +333,8 @@ namespace LicenseServerError
 	*/
 
 	#define SL_IS_LIC_HR(hr) \
-		(((hr) & ITF_LIC_MIN) == ITF_LIC_MIN)
+		(((hr) & 0x0000F000) == ITF_LIC_MIN)
+
 	/*
 	* SL_EC_FROM_EHR()
 	*
