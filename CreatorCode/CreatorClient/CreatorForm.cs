@@ -556,9 +556,11 @@ namespace Client.Creator
                         if (bFound)
                         {
                             client.KeyFormat(keyValue);
+                            selectedToken.LicenseID = -1;
                             selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
                             selectedToken.DeactivatedDate = DateTime.Now;
                             client.UpdateToken(selectedToken);
+                            HardwareKeyListView.SelectedItems[0].SubItems[1].Text = string.Empty;
                             HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
                             HardwareKeyListView.SelectedItems[0].SubItems[3].Text = DateTime.Now.ToString(); 
                         }
