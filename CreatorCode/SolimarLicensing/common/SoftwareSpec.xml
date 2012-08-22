@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="10">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="12">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -331,9 +331,11 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="104" moduleName="Parallel Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="105" moduleName="SCSI SDI Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
-      			<Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="6"/>      
+      <Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="6"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="108" moduleName="AFPDS Resource Checker" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="12"/>      
+      
 
-			<!-- Module IDs identifying resources -->
+      <!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP/IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>
@@ -385,7 +387,7 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="20" productName="Library Services">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip"  moduleTrialLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="11"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="PDF Renderer" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
