@@ -144,6 +144,11 @@ namespace Service.Creator
 
         #region License Implementation
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<int> GetUnVerifiedLicenses()
+        {
+            return LicenseTable.GetUnVerifiedLicenses();
+        }
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public IList<LicenseTable> GetLicensesByDestination(string custName, string destName, string findStr, bool bLoadOptions)
         {
             return LicenseTable.GetLicensesByDestination(custName, destName, findStr, bLoadOptions);

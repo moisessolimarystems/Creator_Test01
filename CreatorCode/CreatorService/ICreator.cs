@@ -90,6 +90,9 @@ namespace Service.Creator
         string KeyFormat(string key);
 
         [OperationContract]
+        IList<int> GetUnVerifiedLicenses();
+
+        [OperationContract]
         string KeyProgramVerification(string key, int custNum, int keyNum);
 
         [OperationContract]

@@ -177,6 +177,31 @@ namespace CreatorData
             }
         }
 
+        public static IList<int> GetUnVerifiedLicenses()
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.ObjectTrackingEnabled = false;
+                //find packets for given licenseID and is verified is false = total is 0 
+                //this means all packets are verified
+
+                //find packets where 
+                //(packets.Where(t => t.LicenseID == licenses[index].ID && t.IsVerified == false).Count() == 0 && packets.Where(t => t.LicenseID == licenses[index].ID).Count() > 0) ? bool.TrueString : bool.FalseString;
+                var packets = from c in db.LicenseTables
+                              from p in db.PacketTables
+                              where p.LicenseID == c.ID &&
+                              p.IsVerified == false
+                              select p;
+                var licenses = from p in packets
+                               from c in db.LicenseTables
+                               where p.LicenseID == c.ID
+                               select c.ID;
+
+               
+                return licenses.Distinct().ToList();
+            }
+        }
+
         public static IList<string> GetEnabledLicenseNamesByCustomer(string custName)
         {
             //return all license names for a customer where a license has transactions that have no packetid value
