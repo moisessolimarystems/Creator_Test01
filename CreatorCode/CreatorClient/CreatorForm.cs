@@ -4389,7 +4389,7 @@ namespace Client.Creator
         {
             IList<ProductLicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
-            IList<PacketTable> packets = null;
+            IList<int> unverifiedLicenses = null;
             IList<TokenTable> tokens = null;
 
             CustomerTable customer = null;
@@ -4399,7 +4399,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {                
                 licenses = client.GetProductLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
-                packets = client.GetPacketsByLicenseName(string.Empty);
+                unverifiedLicenses = client.GetUnVerifiedLicenses();
                 customers = client.GetAllCustomers(string.Empty, false);
                 tokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
             });
@@ -4443,8 +4443,8 @@ namespace Client.Creator
                     if (validationType == "Hardware")
                         validationType = tokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
                     newItem.SubItems.Add(validationType);
-                    
-                    verifiedStatus = (packets.Where(p => p.LicenseID == licenses[index].LicenseID && p.IsVerified == false).Count() == 0 && (packets.Where(p => p.LicenseID == licenses[index].LicenseID).Count() > 0)) ? bool.TrueString : bool.FalseString;
+
+                    verifiedStatus = unverifiedLicenses.Contains(licenses[index].LicenseID) ? bool.FalseString : bool.TrueString;
                     newItem.SubItems.Add(verifiedStatus);
                     newItem.SubItems.Add(licenses[index].Description);
                     lvItems[index] = newItem;                    
@@ -4460,7 +4460,7 @@ namespace Client.Creator
             IList<LicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
             IList<TokenTable> tokens = null;
-            IList<PacketTable> packets = null;
+            IList<int> unverifiedLicenses = null;
             CustomerTable customer = null;
             string[] plSplit;
             string validationType, verifiedStatus;
@@ -4468,7 +4468,7 @@ namespace Client.Creator
             {
                 licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll, false);              
                 customers = client.GetAllCustomers(string.Empty, false);
-                packets = client.GetPacketsByLicenseName(string.Empty);
+                unverifiedLicenses = client.GetUnVerifiedLicenses();
                 tokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
             });
             PopulateReportListViewColumns(Report.ReportType.LicenseServer);
@@ -4496,7 +4496,7 @@ namespace Client.Creator
                     if (validationType == "Hardware")
                         validationType = tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
                     newItem.SubItems.Add(validationType);
-                    verifiedStatus = (packets.Where(t => t.LicenseID == licenses[index].ID && t.IsVerified == false).Count() == 0 && packets.Where(t => t.LicenseID == licenses[index].ID).Count() > 0) ? bool.TrueString : bool.FalseString;
+                    verifiedStatus = unverifiedLicenses.Contains(licenses[index].ID) ? bool.FalseString : bool.TrueString;
                     newItem.SubItems.Add(verifiedStatus);
                     newItem.SubItems.Add(licenses[index].LicenseComments);
                     lvItems[index] = newItem;

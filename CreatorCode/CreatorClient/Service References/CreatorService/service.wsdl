@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_UpdateToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_UpdateToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateTokenResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_DeleteToken_InputMessage">
     <wsdl:part name="parameters" element="tns:DeleteToken" />
   </wsdl:message>
@@ -200,6 +206,12 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetLicenseServerVersion_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetLicenseServerVersionResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeletePacket_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeletePacket" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_DeletePacket_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeletePacketResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetTransactionsByLicenseName_InputMessage">
     <wsdl:part name="parameters" element="tns:GetTransactionsByLicenseName" />
@@ -411,12 +423,6 @@
   <wsdl:message name="ICreator_CreateToken_OutputMessage">
     <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_UpdateToken_InputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateToken" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_UpdateToken_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateTokenResponse" />
-  </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
   </wsdl:message>
@@ -549,6 +555,12 @@
   <wsdl:message name="ICreator_KeyFormat_OutputMessage">
     <wsdl:part name="parameters" element="tns:KeyFormatResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetUnVerifiedLicenses_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUnVerifiedLicenses" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetUnVerifiedLicenses_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUnVerifiedLicensesResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_KeyProgramVerification_InputMessage">
     <wsdl:part name="parameters" element="tns:KeyProgramVerification" />
   </wsdl:message>
@@ -627,13 +639,11 @@
   <wsdl:message name="ICreator_UpdatePackets_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdatePacketsResponse" />
   </wsdl:message>
-  <wsdl:message name="ICreator_DeletePacket_InputMessage">
-    <wsdl:part name="parameters" element="tns:DeletePacket" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_DeletePacket_OutputMessage">
-    <wsdl:part name="parameters" element="tns:DeletePacketResponse" />
-  </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="UpdateToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="DeleteToken">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeleteToken" message="tns:ICreator_DeleteToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeleteTokenResponse" message="tns:ICreator_DeleteToken_OutputMessage" />
@@ -753,6 +763,10 @@
     <wsdl:operation name="GetLicenseServerVersion">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersion" message="tns:ICreator_GetLicenseServerVersion_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetLicenseServerVersionResponse" message="tns:ICreator_GetLicenseServerVersion_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeletePacket">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeletePacket" message="tns:ICreator_DeletePacket_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeletePacketResponse" message="tns:ICreator_DeletePacket_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetTransactionsByLicenseName">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetTransactionsByLicenseName" message="tns:ICreator_GetTransactionsByLicenseName_InputMessage" />
@@ -894,10 +908,6 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="UpdateToken">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllCustomersResponse" message="tns:ICreator_GetAllCustomers_OutputMessage" />
@@ -986,6 +996,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/KeyFormat" message="tns:ICreator_KeyFormat_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/KeyFormatResponse" message="tns:ICreator_KeyFormat_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetUnVerifiedLicenses">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetUnVerifiedLicenses" message="tns:ICreator_GetUnVerifiedLicenses_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetUnVerifiedLicensesResponse" message="tns:ICreator_GetUnVerifiedLicenses_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="KeyProgramVerification">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/KeyProgramVerification" message="tns:ICreator_KeyProgramVerification_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/KeyProgramVerificationResponse" message="tns:ICreator_KeyProgramVerification_OutputMessage" />
@@ -1038,15 +1052,20 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdatePackets" message="tns:ICreator_UpdatePackets_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdatePacketsResponse" message="tns:ICreator_UpdatePackets_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation name="DeletePacket">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/DeletePacket" message="tns:ICreator_DeletePacket_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/DeletePacketResponse" message="tns:ICreator_DeletePacket_OutputMessage" />
-    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="CreatorServiceTcp" type="tns:ICreator">
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="UpdateToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="DeleteToken">
       <soap12:operation soapAction="http://tempuri.org/ICreator/DeleteToken" style="document" />
       <wsdl:input>
@@ -1310,6 +1329,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetLicenseServerVersion">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetLicenseServerVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeletePacket">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/DeletePacket" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -1632,15 +1660,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="UpdateToken">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllCustomers" style="document" />
       <wsdl:input>
@@ -1839,6 +1858,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetUnVerifiedLicenses">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetUnVerifiedLicenses" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="KeyProgramVerification">
       <soap12:operation soapAction="http://tempuri.org/ICreator/KeyProgramVerification" style="document" />
       <wsdl:input>
@@ -1949,15 +1977,6 @@
     </wsdl:operation>
     <wsdl:operation name="UpdatePackets">
       <soap12:operation soapAction="http://tempuri.org/ICreator/UpdatePackets" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="DeletePacket">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/DeletePacket" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
