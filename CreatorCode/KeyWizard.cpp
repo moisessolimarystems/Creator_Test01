@@ -1359,7 +1359,7 @@ AnsiString TKeyWizardFrm::DBFormatVersion(AnsiString strVersion)
     AnsiString majorVersion, minorVersion;
     int pos;
     pos = strVersion.AnsiPos(".");
-    majorVersion = AnsiString(strVersion.SubString(0,pos-1).ToInt());
+    majorVersion = AnsiString::Format("%X", OPENARRAY(TVarRec,(strVersion.SubString(0,pos-1).ToInt())));
     minorVersion = AnsiString(strVersion.SubString(pos+1, strVersion.Length()-(majorVersion.Length())).ToInt());
 
     if(minorVersion.Length() == 1)
@@ -1372,29 +1372,12 @@ bool TKeyWizardFrm::IsValidVersionFormat(AnsiString versionString)
 {
     AnsiString majorVersion, minorVersion, tempString;
     int count = 0, pos = 0, number = 0;
-    //find position of period
-    tempString = versionString;
-    do
-    {
-        pos = tempString.AnsiPos(".");
-        tempString = tempString.SubString(pos+1, tempString.Length()-pos);
-        if(pos != 0)
-            count++;
-    }
-    while(pos != 0);
-    if(count != 1)
+      //only one period ...split into major, minor
+    pos = versionString.AnsiPos(".");
+    majorVersion = versionString.SubString(0,pos-1);
+
+    if((majorVersion.ToInt() < 1) || majorVersion.ToInt() > 15)
         return false;
-    else
-    {   //only one period ...split into major, minor
-        pos = versionString.AnsiPos(".");
-        majorVersion = versionString.SubString(0,pos-1);
-        if((majorVersion.Length() > 1) ||
-           (StrToIntDef(majorVersion, -1) < 0) ||
-           (majorVersion.ToInt() < 1))
-            return false;
-        minorVersion = versionString.SubString(pos+1, versionString.Length()-(majorVersion.Length()));
-        if((minorVersion.Length() > 2) || (StrToIntDef(minorVersion, -1) < 0))
-            return false;
-    }
+    minorVersion = versionString.SubString(pos+1, versionString.Length()-(majorVersion.Length()));
     return true;
 }
