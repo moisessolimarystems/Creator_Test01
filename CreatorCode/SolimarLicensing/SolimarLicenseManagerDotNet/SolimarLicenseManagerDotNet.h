@@ -213,6 +213,7 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			static bool IsKeyTypeDevelopment(int keyType){return (keyType == 13);}
 			static String^ GetLicenseIdString(int licenseID)
 			{
+				// CR.FIX.15648 - Fixed Extension 5 not displaying correctly.
 				String^ licenseType = "Unknown License";
 				if (licenseID == 0)
 					licenseType = "Initial Trial";
@@ -222,12 +223,14 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 					licenseType = "Base";
 				else if (licenseID == 3)
 					licenseType = "Uninitialized Trial";
-				else if (licenseID == 3)
-					licenseType = "Uninitialized Trial";
-				else if (4 <= licenseID && licenseID <= 6)
-					licenseType = "Extended Trial" + (licenseID-2).ToString();
-				else if (12 <= licenseID && licenseID <= 21)
-					licenseType = "Extended Trial" + (licenseID - 6).ToString();
+				else if (4 <= licenseID && licenseID <= 7)
+					licenseType = "Extended Trial " + (licenseID-2).ToString();
+				else if (licenseID == 10)
+					licenseType = "Unused";
+				else if (licenseID == 11)
+					licenseType = "Deactivated";
+				else if (12 <= licenseID && licenseID <= 22)
+					licenseType = "Extended Trial " + (licenseID - 6).ToString();
 				return licenseType;
 			}
 	};
