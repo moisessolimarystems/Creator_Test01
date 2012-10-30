@@ -1481,14 +1481,16 @@ namespace SolimarLicenseViewer
                             lvItem.SubItems.Add(keyInfo.licenseTypeName);
                             int daysLeft = (int)(keyInfo.hoursLeft / 24);
 
-                            if (daysLeft == 0 && keyInfo.bIsActive)
+                            // CR.FIX.16562 - expiration for creator 2 trial keys does not display, fixed issue for trial keys
+                            // looking like perm keys when they are in the last day.  Use keyInfo.hoursLeft instead of days.
+                            if (keyInfo.hoursLeft == 0 && keyInfo.bIsActive)
                                 lvItem.SubItems.Add("Unlimited");
                             else if (keyInfo.IsKeyTypeDevelopment())
                                 lvItem.SubItems.Add(daysLeft.ToString());
                             else
                                 lvItem.SubItems.Add("-");
 
-                            if (daysLeft == 0 && keyInfo.bIsActive)
+                            if (keyInfo.hoursLeft == 0 && keyInfo.bIsActive)
                                 lvItem.SubItems.Add("Unlimited");
                             else
                                 lvItem.SubItems.Add(keyInfo.expirationDate.ToString());
