@@ -1924,18 +1924,19 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 		if(licServerDataMgr.InClockViolation())
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_ARCHIVE;
 
+		// CR.FIX.16565 - Comment out code below to try...
 		//make sure that if there is a licenseID, it must match because if it doesn't match that means that the license file might have been replaced with an older one
-		std::wstring tmpLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
-		if(tmpLicenseCode.length() != 0)
-		{
-			SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
-			if(pSwLicMgr != NULL)
-			{
-				hr = pSwLicMgr->ValidateLicenseCode(tmpLicenseCode.c_str());
-				if(FAILED(hr))
-					throw hr;
-			}
-		}
+		//std::wstring tmpLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
+		//if(tmpLicenseCode.length() != 0)
+		//{
+		//	SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
+		//	if(pSwLicMgr != NULL)
+		//	{
+		//		hr = pSwLicMgr->ValidateLicenseCode(tmpLicenseCode.c_str());
+		//		if(FAILED(hr))
+		//			throw hr;
+		//	}
+		//}
 
 		// Set a variable in licenseInfoAttribs to license archive
 		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs tmpVerTokenAttribs;
