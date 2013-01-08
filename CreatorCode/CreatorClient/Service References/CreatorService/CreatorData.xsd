@@ -67,6 +67,19 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfSoftwareTokenTable" nillable="true" type="tns:ArrayOfSoftwareTokenTable" />
+  <xs:complexType name="ArrayOfProductLicenseType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ProductLicenseType" nillable="true" type="tns:ProductLicenseType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfProductLicenseType" nillable="true" type="tns:ArrayOfProductLicenseType" />
+  <xs:complexType name="ProductLicenseType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Type" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ProductLicenseType" nillable="true" type="tns:ProductLicenseType" />
   <xs:complexType name="ModuleTable">
     <xs:sequence>
       <xs:element minOccurs="0" name="ID" type="xs:int" />
@@ -143,7 +156,16 @@
       <xs:element minOccurs="0" name="Extensions" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="ProductConnection" type="xs:unsignedByte" />
       <xs:element minOccurs="0" name="DateCreated" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="TypeID" type="xs:int" />
       <xs:element minOccurs="0" name="ModuleTables" nillable="true" type="tns:ArrayOfModuleTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="ProductLicenseTypes" nillable="true" type="tns:ArrayOfProductLicenseType">
         <xs:annotation>
           <xs:appinfo>
             <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">

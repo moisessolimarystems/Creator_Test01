@@ -42,6 +42,7 @@
       <xs:enumeration value="VerifiedBy" />
       <xs:enumeration value="LicensePacket" />
       <xs:enumeration value="Token" />
+      <xs:enumeration value="ProductLicenseType" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ConditionName" nillable="true" type="tns:ConditionName" />

@@ -98,7 +98,8 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 _licenseTable.LicenseInfo = LicPackage.Stream;
-                client.UpdateLicense(_licenseTable, false);
+                _licenseTable.IsDirty = false;
+                client.UpdateLicense(_licenseTable);
             });            
         }
 
@@ -115,7 +116,7 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    softwareTokens = client.GetAllSoftwareTokens();
+                    softwareTokens = CreatorForm.s_AllSoftwareTokens;//.GetAllSoftwareTokens();
                     tokenList = client.GetTokensByLicenseName(_licenseServer);
                 });
                 foreach (TokenTable token in tokenList)  //add validation tokens for licinfo object, tokentable may contain licensecode

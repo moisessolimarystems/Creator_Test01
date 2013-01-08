@@ -182,7 +182,7 @@ namespace Client.Creator
                     LicenseTable lt = client.GetLicenseByName(Name, false);
                     if (lt != null)
                         lt.UserLock = (value) ? WindowsIdentity.GetCurrent().Name.ToLower() : null;
-                    client.UpdateLicense(lt, false);
+                    client.UpdateLicense(lt);                          
                 });
             }
         }
@@ -302,8 +302,8 @@ namespace Client.Creator
                         LicenseTable lt = client.GetLicenseByName(Name, false);
                         if (lt != null)
                         {
-                            lt.LicenseComments = value;
-                            client.UpdateLicense(lt, false);
+                            lt.LicenseComments = value;                            
+                            client.UpdateLicense(lt);
                         }
                     });
                     _comments = value;

@@ -76,6 +76,8 @@
             this.productLicenseDescriptionTextBox = new System.Windows.Forms.TextBox();
             this.notesCharactersLeftLabel = new System.Windows.Forms.Label();
             this.productLicenseAttribsGroupBox = new System.Windows.Forms.GroupBox();
+            this.typeComboBox = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.longDateLabel = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -86,9 +88,6 @@
             this.ProductLicenseTypeComboBox = new System.Windows.Forms.ComboBox();
             this.productLicenseVersionMaskedTextBox = new System.Windows.Forms.MaskedTextBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.browseCSVOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -115,7 +114,6 @@
             this.bindingNavigator1.SuspendLayout();
             this.productLicenseNotesGroupBox.SuspendLayout();
             this.productLicenseAttribsGroupBox.SuspendLayout();
-            this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -137,7 +135,7 @@
             this.topPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.topPanel.Location = new System.Drawing.Point(0, 0);
             this.topPanel.Name = "topPanel";
-            this.topPanel.Size = new System.Drawing.Size(445, 299);
+            this.topPanel.Size = new System.Drawing.Size(445, 326);
             this.topPanel.TabIndex = 3;
             // 
             // licInfoTabControl
@@ -151,7 +149,7 @@
             this.licInfoTabControl.Margin = new System.Windows.Forms.Padding(1);
             this.licInfoTabControl.Name = "licInfoTabControl";
             this.licInfoTabControl.SelectedIndex = 0;
-            this.licInfoTabControl.Size = new System.Drawing.Size(445, 299);
+            this.licInfoTabControl.Size = new System.Drawing.Size(445, 326);
             this.licInfoTabControl.TabIndex = 9;
             // 
             // TokenTabPage
@@ -159,7 +157,7 @@
             this.TokenTabPage.Controls.Add(this.tokenAttribsSplitContainer);
             this.TokenTabPage.Location = new System.Drawing.Point(4, 22);
             this.TokenTabPage.Name = "TokenTabPage";
-            this.TokenTabPage.Size = new System.Drawing.Size(437, 273);
+            this.TokenTabPage.Size = new System.Drawing.Size(437, 325);
             this.TokenTabPage.TabIndex = 1;
             this.TokenTabPage.Text = "Validation Tokens";
             this.TokenTabPage.UseVisualStyleBackColor = true;
@@ -181,8 +179,8 @@
             // 
             this.tokenAttribsSplitContainer.Panel2.Controls.Add(this.groupBox5);
             this.tokenAttribsSplitContainer.Panel2.Controls.Add(this.groupBox3);
-            this.tokenAttribsSplitContainer.Size = new System.Drawing.Size(437, 273);
-            this.tokenAttribsSplitContainer.SplitterDistance = 35;
+            this.tokenAttribsSplitContainer.Size = new System.Drawing.Size(437, 325);
+            this.tokenAttribsSplitContainer.SplitterDistance = 41;
             this.tokenAttribsSplitContainer.TabIndex = 10;
             // 
             // label11
@@ -227,10 +225,10 @@
             this.tokenListView.FullRowSelect = true;
             this.tokenListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.tokenListView.HideSelection = false;
-            this.tokenListView.Location = new System.Drawing.Point(19, 46);
+            this.tokenListView.Location = new System.Drawing.Point(19, 36);
             this.tokenListView.Margin = new System.Windows.Forms.Padding(40, 5, 5, 5);
             this.tokenListView.Name = "tokenListView";
-            this.tokenListView.Size = new System.Drawing.Size(375, 84);
+            this.tokenListView.Size = new System.Drawing.Size(375, 94);
             this.tokenListView.TabIndex = 14;
             this.tokenListView.UseCompatibleStateImageBehavior = false;
             this.tokenListView.View = System.Windows.Forms.View.Details;
@@ -307,7 +305,7 @@
             this.PacketTabPage.Controls.Add(this.licPktSplitContainer);
             this.PacketTabPage.Location = new System.Drawing.Point(4, 22);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(437, 273);
+            this.PacketTabPage.Size = new System.Drawing.Size(437, 325);
             this.PacketTabPage.TabIndex = 3;
             this.PacketTabPage.Text = "License Packet";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -329,8 +327,8 @@
             // 
             this.licPktSplitContainer.Panel2.Controls.Add(this.groupBox4);
             this.licPktSplitContainer.Panel2.Controls.Add(this.licPacketAttribsGroupBox);
-            this.licPktSplitContainer.Size = new System.Drawing.Size(437, 273);
-            this.licPktSplitContainer.SplitterDistance = 35;
+            this.licPktSplitContainer.Size = new System.Drawing.Size(437, 325);
+            this.licPktSplitContainer.SplitterDistance = 41;
             this.licPktSplitContainer.TabIndex = 2;
             // 
             // label7
@@ -447,7 +445,7 @@
             this.orderTabPage.Controls.Add(this.productLicenseSplitContainer);
             this.orderTabPage.Location = new System.Drawing.Point(4, 22);
             this.orderTabPage.Name = "orderTabPage";
-            this.orderTabPage.Size = new System.Drawing.Size(437, 273);
+            this.orderTabPage.Size = new System.Drawing.Size(437, 300);
             this.orderTabPage.TabIndex = 4;
             this.orderTabPage.Text = "Product License";
             this.orderTabPage.UseVisualStyleBackColor = true;
@@ -471,8 +469,8 @@
             this.productLicenseSplitContainer.Panel2.BackColor = System.Drawing.Color.Transparent;
             this.productLicenseSplitContainer.Panel2.Controls.Add(this.productLicenseNotesGroupBox);
             this.productLicenseSplitContainer.Panel2.Controls.Add(this.productLicenseAttribsGroupBox);
-            this.productLicenseSplitContainer.Size = new System.Drawing.Size(437, 273);
-            this.productLicenseSplitContainer.SplitterDistance = 51;
+            this.productLicenseSplitContainer.Size = new System.Drawing.Size(437, 300);
+            this.productLicenseSplitContainer.SplitterDistance = 55;
             this.productLicenseSplitContainer.TabIndex = 21;
             // 
             // productLicenseLabelRow1
@@ -518,7 +516,7 @@
             // bindingNavigatorCountItem
             // 
             this.bindingNavigatorCountItem.Name = "bindingNavigatorCountItem";
-            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(36, 22);
+            this.bindingNavigatorCountItem.Size = new System.Drawing.Size(35, 22);
             this.bindingNavigatorCountItem.Text = "of {0}";
             this.bindingNavigatorCountItem.ToolTipText = "Total number of items";
             // 
@@ -612,7 +610,7 @@
             // 
             this.productLicenseNotesGroupBox.Controls.Add(this.productLicenseDescriptionTextBox);
             this.productLicenseNotesGroupBox.Controls.Add(this.notesCharactersLeftLabel);
-            this.productLicenseNotesGroupBox.Location = new System.Drawing.Point(18, 140);
+            this.productLicenseNotesGroupBox.Location = new System.Drawing.Point(18, 163);
             this.productLicenseNotesGroupBox.Name = "productLicenseNotesGroupBox";
             this.productLicenseNotesGroupBox.Size = new System.Drawing.Size(411, 95);
             this.productLicenseNotesGroupBox.TabIndex = 1;
@@ -621,12 +619,12 @@
             // 
             // productLicenseDescriptionTextBox
             // 
-            this.productLicenseDescriptionTextBox.Location = new System.Drawing.Point(25, 19);
+            this.productLicenseDescriptionTextBox.Location = new System.Drawing.Point(14, 19);
             this.productLicenseDescriptionTextBox.Margin = new System.Windows.Forms.Padding(40, 3, 40, 3);
             this.productLicenseDescriptionTextBox.MaxLength = 255;
             this.productLicenseDescriptionTextBox.Multiline = true;
             this.productLicenseDescriptionTextBox.Name = "productLicenseDescriptionTextBox";
-            this.productLicenseDescriptionTextBox.Size = new System.Drawing.Size(360, 49);
+            this.productLicenseDescriptionTextBox.Size = new System.Drawing.Size(384, 49);
             this.productLicenseDescriptionTextBox.TabIndex = 10;
             this.productLicenseDescriptionTextBox.TextChanged += new System.EventHandler(this.productLicenseDescriptionTextBox_TextChanged);
             // 
@@ -635,7 +633,7 @@
             this.notesCharactersLeftLabel.AutoSize = true;
             this.notesCharactersLeftLabel.BackColor = System.Drawing.Color.Transparent;
             this.notesCharactersLeftLabel.ForeColor = System.Drawing.SystemColors.ControlDark;
-            this.notesCharactersLeftLabel.Location = new System.Drawing.Point(22, 71);
+            this.notesCharactersLeftLabel.Location = new System.Drawing.Point(11, 71);
             this.notesCharactersLeftLabel.Margin = new System.Windows.Forms.Padding(40, 0, 3, 0);
             this.notesCharactersLeftLabel.Name = "notesCharactersLeftLabel";
             this.notesCharactersLeftLabel.Size = new System.Drawing.Size(211, 13);
@@ -644,6 +642,8 @@
             // 
             // productLicenseAttribsGroupBox
             // 
+            this.productLicenseAttribsGroupBox.Controls.Add(this.typeComboBox);
+            this.productLicenseAttribsGroupBox.Controls.Add(this.label4);
             this.productLicenseAttribsGroupBox.Controls.Add(this.longDateLabel);
             this.productLicenseAttribsGroupBox.Controls.Add(this.label6);
             this.productLicenseAttribsGroupBox.Controls.Add(this.label2);
@@ -655,10 +655,29 @@
             this.productLicenseAttribsGroupBox.Controls.Add(this.productLicenseVersionMaskedTextBox);
             this.productLicenseAttribsGroupBox.Location = new System.Drawing.Point(18, 3);
             this.productLicenseAttribsGroupBox.Name = "productLicenseAttribsGroupBox";
-            this.productLicenseAttribsGroupBox.Size = new System.Drawing.Size(411, 131);
+            this.productLicenseAttribsGroupBox.Size = new System.Drawing.Size(411, 161);
             this.productLicenseAttribsGroupBox.TabIndex = 0;
             this.productLicenseAttribsGroupBox.TabStop = false;
             this.productLicenseAttribsGroupBox.Text = "[Edit]";
+            // 
+            // typeComboBox
+            // 
+            this.typeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.typeComboBox.FormattingEnabled = true;
+            this.typeComboBox.Location = new System.Drawing.Point(116, 75);
+            this.typeComboBox.Name = "typeComboBox";
+            this.typeComboBox.Size = new System.Drawing.Size(121, 21);
+            this.typeComboBox.TabIndex = 16;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(68, 78);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Type";
             // 
             // longDateLabel
             // 
@@ -674,7 +693,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(17, 105);
+            this.label6.Location = new System.Drawing.Point(18, 108);
             this.label6.Margin = new System.Windows.Forms.Padding(40, 0, 3, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(90, 13);
@@ -696,7 +715,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(58, 78);
+            this.label5.Location = new System.Drawing.Point(58, 134);
             this.label5.Margin = new System.Windows.Forms.Padding(40, 0, 3, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(49, 13);
@@ -720,7 +739,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(70, 50);
+            this.label1.Location = new System.Drawing.Point(68, 51);
             this.label1.Margin = new System.Windows.Forms.Padding(40, 0, 3, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(37, 13);
@@ -729,7 +748,7 @@
             // 
             // expDateTextBox
             // 
-            this.expDateTextBox.Location = new System.Drawing.Point(116, 102);
+            this.expDateTextBox.Location = new System.Drawing.Point(116, 103);
             this.expDateTextBox.Margin = new System.Windows.Forms.Padding(40, 3, 5, 3);
             this.expDateTextBox.Name = "expDateTextBox";
             this.expDateTextBox.Size = new System.Drawing.Size(40, 20);
@@ -748,44 +767,22 @@
             // 
             // productLicenseVersionMaskedTextBox
             // 
-            this.productLicenseVersionMaskedTextBox.Location = new System.Drawing.Point(116, 75);
+            this.productLicenseVersionMaskedTextBox.Location = new System.Drawing.Point(116, 130);
             this.productLicenseVersionMaskedTextBox.Margin = new System.Windows.Forms.Padding(40, 3, 5, 3);
-            this.productLicenseVersionMaskedTextBox.Mask = "0.00";
             this.productLicenseVersionMaskedTextBox.Name = "productLicenseVersionMaskedTextBox";
             this.productLicenseVersionMaskedTextBox.Size = new System.Drawing.Size(40, 20);
             this.productLicenseVersionMaskedTextBox.TabIndex = 12;
+            this.productLicenseVersionMaskedTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.productLicenseVersionMaskedTextBox_Validating);
             // 
             // tabPage1
             // 
             this.tabPage1.BackColor = System.Drawing.SystemColors.Window;
-            this.tabPage1.Controls.Add(this.listView1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(10);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(437, 273);
+            this.tabPage1.Size = new System.Drawing.Size(437, 325);
             this.tabPage1.TabIndex = 5;
             this.tabPage1.Text = "tabPage1";
-            // 
-            // listView1
-            // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3,
-            this.columnHeader4});
-            this.listView1.Location = new System.Drawing.Point(19, 14);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(395, 239);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Product";
-            // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Version";
-            this.columnHeader4.Width = 158;
             // 
             // errorProvider1
             // 
@@ -806,7 +803,7 @@
             // LicenseInfoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.ClientSize = new System.Drawing.Size(445, 330);
+            this.ClientSize = new System.Drawing.Size(445, 357);
             this.Controls.Add(this.topPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "LicenseInfoForm";
@@ -846,7 +843,6 @@
             this.productLicenseNotesGroupBox.PerformLayout();
             this.productLicenseAttribsGroupBox.ResumeLayout(false);
             this.productLicenseAttribsGroupBox.PerformLayout();
-            this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
 
@@ -913,10 +909,9 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label longDateLabel;
         private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.CheckBox clearLicenseCodeCheckBox;
+        private System.Windows.Forms.ComboBox typeComboBox;
+        private System.Windows.Forms.Label label4;
 
 
     }

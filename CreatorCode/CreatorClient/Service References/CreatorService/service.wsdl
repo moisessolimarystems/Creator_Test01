@@ -123,6 +123,12 @@
   <wsdl:message name="ICreator_GetAllSoftwareTokens_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAllSoftwareTokensResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_GetAllProductLicenseTypes_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllProductLicenseTypes" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_GetAllProductLicenseTypes_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetAllProductLicenseTypesResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_CreateModule_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateModule" />
   </wsdl:message>
@@ -708,6 +714,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokens" message="tns:ICreator_GetAllSoftwareTokens_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllSoftwareTokensResponse" message="tns:ICreator_GetAllSoftwareTokens_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetAllProductLicenseTypes">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllProductLicenseTypes" message="tns:ICreator_GetAllProductLicenseTypes_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetAllProductLicenseTypesResponse" message="tns:ICreator_GetAllProductLicenseTypes_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="CreateModule">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateModule" message="tns:ICreator_CreateModule_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateModuleResponse" message="tns:ICreator_CreateModule_OutputMessage" />
@@ -1203,6 +1213,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetAllSoftwareTokens">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllSoftwareTokens" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetAllProductLicenseTypes">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/GetAllProductLicenseTypes" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

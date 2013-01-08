@@ -37,7 +37,8 @@ namespace Client.Creator
             ActivationTotal          = 14,
             ActivationAmount         = 15,
             Extension                = 16,
-            ProductConnection        = 17
+            ProductConnection        = 17,
+            Type                     = 18
         }
 
         enum IconList

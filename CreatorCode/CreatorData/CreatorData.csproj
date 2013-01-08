@@ -58,6 +58,7 @@
     <Compile Include="PacketTable.cs" />
     <Compile Include="PermissionTable.cs" />
     <Compile Include="CustomerTable.cs" />
+    <Compile Include="ProductLicenseTypeTable.cs" />
     <Compile Include="ProductTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LicenseTable.cs" />

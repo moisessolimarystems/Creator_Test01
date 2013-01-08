@@ -63,7 +63,8 @@ namespace Client.Creator
                     {"Product Version", ConditionName.ProductVersion},
                     {"State", ConditionName.State},
                     {"Validation", ConditionName.Validation},
-                    {"Verified", ConditionName.Verified}
+                    {"Verified", ConditionName.Verified},
+                    {"Type", ConditionName.ProductLicenseType}
                 };
 
         public static readonly IDictionary<string, ConditionOperator>
@@ -227,6 +228,10 @@ namespace Client.Creator
                         uint productID = _commLink.GetProductIDByModuleName(userCondition.Value);
                         strVal = string.Format("{0},{1}",productID, _commLink.GetModuleID(productID, userCondition.Value));
                     }
+                    else if (userCondition.Name == ConditionName.ProductLicenseType)
+                    {
+                        strVal = string.Format("{0}", ProductLicense.GetProductLicenseTypeID(userCondition.Value));                         
+                    }
                 }
                 else //HardwareToken
                 {
@@ -309,6 +314,10 @@ namespace Client.Creator
             else if (cn == ConditionName.Validation)
             {
                 definedValueList.AddRange(Enum.GetNames(typeof(ValidationType)));
+            }
+            else if (cn == ConditionName.ProductLicenseType)
+            {
+                definedValueList.AddRange(ProductLicense.ProductLicenseTypeList);
             }
             else
             {

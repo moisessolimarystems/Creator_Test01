@@ -30,15 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode22 = new System.Windows.Forms.TreeNode("Reports");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
-            System.Windows.Forms.TreeNode treeNode18 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
-            System.Windows.Forms.TreeNode treeNode19 = new System.Windows.Forms.TreeNode("Hardware Keys");
-            System.Windows.Forms.TreeNode treeNode20 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
-            treeNode12,
-            treeNode18,
-            treeNode19});
-            System.Windows.Forms.TreeNode treeNode21 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Licenses", 1, 1);
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Packets", 2, 2);
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Hardware Keys");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Creator", 3, 3, new System.Windows.Forms.TreeNode[] {
+            treeNode7,
+            treeNode8,
+            treeNode9});
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,13 +76,13 @@
             this.custNumColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.custNameColumnHeader = new System.Windows.Forms.ColumnHeader();
             this.LicenseViewSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.DetailTreeView = new System.Windows.Forms.TreeView();
+            this.CreatorImageList = new System.Windows.Forms.ImageList(this.components);
             this.findToolStrip = new System.Windows.Forms.ToolStrip();
             this.closeFindToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.findToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.nextFindToolStripButton = new System.Windows.Forms.ToolStripButton();
-            this.DetailTreeView = new System.Windows.Forms.TreeView();
-            this.CreatorImageList = new System.Windows.Forms.ImageList(this.components);
             this.CustomerToolStrip = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.DestNameComboBox = new System.Windows.Forms.ToolStripComboBox();
@@ -630,8 +630,8 @@
             // 
             // LicenseViewSplitContainer.Panel1
             // 
-            this.LicenseViewSplitContainer.Panel1.Controls.Add(this.findToolStrip);
             this.LicenseViewSplitContainer.Panel1.Controls.Add(this.DetailTreeView);
+            this.LicenseViewSplitContainer.Panel1.Controls.Add(this.findToolStrip);
             this.LicenseViewSplitContainer.Panel1.Controls.Add(this.CustomerToolStrip);
             this.LicenseViewSplitContainer.Panel1MinSize = 332;
             // 
@@ -642,53 +642,6 @@
             this.LicenseViewSplitContainer.SplitterDistance = 332;
             this.LicenseViewSplitContainer.SplitterWidth = 1;
             this.LicenseViewSplitContainer.TabIndex = 1;
-            // 
-            // findToolStrip
-            // 
-            this.findToolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.findToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.findToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.closeFindToolStripButton,
-            this.toolStripLabel4,
-            this.findToolStripTextBox,
-            this.nextFindToolStripButton});
-            this.findToolStrip.Location = new System.Drawing.Point(0, 399);
-            this.findToolStrip.Name = "findToolStrip";
-            this.findToolStrip.Size = new System.Drawing.Size(328, 25);
-            this.findToolStrip.TabIndex = 5;
-            this.findToolStrip.Text = "toolStrip1";
-            this.findToolStrip.Visible = false;
-            // 
-            // closeFindToolStripButton
-            // 
-            this.closeFindToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.closeFindToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("closeFindToolStripButton.Image")));
-            this.closeFindToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.closeFindToolStripButton.Name = "closeFindToolStripButton";
-            this.closeFindToolStripButton.Size = new System.Drawing.Size(23, 22);
-            this.closeFindToolStripButton.Click += new System.EventHandler(this.closeFindToolStripButton_Click);
-            // 
-            // toolStripLabel4
-            // 
-            this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(30, 22);
-            this.toolStripLabel4.Text = "Find";
-            // 
-            // findToolStripTextBox
-            // 
-            this.findToolStripTextBox.Name = "findToolStripTextBox";
-            this.findToolStripTextBox.Size = new System.Drawing.Size(125, 25);
-            this.findToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.findToolStripTextBox_KeyUp);
-            // 
-            // nextFindToolStripButton
-            // 
-            this.nextFindToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.nextFindToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("nextFindToolStripButton.Image")));
-            this.nextFindToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.nextFindToolStripButton.Name = "nextFindToolStripButton";
-            this.nextFindToolStripButton.Size = new System.Drawing.Size(35, 22);
-            this.nextFindToolStripButton.Text = "Next";
-            this.nextFindToolStripButton.Click += new System.EventHandler(this.nextFindToolStripButton_Click);
             // 
             // DetailTreeView
             // 
@@ -703,10 +656,11 @@
             this.DetailTreeView.Size = new System.Drawing.Size(328, 399);
             this.DetailTreeView.StateImageList = this.CreatorImageList;
             this.DetailTreeView.TabIndex = 2;
+            this.DetailTreeView.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.DetailTreeView_DrawNode);
             this.DetailTreeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeExpand);
             this.DetailTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseUp);
             this.DetailTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.DetailTreeView_AfterSelect);
-            this.DetailTreeView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DetailTreeView_MouseDown);
+            this.DetailTreeView.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeSelect);
             this.DetailTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DetailTreeView_KeyDown);
             this.DetailTreeView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.DetailTreeView_ItemDrag);
             // 
@@ -757,6 +711,53 @@
             this.CreatorImageList.Images.SetKeyName(40, "Module.ico");
             this.CreatorImageList.Images.SetKeyName(41, "ValidationTokens.png");
             this.CreatorImageList.Images.SetKeyName(42, "Custom-reports-32.png");
+            // 
+            // findToolStrip
+            // 
+            this.findToolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.findToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.findToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.closeFindToolStripButton,
+            this.toolStripLabel4,
+            this.findToolStripTextBox,
+            this.nextFindToolStripButton});
+            this.findToolStrip.Location = new System.Drawing.Point(0, 399);
+            this.findToolStrip.Name = "findToolStrip";
+            this.findToolStrip.Size = new System.Drawing.Size(328, 25);
+            this.findToolStrip.TabIndex = 5;
+            this.findToolStrip.Text = "toolStrip1";
+            this.findToolStrip.Visible = false;
+            // 
+            // closeFindToolStripButton
+            // 
+            this.closeFindToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.closeFindToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("closeFindToolStripButton.Image")));
+            this.closeFindToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.closeFindToolStripButton.Name = "closeFindToolStripButton";
+            this.closeFindToolStripButton.Size = new System.Drawing.Size(23, 22);
+            this.closeFindToolStripButton.Click += new System.EventHandler(this.closeFindToolStripButton_Click);
+            // 
+            // toolStripLabel4
+            // 
+            this.toolStripLabel4.Name = "toolStripLabel4";
+            this.toolStripLabel4.Size = new System.Drawing.Size(30, 22);
+            this.toolStripLabel4.Text = "Find";
+            // 
+            // findToolStripTextBox
+            // 
+            this.findToolStripTextBox.Name = "findToolStripTextBox";
+            this.findToolStripTextBox.Size = new System.Drawing.Size(125, 25);
+            this.findToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.findToolStripTextBox_KeyUp);
+            // 
+            // nextFindToolStripButton
+            // 
+            this.nextFindToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.nextFindToolStripButton.Image = ((System.Drawing.Image)(resources.GetObject("nextFindToolStripButton.Image")));
+            this.nextFindToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.nextFindToolStripButton.Name = "nextFindToolStripButton";
+            this.nextFindToolStripButton.Size = new System.Drawing.Size(35, 22);
+            this.nextFindToolStripButton.Text = "Next";
+            this.nextFindToolStripButton.Click += new System.EventHandler(this.nextFindToolStripButton_Click);
             // 
             // CustomerToolStrip
             // 
@@ -1339,11 +1340,11 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode22.ImageIndex = 42;
-            treeNode22.Name = "RootNode";
-            treeNode22.Text = "Reports";
+            treeNode12.ImageIndex = 42;
+            treeNode12.Name = "RootNode";
+            treeNode12.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode22});
+            treeNode12});
             this.reportsTreeView.SelectedImageIndex = 42;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
@@ -1399,29 +1400,29 @@
             this.MainTreeView.LabelEdit = true;
             this.MainTreeView.Location = new System.Drawing.Point(0, 0);
             this.MainTreeView.Name = "MainTreeView";
-            treeNode12.ImageIndex = 1;
-            treeNode12.Name = "LicenseNode";
-            treeNode12.SelectedImageIndex = 1;
-            treeNode12.Text = "Licenses";
-            treeNode18.ImageIndex = 2;
-            treeNode18.Name = "PacketNode";
-            treeNode18.SelectedImageIndex = 2;
-            treeNode18.Text = "Packets";
-            treeNode19.Name = "KeyNode";
-            treeNode19.Text = "Hardware Keys";
-            treeNode20.ImageIndex = 3;
-            treeNode20.Name = "CreatorRootNode";
-            treeNode20.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode20.SelectedImageIndex = 3;
-            treeNode20.Text = "Creator";
-            treeNode21.ImageIndex = 0;
-            treeNode21.Name = "ReportRootNode";
-            treeNode21.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            treeNode21.SelectedImageIndex = 0;
-            treeNode21.Text = "Reports";
+            treeNode7.ImageIndex = 1;
+            treeNode7.Name = "LicenseNode";
+            treeNode7.SelectedImageIndex = 1;
+            treeNode7.Text = "Licenses";
+            treeNode8.ImageIndex = 2;
+            treeNode8.Name = "PacketNode";
+            treeNode8.SelectedImageIndex = 2;
+            treeNode8.Text = "Packets";
+            treeNode9.Name = "KeyNode";
+            treeNode9.Text = "Hardware Keys";
+            treeNode10.ImageIndex = 3;
+            treeNode10.Name = "CreatorRootNode";
+            treeNode10.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode10.SelectedImageIndex = 3;
+            treeNode10.Text = "Creator";
+            treeNode11.ImageIndex = 0;
+            treeNode11.Name = "ReportRootNode";
+            treeNode11.NodeFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            treeNode11.SelectedImageIndex = 0;
+            treeNode11.Text = "Reports";
             this.MainTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode20,
-            treeNode21});
+            treeNode10,
+            treeNode11});
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
             this.MainTreeView.Size = new System.Drawing.Size(140, 107);

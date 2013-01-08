@@ -38,11 +38,15 @@ namespace Client.Creator
         List<ModuleTable> _moduleList;
         LicenseVersion _version;
 
+        public static List<ProductLicenseType> _productLicenseTypes;
+
         #endregion
 
         #region Constructor
         public ProductLicense(ProductLicenseTable plData, PermissionsTable permissions)
         {
+            if (_productLicenseTypes == null)
+                ListTypeConverter.SetList(ProductLicenseTypeList);            
             Permissions = permissions;
             _plRec = plData;
             _version = new LicenseVersion(_plRec.ProductVersion);
@@ -156,6 +160,21 @@ namespace Client.Creator
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                 });
                 return _moduleList;
+            }
+        }
+
+        public static List<string> ProductLicenseTypeList
+        {
+            get
+            {
+                if(_productLicenseTypes == null)
+                {
+                   Service<ICreator>.Use((client) =>
+                    {
+                        _productLicenseTypes = client.GetAllProductLicenseTypes();               
+                    });
+                }
+                return _productLicenseTypes.Select(t => t.Type).ToList();
             }
         }
 
@@ -448,6 +467,40 @@ namespace Client.Creator
             get { return _plRec.Extensions; }
         }
 
+        [Category("Product License"), PropertyOrder(8)]
+        [TypeConverter(typeof(ListTypeConverter))]
+        [DisplayName("Type")]
+        [Description("Type")]
+        public string Type
+        {
+            get { return GetProductLicenseType(_plRec.TypeID); }
+            set 
+            {
+                if (IsActive)
+                {
+                    if (Type != value)
+                    {
+                        Service<ICreator>.Use((client) =>
+                        {
+                            ProductLicenseTable plt = client.GetProductLicense(ID);
+                            if (plt != null)
+                            {
+                                TransactionManager.CreateTransaction(TransactionType.Type,
+                                                                      string.Empty,
+                                                                      ID,
+                                                                      string.Format("Edit {0} Type", ProductName),
+                                                                      value,
+                                                                      Type);
+                                _plRec.TypeID = GetProductLicenseTypeID(value);
+                                plt.TypeID = _plRec.TypeID;
+                                client.UpdateProductLicense(plt);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
         [Category("Product License Activations"), PropertyOrder(1)]
         [TypeConverter(typeof(ByteConverter))]
         [DisplayName("Total")]
@@ -637,6 +690,23 @@ namespace Client.Creator
         #endregion
 
         #region Methods
+
+        public static string GetProductLicenseType(int typeID)
+        {
+            if (_productLicenseTypes == null)
+                ListTypeConverter.SetList(ProductLicenseTypeList);  
+            ProductLicenseType type = _productLicenseTypes.Single(t => t.ID == typeID);
+            return (type != null) ? type.Type : "";
+        }
+
+        public static int GetProductLicenseTypeID(string type)
+        {
+            if (_productLicenseTypes == null)
+                ListTypeConverter.SetList(ProductLicenseTypeList);  
+            ProductLicenseType plType = _productLicenseTypes.Single(t => t.Type == type);
+            return (plType != null) ? plType.ID : 1;
+        }
+
         private void UpdateModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
         {
             if (IsActive)
@@ -1154,6 +1224,16 @@ namespace Client.Creator
         }
         public LicenseVersion(uint major, uint minor) { _major = major; _minor = minor; }
 
+        public LicenseVersion(int decimalVersion)
+        {
+            string hexVersion, minorVersion, majorVersion;
+            hexVersion = string.Format("{0:x}", decimalVersion);
+            minorVersion = hexVersion.Substring(hexVersion.Length - 3, 2);
+            majorVersion = hexVersion.Substring(0, hexVersion.Length - (minorVersion.Length + 1));
+            _major = UInt32.Parse(majorVersion, System.Globalization.NumberStyles.HexNumber);
+            _minor = UInt32.Parse(minorVersion, System.Globalization.NumberStyles.HexNumber);
+        }
+
         public uint Major
         {
             get { return _major; }
@@ -1168,7 +1248,7 @@ namespace Client.Creator
 
         public static bool IsValid(string version)
         {
-            Regex reg = new Regex(@"^\d+\.\d+$");
+            Regex reg = new Regex(@"\d+\.\d+$");
             if (!reg.IsMatch(version))
                 return false;
             return true;
@@ -1331,7 +1411,7 @@ namespace Client.Creator
             //Debug.WriteLine("ConvertFrom: ");
             if (value is String)
             {
-                Regex reg = new Regex(@"^\d+\.\d+$");
+                Regex reg = new Regex(@"\d+\.\d+$");
                 string version = value.ToString();
                 if (!reg.IsMatch(version))
                 {
@@ -1411,6 +1491,33 @@ namespace Client.Creator
                 stateList.Add(ProductLicenseState.LicensedAddOn);
             }
             return new StandardValuesCollection(stateList);
+        }
+    }
+
+    public class ListTypeConverter : TypeConverter
+    {
+        private static List<string> m_list = new List<string>();
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+        private StandardValuesCollection GetValues()
+        {
+            return new StandardValuesCollection(m_list);
+        }
+        public static void SetList(List<string> list)
+        {
+            m_list = list;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return GetValues();
         }
     }
     #endregion

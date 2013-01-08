@@ -242,7 +242,7 @@ namespace CreatorData
         public static void DeleteLicense(LicenseTable license)
         {
             using (CreatorDataContext db = new CreatorDataContext())
-            {
+            { 
                 db.LicenseTables.Attach(license);
                 db.LicenseTables.DeleteOnSubmit(license);
                 db.SubmitChanges();

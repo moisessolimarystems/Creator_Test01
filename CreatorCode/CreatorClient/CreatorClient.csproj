@@ -305,6 +305,9 @@
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductLicenseTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductLicenseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\CreatorService\Client.Creator.CreatorService.ProductTable.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

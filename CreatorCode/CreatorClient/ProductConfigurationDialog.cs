@@ -88,10 +88,11 @@ namespace Client.Creator
             selectedListView.SmallImageList = StaticImageList.Instance.GlobalImageList;
             IList<SoftwareTokenTable> swTokens = null;
             //load property grid with product items
-            Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
+            /*Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
             {
                 swTokens = client.GetAllSoftwareTokens();
-            });
+            });*/
+            swTokens = CreatorForm.s_AllSoftwareTokens;
             foreach (SoftwareTokenTable swt in swTokens)
             {                
                 ListViewItem lvItem = new ListViewItem();                
@@ -120,7 +121,7 @@ namespace Client.Creator
             byte status;
             ServiceProxy.Service<ICreator>.Use((client) =>
             {
-                List<SoftwareTokenTable> dbTokens = client.GetAllSoftwareTokens();
+                List<SoftwareTokenTable> dbTokens = CreatorForm.s_AllSoftwareTokens; //client.GetAllSoftwareTokens();
                 foreach (SoftwareTokenTable token in dbTokens)
                 {
                     status = (byte)(selectedListView.Items.ContainsKey(token.TokenType) ? 1 : 0);

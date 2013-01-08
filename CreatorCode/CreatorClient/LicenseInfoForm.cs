@@ -14,6 +14,8 @@ using Solimar.Licensing.LicenseManagerWrapper;
 using Solimar.Licensing.Attribs;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
+using System.Text.RegularExpressions;
+
 namespace Client.Creator
 {
     public partial class LicenseInfoForm : Shared.VisualComponents.DialogBaseForm
@@ -140,6 +142,8 @@ namespace Client.Creator
             //set to plt.productid 
             //convert id to product string
             ProductLicenseProductComboBox.SelectedIndex = (plt.ProductID > 0) ? ProductLicenseProductComboBox.FindString(m_CommLink.GetProductName(plt.ProductID)) : 0;
+            //set product type
+            typeComboBox.DataSource = ProductLicense.ProductLicenseTypeList;
             //set product version
             if (plt.ProductVersion != null)
                 productLicenseVersionMaskedTextBox.Text = plt.ProductVersion;
@@ -271,7 +275,7 @@ namespace Client.Creator
                 }
                 else
                 {
-                    IList<SoftwareTokenTable> tokenList = client.GetAllSoftwareTokens();
+                    IList<SoftwareTokenTable> tokenList = CreatorForm.s_AllSoftwareTokens;// client.GetAllSoftwareTokens();
                     if (tokenList != null) //ensure all active tokens are available from customer
                     {
                         foreach (SoftwareTokenTable token in tokenList.Where(t => t.Status > 0))
@@ -296,6 +300,17 @@ namespace Client.Creator
                                 m_Validated = false;
                                 MessageBox.Show(lvItem.Text + " has an empty value!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
+                            }
+                            if (lvItem.Name == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttPartOfDomain.ToString())
+                            {
+                                if (lvItem.SubItems[1].Text != Boolean.TrueString)
+                                {
+                                    if (MessageBox.Show("The software token 'Part of Domain' has the value 'False'. Do you want to continue to use this set of software tokens?", "Validation Tokens", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                                    {
+                                        m_Validated = false;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -355,6 +370,7 @@ namespace Client.Creator
                 return true;
             return false;
         }
+
         #endregion
 
         #region Packet Methods
@@ -526,7 +542,6 @@ namespace Client.Creator
             //get current product version for product;
             string selectedProduct = ProductLicenseProductComboBox.SelectedItem.ToString();
             ProductLicenseTypeComboBox.Items.Clear();
-            productLicenseVersionMaskedTextBox.Text = "0.00";
             Service<ICreator>.Use((client) => 
             {
                 //get all orders for a given product
@@ -541,8 +556,7 @@ namespace Client.Creator
                             productLicenses.Count > 0))
                             ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
                         */
-                        ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);
-                         
+                        ProductLicenseTypeComboBox.Items.Add(ProductLicenseState.Trial);                         
                         break;
                      }
                 }
@@ -563,7 +577,8 @@ namespace Client.Creator
                 if (productID > 0)
                 {
                     int productVersion = client.GetProductVersionFromTable((byte)productID);
-                    productLicenseVersionMaskedTextBox.Text = string.Format("{0:x}", productVersion);
+                    LicenseVersion version = new LicenseVersion(productVersion);
+                    productLicenseVersionMaskedTextBox.Text = version.ToString();
                 }
             });
 
@@ -708,6 +723,17 @@ namespace Client.Creator
             notesCharactersLeftLabel.Text = string.Format("{0} Characters Left(Limit is 255 characters)", 255 - productLicenseDescriptionTextBox.Text.Length);
         }
         #endregion
+
+        private void productLicenseVersionMaskedTextBox_Validating(object sender, CancelEventArgs e)
+        {
+            Regex reg = new Regex(@"\d+\.\d+$");
+            string version = productLicenseVersionMaskedTextBox.Text;
+            if (!reg.IsMatch(version))
+            {
+                System.Windows.Forms.MessageBox.Show("Please enter a valid version", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                e.Cancel = true;
+            }     
+        }
     }
 
     #region PacketDialogData class
