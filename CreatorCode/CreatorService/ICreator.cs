@@ -102,7 +102,7 @@ namespace Service.Creator
         void CreateLicense(LicenseTable lt);
 
         [OperationContract()]
-        void UpdateLicense(LicenseTable lt, bool isDirty);
+        void UpdateLicense(LicenseTable lt);
 
         [OperationContract()]
         void DeleteLicense(LicenseTable lt);
@@ -299,6 +299,12 @@ namespace Service.Creator
         IList<SoftwareTokenTable> GetAllSoftwareTokens();
         #endregion
 
+        #region ProductLicenseType OperationContracts
+
+        [OperationContract]
+        IList<ProductLicenseType> GetAllProductLicenseTypes();
+        #endregion
+
         #region Module OperationContracts
         [OperationContract]
         void CreateModule(ModuleTable module);
@@ -383,7 +389,9 @@ namespace Service.Creator
         [EnumMember]
         LicensePacket,
         [EnumMember]
-        Token
+        Token,
+        [EnumMember]
+        ProductLicenseType
     }
 
     [DataContract]

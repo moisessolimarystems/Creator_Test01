@@ -61,7 +61,8 @@ namespace Service.Creator
                     {"Notes", "Description"},                           //PLT
                     {"Validation", "Validation"},                       //Packet Table
                     {"Verified", "Verified"},
-                    {"DateCreated", "DateCreated"}
+                    {"DateCreated", "DateCreated"},
+                    {"ProductLicenseType", "TypeID"}
                 };
 
         private static readonly IDictionary<string, string>
@@ -388,9 +389,8 @@ namespace Service.Creator
             LicenseTable.CreateLicense(lt);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public void UpdateLicense(LicenseTable lt, bool isDirty)
-        {
-            lt.IsDirty = isDirty;
+        public void UpdateLicense(LicenseTable lt)
+        {      
             LicenseTable.UpdateLicense(lt);
         }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
@@ -1057,6 +1057,14 @@ namespace Service.Creator
         public IList<SoftwareTokenTable> GetAllSoftwareTokens()
         {
             return SoftwareTokenTable.GetAllSoftwareTokens();
+        }
+        #endregion
+
+        #region ProductLicenseTypeTable Implementation
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public IList<ProductLicenseType> GetAllProductLicenseTypes()
+        {
+            return ProductLicenseType.GetAllProductLicenseTypes();
         }
         #endregion
 
