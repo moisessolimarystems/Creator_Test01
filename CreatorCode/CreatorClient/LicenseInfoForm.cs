@@ -635,6 +635,7 @@ namespace Client.Creator
             plt.ProductVersion = productLicenseVersionMaskedTextBox.Text;
             plt.ExpirationDate = CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime();
             plt.Description = productLicenseDescriptionTextBox.Text;
+            plt.TypeID = ProductLicense.GetProductLicenseTypeID(typeComboBox.Text);
         }
 
         private ProductLicenseTable AddCurrentItem()
