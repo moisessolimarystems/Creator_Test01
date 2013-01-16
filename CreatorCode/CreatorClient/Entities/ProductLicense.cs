@@ -60,6 +60,7 @@ namespace Client.Creator
 
         #region Properties
         #region NonBrowsable Properties
+
         [Browsable(false)]
         public byte ProductID
         {
@@ -155,8 +156,8 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
-                    UpdateModules(ProductVersion, productLicenses);
+                    //List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                    //UpdateModules(ProductVersion, productLicenses);
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                 });
                 return _moduleList;
