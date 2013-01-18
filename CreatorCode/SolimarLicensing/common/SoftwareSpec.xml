@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="12">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="13">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -323,8 +323,9 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="49" moduleName="PDF::AFPDS" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="PostScript::AFPDS" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="PDF::AFPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PDF::AFPDS(MO)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="1"/>			
-			<!-- Module IDs identifying hardware -->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PDF::AFPDS(MO)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="1"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="13"/>
+      <!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output(PCI)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Parallel Input"/>
