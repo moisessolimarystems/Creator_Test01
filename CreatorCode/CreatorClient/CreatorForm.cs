@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Drawing.Printing;
 using System.Drawing.Imaging;
 using System.ServiceProcess;
-
 /*
  * TODO : 
  *        - Create custom filters to retrieve lists.
@@ -38,6 +37,18 @@ namespace Client.Creator
 {
     public partial class CreatorForm : Form
     {
+        internal static class NativeWinAPI
+        {
+           internal static readonly int GWL_EXSTYLE = -20;
+           internal static readonly int WS_EX_COMPOSITE = 0x02000000;
+
+           [DllImport("user32")]
+           internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+            [DllImport("user32")]
+           internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        }
+
         #region Fields
         //private Dictionary<string, bool> m_TreeState;
         private ListViewMgr _lvManager; //manages standard listview functions
@@ -87,9 +98,13 @@ namespace Client.Creator
         #region Constructor
         public CreatorForm()
         {
-            this.DoubleBuffered = true;
             this.Font = SystemFonts.MessageBoxFont;
             InitializeComponent();
+            this.DoubleBuffered = true;
+            int style = NativeWinAPI.GetWindowLong(this.Handle, NativeWinAPI.GWL_EXSTYLE);
+            style |= NativeWinAPI.WS_EX_COMPOSITE;
+            NativeWinAPI.SetWindowLong(DetailTreeView.Handle, NativeWinAPI.GWL_EXSTYLE, style);
+
             m_ServerList = new List<String>();
             s_CommLink = new CommunicationLink();
             storageListView = new ListView();
@@ -284,6 +299,12 @@ namespace Client.Creator
 
         private void CreatorForm_Load(object sender, EventArgs e)
         {
+            //this.SetStyle(ControlStyles.DoubleBuffer, true);
+            /*int style = NativeWinAPI.GetWindowLong(DetailTreeView.Handle, NativeWinAPI.GWL_EXSTYLE);
+            style |= NativeWinAPI.WS_EX_COMPOSITE;
+            NativeWinAPI.SetWindowLong(/*this.HandlesplitContainer2.Handle, NativeWinAPI.GWL_EXSTYLE, style);*/
+            
+
             MainTabControl.Visible = false;
             // Set Server Connection List
             if (Settings.Default.ServerList != null)
@@ -1559,25 +1580,61 @@ namespace Client.Creator
             //watch.Stop();
             //MessageBox.Show(string.Format("DetailTreeView_AfterSelect Elapsed: {0}\nIn milliseconds: {1}\nIn timer ticks: {2}", watch.Elapsed, watch.ElapsedMilliseconds, watch.ElapsedTicks), "INFORMATION", MessageBoxButtons.OK);
             if (DetailTreeView.SelectedImageIndex >= 0) //selectedimageindex = -1 when nothing application is closing.
-                LoadDetailTreeViewSelectedNode(e.Node);
-            SetCurrentViewTabPages(e.Node);
+            {
+                if (e.Node.Tag != null)
+                {
+                    LoadDetailTreeViewSelectedNode(e.Node);
+                    if (e.Node.Tag != null) SetCurrentViewTabPages(e.Node);
+                }
+            }
 
+        }
+
+        //private void LoadSelectedLicenseNode()
+        //{
+            
+        //}
+        //private void LoadSelectedProductLicenseNode(TreeNode productLicenseNode)
+        //{
+        //    GetProductLicenseNodeDB(productLicenseNode);
+        //}
+
+        TreeNode GetProductNodeFromSelectedNode(TreeNode node)
+        {
+            TreeNode productNode = null;
+            if (node != null)
+            {
+                switch (node.Level)
+                {
+                    case 1: //product
+                        productNode = node;
+                        break;
+                    case 2: //product license
+                        productNode = node.Parent;
+                        break;
+                    case 3: //product license - addon
+                        productNode = node.Parent.Parent;
+                        break;
+                    default: break;
+                }
+            }
+            return productNode;
         }
 
         //need to account for deleted node
         private void LoadDetailTreeViewSelectedNode(TreeNode node)
         {                        
             LicenseServer lsp = null;
-            TreeNode lspNode = null, productNode = null;
+            TreeNode productNode, lspNode = null;
             DetailPropertyGrid.Enabled = true;
             DetailSplitContainer.Panel1Collapsed = false;
-            DetailTreeView.BeginUpdate();
+            //DetailTreeView.BeginUpdate();
+            productNode = GetProductNodeFromSelectedNode(node);
             //verify node exists otherwise find next available
             switch (node.Level)
             { 
                 case 1:            //level 1 - Product
-                    productNode = node;
-                    LoadProductNode(productNode);
+                    LoadProductNode(productNode);                    
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         lspNode = productNode.Parent;
@@ -1589,12 +1646,13 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);
                     break;
                 case 2:            //level 2 - Product License
-                    productNode = node.Parent;
-                    LoadProductNode(productNode);
+                    //LoadProductNode(productNode);
+                    LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
                         {
+                            //DetailTreeView.Nodes[DetailTreeView.Nodes.Find(node.Name, true).First().Index].selected ;
                             lspNode = productNode.Parent;
                             lsp = lspNode.Tag as LicenseServer;
                             m_CurrentLicenseName = lsp.Name;
@@ -1604,8 +1662,8 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);                    
                     break;
                 case 3:            //level 3 - AddOn Product License
-                    productNode = node.Parent.Parent;
-                    LoadProductNode(productNode);
+                    //LoadProductNode(productNode);
+                    LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -1639,7 +1697,7 @@ namespace Client.Creator
                 SetLicenseServerState(node, false);
             }
             EnableToolStripMenu(node);
-            DetailTreeView.EndUpdate();
+            //DetailTreeView.EndUpdate();
         }
 
         private void SetCurrentViewTabPages(TreeNode node)
@@ -2017,6 +2075,10 @@ namespace Client.Creator
                                 DetailTreeView.SelectedNode = DetailTreeView.SelectedNode.Parent;
                         }
                     }
+                }
+                if (e.OldValue is LicenseVersion) //only product license has a license version
+                {
+                    LoadSelectedTabPage(PropertyGridTabControl.SelectedTab);
                 }
             }
             LoadDetailTreeViewSelectedNode(DetailTreeView.SelectedNode);
@@ -3278,12 +3340,45 @@ namespace Client.Creator
         #endregion
 
         #region Product Methods
+        private void LoadProductLicenseNode(TreeNode productLicenseNode)
+        {
+            ProductLicenseTable plt = null;
+            Service<ICreator>.Use((client) =>
+            {
+                plt = client.GetProductLicense(productLicenseNode.Name);
+            });
+            if (plt != null)
+            {
+                productLicenseNode.Tag = new ProductLicense(plt, m_Permissions);
+                //update 
+                SetProductLicenseNodeDisplayStatus(productLicenseNode);
+            }
+
+        }
+
+        private void SetProductLicenseNodeDisplayStatus(TreeNode productLicenseNode)
+        {
+            //setup node style
+            productLicenseNode.ForeColor = this.ForeColor;
+            productLicenseNode.NodeFont = this.Font;
+            if ((productLicenseNode.Tag as ProductLicense).IsExpired)
+            {
+                productLicenseNode.NodeFont = new Font(this.Font, FontStyle.Italic);
+                productLicenseNode.ForeColor = Color.Red;
+            }
+            if (!(productLicenseNode.Tag as ProductLicense).IsActive)
+            {
+                productLicenseNode.NodeFont = new Font(this.Font, FontStyle.Italic);
+                productLicenseNode.ForeColor = SystemColors.InactiveCaptionText;
+            }           
+        }
         //create only done on new contract with new product        
         private void LoadProductNode(TreeNode productNode)
         {
             List<ProductLicenseTable> plRecords = null;
             if (productNode.Parent != null)
-            {
+            {       
+                //only reload product license node if it doesnt exist or hasn't been loaded in the past 10 secs?
                 Service<ICreator>.Use((client) =>
                 {
                     plRecords = client.GetProductLicensesByProduct(productNode.Parent.Name, (byte)s_CommLink.GetProductID(productNode.Name));
@@ -3359,7 +3454,7 @@ namespace Client.Creator
                             if (removeNode.Nodes.Count > 0)
                             {
                                 foreach (TreeNode addonNode in removeNode.Nodes)
-                                {
+                                {                     
                                     if (plRecords.Find(c => c.plID.Equals((addonNode.Name))) == null)
                                         removeNode.Nodes.Remove(addonNode);
                                 }
@@ -4055,11 +4150,11 @@ namespace Client.Creator
         #region DetailListView Methods
             private void LoadDetailListView(Object item)
             {
-                //DetailListView.BeginUpdate();
+                DetailListView.BeginUpdate();
                 PopulateDetailListViewColumns(item);
                 PopulateDetailListView(item);
                 _lvManager.AutoResizeColumns(DetailListView);
-                //DetailListView.EndUpdate();
+                DetailListView.EndUpdate();
             }
             /// <summary>
             /// Populates the ListView column headers based upon the selected TreeNode of the License view.
@@ -4770,6 +4865,31 @@ namespace Client.Creator
         #endregion
 
         #region Database Methods
+
+        //void GetProductLicenseNodeDB(TreeNode productNode)
+        //{
+        //    using (BackgroundWorker worker = new BackgroundWorker())
+        //    {
+        //        worker.DoWork += new DoWorkEventHandler(GetProductLicenseNodeData);
+        //        worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RetrievedProductLicenseNodeData);
+        //        var parameters = productNode;
+        //        worker.RunWorkerAsync(parameters);
+        //    }
+        //}
+
+        //void GetProductLicenseNodeData(object sender, DoWorkEventArgs e)
+        //{
+        //    Service<ICreator>.Use((client) =>
+        //    {
+        //        plRecords = client.GetProductLicensesByProduct(productNode.Parent.Name, (byte)s_CommLink.GetProductID(productNode.Name));
+        //    });
+        //}
+
+        //void RetrievedProductLicenseNodeData(object sender, RunWorkerCompletedEventArgs e)
+        //{
+        //    LoadProductNode(
+        //}
+
         /// <summary>
         /// Retrieves customers from database.
         /// </summary>
@@ -5001,6 +5121,8 @@ namespace Client.Creator
             LoadPacketItems(licenseName);
             SetLicenseServerState(DetailTreeView.SelectedNode, false);                        
         }
+
+
         #endregion
 
         private void DetailTreeView_ItemDrag(object sender, ItemDragEventArgs e)
@@ -5189,9 +5311,9 @@ namespace Client.Creator
                     if (e.Node.Tag is ProductLicense)
                     {
                         ProductLicense pl = e.Node.Tag as ProductLicense;
+                        //pl.DrawCount = ++pl.DrawCount;
                         //Brush test = (pl.Type) ? Brushes.SlateGray : Brushes.DarkGray;
-
-                        e.Graphics.DrawString(pl.Type, /*tagFont*/this.Font,
+                        e.Graphics.DrawString(pl.Type /*string.Format("{0} {1}", pl.Type, pl.DrawCount)*/, this.Font,
                             Brushes.LightSteelBlue, e.Bounds.Right + 2, e.Bounds.Top);
                     }
                 }
