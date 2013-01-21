@@ -18,7 +18,49 @@
 #define _UTILITY_RUL_    
 
 #include "..\..\Common Script\ntservice.h" 
+     
+//=============================================================================  
+//
+// Function: 	_CActionSelfRegister()
+// Purpose:   	This function registers x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function InstallPerformanceCounter(svSystemPath ,svFilePath)
+	STRING szCmd;   
+begin           
+	szCmd = svSystemPath ^ "lodctr.exe";		
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      
+		if(LaunchAppAndWait(szCmd," /M:" +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+			WriteLog("Failed to install performance counter " + svFilePath + " for " + @PRODUCT_NAME);
+		endif;			
+	endif;       	                    
+end;   
 
+//=============================================================================  
+//
+// Function: 	_CActionSelfRegister()
+// Purpose:   	This function registers x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function RemovePerformanceCounter(svSystemPath ,svFilePath)
+	STRING szCmd;   
+begin           
+	szCmd = svSystemPath ^ "unlodctr.exe";		
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      
+		if(LaunchAppAndWait(szCmd," /M:" +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+			WriteLog("Failed to remove performance counter " + svFilePath + " for " + @PRODUCT_NAME);
+		endif;			
+	endif;       	                    
+end; 
+ 
 //=============================================================================  
 //
 // Function: 	_CActionSelfRegister()
