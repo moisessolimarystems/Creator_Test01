@@ -22,5 +22,7 @@ prototype UnRegisterService(STRING);
 prototype DisableService( STRING ); 
 prototype RegAsmRegister(STRING, STRING, BOOL);
 prototype RegAsmUnRegister(STRING, STRING, BOOL);   
+prototype InstallPerformanceCounter(STRING, STRING);
+prototype RemovePerformanceCounter(STRING, STRING);
 
 #endif //_UTILITY_H_
