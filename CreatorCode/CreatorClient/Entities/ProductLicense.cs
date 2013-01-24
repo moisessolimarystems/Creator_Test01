@@ -174,8 +174,8 @@ namespace Client.Creator
                     {
                         _productLicenseTypes = client.GetAllProductLicenseTypes();               
                     });
-                }
-                return _productLicenseTypes.Select(t => t.Type).ToList();
+                }                
+                return _productLicenseTypes.OrderBy(p => p.Type).Select(t => t.Type).ToList();
             }
         }
 
@@ -242,7 +242,7 @@ namespace Client.Creator
                             }
                             client.MarkDirty(LicenseServer);
                         });
-                        UpdateModules(value, productLicenses);
+                        UpdateModules(value, productLicenses); //needs to reload module list
                         _plRec.ProductVersion = value.ToString();
                         _version = value;
                     }
@@ -752,15 +752,18 @@ namespace Client.Creator
                 }
                 if (bDeprecated) removeModuleList.Add(module);
             }
-            Service<ICreator>.Use((client) =>
+            if (removeModuleList.Count > 0)
             {
-                foreach (ModuleTable mt in removeModuleList)
+                Service<ICreator>.Use((client) =>
                 {
-                    client.DeleteModule(mt);
-                }
-                if (removeModuleList.Count > 0)
-                    client.MarkDirty(LicenseServer);
-            });
+                    foreach (ModuleTable mt in removeModuleList)
+                    {
+                        client.DeleteModule(mt);
+                    }
+                    if (removeModuleList.Count > 0)
+                        client.MarkDirty(LicenseServer);
+                });
+            }
         }
 
         private void AddIntroducedModules(LicenseVersion version, List<ModuleTable> dbModuleList, IList<ProductLicenseTable> pltList)
@@ -811,14 +814,14 @@ namespace Client.Creator
                     }
                 }
             }
-            Service<ICreator>.Use((client) =>
+            if (addModuleList.Count > 0)
             {
-                if (addModuleList.Count > 0)
+                Service<ICreator>.Use((client) =>
                 {
                     client.CreateAllModules(addModuleList);
                     client.MarkDirty(LicenseServer);
-                }
-            });
+                });
+            }
         }
 
         public bool HasHardwareToken()

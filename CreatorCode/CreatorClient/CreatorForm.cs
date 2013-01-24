@@ -1628,7 +1628,6 @@ namespace Client.Creator
             TreeNode productNode, lspNode = null;
             DetailPropertyGrid.Enabled = true;
             DetailSplitContainer.Panel1Collapsed = false;
-            //DetailTreeView.BeginUpdate();
             productNode = GetProductNodeFromSelectedNode(node);
             //verify node exists otherwise find next available
             switch (node.Level)
@@ -1646,8 +1645,7 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);
                     break;
                 case 2:            //level 2 - Product License
-                    //LoadProductNode(productNode);
-                    LoadProductLicenseNode(node);
+                    LoadProductNode(productNode);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -1662,8 +1660,8 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);                    
                     break;
                 case 3:            //level 3 - AddOn Product License
-                    //LoadProductNode(productNode);
-                    LoadProductLicenseNode(node);
+                    LoadProductNode(productNode);
+                    //LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -1697,7 +1695,6 @@ namespace Client.Creator
                 SetLicenseServerState(node, false);
             }
             EnableToolStripMenu(node);
-            //DetailTreeView.EndUpdate();
         }
 
         private void SetCurrentViewTabPages(TreeNode node)
@@ -2082,6 +2079,7 @@ namespace Client.Creator
                 }
             }
             LoadDetailTreeViewSelectedNode(DetailTreeView.SelectedNode);
+            DetailTreeView.Focus();
         }
 
         private void DetailPropertyGrid_SelectedObjectsChanged(object sender, EventArgs e)
@@ -5311,10 +5309,7 @@ namespace Client.Creator
                     if (e.Node.Tag is ProductLicense)
                     {
                         ProductLicense pl = e.Node.Tag as ProductLicense;
-                        //pl.DrawCount = ++pl.DrawCount;
-                        //Brush test = (pl.Type) ? Brushes.SlateGray : Brushes.DarkGray;
-                        e.Graphics.DrawString(pl.Type /*string.Format("{0} {1}", pl.Type, pl.DrawCount)*/, this.Font,
-                            Brushes.LightSteelBlue, e.Bounds.Right + 2, e.Bounds.Top);
+                        e.Graphics.DrawString(pl.Type, this.Font, Brushes.LightSteelBlue, e.Bounds.Right + 2, e.Bounds.Top);
                     }
                 }
             

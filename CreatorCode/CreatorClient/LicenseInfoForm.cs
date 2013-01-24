@@ -144,6 +144,7 @@ namespace Client.Creator
             ProductLicenseProductComboBox.SelectedIndex = (plt.ProductID > 0) ? ProductLicenseProductComboBox.FindString(m_CommLink.GetProductName(plt.ProductID)) : 0;
             //set product type
             typeComboBox.DataSource = ProductLicense.ProductLicenseTypeList;
+            typeComboBox.SelectedIndex = typeComboBox.Items.IndexOf("Production");
             //set product version
             if (plt.ProductVersion != null)
                 productLicenseVersionMaskedTextBox.Text = plt.ProductVersion;
@@ -580,6 +581,7 @@ namespace Client.Creator
                     LicenseVersion version = new LicenseVersion(productVersion);
                     productLicenseVersionMaskedTextBox.Text = version.ToString();
                 }
+                typeComboBox.SelectedIndex = (selectedProduct.Contains("Test")) ? typeComboBox.Items.IndexOf("Development") : typeComboBox.Items.IndexOf("Production");
             });
 
         }
