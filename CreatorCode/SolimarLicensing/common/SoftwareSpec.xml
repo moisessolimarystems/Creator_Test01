@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="13">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="14">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -333,8 +333,9 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="105" moduleName="SCSI SDI Output"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="6"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="108" moduleName="AFPDS Resource Checker" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="12"/>      
-      
+      <Lic_ModuleSoftwareSpecAttribs moduleID="108" moduleName="AFPDS Resource Checker" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="12"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="14"/>
+
 
       <!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
