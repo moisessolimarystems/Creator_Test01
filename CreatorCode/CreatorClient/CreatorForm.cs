@@ -1661,7 +1661,6 @@ namespace Client.Creator
                     break;
                 case 3:            //level 3 - AddOn Product License
                     LoadProductNode(productNode);
-                    //LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -1689,8 +1688,9 @@ namespace Client.Creator
             
             if (lsp != null)
             {
-                if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
-                    DetailPropertyGrid.Enabled = false;
+                if(DetailSplitContainer.Panel1Collapsed)
+                    if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
+                        DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
                 SetLicenseServerState(node, false);
             }
@@ -1769,9 +1769,15 @@ namespace Client.Creator
                     int moduleID;
                     Int32.TryParse(e.Item.Name, out moduleID);
                     StringBuilder sb = new StringBuilder();
-                    foreach (ProductLicense productLicense in (DetailTreeView.SelectedNode.Tag as ProductCollection).Collection)
+                    ProductCollection currentProduct = DetailTreeView.SelectedNode.Tag as ProductCollection;
+                    List<ModuleTable> moduleList = null;
+                    Service<ICreator>.Use((client) =>
                     {
-                        if (productLicense.ModuleList.Find(c => c.ModID == moduleID) != null)
+                        moduleList = client.GetAllActiveModulesByProduct(m_CurrentLicenseName, (DetailTreeView.SelectedNode.Tag as ProductCollection).ProductID);
+                    });
+                    foreach (ProductLicense productLicense in currentProduct.Collection)
+                    {
+                        if (moduleList.Where(c => c.ModID == moduleID && c.ProductLicenseID == productLicense.ProductLicenseDatabaseID) != null) //productLicense.ModuleList.Find(c => c.ModID == moduleID) != null)
                         {
                             expDate = (productLicense.ExpirationDate.HasValue) ? productLicense.ExpirationDate.Value.ToShortDateString() : "None";
                             sb.AppendFormat("Product License - {0}, Exp Date - {1}\n", productLicense.ID, expDate);
@@ -2918,8 +2924,9 @@ namespace Client.Creator
                 if (license != null)
                 {
                     licenseNode.Text = (license.UserLock != null) ? license.LicenseName + " - " + license.UserLock : license.LicenseName;
-                    licenseNode.Tag = new LicenseServer(license, m_Permissions);
+                    licenseNode.Tag = new LicenseServer(license, m_Permissions);                    
                     pltList = client.GetProductLicenses(license.LicenseName, false); // db - 2
+                    //(licenseNode.Tag as LicenseServer).ProductLicenseCount = pltList.Count();
                 }
                 else
                     licenseNode.Tag = null;
@@ -3422,7 +3429,8 @@ namespace Client.Creator
                         else //update found product node
                         {
                             plNode = productNode.Nodes.Find(plt.plID, true).First();
-                            plNode.Tag = new ProductLicense(plt, m_Permissions);
+                            if(plNode != null && plNode.Tag is ProductLicense)
+                                (plNode.Tag as ProductLicense).ProductLicenseData = plt;
                         }
 
                         //setup node style
@@ -3833,9 +3841,9 @@ namespace Client.Creator
         private void ShowModuleListView(string type)
         {
             DetailListView.BeginUpdate();
-            DetailListView.Items.Clear();
+            DetailListView.Items.Clear();                        
             foreach (ListViewItem lvItem in storageListView.Items)
-            {
+            {                
                 if (IsModuleFiltered(lvItem.Tag as Module, type))
                     DetailListView.Items.Insert(0, lvItem.Clone() as ListViewItem);
             }
@@ -5311,6 +5319,11 @@ namespace Client.Creator
                         ProductLicense pl = e.Node.Tag as ProductLicense;
                         e.Graphics.DrawString(pl.Type, this.Font, Brushes.LightSteelBlue, e.Bounds.Right + 2, e.Bounds.Top);
                     }
+                    /*if (e.Node.Tag is LicenseServer)
+                    {
+                        LicenseServer ls = e.Node.Tag as LicenseServer;
+                        e.Graphics.DrawString(string.Format("({0})", ls.ProductLicenseCount), this.Font, Brushes.Blue, e.Bounds.Right + 2, e.Bounds.Top);
+                    }*/
                 }
             
             // If the node has focus, draw the focus rectangle large, making 

@@ -223,6 +223,37 @@ namespace Client.Creator
         #endregion
 
         #region Helper Methods
+        public List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> GetModuleSpecForProductVersion(uint productID, uint versionMajor, uint versionMinor)
+        {
+            List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = new List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs>();
+            Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecMap = GetModuleSpecList(productID);
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecMap.TVal.Values)
+            {
+                bool bDeprecated = false;
+                bool bValid = false;
+                if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
+                {
+                    if (versionMajor > moduleSpec.moduleVersionDeprecated_Major)
+                        bDeprecated = true;
+                    else if (versionMajor == moduleSpec.moduleVersionDeprecated_Major)
+                    {
+                        if (versionMinor >= moduleSpec.moduleVersionDeprecated_Minor)
+                            bDeprecated = true;
+                    }
+                }
+                if (versionMajor > moduleSpec.moduleVersionIntroduced_Major)
+                    bValid = true;
+                else if (versionMajor == moduleSpec.moduleVersionIntroduced_Major)
+                {
+                    if (versionMinor >= moduleSpec.moduleVersionIntroduced_Minor)
+                        bValid = true;
+                }
+                if (bValid && !bDeprecated)
+                    moduleSpecList.Add(moduleSpec);
+            }
+            return moduleSpecList;
+        }
+
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap GetModuleSpecList(uint productID)
         {
             return Lic_LicenseInfoAttribsHelper.GetModuleList(m_softwareSpec, productID);
