@@ -56,6 +56,8 @@ namespace Client.Creator
             else
                 SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
         }
+
+
         #endregion
 
         #region Properties
@@ -149,6 +151,22 @@ namespace Client.Creator
             }
         }
 
+        bool ValidModuleList()
+        {
+            if (_moduleList == null)
+                return false;
+            bool bRetVal = true;
+            List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = _commLink.GetModuleSpecForProductVersion(ProductID, ProductVersion.Major, ProductVersion.Minor);
+            foreach (ModuleTable module in _moduleList)
+            {
+                if(moduleSpecList.Where(m => m.moduleID == module.ModID).Count() == 0)
+                {
+                    return false;
+                }
+            }
+            return bRetVal;
+        }
+
         [Browsable(false)]
         public List<ModuleTable> ModuleList
         {
@@ -156,8 +174,11 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    //List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
-                    //UpdateModules(ProductVersion, productLicenses);
+                    if (!ValidModuleList())
+                    {
+                        List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                        UpdateModules(ProductVersion, productLicenses);
+                    }
                     _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                 });
                 return _moduleList;
@@ -813,7 +834,7 @@ namespace Client.Creator
                         }
                     }
                 }
-            }
+            }            
             if (addModuleList.Count > 0)
             {
                 Service<ICreator>.Use((client) =>
