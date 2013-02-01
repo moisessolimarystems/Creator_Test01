@@ -45,16 +45,12 @@ namespace Client.Creator
         #region Constructor
         public ProductLicense(ProductLicenseTable plData, PermissionsTable permissions)
         {
+            _commLink = CreatorForm.s_CommLink;
             if (_productLicenseTypes == null)
                 ListTypeConverter.SetList(ProductLicenseTypeList);            
             Permissions = permissions;
-            _plRec = plData;
+            ProductLicenseData = plData;
             _version = new LicenseVersion(_plRec.ProductVersion);
-            _commLink = CreatorForm.s_CommLink;
-            if (_commLink.GetProductSpec(plData.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
-                SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
-            else
-                SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
         }
 
 
@@ -73,7 +69,14 @@ namespace Client.Creator
         public ProductLicenseTable ProductLicenseData
         {
             get { return _plRec; }
-            set { _plRec = value; }
+            set 
+            {                
+                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
+                    SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
+                else
+                    SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
+                _plRec = value; 
+            }
         }
 
         [Browsable(false)]
