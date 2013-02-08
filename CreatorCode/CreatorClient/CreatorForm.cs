@@ -1688,7 +1688,7 @@ namespace Client.Creator
             
             if (lsp != null)
             {
-                if(DetailSplitContainer.Panel1Collapsed)
+                if(!DetailSplitContainer.Panel1Collapsed)
                     if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
                         DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
@@ -3428,7 +3428,7 @@ namespace Client.Creator
                         }
                         else //update found product node
                         {
-                            plNode = productNode.Nodes.Find(plt.plID, true).First();
+                            plNode = productNode.Nodes.Find(plt.plID, true).First();                            
                             if(plNode != null && plNode.Tag is ProductLicense)
                                 (plNode.Tag as ProductLicense).ProductLicenseData = plt;
                         }
@@ -4366,7 +4366,6 @@ namespace Client.Creator
             private void PopulateDetailListView(ProductLicense plData)
             {
                 //clear previous items from storage and current view
-                //DetailListView.Items.Clear();
                 storageListView.Items.Clear();
                 //test-dev image missing
                 int imageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(plData.ProductName));
