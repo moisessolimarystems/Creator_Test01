@@ -58,16 +58,12 @@ namespace Client.Creator
             Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
             {
                 LicenseVersion version;
-                string hexVersion, minorVersion, majorVersion;
                 IList<ProductTable> products = client.GetProducts();
                 foreach (ProductTable product in products)
                 {
                     if (!product.pName.Contains("Test") && commLink.GetProductName((byte)product.pId) != "Unknown")
                     {
-                        hexVersion = string.Format("{0:x}", product.pVersion);
-                        minorVersion = hexVersion.Substring(hexVersion.Length - 3, 2);
-                        majorVersion = hexVersion.Substring(0, hexVersion.Length - (minorVersion.Length + 1));
-                        version = new LicenseVersion(UInt32.Parse(majorVersion), UInt32.Parse(minorVersion));
+                        version = new LicenseVersion(product.pVersion);
                         productList.Add(new ProductContainer(product.pName, version, StaticImageList.Instance.GlobalImageList.Images[Enums.GetIconIndex(commLink.GetProductName((byte)product.pId))]));
                     }
                 }
