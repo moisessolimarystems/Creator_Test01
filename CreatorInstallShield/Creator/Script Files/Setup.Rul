@@ -48,6 +48,8 @@ BOOL 			gServerType;
 //
 //=============================================================================
 function CheckRequirements()
+	NUMBER nBuffer;
+	STRING svReleaseFlag, svErrorMsg;
 begin                      
     //Re-initialize INSTALLDIR since PROGRAMFILES doesn't automatically account for 64bit folders.
     //don't allow install on systems that have solimar license server
@@ -71,7 +73,22 @@ begin
    	if(SYSINFO.bIsWow64) then            
    		//Set INSTALLDIR to use the correct program files folder for x64
    		INSTALLDIR = PROGRAMFILES64 ^ "Solimar Systems\\License Creator";   		
-   	endif;   	                           		   	                                                
+   	endif;  
+   	    
+    nBuffer = MAX_PATH + 1; // initialize size buffer before calling MsiGetProperty
+	MsiGetProperty(ISMSI_HANDLE, "ISReleaseFlags", svReleaseFlag, nBuffer);     	    
+   	if(SYSINFO.bIsWow64 && svReleaseFlag % "x86") then
+   		svErrorMsg = @IDS_ERROR_INVALID_OS32;
+   		SdSubstituteProductInfo(svErrorMsg);
+   		MessageBox(svErrorMsg,SEVERE);
+   		abort;    		
+   	endif;    
+   	if(!SYSINFO.bIsWow64 && svReleaseFlag % "x64") then
+		svErrorMsg = @IDS_ERROR_INVALID_OS64;   
+	    SdSubstituteProductInfo(svErrorMsg);
+   		MessageBox(svErrorMsg,SEVERE);
+   		abort;    		
+   	endif;    	 	                           		   	                                                
 end;                                                          
                             
 //---------------------------------------------------------------------------
