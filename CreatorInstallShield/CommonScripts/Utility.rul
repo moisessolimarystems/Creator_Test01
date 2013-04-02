@@ -34,9 +34,11 @@ begin
 	szCmd = svSystemPath ^ "lodctr.exe";		
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
+WriteLog("Install Performance Counter Start: " + svFilePath);		
 		if(LaunchAppAndWait(szCmd," /M:" +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
 			WriteLog("Failed to install performance counter " + svFilePath + " for " + @PRODUCT_NAME);
-		endif;			
+		endif;			                                                                               
+WriteLog("Install Performance Counter End: " + svFilePath);		
 	endif;       	                    
 end;   
 
@@ -55,9 +57,11 @@ begin
 	szCmd = svSystemPath ^ "unlodctr.exe";		
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
-		if(LaunchAppAndWait(szCmd," /M:" +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+WriteLog("Remove Performance Counter Start: " + svFilePath);		
+		if(LaunchAppAndWait(szCmd," /M: " +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
 			WriteLog("Failed to remove performance counter " + svFilePath + " for " + @PRODUCT_NAME);
-		endif;			
+		endif;
+WriteLog("Remove Performance Counter End: " + svFilePath);					
 	endif;       	                    
 end; 
  
@@ -76,9 +80,11 @@ begin
 	szCmd = svRegSvrPath ^ "RegSvr32.exe";		
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
+WriteLog("Self Register Start: " + svFilePath);		
 		if(LaunchAppAndWait(szCmd," /s " +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
 			WriteLog("Failed to register " + svFilePath + " for " + @PRODUCT_NAME);
-		endif;			
+		endif;			                                     
+WriteLog("Self Register End: " + svFilePath);			
 	endif;       	                    
 end; 
 
@@ -97,9 +103,11 @@ begin
 	szCmd = szRegSvrPath ^ "RegSvr32.exe";
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      			
+WriteLog("Self UnRegister Start: " + svFilePath);			
 		if(LaunchAppAndWait(szCmd, "/u /s " + svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
 			WriteLog("Failed to unregister " + svFilePath + " for " + @PRODUCT_NAME);
-		endif;
+		endif;         
+WriteLog("Self UnRegister Start: " + svFilePath);			
 	endif;				
 end;  
 
@@ -116,9 +124,11 @@ function RegisterService(svFilePath, svParam)
 begin            	
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
+WriteLog("Register Service Start: " + svFilePath);	   		
    		if (LaunchAppAndWait (svFilePath, svParam , WAIT) < 0) then 
    			WriteLog("Failed to register " + svFilePath + " for " + @PRODUCT_NAME);
-   		endif;
+   		endif;                                     
+WriteLog("Register Service End: " + svFilePath);	   		
 	endif;       	                    
 end; 
 
@@ -135,10 +145,12 @@ function UnRegisterService(svFilePath)
 begin  
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
+WriteLog("UnRegister Service Start: " + svFilePath);   		
    		if (LaunchAppAndWait (svFilePath, "/UNREGSERVER" , WAIT) < 0) then 
    			WriteLog("Failed to unregister " + svFilePath + " for " + @PRODUCT_NAME);
-   		endif;
-	endif;   				
+   		endif;                                          
+WriteLog("UnRegister Service End: " + svFilePath);    		
+	endif;   				                                       	
 end; 
 
 function RegAsmRegister(svRegAsmPath, svFilePath, bHasTypeLib)
@@ -152,17 +164,16 @@ begin
 		szCmdLine = " /codebase " + svFilePath;
 	endif; 	    
 	if(Is(FILE_EXISTS, svFilePath)) then      
-	   WriteLog("Registering " + svFilePath);     
+	   WriteLog("RegAsm Register Start: " + svFilePath);     
 	   if (_LaunchAppEx(svRegAsmPath,
 	 	 				szCmdLine , 
 	  	 				WAIT, 
 	   					SW_HIDE, 
 	   					-1, 
 	   					nvExitCode) < 0) then 
-	       WriteErrorToLog(nvExitCode, "Error registering " + svFilePath);
-	   else
-	       WriteLog("Registered " + svFilePath + " successfully.");     
-	   endif;	
+	       WriteErrorToLog(nvExitCode, "Error registering " + svFilePath);    
+	   endif;
+	   WriteLog("RegAsm Register End: " + svFilePath);	
 	endif;	
 end;   
 
@@ -178,17 +189,16 @@ begin
 	endif;
 
 	if(Is(FILE_EXISTS, svFilePath)) then 	
-		WriteLog("UnRegistering " + svFilePath);            	
+	   WriteLog("RegAsm UnRegister Start: " + svFilePath);	         	
 		if (_LaunchAppEx(svRegAsmPath,
 						 svCmdLine , 
 						 WAIT, 
 						 SW_HIDE, 
 						 -1, 
 					 	nvExitCode) < 0) then 
-			WriteErrorToLog(nvExitCode, "Error unregistering " + svFilePath);
-		else
-			WriteLog("UnRegistered " + svFilePath + " successfully."); 	
-		endif;   
+			WriteErrorToLog(nvExitCode, "Error unregistering " + svFilePath);		
+		endif;  
+		WriteLog("RegAsm UnRegister Start: " + svFilePath);
 	endif; 
 end;    
 
