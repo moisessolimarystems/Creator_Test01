@@ -557,8 +557,7 @@ void InititalizeProduct8()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
 	pTmpModSpec->moduleID = 3;
 	pTmpModSpec->moduleName = std::wstring(L"Application Databases");
-	pTmpModSpec->modUnlimitedValue = 255;
-	pTmpModSpec->moduleTrialLicense = 255;
+	pTmpModSpec->moduleTrialLicense = 127;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);

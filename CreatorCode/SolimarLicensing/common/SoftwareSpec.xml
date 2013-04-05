@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="16">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="17">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -178,7 +178,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Index Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Document Server"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Concurrent Users"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Application Databases" modUnlimitedValue="255"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Application Databases" />
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Document Assembler" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Application Server"/>
