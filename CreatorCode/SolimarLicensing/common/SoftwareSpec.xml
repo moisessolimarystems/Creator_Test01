@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="17">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="18">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -325,7 +325,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="PDF::AFPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PDF::AFPDS(MO)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="1"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="13"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="54" moduleName="PDF::PDFA" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="16"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="54" moduleName="PDF::PDF/A" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="18"/>
       <!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output(PCI)"/>
@@ -336,7 +336,7 @@
       <Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="6"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="108" moduleName="AFPDS Resource Checker" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="12"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="14"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="110" moduleName="PDF::PDFA Manager" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="16"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="110" moduleName="PDF::PDF/A Manager" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="18"/>
 
 
       <!-- Module IDs identifying resources -->

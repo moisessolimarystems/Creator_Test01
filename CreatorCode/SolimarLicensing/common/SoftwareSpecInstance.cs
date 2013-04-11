@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 17;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 18;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -1805,7 +1805,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 54;
-			tmpModSpec.moduleName.TVal = "PDF::PDFA";
+			tmpModSpec.moduleName.TVal = "PDF::PDF/A";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -1815,7 +1815,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 7;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 5;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 16;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 18;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -3173,7 +3173,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 110;
-			tmpModSpec.moduleName.TVal = "PDF::PDFA Manager";
+			tmpModSpec.moduleName.TVal = "PDF::PDF/A Manager";
 			tmpModSpec.modUnlimitedValue.TVal = 0;
 			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -3183,7 +3183,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 7;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 5;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 16;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 18;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;

@@ -986,12 +986,12 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(54, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(54))->second);
 	pTmpModSpec->moduleID = 54;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::PDFA");
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PDF/A");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 16;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 18;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(42, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(42))->second);
@@ -1519,11 +1519,11 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(110, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(110))->second);
 	pTmpModSpec->moduleID = 110;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::PDFA Manager");
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PDF/A Manager");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 16;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 18;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(33, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(33))->second);
