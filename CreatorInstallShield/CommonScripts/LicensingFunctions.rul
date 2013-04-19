@@ -199,8 +199,7 @@ begin
    	endif;
     
     if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
-    	nvSize = StrFind(svValue, "7.5.1") ;
-    	if(nvSize < 0) then 
+    	if(VerCompare("7.5.8.0", svValue + ".0", VERSION) = GREATER_THAN) then    
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
 			if(!SYSINFO.bIsWow64) then    
 				sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
@@ -212,8 +211,8 @@ begin
    				if(LaunchAppAndWait(sentPath, sentOpts, WAIT) < 0) then
    					MessageBox("Unable to install Rainbow Sentinel Driver. Please retry from source.", SEVERE);
    				endif;
-   			endif;
-		endif;  
+   			endif;    	
+    	endif;
 	else
 		MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);	
 		if(!SYSINFO.bIsWow64) then                                              
