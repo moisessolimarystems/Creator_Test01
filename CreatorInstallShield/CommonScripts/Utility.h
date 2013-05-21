@@ -24,5 +24,9 @@ prototype RegAsmRegister(STRING, STRING, BOOL);
 prototype RegAsmUnRegister(STRING, STRING, BOOL);   
 prototype InstallPerformanceCounter(STRING, STRING);
 prototype RemovePerformanceCounter(STRING, STRING);
+prototype FindNReplaceInFile(STRING,STRING,STRING,STRING);
+prototype FindReplaceAllFiles(STRING,STRING,STRING,STRING);
+prototype RegSvcsRegister(STRING,STRING,STRING);
+prototype RegSvcsUnRegister(STRING,STRING,STRING);
 
 #endif //_UTILITY_H_
