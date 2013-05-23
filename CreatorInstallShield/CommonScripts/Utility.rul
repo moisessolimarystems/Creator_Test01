@@ -39,6 +39,8 @@ WriteLog("Install Performance Counter Start: " + svFilePath);
 			WriteLog("Failed to install performance counter " + svFilePath + " for " + @PRODUCT_NAME);
 		endif;			                                                                               
 WriteLog("Install Performance Counter End: " + svFilePath);		
+	else
+		WriteLog("Skipping InstallPerformanceCounter: " + svFilePath + " not found.");	
 	endif;       	                    
 end;   
 
@@ -62,6 +64,8 @@ WriteLog("Remove Performance Counter Start: " + svFilePath);
 			WriteLog("Failed to remove performance counter " + svFilePath + " for " + @PRODUCT_NAME);
 		endif;
 WriteLog("Remove Performance Counter End: " + svFilePath);					
+	else
+		WriteLog("Skipping RemovePerformanceCounter: " + svFilePath + " not found.");	
 	endif;       	                    
 end; 
  
@@ -85,6 +89,8 @@ WriteLog("Self Register Start: " + svFilePath);
 			WriteLog("Failed to register " + svFilePath + " for " + @PRODUCT_NAME);
 		endif;			                                     
 WriteLog("Self Register End: " + svFilePath);			
+	else
+		WriteLog("Skipping SelfRegister: " + svFilePath + " not found.");	
 	endif;       	                    
 end; 
 
@@ -108,6 +114,8 @@ WriteLog("Self UnRegister Start: " + svFilePath);
 			WriteLog("Failed to unregister " + svFilePath + " for " + @PRODUCT_NAME);
 		endif;         
 WriteLog("Self UnRegister Start: " + svFilePath);			
+	else
+		WriteLog("Skipping SelfUnRegister: " + svFilePath + " not found.");	
 	endif;				
 end;  
 
@@ -128,7 +136,9 @@ WriteLog("Register Service Start: " + svFilePath);
    		if (LaunchAppAndWait (svFilePath, svParam , WAIT) < 0) then 
    			WriteLog("Failed to register " + svFilePath + " for " + @PRODUCT_NAME);
    		endif;                                     
-WriteLog("Register Service End: " + svFilePath);	   		
+WriteLog("Register Service End: " + svFilePath);	
+	else
+		WriteLog("Skipping RegisterService: " + svFilePath + " not found.");	   		
 	endif;       	                    
 end; 
 
@@ -150,6 +160,8 @@ WriteLog("UnRegister Service Start: " + svFilePath);
    			WriteLog("Failed to unregister " + svFilePath + " for " + @PRODUCT_NAME);
    		endif;                                          
 WriteLog("UnRegister Service End: " + svFilePath);    		
+	else
+		WriteLog("Skipping UnRegisterService: " + svFilePath + " not found.");		
 	endif;   				                                       	
 end; 
 
@@ -174,6 +186,8 @@ begin
 	       WriteErrorToLog(nvExitCode, "Error registering " + svFilePath);    
 	   endif;
 	   WriteLog("RegAsm Register End: " + svFilePath);	
+	else
+		WriteLog("Skipping RegAsmRegister: " + svFilePath + " not found.");		   
 	endif;	
 end;   
 
@@ -198,8 +212,58 @@ begin
 					 	nvExitCode) < 0) then 
 			WriteErrorToLog(nvExitCode, "Error unregistering " + svFilePath);		
 		endif;  
-		WriteLog("RegAsm UnRegister Start: " + svFilePath);
+		WriteLog("RegAsm UnRegister Start: " + svFilePath);	
+	else
+		WriteLog("Skipping RegAsmUnRegister: " + svFilePath + " not found.");		 	
 	endif; 
+end;
+
+function RegSvcsRegister(svRegSvcsPath, svFilePath, svAppName)
+	STRING szCmdLine;
+	NUMBER nvExitCode;
+begin    
+	LongPathToQuote(svFilePath,TRUE);     
+	Sprintf(szCmdLine, " /appname:\"%s\" /noreconfig %s", svAppName, svFilePath);    
+	if(Is(FILE_EXISTS, svFilePath)) then      
+	   WriteLog("RegSvcs Register Start: " + svFilePath);     
+	   if (_LaunchAppEx(svRegSvcsPath,
+	 	 				szCmdLine , 
+	  	 				WAIT, 
+	   					SW_HIDE, 
+	   					-1, 
+	   					nvExitCode) < 0) then 
+   			gsvErrorMessage = "Error registering " + svAppName + " as a COM+ Application";
+  			WriteErrorToLog(nvExitCode, gsvErrorMessage);  
+   			MessageBox(gsvErrorMessage, SEVERE);  		
+   		endif;  
+	   WriteLog("RegSvcs Register End: " + svFilePath);	
+	else
+		WriteLog("Skipping RegSvcsRegister: " + svFilePath + " not found.");			   
+	endif;	
+end;   
+
+function RegSvcsUnRegister(svRegSvcsPath, svFilePath, svAppName)
+	STRING szCmdLine;
+	NUMBER nvExitCode;
+begin               
+	LongPathToQuote(svFilePath,TRUE);     
+	Sprintf(szCmdLine, " /u /quiet /appname:\"%s\" %s", svAppName, svFilePath);    
+	if(Is(FILE_EXISTS, svFilePath)) then      
+	   WriteLog("RegSvcs UnRegister Start: " + svFilePath);     
+	   if (_LaunchAppEx(svRegSvcsPath,
+	 	 				szCmdLine , 
+	  	 				WAIT, 
+	   					SW_HIDE, 
+	   					-1, 
+	   					nvExitCode) < 0) then 
+   			gsvErrorMessage = "Error unregistering " + svAppName + " as a COM+ Application";
+  			WriteErrorToLog(nvExitCode, gsvErrorMessage);  
+   			MessageBox(gsvErrorMessage, SEVERE);  		
+   		endif;  
+	   WriteLog("RegSvcs UnRegister End: " + svFilePath);	
+	else
+		WriteLog("Skipping RegSvcsUnRegister: " + svFilePath + " not found.");		   
+	endif;	
 end;    
 
 //============================================================================= 
@@ -227,7 +291,110 @@ begin
 		endif;		   
 	endif;  	
 	return 0;
-end;       
+end;         
+
+//============================================================================= 
+//
+//  Function:   FindReplaceAllFiles
+//  Purpose:    replaces all patterns found in a file with a new pattern within a 
+//				directory. Includes sub-directories.
+//  Parameters:	STRING fileDir   		- fileDirectory to be edited
+//				STRING fileName			- filename to edit
+//				STRING p_patternToFind	- pattern to be replaced
+//				STRING p_newData		- data to replace pattern
+//  Returns:	None
+//
+//=============================================================================
+function FindReplaceAllFiles(szFilePath, szFileName, szPattern, szReplace)
+	STRING file, filePath, fileName;  
+	NUMBER nResult;
+begin
+	nResult = FindAllFiles(szFilePath, szFileName, file, RESET);
+	if(nResult = 0) then 		
+		while(nResult = 0) 
+			ParsePath(filePath, file, PATH);   
+			ParsePath(fileName, file, FILENAME);
+			FindNReplaceInFile(filePath, fileName, szPattern, szReplace); 			
+			nResult = FindAllFiles(szFilePath, szFileName, file, CONTINUE);        		
+    	endwhile;		
+	endif; 	                             
+end;
+
+//============================================================================= 
+//
+//  Function:   FindNReplaceInFile
+//  Purpose:    replaces a pattern found in a file with a new pattern.
+//  Parameters:	STRING fileDir   		- fileDirectory to be edited
+//				STRING fileName			- filename to edit
+//				STRING p_patternToFind	- pattern to be replaced
+//				STRING p_newData		- data to replace pattern
+//  Returns:	None
+//
+//=============================================================================
+function FindNReplaceInFile(szFileDir, szFileName, szPatternToFind, szNewData)  
+	NUMBER  nvReadFileHandle, nvWriteFileHandle, nLocationInString;
+	NUMBER  nvAttribute;
+    STRING 	svLine, szLeft, szRight, szTempFileName, svResult;
+begin
+
+	if( szPatternToFind = szNewData) goto EndFunction_FindNReplaceInFile;
+
+    // Set the file mode to append.
+    OpenFileMode (FILE_MODE_APPEND);
+
+	szTempFileName = "temp.temp";     
+    // Open file and leave it open.
+    if (CreateFile (nvWriteFileHandle, szFileDir, szTempFileName) < 0) then
+        // Report the error.
+        MessageBox ("Creating " + szFileDir ^ szTempFileName + " failed.", SEVERE);
+        goto EndFunction_FindNReplaceInFile;
+	endif;
+	    
+    // Set the file mode to normal.
+    OpenFileMode (FILE_MODE_NORMAL);
+    
+    // Open the file for editing.
+    if(OpenFile (nvReadFileHandle, szFileDir, szFileName) < 0) then
+    	WriteLog("Failed to open :" + szFileDir ^ szFileName);
+    endif;
+	
+	
+	// Go through entire file
+    while (GetLine (nvReadFileHandle, svLine) == 0)
+ 		while (StrFind(svLine, szPatternToFind) > -1)	//Found Pattern in line
+            nLocationInString = StrFind(svLine, szPatternToFind);
+            StrSub (szLeft, svLine, 0, nLocationInString);
+            StrSub (szRight, svLine, nLocationInString+StrLengthChars(szPatternToFind), StrLengthChars(svLine)-(nLocationInString+StrLengthChars(szPatternToFind)));
+            svLine = szLeft + szNewData + szRight;
+        endwhile;
+    	WriteLine(nvWriteFileHandle, svLine);
+    endwhile;
+    
+    // Close the file.
+    CloseFile (nvReadFileHandle);
+    
+    // Close the file.
+    CloseFile (nvWriteFileHandle);
+ 	
+ 	//Readonly attrib must be off before delete.
+	if Is(FILE_WRITEABLE, szFileDir ^ szFileName) = 0 then
+		GetFileInfo (szFileDir ^ szFileName, FILE_ATTRIBUTE, nvAttribute, svResult);
+		nvAttribute = nvAttribute & (~FILE_ATTR_READONLY);
+		SetFileInfo (szFileDir ^ szFileName, FILE_ATTRIBUTE, nvAttribute, "");
+	endif;
+	
+	//replace old file with new file 	
+ 	if(DeleteFile (szFileDir ^ szFileName) < 0) then
+ 		 WriteLog("Failed to delete :" + szFileDir ^ szFileName);
+ 	endif;
+    if(RenameFile (szFileDir ^ szTempFileName ,szFileDir ^ szFileName) < 0) then
+    	 WriteLog("Failed to rename :" + szFileDir ^ szTempFileName + " to " + szFileDir ^ szFileName);
+    endif;
+     
+	EndFunction_FindNReplaceInFile:
+	
+	svLine = "End";
+end;
               
 #include "..\..\Common Script\ntservice.rul" 
               
