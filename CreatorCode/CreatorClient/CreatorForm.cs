@@ -204,7 +204,7 @@ namespace Client.Creator
                         bHasActiveHardwareToken = licData.HasActiveHardwareToken; // DB - 4
                         deleteToolStripMenuItem.Enabled = true;
                         newProductLicenseToolStripMenuItem.Enabled = licData.IsActive;
-                        validationTokensToolStripMenuItem.Enabled = licData.IsActive;
+                        validationTokensToolStripMenuItem.Enabled = licData.IsActive || bHasValidTokens;
                         newTokenToolStripMenuItem.Enabled = !bHasValidTokens;
                         clearToolStripMenuItem.Enabled = bHasValidTokens && !bHasActiveHardwareToken;
                         markLostToolStripMenuItem.Enabled = bHasActiveHardwareToken;
@@ -212,7 +212,7 @@ namespace Client.Creator
                         reactivateToolStripMenuItem.Enabled = true;
                     }
                 }
-                createPacketFileToolStripMenuItem.Enabled = (licData.HasActiveProductLicense()) ? m_Permissions.pt_version_pwd.Value && bHasValidTokens : m_Permissions.pt_version_pwd.Value;
+                createPacketFileToolStripMenuItem.Enabled = m_Permissions.pt_version_pwd.Value && bHasValidTokens; // (licData.HasActiveProductLicense()) ? /*m_Permissions..Value &&*/ bHasValidTokens : m_Permissions.pt_version_pwd.Value;
             }   
         }
 
@@ -289,7 +289,7 @@ namespace Client.Creator
                                                                         lsp.IsActive && 
                                                                         m_Permissions.pt_create_modify_key.Value;                
                 //disallow packet generation for active LS, active PL, 0 tokens, no permissions
-                createPacketMainToolStripBtn.Enabled = (lsp.HasActiveProductLicense()) ? m_Permissions.pt_version_pwd.Value && lsp.HasValidTokens : m_Permissions.pt_version_pwd.Value;
+                createPacketMainToolStripBtn.Enabled = m_Permissions.pt_version_pwd.Value && lsp.HasValidTokens; // (lsp.HasActiveProductLicense()) ? m_Permissions.pt_version_pwd.Value && lsp.HasValidTokens : m_Permissions.pt_version_pwd.Value;
             }          
         }
 
@@ -1031,6 +1031,7 @@ namespace Client.Creator
             {
                 (LicenseServerNode.Tag as LicenseServer).LockStatus = false;
                 LoadDetailTreeViewSelectedNode(LicenseServerNode);
+                PopulateDetailListView(LicenseServerNode.Tag);
             }
         }
         private void checkOutLicenseServer(TreeNode LicenseServerNode)
@@ -1039,6 +1040,7 @@ namespace Client.Creator
             {
                 (LicenseServerNode.Tag as LicenseServer).LockStatus = true;
                 LoadDetailTreeViewSelectedNode(LicenseServerNode);
+                PopulateDetailListView(LicenseServerNode.Tag);
             }
         }
 
@@ -1073,12 +1075,12 @@ namespace Client.Creator
                                 token.LicenseID = -1;
                                 client.UpdateToken(token);
                             }
-                            else
+                            /*else
                             {
                                 token.TokenStatus = (byte)TokenStatus.Deactivated;
                                 client.UpdateToken(token);
                                 //client.DeleteToken(token);
-                            }
+                            }*/
                         }
                     }
                     List<ProductLicenseTable> plList = client.GetProductLicenses(lsProperty.Name, true); // db - 2
@@ -1096,6 +1098,7 @@ namespace Client.Creator
                 ////SetLicenseServerState(DetailTreeView.SelectedNode, false);
                 ////DetailPropertyGrid.Refresh();
                 LoadDetailTreeViewSelectedNode(DetailTreeView.SelectedNode);
+                PopulateDetailListView(DetailTreeView.SelectedNode.Tag);
                 foreach (TreeNode node in DetailTreeView.SelectedNode.Nodes)
                 {
                     LoadProductNode(node);
@@ -1692,6 +1695,7 @@ namespace Client.Creator
                     if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
                         DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
+                //PopulateDetailListView(DetailPropertyGrid.SelectedObject);
                 SetLicenseServerState(node, false);
             }
             EnableToolStripMenu(node);
@@ -4204,18 +4208,47 @@ namespace Client.Creator
             /// </summary>
             public void PopulateDetailListView(Object selectedObject)
             {
-                switch (selectedObject.GetType().Name)
+                if (selectedObject is LicenseServer)
+                    PopulateDetailListView(selectedObject as LicenseServer);
+                else if(selectedObject is ProductCollection)
+                    PopulateDetailListView(selectedObject as ProductCollection);
+                else
+                    PopulateDetailListView(selectedObject as ProductLicense);
+            }
+
+            public void SetupDetailListViewToolStrip(Object currentObject)
+            {
+                int imageIndex;
+                string toolStripText;
+                if(currentObject is LicenseServer)
                 {
-                    case AppConstants.LicenseServerObjectName:
-                        PopulateDetailListView(selectedObject as LicenseServer);
-                        break;
-                    case AppConstants.ProductCollectionObjectName:
-                        PopulateDetailListView(selectedObject as ProductCollection);
-                        break;
-                    default: //product license
-                        PopulateDetailListView(selectedObject as ProductLicense);
-                        break;
+                    imageIndex = Enums.GetIconIndex("VALIDATIONTOKENS");
+                    toolStripText = "Validation Tokens";
                 }
+                else if (currentObject is ProductCollection)
+                {
+                    ProductCollection productData = currentObject as ProductCollection;
+                    imageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName((byte)productData.ProductID));
+                    toolStripText = string.Format("{0} Module Summary", s_CommLink.GetProductName(productData.ProductID));
+                }
+                else //Product License
+                {
+                    ProductLicense plData = currentObject as ProductLicense;
+                    imageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(plData.ProductName));
+                    toolStripText = string.Format("{0} Modules", plData.ProductName);
+                }
+                if (imageIndex < 0) imageIndex = 0;
+                Image tokenImage = CreatorImageList.Images[imageIndex];
+                ImageToolStripLabel.Size = new Size(tokenImage.Width, tokenImage.Height);
+                ImageToolStripLabel.Image = tokenImage;                    
+                DetailListViewToolStripLabel.Text = toolStripText;
+                DetailListViewToolStripLabel2.Visible = currentObject is ProductCollection;// false;
+                //enable/disable buttons
+                dlvAddToolStripButton.Visible = currentObject is LicenseServer; //true;
+                dlvRemoveToolStripButton.Visible = currentObject is LicenseServer;// true;
+                moduleFilterToolStripComboBox.Visible = currentObject is ProductLicense;// false;
+                totalModuleListToolStripButton.Visible = currentObject is ProductLicense;// false;
+                defaultModuleListToolStripButton.Visible = currentObject is ProductLicense;// false;
             }
             
             //CONTACT DB : 2
@@ -4224,19 +4257,7 @@ namespace Client.Creator
                 IList<TokenTable> tokenList = null;
                 IList<SoftwareTokenTable> swTokenList = null;
                 DetailListView.Items.Clear();
-                int imageIndex = Enums.GetIconIndex("VALIDATIONTOKENS");
-                if (imageIndex < 0) imageIndex = 0;
-                Image tokenImage = CreatorImageList.Images[imageIndex];
-                ImageToolStripLabel.Size = new Size(tokenImage.Width, tokenImage.Height);
-                ImageToolStripLabel.Image = tokenImage;
-                DetailListViewToolStripLabel.Text = "Validation Tokens";
-                DetailListViewToolStripLabel2.Visible = false;
-                //enable/disable buttons
-                dlvAddToolStripButton.Visible = true;
-                dlvRemoveToolStripButton.Visible = true;
-                moduleFilterToolStripComboBox.Visible = false;
-                totalModuleListToolStripButton.Visible = false;
-                defaultModuleListToolStripButton.Visible = false;
+                SetupDetailListViewToolStrip(licenseData);
                 ListViewItem lvItem;        
                 TokenTable hardwareToken = null;
                // retrieve tokens from database not license info object
@@ -4279,9 +4300,12 @@ namespace Client.Creator
                         }
                         DetailListView.Items.Add(lvItem);
                     }
-                    bool bLockStatus = licenseData.LockStatus; //db - 2
+                    bool bLockStatus = licenseData.LockStatus; //db - 2 refreshes lockstatus
+                    //1) token count that are reserved or active more then one or no tokens found
+                    //2) license server is active
+                    //3) license server is checked out by the current user
                     dlvAddToolStripButton.Enabled = (tokenList.Where(t => t.TokenStatus == (byte)TokenStatus.Reserved || t.TokenStatus == (byte)TokenStatus.Active).Count() == 0 || tokenList.Count == 0) && licenseData.IsActive && licenseData.LockedByCurrentUser();
-                    dlvRemoveToolStripButton.Enabled = tokenList.Where(t => t.TokenStatus != (byte)TokenStatus.Deactivated).Count() > 0 && hardwareToken == null && licenseData.IsActive && licenseData.LockedByCurrentUser();              
+                    dlvRemoveToolStripButton.Enabled = tokenList.Where(t => t.TokenStatus != (byte)TokenStatus.Deactivated).Count() > 0 && hardwareToken == null && /*licenseData.IsActive &&*/ licenseData.LockedByCurrentUser();              
                 }               
                 _lvManager.SetSortIndexColumn(DetailListView.Handle, DetailListView.Columns.Count - 1);
                 DetailListView.Sort();
@@ -4293,18 +4317,7 @@ namespace Client.Creator
                 ProductLicenseTable plt = null;
                 List<ModuleTable> moduleList = null;
                 DetailListView.Items.Clear();
-                int imageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName((byte)productData.ProductID));
-                if (imageIndex < 0) imageIndex = 0;
-                Image productImage = CreatorImageList.Images[imageIndex];
-                ImageToolStripLabel.Size = new Size(productImage.Width, productImage.Height);
-                ImageToolStripLabel.Image = productImage;
-                DetailListViewToolStripLabel.Text = string.Format("{0} Module Summary", s_CommLink.GetProductName(productData.ProductID));
-                DetailListViewToolStripLabel2.Visible = true;
-                dlvAddToolStripButton.Visible = false;
-                dlvRemoveToolStripButton.Visible = false;
-                moduleFilterToolStripComboBox.Visible = false;
-                totalModuleListToolStripButton.Visible = false;
-                defaultModuleListToolStripButton.Visible = false;
+                SetupDetailListViewToolStrip(productData);
                 //needs to skip any product,modules that are deactivated            
                 //Need function to get correct parent node
                 LicenseServer lsp = GetLicenseServerFromSelectedNode(DetailTreeView.SelectedNode); //DetailTreeView.SelectedNode.Parent.Tag as LicenseServer;
@@ -4367,20 +4380,8 @@ namespace Client.Creator
             {
                 //clear previous items from storage and current view
                 storageListView.Items.Clear();
+                SetupDetailListViewToolStrip(plData);
                 //test-dev image missing
-                int imageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(plData.ProductName));
-                if (imageIndex < 0) imageIndex = 0;
-                Image productImage = CreatorImageList.Images[imageIndex];
-                ImageToolStripLabel.Size = new Size(productImage.Width, productImage.Height);
-                ImageToolStripLabel.Image = productImage;
-                DetailListViewToolStripLabel.Text = string.Format("{0} Modules", plData.ProductName);
-                DetailListViewToolStripLabel2.Visible = false;
-                dlvAddToolStripButton.Visible = false;
-                dlvAddToolStripButton.Enabled = true;
-                dlvRemoveToolStripButton.Visible = false;
-                moduleFilterToolStripComboBox.Visible = true;
-                totalModuleListToolStripButton.Visible = true;
-                defaultModuleListToolStripButton.Visible = true;
                 totalModuleListToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled;
                 defaultModuleListToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled;
                 //need to set plData read-only attributes
