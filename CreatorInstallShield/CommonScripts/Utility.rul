@@ -219,7 +219,7 @@ begin
 end;
 
 function RegSvcsRegister(svRegSvcsPath, svFilePath, svAppName)
-	STRING szCmdLine;
+	STRING szCmdLine, svErrorMessage;
 	NUMBER nvExitCode;
 begin    
 	LongPathToQuote(svFilePath,TRUE);     
@@ -232,9 +232,9 @@ begin
 	   					SW_HIDE, 
 	   					-1, 
 	   					nvExitCode) < 0) then 
-   			gsvErrorMessage = "Error registering " + svAppName + " as a COM+ Application";
-  			WriteErrorToLog(nvExitCode, gsvErrorMessage);  
-   			MessageBox(gsvErrorMessage, SEVERE);  		
+   			svErrorMessage = "Error registering " + svAppName + " as a COM+ Application";
+  			WriteErrorToLog(nvExitCode, svErrorMessage);  
+   			MessageBox(svErrorMessage, SEVERE);  		
    		endif;  
 	   WriteLog("RegSvcs Register End: " + svFilePath);	
 	else
@@ -243,7 +243,7 @@ begin
 end;   
 
 function RegSvcsUnRegister(svRegSvcsPath, svFilePath, svAppName)
-	STRING szCmdLine;
+	STRING szCmdLine, svErrorMessage ;
 	NUMBER nvExitCode;
 begin               
 	LongPathToQuote(svFilePath,TRUE);     
@@ -256,9 +256,9 @@ begin
 	   					SW_HIDE, 
 	   					-1, 
 	   					nvExitCode) < 0) then 
-   			gsvErrorMessage = "Error unregistering " + svAppName + " as a COM+ Application";
-  			WriteErrorToLog(nvExitCode, gsvErrorMessage);  
-   			MessageBox(gsvErrorMessage, SEVERE);  		
+   			svErrorMessage = "Error unregistering " + svAppName + " as a COM+ Application";
+  			WriteErrorToLog(nvExitCode, svErrorMessage);  
+   			MessageBox(svErrorMessage, SEVERE);  		
    		endif;  
 	   WriteLog("RegSvcs UnRegister End: " + svFilePath);	
 	else
