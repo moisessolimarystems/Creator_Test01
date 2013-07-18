@@ -105,35 +105,44 @@ namespace Client.Creator
 
         /// <summary>
         /// Retrieves all validation tokens in the database for a license server and stores them the _licPackage object with the tokens.
+        /// 2 cases - active, deactive ls
+        /// active ls - include all active tokens, can clear licenseCode
+        /// deactive ls - include computer name with sw tokens, include nothing for hardware token     
         /// </summary>
         private bool PopulateValidationTokens(PacketDialogData data)
         {
             bool bRetVal = true;
             IList<SoftwareTokenTable> softwareTokens = null;
-            IList<TokenTable> tokenList = null;
-            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();           
-            if (_licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Count > 0)  //leave tokens empty if product list is empty            
+            IList<TokenTable> tokenList = null;            
+            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
+
+            Service<ICreator>.Use((client) =>
             {
-                Service<ICreator>.Use((client) =>
-                {
-                    softwareTokens = CreatorForm.s_AllSoftwareTokens;//.GetAllSoftwareTokens();
-                    tokenList = client.GetTokensByLicenseName(_licenseServer);
-                });
+                softwareTokens = CreatorForm.s_AllSoftwareTokens;
+                tokenList = client.GetTokensByLicenseName(_licenseServer).Where(t => t.TokenStatus != (byte)TokenStatus.Deactivated).ToList();
+            });       
+            if (_licenseTable.IsActive)
+            {
+                bool bExistLicenseCode = false;
                 foreach (TokenTable token in tokenList)  //add validation tokens for licinfo object, tokentable may contain licensecode
                 {
                     if (tokenList.Count > 1)
-                    {   //not found in software token table -> ttlicensecode
+                    { 
                         string tokenName = Enum.GetName(typeof(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType), token.TokenType);
                         SoftwareTokenTable st = softwareTokens.FirstOrDefault(t => t.TokenType == tokenName);
                         if (st != null)
                         {
-                            if (st.Status == 0 || token.TokenStatus == (byte)TokenStatus.Deactivated) //skip licenseCode if user doesn't select ClearLicenseCode
+                            if (st.Status == 0)
                                 continue;
                         }
-                        else
+                        else  //not found in software token table - ttlicensecode
                         {
-                            if (!data.ClearLicenseCode && token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
-                                continue;
+                            if(token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
+                            {
+                                if (data.ClearLicenseCode)
+                                    continue; //skip licenseCode if user doesn't select ClearLicenseCode
+                                bExistLicenseCode = true;
+                            }
                         }
                     }
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
@@ -141,17 +150,23 @@ namespace Client.Creator
                     newToken.tokenValue.TVal = token.TokenValue;
                     _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
                 }
-                bool bExistLicenseCode = false;
-                foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal)
-                {
-                    if (token.tokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
-                        bExistLicenseCode = true;
-                }
                 if (!bExistLicenseCode)  //add empty licensecode token if it hasn't been added
                 {
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
                     _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken);
+                }
+            }
+            else //deactive ls
+            {   //SW will have history of tokens, HW will be empty                 
+                TokenTable computerNameToken = tokenList.Where(t => t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName &&
+                                                                    t.TokenStatus != (byte)TokenStatus.Deactivated).FirstOrDefault();
+                if (computerNameToken != null) //no need to add any tokens for HW deactivated LS
+                {
+                    Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+                    newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)computerNameToken.TokenType;
+                    newToken.tokenValue.TVal = computerNameToken.TokenValue;
+                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
                 }
             }
             return bRetVal;
