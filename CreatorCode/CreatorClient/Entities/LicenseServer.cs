@@ -22,7 +22,7 @@ namespace Client.Creator
         PermissionsTable                          _permissions;
         bool                                      _isActive;
         string                                    _userLock;
-        int                                      _productLicenseIndex;
+        int                                       _productLicenseIndex;
 
         #endregion
 
@@ -59,6 +59,11 @@ namespace Client.Creator
 
         #region Properties
         #region UnBrowsable
+        /// <summary>
+        /// Gets or sets the number of product licenses for display purposes.
+        /// </summary>
+        [Browsable(false)]
+        public int ProductLicenseCount { get; set; }
         /// <summary>
         /// Gets or sets the PermissionsTable to retrieve user rights.
         /// </summary>
@@ -116,30 +121,30 @@ namespace Client.Creator
             get
             {
                 bool bEnabled = false;
-                Service<ICreator>.Use((client) =>
+                //Service<ICreator>.Use((client) =>
+                //{
+                //    IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
+                if (TokenList != null && TokenList.Count > 0)
                 {
-                    IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
-                    if(tokenList != null && tokenList.Count > 0)
+                    foreach (TokenTable token in TokenList)
                     {
-                        foreach (TokenTable token in tokenList)
+                        if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                         {
-                            if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                            if (token.TokenStatus == (byte)TokenStatus.Active || token.TokenStatus == (byte)TokenStatus.Reserved)
+                                bEnabled = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (token.TokenStatus == (byte)TokenStatus.Reserved)
                             {
-                                if (token.TokenStatus == (byte)TokenStatus.Active)
-                                    bEnabled = true;
-                                break;
-                            }
-                            else
-                            {
-                                if (token.TokenStatus == (byte)TokenStatus.Reserved)
-                                {
-                                    bEnabled = true;
-                                    break; //found SW token that is active.
-                                }
+                                bEnabled = true;
+                                break; //found SW token that is active.
                             }
                         }
                     }
-                });
+                }
+                //});
                 return bEnabled;
             }
         }
@@ -196,24 +201,26 @@ namespace Client.Creator
             get
             {
                 bool bHardware = false;
-                Service<ICreator>.Use((client) =>
+               /* Service<ICreator>.Use((client) =>
                 {
                     IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
-                    if (tokenList != null && tokenList.Count > 0)
+                */
+                IList<TokenTable> tokenList = TokenList;
+                if (tokenList != null && tokenList.Count > 0)
+                {
+                    foreach (TokenTable token in tokenList)
                     {
-                        foreach (TokenTable token in tokenList)
+                        if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                         {
-                            if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
-                            {
-                                if (token.TokenStatus == (byte)TokenStatus.Active)
-                                    bHardware = true;
-                                break;
-                            }
+                            if (token.TokenStatus == (byte)TokenStatus.Active)
+                                bHardware = true;
+                            break;
                         }
                     }
-                    else
-                        bHardware = false;
-                });
+                }
+                else
+                    bHardware = false;
+                //});
                 return bHardware;
             }
         }
@@ -227,24 +234,24 @@ namespace Client.Creator
             get
             {
                 bool bLost = false;
-                Service<ICreator>.Use((client) =>
+                //Service<ICreator>.Use((client) =>
+                //{
+                //    IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
+                if (TokenList != null && TokenList.Count > 0)
                 {
-                    IList<TokenTable> tokenList = client.GetTokensByLicenseName(Name);
-                    if (tokenList != null && tokenList.Count > 0)
+                    foreach (TokenTable token in TokenList)
                     {
-                        foreach (TokenTable token in tokenList)
+                        if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
                         {
-                            if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
-                            {
-                                if (token.TokenStatus == (byte)TokenStatus.Lost)
-                                    bLost = true;
-                                break;
-                            }
+                            if (token.TokenStatus == (byte)TokenStatus.Lost)
+                                bLost = true;
+                            break;
                         }
                     }
-                    else
-                        bLost = false;
-                });
+                }
+                else
+                    bLost = false;
+                //});
                 return bLost;
             }
         }
@@ -310,6 +317,8 @@ namespace Client.Creator
                 }
             }
         }
+
+        public List<TokenTable> TokenList { get;set;}
         #endregion
 
         #region Browsable
@@ -423,6 +432,51 @@ namespace Client.Creator
             //lock status, 
         }
 
+        public void ResynchronizeTokens()
+        {
+            Service<ICreator>.Use((client) =>
+            {
+                TokenList = client.GetTokensByLicenseName(Name);
+            });
+        }
+
+        public bool HasReservedHardwareToken()
+        {
+            if (TokenList != null && TokenList.Count > 0)
+            {
+                foreach (TokenTable token in TokenList)
+                {
+                    if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                    {
+                        if (token.TokenStatus == (byte)TokenStatus.Reserved)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool HasActiveTokens()
+        {
+            if (TokenList != null && TokenList.Count > 0)
+            {
+                foreach (TokenTable token in TokenList)
+                {
+                    if (token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID)
+                    {
+                        if (token.TokenStatus == (byte)TokenStatus.Active)
+                            return true;
+                    }
+                    else
+                    {
+                        if (token.TokenStatus == (byte)TokenStatus.Reserved)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         public bool LockedByCurrentUser()
         {
             return (string.Compare(UserLock, WindowsIdentity.GetCurrent().Name, true) == 0);// UserLock == WindowsIdentity.GetCurrent().Name.ToLower();
@@ -455,8 +509,8 @@ namespace Client.Creator
                         }
                     }
                 }
-                else
-                    bRetVal = true;
+               // else
+               //     bRetVal = true;
             });
             return bRetVal;
         }
