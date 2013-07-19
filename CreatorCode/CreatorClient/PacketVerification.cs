@@ -84,24 +84,27 @@ namespace Client.Creator
                                 }
                             }                            
                             client.UpdatePackets(modifiedPacketList);
-                            if (_licenseCode.Length > 0) //store licenseCode to allow reset when generating packets.
+                            if (_licenseCode != null)
                             {
-                                TokenTable licCodeToken = client.GetTokenByLicenseName(_licenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
-                                if (licCodeToken != null)
+                                if (_licenseCode.Length > 0) //store licenseCode to allow reset when generating packets.
                                 {
-                                    licCodeToken.TokenValue = _licenseCode;
-                                    client.UpdateToken(licCodeToken);
-                                }
-                                else
-                                {
-                                    licCodeToken = new TokenTable()
+                                    TokenTable licCodeToken = client.GetTokenByLicenseName(_licenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
+                                    if (licCodeToken != null)
                                     {
-                                        CustID = lt.SCRnumber,
-                                        LicenseID = lt.ID,
-                                        TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode,
-                                        TokenValue = _licenseCode
-                                    };
-                                    client.CreateToken(licCodeToken);
+                                        licCodeToken.TokenValue = _licenseCode;
+                                        client.UpdateToken(licCodeToken);
+                                    }
+                                    else
+                                    {
+                                        licCodeToken = new TokenTable()
+                                        {
+                                            CustID = lt.SCRnumber,
+                                            LicenseID = lt.ID,
+                                            TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode,
+                                            TokenValue = _licenseCode
+                                        };
+                                        client.CreateToken(licCodeToken);
+                                    }
                                 }
                             }
                         }
