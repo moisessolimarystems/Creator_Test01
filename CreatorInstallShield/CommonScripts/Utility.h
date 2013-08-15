@@ -28,5 +28,7 @@ prototype FindNReplaceInFile(STRING,STRING,STRING,STRING);
 prototype FindReplaceAllFiles(STRING,STRING,STRING,STRING);
 prototype RegSvcsRegister(STRING,STRING,STRING);
 prototype RegSvcsUnRegister(STRING,STRING,STRING);
+prototype BOOL IsMSMQEnabled();
+prototype EnableMSMQ(STRING,STRING);
 
 #endif //_UTILITY_H_
