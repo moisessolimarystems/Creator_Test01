@@ -317,7 +317,7 @@ namespace Client.Creator
                 }
             }
         }
-
+        [Browsable(false)]
         public List<TokenTable> TokenList { get;set;}
         #endregion
 
