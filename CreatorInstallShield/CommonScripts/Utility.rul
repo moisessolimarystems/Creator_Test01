@@ -17,7 +17,74 @@
 #ifndef _UTILITY_RUL_
 #define _UTILITY_RUL_    
 
-#include "..\..\Common Script\ntservice.h" 
+//Needs to be run before registering files
+//MSMQs are created during registration         
+function BOOL IsMSMQEnabled()            
+	STRING szMSMQCore, szMSMQADIntegrated;    
+	NUMBER nvRegType, nvRegValueSize;	          
+	BOOL bRetVal;
+begin
+	bRetVal = FALSE;
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	
+	if(SYSINFO.bIsWow64) then      
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
+	endif;       
+	
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Setup", "msmq_Core", nvRegType, szMSMQCore, nvRegValueSize );	
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Setup", "msmq_ADIntegrated", nvRegType, szMSMQADIntegrated, nvRegValueSize );		
+	
+	if(szMSMQCore = "1" && szMSMQADIntegrated = "1") then	
+		bRetVal = TRUE;
+	endif;
+	if(SYSINFO.bIsWow64) then    
+	 	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
+	endif; 
+	return bRetVal;
+end;                                                          
+
+//Needs to be run before registering files
+//MSMQs are created during registration
+function EnableMSMQ(szWinDir, szSupportFolder)
+	STRING szCmd;     
+	NUMBER nvExitCode;
+begin  
+	if(SYSINFO.bIsWow64) then
+		Disable (WOW64FSREDIRECTION);
+	endif;               
+	//Windows XP, Windows 2003
+	szCmd = szWinDir ^ "System32\\sysocmgr.exe";	
+	if(SYSINFO.WINNT.bWinXP || SYSINFO.WINNT.bWinServer2003) then
+		//install msmq from support directory?   
+		LaunchAppAndWait(szCmd,"/i:" + szWinDir ^ "inf\\sysoc.inf" +  " /u:" + szSupportFolder ^ "InstallMSMQXP.inf" + " /q", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);
+	endif;
+	szCmd = szWinDir ^ "System32\\dism.exe";	     
+	//Windows Vista, 7, 8
+	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSProductType = VER_NT_WORKSTATION) then
+		LaunchAppAndWait(szCmd,"/online /enable-feature /featurename:MSMQ-Container /Quiet /NoRestart", LAAW_OPTION_WAIT);					
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT);					            		
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+	endif;
+	//Windows 2008, Windows 2008 R2
+	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor < 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then		  
+		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);		
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+	endif;                    
+	//Windows 2012
+	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor = 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then
+		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
+		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Services /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) ;
+		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+	endif;  
+	
+	if(SYSINFO.bIsWow64) then
+		Enable (WOW64FSREDIRECTION);
+	endif; 	
+	
+	if(!IsMSMQEnabled()) then
+		WriteLog("Failed to enable MSMQ.");		     
+	endif;       
+end;    
      
 //=============================================================================  
 //
@@ -265,33 +332,7 @@ begin
 		WriteLog("Skipping RegSvcsUnRegister: " + svFilePath + " not found.");		   
 	endif;	
 end;    
-
-//============================================================================= 
-//
-// Function:	DisableService
-// Purpose:  	Configures the Service to the specifications necessary for
-//				the Docserver.
-// Parameters:  STRING szService
-// Returns:  	0 if successful
-//				-1 if failure
-//
-//=============================================================================
-function DisableService(szService)       	
-begin                                               
-	// check for the service availability
-    if (_IsServiceAvailable(szService) = 0) then 
-    	// check for service stopped. 
-		if ( _IsNTServiceStopped(szService) != 0) then
-    		_StopNTService(szService);
-    	endif;   
-        // remove the service
-		if ( _DeleteNTService(szService) != 0 ) then
-//			MessageBox(szService + " Service NOT Disabled", INFORMATION);
-			return -1;
-		endif;		   
-	endif;  	
-	return 0;
-end;         
+       
 
 //============================================================================= 
 //
@@ -394,9 +435,7 @@ begin
 	EndFunction_FindNReplaceInFile:
 	
 	svLine = "End";
-end;
-              
-#include "..\..\Common Script\ntservice.rul" 
+end;             
               
 #endif //_UTILITY_RUL_
   
