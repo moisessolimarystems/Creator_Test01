@@ -290,14 +290,14 @@ namespace Client.Creator
                 case ConditionName.ProductVersion:
                 case ConditionName.VerifiedBy:
                 case ConditionName.Token:
-                case ConditionName.Module:
+                //case ConditionName.Module:
                     return ConditionNameType.String;
                     break;
                 case ConditionName.Active:
                 case ConditionName.Verified:
                     return ConditionNameType.Bool;
                     break;
-                default : // ConditionName.Product, ConditionName.State(PL, HW), ConditionName.Validation
+                default : // ConditionName.Product, ConditionName.State(PL, HW), ConditionName.Validation, ConditionName.Module
                     return ConditionNameType.Defined;
                     break;
             }
@@ -318,6 +318,10 @@ namespace Client.Creator
             else if (cn == ConditionName.ProductLicenseType)
             {
                 definedValueList.AddRange(ProductLicense.ProductLicenseTypeList);
+            }
+            else if (cn == ConditionName.Module)
+            {
+                definedValueList.AddRange(_commLink.GetAllModuleNamesList());
             }
             else
             {
