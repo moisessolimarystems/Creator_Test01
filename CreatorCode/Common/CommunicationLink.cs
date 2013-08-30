@@ -270,6 +270,17 @@ namespace Client.Creator
             return moduleList;
         }
 
+        public List<String> GetAllModuleNamesList()
+        {
+            List<String> moduleList = new List<string>();
+            List<String> productList = new List<string>();
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
+            {
+                moduleList.AddRange(GetModuleNameList(productSpec.productID.TVal));
+            }
+            return moduleList;
+        }
+
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(byte productID)
         {
             string productName = "Test/Dev/DR " + GetProductName(productID);
