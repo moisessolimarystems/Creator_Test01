@@ -53,5 +53,14 @@ namespace Client.Creator
             set { _customer.SCRoperator = value; }
         }
         #endregion
+
+        #region Methods
+        public void Clear()
+        {
+            Id = 0;
+            Name = string.Empty;
+            Operator = string.Empty;            
+        }
+        #endregion
     }
 }
