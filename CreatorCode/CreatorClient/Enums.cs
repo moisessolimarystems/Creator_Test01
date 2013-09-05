@@ -9,7 +9,14 @@ using System.Reflection;
 namespace Client.Creator
 {
         #region Enums
-            
+
+        enum ProductLicenseStatus
+        {
+            Default,
+            InActive,
+            Expired
+        }
+
         enum TokenStatus
         {
             Reserved,
