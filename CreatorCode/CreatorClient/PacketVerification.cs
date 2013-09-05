@@ -157,8 +157,8 @@ namespace Client.Creator
                         if (licenseName == _pktData.LicenseName)
                         {
                             int index = 0;
-                            if (tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0) ;
-                            index = tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
+                            if (tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0) 
+                                index = tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
                             Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[index];
                             verificationCodeTextBox.Text = attrib.verificationValue;
                             break;

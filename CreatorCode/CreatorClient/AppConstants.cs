@@ -29,9 +29,16 @@ namespace Client.Creator
         public const String PacketTabPage = "PacketTabPage";
 
         //LicenseView Tab Page Names
+        public const String CustomersTabPage = "CustomersTabPage";
         public const String LicensesTabPage = "LicensesTabPage";
         public const String ValidationKeysTabPage = "ValidationKeysTabPage";
         public const String ReportTabPage = "ReportTabPage";
+
+        //View Items
+        public static readonly int CustomersView = 0;
+        public static readonly int LicensesView = 1;
+        public static readonly int TokensView = 2;
+        public static readonly int ReportsView = 3;
 
         public class ReportXMLTags
         {

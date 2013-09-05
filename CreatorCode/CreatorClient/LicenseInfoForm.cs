@@ -121,7 +121,7 @@ namespace Client.Creator
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
                     bool bSkip = false;
-                    productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal).ToList();//client.GetProductLicensesByProduct(pltData.LicenseServerString, (byte)productSpec.productID.TVal);
+                    productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal).ToList();
                     /*foreach (ProductLicenseTable pl in productLicenses)
                     {   //skip if client and not perm
                         if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
@@ -581,6 +581,7 @@ namespace Client.Creator
                     LicenseVersion version = new LicenseVersion(productVersion);
                     productLicenseVersionMaskedTextBox.Text = version.ToString();
                 }
+                //initialize types combobox
                 typeComboBox.SelectedIndex = (selectedProduct.Contains("Test")) ? typeComboBox.Items.IndexOf("Development") : typeComboBox.Items.IndexOf("Production");
             });
 
@@ -612,8 +613,6 @@ namespace Client.Creator
         private void bindingNavigatorDeleteItem_Click(object sender, EventArgs e)
         {
             InitializeProductLicenseTabPage(RemoveCurrentItem());
-            //delete current item
-            //re-initialize previous view
         }
 
         private void SaveCurrentItem()
