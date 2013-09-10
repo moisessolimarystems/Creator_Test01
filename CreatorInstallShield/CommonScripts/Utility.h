@@ -30,5 +30,6 @@ prototype RegSvcsRegister(STRING,STRING,STRING);
 prototype RegSvcsUnRegister(STRING,STRING,STRING);
 prototype BOOL IsMSMQEnabled();
 prototype EnableMSMQ(STRING,STRING);
+prototype DisableMSMQWorkgroup();
 
 #endif //_UTILITY_H_

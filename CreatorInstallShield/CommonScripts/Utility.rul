@@ -40,7 +40,37 @@ begin
 	 	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
 	endif; 
 	return bRetVal;
-end;                                                          
+end;  
+
+function DisableMSMQWorkgroup()	
+	STRING szValue;    
+	NUMBER nvRegType, nvRegValueSize;	          
+begin	          
+	Disable(LOGGING);
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Parameters", "Workgroup", nvRegType, szValue, nvRegValueSize );	
+	if(szValue = "1") then
+		szValue = "0";
+		RegDBSetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Parameters", "Workgroup", REGDB_NUMBER, szValue, -1);	
+		BATCH_INSTALL = TRUE;
+	endif;
+	
+	if(SYSINFO.bIsWow64) then      
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
+	endif;       
+	
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Parameters", "Workgroup", nvRegType, szValue, nvRegValueSize );	
+	if(szValue = "1") then
+		szValue = "0";
+		RegDBSetKeyValueEx("\\SOFTWARE\\Microsoft\\MSMQ\\Parameters", "Workgroup", REGDB_NUMBER, szValue, -1);	
+		BATCH_INSTALL = TRUE;
+	endif;
+	
+	if(SYSINFO.bIsWow64) then    
+	 	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
+	endif;  
+	Enable(LOGGING);   
+end;                                                        
 
 //Needs to be run before registering files
 //MSMQs are created during registration
@@ -331,8 +361,7 @@ begin
 	else
 		WriteLog("Skipping RegSvcsUnRegister: " + svFilePath + " not found.");		   
 	endif;	
-end;    
-       
+end;         
 
 //============================================================================= 
 //
@@ -435,7 +464,8 @@ begin
 	EndFunction_FindNReplaceInFile:
 	
 	svLine = "End";
-end;             
+end;
+              
               
 #endif //_UTILITY_RUL_
   
