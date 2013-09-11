@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Drawing.Printing;
 using System.Drawing.Imaging;
 using System.ServiceProcess;
+using System.Text.RegularExpressions;
 /*
  * TODO : 
  *        - Create custom filters to retrieve lists.
@@ -444,13 +445,29 @@ namespace Client.Creator
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
             {
+                Regex reg = null;
                 string[] findStringArray = searchToolStripTextBox.Text.Split("-".ToCharArray());
-                //valid search string LS = 3, PL = 4
-                if (findStringArray.Count() == 3)
-                    LoadSelectedLicenseServer(searchToolStripTextBox.Text);
+                //valid search string Token = 2, LS = 3, PL = 4
+                if (findStringArray.Count() == 2) //possibly one in the future?
+                {
+                    reg = new Regex(@"^\w{4}\-\w{4}$");
+                    if(reg.IsMatch(searchToolStripTextBox.Text))
+                        LoadSelectedLicenseServerFromToken(searchToolStripTextBox.Text);
+                }                
+                else if (findStringArray.Count() == 3)
+                {
+                    reg = new Regex(@"^\w{3}\-\w{2}-\w{3}$");
+                    if(reg.IsMatch(searchToolStripTextBox.Text))
+                        LoadSelectedLicenseServer(searchToolStripTextBox.Text);
+                }
                 else if (findStringArray.Count() == 4)
-                    LoadSelectedProductLicense(searchToolStripTextBox.Text);
-                else
+                {
+                    reg = new Regex(@"^\w{3}\-\w{2}-\w{3}-\w+$");
+                    if(reg.IsMatch(searchToolStripTextBox.Text))
+                        LoadSelectedProductLicense(searchToolStripTextBox.Text);
+                }
+
+                if (reg == null || !reg.IsMatch(searchToolStripTextBox.Text))
                     SearchCurrentView(searchToolStripTextBox.Text);
             }
         }
@@ -3093,11 +3110,31 @@ namespace Client.Creator
             DetailTreeView.EndUpdate();
         }
 
+        void LoadSelectedLicenseServerFromToken(string tokenName)
+        {
+            LicenseTable license = null;
+            List<Condition> conditionList = new List<Condition>()
+                    {
+                        new Condition()
+                        {
+                            Name = ConditionName.Token, 
+                            Operator = ConditionOperator.Equal, 
+                            Value = searchToolStripTextBox.Text
+                        }              
+                    };
+            Service<ICreator>.Use((client) =>
+            {
+                license = client.GetLicensesByConditions(conditionList, true, false).FirstOrDefault();
+            });
+            if (license != null)
+                LoadSelectedLicenseServer(license.LicenseName);
+            else
+                MessageBox.Show("Could not find License Server for token : " + tokenName, "Search Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
         private void LoadSelectedLicenseServer(string selectedLicense)
         {
             bool bFound = true;
-            //load licenses, highlight particular license
-            findToolStrip.Visible = false;
             //get destination from string or.....store in tag?
             string[] lsString = selectedLicense.Split("-".ToCharArray());
             int custID = Int32.Parse(lsString[0], System.Globalization.NumberStyles.HexNumber);
@@ -3111,7 +3148,9 @@ namespace Client.Creator
                     bFound = false;
                 }
                 else
+                {
                     _selectedLicenseCustomer = new Customer(client.GetCustomer(custID.ToString(), false));
+                }
             });
             if (bFound)
             {
@@ -3119,6 +3158,8 @@ namespace Client.Creator
                 LoadDestinationNameComboBox(custID, destID);
                 viewToolStripComboBox.SelectedIndex = AppConstants.LicensesView;
             }
+            //load licenses, highlight particular license
+            findToolStrip.Visible = false;
         }
         private void LoadDestinationNameComboBox(Customer custProperty)
         {
@@ -4582,7 +4623,7 @@ namespace Client.Creator
             string[] plSplit;
             string validationType, verifiedStatus;
             Service<ICreator>.Use((client) =>
-            {
+            {        
                 licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll, false);              
                 customers = client.GetAllCustomers(string.Empty, false);
                 unverifiedLicenses = client.GetUnVerifiedLicenses();
