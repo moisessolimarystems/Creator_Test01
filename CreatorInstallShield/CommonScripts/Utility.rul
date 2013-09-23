@@ -90,21 +90,21 @@ begin
 	szCmd = szWinDir ^ "System32\\dism.exe";	     
 	//Windows Vista, 7, 8
 	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSProductType = VER_NT_WORKSTATION) then
-		LaunchAppAndWait(szCmd,"/online /enable-feature /featurename:MSMQ-Container /Quiet /NoRestart", LAAW_OPTION_WAIT);					
-		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT);					            		
-		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+		LaunchAppAndWait(szCmd,"/online /enable-feature /featurename:MSMQ-Container /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);					
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);					            		
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 	endif;
 	//Windows 2008, Windows 2008 R2
 	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor < 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then		  
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);		
-		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 	endif;                    
 	//Windows 2012
 	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor = 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Services /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) ;
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
-		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT);			
+		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 	endif;  
 	
 	if(SYSINFO.bIsWow64) then
