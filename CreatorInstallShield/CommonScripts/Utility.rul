@@ -75,9 +75,17 @@ end;
 //Needs to be run before registering files
 //MSMQs are created during registration
 function EnableMSMQ(szWinDir, szSupportFolder)
-	STRING szCmd;     
-	NUMBER nvExitCode;
-begin  
+	STRING szCmd, svMsg, svWindowsVersion;     
+	NUMBER nvExitCode, nvSize, nvWindowsVersion;
+begin      
+	nvSize = 256;
+	MsiGetProperty(ISMSI_HANDLE, "VersionNT", svWindowsVersion, nvSize);
+	if(SYSINFO.bIsWow64) then
+		Disable (WOW64FSREDIRECTION); 
+		nvSize = 256;	
+		MsiGetProperty(ISMSI_HANDLE, "VersionNT64", svWindowsVersion, nvSize);
+	endif;    
+	StrToNum(nvWindowsVersion, svWindowsVersion);
 	if(SYSINFO.bIsWow64) then
 		Disable (WOW64FSREDIRECTION);
 	endif;               
@@ -95,12 +103,12 @@ begin
 		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 	endif;
 	//Windows 2008, Windows 2008 R2
-	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor < 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then		  
+	if(nvWindowsVersion < 602 && SYSINFO.nOSProductType = VER_NT_SERVER) then		  
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);		
-		LaunchAppAndWait(szCmd, "/online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
+		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-ADIntegration /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 	endif;                    
-	//Windows 2012
-	if(SYSINFO.nOSMajor = 6 && SYSINFO.nOSMinor = 2 && SYSINFO.nOSProductType = VER_NT_SERVER) then
+
+	if(nvWindowsVersion = 602 && SYSINFO.nOSProductType = VER_NT_SERVER) then
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);			
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Services /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) ;
 		LaunchAppAndWait(szCmd," /online /enable-feature /featurename:MSMQ-Server /Quiet /NoRestart", LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
