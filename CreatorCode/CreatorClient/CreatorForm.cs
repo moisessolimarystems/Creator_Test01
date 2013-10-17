@@ -2955,14 +2955,14 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 license = client.GetLicenseByName(licenseNode.Name, true); // db - 1             
-                if (license != null)
+                if (license != null)                
                 {
                     licenseNode.Text = (license.UserLock != null) ? license.LicenseName + " - " + license.UserLock : license.LicenseName;
                     licenseNode.Tag = new LicenseServer(license, m_Permissions);                    
                     pltList = client.GetProductLicenses(license.LicenseName, false); // db - 2
                 }
                 else
-                    licenseNode.Tag = null;
+                    licenseNode.Tag = null;                 
             });
             //need to clear out existing product collection
             TreeNode productNode = null;
@@ -4547,7 +4547,8 @@ namespace Client.Creator
             IList<ProductLicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
             IList<int> unverifiedLicenses = null;
-            IList<TokenTable> tokens = null;
+            IList<TokenTable> hwTokens = null;
+            IList<TokenTable> swTokens = null;
 
             CustomerTable customer = null;
 
@@ -4558,7 +4559,8 @@ namespace Client.Creator
                 licenses = client.GetProductLicensesByConditions(rp.DatabaseConditions, rp.MatchAll);
                 unverifiedLicenses = client.GetUnVerifiedLicenses();
                 customers = client.GetAllCustomers(string.Empty, false);
-                tokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
+                hwTokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                swTokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName);
             });
             PopulateReportListViewColumns(Report.ReportType.ProductLicense);
             ReportListView.BeginUpdate();
@@ -4567,7 +4569,7 @@ namespace Client.Creator
             {
                 ListViewItem[] lvItems = new ListViewItem[licenses.Count];
                 for (int index = 0; index < licenses.Count; index++)
-                {
+                {                    
                     ListViewItem newItem = new ListViewItem();
                     plSplit = licenses[index].plID.Split("-".ToCharArray());
                     customer = customers.Where(c => c.SCRnumber.Equals(Int32.Parse(plSplit[0], System.Globalization.NumberStyles.HexNumber))).FirstOrDefault();
@@ -4596,10 +4598,11 @@ namespace Client.Creator
                     
                     //need link to licenses to product licenses
                     //have product license list with access to modules
-                    
-                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware" : "Software";
-                    if (validationType == "Hardware")
-                        validationType = tokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                    validationType = string.Empty;
+                    if(swTokens.Where(t => t.LicenseID == licenses[index].LicenseID).Count() > 0) 
+                        validationType = "Software";
+                    else if(hwTokens.Where(t => t.LicenseID == licenses[index].LicenseID).Count() > 0)
+                        validationType = hwTokens.Where(t => t.LicenseID == licenses[index].LicenseID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
                     newItem.SubItems.Add(validationType);
 
                     verifiedStatus = unverifiedLicenses.Contains(licenses[index].LicenseID) ? bool.FalseString : bool.TrueString;
@@ -4617,7 +4620,8 @@ namespace Client.Creator
         {
             IList<LicenseTable> licenses = null;
             IList<CustomerTable> customers = null;
-            IList<TokenTable> tokens = null;
+            IList<TokenTable> hwTokens = null;
+            IList<TokenTable> swTokens = null;
             IList<int> unverifiedLicenses = null;
             CustomerTable customer = null;
             string[] plSplit;
@@ -4627,7 +4631,10 @@ namespace Client.Creator
                 licenses = client.GetLicensesByConditions(rp.DatabaseConditions, rp.MatchAll, false);              
                 customers = client.GetAllCustomers(string.Empty, false);
                 unverifiedLicenses = client.GetUnVerifiedLicenses();
-                tokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttNone);
+                hwTokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                swTokens = client.GetAllTokens(string.Empty, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttComputerName);
+                //tokens returned 7500 might be too many for linq to handle?
+                //used to determine type and if hw then display hw id otherwise 'software'
             });
             PopulateReportListViewColumns(Report.ReportType.LicenseServer);
             ReportListView.BeginUpdate();
@@ -4650,9 +4657,12 @@ namespace Client.Creator
                     else
                         newItem.SubItems.Add(string.Empty);
                     newItem.SubItems.Add(licenses[index].IsActive.ToString());
-                    validationType = (tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).Count() > 0) ? "Hardware": "Software";
-                    if (validationType == "Hardware")
-                        validationType = tokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                    validationType = string.Empty;
+                    if (swTokens.Where(t => t.LicenseID == licenses[index].ID).Count() > 0)
+                        validationType = "Software";
+                    else if (hwTokens.Where(t => t.LicenseID == licenses[index].ID).Count() > 0)
+                        validationType = hwTokens.Where(t => t.LicenseID == licenses[index].ID && t.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID).First().TokenValue;
+                    
                     newItem.SubItems.Add(validationType);
                     verifiedStatus = unverifiedLicenses.Contains(licenses[index].ID) ? bool.FalseString : bool.TrueString;
                     newItem.SubItems.Add(verifiedStatus);
