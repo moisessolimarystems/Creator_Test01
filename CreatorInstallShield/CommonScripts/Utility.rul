@@ -165,7 +165,7 @@ begin
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
 WriteLog("Remove Performance Counter Start: " + svFilePath);		
-		if(LaunchAppAndWait(szCmd," /M: " +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+		if(LaunchAppAndWait(szCmd," /M:" +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
 			WriteLog("Failed to remove performance counter " + svFilePath + " for " + @PRODUCT_NAME);
 		endif;
 WriteLog("Remove Performance Counter End: " + svFilePath);					
