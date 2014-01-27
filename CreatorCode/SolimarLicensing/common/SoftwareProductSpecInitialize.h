@@ -1383,9 +1383,11 @@ void InititalizeProduct14()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(106))->second);
 	pTmpModSpec->moduleID = 106;
 	pTmpModSpec->moduleName = std::wstring(L"SOLitrack Input");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 21;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(107, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(107))->second);
