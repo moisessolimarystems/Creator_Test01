@@ -527,6 +527,16 @@ void InititalizeProduct8()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(134, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(134))->second);
+	pTmpModSpec->moduleID = 134;
+	pTmpModSpec->moduleName = std::wstring(L"Tiered Storage");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 6;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 22;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(131, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(131))->second);
 	pTmpModSpec->moduleID = 131;

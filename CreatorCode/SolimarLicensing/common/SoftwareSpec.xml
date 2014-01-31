@@ -124,7 +124,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="21">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="22">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -192,7 +192,8 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="132" moduleName="PDF" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="133" moduleName="Full Text" modUnlimitedValue="1"/>
-		</Lic_ModuleSoftwareSpecAttribsMap>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="134" moduleName="Tiered Storage" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="6" moduleVersionIntroduced_SubMinor="22"/>
+    </Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="9" productName="SOLscript">
 		<Lic_ModuleSoftwareSpecAttribsMap>
