@@ -445,30 +445,7 @@ namespace Client.Creator
         {
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Return)
             {
-                Regex reg = null;
-                string[] findStringArray = searchToolStripTextBox.Text.Split("-".ToCharArray());
-                //valid search string Token = 2, LS = 3, PL = 4
-                if (findStringArray.Count() == 2) //possibly one in the future?
-                {
-                    reg = new Regex(@"^\w{4}\-\w{4}$");
-                    if(reg.IsMatch(searchToolStripTextBox.Text))
-                        LoadSelectedLicenseServerFromToken(searchToolStripTextBox.Text);
-                }                
-                else if (findStringArray.Count() == 3)
-                {
-                    reg = new Regex(@"^\w{3}\-\w{2}-\w{3}$");
-                    if(reg.IsMatch(searchToolStripTextBox.Text))
-                        LoadSelectedLicenseServer(searchToolStripTextBox.Text);
-                }
-                else if (findStringArray.Count() == 4)
-                {
-                    reg = new Regex(@"^\w{3}\-\w{2}-\w{3}-\w+$");
-                    if(reg.IsMatch(searchToolStripTextBox.Text))
-                        LoadSelectedProductLicense(searchToolStripTextBox.Text);
-                }
-
-                if (reg == null || !reg.IsMatch(searchToolStripTextBox.Text))
-                    SearchCurrentView(searchToolStripTextBox.Text);
+                processUserSearch(searchToolStripTextBox.Text);
             }
         }
 
@@ -502,7 +479,7 @@ namespace Client.Creator
             string searchString = string.Empty;
             if (searchToolStripTextBox.ForeColor != SystemColors.InactiveCaptionText)
                 searchString = searchToolStripTextBox.Text;
-            SearchCurrentView(searchString);
+            processUserSearch(searchString);
         }
 
         private void searchToolStripTextBox_Enter(object sender, EventArgs e)
@@ -1673,7 +1650,7 @@ namespace Client.Creator
             { 
                 case 1:            //level 1 - Product
                     LoadProductNode(productNode);                    
-                    if (productNode.Tag != null)                    //remove self if holds no product licenses
+                    if (productNode.Tag != null)                    //remove self if holds no product lice2nses
                     {
                         lspNode = productNode.Parent;
                         lsp = lspNode.Tag as LicenseServer;
@@ -2796,6 +2773,34 @@ namespace Client.Creator
                 MessageBox.Show("Failed to find " + findToolStripTextBox.Text, "Find", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        private void processUserSearch(string userSearchText)
+        {
+            Regex reg = null;
+            string[] findStringArray = userSearchText.Split("-".ToCharArray());
+            //valid search string Token = 2, LS = 3, PL = 4
+            if (findStringArray.Count() == 2) //possibly one in the future?
+            {
+                reg = new Regex(@"^\w{4}\-\w{4}$");
+                if (reg.IsMatch(userSearchText))
+                    LoadSelectedLicenseServerFromToken(userSearchText);
+            }
+            else if (findStringArray.Count() == 3)
+            {
+                reg = new Regex(@"^\w{3}\-\w{2}-\w{3}$");
+                if (reg.IsMatch(userSearchText))
+                    LoadSelectedLicenseServer(userSearchText);
+            }
+            else if (findStringArray.Count() == 4)
+            {
+                reg = new Regex(@"^\w{3}\-\w{2}-\w{3}-\w+$");
+                if (reg.IsMatch(userSearchText))
+                    LoadSelectedProductLicense(userSearchText);
+            }
+
+            if (reg == null || !reg.IsMatch(userSearchText))
+                SearchCurrentView(userSearchText);
+        }
+
         //issue std selected license node is customer node
         //      all others are std license node 
         private void SearchCurrentView(string searchString)
@@ -2957,7 +2962,7 @@ namespace Client.Creator
                 license = client.GetLicenseByName(licenseNode.Name, true); // db - 1             
                 if (license != null)                
                 {
-                    licenseNode.Text = (license.UserLock != null) ? license.LicenseName + " - " + license.UserLock : license.LicenseName;
+                    licenseNode.Text = (license.UserLock != null) ? string.Format("{0} - {1}", license.LicenseName, license.UserLock) : license.LicenseName;
                     licenseNode.Tag = new LicenseServer(license, m_Permissions);                    
                     pltList = client.GetProductLicenses(license.LicenseName, false); // db - 2
                 }
@@ -2972,7 +2977,7 @@ namespace Client.Creator
                 {   //selectednode = licenseName
                     productName = s_CommLink.GetProductName(plt.ProductID);
                     if (!licenseNode.Nodes.ContainsKey(productName))
-                    { 
+                    {
                         productNode = new TreeNode(productName);
                         productNode.Name = productName;
                         productNode.ImageIndex = productNode.SelectedImageIndex = Enums.GetIconIndex(s_CommLink.GetProductBaseName(productName));
@@ -3057,11 +3062,11 @@ namespace Client.Creator
             {
                 if (selectedName.Length > 0)
                 {
-                    if (selectedName.Split("-".ToCharArray()).Count() == 3)
+                    if (selectedName.Split("-".ToCharArray()).Count() == 3) //find license server
                     {
                         DetailTreeView.SelectedNode = DetailTreeView.Nodes.Find(selectedName, false).FirstOrDefault();
                     }
-                    else
+                    else //find product license
                     {
                         string licenseServer = selectedName.Remove(selectedName.LastIndexOf("-"), selectedName.Length - selectedName.LastIndexOf("-"));
                         DetailTreeView.SelectedNode = DetailTreeView.Nodes.Find(licenseServer, false).FirstOrDefault();
@@ -3070,12 +3075,13 @@ namespace Client.Creator
                     }
                 }
                 else
+                {
                     DetailTreeView.SelectedNode = DetailTreeView.Nodes[0];
+                }
                 SetLicenseServerState(DetailTreeView.SelectedNode, true);
             }
             else
-            {
-                //empty treeview, disable propertygrid
+            {   //empty treeview, disable propertygrid
                 DetailPropertyGrid.SelectedObject = null;
             }
         }
@@ -3114,14 +3120,14 @@ namespace Client.Creator
         {
             LicenseTable license = null;
             List<Condition> conditionList = new List<Condition>()
-                    {
-                        new Condition()
-                        {
-                            Name = ConditionName.Token, 
-                            Operator = ConditionOperator.Equal, 
-                            Value = searchToolStripTextBox.Text
-                        }              
-                    };
+            {
+                new Condition()
+                {
+                    Name = ConditionName.Token, 
+                    Operator = ConditionOperator.Equal, 
+                    Value = searchToolStripTextBox.Text
+                }              
+            };
             Service<ICreator>.Use((client) =>
             {
                 license = client.GetLicensesByConditions(conditionList, true, false).FirstOrDefault();
@@ -5407,8 +5413,7 @@ namespace Client.Creator
         }
 
         private void SetProductLicenseNodeDisplayStatus(TreeNode node)
-        {
-            //setup node style
+        {   //setup node style
             SetNodeStyle(node, ProductLicenseStatus.Default);
             if ((node.Tag as ProductLicense).IsExpired)
                 SetNodeStyle(node, ProductLicenseStatus.Expired);
