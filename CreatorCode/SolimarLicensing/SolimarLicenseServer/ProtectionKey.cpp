@@ -179,7 +179,7 @@ ProtectionKey::ProtectionKey(_bstr_t physicalKeyIdent, _bstr_t virtualKeyIdent, 
 {
 	try
 	{
-		UpdateAllCellsCache();
+		UpdateAllCellsCache(true, true);
 	}
 	catch (_com_error &e)
 	{
@@ -1401,7 +1401,7 @@ HRESULT ProtectionKey::CopyCellCache(const ProtectionKey &k)
 	return S_OK;
 }
 
-void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
+void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh, bool bFirstTime)
 {
 	time_t cur_time = time(NULL);
 	static const time_t UPDATE_TIME_PERIOD = (time_t)30;//30 Seconds - Don't check more than once every thirty seconds.
@@ -1423,7 +1423,7 @@ void ProtectionKey::UpdateAllCellsCache(bool bForceRefresh)
 		memset(tmp_cells,0,sizeof(tmp_cells));
 		memset(tmp_cells_valid,0,sizeof(tmp_cells));
 		unsigned short key_layout_version = 0;
-		this->GetKeyVersion(&key_layout_version);
+		this->GetKeyVersion(&key_layout_version, !bFirstTime);
 		for (unsigned int i=0; i<ProtectionKey::KeyCellCount; ++i)
 		{
 			if (RainbowDriver::ALGORITHM == ((key_layout_version==0) ? RainbowDriver::accessCode[i] : RainbowDriver::accessCode_version1[i]))
@@ -3641,8 +3641,17 @@ HRESULT ProtectionKey::WriteExpirationDays(unsigned short extend_days)
 
 
 //Returns the Key Version, a key version will correspond to a certain key layout
-HRESULT ProtectionKey::GetKeyVersion(unsigned short* key_version)
+HRESULT ProtectionKey::GetKeyVersion(unsigned short* key_version, bool bUseCache)
 {
-	*key_version = ReadHeaderCache(_bstr_t(L"Key Version")).uiVal;
+	if (bUseCache)
+	{
+		*key_version = ReadHeaderCache(_bstr_t(L"Key Version")).uiVal;
+	}
+	else
+	{
+		// Special case, there is no cache yet
+		KeySpec::Header &header(m_keyspec->headers[_bstr_t(L"Key Version")]);
+		*key_version = ReadBits(header.offset, header.bits, true).uiVal;
+	}
 	return S_OK;
 }

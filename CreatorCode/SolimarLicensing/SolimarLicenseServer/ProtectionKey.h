@@ -101,7 +101,7 @@ public:
 	// Reads raw data off of the key
 	HRESULT ReadRaw(VARIANT *pvtKeyData);
 
-	void UpdateAllCellsCache(bool bForceRefresh = false);
+	void UpdateAllCellsCache(bool bForceRefresh = false, bool bFirstTime = false);
 	void UpdateCellCache(unsigned int cell);
 	virtual HRESULT DecrementTrialHours();
 	virtual bool TimesUp();
@@ -119,7 +119,7 @@ public:
 	HRESULT CopyCellCache(const ProtectionKey &k);
 
 	//Functions to help with muliple Key Version's (How the cells on a Key will be interpreted
-	HRESULT GetKeyVersion(unsigned short* key_version);
+	HRESULT GetKeyVersion(unsigned short* key_version, bool bUseCache = true);
 
 protected:
 
@@ -183,7 +183,7 @@ public:
 	static const unsigned int SECONDS_PER_DAY = 86400;
 		
 	// read a cell (a 16 bit segment of data) off of the protection key
-	unsigned short ReadCellCache(unsigned short cell);
+	virtual unsigned short ReadCellCache(unsigned short cell);
 protected:
 	HANDLE cells_lock;
 	static const unsigned int KeyCellCount = 64;

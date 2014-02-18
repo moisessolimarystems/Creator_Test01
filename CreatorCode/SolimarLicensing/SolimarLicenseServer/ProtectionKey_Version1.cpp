@@ -124,8 +124,8 @@ HRESULT ProtectionKey_Version1::DecrementTrialHours()
 		int timeDifferenceInHours = int(timeDifferenceInSeconds / TimeHelper::ONE_HOUR_IN_SECONDS);
 		if(timeDifferenceInHours > 0)
 		{
-			unsigned short currentActivation;
-			unsigned short activationHoursLeft;
+			unsigned long currentActivation;
+			unsigned long activationHoursLeft;
 			for(int idx=0; idx<_countof(CELL_ACTIVATION_SLOT_LIST); idx++)
 			{
 				
@@ -199,25 +199,25 @@ HRESULT ProtectionKey_Version1::SetSoftwareCurrentDateTime(time_t current_dateti
 	return WriteBits(CELL_CURRENT_DATE, CELL_BIT_SIZE_DATE, (unsigned long)current_datetime);
 }
 
-HRESULT ProtectionKey_Version1::GetHistoryNumber(unsigned short *history_number)
+HRESULT ProtectionKey_Version1::GetHistoryNumber(unsigned long *history_number)
 {
-	return ReadBits(CELL_HEADER_HISTORY_NUMBER, CELL_BIT_SIZE_HEADER, (unsigned long*)history_number, false);
+	return ReadBits(CELL_HEADER_HISTORY_NUMBER, CELL_BIT_SIZE_HEADER, history_number, false);
 }
 HRESULT ProtectionKey_Version1::SetHistoryNumber(unsigned short history_number)
 {
 	return WriteBits(CELL_HEADER_HISTORY_NUMBER, CELL_BIT_SIZE_HEADER, history_number);
 }
-HRESULT ProtectionKey_Version1::GetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned short* current_activation)
+HRESULT ProtectionKey_Version1::GetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned long* current_activation)
 {
-	return (unsigned short)ReadBits(CELL_ACTIVATION_SLOT_LIST[activity_index], CELL_BIT_SIZE_ACTIVATION_CURRENT, (unsigned long*)current_activation, false);
+	return (unsigned short)ReadBits(CELL_ACTIVATION_SLOT_LIST[activity_index], CELL_BIT_SIZE_ACTIVATION_CURRENT, current_activation, false);
 }
 HRESULT ProtectionKey_Version1::SetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned short current_activation)
 {
 	return WriteBits(CELL_ACTIVATION_SLOT_LIST[activity_index], CELL_BIT_SIZE_ACTIVATION_CURRENT, current_activation);
 }
-HRESULT ProtectionKey_Version1::GetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned short* hours_to_expiration)
+HRESULT ProtectionKey_Version1::GetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned long* hours_to_expiration)
 {
-	return (unsigned short)ReadBits(CELL_ACTIVATION_SLOT_LIST[activity_index] + (CELL_BIT_SIZE_ACTIVATION_CURRENT * CELL_BIT_SIZE_TO_SUBCELL), CELL_BIT_SIZE_ACTIVATION_HOURS_TO_EXPIRE, (unsigned long*)hours_to_expiration, false);
+	return (unsigned short)ReadBits(CELL_ACTIVATION_SLOT_LIST[activity_index] + (CELL_BIT_SIZE_ACTIVATION_CURRENT * CELL_BIT_SIZE_TO_SUBCELL), CELL_BIT_SIZE_ACTIVATION_HOURS_TO_EXPIRE, hours_to_expiration, false);
 }
 HRESULT ProtectionKey_Version1::SetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned short hours_to_expiration)
 {
@@ -237,8 +237,8 @@ HRESULT ProtectionKey_Version1::UseSoftwareActivation(unsigned short activity_in
 		if(increase_hours_to_expiration > 0xeff)
 			throw E_INVALIDARG;
 
-		unsigned short currentActivation(0);
-		unsigned short activationHoursLeft(0);
+		unsigned long currentActivation(0);
+		unsigned long activationHoursLeft(0);
 		hr = this->GetSoftwareActivitySlotCurrentActivation(activity_index, &currentActivation);
 		if(FAILED(hr)) throw hr;
 
@@ -467,4 +467,12 @@ HRESULT ProtectionKey_Version1::WriteBits(unsigned short offset, unsigned short 
 		hr = e.Error();
 	}
 	return hr;
+}
+
+unsigned short ProtectionKey_Version1::ReadCellCache(unsigned short cell)
+{
+	SafeMutex mutex(cells_lock);
+	if (cell>=KeyCellCount)
+		throw _com_error(E_INVALIDARG);
+	return cells[cell];
 }

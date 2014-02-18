@@ -914,6 +914,15 @@ LicenseCache::~LicenseCache()
 		CloseHandle(licenseUseCacheLock);
 		licenseUseCacheLock = NULL;
 	}
+
+   for(  LicenseCacheByProductMap::iterator productCacheMapIt = productCacheMap.begin();
+         productCacheMapIt != productCacheMap.end();
+         productCacheMapIt++)
+   {
+      delete productCacheMapIt->second;
+      productCacheMapIt->second = NULL;
+   }
+   productCacheMap.clear();
 }
 
 HRESULT LicenseCache::AddApplicationInstance(long productID, BSTR licenseID, BSTR applicationInstance, long flags)

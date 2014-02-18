@@ -57,6 +57,17 @@ RainbowDriver::RainbowDriver() :
 
 RainbowDriver::~RainbowDriver()
 {
+	{
+	SafeMutex mutex(keys_lock);
+	// delete old key packets
+	while(!keys.empty())
+	{
+		RNBOsproReleaseLicense(keys.begin()->second, 0, NULL);	//release previous license into key
+		delete keys.begin()->second;
+		keys.erase(keys.begin());
+	}
+	}
+
 	if (keys_lock!=INVALID_HANDLE_VALUE)
 		CloseHandle(keys_lock);
 }
@@ -219,7 +230,9 @@ HRESULT RainbowDriver::RefreshKeyList()
 	if (packet)
 	{
 		delete packet;
+		RNBOsproCleanup();
 	}
+
 	// run through the list of keys backwards (see note above) storing each key's packet
 	for (int i = key_count - 1; i >= 0; i--)
 	{

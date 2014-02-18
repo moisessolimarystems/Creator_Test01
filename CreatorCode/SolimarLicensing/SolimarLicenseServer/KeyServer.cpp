@@ -1480,7 +1480,7 @@ HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs
 				pKeyAttribs->currentDate = std::wstring(timestamp);
 			}
 
-			unsigned short historyNumber = 0;
+			unsigned long historyNumber = 0;
 			hr = pKeyV1->GetHistoryNumber(&historyNumber);
 			if(SUCCEEDED(hr))
 				pKeyAttribs->historyNumber = historyNumber;
@@ -1489,8 +1489,8 @@ HRESULT KeyServer::GetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs* pKeyAttribs
 			for(unsigned short idx=0; idx<20; idx++)
 			{
 				Lic_KeyAttribs::Lic_ActivationInfoAttribs actInfo;
-				unsigned short currentActivations = 0;
-				unsigned short hoursToExpire = 0;
+				unsigned long currentActivations = 0;
+				unsigned long hoursToExpire = 0;
 				hr = pKeyV1->GetSoftwareActivitySlotCurrentActivation(idx, &currentActivations);
 				if(SUCCEEDED(hr))
 					hr = pKeyV1->GetSoftwareActivitySlotHoursToExpiration(idx, &hoursToExpire);
@@ -1562,7 +1562,7 @@ HRESULT KeyServer::SetKeyInfoAttribs(BSTR key_ident, Lic_KeyAttribs keyAttribs, 
 			hr = pKeyV1->SetSoftwarePacketCreationDateTime(TimeHelper::VariantToTimeT(tmpDateVt, false));
 			if(FAILED(hr)) throw hr;
 
-			unsigned short historyNumber(0);
+			unsigned long historyNumber(0);
 			hr = pKeyV1->GetHistoryNumber(&historyNumber);
 			if(FAILED(hr)) throw hr;
 

@@ -142,6 +142,20 @@ SoftwareServer::~SoftwareServer()
 		delete pSoftwareSpec;
 		pSoftwareSpec = NULL;
 	}
+	if (g_pSoftwareSpec != NULL)
+	{
+		delete g_pSoftwareSpec;
+		g_pSoftwareSpec = NULL;
+	}
+	for (SoftwareLicList::iterator softwareLicMgrMapIt = softwareLicMgrMap.begin();
+			softwareLicMgrMapIt != softwareLicMgrMap.end();
+			softwareLicMgrMapIt++)
+	{
+		delete softwareLicMgrMapIt->second;
+		softwareLicMgrMapIt->second = NULL;
+	}
+	softwareLicMgrMap.clear();
+
 }
 
 HRESULT SoftwareServer::Initialize(KeyServer* _pKeyServer, RainbowDriver* _pDriver)
@@ -1924,7 +1938,7 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 		if(licServerDataMgr.InClockViolation())
 			throw LicenseServerError::EHR_LIC_CLOCK_LIC_ARCHIVE;
 
-		// CR.FIX.16565 - Comment out code below to try...
+		// CR.FIX.16565 - Removed the check make sure that there is a usb token attach
 		//make sure that if there is a licenseID, it must match because if it doesn't match that means that the license file might have been replaced with an older one
 		//std::wstring tmpLicenseCode = Lic_PackageAttribsHelper::GetValidationValue(&(licensePackageAttribs.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList), Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode);
 		//if(tmpLicenseCode.length() != 0)

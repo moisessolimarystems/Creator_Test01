@@ -375,6 +375,7 @@ HRESULT CryptoHelper::EncryptData(BYTE *password, DWORD password_size, BYTE *pDa
 			}
 		} while (input_cursor<data_size && SUCCEEDED(hr));
 	}
+	delete[] pBuffer;
 	
 	if (hKey)
 		CryptDestroyKey(hKey);
@@ -433,7 +434,8 @@ HRESULT CryptoHelper::DecryptData(BYTE *password, DWORD password_size, BYTE *pDa
 			}
 		} while (input_cursor<data_size && SUCCEEDED(hr));
 	}
-	
+	delete[] pBuffer;
+
 	if (hKey)
 		CryptDestroyKey(hKey);
 	

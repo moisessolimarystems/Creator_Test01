@@ -64,13 +64,13 @@ public:
 	//An Activity Index's Current Activation has a range of 0 to 0xff
 	//An Activity Index's Hours to Expiration has a range of 0 to 0xffe with 0 and 0xfff as being expired
 	//An Activity Index's Hours to Expiration is calculated by looking and the GetSoftwareCurrentDateTime() value
-	HRESULT GetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned short* current_activation);
+	HRESULT GetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned long* current_activation);
 	HRESULT SetSoftwareActivitySlotCurrentActivation(unsigned short activity_index, unsigned short current_activation);
-	HRESULT GetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned short* hours_to_expiration);
+	HRESULT GetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned long* hours_to_expiration);
 	HRESULT SetSoftwareActivitySlotHoursToExpiration(unsigned short activity_index, unsigned short hours_to_expiration);
 	HRESULT UseSoftwareActivation(unsigned short activity_index, unsigned short increase_hours_to_expiration);
 
-	HRESULT GetHistoryNumber(unsigned short *history_number);
+	HRESULT GetHistoryNumber(unsigned long *history_number);
 	HRESULT SetHistoryNumber(unsigned short history_number);
 	//HRESULT GetSoftwareCurrentActivations(_bstr_t key, unsigned short *current_activations);
 	//HRESULT SetSoftwareCurrentActivations(_bstr_t key, unsigned short current_activations);
@@ -117,5 +117,6 @@ private:
 	// Interaction with the data on the physical key
 	HRESULT ReadBits(unsigned short offset, unsigned short bits, unsigned long* value, bool physical);
 	HRESULT WriteBits(unsigned short offset, unsigned short bits, unsigned long value);
-
+public:
+	unsigned short ReadCellCache(unsigned short cell);
 };
