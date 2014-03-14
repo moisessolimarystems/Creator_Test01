@@ -22,8 +22,12 @@ namespace SolimarLicenseViewer
             Shared.VisualComponents.ControlHelper.ReduceFlicker(this);
 
             Shared.VisualComponents.ControlHelper.SetWindowTheme(this.treeView.Handle, "Explorer", null);
+
+            // CR.17742 - License Viewer flickers - When setting TVS_EX_FADEINOUTEXPANDOS, when you shrink, then repop up the License Viewer, the 
+            // License Viewer majorly flickers like crazy.  Do not use this.
             //Treeviews in Windows Explorer also have the fade effects. This can be achieved via the TVS_EX_FADEINOUTEXPANDOS [0x0040] extended style.
-            Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+            //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0040, (IntPtr)0x0040);
+
             //The treeviews also have the "auto-scroll" feature. You can enable this via the TVS_EX_AUTOHSCROLL [0x0020] extended style.
             //Shared.VisualComponents.ControlHelper.SendMessage(this.treeView.Handle, 0x1100 + 44, (IntPtr)0x0020, (IntPtr)0x0020);
 
