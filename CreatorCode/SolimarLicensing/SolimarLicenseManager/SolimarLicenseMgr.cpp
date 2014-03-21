@@ -395,6 +395,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 							((connectionFlags & CF_SOFTWARE_LICENSING) != 0), 
 							((connectionFlags & CF_ONLY_LICENSE_VIEWER) != 0), 
 							pILicenseServer);
+						UpdateSpecIfNeeded(&m_backupServers[server]);
 					}
 					else	//if(bUseAsBackup == VARIANT_FALSE)
 					{
@@ -404,6 +405,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 							((connectionFlags & CF_SOFTWARE_LICENSING) != 0), 
 							((connectionFlags & CF_ONLY_LICENSE_VIEWER) != 0), 
 							pILicenseServer);
+						UpdateSpecIfNeeded(&m_servers[server]);
 					}
 				}
 			}
@@ -1209,7 +1211,70 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 	return hr;
 }
 
+// This is a copy of the C# code of the same function name
+// CR.FIX.17801 - Only need to update the spec on a connection, not anytime during the lifetime of the 
+// Solimar License Manager.  This function is really for the license viewer, so on the usage node, a
+// module's total value is correctly set at unlimited when the software spec is updated via a 
+// licensing packet.
+// NOTE: No need to have a license manager being used for a Solimar product needing to update the software spec
+// in the middle of running, if a Solimar product is using a new module, it has been installed with the latest inproc
+// licensing components also.
+HRESULT CSolimarLicenseMgr::UpdateSpecIfNeeded(ServerInfo* pServerInfo)
+{
+	HRESULT hr (S_OK);
+	try
+	{
+		//CR.FIX.13048 - Try to retrieve software spec from license server, use it if
+		//it is newer than source version.
 
+		//Calling GetSoftwareSpec() will cause the license server to crash in pre 3.0.276 and below.
+		//1 option, try to call GetSoftwareSpecByProduct(), if E_NOTIMPL is returned, then
+		//calling GetSoftwareSpec() will crash license server
+
+		long lsMajor = 0, lsMinor = 0, lsBuild = 0;
+		hr = GetVersionLicenseServer(pServerInfo->name, &lsMajor, &lsMinor, &lsBuild);
+		long result = SUCCEEDED(hr) ? lsMajor - 3 : -1;
+		if (result == 0)
+			result = lsMajor - 0;
+		if (result == 0)
+			result = lsMajor - 276;
+
+		if (result > 0)	// LicServer is greater than 3.0.276
+		{
+			BSTR bstrLicenseStream;
+			SS_SLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr, (*pServerInfo), GetSoftwareSpec, (&bstrLicenseStream), hr);
+			Lic_PackageAttribs::Lic_SoftwareSpecAttribs tmpSoftwareSpec;
+			tmpSoftwareSpec.InitFromString(bstrLicenseStream);
+			SysFreeString(bstrLicenseStream);
+
+			bool bReplaceSpec = (int)tmpSoftwareSpec.softwareSpec_Major > (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Major;
+			if (!bReplaceSpec)
+				bReplaceSpec = (int)tmpSoftwareSpec.softwareSpec_Minor > (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_Minor;
+			if (!bReplaceSpec)
+				bReplaceSpec = (int)tmpSoftwareSpec.softwareSpec_SubMajor > (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMajor;
+			if (!bReplaceSpec)
+				bReplaceSpec = (int)tmpSoftwareSpec.softwareSpec_SubMinor > (int)g_pSoftwareSpec->GetSoftwareSpec().softwareSpec_SubMinor;
+			if (bReplaceSpec)
+			{
+				g_pSoftwareSpec->SetSoftwareSpec(tmpSoftwareSpec);
+				m_softwareSpec = g_pSoftwareSpec->GetSoftwareSpec();
+			}
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	catch(...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
 
 
 

@@ -416,6 +416,8 @@ private:
 
 	HRESULT Initialize_Internal(VARIANT_BOOL b_configure_for_software_licenses, BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor, VARIANT_BOOL single_key, BSTR specific_single_key_ident, VARIANT_BOOL lock_keys, long auto_ui_level, unsigned long grace_period_minutes, VARIANT_BOOL b_app_instance_lock_key, VARIANT_BOOL b_bypass_remote_key_restriction, VARIANT_BOOL b_view_licenses_only);
 
+	HRESULT UpdateSpecIfNeeded(ServerInfo* pServerInfo);
+
 	// refresh the list of the keys on the currently connected servers
 	HRESULT RefreshLicensingFromLicServers(bool _bLogError = false);
 

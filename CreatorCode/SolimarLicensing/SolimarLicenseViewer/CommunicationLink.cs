@@ -159,40 +159,7 @@ namespace SolimarLicenseViewer
                     throw innerEx;
                 }
                 m_ServerName = serverName;
-
-                //CR.FIX.13048 - Try to retrieve software spec from license server, use it if
-                //it is newer than source version.
-
-                //Calling GetSoftwareSpec() will cause the license server to crash in pre 3.0.276 and below.
-                //1 option, try to call GetSoftwareSpecByProduct(), if E_NOTIMPL is returned, then
-                //calling GetSoftwareSpec() will crash license server
-                int svrMajor = 0;
-                int svrMinor = 0;
-                int svrBuild = 0;
-                GetVersionLicenseServer(serverName, ref svrMajor, ref svrMinor, ref svrBuild);
-                InstanceVersionInfo verInfo = new InstanceVersionInfo(svrMajor, svrMinor, svrBuild);
-                if (verInfo.CompareTo(new InstanceVersionInfo(3, 0, 276)) > 0)
-                {
-                    string str = m_licServer.GetSoftwareSpec();
-                    Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
-                    tmpSpec.AssignMembersFromStream(str);
-
-                    bool? bReplaceSoftwareSpec = null;
-                    if(tmpSpec.softwareSpec_Major.TVal != m_softwareSpec.softwareSpec_Major.TVal)
-                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Major.TVal > m_softwareSpec.softwareSpec_Major.TVal);
-                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_Minor.TVal != m_softwareSpec.softwareSpec_Minor.TVal))
-                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Minor.TVal > m_softwareSpec.softwareSpec_Minor.TVal);
-                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMajor.TVal != m_softwareSpec.softwareSpec_SubMajor.TVal))
-                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMajor.TVal > m_softwareSpec.softwareSpec_SubMajor.TVal);
-                    if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMinor.TVal != m_softwareSpec.softwareSpec_SubMinor.TVal))
-                        bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMinor.TVal > m_softwareSpec.softwareSpec_SubMinor.TVal);
-
-                    if ((bReplaceSoftwareSpec.HasValue == true) && (bReplaceSoftwareSpec.Value == true))
-                    {
-                        m_softwareSpec = tmpSpec;
-                        tmpSpec = null;
-                    }
-                }
+                UpdateSpecIfNeeded();
             }
             catch (COMException ex)
             {
@@ -569,6 +536,13 @@ namespace SolimarLicenseViewer
             try
             {
                 verificationCode = m_licServer.EnterSoftwareLicPacket(byteLicPacket);
+
+                // CR.FIX.17801 - The License Packet may have a newer software spec, update the license viewers after applying a license packet.
+                if (UpdateSpecIfNeeded())
+                {
+                    // CR.FIX.17801 - Reconnect with existing license server so inproc license manager can get latest software spec
+                    Connect(m_ServerName);
+                }
             }
             catch (COMException)
             {
@@ -889,6 +863,47 @@ namespace SolimarLicenseViewer
         #endregion
 
         #region Helper Methods
+        // CR.FIX.17801 - Updates the software spec if neccessary
+        internal bool UpdateSpecIfNeeded()
+        {
+            bool bUpdatedSpec = false;
+            //CR.FIX.13048 - Try to retrieve software spec from license server, use it if
+            //it is newer than source version.
+
+            //Calling GetSoftwareSpec() will cause the license server to crash in pre 3.0.276 and below.
+            //1 option, try to call GetSoftwareSpecByProduct(), if E_NOTIMPL is returned, then
+            //calling GetSoftwareSpec() will crash license server
+            int svrMajor = 0;
+            int svrMinor = 0;
+            int svrBuild = 0;
+            GetVersionLicenseServer(m_ServerName, ref svrMajor, ref svrMinor, ref svrBuild);
+            InstanceVersionInfo verInfo = new InstanceVersionInfo(svrMajor, svrMinor, svrBuild);
+            if (verInfo.CompareTo(new InstanceVersionInfo(3, 0, 276)) > 0)
+            {
+                string str = m_licServer.GetSoftwareSpec();
+                Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs tmpSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
+                tmpSpec.AssignMembersFromStream(str);
+
+                bool? bReplaceSoftwareSpec = null;
+                if (tmpSpec.softwareSpec_Major.TVal != m_softwareSpec.softwareSpec_Major.TVal)
+                    bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Major.TVal > m_softwareSpec.softwareSpec_Major.TVal);
+                if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_Minor.TVal != m_softwareSpec.softwareSpec_Minor.TVal))
+                    bReplaceSoftwareSpec = (tmpSpec.softwareSpec_Minor.TVal > m_softwareSpec.softwareSpec_Minor.TVal);
+                if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMajor.TVal != m_softwareSpec.softwareSpec_SubMajor.TVal))
+                    bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMajor.TVal > m_softwareSpec.softwareSpec_SubMajor.TVal);
+                if (!bReplaceSoftwareSpec.HasValue && (tmpSpec.softwareSpec_SubMinor.TVal != m_softwareSpec.softwareSpec_SubMinor.TVal))
+                    bReplaceSoftwareSpec = (tmpSpec.softwareSpec_SubMinor.TVal > m_softwareSpec.softwareSpec_SubMinor.TVal);
+
+                if ((bReplaceSoftwareSpec.HasValue == true) && (bReplaceSoftwareSpec.Value == true))
+                {
+                    m_softwareSpec = tmpSpec;
+                    bUpdatedSpec = true;
+                    tmpSpec = null;
+                }
+            }
+            return bUpdatedSpec;
+        }
+
         public string GetProductName(int productID)
         {
             return Solimar.Licensing.Attribs.Lic_LicenseInfoAttribsHelper.GetProductName(m_softwareSpec, (uint)productID);
