@@ -31,5 +31,6 @@ prototype RegSvcsUnRegister(STRING,STRING,STRING);
 prototype BOOL IsMSMQEnabled();
 prototype EnableMSMQ(STRING,STRING);
 prototype DisableMSMQWorkgroup();
+prototype NUMBER GetSharedFileCount(STRING,BOOL);
 
 #endif //_UTILITY_H_
