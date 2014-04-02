@@ -15,7 +15,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef _UTILITY_RUL_
-#define _UTILITY_RUL_    
+#define _UTILITY_RUL_         
+
+function NUMBER GetSharedFileCount(szFilePath, bIs64BitFile)
+	NUMBER nvRegType, nvRegValueSize, nvRetVal;
+	STRING szKeyData;
+begin
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	             
+	if(bIs64BitFile) then
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
+	endif; 
+		
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\SharedDLLs", szFilePath, nvRegType, szKeyData, nvRegValueSize );		
+	if(szKeyData != "") then
+		StrToNum(nvRetVal, szKeyData);
+	else
+		nvRetVal = 0;	
+	endif;
+
+	if(bIs64BitFile) then    
+	 	REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
+	endif; 	
+	return nvRetVal;	
+end;
 
 //Needs to be run before registering files
 //MSMQs are created during registration         
