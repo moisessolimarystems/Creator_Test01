@@ -223,6 +223,21 @@ namespace Client.Creator
         #endregion
 
         #region Helper Methods
+
+        public Int64 ConvertFromBase36(string _base36Number)
+        {
+            string base36Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            char[] arrInput = _base36Number.ToCharArray();
+            Array.Reverse(arrInput);
+            Int64 returnValue = 0;
+            for (int i = 0; i < arrInput.Length; i++)
+            {
+                int valueindex = base36Chars.IndexOf(arrInput[i]);
+                returnValue += Convert.ToInt64(valueindex * Math.Pow(36, i));
+            }
+            return returnValue;
+        }
+
         public List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> GetModuleSpecForProductVersion(uint productID, uint versionMajor, uint versionMinor)
         {
             List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = new List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs>();

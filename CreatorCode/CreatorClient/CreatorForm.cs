@@ -3144,7 +3144,7 @@ namespace Client.Creator
             //get destination from string or.....store in tag?
             string[] lsString = selectedLicense.Split("-".ToCharArray());
             int custID = Int32.Parse(lsString[0], System.Globalization.NumberStyles.HexNumber);
-            int destID = Int32.Parse(lsString[1], System.Globalization.NumberStyles.HexNumber);
+            int destID = (int)s_CommLink.ConvertFromBase36(lsString[1]); //Int32.Parse(lsString[1], System.Globalization.NumberStyles.HexNumber);
             //1)custid 2)destid 3) number 
             Service<ICreator>.Use((client) =>
             {
