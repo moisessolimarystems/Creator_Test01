@@ -30,6 +30,7 @@
 <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
 <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
+<enum name="pid_XImagePDF" value="21" alias="XIMAGEPDF_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -43,6 +44,7 @@
 <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
 <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
+<enum name="pid_TestDevXImagePDF" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
 <enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 </typedef>
 -->
@@ -124,7 +126,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="24">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="25">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -397,10 +399,16 @@
 	<Lic_ProductSoftwareSpecAttribs productID="20" productName="Library Services">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip"  moduleTrialLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="11"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="PDF Renderer" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>/>
-  </Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="PDF Renderer" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>
+    </Lic_ModuleSoftwareSpecAttribsMap>      
 	</Lic_ProductSoftwareSpecAttribs>	
+	<Lic_ProductSoftwareSpecAttribs productID="21" productName="XimagePDF">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="IMG Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="FRM Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
+    </Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -426,6 +434,8 @@
 	<Lic_ProductSoftwareSpecAttribs productID="119" productName="Test/Dev/DR SPDE Queue Manager" sameModSpecProductID="19" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="120" productName="Test/Dev/DR Library Services" sameModSpecProductID="20">
+  </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="121" productName="Test/Dev/DR XimagePDF" sameModSpecProductID="21">
   </Lic_ProductSoftwareSpecAttribs>
 </Lic_SoftwareSpecAttribs>
 
