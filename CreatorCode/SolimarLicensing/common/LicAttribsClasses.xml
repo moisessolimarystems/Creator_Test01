@@ -94,6 +94,7 @@
       <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
       <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
+      <enum name="pid_XimagePDF" value="21" alias="XIMAGEPDF_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -107,6 +108,7 @@
       <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
       <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
       <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
+      <enum name="pid_TestDevXimagePDF" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
 		<!-- Dont include, these typedefs can never change, not sure what this is...
 			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
 			-->
