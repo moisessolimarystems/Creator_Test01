@@ -157,10 +157,10 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:21, ProdName: XimagePDF
+			#region ProdID:21, ProdName: XIMAGEpdf
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 21;
-			tmpProdSpec.productName.TVal = "XimagePDF";
+			tmpProdSpec.productName.TVal = "XIMAGEpdf";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();

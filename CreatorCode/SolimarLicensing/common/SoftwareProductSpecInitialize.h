@@ -168,11 +168,11 @@ void InititalizeProduct21()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:21, ProdName: XimagePDF
+	// ProdID:21, ProdName: XIMAGEpdf
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(21, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(21))->second);
 	pTmpProdSpec->productID = 21;
-	pTmpProdSpec->productName = std::wstring(L"XimagePDF");
+	pTmpProdSpec->productName = std::wstring(L"XIMAGEpdf");
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	

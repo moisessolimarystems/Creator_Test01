@@ -30,7 +30,7 @@
 <enum name="pid_SdxDesigner" value="18" alias="SDX_DESIGNER_PRODUCT"/>
 <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
-<enum name="pid_XImagePDF" value="21" alias="XIMAGEPDF_PRODUCT"/>
+<enum name="pid_XIMAGEpdf" value="21" alias="XIMAGEPDF_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -44,7 +44,7 @@
 <enum name="pid_TestDevSdxDesigner" value="118" alias="TEST_DEV_SDX_DESIGNER_PRODUCT"/>
 <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
-<enum name="pid_TestDevXImagePDF" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
+<enum name="pid_TestDevXIMAGEpdf" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
 <enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 </typedef>
 -->
@@ -403,7 +403,7 @@
       <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>
     </Lic_ModuleSoftwareSpecAttribsMap>      
 	</Lic_ProductSoftwareSpecAttribs>	
-	<Lic_ProductSoftwareSpecAttribs productID="21" productName="XimagePDF">
+	<Lic_ProductSoftwareSpecAttribs productID="21" productName="XIMAGEpdf">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="IMG Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="FRM Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
