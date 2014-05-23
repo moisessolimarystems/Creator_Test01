@@ -39,6 +39,7 @@ namespace SolimarLicenseViewer
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
             LIBRARYSERVICES,
             EVENTLOG,
+            XIMAGEPDF,
         }
 
 
