@@ -65,6 +65,7 @@ namespace Client.Creator
             SOLITRACK,
             SPD,
             LIBRARYSERVICES,
+            XIMAGEPDF,
             CUSTOMER,
             LICENSE,
             LICENSEUPDATE,
