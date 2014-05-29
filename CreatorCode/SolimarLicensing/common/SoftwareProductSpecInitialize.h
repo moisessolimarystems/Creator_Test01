@@ -1710,7 +1710,11 @@ void InititalizeProduct16()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"Monitor Instances");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 26;
 }
 
 void InititalizeProduct19()

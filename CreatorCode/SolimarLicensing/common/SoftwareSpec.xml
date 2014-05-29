@@ -126,7 +126,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="25">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="26">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -377,7 +377,7 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Devices"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Operators"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="26"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Sites" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="8"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
