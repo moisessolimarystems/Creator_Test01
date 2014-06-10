@@ -32,7 +32,7 @@ namespace SolimarLicenseViewer
             InitializeInternal();
             this.funcGetProductName = null;
         }
-        public EditEmailAlert_ProductsDialog(Shared.VisualComponents.Func<int, string> _funcGetProductName, ImageList _imageList)
+        public EditEmailAlert_ProductsDialog(Func<int, string> _funcGetProductName, ImageList _imageList)
         {
             InitializeComponent();
             InitializeInternal();
@@ -49,7 +49,7 @@ namespace SolimarLicenseViewer
         private const string TITLE = "Configure Solimar Products";
         private const string READONLY = " (Read Only)";
         private bool bReadOnly = false;
-        private Shared.VisualComponents.Func<int, string> funcGetProductName = null;
+        private Func<int, string> funcGetProductName = null;
         private DialogData data = null;
         public void SetData(DialogData _data, bool _bReadOnly)
         {
