@@ -131,6 +131,7 @@ class HResultOutputH(AttribsOutput):
                 class_text += '\n'
 
                 class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id);\n'
+                class_text += '\tHRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id, long product_id);\n'
                 class_text += '\tHRESULT TReadEventLog();\n'
                 class_text += '\n'
 
@@ -155,7 +156,7 @@ class HResultOutputH(AttribsOutput):
                 #define SL_IS_LIC_HR (hr)
                 class_text += '\n\n\t/*\n\t* SL_IS_LIC_HR()\n\t*\n\t* Determine if hr is a Lic HR\n\t*/\n'
                 class_text += '\n\t#define SL_IS_LIC_HR(hr) \\\n'
-                class_text += '\t\t((hr) & ITF_LIC_MIN)\n'
+                class_text += '\t\t(((hr) & 0x0000F000) == ITF_LIC_MIN)\n'
 
                 #define SL_EC_FROM_EHR (hr)
                 class_text += '\t/*\n\t* SL_EC_FROM_EHR()\n\t*\n\t* Extracts the error code portion from an HRESULT.\n\t*/\n'
@@ -176,7 +177,7 @@ class HResultOutputH(AttribsOutput):
 	def GenerateGenericHResultsFile(self, hresults_class):#include <string>\n\n
 		# generate and write the header file text
 		self.WriteFileIfDifferent(self.ComputeFilePath(hresults_class['filename']),     \
-                                          """#ifndef _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n#define _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n\n#include <windows.h>\n#include <string>\n#include <atlbase.h>\t// For AtlReportError\n#if _MSC_VER >= 1400\n#include <atlcom.h>\t// For AtlReportError\n#endif\nnamespace LicenseServerError\n%s\n""" %  \
+                                          """#ifndef _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n#define _LicenseError_h_9515ABE0E22648899A90CF0001BBBB05_\n\n#include <windows.h>\n#include <string>\n#if _MSC_VER >= 1400\n#include <atlbase.h>\t// For AtlReportError\n#include <atlcom.h>\t// For AtlReportError\n#endif\nnamespace LicenseServerError\n%s\n""" %  \
                                           (self.GenerateHResultsClass(hresults_class)))
 			
 

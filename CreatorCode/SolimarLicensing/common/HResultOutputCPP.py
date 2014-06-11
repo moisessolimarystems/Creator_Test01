@@ -54,6 +54,11 @@ class HResultOutputCPP(AttribsOutput):
                 class_text += '\nconst unsigned long SL_ERROR_COUNT = sizeof(SLErrors) / sizeof(SL_ERROR);\n\n\n'
 
                 #function: HRESULT WriteEventLog
+                class_text += 'HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id, long product_id)\n'
+                class_text += '{\n'
+                class_text += '\treturn WriteEventLog(event_log_msg, event_type, (product_id!=-1) ? (product_id * 1000) + event_id : event_id);\n'
+                class_text += '}\n'
+                class_text += '\n'
                 class_text += 'HRESULT WriteEventLog(wchar_t *event_log_msg, unsigned int event_type, long event_id)\n'
                 class_text += '{\n'
                 class_text += '\t//TReadEventLog();\n'
