@@ -26,6 +26,9 @@
 #include "SpdUtils.h"
 #include "SpdDefines.h"
 
+#ifndef sol_assert
+#define sol_assert(x) if (!x) { _ASSERTE(x) ; _CrtDbgBreak() ; }
+#endif
 
 //
 // Version 3 of this functionality.
@@ -61,18 +64,48 @@ public:
 namespace SpdAttribs
 {
 
-inline wchar_t *ReallocateWcsBuffer(wchar_t *pwcBufferToCopy, size_t stBuffSize, size_t &stNewBufSize)
+/* ReallocateWcsBuffer() - 
+ *
+ * SLB 06.feb.2008 Modified to catch memory allocation exception.
+---------------------------------------------------------------------------*/
+inline wchar_t *ReallocateWcsBuffer(
+   wchar_t *pwcBufferToCopy, 
+   size_t stBuffSize, 
+   size_t &stNewBufSize,
+   bool bFreeCopyBufferOnError
+   )
 {
-   wchar_t *pwcNewBuffer(new wchar_t[2*stBuffSize]) ;
-
-   stNewBufSize = 2*stBuffSize ;
-   if (pwcBufferToCopy)
+   wchar_t *pwcNewBuffer(NULL) ;
+   stNewBufSize = pwcBufferToCopy ? 2*stBuffSize : stBuffSize ;
+   try
    {
-      if (pwcNewBuffer)
-         wmemcpy(pwcNewBuffer, pwcBufferToCopy, stBuffSize) ;
-      delete [](pwcBufferToCopy) ;
+      pwcNewBuffer = new wchar_t[stNewBufSize] ;
    }
-   assert(pwcNewBuffer!=NULL) ;
+   catch(...)
+   {
+   }
+   if (!pwcNewBuffer)
+   {  //
+      // problem: failed to allocate a new buffer.
+      //
+      if (bFreeCopyBufferOnError && pwcBufferToCopy!=NULL)
+      {
+         delete [](pwcBufferToCopy) ;
+         sol_assert(pwcNewBuffer!=NULL) ;
+      }
+   }
+   else
+   {
+      pwcNewBuffer[0] = 0 ;
+      if (pwcBufferToCopy!=NULL)
+      {
+         if (pwcNewBuffer)
+         {
+            wmemcpy(pwcNewBuffer, pwcBufferToCopy, stBuffSize) ;
+         }
+         delete [](pwcBufferToCopy) ;
+      }
+   }
    return pwcNewBuffer ;
 }
 //*************************************************************************************
@@ -622,7 +655,7 @@ public:
 			// Append operations should be fast as this is a std::wstring object
 			// which is being appended to.
 			//
-			_snwprintf_s(wcFormatted, _countof(wcFormatted), L"%02X", tVal.data()[i] ) ;
+			_snwprintf_s(wcFormatted, _TRUNCATE, L"%02X", tVal.data()[i] ) ;
 			wsOutVal += wcFormatted ;
 		}
 		wsOutVal += wsEndData ;
@@ -829,7 +862,7 @@ public: // public methods
       FileTimeToSystemTime(&ftSystem, &stVal) ;
 
       _snwprintf_s(
-         wcTmp,
+         wcTmp, _TRUNCATE,
          sizeof(wcTmp)/sizeof(wchar_t),
          L"%04d-%02d-%02d %02d:%02d:%02d.%04d",
          stVal.wYear,
@@ -1059,91 +1092,121 @@ public:  // public methods
 	 *
 	 * SLB 20.aug.04 Changed format of Xml.  No longer puts count in xml.
     * SLB 05.jul.05 - Modified to use _snwprintf() to improve performance.
+    * SLB 06.feb.2008 - Modified to handle memory allocation error.
+    * SLB 26.mar.2008 - CR.9380; Fix for end tag getting cut off by 1-2 bytes, occasionally. Also,
+    * fix for possibly not adding all items in map to the stream.
 	--------------------------------------------------------------------------------------------*/
-	void ValueToString(const T &tVal, CWStringStream &wsOutVal) const
-	{	
+   void ValueToString(const T &tVal, CWStringStream &wsOutVal) const
+   {   //
+      // ValueToString()/StringToValue() are where the meat of this template lies.  
+      // Class T must be of the following form: std::map<X,Y> where X & Y are derived from 
+      //   CStreamable. Hence they have a the ToString() method defined.  This will generate a 
+      // XML tag like stream.
+      // 
+      // Generates a stream like this:
+      // <Map>
+      //      <N><K>key</K><V>value</V></N>
+      //      <N><K>key</K><V>value</V></N>
+      //      <N><K>key</K><V>value</V></N>
+      //            .
+      //            .
+      //      <N><K>key</K><V>value</V></N>
+      // </Map>
       //
-		// ValueToString()/StringToValue() are where the meat of this template lies.  
-		// Class T must be of the following form: std::map<X,Y> where X & Y are derived from 
-		//	CStreamable. Hence they have a the ToString() method defined.  This will generate a 
-		// XML tag like stream.
-		// 
-		// Generates a stream like this:
-		// <Map>
-		//		<N><K>key</K><V>value</V></N>
-		//		<N><K>key</K><V>value</V></N>
-		//		<N><K>key</K><V>value</V></N>
-		//				.
-		//				.
-		//		<N><K>key</K><V>value</V></N>
-		// </Map>
-		//
       size_t stOutBufSize(0x2000) ;
-      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize)) ; // allocates a growable buffer
+      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize, true)) ; // allocates a growable buffer
       const wchar_t *pwcMapKey = L"Map" ;
-	   T::const_iterator it (tVal.begin()) ;
+      T::const_iterator it (tVal.begin()) ;
       int nCpyLen(0) ;
       size_t stWriteLen(0) ;
 
       nCpyLen = _snwprintf_s(
-         &pwcTempOut[stWriteLen],
-         stOutBufSize - stWriteLen,
-         stOutBufSize - stWriteLen,
+         &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
          L"<%s>",
          pwcMapKey
          ) ;
       stWriteLen += nCpyLen ;
-
-		while (it != tVal.end() && stWriteLen<stOutBufSize)
-		{  
-			while (stOutBufSize - stWriteLen < wcslen(L"<N><K></K><V></V></N>") + wcslen(it->first.ToString().c_str()) + wcslen(it->second.ToString().c_str()) + 2/*NULL*/)
-			{  //
-				// Not enough room in buffer for ending tag.
-				// make sure there is enough room
-				//
-				pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize) ;
-			}
-			
-			//
-			// for each node, generate appropriate XML.  
-			// 
-         nCpyLen = _snwprintf_s(
-            &pwcTempOut[stWriteLen],
-            stOutBufSize - stWriteLen,
-            stOutBufSize - stWriteLen,
-            L"<N><K>%s</K><V>%s</V></N>",
-            it->first.ToString().c_str(),
-            it->second.ToString().c_str()
-            ) ;
-
-            stWriteLen += nCpyLen ;
-            it++ ;
-		}
-
+      //
+      // CR.9380; removed requirement for WriteLen<OutBufSize. Out buffer now gets 
+      // re-allocated if necessary. This would just cause any remaining items in map
+      // to not get added to the stream. Otherwise, xml data would look ok.
+      //
+      while (it != tVal.end())
+      {  
+         if (pwcTempOut==NULL)
+         {  //
+            // problem: error allocating buffer.
+            //
+            OutputDebugStringW(                                                     // CR.9380
+               L"\nAttribsMap::ValueToString() - Critical error, output buffer is null(0)"
+               ) ;
+            sol_assert(false) ;
+            break ;
+         }
+         else
+         {  //
+            // for each node, generate appropriate XML.  
+            // 
+            nCpyLen = _snwprintf_s(
+               &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
+               L"<N><K>%s</K><V>%s</V></N>",
+               it->first.ToString().c_str(),
+               it->second.ToString().c_str()
+               ) ;
+            if (nCpyLen<0)
+            {  //
+               // problem: filled up the buffer. 
+               // Re-allocate and use a new buffer.
+               //
+               pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize, true) ;
+            }
+            else
+            {
+               stWriteLen += nCpyLen ;
+               it++ ;
+            }
+         }
+      }
       //
       // Add </Map>
-      //
-      while (stOutBufSize - stWriteLen < wcslen(pwcMapKey)+wcslen(L"</>")+2/*NULL*/)
+      // CR.9380; need a min of key length + 4 extra characters, not just 2. (</> = 3 + 1 for Null terminator)
+      // 
+      if (stOutBufSize - stWriteLen < wcslen(pwcMapKey)+4)
       {  //
          // Not enough room in buffer for ending tag.
          // make sure there is enough room
          //
-         pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize) ;
+         pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize, true) ;
       }
-      nCpyLen = _snwprintf_s(
-         &pwcTempOut[stWriteLen],
-         stOutBufSize - stWriteLen,
-         stOutBufSize - stWriteLen,
-         L"</%s>",
-         pwcMapKey
-         ) ;
-      stWriteLen += nCpyLen ;
-      pwcTempOut[stOutBufSize - 1] = 0 ; // ensure null termination.
-      wsOutVal = pwcTempOut ;
-
-      assert(nCpyLen >= 0) ;
-      delete(pwcTempOut) ;
-	}
+      if (pwcTempOut==NULL)
+      {  //
+         // problem: error allocating output buffer.
+         //
+         OutputDebugStringW(                                                        // CR.9380
+            L"\nAttribsMap::ValueToString() - Critical error, output buffer is null(1)"
+            ) ;
+         sol_assert(false) ;
+      }
+      else
+      {
+         nCpyLen = _snwprintf_s(
+            &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
+            L"</%s>",
+            pwcMapKey
+            ) ;
+         if (nCpyLen<0)
+         {  //
+            // CR.9380; This should never occur, but just in case, output a debug message.
+            //
+            OutputDebugStringW(L"\nAttribsMap::ValueToString() - Critical error, CpyLen<0 after adding end tag to stream") ;
+            sol_assert(false) ;
+         }
+         stWriteLen += nCpyLen ;
+         pwcTempOut[stOutBufSize - 1] = 0 ; // ensure null termination.
+         wsOutVal = pwcTempOut ;
+         delete(pwcTempOut) ;
+      }
+   }
 	/* StringToValue() - ingests Xml stream and initializes object from it.
 	 *
 	 * SLB 20.aug.04 Changed format of Xml.  No longer puts count in xml.
@@ -1299,90 +1362,128 @@ public:
 	 *
 	 * SLB 20.aug.04 Changed format of Xml.  No longer puts count in xml.
     * SLB 05.jul.05 - Modified to use _snwprintf() to improve performance.
+    * SLB 06.feb.2008 - Modified to handle memory allocation error.
+    * SLB 26.mar.2008 - CR.9380; Fix for end tag getting cut off by 1-2 bytes, occasionally. Also,
+    * fix for possibly not adding all items in map to the stream.
 	--------------------------------------------------------------------------------------------*/
 	void ValueToString(const T &tVal, CWStringStream &wsOutVal) const
-	{	//
-		// ValueToString()/StringToValue() are where the meat of this template lies.  
-		// Class T must be of the following form: std::vector<X> where X is derived from 
-		//	CStreamable. Hence they have a the ToString() method defined.  This will generate a 
-		// XML tag like stream.
-		// 
-		// Generates a stream like this:
-		// <Vector>
-		//		<N>value</N>
-		//		<N>value</N>
-		//		<N>value</N>
-		//				.
-		//				.
-		//		<N>value</N>
-		// </Vector>
-		//
+   {  //
+      // ValueToString()/StringToValue() are where the meat of this template lies.  
+      // Class T must be of the following form: std::vector<X> where X is derived from 
+      //   CStreamable. Hence they have a the ToString() method defined.  This will generate a 
+      // XML tag like stream.
+      // 
+      // Generates a stream like this:
+      // <Vector>
+      //      <N>value</N>
+      //      <N>value</N>
+      //      <N>value</N>
+      //            .
+      //            .
+      //      <N>value</N>
+      // </Vector>
+      //
       size_t stOutBufSize(0x2000) ;
-      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize)) ; 
+      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize, true)) ; 
       const wchar_t *pwcVectorKey = L"Vector" ;
-	   T::const_iterator it (tVal.begin()) ;
+      T::const_iterator it (tVal.begin()) ;
       int nCpyLen(0) ;
       size_t stWriteLen(0) ;
 
       nCpyLen = _snwprintf_s(
-         &pwcTempOut[stWriteLen],
-         stOutBufSize - stWriteLen,
-         stOutBufSize - stWriteLen,
+         &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
          L"<%s>",
          pwcVectorKey
          ) ;
+      if (nCpyLen<0)
+      {
+         OutputDebugStringW(L"\nDebug::AttribsVector::ValueToString() - Issue: temp buff to small for begin tag") ;
+         sol_assert(false) ;
+      }
       stWriteLen += nCpyLen ;
-
-		while (it != tVal.end() && stWriteLen<stOutBufSize)
-		{  
-			while (stOutBufSize - stWriteLen < wcslen(L"<N></N>") + wcslen(it->ToString().c_str()) + 2/*NULL*/)
-			{  //
-				// Not enough room in buffer for ending tag.
-				// make sure there is enough room
-				//
-				pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize) ;
-			}
-
-			//
-			// for each node, generate appropriate XML.  
-			// 
-         nCpyLen = _snwprintf_s(
-            &pwcTempOut[stWriteLen],
-            stOutBufSize - stWriteLen,
-            stOutBufSize - stWriteLen,
-            L"<N>%s</N>",
-            it->ToString().c_str()
-            ) ;
-            stWriteLen += nCpyLen ;
-         	it++ ;
-		}
-
+      //
+      // CR.9380; removed requirement for WriteLen<OutBufSize. Out buffer now gets 
+      // re-allocated if necessary. This would just cause any remaining items in map
+      // to not get added to the stream. Otherwise, xml data would look ok.
+      //
+      while (it != tVal.end())
+      {  
+         if (pwcTempOut==NULL)
+         {  //
+            // problem: error allocating memory.
+            //
+            OutputDebugStringW(                                                     // CR.9380
+               L"\nAttribsVector::ValueToString() - Critical error, output buffer is null(0)"
+               ) ;
+            sol_assert(false) ;
+            break ;
+         }
+         else
+         {  //
+            // for each node, generate appropriate XML.  
+            // 
+            nCpyLen = _snwprintf_s(
+               &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
+               L"<N>%s</N>",
+               it->ToString().c_str()
+               ) ;
+            if (nCpyLen<0)
+            {  //
+               // problem: filled up the buffer. 
+               // Re-allocate and use a new buffer.
+               //
+               pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize, true) ;
+            }
+            else
+            {
+               stWriteLen += nCpyLen ;
+               it++ ;
+            }
+         }
+      }
       //
       // Add </Vector>
-      //
-      while (stOutBufSize - stWriteLen < wcslen(pwcVectorKey)+wcslen(L"</>")+2/*NULL*/)
+      // CR.9380; need a min of key length + 4 extra characters, not just 2. (</> = 3 + 1 for Null terminator)
+      // 
+      if (stOutBufSize - stWriteLen < wcslen(pwcVectorKey)+4) // needs to be +4
       {  //
          // Not enough room in buffer for ending tag.
          // make sure there is enough room
          //
-         pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize) ;
+         pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize, true) ;
       }
+      if (pwcTempOut==NULL)
+      {  //
+         // problem: error allocating memory.
+         //
+         OutputDebugStringW(                                                        // CR.9380
+            L"\nAttribsVector::ValueToString() - Critical error, output buffer is null(1)"
+            ) ;
+         sol_assert(false) ;
+      }
+      else
+      {
+         nCpyLen = _snwprintf_s(
+            &pwcTempOut[stWriteLen], stOutBufSize - stWriteLen, _TRUNCATE,
+            L"</%s>",
+            pwcVectorKey
+            ) ;
 
-      nCpyLen = _snwprintf_s(
-         &pwcTempOut[stWriteLen],
-         stOutBufSize - stWriteLen,
-         stOutBufSize - stWriteLen,
-         L"</%s>",
-         pwcVectorKey
-         ) ;
-
-      stWriteLen += nCpyLen ;
-      pwcTempOut[stOutBufSize-1] = 0 ; // ensure this is NULL terminated.
-      wsOutVal = pwcTempOut ;
-
-      assert(nCpyLen >= 0) ;
-      delete(pwcTempOut) ;
-	}
+         if (nCpyLen<0)
+         {  //
+            // CR.9380; This should never occur, but just in case, output a debug message.
+            //
+            OutputDebugStringW(
+               L"\nAttribsVector::ValueToString() - Critical error, CpyLen<0 after adding end tag to stream"
+               ) ;
+            sol_assert(false) ;
+         }
+         stWriteLen += nCpyLen ;
+         pwcTempOut[stOutBufSize-1] = 0 ; // ensure this is NULL terminated.
+         wsOutVal = pwcTempOut ;
+         delete(pwcTempOut) ;
+      }
+   }
 	/* StringToValue() - ingests Xml stream and initializes object from it.
 	 *
 	 * SLB 20.aug.04 Changed format of Xml.  No longer puts count in xml.
@@ -1659,7 +1760,7 @@ public: // public methods
 	void ValueToString(const U &uVal, CWStringStream &wsRetVal) const
 	{
       size_t stOutBufSize(0x2000) ;
-      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize)) ; // allocates a growable buffer
+      wchar_t *pwcTempOut(ReallocateWcsBuffer(NULL, stOutBufSize, stOutBufSize, true)) ; // allocates a growable buffer
       int nCpyLen(-1) ;
 
       while (stOutBufSize < wcslen(L"<></>\r\n") + (2*wcslen(GetKeyName().c_str())) + wcslen(uVal.ToString().c_str()) + 2/*NULL*/)
@@ -1668,13 +1769,13 @@ public: // public methods
 		// Not enough room in buffer for ending tag.
 		// make sure there is enough room
 		//
-		pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize) ;
+		pwcTempOut = ReallocateWcsBuffer(pwcTempOut, stOutBufSize, stOutBufSize, true) ;
       }
 
       nCpyLen = _snwprintf_s(
             pwcTempOut,
             stOutBufSize,
-            stOutBufSize,
+            _TRUNCATE,
             L"<%s>%s</%s>\r\n",
             GetKeyName().c_str(),
             uVal.ToString().c_str(),
@@ -2064,6 +2165,11 @@ public: // public methods
    }
    // private member methods
 private:
+   /* compare() - 
+    *
+    * SLB 14.jun.2012 CR.17498; Fix for not iterating comparison iterator in for(;;) loop. Compare would 
+    * of objects would almost always result in a return value of 1. Even if the objects did match.
+   ------------------------------------------------------------------------------------------*/
    int compare(const CAttribMemberBase &cmp) const
    {
       int nRetVal(0) ;
@@ -2083,7 +2189,7 @@ private:
          for (
             itAttribObj = m_mapAttribObjs.begin(), itCmpAttribObj = cmpb.m_mapAttribObjs.begin() ;
             nRetVal == 0 && itAttribObj != m_mapAttribObjs.end() && itCmpAttribObj != cmpb.m_mapAttribObjs.end() ;
-            itAttribObj++
+            itAttribObj++, itCmpAttribObj++                                         // CR.17498; modified.
             )
          {
             if (*itAttribObj->second == *itCmpAttribObj->second)
@@ -2215,6 +2321,7 @@ private:
 
 	void InitMapFromStream(const std::wstring &wsAttribsStream) 
    {
+      m_mapAttribStream.clear();
 		InitMapFromStream(m_mapAttribStream, wsAttribsStream) ;
    }
 

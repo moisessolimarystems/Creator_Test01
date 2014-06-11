@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace Shared.VisualComponents
 {
+    public delegate TResult Func<T, TResult>(T t);
     public class ControlHelper
     {
         static private BindingFlags AllBindings

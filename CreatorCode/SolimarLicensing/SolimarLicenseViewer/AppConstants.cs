@@ -37,6 +37,7 @@ namespace SolimarLicenseViewer
         public static readonly String LicenseRootNode = "Licenses";
         public static readonly String UsageRootNode = "Usage";
         public static readonly String EventLogRootNode = "Event Log (out of 100 Newest Items)";
+        public static readonly String EmailAlertNode = "E-mail Alerts";
         public static readonly String NoConnectedProductsRootNode = "No Connected Products";
         public static readonly String ProtectionKeyRootNode = "Protection Keys";
         public static readonly String ProductConnectionSettingsRootNode = "Product Connection Settings";
@@ -61,6 +62,17 @@ namespace SolimarLicenseViewer
         public static readonly String EventLogFilterWarningTSB = "Warnings";
         public static readonly String EventLogSourceLabel = "Source";
         public static readonly String EventLogSourceToolTip = "Filter Source";
+
+        public static readonly String EmailAlertNewToolTipTSB = "New E-mail Alert";
+        public static readonly String EmailAlertNewTSB = "New";
+        public static readonly String EmailAlertEditToolTipTSB = "Edit E-mail Alert";
+        public static readonly String EmailAlertEditSB = "Edit";
+        public static readonly String EmailAlertDeleteToolTipTSB = "Delete E-mail Alert";
+        public static readonly String EmailAlertDeleteTSB = "Delete";
+        public static readonly String EmailAlertEditMailToolTipTSB = "Configure Mail Server";
+        public static readonly String EmailAlertEditMailTSB = "Configure Mail";
+        public static readonly String EmailAlertTestMailToolTipTSB = "Test Mail Server";
+        public static readonly String EmailAlertTestMailTSB = "Test Mail";
         #endregion
 
         #region ListView Constants
@@ -123,17 +135,23 @@ namespace SolimarLicenseViewer
         public static readonly String UsageModuleHeader = "Module";
         public static readonly String ObtainedHeader = "Obtained";
         public static readonly String TotalHeader = "Total";
-        //Protection Key Module Column Hearers
+        //Protection Key Module Column Headers
         public static readonly String PkModuleHeader = "Module Name";
         public static readonly String PkModuleInUseHeader = "In Use";
         public static readonly String PkModuleTotalHeader = "Total Licenses";
 
-        //Event Log Column Hearers
+        //Event Log Column Headers
         public static readonly String EventLogLevelHeader = "Level";
         public static readonly String EventLogDateTimeHeader = "Date and Time";
         public static readonly String EventLogSourceHeader = "Source";
         public static readonly String EventLogEventIdHeader = "Event ID";
         public static readonly String EventLogTaskCategoryHeader = "Task Category";
+
+        // Email Alert Column Hearers
+        public static readonly String EmailAlertNameHeader = "Name";
+        public static readonly String EmailAlertActiveHeader = "Active";
+        public static readonly String EmailAlertIdListHeader = "Event IDs";
+        public static readonly String EmailAlertRecipentListHeader = "Recipents";
 
         #endregion
 
