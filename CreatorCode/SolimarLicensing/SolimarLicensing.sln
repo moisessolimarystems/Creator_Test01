@@ -1,35 +1,20 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F111B110-0EAD-4C55-8F25-39253546B137}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManager", "SolimarLicenseManager\SolimarLicenseManager.vcproj", "{59F6B038-5173-4A62-A866-BC1B5826CFFF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManager", "SolimarLicenseManager\SolimarLicenseManager.vcxproj", "{59F6B038-5173-4A62-A866-BC1B5826CFFF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManagerPS", "SolimarLicenseManager\SolimarLicenseManagerPS.vcproj", "{71098209-3D45-442A-820A-787C94065CFA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF} = {59F6B038-5173-4A62-A866-BC1B5826CFFF}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManagerPS", "SolimarLicenseManager\SolimarLicenseManagerPS.vcxproj", "{71098209-3D45-442A-820A-787C94065CFA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServerPS", "SolimarLicenseServer\SolimarLicenseServerPS.vcproj", "{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyReaderGUI", "KeyReaderGUI\KeyReaderGUI.vcxproj", "{96F6EB14-80CB-4235-B86C-81A4FE4EF255}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyReaderGUI", "KeyReaderGUI\KeyReaderGUI.vcproj", "{96F6EB14-80CB-4235-B86C-81A4FE4EF255}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicensingTestObtainingProgram", "LicensingTestObtainingProgram\LicensingTestObtainingProgram.vcxproj", "{1B4EAC93-7194-4823-ACF5-C23983E3D2FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicensingTestObtainingProgram", "LicensingTestObtainingProgram\LicensingTestObtainingProgram.vcproj", "{1B4EAC93-7194-4823-ACF5-C23983E3D2FA}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManagerDotNet", "SolimarLicenseManagerDotNet\SolimarLicenseManagerDotNet.vcproj", "{9394710F-23DA-4816-8F33-B62489F7FB8B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{59F6B038-5173-4A62-A866-BC1B5826CFFF} = {59F6B038-5173-4A62-A866-BC1B5826CFFF}
-		{DD791949-C013-44C7-9044-0BD21F9AAB50} = {DD791949-C013-44C7-9044-0BD21F9AAB50}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseManagerDotNet", "SolimarLicenseManagerDotNet\SolimarLicenseManagerDotNet.vcxproj", "{9394710F-23DA-4816-8F33-B62489F7FB8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicenseMixedModeTesterUI", "LicenseMixedModeTesterUI\LicenseMixedModeTesterUI.csproj", "{49297001-133B-431B-9E9B-71E8620ADAD7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MessageFile", "MessageFile\MessageFile.vcproj", "{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MessageFile", "MessageFile\MessageFile.vcxproj", "{0EA7EB67-EEBA-411B-80F4-D9E00250FFF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solimar.Licensing.Common", "common\Solimar.Licensing.Common.csproj", "{8FB109FF-36E9-4A3F-A2D6-9DE37EFA2C78}"
 EndProject
@@ -37,18 +22,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolimarLicenseViewer", "Sol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.VisualComponents", "Shared.VisualComponents\Shared.VisualComponents.csproj", "{1B63AAE8-F2DF-4495-A7E1-2277ED836BF1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flatelib", "flatelib\flatelib.vcproj", "{E54415C2-DBB5-4711-89FB-B1EE46997D7E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "flatelib", "flatelib\flatelib.vcxproj", "{E54415C2-DBB5-4711-89FB-B1EE46997D7E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LicensingTest_SoftwareLicense", "LicensingTest_SoftwareLicense\LicensingTest_SoftwareLicense.csproj", "{78B138EC-7471-4211-94A1-5DDEAC255AFE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServer", "SolimarLicenseServer\SolimarLicenseServer.vcproj", "{DD791949-C013-44C7-9044-0BD21F9AAB50}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E54415C2-DBB5-4711-89FB-B1EE46997D7E} = {E54415C2-DBB5-4711-89FB-B1EE46997D7E}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServer", "SolimarLicenseServer\SolimarLicenseServer.vcxproj", "{DD791949-C013-44C7-9044-0BD21F9AAB50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationTokenRetriever", "ValidationTokenRetriever\ValidationTokenRetriever.csproj", "{17D41D14-4BBF-46E5-8B85-0645C1F33160}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidationTokenRetriever", "ValidationTokenRetriever\ValidationTokenRetriever.csproj", "{BCFA3DE0-8538-400C-8072-23EC09537DBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolimarLicenseDiagnosticDataViewer", "SolimarLicenseDiagnosticDataViewer\SolimarLicenseDiagnosticDataViewer.csproj", "{C7555889-9008-4378-BA32-51E82938B624}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SolimarLicenseServerPS", "SolimarLicenseServer\SolimarLicenseServerPS.vcxproj", "{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,20 +84,6 @@ Global
 		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|x64
 		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
 		{71098209-3D45-442A-820A-787C94065CFA}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|x64.ActiveCfg = Debug|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Any CPU.ActiveCfg = Release|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Mixed Platforms.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Mixed Platforms.Build.0 = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Win32.ActiveCfg = Release|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|x64.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Any CPU.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Mixed Platforms.ActiveCfg = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|x64
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
-		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
 		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
 		{96F6EB14-80CB-4235-B86C-81A4FE4EF255}.Debug|Mixed Platforms.Build.0 = Debug|x64
@@ -324,23 +294,23 @@ Global
 		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|Win32.Build.0 = SolimarInternalRelease|Win32
 		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|x64.ActiveCfg = SolimarInternalRelease|x64
 		{DD791949-C013-44C7-9044-0BD21F9AAB50}.SolimarInternalRelease|x64.Build.0 = SolimarInternalRelease|x64
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Release|Win32.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.Release|x64.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|Any CPU.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|Any CPU.Build.0 = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|Win32.ActiveCfg = Release|Any CPU
-		{17D41D14-4BBF-46E5-8B85-0645C1F33160}.SolimarInternalRelease|x64.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Release|Win32.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.Release|x64.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|Any CPU.Build.0 = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|Win32.ActiveCfg = Release|Any CPU
+		{BCFA3DE0-8538-400C-8072-23EC09537DBF}.SolimarInternalRelease|x64.ActiveCfg = Release|Any CPU
 		{C7555889-9008-4378-BA32-51E82938B624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7555889-9008-4378-BA32-51E82938B624}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7555889-9008-4378-BA32-51E82938B624}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -358,6 +328,27 @@ Global
 		{C7555889-9008-4378-BA32-51E82938B624}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|Any CPU
 		{C7555889-9008-4378-BA32-51E82938B624}.SolimarInternalRelease|Win32.ActiveCfg = Release|Any CPU
 		{C7555889-9008-4378-BA32-51E82938B624}.SolimarInternalRelease|x64.ActiveCfg = Release|Any CPU
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|Win32.Build.0 = Debug|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|x64.ActiveCfg = Debug|x64
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Debug|x64.Build.0 = Debug|x64
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Win32.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|Win32.Build.0 = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|x64.ActiveCfg = Release|x64
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.Release|x64.Build.0 = Release|x64
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Any CPU.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Mixed Platforms.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Mixed Platforms.Build.0 = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Win32.ActiveCfg = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|Win32.Build.0 = Release|Win32
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|x64.ActiveCfg = Release|x64
+		{D68D0C3B-62EB-4958-9EA6-F709A0F50CBA}.SolimarInternalRelease|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

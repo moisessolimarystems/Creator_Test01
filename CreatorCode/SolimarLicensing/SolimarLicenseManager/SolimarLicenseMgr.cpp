@@ -3785,7 +3785,7 @@ HRESULT CSolimarLicenseMgr::AssociateAppInstanceToBaseKey(ServerInfo* pServerInf
 			bstrApplicationInstance = GetAppInstanceFromKey(pServerInfo, key_ident, bLogError);
 			if(!bFoundAppInstance)
 			{
-				if(wcsicmp(bstrApplicationInstance, m_applicationInstanceKey) == 0)
+				if(_wcsicmp(bstrApplicationInstance, m_applicationInstanceKey) == 0)
 				{
 					//Found a key that is already associated with the application instance, leave
 					hr = pServerInfo->LicenseServer->AddApplicationInstance(key_ident, m_applicationInstanceKey, VARIANT_FALSE);
