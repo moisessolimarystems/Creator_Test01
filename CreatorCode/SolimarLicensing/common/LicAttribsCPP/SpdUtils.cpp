@@ -492,9 +492,11 @@ SPDUTILS_IMP_EXP std::wstring __stdcall SpdUtils::FixFileName( const std::wstrin
 ------------------------------------------------------------------------------*/
 SPDUTILS_IMP_EXP char * __stdcall SpdUtils::newStr(const char *sz)
 {
-char *nsz = new char[strlen(sz)+1] ;
+   size_t stBufLen(strlen(sz)+1) ;
+   char *nsz = new char[stBufLen] ;
+
    if (nsz)
-      strcpy(nsz, sz) ;
+      strcpy_s(nsz, stBufLen, sz) ; // CR.13870; modified to use safe version 
    return nsz ;
 } // newStr()
 
@@ -652,7 +654,7 @@ DWORD ret(WAIT_FAILED) ;
 
 } // SWaitForSingleObject()
 
-
+#if 0
 // SpdStringMatch() - Returns true if the two strings match. Wildcards '*' and '?'
 // can be used in the first parameter. Case insensitive.
 // DCM 18.feb.05 - This function is now obsolete. Please use WildcardCompare()
@@ -706,19 +708,20 @@ SPDUTILS_IMP_EXP bool __stdcall SpdUtils::StringMatch(char *wildStr, char *match
    }
    return false;
 }
-
+#endif
 
 
 /* wsplitpath() - an stl version of the crt _wsplitpath() routine.
  * SLB 08.may.2004 - created. At this time this is just a wrapper arount the crt 
  * version of the function.
 ---------------------------------------------------------------------------*/
-SPDUTILS_IMP_EXP void __stdcall SpdUtils::wsplitpath(   const std::wstring &wsPath, 
-                     std::wstring &wsDrive,
-                     std::wstring &wsDir,
-                     std::wstring &wsFName,
-                     std::wstring &wsExt
-                 )
+SPDUTILS_IMP_EXP void __stdcall SpdUtils::wsplitpath(   
+   const std::wstring &wsPath, 
+   std::wstring &wsDrive,
+   std::wstring &wsDir,
+   std::wstring &wsFName,
+   std::wstring &wsExt
+   )
 {
 wchar_t szDrive[MAX_PATH] ;
 wchar_t szDir[MAX_PATH*2] ;
@@ -728,7 +731,17 @@ wchar_t szExt[MAX_PATH*2] ;
    szDir[0] = 0 ;
    szFName[0] = 0 ;
    szExt[0] = 0 ;
-   _wsplitpath( wsPath.c_str(),szDrive,szDir,szFName,szExt) ;
+   _wsplitpath_s(                         // CR.13870; modified to use safe version 
+      wsPath.c_str(),
+      szDrive,
+      sizeof(szDrive)/sizeof(wchar_t),    // CR.13870; added.    
+      szDir,
+      sizeof(szDir)/sizeof(wchar_t),      // CR.13870; added.  
+      szFName,
+      sizeof(szFName)/sizeof(wchar_t),    // CR.13870; added.  
+      szExt,
+      sizeof(szExt)/sizeof(wchar_t)       // CR.13870; added.  
+      ) ;
    wsDrive = szDrive ;
    wsDir = szDir ;
    wsFName = szFName ;
@@ -740,14 +753,14 @@ wchar_t szExt[MAX_PATH*2] ;
  * version of the function.
 ---------------------------------------------------------------------------*/
 SPDUTILS_IMP_EXP void __stdcall SpdUtils::wmakepath( std::wstring &wsPath,
-                  const std::wstring &wsDrive,
-                  const std::wstring &wsDir,
-                  const std::wstring &wsFName,
-                  const std::wstring &wsExt
-                  )
+   const std::wstring &wsDrive,
+   const std::wstring &wsDir,
+   const std::wstring &wsFName,
+   const std::wstring &wsExt
+   )
 {
-wchar_t szPath[MAX_PATH*2] ;
-   _wmakepath( szPath,
+   wchar_t szPath[MAX_PATH*2] ;
+   _wmakepath_s( szPath,
                wsDrive.c_str(),
                wsDir.c_str(),
                wsFName.c_str(),
@@ -994,10 +1007,10 @@ SPDUTILS_IMP_EXP bool __stdcall SpdUtils::XmlEscapeString(const wchar_t *pwcsIn,
 // XmlUnescapeString()
 //-----------------------------------------------------------------------------
 SPDUTILS_IMP_EXP bool __stdcall SpdUtils::XmlUnescapeString(const wchar_t *pwcsIn, 
-                                                            wchar_t *pwcsOut, 
-                                                            size_t stOutBufLen, 
-                                                            size_t &stOutStringLen
-                                                            )
+   wchar_t *pwcsOut, 
+   size_t stOutBufLen, 
+   size_t &stOutStringLen
+   )
 {
    bool bRetVal(false) ;
    //
@@ -1061,7 +1074,7 @@ SPDUTILS_IMP_EXP bool __stdcall SpdUtils::XmlUnescapeString(const wchar_t *pwcsI
                else if (!wcsncmp(&pwcsIn[stInPos], L"&#x", stSubStrLen)) // very rare
                {
                   int escChar ;
-                  if (_snwscanf(&pwcsIn[stInPos], stSubStrLen, L"&#x%X;", &escChar) > 0)
+                  if (_snwscanf_s(&pwcsIn[stInPos], stSubStrLen, L"&#x%X;", &escChar) > 0)
                   {
                      pwcsOut[stOutPos++] = (wchar_t)escChar ;
                      stInPos += stSubStrLen ;
