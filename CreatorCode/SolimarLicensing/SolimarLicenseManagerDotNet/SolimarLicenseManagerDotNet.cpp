@@ -61,50 +61,25 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved) {
 //namespace SolimarLicenseManagerDotNet
 namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 {
+
+
 	SolimarLicenseWrapper::SolimarLicenseWrapper()
 	{
+//OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper() - Enter");
 		m_pLicenseWrapper = new SolimarLicenseManagerWrapper::LicensingWrapper();
-		Initialize();
-	}
-
-	SolimarLicenseWrapper::SolimarLicenseWrapper(
-		String^ domain,
-		String^ username,
-		String^ password,
-		long authenticationLevel,
-		long impersonationLevel)
-	{
-		BSTR bstrDomain;
-		System::IntPtr ptrDomain(System::Runtime::InteropServices::Marshal::StringToBSTR(domain));
-		bstrDomain = (static_cast<BSTR>(static_cast<void *>(ptrDomain)));
-
-		BSTR bstrUsername;
-		System::IntPtr ptrUsername(System::Runtime::InteropServices::Marshal::StringToBSTR(username));
-		bstrUsername = (static_cast<BSTR>(static_cast<void *>(ptrUsername)));
-
-		BSTR bstrPassword;
-		System::IntPtr ptrPassword(System::Runtime::InteropServices::Marshal::StringToBSTR(password));
-		bstrPassword = (static_cast<BSTR>(static_cast<void *>(ptrPassword)));
-
-		m_pLicenseWrapper = new SolimarLicenseManagerWrapper::LicensingWrapper(bstrDomain, bstrUsername, bstrPassword, authenticationLevel, impersonationLevel);
-
-		Initialize();
-	}
-
-	void SolimarLicenseWrapper::Initialize()
-	{
 		m_bRegisteredMessageCallback = false;
 		m_bRegisteredInvalidLicenseCallback = false;
 		m_messageCallbackUnmanaged = gcnew DelegateMessageCallbackUnmanaged(this, &SolimarLicenseWrapper::MessageCallback);
 		m_invalidLicenseCallbackUnmanaged = gcnew DelegateInvalidLicenseCallbackUnmanaged(this, &SolimarLicenseWrapper::InvalidLicenseCallback);
-
+		
 		m_bFinalized = false;
 
 		m_bUseSharedLicenseServers = false;
 		m_productID = -1;
 		m_licServer = "";
-	}
+//OutputDebugStringW(L"SolimarLicenseWrapper::SolimarLicenseWrapper() - Leave");
 
+	}
 	SolimarLicenseWrapper::~SolimarLicenseWrapper()
 	{
 //OutputDebugStringW(L"SolimarLicenseWrapper::~SolimarLicenseWrapper() - Enter");
