@@ -510,6 +510,7 @@ STDMETHODIMP CSolimarLicenseSvr::GetSoftwareLicenseInfoByProduct_ByLicense(BSTR 
 	CHECK_CLIENT_AUTHENTICATION;
 	return g_licenseController.softwareServer.GetSoftwareLicenseInfoByProduct_ByLicense(softwareLicense, productID, pBstrProductInfoAttribsStream);
 }
+
 STDMETHODIMP CSolimarLicenseSvr::GetSoftwareLicenseInfo_ByLicense(BSTR softwareLicense, BSTR *pBstrLicenseInfoAttribsStream)
 {
 	CHECK_CLIENT_AUTHENTICATION;
@@ -718,16 +719,4 @@ STDMETHODIMP CSolimarLicenseSvr::GenerateLicenseSystemDataForSolimar()
 {
 	CHECK_CLIENT_AUTHENTICATION;
 	return g_licenseController.softwareServer.GenerateLicenseSystemDataForSolimar();
-}
-
-// ISolimarSoftwareLicenseSvr4
-STDMETHODIMP CSolimarLicenseSvr::CanDeleteSoftwareLicense(BSTR softwareLicense, VARIANT_BOOL *pBCanDelete)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.CanDeleteSoftwareLicense(softwareLicense, pBCanDelete);
-}
-STDMETHODIMP CSolimarLicenseSvr::DeleteSoftwareLicense(BSTR softwareLicense)
-{
-	CHECK_CLIENT_AUTHENTICATION;
-	return g_licenseController.softwareServer.DeleteSoftwareLicense(softwareLicense);
 }

@@ -355,9 +355,6 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			String^ AddEmailAlert(String^ emailAlertMailAttribsStream);
 			void DeleteEmailAlert(String^ emailAlertId);
 
-			bool CanDeleteSoftwareLicense(String^ softwareLicense);
-			void DeleteSoftwareLicense(String^ softwareLicense);
-
 			void SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber);
 
 			System::Collections::Generic::List<SolimarLicenseProtectionKeyInfo^>^ KeyEnumerate();

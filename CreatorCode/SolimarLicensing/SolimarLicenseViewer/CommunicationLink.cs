@@ -910,32 +910,6 @@ namespace SolimarLicenseViewer
             }
         }
 
-        public bool CanDeleteSoftwareLicense(String license)
-        {
-           try
-           {
-              return (this.bDiagnosticDateView == true) ? false : m_licServer.CanDeleteSoftwareLicense(license);
-           }
-           catch (COMException ex)
-           {
-              throw new COMException("CanDeleteSoftwareLicense Failed", ex);
-           }
-        }
-        public void DeleteSoftwareLicense(String license)
-        {
-           try
-           {
-              if (this.bDiagnosticDateView == true)
-                 throw new NotImplementedException();
-              else
-                 m_licServer.DeleteSoftwareLicense(license);
-           }
-           catch (COMException ex)
-           {
-              throw new COMException("DeleteSoftwareLicense Failed", ex);
-           }
-        }
-
         //Cache for Protection Key Info - m_protectionKeyCache
         private System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> m_protectionKeyCache = null;
         public System.Collections.Generic.List<Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo> KeyEnumerate()
