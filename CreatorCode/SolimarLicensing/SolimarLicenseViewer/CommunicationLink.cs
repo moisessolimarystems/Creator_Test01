@@ -121,6 +121,16 @@ namespace SolimarLicenseViewer
             // Call EndInvoke to retrieve the results.
             delFunction.EndInvoke(ref _newByteArrayLicense, result);
         }
+        public void Async_GenerateLicenseSystemDataForSolimar()
+        {
+            DelParamVoidReturnsVoid delFunction = new DelParamVoidReturnsVoid(GenerateLicenseSystemDataForSolimar);
+            IAsyncResult result = delFunction.BeginInvoke(null, null);
+
+            result.AsyncWaitHandle.WaitOne();
+
+            // Call EndInvoke to retrieve the results.
+            delFunction.EndInvoke(result);
+        }
         public void Async_GenerateSoftwareLicArchive_ByLicense(string _softwareLicense, ref byte[] _refByteLicenseArchive)
         {
             DelParamStringRefByteArrayReturnsVoid delFunction = new DelParamStringRefByteArrayReturnsVoid(GenerateSoftwareLicArchive_ByLicense);
@@ -220,7 +230,18 @@ namespace SolimarLicenseViewer
                                 string usageInfoStreamed = "";
                                 string eventLogListStreamed = "";
                                 string connectionInfoListStreamed = "";
-                                licInfoListStreamed = m_licServer.GenerateStreamData_ByLicenseSystemData(m_DiagnosticDateByteArray, ref modifiedDateStreamed, ref keyAttribsListStreamed, ref usageInfoStreamed, ref eventLogListStreamed, ref connectionInfoListStreamed);
+                                string alertInfoStreamed = null;
+
+                                try
+                                {
+                                    alertInfoStreamed = m_licServer.GenerateStreamData_ByLicenseSystemData2(m_DiagnosticDateByteArray, ref modifiedDateStreamed, ref keyAttribsListStreamed, ref usageInfoStreamed, ref eventLogListStreamed, ref connectionInfoListStreamed, ref licInfoListStreamed);
+                                }
+
+                                catch (COMException ex)
+                                {
+                                    licInfoListStreamed = m_licServer.GenerateStreamData_ByLicenseSystemData(m_DiagnosticDateByteArray, ref modifiedDateStreamed, ref keyAttribsListStreamed, ref usageInfoStreamed, ref eventLogListStreamed, ref connectionInfoListStreamed);
+                                }
+                                
 
                                 Solimar.Licensing.Attribs.AttribsMemberStringList streamedKeyInfoList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
                                 streamedKeyInfoList.SVal = keyAttribsListStreamed;
@@ -291,6 +312,16 @@ namespace SolimarLicenseViewer
                                 }
                                 //surround xml <stringList> around the softwareLicNameList
                                 m_allSoftwareLic_Cache = string.Format("<stringList>{0}</stringList>", softwareLicNameList);
+
+                                if (alertInfoStreamed != null)
+                                {
+                                    this.m_alertInfoAttribs = new Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs();
+                                    this.m_alertInfoAttribs.AssignMembersFromStream(alertInfoStreamed);
+                                }
+                                else
+                                {
+                                    this.m_alertInfoAttribs = null;
+                                }
                             }
                             catch (COMException)
                             {
@@ -321,12 +352,26 @@ namespace SolimarLicenseViewer
                 if (this.bDiagnosticDateView == true)
                 {
                     Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
-                    foreach (Solimar.Licensing.Attribs.Lic_UsageInfoAttribs.Lic_UsProductInfoAttribs usProdInfo in m_usageAttribs.productList.TVal)
+                    System.Collections.Generic.Dictionary<uint, bool> productIdMap = new Dictionary<uint, bool>();
+
+                    Solimar.Licensing.Attribs.AttribsMemberStringList strList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
+                    strList.SVal = this.m_allSoftwareLic_Cache;
+
+                    foreach (string softwareLicense in strList.TVal)
                     {
-                        Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs();
-                        prodInfo.productID.TVal = usProdInfo.productID.TVal;
-                        prodInfo.productAppInstance.TVal = (uint)usProdInfo.appInstanceList.TVal.Count;
-                        licInfo.productList.TVal.Add(prodInfo);
+                        string generalStream = string.Empty;
+                        GetSoftwareLicenseInfoByLicense(softwareLicense, ref generalStream);
+                        Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
+                        licInfoAttrib.AssignMembersFromStream(generalStream);
+
+                        foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
+                        {
+                            if (!productIdMap.ContainsKey(prodInfo.productID.TVal))
+                            {
+                                licInfo.productList.TVal.Add(prodInfo);
+                                productIdMap.Add(prodInfo.productID.TVal, true);
+                            }
+                        }
                     }
                     slStream = licInfo.Stream;
                 }
@@ -606,6 +651,17 @@ namespace SolimarLicenseViewer
                 throw;
             }
         }
+        public void GenerateLicenseSystemDataForSolimar()
+        {
+            try
+            {
+                m_licServer.GenerateLicenseSystemDataForSolimar();
+            }
+            catch (COMException)
+            {
+                throw;
+            }
+        }
 
         public void GenerateVerifyDataWithLicInfo_ByLicense(String softwareLicense, ref Byte[] newByteArrayLicense)
         {
@@ -693,6 +749,165 @@ namespace SolimarLicenseViewer
                 throw;
             }
             return streamedEventLog;
+        }
+
+        public void GetMailServerInfo(ref String slStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    slStream = this.m_alertInfoAttribs.mailServer.TVal.Stream;
+                }
+                else
+                {
+                    slStream = m_licServer.GetMailServerInfo();
+                }
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("GetMailServerInfo Failed", ex);
+            }
+        }
+        public void SetMailServerInfo(String slStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                    m_licServer.SetMailServerInfo(slStream);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("SetMailServerInfo Failed", ex);
+            }
+        }
+        public void TestMailServerInfo(String slStream)
+        {
+            //try
+            //{
+                if (this.bDiagnosticDateView == true)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                    m_licServer.TestMailServerInfo(slStream);
+            //}
+            //catch (COMException ex)
+            //{
+            //    throw new COMException("TestMailServerInfo Failed", ex);
+            //}
+        }
+        public void GetAllEmailAlerts(ref String slStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    if (this.m_alertInfoAttribs != null)
+                        slStream = string.Format("<{0}>{1}</{0}>", this.m_alertInfoAttribs.emailAlertsList.GetKeyName(), this.m_alertInfoAttribs.emailAlertsList.ToString());
+                    else
+                        throw new NotImplementedException();
+                }
+                else
+                    slStream = m_licServer.GetAllEmailAlerts();
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("GetAllEmailAlerts Failed", ex);
+            }
+        }
+        public void GetEmailAlert(String emailAlertId, ref String slStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    if (this.m_alertInfoAttribs != null)
+                    {
+                        for (int idx = 0; idx < this.m_alertInfoAttribs.emailAlertsList.TVal.Count; idx++)
+                        {
+                            Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailAlertMailAttrib = this.m_alertInfoAttribs.emailAlertsList.TVal[idx] as Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs;
+                            if (emailAlertMailAttrib != null)
+                            {
+                                if (string.Equals(emailAlertMailAttrib.id.TVal, emailAlertId, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    slStream = emailAlertMailAttrib.ToString();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+                else
+                    slStream = m_licServer.GetEmailAlert(emailAlertId);
+
+//System.Diagnostics.Trace.WriteLine(string.Format(
+//    "GetEmailAlert() ({0})- '{1}'",
+//    (this.bDiagnosticDateView == true) ? "DiagnosticData" : "LicenseServer",
+//    slStream
+//    ));
+
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("GetAllEmailGetEmailAlertAlerts Failed", ex);
+            }
+        }
+        public void SetEmailAlert(String emailAlertId, String slStream)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                    m_licServer.SetEmailAlert(emailAlertId, slStream);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("SetEmailAlert Failed", ex);
+            }
+        }
+        public void AddEmailAlert(String slStream, ref String emailAlertId)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                    emailAlertId = m_licServer.AddEmailAlert(slStream);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("AddEmailAlert Failed", ex);
+            }
+        }
+        public void DeleteEmailAlert(String emailAlertId)
+        {
+            try
+            {
+                if (this.bDiagnosticDateView == true)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                    m_licServer.DeleteEmailAlert(emailAlertId);
+            }
+            catch (COMException ex)
+            {
+                throw new COMException("DeleteEmailAlert Failed", ex);
+            }
         }
 
         //Cache for Protection Key Info - m_protectionKeyCache
@@ -960,6 +1175,7 @@ namespace SolimarLicenseViewer
             get { return m_exception; }
             set { m_exception = value; }
         }
+        public Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs SoftwareSpec { get { return m_softwareSpec; } }
         #endregion
 
         #region Private Variables
@@ -972,6 +1188,7 @@ namespace SolimarLicenseViewer
         private Byte[] m_DiagnosticDateByteArray = null;
         private Exception m_exception = null;
         private Solimar.Licensing.Attribs.Lic_UsageInfoAttribs m_usageAttribs = new Solimar.Licensing.Attribs.Lic_UsageInfoAttribs();
+        private Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs m_alertInfoAttribs = null;
         private string m_DiagnosticEventLogStreamed = string.Empty;
         #endregion
         public bool bDiagnosticDateView { get { return m_bDiagnosticDateView; } }

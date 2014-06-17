@@ -52,7 +52,6 @@ CSolimarLicenseSvr::~CSolimarLicenseSvr()
 
 	g_licenseController.keyserver.LicenseReleaseAll(m_licenseId);
 	g_licenseController.RemoveHeartbeat(m_licenseId);
-	
 //_snwprintf_s(debug_buf, _countof(debug_buf), L"CSolimarLicenseSvr::~CSolimarLicenseSvr() - Leave, m_licenseId: %s", (wchar_t*)m_licenseId);
 //OutputDebugStringW(debug_buf);
 }
@@ -669,3 +668,55 @@ STDMETHODIMP CSolimarLicenseSvr::ConvertProtectionKeyToSoftwareLicense(BSTR soft
 	return g_licenseController.softwareServer.ConvertProtectionKeyToSoftwareLicense(softwareLicense, keyIdent);	
 }
 
+// ISolimarLicenseEmailAlert
+STDMETHODIMP CSolimarLicenseSvr::GetMailServerInfo(BSTR *pBstrAlertMailServerAttribsStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GetMailServerInfo(pBstrAlertMailServerAttribsStream);	
+}
+STDMETHODIMP CSolimarLicenseSvr::SetMailServerInfo(BSTR bstrAlertMailServerAttribsStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.SetMailServerInfo(bstrAlertMailServerAttribsStream);
+}
+STDMETHODIMP CSolimarLicenseSvr::TestMailServerInfo(BSTR bstrTestMailServerAttribsStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.TestMailServerInfo(bstrTestMailServerAttribsStream);
+}
+STDMETHODIMP CSolimarLicenseSvr::GetAllEmailAlerts(BSTR *pBstrEmailAlertMailAttribsListStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GetAllEmailAlerts(pBstrEmailAlertMailAttribsListStream);
+}
+STDMETHODIMP CSolimarLicenseSvr::GetEmailAlert(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GetEmailAlert(bstrEmailAlertId, pBstrEmailAlertMailAttribsStream);
+}
+STDMETHODIMP CSolimarLicenseSvr::SetEmailAlert(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.SetEmailAlert(bstrEmailAlertId, bstrEmailAlertMailAttribsStream);
+}
+STDMETHODIMP CSolimarLicenseSvr::AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.AddEmailAlert(bstrEmailAlertMailAttribsStream, pBstrEmailAlertId);
+}
+STDMETHODIMP CSolimarLicenseSvr::DeleteEmailAlert(BSTR bstrEmailAlertId)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.DeleteEmailAlert(bstrEmailAlertId);
+}
+// ISolimarSoftwareLicenseSvr3
+STDMETHODIMP CSolimarLicenseSvr::GenerateStreamData_ByLicenseSystemData2(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed,	BSTR *pBstrKeyAttribsListStream,	BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream, BSTR *pBstrLicAlertInfoAttribs)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GenerateStreamData_ByLicenseSystemData2(vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrEventLogAttribsListStream, pBstrLicInfoDataAttribsListStream, pBstrLicAlertInfoAttribs);
+}
+STDMETHODIMP CSolimarLicenseSvr::GenerateLicenseSystemDataForSolimar()
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return g_licenseController.softwareServer.GenerateLicenseSystemDataForSolimar();
+}

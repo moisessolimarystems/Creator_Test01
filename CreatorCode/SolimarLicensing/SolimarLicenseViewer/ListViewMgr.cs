@@ -17,6 +17,7 @@ namespace SolimarLicenseViewer
 
     /// <summary>Tracks Number of Events seen of a given Event Type</summary>
     using EventCounter = Solimar.Licensing.Common.Collections.Tuple<ToolStripItem, int/*Count Seen*/, string>;
+    using Solimar.Licensing.Attribs;
 
     public class ListViewMgr
     {
@@ -88,7 +89,8 @@ namespace SolimarLicenseViewer
             Shared.VisualComponents.NoFlickerListView bottomLv,
             ToolStrip bottomLvTs,
             Shared.VisualComponents.EventLogEntryControl eventLogEntryControl,
-            CommunicationLink commlink)
+            CommunicationLink commlink,
+            ImageList imageList)
         {
             TheSplitControl = splitCntl;
             TheListView = lv;
@@ -100,6 +102,7 @@ namespace SolimarLicenseViewer
             m_TreeNode = null;
             m_connSettingsHelper = new ConnectionSettingsHelper(m_CommLink);
             m_toolStripList = new Dictionary<string, List<ToolStripItem>>();
+            m_imageList = imageList;
 
             // Create an instance of a ListView column sorter and assign it 
             // to the ListView control.
@@ -303,6 +306,70 @@ namespace SolimarLicenseViewer
             m_toolStripList.Add(AppConstants.EventLogRootNode, tmpTSItemList);
 
             #endregion
+
+            #region Items for AppConstants.EmailAlertsNode
+            tmpTSItemList = new List<ToolStripItem>();
+
+            tmpTSL = new ToolStripLabel();
+            tmpTSL.Text = string.Format("{0}:", AppConstants.EmailAlertNode);
+            tmpTSItemList.Add(tmpTSL);
+
+            tmpTSB = new ToolStripButton()
+            {
+                Text = AppConstants.EmailAlertTestMailTSB,
+                ToolTipText = AppConstants.EmailAlertTestMailToolTipTSB,
+                Alignment = ToolStripItemAlignment.Right,
+            };
+            tmpTSB.Click += new EventHandler(emailAlert_TestMailServer);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator() { Alignment = ToolStripItemAlignment.Right });
+
+            tmpTSB = new ToolStripButton()
+            {
+                Text = AppConstants.EmailAlertEditMailTSB,
+                ToolTipText = AppConstants.EmailAlertEditMailToolTipTSB,
+                Alignment = ToolStripItemAlignment.Right,
+            };
+            tmpTSB.Click += new EventHandler(emailAlert_EditMailServer);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator() { Alignment = ToolStripItemAlignment.Right });
+
+            tmpTSB = new ToolStripButton()
+            {
+                Text = AppConstants.EmailAlertDeleteTSB,
+                ToolTipText = AppConstants.EmailAlertDeleteToolTipTSB,
+                Alignment = ToolStripItemAlignment.Right,
+            };
+            tmpTSB.Click += new EventHandler(emailAlert_DeleteAlert);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator() { Alignment = ToolStripItemAlignment.Right });
+
+            tmpTSB = new ToolStripButton()
+            {
+                Text = AppConstants.EmailAlertEditSB,
+                ToolTipText = AppConstants.EmailAlertEditToolTipTSB,
+                Alignment = ToolStripItemAlignment.Right,
+            };
+            tmpTSB.Click += new EventHandler(emailAlert_EditAlert);
+            tmpTSItemList.Add(tmpTSB);
+
+            tmpTSItemList.Add(new ToolStripSeparator() { Alignment = ToolStripItemAlignment.Right });
+
+            tmpTSB = new ToolStripButton()
+            {
+                Text = AppConstants.EmailAlertNewTSB,
+                ToolTipText = AppConstants.EmailAlertNewToolTipTSB,
+                Alignment = ToolStripItemAlignment.Right,
+            };
+            tmpTSB.Click += new EventHandler(emailAlert_NewAlert);
+            tmpTSItemList.Add(tmpTSB);
+
+
+            m_toolStripList.Add(AppConstants.EmailAlertNode, tmpTSItemList);
+            #endregion
         }
 
         void m_moduleFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -350,6 +417,8 @@ namespace SolimarLicenseViewer
                             LoadProductConnectionData();
                         else if (SelectedNode.Name == AppConstants.EventLogRootNode)
                             LoadEventLogData();
+                        else if (SelectedNode.Name == AppConstants.EmailAlertNode)
+                            LoadEmailAlertData();
                         break;
                     case 1:
                         if (SelectedNode.Name == AppConstants.HistoryNode)
@@ -516,6 +585,16 @@ namespace SolimarLicenseViewer
                         defaultListView = TheListView;
                         defaultColIdx = 1;
                         defaultSortOrder = SortOrder.Descending;
+                    }
+                    else if (SelectedNode.Name == AppConstants.EmailAlertNode)
+                    {
+                        List<ColumnHeader> colHeaderList = new List<ColumnHeader>();
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EmailAlertNameHeader });
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EmailAlertActiveHeader });
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EmailAlertRecipentListHeader });
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.EmailAlertIdListHeader });
+
+                        TheListView.Columns.AddRange(colHeaderList.ToArray());
                     }
                     break;
                 case 1:
@@ -2333,6 +2412,402 @@ namespace SolimarLicenseViewer
 
         #endregion
 
+        #region Email Alert Section
+        private const string DIAGNOSTIC_DATA_ERROR = "Unable to perform this action with diagnostic data.";
+        public void LoadEmailAlertData()
+        {
+            try
+            {
+                PopulateEmailAlertView();
+
+                int major = 0;
+                int minor = 0;
+                int build = 0;
+                this.m_CommLink.GetVersionLicenseServer(this.m_CommLink.ServerName, ref major, ref minor, ref build);
+                if (major < 3 || (major == 3 && minor < 2))
+                {
+                    Exception ex = new Exception(string.Format("License Server '{0}' must be at least version 3.2 for this feature.  The server is currenly version {1}.{2}", this.m_CommLink.ServerName, major, minor));
+                    HandleExceptions.DisplayException(ex);
+                    this.TheListView.NoItemsMessage = ex.Message;
+                    throw ex;
+
+                }
+                else
+                {
+                    RefreshEmailAlertData(null, null);
+                    emailAlert_SelectedIndexChanged(this.TheListView, new EventArgs());
+                }
+            }
+            catch (Exception)
+            {
+                foreach (ToolStripItem tsItem in this.TheListViewToolStrip.Items)
+                {
+                    if (tsItem is ToolStripButton)
+                        (tsItem as ToolStripButton).Enabled = false;
+                }
+            }
+        }
+        public void PopulateEmailAlertView()
+        {
+            try
+            {
+                this.TheListViewToolStrip.Visible = true;
+                this.TheListViewToolStrip.Items.Clear();
+                this.TheListViewToolStrip.Items.AddRange(m_toolStripList[AppConstants.EmailAlertNode].ToArray());
+
+                //this.TheListView.FindForm().Cursor = Cursors.WaitCursor;
+                this.TheListView.BeginUpdate();
+                this.TheListView.Items.Clear();
+                this.TheListView.MultiSelect = false;
+
+                this.TheListView.SelectedIndexChanged += new EventHandler(emailAlert_SelectedIndexChanged);
+                this.TheListView.KeyDown += new KeyEventHandler(emailAlert_KeyDown);
+                this.TheListView.DoubleClick += new EventHandler(emailAlert_EditAlert);
+
+                TheListView_SelectedIndexChanged(this.TheListView, null);
+                //this.bottomInfoPanel.visible = true;
+            }
+            catch (Exception ex)
+            {
+                this.TheListView.NoItemsMessage = ex.Message;
+            }
+            finally
+            {
+                this.TheListView.EndUpdate();
+                //this.TheListView.FindForm().Cursor = Cursors.Default;
+            }
+        }
+        public void RefreshEmailAlertData(object sender, EventArgs e)
+        {
+            //if (m_CommLink.bDiagnosticDateView == true)
+            //{
+            //}
+            String generalStream = "";
+            Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribsList emailAlertAttribsList = new Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribsList("emLt", new ArrayList());
+            try
+            {
+                this.TheListView.BeginUpdate();
+                System.Collections.Generic.List<ListViewItem> lviList = new List<ListViewItem>();
+
+                // Track previous selected id
+                SortedDictionary<string, bool> selIdTable = new SortedDictionary<string, bool>();
+                foreach (ListViewItem selLvi in this.TheListView.SelectedItems)
+                    selIdTable.Add(selLvi.Tag as string, true);
+
+                // This code might occur at the CommunicationLink level instead, think about
+
+                m_CommLink.GetAllEmailAlerts(ref generalStream);
+                emailAlertAttribsList.SVal = generalStream;
+
+                // For initial testing, just add item, don't update yet
+                foreach (Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailAlertAttribs in emailAlertAttribsList.TVal)
+                {
+                    ListViewItem lvItem = new ListViewItem();
+                    lvItem.Name = emailAlertAttribs.id.TVal;
+                    lvItem.Text = emailAlertAttribs.name.TVal;
+                    lvItem.Tag = emailAlertAttribs.id.TVal;
+                    lvItem.Selected = selIdTable.ContainsKey(emailAlertAttribs.id.TVal);
+                    lvItem.SubItems.Add(string.Format("{0}", emailAlertAttribs.bActive.TVal));
+
+                    StringBuilder sBuilder = new StringBuilder();
+                    foreach (string recipentId in emailAlertAttribs.recipentsList.TVal)
+                        sBuilder.AppendFormat("{0}{1}", (sBuilder.Length > 0) ? ", " : "", recipentId);
+                    lvItem.SubItems.Add(sBuilder.ToString());
+
+                    sBuilder = new StringBuilder();
+                    foreach (UInt32 eventId in emailAlertAttribs.eventIdList.TVal)
+                        sBuilder.AppendFormat("{0}{1}", (sBuilder.Length > 0) ? ", " : "", eventId);
+                    lvItem.SubItems.Add(sBuilder.ToString());
+
+                    lviList.Add(lvItem);
+                }
+
+                this.TheListView.Items.Clear();
+                this.TheListView.Items.AddRange(lviList.ToArray());
+                Shared.VisualComponents.ListViewHelper.ResizeListViewHeadersToMaxOfDataAndHeader(TheListView);
+            }
+            catch (Exception ex)
+            {
+                this.TheListView.NoItemsMessage = ex.Message;
+            }
+            finally
+            {
+                this.TheListView.EndUpdate();
+            }
+        }
+
+        private void ValidateEmailAlertName(string _streamedEmailAlertMailAttribs)
+        {
+            Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs tmpEmailAlertMailAttribs = new Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs();
+            tmpEmailAlertMailAttribs.AssignMembersFromStream(_streamedEmailAlertMailAttribs);
+            foreach (ListViewItem lvi in this.TheListView.Items)
+            {
+                if (string.Equals(lvi.Text, tmpEmailAlertMailAttribs.name.TVal, StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(lvi.Tag as string, tmpEmailAlertMailAttribs.id, StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception(string.Format("Name: '{0}' is already used, choose a different name", tmpEmailAlertMailAttribs.name.TVal));
+                }
+            }
+        }
+
+        private List<int> GetLicensedProductIdList()
+        {
+            string generalStream = string.Empty;
+            m_CommLink.GetSoftwareLicenseInfoForAll(ref generalStream);
+            Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfoAttrib = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_LicenseInfoAttribs();
+            licInfoAttrib.AssignMembersFromStream(generalStream);
+
+            List<int> licenseIdList = new List<int>();
+            licenseIdList.Add(-1);
+            foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductInfoAttribs prodInfo in licInfoAttrib.productList.TVal)
+                licenseIdList.Add((int)prodInfo.productID.TVal);
+
+            return licenseIdList;
+        }
+        private List<int> GetAllProductIdList()
+        {
+            List<int> allIdList = new List<int>();  // Look at software spec to find ALL the products...
+            allIdList.Add(-1);
+            foreach (UInt32 productID in m_CommLink.SoftwareSpec.productSpecMap.TVal.Keys)
+                allIdList.Add((int)productID);
+            return allIdList;
+        }
+        private string GetProductName(int _productID)
+        {
+            return (_productID == -1) ? "Solimar License Server" : m_CommLink.GetProductName(_productID);
+        }
+
+        private void emailAlert_NewAlert(object sender, EventArgs e)
+        {
+            using (EditEmailAlertDialog dialog = new EditEmailAlertDialog(
+                GetProductName,
+                ValidateEmailAlertName,
+                this.m_imageList))
+            {
+                try
+                {
+                    if (m_CommLink.bDiagnosticDateView)
+                        throw new Exception(DIAGNOSTIC_DATA_ERROR);
+
+                    if (ensureMailServerIsConfigured())
+                    {
+                        Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailAlertAttribs = new Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs();
+
+                        SolimarLicenseViewer.EditEmailAlertDialog.EditEmailAlertDialogData data = new EditEmailAlertDialog.EditEmailAlertDialogData(
+                            emailAlertAttribs,
+                            //GetAllProductIdList(),
+                            GetLicensedProductIdList().ToArray()
+                            );
+
+                        dialog.SetData(data, this.m_CommLink.bDiagnosticDateView);
+
+                        if (dialog.ShowDialog() == DialogResult.OK)
+                        {
+                            Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailData = dialog.GetData();
+                            string emailAlertId = string.Empty;
+                            m_CommLink.AddEmailAlert(emailData.ToString(), ref emailAlertId);
+
+                            RefreshEmailAlertData(null, null);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+
+        }
+        private void emailAlert_EditAlert(object sender, EventArgs e)
+        {
+            if (this.TheListView.SelectedItems.Count > 0)
+            {
+                try
+                {
+                    if (ensureMailServerIsConfigured())
+                    {
+                        ListViewItem selLvi = this.TheListView.SelectedItems[0];
+                        string emailAlertId = selLvi.Tag as string;
+
+                        string streamedAttribs = string.Empty;
+                        m_CommLink.GetEmailAlert(emailAlertId, ref streamedAttribs);
+
+                        Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailAlertAttribs = new Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs();
+                        emailAlertAttribs.AssignMembersFromStream(streamedAttribs);
+
+                        using (EditEmailAlertDialog dialog = new EditEmailAlertDialog(
+                            GetProductName,
+                            ValidateEmailAlertName,
+                            this.m_imageList))
+                        {
+                            SolimarLicenseViewer.EditEmailAlertDialog.EditEmailAlertDialogData data = new EditEmailAlertDialog.EditEmailAlertDialogData(
+                                emailAlertAttribs,
+                                //GetAllProductIdList(),
+                                GetLicensedProductIdList().ToArray()
+                                );
+
+                            dialog.SetData(data, this.m_CommLink.bDiagnosticDateView);
+
+                            if (dialog.ShowDialog() == DialogResult.OK)
+                            {
+                                if (m_CommLink.bDiagnosticDateView == false)
+                                {
+                                    Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_EmailAlertMailAttribs emailData = dialog.GetData();
+                                    m_CommLink.SetEmailAlert(emailData.id.TVal, emailData.ToString());
+
+                                    RefreshEmailAlertData(null, null);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+        }
+        private void emailAlert_DeleteAlert(object sender, EventArgs e)
+        {
+            if (this.TheListView.SelectedItems.Count > 0)
+            {
+                try
+                {
+                    if (m_CommLink.bDiagnosticDateView)
+                        throw new Exception(DIAGNOSTIC_DATA_ERROR);
+
+                    ListViewItem selLvi = this.TheListView.SelectedItems[0];
+                    string deleteQuestion = string.Format("Are you sure you want to delete the E-mail Alert \'{0}\'?", selLvi.Text);
+                    if (MessageBox.Show(deleteQuestion, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                    {
+                        m_CommLink.DeleteEmailAlert(selLvi.Tag as string);
+                        RefreshEmailAlertData(null, null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+        }
+        private void ConfigureMailServer(object obj)
+        {
+            emailAlert_EditMailServer(null, null);
+        }
+        private void TestMailServer(string _testMailAttribsStreamed)
+        {
+            m_CommLink.TestMailServerInfo(_testMailAttribsStreamed);
+        }
+        private List<string> previousRecipientList = new List<string>();
+        private void emailAlert_TestMailServer(object sender, EventArgs e)
+        {
+            using (TestMailServerDialog dialog = new TestMailServerDialog(TestMailServer, ConfigureMailServer))
+            {
+                try
+                {
+                    if (m_CommLink.bDiagnosticDateView)
+                        throw new Exception(DIAGNOSTIC_DATA_ERROR);
+
+                    if (ensureMailServerIsConfigured())
+                    {
+                        string mailServerInfoStream = string.Empty;
+                        m_CommLink.GetMailServerInfo(ref mailServerInfoStream);
+
+                        Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs mailServerAttribs = new Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs();
+                        mailServerAttribs.AssignMembersFromStream(mailServerInfoStream);
+                        dialog.SetData(this.previousRecipientList);
+                        if (dialog.ShowDialog() == DialogResult.OK)
+                        {
+                            this.previousRecipientList = (List<string>)dialog.GetData();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+        }
+
+        public bool ensureMailServerIsConfigured()
+        {
+            return ensureMailServerIsConfigured(false);
+        }
+        private bool ensureMailServerIsConfigured(bool bBypassEmptyMailServerCheck)
+        {
+            DialogResult dialogResult = DialogResult.OK;
+
+            using (EditMailServerDialog dialog = new EditMailServerDialog())
+            {
+                try
+                {
+                    string mailServerInfoStream = string.Empty;
+                    m_CommLink.GetMailServerInfo(ref mailServerInfoStream);
+
+                    Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs mailServerAttribs = new Solimar.Licensing.Attribs.Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs();
+                    mailServerAttribs.AssignMembersFromStream(mailServerInfoStream);
+
+                    bool bEditMailServer = (mailServerAttribs.mailServerName.TVal.Length == 0) || bBypassEmptyMailServerCheck;
+
+                    if (mailServerAttribs.mailServerName.TVal.Length == 0)
+                        MessageBox.Show("The Mail Server must be configured before continuing.");
+
+                    if (bEditMailServer)
+                    {
+                        dialog.SetData(mailServerAttribs, m_CommLink.bDiagnosticDateView);
+                        dialogResult = dialog.ShowDialog();
+                        if (dialogResult == DialogResult.OK)
+                        {
+                            if (m_CommLink.bDiagnosticDateView == false)
+                            {
+                                mailServerAttribs = dialog.GetData();
+                                m_CommLink.SetMailServerInfo(mailServerAttribs.ToString());
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HandleExceptions.DisplayException(ex);
+                }
+            }
+            return (dialogResult == DialogResult.OK);
+        }
+
+        private void emailAlert_EditMailServer(object sender, EventArgs e)
+        {
+            ensureMailServerIsConfigured(true);
+        }
+        private void emailAlert_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Insert)
+                emailAlert_NewAlert(this.TheListView, new EventArgs());
+            else if (e.KeyCode == Keys.Enter)
+                emailAlert_EditAlert(this.TheListView, new EventArgs());
+            else if (e.KeyCode == Keys.Delete)
+                emailAlert_DeleteAlert(this.TheListView, new EventArgs());
+            else
+                e.Handled = false;
+        }
+        private void emailAlert_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bool bSelected = this.TheListView.SelectedItems.Count > 0;
+            foreach (ToolStripItem tsItem in this.TheListViewToolStrip.Items)
+            {
+                if (tsItem is ToolStripButton)
+                {
+                    if (
+                        string.Equals(tsItem.Text, AppConstants.EmailAlertEditSB, StringComparison.InvariantCultureIgnoreCase) ||
+                        string.Equals(tsItem.Text, AppConstants.EmailAlertDeleteTSB, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        tsItem.Enabled = bSelected;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region ListViewColumn Methods
         /// <summary>
         /// Force the ListView to be sorted by a given column and sortOrder
@@ -2576,6 +3051,8 @@ namespace SolimarLicenseViewer
         /// </summary>
         //private Boolean m_EnableDisasterRecoverExt;
 
+        private ImageList m_imageList;
+
         private Dictionary<string, List<ToolStripItem>> m_toolStripList;
         private ToolStripComboBox m_moduleFilterComboBox;
         //private ToolStripButton m_moduleGroupByTSButton;
@@ -2656,33 +3133,21 @@ namespace SolimarLicenseViewer
                         }
                         else if (InternalSortType == typeof(System.DateTime))
                         {
-                            DateTime? d1 = null;
-                            DateTime? d2 = null;
-                            try
-                            {
-                                d1 = Convert.ToDateTime(itemX);
-                            }
-                            catch (Exception)
-                            {
-                                compareResult = -1;
-                            }
-                            try
-                            {
-                                d2 = Convert.ToDateTime(itemY);
-                            }
-                            catch (Exception)
-                            {
-                                compareResult = 1;
-                            }
-                            if (d1 != null && d2 != null)
-                            {
-                                compareResult = DateTime.Compare(Convert.ToDateTime(itemX), Convert.ToDateTime(itemY));
-                            }
-                            if (d1 == null && d2 == null)
-                            {
-                                //compareResult = 0;
+                            DateTime d1;
+                            DateTime d2;
+
+                            bool bD1IsDate = DateTime.TryParse(itemX, out d1);
+                            bool bD2IsDate = DateTime.TryParse(itemY, out d2);
+
+                            if (bD1IsDate && bD2IsDate)
+                                compareResult = DateTime.Compare(d1, d2);
+                            else if (!bD1IsDate && !bD2IsDate)
                                 compareResult = String.Compare(itemX, itemY);
-                            }
+                            else if (!bD1IsDate && bD2IsDate)
+                                compareResult = -1;
+                            else if (bD1IsDate && !bD2IsDate)
+                                compareResult = 1;
+
                             bCalculatedCompareResult = true;
                         }
                     }

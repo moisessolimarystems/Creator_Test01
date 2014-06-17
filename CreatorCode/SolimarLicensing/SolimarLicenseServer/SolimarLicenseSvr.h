@@ -192,8 +192,6 @@ __interface ISolimarSoftwareLicenseSvr2 : ISolimarSoftwareLicenseSvr
 {
    [id(115),helpstring("method SoftwareAddApplicationInstanceByProduct2")] HRESULT SoftwareAddApplicationInstanceByProduct2([in] long productID, [in] BSTR applicationInstance, [in] long flags);
    [id(116),helpstring("method SoftwareGetApplicationInstanceListByProduct2")] HRESULT SoftwareGetApplicationInstanceListByProduct2([in] long productID, [out,retval] BSTR *pBstrListUsAppInstInfoAttribs);
-   
-   //[id(116),helpstring("method SoftwareGetApplicationInstanceListByProduct2")] HRESULT SoftwareGetApplicationInstanceListByProduct2([in] long productID, [out] BSTR *pBstrListAppInstStream, [out,retval] BSTR *pBstrListAppInstFlagsStream);
 };
 
 
@@ -208,6 +206,37 @@ __interface ISolimarConversionToSoftwareLicenseSvr : IDispatch
 	[id(113),helpstring("method ConvertProtectionKeyToSoftwareLicense")] HRESULT ConvertProtectionKeyToSoftwareLicense([in] BSTR softwareLicense, [in] BSTR keyIdent);
 };
 
+// ISolimarLicenseEmailAlert
+[
+	object,
+	uuid("64BF79C5-F816-439d-80D6-EBB7296BC803"),
+	dual,	helpstring("ISolimarLicenseEmailAlert Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseEmailAlert : IDispatch
+{
+	[id(117),helpstring("method GetMailServerInfo")] HRESULT GetMailServerInfo([out,retval] BSTR *pBstrAlertMailServerAttribsStream);
+	[id(118),helpstring("method SetMailServerInfo")] HRESULT SetMailServerInfo([in] BSTR bstrAlertMailServerAttribsStream);
+	[id(119),helpstring("method TestMailServerInfo")] HRESULT TestMailServerInfo([in] BSTR bstrTestMailServerAttribsStream);
+	[id(120),helpstring("method GetAllEmailAlerts")] HRESULT GetAllEmailAlerts([out,retval] BSTR *pBstrEmailAlertMailAttribsListStream);
+	[id(121),helpstring("method GetEmailAlert")] HRESULT GetEmailAlert([in] BSTR bstrEmailAlertId, [out,retval] BSTR *pBstrEmailAlertMailAttribsStream);
+	[id(122),helpstring("method SetEmailAlert")] HRESULT SetEmailAlert([in] BSTR bstrEmailAlertId, [in] BSTR bstrEmailAlertMailAttribsStream);
+	[id(123),helpstring("method AddEmailAlert")] HRESULT AddEmailAlert([in] BSTR bstrEmailAlertMailAttribsStream, [out,retval] BSTR *pBstrEmailAlertId);
+	[id(124),helpstring("method DeleteEmailAlert")] HRESULT DeleteEmailAlert([in] BSTR bstrEmailAlertId);
+};
+
+// ISolimarSoftwareLicenseSvr3
+[
+	object,
+	uuid("0C0E18D9-DB58-49bf-8049-491601DFD84E"),
+	dual,	helpstring("ISolimarSoftwareLicenseSvr3 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarSoftwareLicenseSvr3 : ISolimarSoftwareLicenseSvr2
+{
+   [id(125),helpstring("method GenerateStreamData_ByLicenseSystemData2")] HRESULT GenerateStreamData_ByLicenseSystemData2([in] VARIANT vtLicSysDataPacket, [out] BSTR *pBstrCreatedDateStreamed, [out] BSTR *pBstrKeyAttribsListStream, [out] BSTR *pBstrLicUsageDataAttribsStream, [out] BSTR *pBstrConnectionAttribsListStream, [out] BSTR *pBstrEventLogAttribsListStream, [out] BSTR *pBstrLicInfoDataAttribsListStream, [out,retval] BSTR *pBstrLicAlertInfoAttribs);
+   [id(126),helpstring("method GenerateLicenseSystemDataForSolimar")] HRESULT GenerateLicenseSystemDataForSolimar();
+};
 
 // CSolimarLicenseSvr
 
@@ -223,8 +252,9 @@ __interface ISolimarConversionToSoftwareLicenseSvr : IDispatch
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
 	public ISolimarLicenseSvr4, 
-	public ISolimarSoftwareLicenseSvr2,
+	public ISolimarSoftwareLicenseSvr3,
 	public ISolimarConversionToSoftwareLicenseSvr,
+	public ISolimarLicenseEmailAlert,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ISoftwareLicensingMessage,
@@ -469,6 +499,20 @@ public:
 	// ISolimarConversionToSoftwareLicenseSvr
 	//if softwareLicense is L"", will try to add to first license file it finds, if it can't find one then will create new license file.
 	STDMETHOD(ConvertProtectionKeyToSoftwareLicense)(BSTR softwareLicense, BSTR keyIdent);
+
+	// ISolimarLicenseEmailAlert
+	STDMETHOD(GetMailServerInfo)(BSTR *pBstrAlertMailServerAttribsStream);
+	STDMETHOD(SetMailServerInfo)(BSTR bstrAlertMailServerAttribsStream);
+	STDMETHOD(TestMailServerInfo)(BSTR bstrTesTMailServerAttribsStream);
+	STDMETHOD(GetAllEmailAlerts)(BSTR *pBstrEmailAlertMailAttribsListStream);
+	STDMETHOD(GetEmailAlert)(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream);
+	STDMETHOD(SetEmailAlert)(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream);
+	STDMETHOD(AddEmailAlert)(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId);
+	STDMETHOD(DeleteEmailAlert)(BSTR bstrEmailAlertId);
+
+	// ISolimarSoftwareLicenseSvr3
+	STDMETHOD(GenerateStreamData_ByLicenseSystemData2)(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream, BSTR *pBstrLicAlertInfoAttribs);
+	STDMETHOD(GenerateLicenseSystemDataForSolimar)();
 private:
 
 	// Connection to the License Server via CocreateInstance will have a different m_licenseId.

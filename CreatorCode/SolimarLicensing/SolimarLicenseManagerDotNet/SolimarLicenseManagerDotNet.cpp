@@ -1652,6 +1652,14 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 		return ;
 	}
 
+	void SolimarLicenseServerWrapper::GenerateLicenseSystemDataForSolimar()
+	{
+		HRESULT hrResult = m_pLicenseServerWrapper->GenerateLicenseSystemDataForSolimar();
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return ;
+	}
+
 	//throws an exception on a failure, 
 	String^ SolimarLicenseServerWrapper::GenerateStreamData_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refEventLogAttribsListStream, String^% refConnectionAttribsListStream)
 	{
@@ -1713,6 +1721,72 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 
 		return retLicInfoAttribsListStream;
+	}
+
+	//throws an exception on a failure, returns LicAlertInfoAttribs on success.
+	String^ SolimarLicenseServerWrapper::GenerateStreamData_ByLicenseSystemData2(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refEventLogAttribsListStream, String^% refConnectionAttribsListStream, String^% refLicInfoAttribsListStream)
+	{
+		String^ retLicAlertInfoAttribsStream = "";
+		HRESULT hrResult = S_OK;
+		BSTR bstrLicInfoAttribsListStream;
+		BSTR bstrModifiedDateStreamedStream;
+		BSTR bstrKeyAttribsListStream;
+		BSTR bstrLicUsageDataAttribsStream;
+		BSTR bstrConnectionAttribsListStream;
+		BSTR bstrEventLogAttribsListStream;
+		BSTR bstrLicAlertInfoAttribsStream;
+
+		_variant_t vtLicInfoAttribsListPacket;
+		VariantInit(&vtLicInfoAttribsListPacket);
+
+		try
+		{
+			// package the string in to a variant
+			vtLicInfoAttribsListPacket.vt = VT_ARRAY | VT_UI1;
+			vtLicInfoAttribsListPacket.parray = SafeArrayCreateVector(VT_UI1, 0, (byteLicSysDataPacket->Length+1)*sizeof(wchar_t));
+
+			BYTE *pPacket = 0;
+			hrResult = SafeArrayAccessData(vtLicInfoAttribsListPacket.parray, (void**)&pPacket);
+			if (FAILED(hrResult)) 
+				throw hrResult;
+
+			{
+			pin_ptr<Byte> pSrcPinned = &byteLicSysDataPacket[0];
+			memcpy(pPacket, pSrcPinned, (byteLicSysDataPacket->Length+1)*sizeof(wchar_t));
+			}
+
+			SafeArrayUnaccessData(vtLicInfoAttribsListPacket.parray);
+			
+			hrResult = m_pLicenseServerWrapper->GenerateStreamData_ByLicenseSystemData2(vtLicInfoAttribsListPacket, &bstrModifiedDateStreamedStream, &bstrKeyAttribsListStream, &bstrLicUsageDataAttribsStream, &bstrConnectionAttribsListStream, &bstrEventLogAttribsListStream, &bstrLicInfoAttribsListStream, &bstrLicAlertInfoAttribsStream);
+			if(FAILED(hrResult)) 
+				throw hrResult;
+			retLicAlertInfoAttribsStream = gcnew String(bstrLicAlertInfoAttribsStream);
+			refLicInfoAttribsListStream = gcnew String(bstrLicInfoAttribsListStream);
+			refKeyAttribsListStream = gcnew String(bstrKeyAttribsListStream);
+			refLicUsageDataAttribsStream = gcnew String(bstrLicUsageDataAttribsStream);
+			refConnectionAttribsListStream = gcnew String(bstrConnectionAttribsListStream);
+			refEventLogAttribsListStream = gcnew String(bstrEventLogAttribsListStream);
+			refModifiedDateStreamed = gcnew String(bstrModifiedDateStreamedStream);
+		}
+		catch(HRESULT &ehr)
+		{
+			hrResult = ehr;
+		}
+
+		// cleanup section
+		VariantClear(&vtLicInfoAttribsListPacket);
+		SysFreeString(bstrLicAlertInfoAttribsStream);
+		SysFreeString(bstrConnectionAttribsListStream);
+		SysFreeString(bstrKeyAttribsListStream);
+		SysFreeString(bstrLicUsageDataAttribsStream);
+		SysFreeString(bstrLicInfoAttribsListStream);
+		SysFreeString(bstrEventLogAttribsListStream);
+		SysFreeString(bstrModifiedDateStreamedStream);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return retLicAlertInfoAttribsStream;
 	}
 
 	//throws an exception on a failure, 
@@ -1786,6 +1860,174 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 		if(FAILED(hrResult))
 			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
 		return retValueStream;
+	}
+
+	String^ SolimarLicenseServerWrapper::GetMailServerInfo()
+	{
+		HRESULT hrResult = S_OK;
+		String^ retValueStream = "";
+		BSTR bstrMailServerAttribsStream;
+		try
+		{
+			hrResult = m_pLicenseServerWrapper->GetMailServerInfo(&bstrMailServerAttribsStream);
+			if(FAILED(hrResult)) 
+				throw hrResult;
+			retValueStream = gcnew String(bstrMailServerAttribsStream);
+		}
+		catch(HRESULT &ehr)
+		{
+			hrResult = ehr;
+		}
+		SysFreeString(bstrMailServerAttribsStream);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retValueStream;
+	}
+	void SolimarLicenseServerWrapper::SetMailServerInfo(String^ alertMailServerAttribsStream)
+	{
+		BSTR bstrAlertMailServerAttribs;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(alertMailServerAttribsStream));
+		bstrAlertMailServerAttribs = (static_cast<BSTR>(static_cast<void *>(ptr)));
+
+		HRESULT hrResult = m_pLicenseServerWrapper->SetMailServerInfo(bstrAlertMailServerAttribs);
+		
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
+	}
+	void SolimarLicenseServerWrapper::TestMailServerInfo(String^ testMailServerAttribsStream)
+	{
+		BSTR bstrTestMailServerAttribsStream;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(testMailServerAttribsStream));
+		bstrTestMailServerAttribsStream = (static_cast<BSTR>(static_cast<void *>(ptr)));
+
+		HRESULT hrResult = m_pLicenseServerWrapper->TestMailServerInfo(bstrTestMailServerAttribsStream);
+		
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
+	}
+	String^ SolimarLicenseServerWrapper::GetAllEmailAlerts()
+	{
+		HRESULT hrResult = S_OK;
+		String^ retValueStream = "";
+		BSTR bstrAttribsStream;
+		try
+		{
+			hrResult = m_pLicenseServerWrapper->GetAllEmailAlerts(&bstrAttribsStream);
+			if(FAILED(hrResult)) 
+				throw hrResult;
+			retValueStream = gcnew String(bstrAttribsStream);
+		}
+		catch(HRESULT &ehr)
+		{
+			hrResult = ehr;
+		}
+		SysFreeString(bstrAttribsStream);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		return retValueStream;
+	}
+	String^ SolimarLicenseServerWrapper::GetEmailAlert(String^ emailAlertId)
+	{
+		String^ retAttribsStream;
+		BSTR bstrStream;
+		BSTR bstrEmailAlertId;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(emailAlertId));
+		bstrEmailAlertId = (static_cast<BSTR>(static_cast<void *>(ptr)));
+		HRESULT hrResult = m_pLicenseServerWrapper->GetEmailAlert(bstrEmailAlertId, &bstrStream);
+		
+		if(FAILED(hrResult))
+		{
+			//free BSTR
+			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		}
+
+		retAttribsStream = gcnew String(bstrStream);
+		SysFreeString(bstrStream);
+
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		return retAttribsStream;	
+	}
+
+	void SolimarLicenseServerWrapper::SetEmailAlert(String^ emailAlertId, String^ emailAlertMailAttribsStream)
+	{
+		BSTR bstrEmailAlertId;
+		BSTR bstrEmailAlertMailAttribsStream;
+		//convert the string* to a BSTR
+		System::IntPtr ptr1(System::Runtime::InteropServices::Marshal::StringToBSTR(emailAlertId));
+		bstrEmailAlertId = (static_cast<BSTR>(static_cast<void *>(ptr1)));
+		System::IntPtr ptr2(System::Runtime::InteropServices::Marshal::StringToBSTR(emailAlertMailAttribsStream));
+		bstrEmailAlertMailAttribsStream = (static_cast<BSTR>(static_cast<void *>(ptr2)));
+
+		HRESULT hrResult = m_pLicenseServerWrapper->SetEmailAlert(bstrEmailAlertId, bstrEmailAlertMailAttribsStream);
+		
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr1);
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr2);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
+	}
+	String^ SolimarLicenseServerWrapper::AddEmailAlert(String^ emailAlertMailAttribsStream)
+	{
+		String^ retEmailAlertId;
+		BSTR bstrStream;
+		BSTR bstrEmailAlertId;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(emailAlertMailAttribsStream));
+		bstrStream = (static_cast<BSTR>(static_cast<void *>(ptr)));
+		HRESULT hrResult = m_pLicenseServerWrapper->AddEmailAlert(bstrStream, &bstrEmailAlertId);
+		
+		if(FAILED(hrResult))
+		{
+			//free BSTR
+			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		}
+
+		retEmailAlertId = gcnew String(bstrEmailAlertId);
+		SysFreeString(bstrStream);
+
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		return retEmailAlertId;	
+	}
+	void SolimarLicenseServerWrapper::DeleteEmailAlert(String^ emailAlertId)
+	{
+		BSTR bstrEmailAlertId;
+		//convert the string* to a BSTR
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(emailAlertId));
+		bstrEmailAlertId = (static_cast<BSTR>(static_cast<void *>(ptr)));
+
+		HRESULT hrResult = m_pLicenseServerWrapper->DeleteEmailAlert(bstrEmailAlertId);
+		
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		if(FAILED(hrResult))
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+
+		return ;
 	}
 
 	void SolimarLicenseServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber)

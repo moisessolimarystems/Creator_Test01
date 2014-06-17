@@ -373,12 +373,30 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateLicenseSys
 	}
 	return hr;
 }
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateLicenseSystemDataForSolimar()
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr3, licenseSoftwareServer, GenerateLicenseSystemDataForSolimar, (), hr);
+	}
+	return hr;
+}
 HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream)
 {
 	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
 	if(bConnected)
 	{
 		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GenerateStreamData_ByLicenseSystemData, (vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrEventLogAttribsListStream, pBstrLicInfoDataAttribsListStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GenerateStreamData_ByLicenseSystemData2(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream, BSTR *pBstrLicAlertInfoAttribs)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr3, licenseSoftwareServer, GenerateStreamData_ByLicenseSystemData2, (vtLicSysDataPacket, pBstrCreatedDateStreamed, pBstrKeyAttribsListStream, pBstrLicUsageDataAttribsStream, pBstrConnectionAttribsListStream, pBstrEventLogAttribsListStream, pBstrLicInfoDataAttribsListStream, pBstrLicAlertInfoAttribs), hr);
 	}
 	return hr;
 }
@@ -398,6 +416,79 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GetEventLogList_Fo
 	if(bConnected)
 	{
 		LIC_SSLSERVER_FTCALL_HR(licenseSoftwareServer, GetEventLogList_ForLicenseServer, (pBstrEventLogAttribsListStream), hr);
+	}
+	return hr;
+}
+
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GetMailServerInfo(BSTR *pBstrAlertMailServerAttribsStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, GetMailServerInfo, (pBstrAlertMailServerAttribsStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SetMailServerInfo(BSTR bstrAlertMailServerAttribsStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, SetMailServerInfo, (bstrAlertMailServerAttribsStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::TestMailServerInfo(BSTR bstrTestMailServerAttribsStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, TestMailServerInfo, (bstrTestMailServerAttribsStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GetAllEmailAlerts(BSTR *pBstrEmailAlertMailAttribsListStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, GetAllEmailAlerts, (pBstrEmailAlertMailAttribsListStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::GetEmailAlert(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, GetEmailAlert, (bstrEmailAlertId, pBstrEmailAlertMailAttribsStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SetEmailAlert(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, SetEmailAlert, (bstrEmailAlertId, bstrEmailAlertMailAttribsStream), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, AddEmailAlert, (bstrEmailAlertMailAttribsStream, pBstrEmailAlertId), hr);
+	}
+	return hr;
+}
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::DeleteEmailAlert(BSTR bstrEmailAlertId)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarLicenseEmailAlert, licenseSoftwareServer, DeleteEmailAlert, (bstrEmailAlertId), hr);
 	}
 	return hr;
 }

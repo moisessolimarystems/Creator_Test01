@@ -331,15 +331,29 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 
 			//throws an exception on a failure
 			void GenerateLicenseSystemData(array<Byte>^% refByteLicSysDataPacket);
+
+			void GenerateLicenseSystemDataForSolimar();
 			
 			//throws an exception on a failure, returns licenseInfoAttribsStream on success.
 			String^ GenerateStreamData_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refEventLogAttribsListStream, String^% refConnectionAttribsListStream);
+
+			//throws an exception on a failure, returns LicAlertInfoAttribs on success.
+			String^ GenerateStreamData_ByLicenseSystemData2(array<Byte>^ byteLicSysDataPacket, String^% refModifiedDateStreamed, String^% refKeyAttribsListStream, String^% refLicUsageDataAttribsStream, String^% refEventLogAttribsListStream, String^% refConnectionAttribsListStream, String^% refLicInfoDataAttribsListStream);
 
 			//throws an exception on a failure, returns licenseInfoAttribsStream on success.
 			String^ GenerateStream_ByLicenseSystemData(array<Byte>^ byteLicSysDataPacket);
 
 			//throws an exception on a failure, 
 			String^ GetEventLogList_ForLicenseServer();
+
+			String^ GetMailServerInfo();
+			void SetMailServerInfo(String^ alertMailServerAttribsStream);
+			void TestMailServerInfo(String^ testMailServerAttribsStream);
+			String^ GetAllEmailAlerts();
+			String^ GetEmailAlert(String^ emailAlertId);
+			void SetEmailAlert(String^ emailAlertId, String^ emailAlertMailAttribsStream);
+			String^ AddEmailAlert(String^ emailAlertMailAttribsStream);
+			void DeleteEmailAlert(String^ emailAlertId);
 
 			void SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber);
 

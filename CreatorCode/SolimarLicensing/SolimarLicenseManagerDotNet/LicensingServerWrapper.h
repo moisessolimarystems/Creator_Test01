@@ -17,6 +17,21 @@
 namespace SolimarLicenseManagerWrapper
 {
 	/*
+	 * LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR
+	 *	Fault tolerant call for interfaceType
+	 */
+	#define LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(interfaceType, sslSever, func, plist, hr) \
+	{ \
+		interfaceType *pSolimarLicenseInterface; \
+		hr = sslSever->QueryInterface(__uuidof(interfaceType), (void**)&pSolimarLicenseInterface); \
+		if (SUCCEEDED(hr)) \
+		{ \
+			LIC_SSLSERVER_FTCALL_HR(pSolimarLicenseInterface, func, plist, hr); \
+			pSolimarLicenseInterface->Release(); \
+		} \
+	} \
+
+	/*
 	 * LIC_SSLSERVER_FTCALL 
 	 *	Fault tolerant call for ISolimarSoftwareLicenseSvr
 	 */
@@ -111,12 +126,23 @@ namespace SolimarLicenseManagerWrapper
 			HRESULT GenerateLicPackage_BySoftwareLicArchive(VARIANT vtLicenseArchive, BSTR *pBstrLicensePackageAttribsStream);
 			HRESULT GenerateLicPackage_BySoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pBstrLicensePackageAttribsStream);
 			HRESULT GenerateLicenseSystemData(VARIANT* pVtLicSysDataPacket);
+			HRESULT GenerateLicenseSystemDataForSolimar();
 			HRESULT GenerateStreamData_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream);
+			HRESULT GenerateStreamData_ByLicenseSystemData2(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream, BSTR *pBstrLicAlertInfoAttribs);
 			HRESULT GenerateStream_ByLicenseSystemData(VARIANT vtLicSysDataPacket, BSTR *pBstrLicSysDataAttribsStream);
 
 			HRESULT SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR softwareLicense, BSTR contractNumber);
 
 			HRESULT GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttribsListStream);
+
+			HRESULT GetMailServerInfo(BSTR *pBstrAlertMailServerAttribsStream);
+			HRESULT SetMailServerInfo(BSTR bstrAlertMailServerAttribsStream);
+			HRESULT TestMailServerInfo(BSTR bstrTestMailServerAttribsStream);
+			HRESULT GetAllEmailAlerts(BSTR *pBstrEmailAlertMailAttribsListStream);
+			HRESULT GetEmailAlert(BSTR bstrEmailAlertId, BSTR *pBstrEmailAlertMailAttribsStream);
+			HRESULT SetEmailAlert(BSTR bstrEmailAlertId, BSTR bstrEmailAlertMailAttribsStream);
+			HRESULT AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId);
+			HRESULT DeleteEmailAlert(BSTR bstrEmailAlertId);
 
 			HRESULT KeyEnumerate(VARIANT *pVtKeyList);
 			HRESULT KeyHeaderQuery(BSTR bstrKey, long headerIdent, VARIANT *pVtValue);
