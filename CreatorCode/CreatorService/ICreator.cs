@@ -157,6 +157,9 @@ namespace Service.Creator
         void CreateTransaction(TransactionTable tt);
 
         [OperationContract()]
+        void CreateAllTransactions(IList<TransactionTable> ttList);
+
+        [OperationContract()]
         void UpdateTransaction(TransactionTable tt);
 
         [OperationContract()]

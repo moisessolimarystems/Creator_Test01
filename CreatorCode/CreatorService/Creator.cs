@@ -564,6 +564,13 @@ namespace Service.Creator
         {
             TransactionTable.CreateTransaction(tt);
         }
+
+        [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
+        public void CreateAllTransactions(IList<TransactionTable> ttList)
+        {
+            TransactionTable.CreateAllTransactions(ttList);
+        }
+
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void UpdateTransaction(TransactionTable tt)
         {

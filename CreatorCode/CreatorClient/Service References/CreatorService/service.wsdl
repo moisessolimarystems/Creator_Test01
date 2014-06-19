@@ -21,6 +21,12 @@
       <xsd:import namespace="http://schemas.datacontract.org/2004/07/Solimar.Licensing.LicenseManagerWrapper" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICreator_CreateToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateToken" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_UpdateToken_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateToken" />
   </wsdl:message>
@@ -249,6 +255,12 @@
   <wsdl:message name="ICreator_CreateTransaction_OutputMessage">
     <wsdl:part name="parameters" element="tns:CreateTransactionResponse" />
   </wsdl:message>
+  <wsdl:message name="ICreator_CreateAllTransactions_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateAllTransactions" />
+  </wsdl:message>
+  <wsdl:message name="ICreator_CreateAllTransactions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateAllTransactionsResponse" />
+  </wsdl:message>
   <wsdl:message name="ICreator_UpdateTransaction_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateTransaction" />
   </wsdl:message>
@@ -422,12 +434,6 @@
   </wsdl:message>
   <wsdl:message name="ICreator_GetNextHardwareTokenValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetNextHardwareTokenValueResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_CreateToken_InputMessage">
-    <wsdl:part name="parameters" element="tns:CreateToken" />
-  </wsdl:message>
-  <wsdl:message name="ICreator_CreateToken_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CreateTokenResponse" />
   </wsdl:message>
   <wsdl:message name="ICreator_GetAllCustomers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAllCustomers" />
@@ -646,6 +652,10 @@
     <wsdl:part name="parameters" element="tns:UpdatePacketsResponse" />
   </wsdl:message>
   <wsdl:portType name="ICreator">
+    <wsdl:operation name="CreateToken">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="UpdateToken">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateToken" message="tns:ICreator_UpdateToken_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTokenResponse" message="tns:ICreator_UpdateToken_OutputMessage" />
@@ -798,6 +808,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateTransaction" message="tns:ICreator_CreateTransaction_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTransactionResponse" message="tns:ICreator_CreateTransaction_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="CreateAllTransactions">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateAllTransactions" message="tns:ICreator_CreateAllTransactions_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateAllTransactionsResponse" message="tns:ICreator_CreateAllTransactions_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="UpdateTransaction">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/UpdateTransaction" message="tns:ICreator_UpdateTransaction_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/UpdateTransactionResponse" message="tns:ICreator_UpdateTransaction_OutputMessage" />
@@ -913,10 +927,6 @@
     <wsdl:operation name="GetNextHardwareTokenValue">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValue" message="tns:ICreator_GetNextHardwareTokenValue_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICreator/GetNextHardwareTokenValueResponse" message="tns:ICreator_GetNextHardwareTokenValue_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="CreateToken">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICreator/CreateToken" message="tns:ICreator_CreateToken_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICreator/CreateTokenResponse" message="tns:ICreator_CreateToken_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAllCustomers">
       <wsdl:input wsaw:Action="http://tempuri.org/ICreator/GetAllCustomers" message="tns:ICreator_GetAllCustomers_InputMessage" />
@@ -1067,6 +1077,15 @@
     <wsp:PolicyReference URI="#CreatorServiceTcp_policy">
     </wsp:PolicyReference>
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="CreateToken">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateToken" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="UpdateToken">
       <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateToken" style="document" />
       <wsdl:input>
@@ -1409,6 +1428,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="CreateAllTransactions">
+      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateAllTransactions" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="UpdateTransaction">
       <soap12:operation soapAction="http://tempuri.org/ICreator/UpdateTransaction" style="document" />
       <wsdl:input>
@@ -1663,15 +1691,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetNextHardwareTokenValue">
       <soap12:operation soapAction="http://tempuri.org/ICreator/GetNextHardwareTokenValue" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CreateToken">
-      <soap12:operation soapAction="http://tempuri.org/ICreator/CreateToken" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

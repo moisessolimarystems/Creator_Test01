@@ -61,6 +61,16 @@ namespace CreatorData
             }
         }
 
+        public static void CreateAllTransactions(IList<TransactionTable> transactions)
+        {
+            using (CreatorDataContext db = new CreatorDataContext())
+            {
+                db.TransactionTables.InsertAllOnSubmit(transactions);
+                db.SubmitChanges();
+            }
+        }
+
+
         public static void UpdateTransaction(TransactionTable transaction)
         {
             using (CreatorDataContext db = new CreatorDataContext())
