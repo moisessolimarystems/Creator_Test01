@@ -101,23 +101,28 @@ HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream
 				// Message
 				uOffset = pevlr->StringOffset;
 				dataSize = pevlr->DataOffset - pevlr->StringOffset;
-				pTmpString = (LPBYTE)GlobalAlloc(GPTR, dataSize * sizeof(BYTE));
-				if(pTmpString != 0)
+				// CR.FIX.18075 - Fixed an issue when event log message was empty (dataSize==0), uninitialized data was trying to 
+				// be accessed, thus causing License Server to crash if uninitialized data was invalid data for StringUtils::WstringToString
+				std::wstring wTmpString = L"";
+				if (dataSize > 0)
 				{
-					memcpy(pTmpString, (LPBYTE)pevlr + uOffset, dataSize);
-					std::wstring wTmpString = std::wstring((wchar_t*)pTmpString);
-					GlobalFree(pTmpString);
-					pTmpString = 0;
-
-					// CR.FIX.13703.v2 - It is possible for binary data to be in the msg.  In those cases, can not 
-					//get proper msg from event log.
-					long errorNo = 0;
-					StringUtils::WstringToString(wTmpString, &errorNo);
-					if(errorNo == EILSEQ)	//Cannot convert wide string to a multibyte character, assume binary data
-						tmpEventLogEntryInfo.message = std::wstring(L"Can not retrieve Event Log Message");
-					else
-						tmpEventLogEntryInfo.message = SpdUtils::XmlEscapeString(SpdUtils::ConvertNonPrintableToHex(wTmpString));
+					pTmpString = (LPBYTE)GlobalAlloc(GPTR, dataSize * sizeof(BYTE));
+					if(pTmpString != 0)
+					{
+						memcpy(pTmpString, (LPBYTE)pevlr + uOffset, dataSize);
+						wTmpString = std::wstring((wchar_t*)pTmpString);
+						GlobalFree(pTmpString);
+						pTmpString = 0;
+					}
 				}
+				// CR.FIX.13703.v2 - It is possible for binary data to be in the msg.  In those cases, can not 
+				// get proper msg from event log.
+				long errorNo = 0;
+				StringUtils::WstringToString(wTmpString, &errorNo);
+				if(errorNo == EILSEQ)	//Cannot convert wide string to a multibyte character, assume binary data
+					tmpEventLogEntryInfo.message = std::wstring(L"Can not retrieve Event Log Message");
+				else
+					tmpEventLogEntryInfo.message = SpdUtils::XmlEscapeString(SpdUtils::ConvertNonPrintableToHex(wTmpString));
 
 
 				// Source
