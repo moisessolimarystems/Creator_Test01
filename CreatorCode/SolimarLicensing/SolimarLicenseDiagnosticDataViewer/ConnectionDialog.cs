@@ -91,7 +91,7 @@ namespace SolimarLicenseDiagnosticDataViewer
         private void general_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                cancelButton_Click(sender, new EventArgs());
+                cancelButton_Click(sender, EventArgs.Empty);
         }
 	}
 }

@@ -221,7 +221,16 @@ namespace SolimarLicenseViewer
                     messageDialog.Update();
 
                     //create treeview manager
-                    m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.lvToolStrip, this.bottomNoFlickerListView, this.bottomLvToolStrip, this.bottomEventLogEntryControl1, m_CommLink);
+                    m_listViewMgr = new ListViewMgr(
+                        this.infoSplitContainer, 
+                        this.noFlickerListView, 
+                        this.lvToolStrip, 
+                        this.bottomNoFlickerListView, 
+                        this.bottomLvToolStrip, 
+                        this.bottomEventLogEntryControl1, 
+                        m_CommLink,
+                        productIconList
+                        );
                     m_listViewMgr.DelUseWaitCursor += new ListViewMgr.ParamBoolReturnsVoid(this.SetWaitCursor);
                     m_listViewMgr.DelTestConnection += new ListViewMgr.ParamListViewItemListReturnsVoid(this.TestConnection);
                     //create listview manager
@@ -405,6 +414,10 @@ namespace SolimarLicenseViewer
             }
         }
 
+        private string ConvertToCsv(string line)
+        {
+            return line.Replace("\"", "\"\"");
+        }
         private void General_KeyDown(object sender, KeyEventArgs e)
         {
             //Alan, you might want to move this into your ListViewMgr.cs, I just threw it in here because I needed some
@@ -424,7 +437,7 @@ namespace SolimarLicenseViewer
                         {
                             if (idx != 0)
                                 strBuilder.Append(", ");
-                            strBuilder.Append(selItem.SubItems[idx].Text);
+                            strBuilder.Append(string.Format("\"{0}\"", ConvertToCsv(selItem.SubItems[idx].Text)));
                         }
                     }
                     Clipboard.SetData(DataFormats.UnicodeText, strBuilder.ToString());
@@ -1004,6 +1017,40 @@ namespace SolimarLicenseViewer
             }
         }
 
+        private void eMailToSolimarSystemsIncToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int major = 0;
+                int minor = 0;
+                int build = 0;
+                this.m_CommLink.GetVersionLicenseServer(this.m_CommLink.ServerName, ref major, ref minor, ref build);
+                if (major < 3 || (major == 3 && minor < 2))
+                {
+                    throw new Exception(string.Format("License Server '{0}' must be at least version 3.2 for this feature.  The server is currenly version {1}.{2}", this.m_CommLink.ServerName, major, minor));
+                }
+
+                string confirmQuestion = "Are you sure you want to e-mail the Diagnostic Data to Solimar Systems, Inc.?";
+                if (MessageBox.Show(confirmQuestion, "Confirm e-mailing to Solimar Systems, Inc.", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                {
+                    this.Cursor = Cursors.WaitCursor;
+                    if (m_listViewMgr.ensureMailServerIsConfigured())
+                    {
+                        m_CommLink.Async_GenerateLicenseSystemDataForSolimar();
+                        MessageBox.Show(this, "Successfully send Diagnostic Data to Solimar Systems, Inc.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleExceptions.DisplayException(this, ex, "Failed to generate License Diagnostic Data and e-mail to Solimar Systems, Inc.", "License System Data");
+            }
+            finally
+            {
+                this.Cursor = Cursors.Default;
+            }
+        }
+
         private void tsUseActivationMenuItem_Click(object sender, EventArgs e)
         {
             if (sender is ToolStripMenuItem)
@@ -1112,7 +1159,6 @@ namespace SolimarLicenseViewer
         public Shared.VisualComponents.BaseMessageDialog messageDialog = null;
 
         #endregion
-
 
         private void remoteConnectToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1242,7 +1288,6 @@ namespace SolimarLicenseViewer
             }
         }
         private Form parentForm = null;
-
 
         #region Background Worker - testConnBackgroundWorker
         private void TestConnection(IList<ListViewItem> _lviList)
@@ -1438,11 +1483,27 @@ namespace SolimarLicenseViewer
 
             errBuilder.Append(paramException.Message);
 
+            string innerExMsg = GetMessageFromInnerException(paramException);
+            if (!string.IsNullOrEmpty(innerExMsg))
+                errBuilder.AppendFormat(" - {0}", innerExMsg);
+
             MessageBox.Show(paramParentForm,
                             errBuilder.ToString(),
                             paramCaptionString,
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Error);
+        }
+        protected static string GetMessageFromInnerException(System.Exception paramException)
+        {
+            StringBuilder sBuilder = new StringBuilder();
+            if (paramException != null)
+            {
+                sBuilder.Append((paramException.InnerException != null) ? paramException.InnerException.Message : string.Empty);
+                string innerExMsg = GetMessageFromInnerException(paramException.InnerException);
+                if (!string.IsNullOrEmpty(innerExMsg))
+                    sBuilder.AppendFormat(" - {0}", innerExMsg);
+            }
+            return sBuilder.ToString();
         }
     }
 }
