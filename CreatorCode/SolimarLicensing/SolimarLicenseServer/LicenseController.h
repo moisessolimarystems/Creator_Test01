@@ -64,6 +64,8 @@ private:
 
 	static const unsigned int HeartbeatCheckThreadPeriod = 60*1000;		//(ms)
 	static const unsigned int HeartbeatKillClientPeriod = 60;			// seconds before a non-responding client's licenses are revolked
+
+	static const unsigned int ProcessAlertEmailThreadPeriod = 60*1000;		//(ms)
 	
 	_bstr_t server_host_name;
 
@@ -88,6 +90,7 @@ private:
 	HANDLE HeartbeatListLock;
 	HANDLE MessageClientListLock;
 	HANDLE PasswordPacketListLock;		//xxx initialize this member
+	HANDLE ProcessAlertEmailLock;
 	
 	HRESULT CheckHealth(); //Checks for mutex deadlocks, if any are hit, will recycle process.
 	
@@ -108,9 +111,22 @@ private:
 
 	// called periodically by the UpdateKeysThread
 	HRESULT UpdateKeys();
+
+	// called periodically to send all alert e-mails that have been queued up.
+	HRESULT ProcessAllAlertEmails();
 	
 	typedef std::vector<_bstr_t> StringList;
 	typedef std::map<_bstr_t, ProtectionKey*> KeyList;
+
+	struct EmailAttribs
+	{
+		long productId;
+		unsigned int eventId;
+		std::wstring message;
+	};
+
+	typedef std::vector<EmailAttribs> EmailAttribsStack;
+	EmailAttribsStack toSendEmailStack;
 	
 	// maps a license_id to a proxy to its LicenseManager's ILicensingManager interface
 	//yyy _COM_SMARTPTR_TYPEDEF(ILicensingMessage,__uuidof(ILicensingMessage));
@@ -126,9 +142,11 @@ private:
 	APCTimer *CheckHealthThread;
 	APCTimer *UpdateKeysThread;
 	APCTimer *HeartbeatCheckThread;
+	APCTimer *ProcessAlertEmailThread;
 	static void CheckHealthThreadFunction(void* pvThis);
 	static void UpdateKeysThreadFunction(void* pvThis);
 	static void HeartbeatCheckThreadFunction(void* pvThis);
+	static void ProcessAlertEmailCheckThreadFunction(void* pvThis);
 
 	static bool InitTimerThreadCB(EInitReason reason, void *pArg) ;
 	virtual void USBEventCallback(LPVOID pContext);		// supports usb device insert/remove notification

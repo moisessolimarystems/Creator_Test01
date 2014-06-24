@@ -43,13 +43,25 @@ void LicenseController::TimesUpThreadFunction(void* pvThis)
 //OutputDebugStringW(L"LicenseController::TimesUpThreadFunction() - Leave");
 }
 
+void LicenseController::ProcessAlertEmailCheckThreadFunction(void* pvThis)
+{
+//	OutputDebugStringW(L"LicenseController::ProcessAlertEmailCheckThreadFunction() - Enter");
+
+	HRESULT hr = S_OK;
+	LicenseController *pThis = (LicenseController*)pvThis;
+	hr = pThis->ProcessAllAlertEmails();
+
+//	OutputDebugStringW(L"LicenseController::ProcessAlertEmailCheckThreadFunction() - Leave");
+}
+
 LicenseController::LicenseController() : 
 	HeartbeatListLock(CreateMutex(0,0,0)), 
 	MessageClientListLock(CreateMutex(0,0,0)),
+	ProcessAlertEmailLock(CreateMutex(0,0,0)),
 	USBNotification(NULL)//USBNotification(this)
 {
 	//wchar_t tmpbuf[1024];
-	//swprintf_s(tmpbuf, 1024, L"LicenseController::LicenseController() - Enter, ThreadID: %d", GetCurrentThreadId());
+	//_snwprintf_s(tmpbuf, _TRUNCATE, 1024, L"LicenseController::LicenseController() - Enter, ThreadID: %d", GetCurrentThreadId());
 	//OutputDebugString(tmpbuf);
 
 	_tzset();
@@ -70,6 +82,7 @@ LicenseController::LicenseController() :
 	UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod, InitTimerThreadCB, this);
 	HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod, InitTimerThreadCB, this);
 	TimesUpThread = new APCTimer(TimesUpThreadFunction, this, TrialKeyDecrementCheckPeriod, InitTimerThreadCB, this);
+	ProcessAlertEmailThread = new APCTimer(ProcessAlertEmailCheckThreadFunction, this, ProcessAlertEmailThreadPeriod, InitTimerThreadCB, this);
 	
 	//UpdateKeysThread = new APCTimer(UpdateKeysThreadFunction, this, UpdateKeysThreadPeriod);
 	//HeartbeatCheckThread = new APCTimer(HeartbeatCheckThreadFunction, this, HeartbeatCheckThreadPeriod);
@@ -133,8 +146,12 @@ LicenseController::~LicenseController()
 		delete HeartbeatCheckThread;
 	if (TimesUpThread)
 		delete TimesUpThread;
+	if (ProcessAlertEmailThread)
+		delete ProcessAlertEmailThread;
 	if (MessageClientListLock!=NULL)
 		CloseHandle(MessageClientListLock);
+	if (ProcessAlertEmailLock!=NULL)
+		CloseHandle(ProcessAlertEmailLock);
 }
 
 
@@ -272,6 +289,17 @@ void LicenseController::GenerateMessageInternal(const wchar_t* license_source, b
 	else if(message_type == MT_WARNING)
 		event_type = EVENTLOG_WARNING_TYPE;
 	LicenseServerError::WriteEventLog(event_log_msg, event_type, MessageLookupID, productID);
+
+	// Try to send an email for all errors except for mail server errors
+	if (error != LicenseServerError::EHR_LIC_MAIL_SERVER)
+	{
+		SafeMutex mutex(ProcessAlertEmailLock);
+		EmailAttribs tmpAttribs;
+		tmpAttribs.productId = productID;
+		tmpAttribs.eventId = MessageLookupID;
+		tmpAttribs.message = event_log_msg;
+		toSendEmailStack.insert(toSendEmailStack.begin(), tmpAttribs);
+	}
 	
 	// notify the clients of the message
 	SafeMutex mutex(MessageClientListLock);
@@ -404,7 +432,8 @@ HRESULT LicenseController::CheckHealth()
 			MAX_MESSAGE_SIZE, 
 			L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\nSolimar License Server has encountered a deadlock scenario and is shutting down."
 			);
-		LicenseServerError::WriteEventLog(event_log_msg, EVENTLOG_ERROR_TYPE, MessageGenericError);
+		GenerateMessage(L"", MT_ERROR, hr, time(0), MessageGenericError, event_log_msg);
+
 		ExitProcess(hr);
 	}
 	return hr;
@@ -514,6 +543,29 @@ HRESULT LicenseController::TimesUp()
 
 	//Sent out warning messages for close to expired product licenses...
 	softwareServer.TimesUp();
+	return S_OK;
+}
+
+HRESULT LicenseController::ProcessAllAlertEmails()
+{
+	HRESULT hr(S_OK);
+	bool bProcessEmail = true;
+	EmailAttribs emailAttrib;
+	while (bProcessEmail)
+	{
+		{
+		SafeMutex mutex(ProcessAlertEmailLock);
+		bProcessEmail = (toSendEmailStack.size() != 0);
+		if (bProcessEmail)
+		{
+			emailAttrib = toSendEmailStack.back();
+			toSendEmailStack.pop_back();
+		}
+		}
+
+		if (bProcessEmail)
+			softwareServer.SendAlertEmailIfNeeded(emailAttrib.productId, emailAttrib.eventId, emailAttrib.message);
+	}
 	return S_OK;
 }
 
