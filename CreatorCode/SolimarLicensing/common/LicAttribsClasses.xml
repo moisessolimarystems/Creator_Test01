@@ -95,6 +95,7 @@
       <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
       <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_XIMAGEpdf" value="21" alias="XIMAGEPDF_PRODUCT"/>
+      <enum name="pid_SolimarUtilities" value="22" alias="SOLIMARUTILITIES_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -109,7 +110,8 @@
       <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
       <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_TestDevXIMAGEpdf" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
-		<!-- Dont include, these typedefs can never change, not sure what this is...
+      <enum name="pid_TestDevSolimarUtilities" value="122" alias="TEST_DEV_SOLIMARUTILITIES_PRODUCT"/>
+      <!-- Dont include, these typedefs can never change, not sure what this is...
 			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
@@ -382,6 +384,44 @@
 			<List value_type="Lic_ClockViolationInfoAttribs"/>
 		</typedef>
 		<attrib type="Lic_ClockViolationInfoAttribsList" name="clockViolHistoryList" tagname="cVLt" default="" />
+		
+		<typedef type="class" name="Lic_AlertInfoAttribs">
+		<AttribsClass code_class_name="Lic_AlertInfoAttribs" name="aia" descriptive_name="License Server Alert Info Attributes" base="">
+			<typedef type="class" name="Lic_EmailAlertMailAttribs">
+			<AttribsClass code_class_name="Lic_EmailAlertMailAttribs" name="eA" descriptive_name="Email Alert Attributes" base="">
+				<attrib type="string" name="id" tagname="eID" default="" />
+				<attrib type="string" name="name" tagname="eN" default="" />
+				<attrib type="bool" name="bActive" tagname="bA" default="true" />
+				<attrib type="list(string)" name="recipentsList" tagname="rL" default=""/>
+				<attrib type="list(unsigned __int32)" name="eventIdList" tagname="eL" default=""/>
+			</AttribsClass>
+			</typedef>
+			
+			<typedef type="collection" name="Lic_EmailAlertMailAttribsList">
+				<List value_type="Lic_EmailAlertMailAttribs"/>
+			</typedef>
+			
+			<typedef type="class" name="Lic_AlertMailServerAttribs">
+			<AttribsClass code_class_name="Lic_AlertMailServerAttribs" name="aMS" descriptive_name="License Server Alert Mail Server Attributes" base="">
+				<typedef type="enum" name="TAuthenticationType">
+					<enum name="ttAnonymous" value="0" alias="Anonymous"/>
+					<enum name="ttBasic" value="1" alias="Basic"/>
+				</typedef>
+
+				<attrib type="string" name="mailServerName" tagname="msn" default="" />
+				<attrib type="string" name="fromEmail" tagname="fe" default="" />
+				<attrib type="string" name="fromDisplayName" tagname="fD" default="" />
+				<attrib type="unsigned __int32" name="portNumber" tagname="pn" default="25"/>
+				<attrib type="TAuthenticationType" name="authenticationType" tagname="aT" default="ttAnonymous"/>
+				<attrib type="string" name="authBasicUserName" tagname="uN" default="" />
+				<attrib type="string" name="authBasicUserPassword" tagname="uP" default="" />
+			</AttribsClass>
+			</typedef>
+			
+			<attrib type="Lic_EmailAlertMailAttribsList" name="emailAlertsList" tagname="emLt" default="" />
+			<attrib type="Lic_AlertMailServerAttribs" name="mailServer" tagname="mS" default="" />
+		</AttribsClass>
+		</typedef>
 	
 		<attrib type="unsigned __int32" name="versionMajor" tagname="vMj" default="1"/>
 		<attrib type="unsigned __int32" name="versionMinor" tagname="vMn" default="0"/>
@@ -391,6 +431,13 @@
 		<attrib type="unsigned __int32" name="clockViolCount" tagname="cVC" default="0"/>
 		<attrib type="DateTime" name="clockViolLastDate" tagname="cVD" default="1900-01-01 00:00:00.0000"/>
 		<attrib type="bool" name="bInClockViol" tagname="iCV" default="false" />
+		<attrib type="Lic_AlertInfoAttribs" name="alertInfo" tagname="aI" default="" />
+	</AttribsClass>
+	
+	<AttribsClass code_class_name="Lic_TestMailServer" name="L_TMS" descriptive_name="Test Mail Server Attributes" base="" filename="Lic_TestMailServerAttribs">
+		<attrib type="string" name="subject" tagname="mS" default="Test E-mail" />
+		<attrib type="string" name="body" tagname="mB" default="This is an e-mail sent by Solimar Systems, Inc. testing Mail Server settings." />
+		<attrib type="list(string)" name="recipentsList" tagname="rL" default=""/>
 	</AttribsClass>
 	
 	<AttribsClass code_class_name="Lic_KeyAttribs" name="L_KyA" descriptive_name="License Key Attributes" base="" filename="Lic_KeyAttribs">

@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 26;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 28;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -195,6 +195,33 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 25;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
+			#region ProdID:22, ProdName: Solimar Utilities
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 22;
+			tmpProdSpec.productName.TVal = "Solimar Utilities";
+			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 0;
+			tmpModSpec.moduleName.TVal = "Solimar Compiler";
+			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -1455,6 +1482,25 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 7;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 20;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 29;
+			tmpModSpec.moduleName.TVal = "Segment By List";
+			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 3;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 7;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 27;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -3561,6 +3607,14 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+			#endregion
+			
+			#region ProdID:122, ProdName: Test/Dev/DR Solimar Utilities
+			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
+			tmpProdSpec.productID.TVal = 122;
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Solimar Utilities";
+			tmpProdSpec.sameModSpecProductID.TVal = 22;
+			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 		}
 		private Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs m_softwareSpec = null;

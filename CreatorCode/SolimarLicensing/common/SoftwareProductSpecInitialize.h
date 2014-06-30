@@ -199,6 +199,28 @@ void InititalizeProduct21()
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 25;
 }
 
+void InititalizeProduct22()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:22, ProdName: Solimar Utilities
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(22, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(22))->second);
+	pTmpProdSpec->productID = 22;
+	pTmpProdSpec->productName = std::wstring(L"Solimar Utilities");
+	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
+
+	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
+	pTmpModSpec->moduleID = 0;
+	pTmpModSpec->moduleName = std::wstring(L"Solimar Compiler");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+}
+
 void InititalizeProduct7()
 {
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
@@ -862,6 +884,16 @@ void InititalizeProduct12()
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 20;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(29, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(29))->second);
+	pTmpModSpec->moduleID = 29;
+	pTmpModSpec->moduleName = std::wstring(L"Segment By List");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 27;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
@@ -1761,5 +1793,18 @@ void InititalizeProduct18()
 	pTmpModSpec->moduleName = std::wstring(L"SDX Designer Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleDefaultLicense = 1;
+}
+
+void InititalizeProduct122()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:122, ProdName: Test/Dev/DR Solimar Utilities
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(122, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(122))->second);
+	pTmpProdSpec->productID = 122;
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Solimar Utilities");
+	pTmpProdSpec->sameModSpecProductID = 22;
 }
 

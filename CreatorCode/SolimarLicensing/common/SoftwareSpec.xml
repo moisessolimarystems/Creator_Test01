@@ -31,6 +31,7 @@
 <enum name="pid_SpdeQueueManager" value="19" alias="SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
 <enum name="pid_XIMAGEpdf" value="21" alias="XIMAGEPDF_PRODUCT"/>
+<enum name="pid_SolimarUtilities" value="22" alias="SOLIMARUTILITIES_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -45,6 +46,7 @@
 <enum name="pid_TestDevSpdeQueueManager" value="119" alias="TEST_DEV_SPDE_QUEUEMANAGER_PRODUCT"/>
 <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
 <enum name="pid_TestDevXIMAGEpdf" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
+<enum name="pid_TestDevSolimarUtilities" value="122" alias="TEST_DEV_SOLIMARUTILITIES_PRODUCT"/>
 <enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 </typedef>
 -->
@@ -126,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="26">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="28">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -252,6 +254,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="26" moduleName="Annotation Stripper" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="3"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="27" moduleName="Commingle" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="10"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="28" moduleName="DPM Finishing" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="20"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="Segment By List" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="27"/>
       <Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
@@ -409,6 +412,11 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="FRM Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
     </Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="22" productName="Solimar Utilities" productLicType="pltClient">
+    <Lic_ModuleSoftwareSpecAttribsMap>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Solimar Compiler" modUnlimitedValue="1"/>
+    </Lic_ModuleSoftwareSpecAttribsMap>
+  </Lic_ProductSoftwareSpecAttribs>  
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -436,6 +444,8 @@
   <Lic_ProductSoftwareSpecAttribs productID="120" productName="Test/Dev/DR Library Services" sameModSpecProductID="20">
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="121" productName="Test/Dev/DR XimagePDF" sameModSpecProductID="21">
+  </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="122" productName="Test/Dev/DR Solimar Utilities" sameModSpecProductID="22">
   </Lic_ProductSoftwareSpecAttribs>
 </Lic_SoftwareSpecAttribs>
 
