@@ -50,7 +50,7 @@ namespace Client.Creator
 
         enum IconList
         {
-            ICONVERT,
+            ICONVERT = 0, 
             RUBIKA,
             RUBIKAPROCESSBUILDER,
             SDXDESIGNER,
@@ -93,8 +93,8 @@ namespace Client.Creator
             TTLICENSECODE,
             MODULE,
             VALIDATIONTOKENS,
-            VERSIONTAB,
-            TOKENTAB
+            REPORTS,
+            UNKNOWN
         }
 
         public enum LicenseServerType
@@ -149,7 +149,7 @@ namespace Client.Creator
                 }
                 catch (Exception ex)
                 {
-                    return -1;
+                    return (int)IconList.UNKNOWN;
                 }
                 return (int)iconIndex;
             }

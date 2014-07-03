@@ -120,6 +120,10 @@ namespace Client.Creator
             _lvManager.SetListViewColumnSorter(LicensePacketListView);
             _lvManager.SetListViewColumnSorter(HardwareKeyListView);
             _lvManager.SetListViewColumnSorter(ReportListView);
+            _lvManager.SetListViewColumnSorter(LogListView);
+            _lvManager.AutoResizeColumns(LogListView);
+            TransactionManager.LogListView = LogListView;
+            TransactionManager.ListViewManager = _lvManager;
             ResetMainToolStripMenu();
              
             //set to make read-only items not greyed-out            
@@ -352,6 +356,12 @@ namespace Client.Creator
             {
                 m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             }
+
+            //Set Log Window
+            if (Settings.Default.ShowLogWindow != null)
+            {
+                this.logToolStripMenuItem.Checked = Settings.Default.ShowLogWindow;
+            }
         }
 
         private void CheckInLocksByUser(string user)
@@ -392,6 +402,9 @@ namespace Client.Creator
             }
 
             Settings.Default.SelectedDirectory = m_selectedDirectory;
+
+            // Save Log Window Setting
+            Settings.Default.ShowLogWindow = this.logToolStripMenuItem.Checked;
 
             // Save settings
             Settings.Default.Save();
@@ -1324,6 +1337,184 @@ namespace Client.Creator
             if (DetailPropertyGrid.SelectedObject is LicenseServer)   //token remove
                 RemoveValidationToken(DetailPropertyGrid.SelectedObject as LicenseServer);
         }
+
+        private void newLicenseServerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateStandardLicense();
+        }
+
+        private void extendLicenseServerToolStripTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                int extensionDays = 0;
+                DateTime? currentExpirationDate = null, newExpirationDate = null;
+                string errorString = string.Empty, confirmationString = string.Empty;
+                string userValue = extendLicenseServerToolStripTextBox.Text;
+
+                if (Int32.TryParse(userValue, out extensionDays))
+                {
+                    if (extensionDays < 1)
+                        errorString = "Please enter a valid number of extension days.";
+                }
+                else
+                {
+                    try { newExpirationDate = DateTime.Parse(userValue); }
+                    catch (Exception ex) { errorString = "Please enter a valid expiration date."; }
+                }
+                if (errorString != string.Empty)
+                {
+                    MessageBox.Show(errorString, "License Server Extension Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                LicenseContextMenuStrip.Close();
+                LicenseServer selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseServer;
+                confirmationString = (newExpirationDate.HasValue) ? string.Format("Please confirm extension of License Server : {0} to Expiration Date : {1}", selectedLicense.Name, newExpirationDate.Value.ToShortDateString()) :
+                                                                    string.Format("Please confirm {0} day extension of License Server : {1}.", userValue, selectedLicense.Name);
+                if (MessageBox.Show(confirmationString,
+                                    "Extend License Server",
+                                    MessageBoxButtons.OKCancel,
+                                    MessageBoxIcon.Question) == DialogResult.OK)
+                {
+                    Cursor.Current = Cursors.WaitCursor;
+                    Service<ICreator>.Use((client) =>
+                    {
+                        List<Transaction> transactionList = new List<Transaction>();
+                        List<ProductLicenseTable> updateList = new List<ProductLicenseTable>();
+                        IList<ProductLicenseTable> plList = client.GetProductLicenses(selectedLicense.Name, true);
+                        foreach (ProductLicenseTable pl in plList)
+                        {
+                            if (pl.IsActive)
+                            {
+                                if (pl.ExpirationDate.HasValue) //skip licensed, HW 
+                                {
+                                    currentExpirationDate = pl.ExpirationDate.Value;
+                                    pl.ExpirationDate = (extensionDays > 0) ? pl.ExpirationDate.Value.AddDays(extensionDays) : newExpirationDate;
+
+                                    if (pl.ExpirationDate.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
+                                    {
+                                        MessageBox.Show(string.Format("Extension of {0} days exceeds the expiration date limit of 18 months from today for Product License : {1}.\n\nSkipping Extension for Product License : {1}", extensionDays, pl.plID), "Extension Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                        pl.ExpirationDate = currentExpirationDate;
+                                    }
+                                    else
+                                    {
+                                        bool validExtension = true;
+                                        if (pl.ExpirationDate.Value.CompareTo(currentExpirationDate) < 0)
+                                        {
+                                            if (MessageBox.Show(string.Format("New expiration date of {0} is before the previous expiration date of {1} for Product License : {2}. Do you want to skip this change?", pl.ExpirationDate.Value.ToShortDateString(), currentExpirationDate.Value.ToShortDateString(), pl.plID), "Extension Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                                                validExtension = false;
+                                        }
+                                        if (validExtension)
+                                        {
+                                            pl.ExpirationDate = new DateTime(pl.ExpirationDate.Value.Year, pl.ExpirationDate.Value.Month, pl.ExpirationDate.Value.Day, 10, 0, 0).ToUniversalTime();
+                                            updateList.Add(pl);
+                                            transactionList.Add(new Transaction()
+                                            {
+                                                Type = TransactionType.ExpirationDate,
+                                                LicenseServerName = string.Empty,
+                                                ProductLicenseName = pl.plID,
+                                                Description = string.Format("Modify {0} Expiration Date", s_CommLink.GetProductName(pl.ProductID)),
+                                                Value = pl.ExpirationDate.Value.ToShortDateString(),
+                                                PreviousValue = currentExpirationDate.Value.ToShortDateString()
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        TransactionManager.CreateTransactions(transactionList);
+                        client.UpdateAllProductLicenses(updateList);
+                        client.MarkDirty(selectedLicense.Name);
+                    });
+                    Cursor.Current = Cursors.Default;
+                }
+            }
+        }
+
+        private void extendLicenseServerToolStripTextBox_Click(object sender, EventArgs e)
+        {
+            if (extendLicenseServerToolStripTextBox.ForeColor == SystemColors.InactiveCaptionText)
+            {
+                extendLicenseServerToolStripTextBox.Text = string.Empty;
+                extendLicenseServerToolStripTextBox.Font = this.Font;
+                extendLicenseServerToolStripTextBox.ForeColor = SystemColors.WindowText;
+            }
+        }
+
+        private void extendLicenseServerToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            extendLicenseServerToolStripTextBox.Text = "Extension Days";
+            extendLicenseServerToolStripTextBox.Font = new Font(this.Font, FontStyle.Italic);
+            extendLicenseServerToolStripTextBox.ForeColor = SystemColors.InactiveCaptionText;
+        }
+
+        private void newLicenseToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            extendLicenseServerToolStripMenuItem.Enabled = false;
+            if (m_Permissions != null)
+                if (m_Permissions.pt_extension_pwd.HasValue)
+                    extendLicenseServerToolStripMenuItem.Enabled = m_Permissions.pt_extension_pwd.Value && (DetailTreeView.SelectedNode.Tag as LicenseServer).LockedByCurrentUser();
+        }
+
+        private void extendLicenseServerToolStripTextBox_Leave(object sender, EventArgs e)
+        {
+            if (extendLicenseServerToolStripTextBox.Text.Length == 0 && !extendLicenseServerToolStripTextBox.Focused)
+            {
+                extendLicenseServerToolStripTextBox.Text = "Extension Days";
+                extendLicenseServerToolStripTextBox.Font = new Font(this.Font, FontStyle.Italic);
+                extendLicenseServerToolStripTextBox.ForeColor = SystemColors.InactiveCaptionText;
+            }
+        }
+
+        private void extendLicenseServerToolStripTextBox_Enter(object sender, EventArgs e)
+        {
+            if (extendLicenseServerToolStripTextBox.ForeColor == SystemColors.InactiveCaptionText)
+            {
+                extendLicenseServerToolStripTextBox.Text = string.Empty;
+                extendLicenseServerToolStripTextBox.Font = this.Font;
+                extendLicenseServerToolStripTextBox.ForeColor = SystemColors.WindowText;
+            }
+        }
+
+        private void LogListView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            _lvManager.SetSortIndexColumn(LogListView.Handle, e.Column);
+            // Perform the sort with these new sort options.
+            LogListView.Sort();
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LogListView.SelectedItems.Count > 0)
+            {
+                StringBuilder itemText = new StringBuilder();
+                foreach (ListViewItem item in LogListView.SelectedItems)
+                {
+                    foreach (ListViewItem.ListViewSubItem subItem in item.SubItems)
+                    {
+                        itemText.Append(subItem.Text);
+                        itemText.Append("\t");
+                    }
+                    itemText.Append("\r\n");
+                }
+                Clipboard.SetText(itemText.ToString());
+            }
+        }
+
+        private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LogListView.Items.Clear();
+        }
+
+        private void hideToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            logToolStripMenuItem.Checked = false;
+        }
+
+        private void logToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        {
+            splitContainer2.Panel2Collapsed = !logToolStripMenuItem.Checked;
+        }     
         #endregion
 
         #region DetailListViewContextMenuStrip Events
@@ -1709,7 +1900,7 @@ namespace Client.Creator
                         DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
                 //PopulateDetailListView(DetailPropertyGrid.SelectedObject);
-                SetLicenseServerState(node, false);
+                //SetLicenseServerState(node, false);
             }
             EnableToolStripMenu();
         }
@@ -2885,6 +3076,15 @@ namespace Client.Creator
                     LicenseInfo = licInfo.Stream       
                 };
                 client.CreateLicense(licRecord);
+                TransactionManager.LogTransactions(new Transaction()
+                {
+                    Type = TransactionType.LicenseServer,
+                    LicenseServerName = licProperties.Name,
+                    ProductLicenseName = "",
+                    Description = "Create License Server",
+                    Value = "",
+                    PreviousValue = ""
+                });
             });
         }
         private void DeleteLicenseEntity(string licenseName)
@@ -2911,6 +3111,12 @@ namespace Client.Creator
                     }
                 }
                 client.DeleteLicense(licRecord);
+                TransactionManager.LogTransactions(new Transaction() { Type = TransactionType.LicenseServer, 
+                                                                       LicenseServerName = licenseName, 
+                                                                       ProductLicenseName = "", 
+                                                                       Description = "Delete License Server", 
+                                                                       Value = "", 
+                                                                       PreviousValue = "" });
             });
         }
 
@@ -2942,7 +3148,7 @@ namespace Client.Creator
                 {
                     TreeNode emptyNode = new TreeNode("No License Servers Available");
                     emptyNode.Name = "Empty";
-                    emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetIconIndex("Empty");
+                    emptyNode.ImageIndex = emptyNode.SelectedImageIndex = (int)IconList.EMPTY;//Enums.GetIconIndex("Empty");
                     DetailTreeView.Nodes.Add(emptyNode);
                     LicenseViewSplitContainer.Panel2Collapsed = true;
                     EnableToolStripMenu();
@@ -3050,7 +3256,7 @@ namespace Client.Creator
             {
                 TreeNode emptyNode = new TreeNode("No License Servers Available");
                 emptyNode.Name = "Empty";
-                emptyNode.ImageIndex = emptyNode.SelectedImageIndex = Enums.GetIconIndex("Empty");
+                emptyNode.ImageIndex = emptyNode.SelectedImageIndex = (int)IconList.EMPTY ; 
                 DetailTreeView.Nodes.Add(emptyNode);
                 LicenseViewSplitContainer.Panel2Collapsed = true;
             }
@@ -3102,7 +3308,7 @@ namespace Client.Creator
                     licNode.Text = license.LicenseName;
                     if (license.UserLock != null) licNode.Text += " - " + license.UserLock;
                     licNode.Name = license.LicenseName;
-                    licNode.ImageIndex = Enums.GetIconIndex("License");
+                    licNode.ImageIndex = (int)IconList.LICENSE; // Enums.GetIconIndex("License");
                     licNode.SelectedImageIndex = licNode.ImageIndex;
                     if (!licNode.IsExpanded)
                         licNode.Nodes.Add(new VirtualTreeNode());
@@ -3267,21 +3473,21 @@ namespace Client.Creator
                     node.ToolTipText = string.Empty;
                     if (!selectedLicense.IsActive)
                     {
-                        if(node.ImageIndex != Enums.GetIconIndex("LicenseDeactivated"))
-                            node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDeactivated");
+                        if (node.ImageIndex != (int)IconList.LICENSEDEACTIVATED)//Enums.GetIconIndex("LicenseDeactivated"))
+                            node.ImageIndex = node.SelectedImageIndex = (int)IconList.LICENSEDEACTIVATED;//Enums.GetIconIndex("LicenseDeactivated");
                         SetNodeStyle(node, ProductLicenseStatus.InActive);
                     }
                     else
                     {
                         SetNodeStyle(node, ProductLicenseStatus.Default);
-                        if(node.ImageIndex != Enums.GetIconIndex("License"))
-                            node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("License");
+                        if (node.ImageIndex != (int)IconList.LICENSE)//Enums.GetIconIndex("License"))
+                            node.ImageIndex = node.SelectedImageIndex = (int)IconList.LICENSE;// Enums.GetIconIndex("License");
                         if (modifiedLicenses != null)
                         {
                             if (modifiedLicenses.Contains(selectedLicense.Name))
                             {
-                                if (node.ImageIndex != Enums.GetIconIndex("LicenseUpdate"))
-                                    node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseUpdate");
+                                if (node.ImageIndex != (int)IconList.LICENSEUPDATE) //Enums.GetIconIndex("LicenseUpdate"))
+                                    node.ImageIndex = node.SelectedImageIndex = (int)IconList.LICENSEUPDATE;// Enums.GetIconIndex("LicenseUpdate");
                                 node.ToolTipText = "Changes have been made to license. Generate license packet.";
                             }
                         }
@@ -3289,8 +3495,8 @@ namespace Client.Creator
                         {
                             if (!enabledLicenses.Contains(selectedLicense.Name))
                             {
-                                if (node.ImageIndex != Enums.GetIconIndex("LicenseDisabled"))
-                                    node.ImageIndex = node.SelectedImageIndex = Enums.GetIconIndex("LicenseDisabled");
+                                if (node.ImageIndex != (int)IconList.LICENSEDISABLED)//Enums.GetIconIndex("LicenseDisabled"))
+                                    node.ImageIndex = node.SelectedImageIndex = (int)IconList.LICENSEDISABLED;// Enums.GetIconIndex("LicenseDisabled");
                                 node.ToolTipText = "Not enough validation tokens are set. Add a new validation token to enable license.";
                             }
                         }
@@ -3463,14 +3669,14 @@ namespace Client.Creator
                             plNode.Tag = new ProductLicense(plt, m_Permissions);
                             if (plt.ParentProductLicenseID != null)
                             {
-                                plNode.ImageIndex = plNode.SelectedImageIndex = Enums.GetIconIndex("ADDONORDER");                                
+                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ADDONORDER;// Enums.GetIconIndex("ADDONORDER");                                
                                 plParent = productNode.Nodes.Find(plt.ParentProductLicenseID, false).FirstOrDefault();
                                 if (plParent != null && !plParent.Nodes.ContainsKey(plNode.Name))
                                     plParent.Nodes.Add(plNode);                                
                             }
                             else
                             {
-                                plNode.ImageIndex = plNode.SelectedImageIndex = Enums.GetIconIndex("ORDER");
+                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ORDER;// Enums.GetIconIndex("ORDER");
                                 productNode.Nodes.Add(plNode);
                             }
                         }
@@ -3847,7 +4053,7 @@ namespace Client.Creator
                     packetItem.Name = packet.PacketName;
                     packetItem.Text = packet.DateCreated.ToString();
                     packetItem.Tag = packet;
-                    packetItem.ImageIndex = (packet.IsVerified) ? -1 : Enums.GetIconIndex("UNVERIFIED");
+                    packetItem.ImageIndex = (packet.IsVerified) ? -1 : (int)IconList.UNVERIFIED;// Enums.GetIconIndex("UNVERIFIED");
                     subItems = new string[]                    
                     {
                         packet.PacketName,
@@ -4228,7 +4434,7 @@ namespace Client.Creator
                 string toolStripText;
                 if(currentObject is LicenseServer)
                 {
-                    imageIndex = Enums.GetIconIndex("VALIDATIONTOKENS");
+                    imageIndex = (int)IconList.VALIDATIONTOKENS;// Enums.GetIconIndex("VALIDATIONTOKENS");
                     toolStripText = "Validation Tokens";
                 }
                 else if (currentObject is ProductCollection)
@@ -4373,7 +4579,7 @@ namespace Client.Creator
                             ListViewItem lvItem = new ListViewItem();
                             lvItem.Text = moduleSpec.moduleName.TVal;
                             lvItem.Name = moduleSpec.moduleID.SVal;
-                            lvItem.ImageIndex = Enums.GetIconIndex("MODULE");
+                            lvItem.ImageIndex = (int)IconList.MODULE;// Enums.GetIconIndex("MODULE");
                             if (s_CommLink.IsDefaultModule(productSpec.productID.TVal, (short)moduleSpec.moduleID.TVal))
                                 lvItem.SubItems.Add("*");
                             else
@@ -4432,7 +4638,7 @@ namespace Client.Creator
                 ListViewItem lvItem = new ListViewItem();
                 lvItem.Tag = newModule;
                 lvItem.Name = lvItem.Text = s_CommLink.GetModuleName(productLicense.ProductID, module.ModID);
-                lvItem.ImageIndex = Enums.GetIconIndex("MODULE");
+                lvItem.ImageIndex = (int)IconList.MODULE;//Enums.GetIconIndex("MODULE");
                 if (s_CommLink.IsDefaultModule(productLicense.ProductID, module.ModID))
                 {
                     lvItem.SubItems.Add("*");
@@ -4853,16 +5059,16 @@ namespace Client.Creator
             switch (reportType)
             {
                 case Report.ReportType.HardwareToken:
-                    imageIndex = Enums.GetIconIndex("TTHARDWAREKEYID");
+                    imageIndex = (int)IconList.TTHARDWAREKEYID;// Enums.GetIconIndex("TTHARDWAREKEYID");
                     break;
                 case Report.ReportType.LicenseServer:
-                    imageIndex = Enums.GetIconIndex("LICENSE");
+                    imageIndex = (int)IconList.LICENSE;// Enums.GetIconIndex("LICENSE");
                     break;
                 case Report.ReportType.ProductLicense:
-                    imageIndex = Enums.GetIconIndex("ORDER");
+                    imageIndex = (int)IconList.ORDER;// Enums.GetIconIndex("ORDER");
                     break;
                 case Report.ReportType.LicensePacket:
-                    imageIndex = Enums.GetIconIndex("ZIPPEDFILE");
+                    imageIndex = (int)IconList.ZIPPEDFILE;// Enums.GetIconIndex("ZIPPEDFILE");
                     break;
                 default: break;
             }
@@ -5418,7 +5624,7 @@ namespace Client.Creator
             if ((node.Tag as ProductLicense).IsExpired)
                 SetNodeStyle(node, ProductLicenseStatus.Expired);
             if (!(node.Tag as ProductLicense).IsActive)
-                SetNodeStyle(node, ProductLicenseStatus.InActive);               
-        }        
+                SetNodeStyle(node, ProductLicenseStatus.InActive);
+        } 
     }
 }

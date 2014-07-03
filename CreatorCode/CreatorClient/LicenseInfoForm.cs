@@ -276,7 +276,7 @@ namespace Client.Creator
                 }
                 else
                 {
-                    IList<SoftwareTokenTable> tokenList = CreatorForm.s_AllSoftwareTokens;// client.GetAllSoftwareTokens();
+                    IList<SoftwareTokenTable> tokenList = CreatorForm.s_AllSoftwareTokens;
                     if (tokenList != null) //ensure all active tokens are available from customer
                     {
                         foreach (SoftwareTokenTable token in tokenList.Where(t => t.Status > 0))
@@ -358,6 +358,16 @@ namespace Client.Creator
                                     }
                                 }
                             }
+                        }
+                    }
+                    if (m_Validated) //Check for non-expiring product licenses
+                    {
+                        IList<ProductLicenseTable> productLicenseTables = client.GetProductLicenses(selectedLicense.Name, true);
+                        int count = productLicenseTables.Where(p => !p.ExpirationDate.HasValue).Count();
+                        if (count > 0)
+                        {
+                            m_Validated = false;
+                            MessageBox.Show(string.Format("License Server - {0} contains non-expiring product licenses. An expiration date must be set on all product licenses before adding software tokens.", selectedLicense.Name), "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);                            
                         }
                     }
                 }

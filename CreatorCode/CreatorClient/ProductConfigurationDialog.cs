@@ -24,8 +24,8 @@ namespace Client.Creator
             InitializeComponent();
             this.commLink = commLink;
             optionsTabControl.ImageList = StaticImageList.Instance.GlobalImageList;
-            versionTabPage.ImageIndex = Enums.GetIconIndex("VERSIONTAB");
-            tokenTabPage.ImageIndex = Enums.GetIconIndex("TOKENTAB");
+            //versionTabPage.ImageIndex = (int)IconList.VERSIONTAB;// Enums.GetIconIndex("VERSIONTAB");
+            //tokenTabPage.ImageIndex = (int)IconList.TOKENTAB; // Enums.GetIconIndex("TOKENTAB");
             //First tab loaded is the product version tab.
             LoadProductVersionTab();
 
@@ -83,11 +83,6 @@ namespace Client.Creator
             availableListView.SmallImageList = StaticImageList.Instance.GlobalImageList;
             selectedListView.SmallImageList = StaticImageList.Instance.GlobalImageList;
             IList<SoftwareTokenTable> swTokens = null;
-            //load property grid with product items
-            /*Client.Creator.ServiceProxy.Service<ICreator>.Use((client) =>
-            {
-                swTokens = client.GetAllSoftwareTokens();
-            });*/
             swTokens = CreatorForm.s_AllSoftwareTokens;
             foreach (SoftwareTokenTable swt in swTokens)
             {                
