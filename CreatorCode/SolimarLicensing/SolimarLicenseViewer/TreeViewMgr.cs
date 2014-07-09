@@ -40,7 +40,8 @@ namespace SolimarLicenseViewer
             LIBRARYSERVICES,
             EVENTLOG,
             XIMAGEPDF,
-            SOLIMARUTILITIES,
+            EMAILALERTS,
+            SOLIMARUTILITIES
         }
 
 
@@ -57,7 +58,7 @@ namespace SolimarLicenseViewer
 
         #region Form Methods
 
-        private int GetIconIndex(String key)
+        public static int GetIconIndex(String key)
         {
             IconList iconIndex;
             try
@@ -357,6 +358,18 @@ namespace SolimarLicenseViewer
         }
         #endregion
 
+        #region Email Alert Node
+        private TreeNode GenerateEmailAlertNode()
+        {
+            TreeNode rootNode = null;
+            rootNode = new TreeNode(SolimarLicenseViewer.AppConstants.EmailAlertNode);
+            rootNode.ImageIndex = GetIconIndex("emailAlerts");
+            rootNode.SelectedImageIndex = rootNode.ImageIndex;
+            rootNode.Name = SolimarLicenseViewer.AppConstants.EmailAlertNode;
+            return rootNode;
+        }
+        #endregion
+
         #region Product Connection Settings Node
         private TreeNode GenerateProductConnectionSettingsNode()
         {
@@ -400,6 +413,10 @@ namespace SolimarLicenseViewer
             }
 
             tmpNode = GenerateEventLogNode();
+            if (tmpNode != null)
+                this.TheTreeView.Nodes.Add(tmpNode);
+
+            tmpNode = GenerateEmailAlertNode();
             if (tmpNode != null)
                 this.TheTreeView.Nodes.Add(tmpNode);
 
