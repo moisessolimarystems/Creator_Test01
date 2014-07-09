@@ -40,6 +40,7 @@ namespace SolimarLicenseViewer
             LIBRARYSERVICES,
             EVENTLOG,
             XIMAGEPDF,
+            SOLIMARUTILITIES,
         }
 
 
