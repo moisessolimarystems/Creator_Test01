@@ -147,6 +147,8 @@
             this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             this.clearAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.customerToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.ReportTreeViewContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -212,8 +214,6 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -250,13 +250,13 @@
             this.reportsSplitContainer.Panel2.SuspendLayout();
             this.reportsSplitContainer.SuspendLayout();
             this.LogWindowContextMenuStrip.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.ReportTreeViewContextMenuStrip.SuspendLayout();
             this.PacketContextMenuStrip.SuspendLayout();
             this.DetailListViewContextMenuStrip.SuspendLayout();
             this.LicenseContextMenuStrip.SuspendLayout();
             this.customerContextMenuStrip.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenuStrip
@@ -328,7 +328,7 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -344,7 +344,7 @@
             // 
             this.logToolStripMenuItem.CheckOnClick = true;
             this.logToolStripMenuItem.Name = "logToolStripMenuItem";
-            this.logToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.logToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.logToolStripMenuItem.Text = "Log Window";
             this.logToolStripMenuItem.CheckedChanged += new System.EventHandler(this.logToolStripMenuItem_CheckedChanged);
             // 
@@ -675,7 +675,7 @@
             this.LicensesTabPage.Location = new System.Drawing.Point(4, 22);
             this.LicensesTabPage.Margin = new System.Windows.Forms.Padding(5);
             this.LicensesTabPage.Name = "LicensesTabPage";
-            this.LicensesTabPage.Size = new System.Drawing.Size(981, 289);
+            this.LicensesTabPage.Size = new System.Drawing.Size(981, 428);
             this.LicensesTabPage.TabIndex = 1;
             this.LicensesTabPage.Text = "License Servers";
             this.LicensesTabPage.UseVisualStyleBackColor = true;
@@ -699,7 +699,7 @@
             // LicenseViewSplitContainer.Panel2
             // 
             this.LicenseViewSplitContainer.Panel2.Controls.Add(this.PropertyGridTabControl);
-            this.LicenseViewSplitContainer.Size = new System.Drawing.Size(981, 289);
+            this.LicenseViewSplitContainer.Size = new System.Drawing.Size(981, 428);
             this.LicenseViewSplitContainer.SplitterDistance = 364;
             this.LicenseViewSplitContainer.SplitterWidth = 1;
             this.LicenseViewSplitContainer.TabIndex = 1;
@@ -715,7 +715,7 @@
             this.DetailTreeView.Name = "DetailTreeView";
             this.DetailTreeView.SelectedImageIndex = 0;
             this.DetailTreeView.ShowNodeToolTips = true;
-            this.DetailTreeView.Size = new System.Drawing.Size(360, 260);
+            this.DetailTreeView.Size = new System.Drawing.Size(360, 399);
             this.DetailTreeView.StateImageList = this.CreatorImageList;
             this.DetailTreeView.TabIndex = 2;
             this.DetailTreeView.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.DetailTreeView_DrawNode);
@@ -746,35 +746,36 @@
             this.CreatorImageList.Images.SetKeyName(13, "SPDNT.ICO");
             this.CreatorImageList.Images.SetKeyName(14, "LibraryServices.ico");
             this.CreatorImageList.Images.SetKeyName(15, "XIMAGEpdf.ico");
-            this.CreatorImageList.Images.SetKeyName(16, "Customer.ico");
-            this.CreatorImageList.Images.SetKeyName(17, "License.ico");
-            this.CreatorImageList.Images.SetKeyName(18, "LicenseUpdate.ico");
-            this.CreatorImageList.Images.SetKeyName(19, "LicenseDisabled.ico");
-            this.CreatorImageList.Images.SetKeyName(20, "LicenseDeactivated.ico");
-            this.CreatorImageList.Images.SetKeyName(21, "Order.ico");
-            this.CreatorImageList.Images.SetKeyName(22, "AppInstance.ico");
-            this.CreatorImageList.Images.SetKeyName(23, "Empty.ico");
-            this.CreatorImageList.Images.SetKeyName(24, "pass64.ico");
-            this.CreatorImageList.Images.SetKeyName(25, "fail64.ico");
-            this.CreatorImageList.Images.SetKeyName(26, "Explorer-32.png");
-            this.CreatorImageList.Images.SetKeyName(27, "Notepad-32.png");
-            this.CreatorImageList.Images.SetKeyName(28, "Dropbox-32.png");
-            this.CreatorImageList.Images.SetKeyName(29, "my computer-32.png");
-            this.CreatorImageList.Images.SetKeyName(30, "ttHardwareKeyID.ico");
-            this.CreatorImageList.Images.SetKeyName(31, "ttMacAddress.png");
-            this.CreatorImageList.Images.SetKeyName(32, "Bios-32.png");
-            this.CreatorImageList.Images.SetKeyName(33, "File-server-32.png");
-            this.CreatorImageList.Images.SetKeyName(34, "Windows-32.png");
-            this.CreatorImageList.Images.SetKeyName(35, "ttPartOfDomain.png");
-            this.CreatorImageList.Images.SetKeyName(36, "server-32.png");
-            this.CreatorImageList.Images.SetKeyName(37, "server-Vista_32.png");
-            this.CreatorImageList.Images.SetKeyName(38, "FileServer-Drive_32.png");
-            this.CreatorImageList.Images.SetKeyName(39, "Hard-Drive-blue-32.png");
-            this.CreatorImageList.Images.SetKeyName(40, "ttLicenseCode.png");
-            this.CreatorImageList.Images.SetKeyName(41, "Module.ico");
-            this.CreatorImageList.Images.SetKeyName(42, "ValidationTokens.png");
-            this.CreatorImageList.Images.SetKeyName(43, "Custom-reports-32.png");
-            this.CreatorImageList.Images.SetKeyName(44, "Unknown.ico");
+            this.CreatorImageList.Images.SetKeyName(16, "SolimarUtilities.ico");
+            this.CreatorImageList.Images.SetKeyName(17, "Customer.ico");
+            this.CreatorImageList.Images.SetKeyName(18, "License.ico");
+            this.CreatorImageList.Images.SetKeyName(19, "LicenseUpdate.ico");
+            this.CreatorImageList.Images.SetKeyName(20, "LicenseDisabled.ico");
+            this.CreatorImageList.Images.SetKeyName(21, "LicenseDeactivated.ico");
+            this.CreatorImageList.Images.SetKeyName(22, "Order.ico");
+            this.CreatorImageList.Images.SetKeyName(23, "AppInstance.ico");
+            this.CreatorImageList.Images.SetKeyName(24, "Empty.ico");
+            this.CreatorImageList.Images.SetKeyName(25, "pass64.ico");
+            this.CreatorImageList.Images.SetKeyName(26, "fail64.ico");
+            this.CreatorImageList.Images.SetKeyName(27, "Explorer-32.png");
+            this.CreatorImageList.Images.SetKeyName(28, "Notepad-32.png");
+            this.CreatorImageList.Images.SetKeyName(29, "Dropbox-32.png");
+            this.CreatorImageList.Images.SetKeyName(30, "my computer-32.png");
+            this.CreatorImageList.Images.SetKeyName(31, "ttHardwareKeyID.ico");
+            this.CreatorImageList.Images.SetKeyName(32, "ttMacAddress.png");
+            this.CreatorImageList.Images.SetKeyName(33, "Bios-32.png");
+            this.CreatorImageList.Images.SetKeyName(34, "File-server-32.png");
+            this.CreatorImageList.Images.SetKeyName(35, "Windows-32.png");
+            this.CreatorImageList.Images.SetKeyName(36, "ttPartOfDomain.png");
+            this.CreatorImageList.Images.SetKeyName(37, "server-32.png");
+            this.CreatorImageList.Images.SetKeyName(38, "server-Vista_32.png");
+            this.CreatorImageList.Images.SetKeyName(39, "FileServer-Drive_32.png");
+            this.CreatorImageList.Images.SetKeyName(40, "Hard-Drive-blue-32.png");
+            this.CreatorImageList.Images.SetKeyName(41, "ttLicenseCode.png");
+            this.CreatorImageList.Images.SetKeyName(42, "Module.ico");
+            this.CreatorImageList.Images.SetKeyName(43, "ValidationTokens.png");
+            this.CreatorImageList.Images.SetKeyName(44, "Custom-reports-32.png");
+            this.CreatorImageList.Images.SetKeyName(45, "Unknown.ico");
             // 
             // findToolStrip
             // 
@@ -867,7 +868,7 @@
             this.PropertyGridTabControl.Multiline = true;
             this.PropertyGridTabControl.Name = "PropertyGridTabControl";
             this.PropertyGridTabControl.SelectedIndex = 0;
-            this.PropertyGridTabControl.Size = new System.Drawing.Size(612, 285);
+            this.PropertyGridTabControl.Size = new System.Drawing.Size(612, 424);
             this.PropertyGridTabControl.TabIndex = 0;
             this.PropertyGridTabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.PropertyGridTabControl_Selecting);
             // 
@@ -878,7 +879,7 @@
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
-            this.PropertyGridTabPage.Size = new System.Drawing.Size(604, 257);
+            this.PropertyGridTabPage.Size = new System.Drawing.Size(604, 396);
             this.PropertyGridTabPage.TabIndex = 0;
             this.PropertyGridTabPage.Text = "Properties";
             this.PropertyGridTabPage.UseVisualStyleBackColor = true;
@@ -899,8 +900,8 @@
             // 
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListView);
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListViewToolStrip);
-            this.DetailSplitContainer.Size = new System.Drawing.Size(604, 257);
-            this.DetailSplitContainer.SplitterDistance = 128;
+            this.DetailSplitContainer.Size = new System.Drawing.Size(604, 396);
+            this.DetailSplitContainer.SplitterDistance = 197;
             this.DetailSplitContainer.SplitterWidth = 2;
             this.DetailSplitContainer.TabIndex = 0;
             // 
@@ -913,7 +914,7 @@
             this.DetailPropertyGrid.Location = new System.Drawing.Point(0, 0);
             this.DetailPropertyGrid.Margin = new System.Windows.Forms.Padding(0);
             this.DetailPropertyGrid.Name = "DetailPropertyGrid";
-            this.DetailPropertyGrid.Size = new System.Drawing.Size(604, 128);
+            this.DetailPropertyGrid.Size = new System.Drawing.Size(604, 197);
             this.DetailPropertyGrid.TabIndex = 2;
             this.DetailPropertyGrid.ToolbarVisible = false;
             this.DetailPropertyGrid.ViewForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
@@ -931,7 +932,7 @@
             this.DetailListView.Location = new System.Drawing.Point(0, 25);
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
-            this.DetailListView.Size = new System.Drawing.Size(604, 102);
+            this.DetailListView.Size = new System.Drawing.Size(604, 172);
             this.DetailListView.SmallImageList = this.CreatorImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
@@ -1173,7 +1174,7 @@
             this.splitContainer1.Panel2.Controls.Add(this.packetDescriptionRichTextBox);
             this.splitContainer1.Panel2Collapsed = true;
             this.splitContainer1.Size = new System.Drawing.Size(604, 371);
-            this.splitContainer1.SplitterDistance = 245;
+            this.splitContainer1.SplitterDistance = 207;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
             // 
@@ -1458,7 +1459,7 @@
             this.LogListView.Location = new System.Drawing.Point(0, 25);
             this.LogListView.Name = "LogListView";
             this.LogListView.NoItemsMessage = "";
-            this.LogListView.Size = new System.Drawing.Size(989, 113);
+            this.LogListView.Size = new System.Drawing.Size(150, 21);
             this.LogListView.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.LogListView.TabIndex = 11;
             this.LogListView.UseCompatibleStateImageBehavior = false;
@@ -1535,6 +1536,23 @@
             this.hideToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.hideToolStripMenuItem.Text = "Hide";
             this.hideToolStripMenuItem.Click += new System.EventHandler(this.hideToolStripMenuItem_Click);
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel5});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(150, 25);
+            this.toolStrip1.TabIndex = 12;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // toolStripLabel5
+            // 
+            this.toolStripLabel5.Name = "toolStripLabel5";
+            this.toolStripLabel5.Size = new System.Drawing.Size(112, 22);
+            this.toolStripLabel5.Text = "Current Session Log";
             // 
             // statusStrip1
             // 
@@ -2058,23 +2076,6 @@
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
             // 
-            // toolStrip1
-            // 
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripLabel5});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(989, 25);
-            this.toolStrip1.TabIndex = 12;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // toolStripLabel5
-            // 
-            this.toolStripLabel5.Name = "toolStripLabel5";
-            this.toolStripLabel5.Size = new System.Drawing.Size(112, 22);
-            this.toolStripLabel5.Text = "Current Session Log";
-            // 
             // CreatorForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -2140,6 +2141,8 @@
             this.reportsSplitContainer.Panel2.ResumeLayout(false);
             this.reportsSplitContainer.ResumeLayout(false);
             this.LogWindowContextMenuStrip.ResumeLayout(false);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ReportTreeViewContextMenuStrip.ResumeLayout(false);
@@ -2147,8 +2150,6 @@
             this.DetailListViewContextMenuStrip.ResumeLayout(false);
             this.LicenseContextMenuStrip.ResumeLayout(false);
             this.customerContextMenuStrip.ResumeLayout(false);
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

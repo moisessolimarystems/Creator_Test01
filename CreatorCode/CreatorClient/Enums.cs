@@ -66,6 +66,7 @@ namespace Client.Creator
             SPD,
             LIBRARYSERVICES,
             XIMAGEPDF,
+            SOLIMARUTILITIES,
             CUSTOMER,
             LICENSE,
             LICENSEUPDATE,
