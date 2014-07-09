@@ -194,6 +194,7 @@ namespace SolimarLicenseViewer
             this.productIconList.Images.SetKeyName(23, "LibraryServices.ico");
             this.productIconList.Images.SetKeyName(24, "eventLog.png");
             this.productIconList.Images.SetKeyName(25, "XIMAGEpdf.ico");
+            this.productIconList.Images.SetKeyName(26, "SolimarUtilities16.png");
             // 
             // infoSplitContainer
             // 
