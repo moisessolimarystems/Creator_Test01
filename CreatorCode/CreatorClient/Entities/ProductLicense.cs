@@ -70,8 +70,8 @@ namespace Client.Creator
         {
             get { return _plRec; }
             set 
-            {                
-                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)
+            {
+                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || (value.plID.StartsWith("100")))
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
                 else
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
@@ -317,7 +317,7 @@ namespace Client.Creator
                                                                       ID,
                                                                       string.Format("Edit {0} Product Connection", ProductName),
                                                                       value.ToString(),
-                                                                      ProductConnection.ToString());
+                                                                      plt.ProductConnection.ToString());
                                 plt.ProductConnection = _plRec.ProductConnection;
                                 client.UpdateProductLicense(plt);
                                 client.MarkDirty(LicenseServer);
