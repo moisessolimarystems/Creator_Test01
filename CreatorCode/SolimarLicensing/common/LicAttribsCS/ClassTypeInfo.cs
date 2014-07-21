@@ -74,7 +74,6 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_ServerDataAttribs"] = new AttribInfo("Streamed_ServerDataAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_SystemEventLogInfoAttribs"] = new AttribInfo("Streamed_SystemEventLogInfoAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_UsageInfoAttribs"] = new AttribInfo("Streamed_UsageInfoAttribs","","");
-				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_ClientSettingsAttribs"] = new AttribInfo("Streamed_ClientSettingsAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["createdDate"] = new AttribInfo("createdDate","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["ListOfStreamed_KeyAttribs"] = new AttribInfo("ListOfStreamed_KeyAttribs","","");
 				((ClassInfoBase)map_class_base["L_LcSysA"]).attribs["Streamed_RunningProcessesInfoAttribs"] = new AttribInfo("Streamed_RunningProcessesInfoAttribs","","");
@@ -91,10 +90,6 @@ namespace Solimar
 				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["excludeService"] = new AttribInfo("excludeService","","");
 				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["checkEmulatorCall_StatusCode"] = new AttribInfo("checkEmulatorCall_StatusCode","","");
 				((ClassInfoBase)map_class_base["L_EmInA"]).attribs["knownEmulatorServicesList"] = new AttribInfo("knownEmulatorServicesList","","");
-				map_class_base["L_csA"] = new ClassInfoBase("L_csA","","Client Settings Attributes");
-				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
-				((System.Collections.ArrayList)map_base_classes[""]).Add("L_csA");
-				((ClassInfoBase)map_class_base["L_csA"]).attribs["prodConnList"] = new AttribInfo("prodConnList","","");
 				map_class_base["S_ElInA"] = new ClassInfoBase("S_ElInA","","System Event Log Info Attributes");
 				if (!map_base_classes.ContainsKey("")) map_base_classes[""] = new System.Collections.ArrayList();
 				((System.Collections.ArrayList)map_base_classes[""]).Add("S_ElInA");
