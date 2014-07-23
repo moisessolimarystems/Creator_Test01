@@ -71,7 +71,7 @@ namespace Client.Creator
             get { return _plRec; }
             set 
             {
-                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || (value.plID.StartsWith("100")))
+                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)// || (value.plID.StartsWith("100")))
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
                 else
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
@@ -139,7 +139,7 @@ namespace Client.Creator
         {
             get { return _plRec.IsActive; }
         }
-
+       
         [Browsable(false)]
         public bool IsExpired
         {
