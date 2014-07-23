@@ -1452,8 +1452,9 @@ namespace Client.Creator
         {
             extendLicenseServerToolStripMenuItem.Enabled = false;
             if (m_Permissions != null)
-                if (m_Permissions.pt_extension_pwd.HasValue)
-                    extendLicenseServerToolStripMenuItem.Enabled = m_Permissions.pt_extension_pwd.Value && (DetailTreeView.SelectedNode.Tag as LicenseServer).LockedByCurrentUser();
+                if (m_Permissions.pt_extension_pwd.HasValue)                    
+                    if(DetailTreeView.SelectedNode.Tag != null)
+                        extendLicenseServerToolStripMenuItem.Enabled = m_Permissions.pt_extension_pwd.Value && (DetailTreeView.SelectedNode.Tag as LicenseServer).LockedByCurrentUser();
         }
 
         private void extendLicenseServerToolStripTextBox_Leave(object sender, EventArgs e)

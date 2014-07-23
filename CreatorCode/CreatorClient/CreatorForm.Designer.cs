@@ -875,7 +875,7 @@
             // PropertyGridTabPage
             // 
             this.PropertyGridTabPage.Controls.Add(this.DetailSplitContainer);
-            this.PropertyGridTabPage.ImageIndex = 26;
+            this.PropertyGridTabPage.ImageIndex = 27;
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
@@ -1038,7 +1038,7 @@
             // 
             this.TransactionsTabPage.Controls.Add(this.TransactionListView);
             this.TransactionsTabPage.Controls.Add(this.TransactionsToolStrip);
-            this.TransactionsTabPage.ImageIndex = 27;
+            this.TransactionsTabPage.ImageIndex = 28;
             this.TransactionsTabPage.Location = new System.Drawing.Point(4, 4);
             this.TransactionsTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionsTabPage.Name = "TransactionsTabPage";
@@ -1147,7 +1147,7 @@
             // 
             this.PacketTabPage.Controls.Add(this.splitContainer1);
             this.PacketTabPage.Controls.Add(this.PacketListToolStrip);
-            this.PacketTabPage.ImageIndex = 28;
+            this.PacketTabPage.ImageIndex = 29;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
             this.PacketTabPage.Size = new System.Drawing.Size(604, 396);
@@ -1380,17 +1380,17 @@
             // 
             this.reportsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.reportsTreeView.HideSelection = false;
-            this.reportsTreeView.ImageIndex = 42;
+            this.reportsTreeView.ImageIndex = 43;
             this.reportsTreeView.ImageList = this.CreatorImageList;
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode1.ImageIndex = 43;
+            treeNode1.ImageIndex = 44;
             treeNode1.Name = "RootNode";
             treeNode1.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1});
-            this.reportsTreeView.SelectedImageIndex = 43;
+            this.reportsTreeView.SelectedImageIndex = 44;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 428);
             this.reportsTreeView.TabIndex = 0;
             this.reportsTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.reportsTreeView_AfterLabelEdit);
