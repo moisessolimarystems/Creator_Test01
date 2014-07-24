@@ -377,7 +377,97 @@ begin
 	else  
 	   	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
 	endif;
-end;           
+end;      
+
+//---------------------------------------------------------------------------
+// OnEnd
+//
+// The OnEnd event is called at the end of the setup. This event is not
+// called if the setup is aborted.
+//---------------------------------------------------------------------------
+function OnEnd()
+	STRING svUninstKey, szManufacturer, szProductVersion, szHelpTelephone, szURLInfoAbout;
+	STRING szURLUpdateInfo, szHelpLink, szARPCONTACT, szVersion, szVersionMajor, szVersionMinor;
+	STRING szEstimatedSize, szNoRepair, szNoModify, svReleaseFlag;
+	NUMBER nBuff, nResult, nvType, nBuffer;	
+begin     
+	Disable( BACKGROUND );  
+    nBuffer = MAX_PATH + 1; // initialize size buffer before calling MsiGetProperty
+	MsiGetProperty(ISMSI_HANDLE, "ISReleaseFlags", svReleaseFlag, nBuffer);   
+		
+	//if(svReleaseFlag % "x64") then 
+	if(SYSINFO.bIsWow64) then		
+		// get Version from the 64 bit registry area
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY;
+		svUninstKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\" + PRODUCT_GUID;
+		RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+		
+		nBuff = 256;
+		RegDBGetKeyValueEx (svUninstKey, "Version", nvType, szVersion, nBuff);
+		nBuff = 256;
+		RegDBGetKeyValueEx (svUninstKey, "VersionMajor", nvType, szVersionMajor, nBuff);
+		nBuff = 256;
+		RegDBGetKeyValueEx (svUninstKey, "VersionMinor", nvType, szVersionMinor, nBuff);
+		nBuff = 256;
+		RegDBGetKeyValueEx (svUninstKey, "EstimatedSize", nvType, szEstimatedSize, nBuff);
+		
+		// Go back to the 32 bit registry
+		REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY;
+		svUninstKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\InstallShield_" + PRODUCT_GUID;
+		RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+			
+		if (REMOVEALLMODE) then
+			RegDBDeleteValue(svUninstKey,"Publisher");
+			RegDBDeleteValue(svUninstKey,"DisplayVersion");
+			RegDBDeleteValue(svUninstKey,"Version");
+			RegDBDeleteValue(svUninstKey,"VersionMajor");
+			RegDBDeleteValue(svUninstKey,"VersionMinor");
+			RegDBDeleteValue(svUninstKey,"HelpTelephone");
+			RegDBDeleteValue(svUninstKey,"HelpLink");
+			RegDBDeleteValue(svUninstKey,"URLInfoAbout");
+			RegDBDeleteValue(svUninstKey,"URLUpdateInfo");
+			RegDBDeleteValue(svUninstKey,"Contact");
+			RegDBDeleteValue(svUninstKey,"EstimatedSize");
+			RegDBDeleteValue(svUninstKey,"InstallLocation");
+		else			
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "Manufacturer", szManufacturer,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "Publisher", REGDB_STRING, szManufacturer, -1 );
+			
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ProductVersion", szProductVersion,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "DisplayVersion", REGDB_STRING, szProductVersion, -1 );		
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "Version", REGDB_NUMBER, szVersion, -1 );
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "VersionMajor", REGDB_NUMBER, szVersionMajor, -1 );
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "VersionMinor", REGDB_NUMBER, szVersionMinor, -1 );
+			
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPHELPTELEPHONE", szHelpTelephone,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "HelpTelephone", REGDB_STRING, szHelpTelephone, -1 );		
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPHELPLINK", szHelpLink,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "HelpLink", REGDB_STRING, szHelpLink, -1 );	
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPURLINFOABOUT", szURLInfoAbout,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "URLInfoAbout", REGDB_STRING, szURLInfoAbout, -1 );
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPURLUPDATEINFO", szURLUpdateInfo,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "URLUpdateInfo", REGDB_STRING, szURLUpdateInfo, -1 );
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPCONTACT", szARPCONTACT,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "Contact", REGDB_STRING, szARPCONTACT, -1 );
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "EstimatedSize", REGDB_NUMBER, szEstimatedSize, -1 );
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "InstallLocation", REGDB_STRING, TARGETDIR, -1);
+			
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPNOMODIFY", szNoModify,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "NoModify", REGDB_NUMBER, szNoModify, -1 );
+			nBuff = 256;
+			MsiGetProperty(ISMSI_HANDLE, "ARPNOREPAIR", szNoRepair,nBuff);
+			nResult = RegDBSetKeyValueEx ( svUninstKey, "NoRepair", REGDB_NUMBER, szNoRepair, -1 );				
+		endif;  
+	endif;
+end;     
 
 
 #include "..\..\CommonScripts\LicensingFunctions.rul"     
