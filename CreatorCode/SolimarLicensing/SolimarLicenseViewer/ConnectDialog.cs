@@ -60,6 +60,8 @@ namespace SolimarLicenseViewer
             Cursor.Current = Cursors.WaitCursor;
             try
             {
+                if (string.IsNullOrEmpty(ServerNameComboBox.Text))
+                    throw new Exception("Server cannot be empty");
                 using (Shared.VisualComponents.BaseMessageDialog messageDialog = new Shared.VisualComponents.BaseMessageDialog())
                 {
                     messageDialog.SetData(new Shared.VisualComponents.MessageBoxData());
@@ -76,7 +78,7 @@ namespace SolimarLicenseViewer
 
                 this.DialogResult = DialogResult.OK;
             }
-            catch (COMException ex)
+            catch (Exception ex)
             {
                 this.DialogResult = DialogResult.None;
                 ServerNameComboBox.Select(0, this.ServerNameComboBox.Text.Length);
