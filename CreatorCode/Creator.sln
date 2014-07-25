@@ -25,10 +25,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorService", "CreatorSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{3C45FC75-1F6A-483B-8A51-12EF869C4863}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{58E855A9-F959-496D-93BE-2445DA7B9C13}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Creator.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|test1 = Debug|test1
@@ -110,8 +109,21 @@ Global
 		{3C45FC75-1F6A-483B-8A51-12EF869C4863}.Release|test1.ActiveCfg = Release|Any CPU
 		{3C45FC75-1F6A-483B-8A51-12EF869C4863}.Release|Win32.ActiveCfg = Release|Any CPU
 		{3C45FC75-1F6A-483B-8A51-12EF869C4863}.Release|x64.ActiveCfg = Release|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Debug|test1.ActiveCfg = Debug|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Release|test1.ActiveCfg = Release|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Release|Win32.ActiveCfg = Release|Any CPU
+		{58E855A9-F959-496D-93BE-2445DA7B9C13}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Creator.vsmdi
 	EndGlobalSection
 EndGlobal
