@@ -745,7 +745,7 @@ namespace Client.Creator
                 //int majorVer = 0;
                 //int minorVer = 0;
                 //int buildVer = 0;
-                dlg.SetCreatorVersion(string.Format("{0}.{1}.{2}", VersionInfo.MAJOR_REVISION_NUMBER, VersionInfo.MINOR_REVISION_NUMBER, VersionInfo.BUILD_NUMBER));
+                dlg.SetCreatorVersion(string.Format("{0}.{1}.{2}", Common.VersionInfo.MAJOR_REVISION_NUMBER, Common.VersionInfo.MINOR_REVISION_NUMBER, Common.VersionInfo.BUILD_NUMBER));
                 //try
                 //{
                 //    s_CommLink.GetVersionLicenseServer(s_CommLink.ServerName, ref majorVer, ref minorVer, ref buildVer);

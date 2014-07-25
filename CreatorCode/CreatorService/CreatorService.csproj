@@ -65,6 +65,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{58E855A9-F959-496D-93BE-2445DA7B9C13}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CreatorData\CreatorData.csproj">
       <Project>{DB058B3D-4418-40DF-ACE0-6306AADC5A06}</Project>
       <Name>CreatorData</Name>

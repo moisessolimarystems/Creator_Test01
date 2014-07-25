@@ -11,6 +11,7 @@ using System.ComponentModel;
 using CreatorData;
 using Solimar.Licensing.LicenseManagerWrapper;
 using Client.Creator;
+using Common;
 
 namespace Service.Creator
 {
@@ -1119,9 +1120,9 @@ namespace Service.Creator
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
         public void GetCreatorServiceVersion(ref int major, ref int minor, ref int buildversion)
         {
-            major = Client.Creator.VersionInfo.MAJOR_REVISION_NUMBER;
-            minor = Client.Creator.VersionInfo.MINOR_REVISION_NUMBER;
-            buildversion = Client.Creator.VersionInfo.BUILD_NUMBER;
+            major = VersionInfo.MAJOR_REVISION_NUMBER;
+            minor = VersionInfo.MINOR_REVISION_NUMBER;
+            buildversion = VersionInfo.BUILD_NUMBER;
         }
 
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]

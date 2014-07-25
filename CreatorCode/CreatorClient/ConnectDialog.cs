@@ -101,13 +101,13 @@ namespace Client.Creator
                 {
                     client.GetCreatorServiceVersion(ref major, ref minor, ref buildversion);
                 });
-                if (major == VersionInfo.MAJOR_REVISION_NUMBER &&
-                   minor == VersionInfo.MINOR_REVISION_NUMBER &&
-                   buildversion == VersionInfo.BUILD_NUMBER)
+                if (major == Common.VersionInfo.MAJOR_REVISION_NUMBER &&
+                   minor == Common.VersionInfo.MINOR_REVISION_NUMBER &&
+                   buildversion == Common.VersionInfo.BUILD_NUMBER)
                     m_ValidServer = true;
                 else
                     throw new Exception(string.Format("Creator Client({0}.{1}.{2}) and Creator Service({3}.{4}.{5}) versions do not match.",
-                                        VersionInfo.MAJOR_REVISION_NUMBER,VersionInfo.MINOR_REVISION_NUMBER, VersionInfo.BUILD_NUMBER,
+                                        Common.VersionInfo.MAJOR_REVISION_NUMBER, Common.VersionInfo.MINOR_REVISION_NUMBER, Common.VersionInfo.BUILD_NUMBER,
                                         major, minor, buildversion));
             }
             catch (Exception ex)
