@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="29">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="30">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -335,7 +335,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="54" moduleName="PDF::PDF/A" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="18"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="55" moduleName="File IO Manager" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="23"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="AFPDS::AFPDS" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="24"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="Adobe Normalizer" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="29"/>	  
+			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="30"/>	  
       
       <!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
@@ -354,7 +354,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP/IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="PS::PDF (Normalizer)" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="29"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="Adobe Normalizer" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="30"/>
 			
 			<!-- Output Pool module -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>
