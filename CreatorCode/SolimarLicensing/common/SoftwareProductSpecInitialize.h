@@ -1056,6 +1056,16 @@ void InititalizeProduct12()
 	pTmpModSpec->moduleName = std::wstring(L"Engine Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(32, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(32))->second);
+	pTmpModSpec->moduleID = 32;
+	pTmpModSpec->moduleName = std::wstring(L"Rename");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 31;
 }
 
 void InititalizeProduct15()
