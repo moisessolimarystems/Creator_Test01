@@ -861,7 +861,7 @@ HRESULT SoftwareServer::EnterSoftwareLicPacket(VARIANT vtLicensePacket, BSTR *pB
 		memcpy(uncompressedBufNullTerm, uncompressedBuf, (uncompressedBufSize)*sizeof(unsigned char));
 		uncompressedBufNullTerm[uncompressedBufSize] = '\0';
 
-		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBufNullTerm).c_str();
+		std::wstring tmpString = StringUtils::StringToWstring(std::string((char*)uncompressedBufNullTerm));
 
 		//
 		// decrypt the password packet (two copies)
@@ -1532,7 +1532,12 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDiaplayNameByte];
 						if (pvtTmp->vt == VT_BSTR)
-							serviceInfo.display = std::wstring(pvtTmp->bstrVal);
+						{
+							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
+							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
+							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
+							serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
+						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
 						if (pvtTmp->vt == VT_BSTR)
@@ -1547,21 +1552,22 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						if (pvtTmp->vt == VT_BSTR)
 							serviceInfo.serviceType = std::wstring(pvtTmp->bstrVal);
 
+
 						/*
 						wchar_t buf[1024];
 						_snwprintf(buf, 
 						  sizeof(buf)/sizeof(wchar_t), 
-						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s', Description: '%s'", 
+						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s'", 
 						  std::wstring(serviceInfo.name).c_str(),
 						  std::wstring(serviceInfo.path).c_str(),
 						  serviceInfo.bStarted == true ? L"TRUE" : L"FALSE",
-						  std::wstring(serviceInfo.display).c_str(),
-						  std::wstring(serviceInfo.description).c_str()
+						  std::wstring(serviceInfo.display).c_str()
 						  );
 						OutputDebugStringW(buf);
-						*/
-						//std::string data = StringUtils::WstringToString(std::wstring(serviceInfo.description));
+						//*/
 						//OutputDebugStringW(std::wstring(serviceInfo.description).c_str());
+						//std::string data = StringUtils::WstringToString(std::wstring(serviceInfo.description));
+						//OutputDebugStringW(L" - StringUtils::WstringToString() work");
 						
 						processInfoAttribs.servicesList->push_back(serviceInfo);
 					}
@@ -1612,11 +1618,21 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDiaplayNameByte];
 						if (pvtTmp->vt == VT_BSTR)
-							serviceInfo.display = std::wstring(pvtTmp->bstrVal);
+						{
+							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
+							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
+							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
+							serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
+						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
 						if (pvtTmp->vt == VT_BSTR)
-							serviceInfo.description = std::wstring(pvtTmp->bstrVal);
+						{
+							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
+							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
+							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
+							serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
+						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpServiceTypeByte];
 						if (pvtTmp->vt == VT_BSTR)
@@ -1625,11 +1641,12 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						//wchar_t buf[1024];
 						//_snwprintf(buf, 
 						//  sizeof(buf)/sizeof(wchar_t), 
-						//  L"SoftwareServer::GenerateLicenseSystemData() - SystemDriver - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s'", 
-						//  std::wstring(systemDriverInfo.name).c_str(),
-						//  std::wstring(systemDriverInfo.path).c_str(),
-						//  systemDriverInfo.bStarted == true ? L"TRUE" : L"FALSE",
-						//  std::wstring(systemDriverInfo.display).c_str()
+						//  L"SoftwareServer::GenerateLicenseSystemData() - SystemDriver - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s', ServiceType: '%s'", 
+						//  std::wstring(serviceInfo.name).c_str(),
+						//  std::wstring(serviceInfo.path).c_str(),
+						//  serviceInfo.bStarted == true ? L"TRUE" : L"FALSE",
+						//  std::wstring(serviceInfo.display).c_str(),
+						//  std::wstring(serviceInfo.serviceType).c_str()
 						//  );
 						//OutputDebugStringW(buf);
 

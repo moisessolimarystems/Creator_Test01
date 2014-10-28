@@ -145,7 +145,7 @@ HRESULT CryptoAndFlateHelper::EncryptCompressByteArrayToStream(
 		memcpy(uncompressedBufNullTerm, uncompressedBuf, (uncompressedBufSize)*sizeof(unsigned char));
 		uncompressedBufNullTerm[uncompressedBufSize] = '\0';
 
-		std::wstring tmpString = StringUtils::StringToWstring((char*)uncompressedBufNullTerm).c_str();
+		std::wstring tmpString = StringUtils::StringToWstring(std::string((char*)uncompressedBufNullTerm));
 
 		//
 		// decrypt the password packet, this copy is used for strtok

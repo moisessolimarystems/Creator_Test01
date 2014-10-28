@@ -11,34 +11,15 @@ class StringUtils
 
 		static std::wstring StringToWstring(const std::string &s)
 		{
-			size_t characters;
-			long errorNo;
-			#if _MSC_VER >= 1400	
-				errorNo = mbstowcs_s(&characters, 0, 0, s.c_str(), 256);
-			#else
-				characters = mbstowcs(0, s.c_str(), 256);
-			#endif
-
-			wchar_t* ws = new wchar_t[characters+1];
-			ws[0]=0;
-			
-			#if _MSC_VER >= 1400	
-				size_t tmpValue;
-				errorNo = mbstowcs_s(	&tmpValue,
-							ws, 
-							characters,	//size in words
-							s.c_str(),
-							characters);
-			#else
-				mbstowcs(ws,s.c_str(),characters);
-			#endif
-			ws[characters]=0;
-			std::wstring ret = ws;
-			delete [] ws;
-			return ret;
+			return std::wstring(s.begin(), s.end());
 		}
 
-		static std::string WstringToString(const std::wstring &ws, long* pErrorNo = 0)
+		static std::string WstringToString(const std::wstring &ws/*, long* pErrorNo = 0*/)
+		{
+			return std::string(ws.begin(), ws.end());
+		}
+
+		static std::string WstringToStringErrorOnBinary(const std::wstring &ws, long* pErrorNo = 0)
 		{
 			size_t characters;
 			long errorNo = 0;
@@ -85,14 +66,17 @@ class StringUtils
 				//this line caused memory corruption that would be displayed on subsquint calls.
 				//swprintf_s(pStr+2*b, sizeOfStr,L"%02x",(unsigned int)pData[b]);
 			}
-			return pStr;
+			//return pStr;
+			_bstr_t retVal = pStr;
+			delete[] pStr;
+			return retVal;
 		}
 		static DWORD StringToBinaryLength(_bstr_t str)
 		{
 			return str.length()/2;
 		}
 
-		static void StringToBinary(_bstr_t str, BYTE *pData, DWORD length)
+static void StringToBinary(_bstr_t str, BYTE *pData, DWORD length)
 {
 	if (length>str.length()/2)
 		return;

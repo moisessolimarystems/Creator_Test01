@@ -118,7 +118,7 @@ HRESULT EventLogLicenseHelper::ReadEventLog(BSTR *pBstrEventLogAttribsListStream
 				// CR.FIX.13703.v2 - It is possible for binary data to be in the msg.  In those cases, can not 
 				// get proper msg from event log.
 				long errorNo = 0;
-				StringUtils::WstringToString(wTmpString, &errorNo);
+				StringUtils::WstringToStringErrorOnBinary(wTmpString, &errorNo);
 				if(errorNo == EILSEQ)	//Cannot convert wide string to a multibyte character, assume binary data
 					tmpEventLogEntryInfo.message = std::wstring(L"Can not retrieve Event Log Message");
 				else
