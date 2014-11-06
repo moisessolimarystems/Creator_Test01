@@ -9,6 +9,16 @@ class StringUtils
 		//static std::wstring StringToWstring(const std::string &s);
 		//static std::string WstringToString(const std::wstring &ws);
 
+		// Returns true if any multi-byte characters, such as foreign language characters
+		static bool DetectMultiByteCharacters(const std::string &s)
+		{
+			return (s.compare(WstringToString(StringToWstring(s))) != 0);
+		}
+		static bool DetectMultiByteCharacters(const std::wstring &ws)
+		{
+			return (ws.compare(StringToWstring(WstringToString(ws))) != 0);
+		}
+
 		static std::wstring StringToWstring(const std::string &s)
 		{
 			return std::wstring(s.begin(), s.end());

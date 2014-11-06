@@ -1535,8 +1535,11 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						{
 							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
 							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
-							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
-							serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
+							if(!StringUtils::DetectMultiByteCharacters(tmpWstring))
+								serviceInfo.display = tmpWstring;
+							else
+								serviceInfo.display = std::wstring(L"-");
+							//serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
 						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
@@ -1544,8 +1547,11 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						{
 							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
 							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
-							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
-							serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
+							if(!StringUtils::DetectMultiByteCharacters(tmpWstring))
+								serviceInfo.description = tmpWstring;
+							else
+								serviceInfo.description = std::wstring(L"-");
+							//serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
 						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpServiceTypeByte];
@@ -1557,11 +1563,24 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						wchar_t buf[1024];
 						_snwprintf(buf, 
 						  sizeof(buf)/sizeof(wchar_t), 
-						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Name: '%s', Path: '%s', Started: '%s', DisplayName: '%s'", 
+						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Name: '%s', Path: '%s', Started: '%s'", 
 						  std::wstring(serviceInfo.name).c_str(),
 						  std::wstring(serviceInfo.path).c_str(),
-						  serviceInfo.bStarted == true ? L"TRUE" : L"FALSE",
+						  serviceInfo.bStarted == true ? L"TRUE" : L"FALSE"
+						  );
+						OutputDebugStringW(buf);
+
+						_snwprintf(buf, 
+						  sizeof(buf)/sizeof(wchar_t), 
+						  L"SoftwareServer::GenerateLicenseSystemData() - Service - DisplayName: '%s'", 
 						  std::wstring(serviceInfo.display).c_str()
+						  );
+						OutputDebugStringW(buf);
+
+						_snwprintf(buf, 
+						  sizeof(buf)/sizeof(wchar_t), 
+						  L"SoftwareServer::GenerateLicenseSystemData() - Service - Description: '%s'", 
+						  std::wstring(serviceInfo.description).c_str()
 						  );
 						OutputDebugStringW(buf);
 						//*/
@@ -1621,8 +1640,11 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						{
 							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
 							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
-							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
-							serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
+							if(!StringUtils::DetectMultiByteCharacters(tmpWstring))
+								serviceInfo.display = tmpWstring;
+							else
+								serviceInfo.display = std::wstring(L"-");
+							//serviceInfo.display = std::wstring(tmpString.begin(), tmpString.end());
 						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpDescriptionByte];
@@ -1630,8 +1652,11 @@ OutputDebugString(L"SoftwareServer::GenerateLicenseSystemData() - Get System Inf
 						{
 							// There is sometime a multibyte character that will cause wcstombs_s to error out with EILSEQ
 							std::wstring tmpWstring = std::wstring(pvtTmp->bstrVal);
-							std::string tmpString = std::string(tmpWstring.begin(), tmpWstring.end());
-							serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
+							if(!StringUtils::DetectMultiByteCharacters(tmpWstring))
+								serviceInfo.description = tmpWstring;
+							else
+								serviceInfo.description = std::wstring(L"-");
+							//serviceInfo.description = std::wstring(tmpString.begin(), tmpString.end());
 						}
 
 						pvtTmp = &rList[idx][(wchar_t*)tmpServiceTypeByte];
