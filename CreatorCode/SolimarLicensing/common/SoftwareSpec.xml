@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="31">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="32">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -210,6 +210,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="50" moduleName="PostScript::AFPDS"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PostScript::PDF"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PostScript::PostScript"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="32"/>	  
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="10" productName="SOLindexer">
