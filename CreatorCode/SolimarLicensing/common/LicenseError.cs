@@ -265,7 +265,7 @@ namespace Solimar
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED,"Failed to apply Software License Packet.  This Packet has already been applied (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET,"License Server does not support generating License Packets (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY,"Can not generate License Archive that does not validate against a Protection Key (License server)");
-				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,"Failed to apply License Archive. License Codes do not match, probably an trying to use an old License Archive (License server)");
+				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,"Failed to apply License Archive. License Codes do not match, probably trying to use an old License Archive (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,"Software License Expired (License server)");
 				SolLicErrors.Add(EHR_LIC_SOFTWARE_NO_PRODUCT,"Software Licensing does not contain licensing for the given product (License Server)");

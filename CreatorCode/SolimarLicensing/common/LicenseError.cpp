@@ -54,7 +54,7 @@ const SL_ERROR SLErrors[] =
 	{EC_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED,						EHR_LIC_SOFTWARE_LIC_PACKET_ALREADY_ENTERED,						L"Failed to apply Software License Packet.  This Packet has already been applied (License server)"},
 	{EC_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET,						EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_PACKET,						L"License Server does not support generating License Packets (License server)"},
 	{EC_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY,						EHR_LIC_SOFTWARE_CANT_GENERATE_LIC_ARCHIVE_NO_KEY,						L"Can not generate License Archive that does not validate against a Protection Key (License server)"},
-	{EC_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,						EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,						L"Failed to apply License Archive. License Codes do not match, probably an trying to use an old License Archive (License server)"},
+	{EC_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,						EHR_LIC_SOFTWARE_LIC_ARCHIVE_CODE_NO_MATCH,						L"Failed to apply License Archive. License Codes do not match, probably trying to use an old License Archive (License server)"},
 	{EC_LIC_SOFTWARE_KEY_ID_REQUIRED,						EHR_LIC_SOFTWARE_KEY_ID_REQUIRED,						L"Failed to update software license, appropriate Protection Key is required to be on the License Server for this action (License server)"},
 	{EC_LIC_SOFTWARE_LIC_FILE_EXPIRED,						EHR_LIC_SOFTWARE_LIC_FILE_EXPIRED,						L"Software License Expired (License server)"},
 	{EC_LIC_SOFTWARE_NO_PRODUCT,						EHR_LIC_SOFTWARE_NO_PRODUCT,						L"Software Licensing does not contain licensing for the given product (License Server)"},
