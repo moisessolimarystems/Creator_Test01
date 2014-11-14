@@ -2030,6 +2030,40 @@ namespace Solimar{	namespace Licensing{		namespace LicenseManagerWrapper
 		return ;
 	}
 
+	bool SolimarLicenseServerWrapper::CanDeleteSoftwareLicense(String^ softwareLicense)
+	{
+		BSTR bstrSoftwareLicense;
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(softwareLicense));
+		bstrSoftwareLicense = (static_cast<BSTR>(static_cast<void *>(ptr)));
+		VARIANT_BOOL vtBoolValue;
+		HRESULT hrResult = m_pLicenseServerWrapper->CanDeleteSoftwareLicense(bstrSoftwareLicense, &vtBoolValue);
+		if(FAILED(hrResult))
+		{
+			//free BSTR
+			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		}
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+
+		return (vtBoolValue == VARIANT_TRUE);
+	}
+	void SolimarLicenseServerWrapper::DeleteSoftwareLicense(String^ softwareLicense)
+	{
+		BSTR bstrSoftwareLicense;
+		System::IntPtr ptr(System::Runtime::InteropServices::Marshal::StringToBSTR(softwareLicense));
+		bstrSoftwareLicense = (static_cast<BSTR>(static_cast<void *>(ptr)));
+		HRESULT hrResult = m_pLicenseServerWrapper->DeleteSoftwareLicense(bstrSoftwareLicense);
+		if(FAILED(hrResult))
+		{
+			//free BSTR
+			System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+			throw gcnew System::Runtime::InteropServices::COMException(gcnew String(LicenseServerError::GetErrorMessage(hrResult).c_str()), hrResult);
+		}
+		//free BSTR
+		System::Runtime::InteropServices::Marshal::FreeBSTR(ptr);
+	}
+
 	void SolimarLicenseServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(String^ softwareLicense, String^ contractNumber)
 	{
 		BSTR bstrSoftwareLicense;

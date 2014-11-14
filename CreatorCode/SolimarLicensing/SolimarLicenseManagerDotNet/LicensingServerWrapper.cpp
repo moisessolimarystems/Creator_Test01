@@ -493,6 +493,26 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::DeleteEmailAlert(B
 	return hr;
 }
 
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::CanDeleteSoftwareLicense(BSTR bstrSoftwareLicense, VARIANT_BOOL *pVtCanDelete)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr4, licenseSoftwareServer, CanDeleteSoftwareLicense, (bstrSoftwareLicense, pVtCanDelete), hr);
+	}
+	return hr;
+}
+
+HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::DeleteSoftwareLicense(BSTR bstrSoftwareLicense)
+{
+	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);
+	if(bConnected)
+	{
+		LIC_SSLSERVER_ON_INTERFACE_FTCALL_HR(ISolimarSoftwareLicenseSvr4, licenseSoftwareServer, DeleteSoftwareLicense, (bstrSoftwareLicense), hr);
+	}
+	return hr;
+}
+
 HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber(BSTR bstrSoftwareLicense, BSTR bstrContractNumber)
 {
 	HRESULT hr(LicenseServerError::EHR_WRPPR_SVR_NOT_CONNECTED);

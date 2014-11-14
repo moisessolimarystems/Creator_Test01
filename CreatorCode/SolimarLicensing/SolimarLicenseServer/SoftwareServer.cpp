@@ -2463,33 +2463,10 @@ HRESULT SoftwareServer::GenerateSoftwareLicArchive_ByLicense(BSTR softwareLicens
 			throw hr;
 
 		//Delete old license object and license file from the system...
-		for(	SoftwareLicList::iterator swLicMgrIt = softwareLicMgrMap.begin();
-				swLicMgrIt != softwareLicMgrMap.end();
-				swLicMgrIt++)
-		{
-			BSTR tmpBstrLicName;
-			hr = swLicMgrIt->second->GetSoftwareLicenseName(&tmpBstrLicName);
-			if(SUCCEEDED(hr))
-			{
-				if(_wcsicmp(tmpBstrLicName, softwareLicense) == 0)
-				{
-					hr = swLicMgrIt->second->DeleteLicenseFile();
-					SysFreeString(tmpBstrLicName);
-					if(FAILED(hr))
-						throw hr;
-
-					delete swLicMgrIt->second;
-					swLicMgrIt->second = NULL;
-					softwareLicMgrMap.erase(swLicMgrIt);
-
-					g_licenseController.GenerateMessage(tmpBstrLicName, MT_INFO, S_OK, time(0), MessageGeneric, L"Successfully generated License Archive from Software License. The original Software License has been removed. This License Archive can be transferred to another system.");
-					SysFreeString(tmpBstrLicName);
-					break;
-				}
-				SysFreeString(tmpBstrLicName);
-			}
-		}
-		ResynchronizeSoftwareLicenses(true);
+		hr = RemoveSoftwareLicense_ByLicenseInternal(softwareLicense);
+		if (FAILED(hr))
+			throw hr;
+		g_licenseController.GenerateMessage(softwareLicense, MT_INFO, S_OK, time(0), MessageGeneric, L"Successfully generated License Archive from Software License. The original Software License has been removed. This License Archive can be transferred to another system.");
 	}
 	catch (HRESULT &ehr)
 	{
@@ -2979,25 +2956,6 @@ HRESULT SoftwareServer::GetEventLogList_ForLicenseServer(BSTR *pBstrEventLogAttr
 	return EventLogLicenseHelper::ReadEventLog(pBstrEventLogAttribsListStream);
 }
 
-//HRESULT SoftwareServer::RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense)
-//{
-//	HRESULT hr(S_OK);
-//	try
-//	{
-//		SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
-//		if(pSwLicMgr == NULL)
-//			throw E_INVALIDARG;
-//	}
-//	catch(HRESULT &eHr)
-//	{
-//		hr = eHr;
-//	}
-//	catch (...)
-//	{
-//		hr = E_FAIL;
-//	}
-//	return hr;
-//}
 
 int m_uniqueValue = 0;
 
@@ -3911,6 +3869,141 @@ HRESULT SoftwareServer::GetProductIdAndApplicationInstanceByLicenseID(BSTR licen
 	SafeMutex mutex(SoftwareLicenseLock);
 	return licCache.GetProductIdAndApplicationInstanceByLicenseID(licenseID, pIntProductID, pBstrApplicationInstance);
 }
+
+// CR.18480
+// Returns true if invalid computer validated tokens, don't include onDomain
+HRESULT SoftwareServer::CanDeleteSoftwareLicense(BSTR softwareLicense, VARIANT_BOOL *pBCanDelete)
+{
+	HRESULT hr (S_OK);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		SoftwareLicenseMgr* pSwLicMgr = GetSoftwareLicenseMgr_ByLicenseInternal(softwareLicense);
+		if(pSwLicMgr == NULL)
+			throw E_INVALIDARG;
+
+		Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_VerificationAttribs verificationAttrib;
+		pSwLicMgr->GetVerificationAttribs(&verificationAttrib);
+		
+		std::wstring value;
+		//Cycle through all the verification tokens, stop if any computer validated fail...
+		for(	std::vector<Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs>::iterator valTokenIT = verificationAttrib.validationTokenList->begin();
+				SUCCEEDED(hr) && (valTokenIT != verificationAttrib.validationTokenList->end());
+				valTokenIT++)
+		{
+			switch(valTokenIT->tokenType)
+			{
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttBiosSerialNumber:
+					value = Lic_PackageAttribsHelper::GetValidationValue(&verificationAttrib.validationTokenList, valTokenIT->tokenType);
+					hr = pSwLicMgr->ValidateHardwareBiosSerialNumber(value.c_str());
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttMacAddress:
+					value = Lic_PackageAttribsHelper::GetValidationValue(&verificationAttrib.validationTokenList, valTokenIT->tokenType);
+					hr = pSwLicMgr->ValidateHardwareMacAddress(value.c_str());
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttComputerName:
+					value = Lic_PackageAttribsHelper::GetValidationValue(&verificationAttrib.validationTokenList, valTokenIT->tokenType);
+					hr = pSwLicMgr->ValidateHardwareCompuerName(value.c_str());
+					break;
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttDomainName:
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttLicenseCode:
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttPartOfDomain:
+				case Lic_PackageAttribs::Lic_LicenseInfoAttribs::Lic_ValidationTokenAttribs::ttHardwareKeyID:
+				default:
+					// Do nothing, these values can't accidently be changed on a virtual image
+					break;
+			};
+		}
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+
+	// Only allow for software license deletion if the bios serial number, mac address or computer name does not match.
+	*pBCanDelete = FAILED(hr) ? VARIANT_TRUE : VARIANT_FALSE;
+
+	return S_OK;
+}
+
+// Only allow softwareLicense to be deleted if there are invalid computer validated tokens
+HRESULT SoftwareServer::DeleteSoftwareLicense(BSTR softwareLicense)
+{
+	HRESULT hr (S_OK);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		VARIANT_BOOL vtCanDelete;
+		hr = CanDeleteSoftwareLicense(softwareLicense, &vtCanDelete);
+		if (FAILED(hr))
+			throw hr;
+		if (vtCanDelete == VARIANT_FALSE)	// Shouldn't ever get here, so don't worry about a custom HR
+			throw E_FAIL;
+
+		hr = RemoveSoftwareLicense_ByLicenseInternal(softwareLicense);
+		if (FAILED(hr))
+			throw hr;
+
+		g_licenseController.GenerateMessage(softwareLicense, MT_INFO, S_OK, time(0), MessageGeneric, L"Successfully deleted Software License '%s' from the system.", (wchar_t*)softwareLicense);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
+HRESULT SoftwareServer::RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense)
+{
+	HRESULT hr (S_OK);
+	SafeMutex mutex(SoftwareLicenseLock);
+	try
+	{
+		for(	SoftwareLicList::iterator swLicMgrIt = softwareLicMgrMap.begin();
+				swLicMgrIt != softwareLicMgrMap.end();
+				swLicMgrIt++)
+		{
+			BSTR tmpBstrLicName;
+			hr = swLicMgrIt->second->GetSoftwareLicenseName(&tmpBstrLicName);
+			if(SUCCEEDED(hr))
+			{
+				if(_wcsicmp(tmpBstrLicName, softwareLicense) == 0)
+				{
+					hr = swLicMgrIt->second->DeleteLicenseFile();
+					SysFreeString(tmpBstrLicName);
+					if(FAILED(hr))
+						throw hr;
+
+					delete swLicMgrIt->second;
+					swLicMgrIt->second = NULL;
+					softwareLicMgrMap.erase(swLicMgrIt);
+
+					break;
+				}
+				SysFreeString(tmpBstrLicName);
+			}
+		}
+		ResynchronizeSoftwareLicenses(true);
+	}
+	catch(HRESULT eHr)
+	{
+		hr = eHr;
+	}
+	catch(_com_error &e)
+	{
+		hr = e.Error();
+	}
+	return hr;
+}
+
 //
 HRESULT SoftwareServer::MergeLicInfoAttribsInternal(Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeFromLicenseInfoAttribs, Lic_PackageAttribs::Lic_LicenseInfoAttribs *pMergeToLicenseInfoAttribs)
 {

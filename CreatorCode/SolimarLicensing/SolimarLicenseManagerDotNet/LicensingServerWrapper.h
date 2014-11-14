@@ -144,6 +144,9 @@ namespace SolimarLicenseManagerWrapper
 			HRESULT AddEmailAlert(BSTR bstrEmailAlertMailAttribsStream, BSTR *pBstrEmailAlertId);
 			HRESULT DeleteEmailAlert(BSTR bstrEmailAlertId);
 
+			HRESULT CanDeleteSoftwareLicense(BSTR bstrSoftwareLicense, VARIANT_BOOL *pVtCanDelete);
+			HRESULT DeleteSoftwareLicense(BSTR bstrSoftwareLicense);
+
 			HRESULT KeyEnumerate(VARIANT *pVtKeyList);
 			HRESULT KeyHeaderQuery(BSTR bstrKey, long headerIdent, VARIANT *pVtValue);
 			HRESULT KeyTrialHours(BSTR bstrKey, long *plTrialHours);

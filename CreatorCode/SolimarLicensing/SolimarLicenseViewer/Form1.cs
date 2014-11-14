@@ -785,6 +785,7 @@ namespace SolimarLicenseViewer
             useActivationOnLicenseDropDownMenuItem.DropDownItems.Clear();
             genVerificationOnLicenseDropDownMenuItem.DropDownItems.Clear();
             genLicArchiveOnLicenseDropDownMenuItem.DropDownItems.Clear();
+            removeLicenseServerToolStripMenuItem.DropDownItems.Clear();
 
             //Expose enterPasswordToolStripMenuItem for any protection key that is not Uninitialized/Verification
             enterPasswordToolStripMenuItem.Visible = false;
@@ -806,10 +807,19 @@ namespace SolimarLicenseViewer
             Solimar.Licensing.Attribs.AttribsMemberStringList strList = new Solimar.Licensing.Attribs.AttribsMemberStringList("stringList", new System.Collections.ArrayList());
             strList.SVal = generalStream;
             bool bAtleastOneSoftwareServer = false;
+
+            int major = 0;
+            int minor = 0;
+            int build = 0;
+            this.m_CommLink.GetVersionLicenseServer(this.m_CommLink.ServerName, ref major, ref minor, ref build);
+            // License Server 3.3 and greater support deleting license servers.
+            bool bSupportsDeleteLicServer = (major > 3 || (major == 3 && minor >= 3));
+
             //display each package name and type
             System.Collections.Generic.SortedList<string, ToolStripMenuItem> genVerifyDataSortedList = new SortedList<string, ToolStripMenuItem>();
             System.Collections.Generic.SortedList<string, ToolStripMenuItem> genLicArchiveSortedList = new SortedList<string, ToolStripMenuItem>();
             System.Collections.Generic.SortedList<string, ToolStripMenuItem> useLicArchiveSortedList = new SortedList<string, ToolStripMenuItem>();
+            System.Collections.Generic.SortedList<string, ToolStripMenuItem> removeLicServerSortedList = new SortedList<string, ToolStripMenuItem>();
             foreach (string softwareLicense in strList.TVal)
             {
                 bAtleastOneSoftwareServer = true;
@@ -835,6 +845,15 @@ namespace SolimarLicenseViewer
                         genLicArchiveSortedList.Add(softwareLicense, tsMenuItem);
                     }
                 }
+
+                if (bSupportsDeleteLicServer && m_CommLink.CanDeleteSoftwareLicense(softwareLicense))
+                {
+                   tsMenuItem = new ToolStripMenuItem(softwareLicense);
+                   tsMenuItem.Tag = softwareLicense;
+                   tsMenuItem.ToolTipText = "Permanently delete License Server: " + softwareLicense;
+                   tsMenuItem.Click += new EventHandler(removeLicenseServerTSMI_Click);
+                   removeLicServerSortedList.Add(softwareLicense, tsMenuItem);
+                }
             }
             foreach (string swLic in useLicArchiveSortedList.Keys)
                 useActivationOnLicenseDropDownMenuItem.DropDownItems.Add(useLicArchiveSortedList[swLic]);
@@ -842,6 +861,8 @@ namespace SolimarLicenseViewer
                 genVerificationOnLicenseDropDownMenuItem.DropDownItems.Add(genVerifyDataSortedList[swLic]);
             foreach (string swLic in genLicArchiveSortedList.Keys)
                 genLicArchiveOnLicenseDropDownMenuItem.DropDownItems.Add(genLicArchiveSortedList[swLic]);
+            foreach (string swLic in removeLicServerSortedList.Keys)
+               removeLicenseServerToolStripMenuItem.DropDownItems.Add(removeLicServerSortedList[swLic]);
 
             updateLicToolStripMenuItem.Visible = bAtleastOneSoftwareServer;
             //genVerificationOnLicenseDropDownMenuItem.Visible = genVerificationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
@@ -851,6 +872,9 @@ namespace SolimarLicenseViewer
 
             useActivationOnLicenseDropDownMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
             sep3ToolStripMenuItem.Visible = useActivationOnLicenseDropDownMenuItem.DropDownItems.Count != 0;
+
+            sep6ToolStripMenuItem.Visible = removeLicenseServerToolStripMenuItem.DropDownItems.Count > 0;
+            removeLicenseServerToolStripMenuItem.Visible = removeLicenseServerToolStripMenuItem.DropDownItems.Count > 0;
         }
 
 
@@ -1141,6 +1165,34 @@ namespace SolimarLicenseViewer
 
                 PopulateAllViews();
             }
+        }
+
+        private void removeLicenseServerTSMI_Click(object sender, EventArgs e)
+        {
+           try
+           {
+              ToolStripMenuItem tsMenu = sender as ToolStripMenuItem;
+              if (tsMenu != null)
+              {
+                 string softwareLicense = tsMenu.Tag as string;
+                 string deleteQuestion = string.Format("Are you sure you want to permanently delete License Server \'{0}\'?", softwareLicense);
+                 if (MessageBox.Show(deleteQuestion, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                 {
+                    this.Cursor = Cursors.WaitCursor;
+                    m_CommLink.DeleteSoftwareLicense(softwareLicense);
+
+                    PopulateAllViews();
+                 }
+              }
+           }
+           catch (Exception ex)
+           {
+              HandleExceptions.DisplayException(this, ex, "Failed to delete License Server", "Error");
+           }
+           finally
+           {
+              this.Cursor = Cursors.Default;
+           }
         }
 
         #endregion

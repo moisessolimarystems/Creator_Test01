@@ -115,6 +115,10 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		
 		HRESULT GetProductIdAndApplicationInstanceByLicenseID(BSTR licenseID, int* pIntProductID, BSTR *pBstrApplicationInstance);
 
+		// CR.18480
+		HRESULT CanDeleteSoftwareLicense(BSTR softwareLicense, VARIANT_BOOL *pBCanDelete);
+		HRESULT DeleteSoftwareLicense(BSTR softwareLicense);
+
 		HRESULT TimesUp();
 		HRESULT CheckHealth(unsigned int timeout);
 	private:
@@ -188,7 +192,8 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		//returns NULL when not found...
 		SoftwareLicenseMgr* GetSoftwareLicenseMgr_ByLicenseInternal(BSTR softwareLicense);
 
-		//HRESULT RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense);
+		// CR.18480
+		HRESULT RemoveSoftwareLicense_ByLicenseInternal(BSTR softwareLicense);
 
 
 		// Matches same variables in KeyServer.h

@@ -238,6 +238,19 @@ __interface ISolimarSoftwareLicenseSvr3 : ISolimarSoftwareLicenseSvr2
    [id(126),helpstring("method GenerateLicenseSystemDataForSolimar")] HRESULT GenerateLicenseSystemDataForSolimar();
 };
 
+// ISolimarSoftwareLicenseSvr4
+[
+	object,
+	uuid("1B91390B-C8CA-4C09-A383-92DB03B38643"),
+	dual,	helpstring("ISolimarSoftwareLicenseSvr4 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarSoftwareLicenseSvr4 : ISolimarSoftwareLicenseSvr3
+{
+	[id(127),helpstring("method CanDeleteSoftwareLicense")] HRESULT CanDeleteSoftwareLicense([in] BSTR softwareLicense, [out,retval] VARIANT_BOOL *bCanDelete);
+	[id(128),helpstring("method DeleteSoftwareLicense")] HRESULT DeleteSoftwareLicense([in] BSTR softwareLicense);
+};
+
 // CSolimarLicenseSvr
 
 [
@@ -252,7 +265,7 @@ __interface ISolimarSoftwareLicenseSvr3 : ISolimarSoftwareLicenseSvr2
 ]
 class ATL_NO_VTABLE CSolimarLicenseSvr : 
 	public ISolimarLicenseSvr4, 
-	public ISolimarSoftwareLicenseSvr3,
+	public ISolimarSoftwareLicenseSvr4,
 	public ISolimarConversionToSoftwareLicenseSvr,
 	public ISolimarLicenseEmailAlert,
 	public IObjectAuthentication,
@@ -513,6 +526,10 @@ public:
 	// ISolimarSoftwareLicenseSvr3
 	STDMETHOD(GenerateStreamData_ByLicenseSystemData2)(VARIANT vtLicSysDataPacket, BSTR *pBstrCreatedDateStreamed, BSTR *pBstrKeyAttribsListStream, BSTR *pBstrLicUsageDataAttribsStream, BSTR *pBstrConnectionAttribsListStream, BSTR *pBstrEventLogAttribsListStream, BSTR *pBstrLicInfoDataAttribsListStream, BSTR *pBstrLicAlertInfoAttribs);
 	STDMETHOD(GenerateLicenseSystemDataForSolimar)();
+
+	// ISolimarSoftwareLicenseSvr4
+	STDMETHOD(CanDeleteSoftwareLicense)(BSTR softwareLicense, VARIANT_BOOL *pBCanDelete);
+	STDMETHOD(DeleteSoftwareLicense)(BSTR softwareLicense);
 private:
 
 	// Connection to the License Server via CocreateInstance will have a different m_licenseId.
