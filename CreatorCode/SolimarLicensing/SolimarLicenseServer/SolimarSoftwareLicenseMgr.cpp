@@ -588,10 +588,15 @@ HRESULT SoftwareLicenseMgr::WmiQueryContainsValue(wchar_t* _wQuery, wchar_t* _wC
 				VARIANT* pvtTmp = &rList[idx][_wColumn];
 				if (pvtTmp->vt == VT_BSTR)
 				{
-					// The '™' character causes the encrypting of the xml to fail so it has been removed from teh token already, remove it from queried value
+					// The '™' character causes the encrypting of the xml to fail so it has been removed from the token already, remove it from queried value
 					std::wstring wsOS = std::wstring(pvtTmp->bstrVal);
 					size_t stEscapePos = wsOS.find(L"™");
-					if(stEscapePos != std::wstring::npos)
+					if (stEscapePos != std::wstring::npos)
+						wsOS.replace(stEscapePos, 1, L" ") ;
+
+					// CR.18357  - The '®' character causes the encrypting of the xml to fail so it has been removed from the token already, remove it from queried value
+					// I haven only seen'®' in 'Microsoft® Windows Server® 2008 Enterprise '.  Windows Server 2008 R2 does not have this issue.
+					for (stEscapePos = wsOS.find(L"®"); stEscapePos != std::wstring::npos; stEscapePos = wsOS.find(L"®"))
 						wsOS.replace(stEscapePos, 1, L" ") ;
 
 					if(_wcsicmp(wsOS.c_str(), _bstrValue) == 0)

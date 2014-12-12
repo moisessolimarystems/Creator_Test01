@@ -426,8 +426,8 @@ You can contact the Solimar Technical Support Team \hich\af1\dbch\af28\loch\f1 b
 				{
 					operatingSystem = obj["Caption"] != null ? obj["Caption"].ToString() : "NULL";
 
-					// The '™' character causes the encrypting of the xml to fail, remove.
-					operatingSystem = operatingSystem.Replace('™', ' ');
+					// The '™' and '®' character causes the encrypting of the xml to fail, remove.
+					operatingSystem = operatingSystem.Replace('™', ' ').Replace('®', ' ');
 				}
 
 				obj.Dispose();
@@ -583,6 +583,7 @@ You can contact the Solimar Technical Support Team \hich\af1\dbch\af28\loch\f1 b
 			else if (_newTabPageIdx == 1)
 			{
 				ActiveControl = idLicenseSvrTextBox;
+				idLicenseSvrTextBox.Focus();
 				this.AcceptButton = idLicenseSvrButton;
 			}
 			else if (_newTabPageIdx == 2)
@@ -612,7 +613,6 @@ You can contact the Solimar Technical Support Team \hich\af1\dbch\af28\loch\f1 b
 		{
 			System.Diagnostics.Process.Start(e.LinkText);
 		}
-
 	}
 
 
