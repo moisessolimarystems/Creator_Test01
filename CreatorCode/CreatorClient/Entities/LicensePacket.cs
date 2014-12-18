@@ -139,8 +139,8 @@ namespace Client.Creator
                         {
                             if(token.TokenType == (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
                             {
-                                if (data.ClearLicenseCode)
-                                    continue; //skip licenseCode if user doesn't select ClearLicenseCode
+                                if (!data.ClearLicenseCode)
+                                    continue; //skip licenseCode token ClearLicenseCode selected
                                 bExistLicenseCode = true;
                             }
                         }
