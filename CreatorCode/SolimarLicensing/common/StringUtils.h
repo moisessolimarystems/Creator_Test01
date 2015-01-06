@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 //#include <wstring>
 
 class StringUtils
@@ -21,11 +22,17 @@ class StringUtils
 
 		static std::wstring StringToWstring(const std::string &s)
 		{
-			return std::wstring(s.begin(), s.end());
+			// Only works for ASCII chars, can't use.
+			//return std::wstring(s.begin(), s.end());
+
+			std::wstringstream wsStream;
+			wsStream << s.c_str();
+			return wsStream.str();
 		}
 
 		static std::string WstringToString(const std::wstring &ws/*, long* pErrorNo = 0*/)
 		{
+			// This will not convert MultiByte characters correctly
 			return std::string(ws.begin(), ws.end());
 		}
 
