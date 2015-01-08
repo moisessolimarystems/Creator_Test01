@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 33;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 34;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -2691,9 +2691,9 @@ namespace Solimar.Licensing
 			tmpModSpec.bModuleIsCounter.TVal = false;
 			tmpModSpec.bModuleIsPool.TVal = false;
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 1;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 30;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 34;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;

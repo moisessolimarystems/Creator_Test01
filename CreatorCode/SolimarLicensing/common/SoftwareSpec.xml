@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="33">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="34">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -356,7 +356,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="200" moduleName="PostScript Interpreter"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="201" moduleName="TCP/IP Output Dynamic Host Selection" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="Adobe Normalizer" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="30"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="Adobe Normalizer" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="34"/>
 			
 			<!-- Output Pool module -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>

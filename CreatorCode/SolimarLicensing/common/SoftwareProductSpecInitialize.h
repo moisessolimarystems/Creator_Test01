@@ -1389,8 +1389,8 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleName = std::wstring(L"Adobe Normalizer");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 30;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 34;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(202, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(202))->second);
