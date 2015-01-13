@@ -24,7 +24,12 @@ namespace SolimarLicenseDiagnosticDataViewer
         {
             if(!string.IsNullOrEmpty(_title))
                 this.Text = _title;
-            softwareSpecViewerControl1.SetData(_data);
+            this.softwareSpecViewerControl1.SetData(_data);
+        }
+
+        private void softwareSpecViewerControl1_Enter(object sender, EventArgs e)
+        {
+            this.softwareSpecViewerControl1.ExpandBaseNode();
         }
     }
 }

@@ -131,6 +131,8 @@ namespace SolimarLicenseViewer
 
         //Usage Node Column Headers
         public static readonly String UsageProductHeader = "Product";
+        public static readonly String UsageUsedAppInstanceHeader = "Used Product Connections";
+        public static readonly String UsageTotalAppInstanceHeader = "Total Product Connections";
         public static readonly String UsageAppInstanceHeader = "Product Connections";//"Application Instance";
         public static readonly String UsageModuleHeader = "Module";
         public static readonly String ObtainedHeader = "Obtained";

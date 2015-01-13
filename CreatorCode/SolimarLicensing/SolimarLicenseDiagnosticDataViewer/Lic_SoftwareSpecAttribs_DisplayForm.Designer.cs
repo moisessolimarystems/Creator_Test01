@@ -42,6 +42,7 @@
             this.softwareSpecViewerControl1.ShowNodeToolTips = true;
             this.softwareSpecViewerControl1.Size = new System.Drawing.Size(507, 344);
             this.softwareSpecViewerControl1.TabIndex = 0;
+            this.softwareSpecViewerControl1.Enter += new System.EventHandler(this.softwareSpecViewerControl1_Enter);
             // 
             // Lic_SoftwareSpecAttribs_DisplayForm
             // 
@@ -50,7 +51,6 @@
             this.ClientSize = new System.Drawing.Size(507, 344);
             this.Controls.Add(this.softwareSpecViewerControl1);
             this.Name = "Lic_SoftwareSpecAttribs_DisplayForm";
-            this.ShowIcon = false;
             this.Text = "Lic_SoftwareSpecAttribs";
             this.ResumeLayout(false);
 

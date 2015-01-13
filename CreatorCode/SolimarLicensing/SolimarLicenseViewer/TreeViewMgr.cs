@@ -233,9 +233,12 @@ namespace SolimarLicenseViewer
                     }
                 }
             }
-            catch (COMException /*ex*/)
+            catch (COMException)
             {
                 rootNode = null;
+                //HandleExceptions.DisplayException(ex);
+                throw;
+
             }
             return rootNode;
         }
@@ -293,14 +296,26 @@ namespace SolimarLicenseViewer
                             if (usageMap.Count > 0)
                             {
                                 productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
-                                TreeNode prodNode = new TreeNode(productName);
+                                TreeNode prodNode = new TreeNode();
                                 prodNode.ImageIndex = GetIconIndex(productName);
                                 prodNode.SelectedImageIndex = prodNode.ImageIndex;
-                                prodNode.Name = prodNode.Text;
+                                
+                                prodNode.Name = productName;
+                                if (m_CommLink.bDiagnosticDateView == true)
+                                   prodNode.Text = string.Format("{0} ({1})", prodNode.Name, usageMap.Count);
+                                else
+                                   prodNode.Text = string.Format("{0} ({1}/{2})", prodNode.Name, usageMap.Count, prodInfo.productAppInstance.TVal.ToString());
+
                                 toolTipBuilder = new StringBuilder();
                                 toolTipBuilder.Append(AppConstants.UsageProductHeader);
                                 toolTipBuilder.Append(": ");
                                 toolTipBuilder.Append(productName);
+
+                                if (m_CommLink.bDiagnosticDateView == true)
+                                   toolTipBuilder.Append(string.Format("\n{0} {1} used", usageMap.Count, AppConstants.UsageAppInstanceHeader));
+                                else 
+                                   toolTipBuilder.Append(string.Format("\n{0} of {1} {2} used", usageMap.Count, prodInfo.productAppInstance.TVal.ToString(), AppConstants.UsageAppInstanceHeader));
+
                                 prodNode.ToolTipText = toolTipBuilder.ToString();
 
                                 #region foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)

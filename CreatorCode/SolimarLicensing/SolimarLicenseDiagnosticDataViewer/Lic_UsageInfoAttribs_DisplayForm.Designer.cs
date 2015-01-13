@@ -44,11 +44,11 @@
             this.usageTreeView.Name = "usageTreeView";
             this.usageTreeView.ShowLines = false;
             this.usageTreeView.ShowNodeToolTips = true;
-            this.usageTreeView.ShowRootLines = false;
             this.usageTreeView.Size = new System.Drawing.Size(360, 298);
             this.usageTreeView.TabIndex = 0;
-            this.usageTreeView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.General_MouseClick);
+            this.usageTreeView.Enter += new System.EventHandler(this.usageTreeView_Enter);
             this.usageTreeView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.usageTreeView_KeyDown);
+            this.usageTreeView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.General_MouseClick);
             // 
             // contextMenuStrip1
             // 
@@ -71,7 +71,6 @@
             this.ClientSize = new System.Drawing.Size(360, 298);
             this.Controls.Add(this.usageTreeView);
             this.Name = "Lic_UsageInfoAttribs_DisplayForm";
-            this.ShowIcon = false;
             this.Text = "Lic_UsageInfoAttribs";
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);

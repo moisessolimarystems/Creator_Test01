@@ -27,9 +27,14 @@ namespace SolimarLicenseDiagnosticDataViewer
                 //licenseInfoTreeView
                 //Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs g_softwareSpec;
                 Solimar.Licensing.GlobalSoftwareSpec globalSwSpec = new Solimar.Licensing.GlobalSoftwareSpec();
-                licenseInfoTreeView.SetData(globalSwSpec.softwareSpec, _data, true);
+                this.licenseInfoTreeView.SetData(globalSwSpec.softwareSpec, _data, true);
 
             }
+        }
+
+        private void Lic_LicenseInfoAttribs_DisplayForm_Enter(object sender, EventArgs e)
+        {
+            this.licenseInfoTreeView.ExpandBaseNode();
         }
     }
 

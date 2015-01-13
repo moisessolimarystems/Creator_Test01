@@ -75,6 +75,11 @@ namespace Shared.VisualComponents
                 this.EndUpdate();
             }
         }
+        public void ExpandBaseNode()
+        {
+            if (this.Nodes.Count > 0)
+                this.Nodes[0].Expand();
+        }
 
         void Tree_Add_Lic_SoftwareSpecAttribs(ref TreeNode param_refRootNode, Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs param_SoftwareSpec)
         {

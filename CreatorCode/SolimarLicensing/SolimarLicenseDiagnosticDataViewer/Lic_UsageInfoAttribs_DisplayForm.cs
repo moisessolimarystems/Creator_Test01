@@ -152,5 +152,11 @@ namespace SolimarLicenseDiagnosticDataViewer
             parentTreeNode.Nodes.Insert(insertIdx, newChildTreeNode);
         }
 
+        private void usageTreeView_Enter(object sender, EventArgs e)
+        {
+            if (this.usageTreeView.Nodes.Count > 0)
+                this.usageTreeView.Nodes[0].Expand();
+        }
+
     }
 }

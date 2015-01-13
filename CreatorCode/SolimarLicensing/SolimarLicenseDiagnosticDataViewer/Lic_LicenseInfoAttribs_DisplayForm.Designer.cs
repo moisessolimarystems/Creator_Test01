@@ -52,8 +52,8 @@ namespace SolimarLicenseDiagnosticDataViewer
 			this.ClientSize = new System.Drawing.Size(452, 302);
 			this.Controls.Add(this.licenseInfoTreeView);
 			this.Name = "Lic_LicenseInfoAttribs_DisplayForm";
-			this.ShowIcon = false;
 			this.Text = "Lic_LicenseInfoAttribs";
+			this.Enter += new System.EventHandler(this.Lic_LicenseInfoAttribs_DisplayForm_Enter);
 			this.ResumeLayout(false);
 
 		}
