@@ -51,23 +51,30 @@ namespace SolimarLicenseViewer
 
         private void PopulateTreeView()
         {
-            Cursor.Current = Cursors.WaitCursor;
-            m_treeViewMgr.PopulateView(hideEmptyLicServersToolStripMenuItem.Checked);
-            if (m_listViewMgr.SelectedNode != null)
-            {
-                TreeNode[] foundNodes = this.treeView.Nodes.Find(m_listViewMgr.SelectedNode.Name, true);
-                if (foundNodes.Length > 0)
-                    this.treeView.SelectedNode = foundNodes[0];
-                else
-                    this.treeView.SelectedNode = null;
+           try
+           {
+               Cursor.Current = Cursors.WaitCursor;
+               m_treeViewMgr.PopulateView(hideEmptyLicServersToolStripMenuItem.Checked);
+               if (m_listViewMgr.SelectedNode != null)
+               {
+                   TreeNode[] foundNodes = this.treeView.Nodes.Find(m_listViewMgr.SelectedNode.Name, true);
+                   if (foundNodes.Length > 0)
+                       this.treeView.SelectedNode = foundNodes[0];
+                   else
+                       this.treeView.SelectedNode = null;
+               }
+               else if (this.treeView.Nodes.Count > 0)
+               {
+                   if (string.Compare(this.treeView.Nodes[0].Text, "Licenses") == 0)
+                       this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes.Count > 0 ? this.treeView.Nodes[0].Nodes[0] : this.treeView.Nodes[0];
+                   else
+                       //this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 1];
+                       this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 2];
+               }
             }
-            else if (this.treeView.Nodes.Count > 0)
+            catch (Exception ex)
             {
-                if (string.Compare(this.treeView.Nodes[0].Text, "Licenses") == 0)
-                    this.treeView.SelectedNode = this.treeView.Nodes[0].Nodes.Count > 0 ? this.treeView.Nodes[0].Nodes[0] : this.treeView.Nodes[0];
-                else
-                    //this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 1];
-                    this.treeView.SelectedNode = this.treeView.Nodes[this.treeView.Nodes.Count - 2];
+                HandleExceptions.DisplayException(ex);
             }
             Cursor.Current = Cursors.Default;
         }
