@@ -473,7 +473,6 @@ namespace SolimarLicenseViewer
             TheListView.BeginUpdate();
             TheListView.SuspendLayout();
             TheListView.Columns.Clear();
-            TheBottomListView.Columns.Clear();
             ColumnHeader colHeader = null;
             ListView defaultListView = null;
             int defaultColIdx = -1;
@@ -532,16 +531,31 @@ namespace SolimarLicenseViewer
                         colHeader.Tag = typeof(DateTime);
                         TheListView.Columns.Add(colHeader);
 
+                        TheBottomListView.Columns.Clear();
                         TheBottomListView.Columns.Add(AppConstants.PkModuleHeader);
                         TheBottomListView.Columns.Add(AppConstants.PkModuleTotalHeader);
                         TheBottomListView.Columns.Add(AppConstants.PkModuleInUseHeader);
-
+                        TheBottomListView.Columns.Add("");    //Extra Cell at the end
                     }
                     #endregion
                     #region else if(SelectedNode.Name == AppConstants.UsageRootNode)
                     else if (SelectedNode.Name == AppConstants.UsageRootNode)
                     {
-                        TheListView.Columns.Add(AppConstants.UsageProductHeader);
+                        List<ColumnHeader> colHeaderList = new List<ColumnHeader>();
+                        colHeaderList.Add(new ColumnHeader() { Text = AppConstants.UsageProductHeader });
+                        colHeaderList.Add(new ColumnHeader()
+                        {
+                           Text = AppConstants.UsageUsedAppInstanceHeader,
+                           Tag = typeof(int),
+                           TextAlign = HorizontalAlignment.Right
+                        });
+                        colHeaderList.Add(new ColumnHeader()
+                        {
+                           Text = AppConstants.UsageTotalAppInstanceHeader,
+                           Tag = typeof(int),
+                           TextAlign = HorizontalAlignment.Right
+                        });
+                        TheListView.Columns.AddRange(colHeaderList.ToArray());
                     }
                     #endregion
                     #region else if(SelectedNode.Name == AppConstants.ProductConnectionSettingsRootNode)
@@ -561,6 +575,7 @@ namespace SolimarLicenseViewer
                         }
                     }
                     #endregion
+                    #region else if (SelectedNode.Name == AppConstants.EventLogRootNode)
                     else if (SelectedNode.Name == AppConstants.EventLogRootNode)
                     {
                         List<ColumnHeader> colHeaderList = new List<ColumnHeader>();
@@ -586,6 +601,8 @@ namespace SolimarLicenseViewer
                         defaultColIdx = 1;
                         defaultSortOrder = SortOrder.Descending;
                     }
+                    #endregion
+                    #region else if (SelectedNode.Name == AppConstants.EmailAlertNode)
                     else if (SelectedNode.Name == AppConstants.EmailAlertNode)
                     {
                         List<ColumnHeader> colHeaderList = new List<ColumnHeader>();
@@ -596,6 +613,7 @@ namespace SolimarLicenseViewer
 
                         TheListView.Columns.AddRange(colHeaderList.ToArray());
                     }
+                    #endregion
                     break;
                 case 1:
                     #region if (SelectedNode.Name == AppConstants.HistoryNode)
@@ -613,10 +631,16 @@ namespace SolimarLicenseViewer
                     else if (SelectedNode.Parent.Name == AppConstants.LicenseRootNode)
                     {
                         TheListView.Columns.Add(AppConstants.NameHeader);
-                        TheListView.Columns.Add(AppConstants.VersionHeader);
+                        colHeader = new ColumnHeader();
+                        colHeader.Text = AppConstants.VersionHeader;
+                        colHeader.Tag = typeof(double);
+                        colHeader.TextAlign = HorizontalAlignment.Right;
+                        TheListView.Columns.Add(colHeader);
+
                         colHeader = new ColumnHeader();
                         colHeader.Text = AppConstants.AppInstanceHeader;
-                        colHeader.Tag = typeof(DateTime);
+                        colHeader.Tag = typeof(int);
+                        colHeader.TextAlign = HorizontalAlignment.Right;
                         TheListView.Columns.Add(colHeader);
                     }
                     #endregion
@@ -683,46 +707,6 @@ namespace SolimarLicenseViewer
                         prodLicListView.Columns.Add(colHeader);
 
                         #endregion
-
-                        #region Populate Columns for TheBottomListView
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.UnitsHeader;
-                        colHeader.Tag = typeof(string);
-                        moduleDataListView.Columns.Add(colHeader);
-
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.LicensesHeader;
-                        colHeader.Tag = typeof(int);
-                        colHeader.TextAlign = HorizontalAlignment.Right;
-                        moduleDataListView.Columns.Add(colHeader);
-
-                        colHeader = new ColumnHeader();
-                        colHeader.Text = AppConstants.AppInstanceHeader;
-                        colHeader.Tag = typeof(int);
-                        colHeader.TextAlign = HorizontalAlignment.Right;
-                        moduleDataListView.Columns.Add(colHeader);
-
-                        if (m_moduleFilterComboBox.SelectedIndex == 1/*GroupByModule*/)
-                        {
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.AppInstanceExpiredHeader;
-                            colHeader.Tag = typeof(int);
-                            colHeader.TextAlign = HorizontalAlignment.Right;
-                            moduleDataListView.Columns.Add(colHeader);
-                        }
-                        else//if((m_moduleFilterComboBox.SelectedIndex == 0/*Details*/) || (m_moduleFilterComboBox.SelectedIndex == 2/*GroupByProductLicNumber*/))
-                        {
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.ExpirationHeader;
-                            colHeader.Tag = typeof(DateTime);
-                            moduleDataListView.Columns.Add(colHeader);
-
-                            colHeader = new ColumnHeader();
-                            colHeader.Text = AppConstants.ProdLicNumHeader;
-                            colHeader.Tag = typeof(string);
-                            moduleDataListView.Columns.Add(colHeader);
-                        }
-                        #endregion
                     }
                     #endregion
                     #region else if (SelectedNode.Parent.Parent.Name == AppConstants.UsageRootNode)
@@ -747,7 +731,6 @@ namespace SolimarLicenseViewer
                     break;
             }
             TheListView.Columns.Add("");    //Extra Cell at the end
-            TheBottomListView.Columns.Add("");    //Extra Cell at the end
             ResetListViewColumnSorter(TheListView);
             ResetListViewColumnSorter(TheBottomListView);
             if (defaultListView != null)
@@ -764,24 +747,23 @@ namespace SolimarLicenseViewer
 			ColumnHeader colHeader = null;
 			if (SelectedNode.Parent.Parent.Text == AppConstants.LicenseRootNode)
 			{
-				ListView moduleDataListView = TheBottomListView;
 				#region Populate Columns for TheBottomListView
 				colHeader = new ColumnHeader();
 				colHeader.Text = AppConstants.UnitsHeader;
 				colHeader.Tag = typeof(string);
-				moduleDataListView.Columns.Add(colHeader);
+				TheBottomListView.Columns.Add(colHeader);
 
 				colHeader = new ColumnHeader();
 				colHeader.Text = AppConstants.LicensesHeader;
 				colHeader.Tag = typeof(int);
 				colHeader.TextAlign = HorizontalAlignment.Right;
-				moduleDataListView.Columns.Add(colHeader);
+				TheBottomListView.Columns.Add(colHeader);
 
 				colHeader = new ColumnHeader();
 				colHeader.Text = AppConstants.AppInstanceHeader;
 				colHeader.Tag = typeof(int);
 				colHeader.TextAlign = HorizontalAlignment.Right;
-				moduleDataListView.Columns.Add(colHeader);
+				TheBottomListView.Columns.Add(colHeader);
 
 				if (_bDisplayDetails == false/*GroupByModule*/)
 				{
@@ -789,19 +771,19 @@ namespace SolimarLicenseViewer
 					colHeader.Text = AppConstants.AppInstanceExpiredHeader;
 					colHeader.Tag = typeof(int);
 					colHeader.TextAlign = HorizontalAlignment.Right;
-					moduleDataListView.Columns.Add(colHeader);
+					TheBottomListView.Columns.Add(colHeader);
 				}
 				else //if(_bDisplayDetails == false/*Details*/)
 				{
 					colHeader = new ColumnHeader();
 					colHeader.Text = AppConstants.ExpirationHeader;
 					colHeader.Tag = typeof(DateTime);
-					moduleDataListView.Columns.Add(colHeader);
+					TheBottomListView.Columns.Add(colHeader);
 
 					colHeader = new ColumnHeader();
 					colHeader.Text = AppConstants.ProdLicNumHeader;
 					colHeader.Tag = typeof(string);
-					moduleDataListView.Columns.Add(colHeader);
+					TheBottomListView.Columns.Add(colHeader);
 				}
 				#endregion
 			}
@@ -1179,7 +1161,9 @@ namespace SolimarLicenseViewer
                 this.TheBottomListView.BeginUpdate();
                 this.TheBottomListView.Items.Clear();
 
-                bool bDisplayAllModuleInfo = string.Compare(_prodLicNumber, AppConstants.SummaryAllProdLicNum, true) == 0;
+                // bool bDisplayAllModuleInfo = string.Compare(_prodLicNumber, AppConstants.SummaryAllProdLicNum, true) == 0;
+                // bool bDisplayAllModuleInfo = string.Equals(_prodLicNumber, AppConstants.SummaryAllProdLicNum, StringComparison.InvariantCultureIgnoreCase) || (this.TheBottomListView.Items.Count == 0);
+                bool bDisplayAllModuleInfo = string.Equals(_prodLicNumber, AppConstants.SummaryAllProdLicNum, StringComparison.InvariantCultureIgnoreCase);
 
                 //LicenseRootNode
                 if (bDisplayAllModuleInfo == true)
@@ -1780,7 +1764,15 @@ namespace SolimarLicenseViewer
                         if (usageMap.Count > 0)
                         {
                             productName = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
-                            this.TheListView.Items.Add(productName);
+
+                            ListViewItem lvItem = new ListViewItem();
+                            lvItem.Text = m_CommLink.GetProductName((int)prodInfo.productID.TVal);
+                            lvItem.SubItems.Add(usageMap.Count.ToString());
+                            if (m_CommLink.bDiagnosticDateView == true)
+                               lvItem.SubItems.Add("-");
+                            else
+                               lvItem.SubItems.Add(prodInfo.productAppInstance.TVal.ToString());
+                            this.TheListView.Items.Add(lvItem);
                         }
                     }
                 }
@@ -1817,7 +1809,7 @@ namespace SolimarLicenseViewer
                     this.TheListViewToolStrip.Visible = false;
                 }
 
-                System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct(m_CommLink.GetProductID(m_TreeNode.Text));
+                System.Collections.Generic.Dictionary<string, bool?> usageMap = m_CommLink.GetAppInstToUsageMap_ByProduct(m_CommLink.GetProductID(m_TreeNode.Name));
                 if (usageMap.Count > 0)
                 {
                     foreach (System.Collections.Generic.KeyValuePair<string, bool?> usagePair in usageMap)
@@ -3129,6 +3121,32 @@ namespace SolimarLicenseViewer
                         if (InternalSortType == typeof(System.Int32))
                         {
                             compareResult = Convert.ToInt32(itemX) - Convert.ToInt32(itemY);
+                            bCalculatedCompareResult = true;
+                        }
+                        else if (InternalSortType == typeof(double))
+                        {
+                            double dbl1;
+                            double dbl2;
+                            bool bDbl1IsDate = Double.TryParse(itemX, out dbl1);
+                            bool bDbl2IsDate = Double.TryParse(itemY, out dbl2);
+
+                            if (bDbl1IsDate && bDbl2IsDate)
+                            {
+                                //compareResult = Double.Compare(d1, d2);
+                                if (dbl1 - dbl2 == 0)
+                                    compareResult = 0;
+                                else
+                                    compareResult = (dbl1 - dbl2 > 0) ? 1 : -1;
+                            }
+                            else if (!bDbl1IsDate && !bDbl2IsDate)
+                                compareResult = String.Compare(itemX, itemY);
+                            else if (!bDbl1IsDate && bDbl2IsDate)
+                                compareResult = -1;
+                            else if (bDbl1IsDate && !bDbl2IsDate)
+                                compareResult = 1;
+
+                            bCalculatedCompareResult = true;
+                            //compareResult = Convert.ToDecimal(itemX) - Convert.ToDecimal(itemY);
                             bCalculatedCompareResult = true;
                         }
                         else if (InternalSortType == typeof(System.DateTime))
