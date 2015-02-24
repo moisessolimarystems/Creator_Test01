@@ -552,7 +552,7 @@ namespace Client.Creator
                             {
                                 IList<ProductLicenseTable> plList = null;
                                 plList = client.GetProductLicenses(LicenseServer, false);
-                                if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                                if (HasHardwareToken() && plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
                                     throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                             }
                             _plRec.Activations = value;
