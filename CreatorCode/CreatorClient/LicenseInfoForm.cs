@@ -304,7 +304,7 @@ namespace Client.Creator
                             }
                             if (lvItem.Name == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttPartOfDomain.ToString())
                             {
-                                if (lvItem.SubItems[1].Text != Boolean.TrueString)
+                                if (lvItem.SubItems[1].Text.ToLower() != Boolean.TrueString.ToLower())
                                 {
                                     if (MessageBox.Show("The software token 'Part of Domain' has the value 'False'. Do you want to continue to use this set of software tokens?", "Validation Tokens", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                                     {
