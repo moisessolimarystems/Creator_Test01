@@ -2288,7 +2288,7 @@ namespace Client.Creator
                         }
                     }
                 }
-                if (e.OldValue is LicenseVersion) //only product license has a license version
+                if (e.OldValue is LicenseVersion || e.OldValue is ProductLicenseState || e.OldValue is DateTime?) //Version, Status, Exp Date change reload.
                 {
                     LoadSelectedTabPage(PropertyGridTabControl.SelectedTab);
                 }
