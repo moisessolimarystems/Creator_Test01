@@ -17,6 +17,11 @@ namespace SolimarLicenseViewer
         }
         private void InitializeInternal()
         {
+            // CR.18713 - Add SSL & TSL
+            this.encryptionComboBox.Items.Clear();
+            foreach (var element in Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.AttribsMemberEnum_TEncryptionType.GetAliases())
+                this.encryptionComboBox.Items.Add(element);
+            this.encryptionComboBox.SelectedIndex = 0;
         }
 
         private const string TITLE = "Edit Mail Server";
@@ -39,6 +44,10 @@ namespace SolimarLicenseViewer
                 this.portTBox.Text = this.mailServerAttribs.portNumber.TVal.ToString();
                 this.emailTBox.Text = this.mailServerAttribs.fromEmail.TVal;
                 this.displayNameTBox.Text = this.mailServerAttribs.fromDisplayName.TVal;
+
+                // CR.18713 - Add SSL & TSL
+                this.encryptionComboBox.SelectedIndex = Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.AttribsMemberEnum_TEncryptionType.GetIndexFromEnum(this.mailServerAttribs.encryption.TVal);
+
                 if (this.mailServerAttribs.authenticationType.TVal == Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.TAuthenticationType.ttAnonymous)
                     this.authAnoyRButton.Checked = true;
                 else
@@ -52,6 +61,7 @@ namespace SolimarLicenseViewer
             this.portTBox.ReadOnly = _bReadOnly;
             this.emailTBox.ReadOnly = _bReadOnly;
             this.displayNameTBox.ReadOnly = _bReadOnly;
+            this.encryptionComboBox.Enabled = !_bReadOnly;
 
             this.authAnoyRButton.Enabled = !_bReadOnly;
             this.authBasicRButton.Enabled = !_bReadOnly;
@@ -72,6 +82,9 @@ namespace SolimarLicenseViewer
                 this.mailServerAttribs.fromEmail.TVal = this.emailTBox.Text;
                 this.mailServerAttribs.fromDisplayName.TVal = this.displayNameTBox.Text;
 
+                // CR.18713 - Add SSL & TSL
+                this.mailServerAttribs.encryption.EVal = Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.AttribsMemberEnum_TEncryptionType.GetEnumValueFromAlias(this.encryptionComboBox.Text);
+
                 if (this.authAnoyRButton.Checked)
                 {
                     this.mailServerAttribs.authenticationType.TVal = Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.TAuthenticationType.ttAnonymous;
@@ -80,7 +93,7 @@ namespace SolimarLicenseViewer
                 {
                     this.mailServerAttribs.authenticationType.TVal = Lic_ServerDataAttribs.Lic_AlertInfoAttribs.Lic_AlertMailServerAttribs.TAuthenticationType.ttBasic;
                     this.mailServerAttribs.authBasicUserName.TVal = this.authBasicUserTBox.Text;
-                    this.mailServerAttribs.authBasicUserPassword.TVal= this.authBasicPasswordTBox.Text;
+                    this.mailServerAttribs.authBasicUserPassword.TVal = this.authBasicPasswordTBox.Text;
                 }
             }
             return this.mailServerAttribs;
