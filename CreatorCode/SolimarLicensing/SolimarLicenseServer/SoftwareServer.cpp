@@ -3451,6 +3451,13 @@ HRESULT SoftwareServer::SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsL
 			StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.mailServerName)).c_str(), 
 			alertInfoAttribs.mailServer.portNumber
 			);
+
+		// CR.18713 - Add SSL & TSL
+		if (alertInfoAttribs.mailServer.encryption == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::etSSL)
+			mail.SetSecurityType(USE_SSL);
+		else if (alertInfoAttribs.mailServer.encryption == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::etTLS)
+			mail.SetSecurityType(USE_TLS);
+
 		if (alertInfoAttribs.mailServer.authenticationType == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttAnonymous)
 		{
 		}
@@ -3468,8 +3475,9 @@ HRESULT SoftwareServer::SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsL
 		for (int idx = 0; idx<recipentsList->size(); idx++)
 			mail.AddRecipient(StringUtils::WstringToString(std::wstring(recipentsList->at(idx))).c_str());
 
-		mail.SetSubject(StringUtils::WstringToString(std::wstring(subject)).c_str());
-		mail.AddMsgLine(StringUtils::WstringToString(std::wstring(body)).c_str());
+		// Convert to UTF8 so can support multibyte languages
+		mail.SetSubject(StringUtils::ConvertUTF16ToUTF8(subject).c_str());
+		mail.AddMsgLine(StringUtils::ConvertUTF16ToUTF8(body).c_str());
 
 		if (attachmentFile.length() > 0)
 			mail.AddAttachment(StringUtils::WstringToString(std::wstring(attachmentFile)).c_str());
