@@ -135,9 +135,6 @@
     <ClCompile Include="..\common\md5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ProductConnectionSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\apctimer.h">
@@ -252,9 +249,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\common\Version.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\ProductConnectionSettings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
