@@ -281,6 +281,99 @@ namespace Solimar
 							}
 						}
 						
+							[FlagsAttribute]
+						public enum TEncryptionType : uint
+						{
+							etNone = 0,
+							etSSL = 1,
+							etTLS = 2,
+						};
+						
+						public class AttribsMemberEnum_TEncryptionType : AttribsMemberEnum
+						{
+							public AttribsMemberEnum_TEncryptionType(string keyName, TEncryptionType defaultVal) :
+								base(keyName, defaultVal, typeof(TEncryptionType))
+							{
+								;
+							}
+							
+							protected static SortedList m_MapAliasToEnum;
+							protected static SortedList m_MapEnumToAlias;
+							protected static SortedList m_MapOrderingIndexToAlias;
+							protected static SortedList m_MapAliasToIndex;
+							protected static SortedList m_MapEnumToIndex;
+							static AttribsMemberEnum_TEncryptionType()
+							{
+								m_MapAliasToEnum = new SortedList();
+								m_MapEnumToAlias = new SortedList();
+								m_MapOrderingIndexToAlias = new SortedList();	// map of the ordering indexes from the xml file to aliases. The ordering indexes are not guranteed to be continuous or 0 based. 
+								m_MapAliasToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapEnumToIndex = new SortedList();	// This is different than the ordering index. This function takes an alias and returns what index it is in the GetAliases() list. 
+								m_MapAliasToEnum.Add("None",TEncryptionType.etNone);
+								m_MapEnumToAlias.Add(TEncryptionType.etNone,"None");
+								m_MapOrderingIndexToAlias.Add(1,"None");
+								m_MapAliasToEnum.Add("SSL",TEncryptionType.etSSL);
+								m_MapEnumToAlias.Add(TEncryptionType.etSSL,"SSL");
+								m_MapOrderingIndexToAlias.Add(2,"SSL");
+								m_MapAliasToEnum.Add("TLS",TEncryptionType.etTLS);
+								m_MapEnumToAlias.Add(TEncryptionType.etTLS,"TLS");
+								m_MapOrderingIndexToAlias.Add(3,"TLS");
+								m_MapAliasToIndex.Add("None",0);
+								m_MapAliasToIndex.Add("SSL",1);
+								m_MapAliasToIndex.Add("TLS",2);
+								m_MapEnumToIndex.Add(TEncryptionType.etNone,0);
+								m_MapEnumToIndex.Add(TEncryptionType.etSSL,1);
+								m_MapEnumToIndex.Add(TEncryptionType.etTLS,2);
+							}
+							
+						
+							public static string GetAlias(System.Enum enum_value)
+							{
+								return (string)m_MapEnumToAlias[enum_value];
+							}
+							public static StringCollection GetAliases()
+							{
+								StringCollection alias_list = new StringCollection();
+								foreach (string alias in m_MapOrderingIndexToAlias.Values)
+								{
+									alias_list.Add(alias);
+								}
+								return alias_list;
+							}
+							public static System.Enum GetEnumValueFromAlias(string alias)
+							{
+								return (System.Enum)m_MapAliasToEnum[alias];
+							}
+							public static int GetIndexFromAlias(string alias)
+							{
+								return (int)m_MapAliasToIndex[alias];
+							}
+							public static int GetIndexFromEnum(System.Enum enum_value)
+							{
+								return (int)m_MapEnumToIndex[enum_value];
+							}
+							
+							public string GetAlias()
+							{
+								return GetAlias(EVal);
+							}
+							public void SetEnumValueFromAlias(string alias)
+							{
+								EVal = GetEnumValueFromAlias(alias);
+							}
+						
+							public static implicit operator TEncryptionType(AttribsMemberEnum_TEncryptionType t)
+							{
+								return (TEncryptionType)t.m_tVal;
+							}
+							
+							public TEncryptionType TVal
+							{
+								get {return this;}
+								set {m_tVal = (Object)value;}
+							}
+						}
+						
 							
 						public AttribsMemberString mailServerName = new AttribsMemberString("msn", "");
 						public AttribsMemberString fromEmail = new AttribsMemberString("fe", "");
@@ -289,6 +382,7 @@ namespace Solimar
 						public AttribsMemberEnum_TAuthenticationType authenticationType = new AttribsMemberEnum_TAuthenticationType("aT", TAuthenticationType.ttAnonymous);
 						public AttribsMemberString authBasicUserName = new AttribsMemberString("uN", "");
 						public AttribsMemberString authBasicUserPassword = new AttribsMemberString("uP", "");
+						public AttribsMemberEnum_TEncryptionType encryption = new AttribsMemberEnum_TEncryptionType("eT", TEncryptionType.etNone);
 					
 					};
 					

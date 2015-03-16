@@ -36,6 +36,22 @@ class StringUtils
 			return std::string(ws.begin(), ws.end());
 		}
 
+		static std::string ConvertUTF16ToUTF8(std::wstring utf16)
+		{
+			std::string utf8 = "";
+			if (utf16.length() > 0)
+			{
+				int utf16Len = utf16.length();
+				int utf8Len = WideCharToMultiByte(CP_UTF8, 0, utf16.c_str(), utf16Len, NULL, 0, NULL, NULL);
+				char* pData = new char[utf8Len + 1];
+				WideCharToMultiByte(CP_UTF8, 0, utf16.c_str(), utf16Len, pData, utf8Len, 0, 0);
+				pData[utf8Len] = '\0';
+				utf8 = pData;
+				delete[] pData;
+			}
+			return utf8;
+		}
+
 		static std::string WstringToStringErrorOnBinary(const std::wstring &ws, long* pErrorNo = 0)
 		{
 			size_t characters;

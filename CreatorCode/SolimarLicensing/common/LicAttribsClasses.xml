@@ -420,6 +420,12 @@
 					<enum name="ttAnonymous" value="0" alias="Anonymous"/>
 					<enum name="ttBasic" value="1" alias="Basic"/>
 				</typedef>
+				
+				<typedef type="enum" name="TEncryptionType">
+					<enum name="etNone" value="0" alias="None"/>
+					<enum name="etSSL" value="1" alias="SSL"/>
+					<enum name="etTLS" value="2" alias="TLS"/>
+				</typedef>
 
 				<attrib type="string" name="mailServerName" tagname="msn" default="" />
 				<attrib type="string" name="fromEmail" tagname="fe" default="" />
@@ -428,6 +434,7 @@
 				<attrib type="TAuthenticationType" name="authenticationType" tagname="aT" default="ttAnonymous"/>
 				<attrib type="string" name="authBasicUserName" tagname="uN" default="" />
 				<attrib type="string" name="authBasicUserPassword" tagname="uP" default="" />
+				<attrib type="TEncryptionType" name="encryption" tagname="eT" default="etNone"/>
 			</AttribsClass>
 			</typedef>
 			

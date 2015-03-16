@@ -484,6 +484,12 @@ public:
 				ttBasic = 1,
 			} TAuthenticationType;
 			
+			typedef enum {
+				etNone = 0,
+				etSSL = 1,
+				etTLS = 2,
+			} TEncryptionType;
+			
 				
 			SpdAttribs::WStringAttrib mailServerName;
 			SpdAttribs::WStringAttrib fromEmail;
@@ -492,6 +498,7 @@ public:
 			SpdAttribs::AttribEnumTypeMember<TAuthenticationType> authenticationType;
 			SpdAttribs::WStringAttrib authBasicUserName;
 			SpdAttribs::WStringAttrib authBasicUserPassword;
+			SpdAttribs::AttribEnumTypeMember<TEncryptionType> encryption;
 		
 			
 		
@@ -504,6 +511,7 @@ public:
 				authenticationType = c.authenticationType;
 				authBasicUserName = c.authBasicUserName;
 				authBasicUserPassword = c.authBasicUserPassword;
+				encryption = c.encryption;
 				return *this ;
 			}
 		
@@ -515,7 +523,8 @@ public:
 				portNumber(m_mapAttribObjs, L"pn", 25),
 				authenticationType(m_mapAttribObjs, L"aT", ttAnonymous),
 				authBasicUserName(m_mapAttribObjs, L"uN", SpdAttribs::WStringObj(L"")),
-				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")){;}
+				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")),
+				encryption(m_mapAttribObjs, L"eT", etNone){;}
 			
 			Lic_AlertMailServerAttribs(const Lic_AlertMailServerAttribs &c) : 
 				SpdAttribs::CAttribsBase(GetAttribsClassName()),
@@ -525,7 +534,8 @@ public:
 				portNumber(m_mapAttribObjs, L"pn", c.portNumber),
 				authenticationType(m_mapAttribObjs, L"aT", c.authenticationType),
 				authBasicUserName(m_mapAttribObjs, L"uN", c.authBasicUserName),
-				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword){;}
+				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword),
+				encryption(m_mapAttribObjs, L"eT", c.encryption){;}
 			
 			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -535,7 +545,8 @@ public:
 				portNumber(m_mapAttribObjs, L"pn", 25),
 				authenticationType(m_mapAttribObjs, L"aT", ttAnonymous),
 				authBasicUserName(m_mapAttribObjs, L"uN", SpdAttribs::WStringObj(L"")),
-				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")){;}
+				authBasicUserPassword(m_mapAttribObjs, L"uP", SpdAttribs::WStringObj(L"")),
+				encryption(m_mapAttribObjs, L"eT", etNone){;}
 			
 			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName, const Lic_AlertMailServerAttribs &c) : 
 				SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
@@ -545,7 +556,8 @@ public:
 				portNumber(m_mapAttribObjs, L"pn", c.portNumber),
 				authenticationType(m_mapAttribObjs, L"aT", c.authenticationType),
 				authBasicUserName(m_mapAttribObjs, L"uN", c.authBasicUserName),
-				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword){;}
+				authBasicUserPassword(m_mapAttribObjs, L"uP", c.authBasicUserPassword),
+				encryption(m_mapAttribObjs, L"eT", c.encryption){;}
 			
 			Lic_AlertMailServerAttribs(const CWStringStream &wsAttribsClassName,
 				const SpdAttribs::WStringAttrib &param_mailServerName,
@@ -554,7 +566,8 @@ public:
 				const SpdAttribs::DwordAttrib &param_portNumber,
 				const TAuthenticationType &param_authenticationType,
 				const SpdAttribs::WStringAttrib &param_authBasicUserName,
-				const SpdAttribs::WStringAttrib &param_authBasicUserPassword) : 
+				const SpdAttribs::WStringAttrib &param_authBasicUserPassword,
+				const TEncryptionType &param_encryption) : 
 					SpdAttribs::CAttribsBase(wsAttribsClassName),
 					mailServerName(m_mapAttribObjs, L"msn", param_mailServerName),
 					fromEmail(m_mapAttribObjs, L"fe", param_fromEmail),
@@ -562,7 +575,8 @@ public:
 					portNumber(m_mapAttribObjs, L"pn", param_portNumber),
 					authenticationType(m_mapAttribObjs, L"aT", param_authenticationType),
 					authBasicUserName(m_mapAttribObjs, L"uN", param_authBasicUserName),
-					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword){;}
+					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword),
+					encryption(m_mapAttribObjs, L"eT", param_encryption){;}
 			
 			Lic_AlertMailServerAttribs(SpdAttribs::SAttribMemberMap &mapAttribObjs, const CWStringStream &wsAttribsClassName, const CWStringStream &wsAttribsKeyName,
 				const SpdAttribs::WStringAttrib &param_mailServerName,
@@ -571,7 +585,8 @@ public:
 				const SpdAttribs::DwordAttrib &param_portNumber,
 				const TAuthenticationType &param_authenticationType,
 				const SpdAttribs::WStringAttrib &param_authBasicUserName,
-				const SpdAttribs::WStringAttrib &param_authBasicUserPassword) : 
+				const SpdAttribs::WStringAttrib &param_authBasicUserPassword,
+				const TEncryptionType &param_encryption) : 
 					SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 					mailServerName(m_mapAttribObjs, L"msn", param_mailServerName),
 					fromEmail(m_mapAttribObjs, L"fe", param_fromEmail),
@@ -579,7 +594,8 @@ public:
 					portNumber(m_mapAttribObjs, L"pn", param_portNumber),
 					authenticationType(m_mapAttribObjs, L"aT", param_authenticationType),
 					authBasicUserName(m_mapAttribObjs, L"uN", param_authBasicUserName),
-					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword){;}
+					authBasicUserPassword(m_mapAttribObjs, L"uP", param_authBasicUserPassword),
+					encryption(m_mapAttribObjs, L"eT", param_encryption){;}
 			
 		
 		};

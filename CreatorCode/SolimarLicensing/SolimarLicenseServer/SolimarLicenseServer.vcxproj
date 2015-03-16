@@ -164,6 +164,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -186,11 +187,19 @@
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Performing registration</Message>
       <Command>"$(TargetPath)" /RegServer</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -214,6 +223,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -235,11 +245,18 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Performing registration</Message>
       <Command>"$(TargetPath)" /RegServer</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -266,6 +283,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -290,6 +308,7 @@
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Performing registration</Message>
@@ -298,6 +317,13 @@ cp $(ProjectDir)_$(ProjectName).tlb $(OutDir)
 echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"
  xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -325,6 +351,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -348,12 +375,17 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <DataExecutionPrevention />
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Copy files for the build process</Message>
       <Command>echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"
  xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">
     <Midl>
@@ -380,6 +412,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -404,11 +437,19 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Performing registration</Message>
       <Command>"$(TargetPath)" /RegServer</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">
     <Midl>
@@ -435,6 +476,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -458,11 +500,18 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <DataExecutionPrevention />
       <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Message>Performing registration</Message>
       <Command>"$(TargetPath)" /RegServer</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common\apctimer.cpp" />
@@ -476,6 +525,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
     <ClCompile Include="..\common\EventLogLicenseHelper.cpp" />
     <ClCompile Include="..\common\FlateHelper.cpp" />
     <ClCompile Include="..\common\LicAttribsCPP\SpdUtils.cpp" />
+    <ClCompile Include="..\common\md5.cpp" />
     <ClCompile Include="KeyServer.cpp" />
     <ClCompile Include="KeyServerInstance.cpp" />
     <ClCompile Include="KeySpec.cpp" />
@@ -575,7 +625,6 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
     <ResourceCompile Include="SolimarLicenseServer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LicenseServerClassDiagram.cd" />
     <None Include="SolimarLicenseServer.rgs" />
     <None Include="resources\KeySpecXMLCompiler.py" />
   </ItemGroup>

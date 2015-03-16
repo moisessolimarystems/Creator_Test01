@@ -50,6 +50,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.mailServerTBox = new Shared.VisualComponents.TextBoxEx();
             this.label1 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.encryptionComboBox = new System.Windows.Forms.ComboBox();
             this.backPanel.SuspendLayout();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -69,7 +71,7 @@
             this.backPanel.Location = new System.Drawing.Point(0, 0);
             this.backPanel.Name = "backPanel";
             this.backPanel.Padding = new System.Windows.Forms.Padding(5);
-            this.backPanel.Size = new System.Drawing.Size(483, 311);
+            this.backPanel.Size = new System.Drawing.Size(483, 337);
             this.backPanel.TabIndex = 3;
             // 
             // mainTabControl
@@ -79,7 +81,7 @@
             this.mainTabControl.Location = new System.Drawing.Point(5, 5);
             this.mainTabControl.Name = "mainTabControl";
             this.mainTabControl.SelectedIndex = 0;
-            this.mainTabControl.Size = new System.Drawing.Size(473, 301);
+            this.mainTabControl.Size = new System.Drawing.Size(473, 327);
             this.mainTabControl.TabIndex = 0;
             // 
             // tabPage1
@@ -89,7 +91,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(465, 275);
+            this.tabPage1.Size = new System.Drawing.Size(465, 301);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Mail Server";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -97,8 +99,8 @@
             // panel1
             // 
             this.panel1.Controls.Add(this.groupBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 118);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(3, 144);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(14, 3, 14, 3);
             this.panel1.Size = new System.Drawing.Size(459, 154);
@@ -152,7 +154,7 @@
             // authBasicConfirmPasswordTBox
             // 
             this.authBasicConfirmPasswordTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.authBasicConfirmPasswordTBox.Banner = "Required";
             this.authBasicConfirmPasswordTBox.Location = new System.Drawing.Point(154, 120);
             this.authBasicConfirmPasswordTBox.Name = "authBasicConfirmPasswordTBox";
@@ -163,7 +165,7 @@
             // authBasicPasswordTBox
             // 
             this.authBasicPasswordTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.authBasicPasswordTBox.Banner = "Required";
             this.authBasicPasswordTBox.Location = new System.Drawing.Point(154, 94);
             this.authBasicPasswordTBox.Name = "authBasicPasswordTBox";
@@ -174,7 +176,7 @@
             // authBasicUserTBox
             // 
             this.authBasicUserTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.authBasicUserTBox.Banner = "Required";
             this.authBasicUserTBox.Location = new System.Drawing.Point(154, 68);
             this.authBasicUserTBox.Name = "authBasicUserTBox";
@@ -207,6 +209,8 @@
             // 
             // headerPanel
             // 
+            this.headerPanel.Controls.Add(this.encryptionComboBox);
+            this.headerPanel.Controls.Add(this.label5);
             this.headerPanel.Controls.Add(this.label4);
             this.headerPanel.Controls.Add(this.label3);
             this.headerPanel.Controls.Add(this.displayNameTBox);
@@ -215,10 +219,10 @@
             this.headerPanel.Controls.Add(this.label2);
             this.headerPanel.Controls.Add(this.mailServerTBox);
             this.headerPanel.Controls.Add(this.label1);
-            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.headerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.headerPanel.Location = new System.Drawing.Point(3, 3);
             this.headerPanel.Name = "headerPanel";
-            this.headerPanel.Size = new System.Drawing.Size(459, 115);
+            this.headerPanel.Size = new System.Drawing.Size(459, 295);
             this.headerPanel.TabIndex = 0;
             // 
             // label4
@@ -242,7 +246,7 @@
             // displayNameTBox
             // 
             this.displayNameTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.displayNameTBox.Banner = "";
             this.displayNameTBox.Location = new System.Drawing.Point(168, 87);
             this.displayNameTBox.Name = "displayNameTBox";
@@ -252,7 +256,7 @@
             // emailTBox
             // 
             this.emailTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.emailTBox.Banner = "Required";
             this.emailTBox.Location = new System.Drawing.Point(168, 61);
             this.emailTBox.Name = "emailTBox";
@@ -262,7 +266,7 @@
             // portTBox
             // 
             this.portTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.portTBox.Banner = "Required";
             this.portTBox.Location = new System.Drawing.Point(168, 35);
             this.portTBox.Name = "portTBox";
@@ -281,7 +285,7 @@
             // mailServerTBox
             // 
             this.mailServerTBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.mailServerTBox.Banner = "Required";
             this.mailServerTBox.Location = new System.Drawing.Point(168, 9);
             this.mailServerTBox.Name = "mailServerTBox";
@@ -297,11 +301,35 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Outgoing Mail Server (SMTP):";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(14, 116);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(60, 13);
+            this.label5.TabIndex = 8;
+            this.label5.Text = "Encryption:";
+            // 
+            // encryptionComboBox
+            // 
+            this.encryptionComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.encryptionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.encryptionComboBox.FormattingEnabled = true;
+            this.encryptionComboBox.Items.AddRange(new object[] {
+            "None",
+            "SSL",
+            "TLS"});
+            this.encryptionComboBox.Location = new System.Drawing.Point(168, 113);
+            this.encryptionComboBox.Name = "encryptionComboBox";
+            this.encryptionComboBox.Size = new System.Drawing.Size(253, 21);
+            this.encryptionComboBox.TabIndex = 6;
+            // 
             // EditMailServerDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(483, 342);
+            this.ClientSize = new System.Drawing.Size(483, 368);
             this.Controls.Add(this.backPanel);
             this.Name = "EditMailServerDialog";
             this.Text = "Configure Mail Server";
@@ -343,5 +371,7 @@
         private Shared.VisualComponents.TextBoxEx authBasicConfirmPasswordTBox;
         private Shared.VisualComponents.TextBoxEx authBasicPasswordTBox;
         private Shared.VisualComponents.TextBoxEx authBasicUserTBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox encryptionComboBox;
     }
 }
