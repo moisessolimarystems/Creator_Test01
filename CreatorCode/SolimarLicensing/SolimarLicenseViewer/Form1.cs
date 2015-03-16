@@ -61,7 +61,7 @@ namespace SolimarLicenseViewer
                    if (foundNodes.Length > 0)
                        this.treeView.SelectedNode = foundNodes[0];
                    else
-                       this.treeView.SelectedNode = null;
+                       this.treeView.SelectedNode = this.treeView.Nodes.Count > 0 ? this.treeView.Nodes[0] : null;
                }
                else if (this.treeView.Nodes.Count > 0)
                {
