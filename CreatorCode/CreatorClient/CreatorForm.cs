@@ -124,9 +124,7 @@ namespace Client.Creator
             _lvManager.AutoResizeColumns(LogListView);
             TransactionManager.LogListView = LogListView;
             TransactionManager.ListViewManager = _lvManager;
-            ResetMainToolStripMenu();
-             
-            //set to make read-only items not greyed-out            
+            ResetMainToolStripMenu();                  
         }
         #endregion
 
@@ -783,6 +781,9 @@ namespace Client.Creator
                 loadingCircle1.Parent = splitContainer2.Panel1;
                 switch (MainTabControl.SelectedTab.Name)
                 {
+                    /*case AppConstants.ConnectServerTabPage:
+                        ConnectServerPanel.Parent = splitContainer2.Panel1;
+                        break;*/
                     case AppConstants.CustomersTabPage:
                         SearchCurrentView(string.Empty);
                         CustomersListView.Parent = splitContainer2.Panel1;
@@ -1578,12 +1579,16 @@ namespace Client.Creator
                             {
                                 if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
                                     errorMsg = "Specified value exceeds the available units allowed for {0}";
+                                else if ((newValue % module.AppInstance > 0) && !s_CommLink.IsClientType(plp.ProductID))
+                                {   //module value needs to be a multiple of product connections
+                                    errorMsg = "Specified value is not valid for the number of product connections.";
+                                }
                                 else
                                 {
                                     module.Value = (short)newValue;
                                     if (plp.SetModule(module))
                                     {
-                                        selectedItem.SubItems[1].Text = module.Value.ToString();
+                                        selectedItem.SubItems[1].Text = module.Value.ToString(); //(module.AppInstance > 1) ? string.Format("{0} ({1})", module.Value, module.Value * module.AppInstance) : module.Value.ToString();
                                         if (selectedItem.SubItems[2].Text != "Unlimited")
                                             selectedItem.SubItems[2].Text = plp.GetAvailableModuleUnits(module).ToString();
                                         SetModuleState(plp, selectedItem);
@@ -1853,7 +1858,8 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);
                     break;
                 case 2:            //level 2 - Product License
-                    LoadProductNode(productNode);
+                    //LoadProductNode(productNode);
+                    LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -1900,8 +1906,6 @@ namespace Client.Creator
                     if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
                         DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
-                //PopulateDetailListView(DetailPropertyGrid.SelectedObject);
-                //SetLicenseServerState(node, false);
             }
             EnableToolStripMenu();
         }
@@ -2135,18 +2139,20 @@ namespace Client.Creator
             ProductLicense productLicense = DetailPropertyGrid.SelectedObject as ProductLicense;           
             if(productLicense != null)
             {
+                short incrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) ? 1 : productLicense.ProductConnection);
                 foreach(ListViewItem lvItem in lvItems)
                 {
                     Module module = lvItem.Tag as Module;
-                    module.Value++;
+                    module.Value += incrementValue;
+                    //module.Value++;
                     if(productLicense.SetModule(module))
                     {
                         //repopulate list view item 
                         lvItem.Tag = module;
-                        lvItem.SubItems[1].Text = module.Value.ToString();
+                        lvItem.SubItems[1].Text = module.Value.ToString(); //(module.AppInstance > 1) ? string.Format("{0} ({1})", module.Value, module.Value * module.AppInstance) : module.Value.ToString();  
                         available = lvItem.SubItems[2].Text;
                         if (available != "Unlimited")
-                            lvItem.SubItems[2].Text = (Int32.Parse(available) - 1).ToString();
+                            lvItem.SubItems[2].Text = (Int32.Parse(available) - incrementValue).ToString();
                         SetModuleState(productLicense, lvItem);
                     }
                     else
@@ -2168,20 +2174,22 @@ namespace Client.Creator
             ProductLicense productLicense = DetailPropertyGrid.SelectedObject as ProductLicense;
             if(productLicense != null)
             {
+                short decrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) ? 1 : productLicense.ProductConnection);
                 foreach(ListViewItem lvItem in lvItems)
                 {
                     Module module = lvItem.Tag as Module;
-                    module.Value--;
+                    module.Value -= decrementValue;
+                    //module.Value--;
                     if(productLicense.SetModule(module))
                     {
                         //repopulate list view item 
                         lvItem.Tag = module;
                         //value 
-                        lvItem.SubItems[1].Text = module.Value.ToString();
+                        lvItem.SubItems[1].Text = module.Value.ToString(); //(module.AppInstance > 1) ? string.Format("{0} ({1})", module.Value, module.Value * module.AppInstance) : module.Value.ToString(); 
                         //available
                         available = lvItem.SubItems[2].Text;
                         if (available != "Unlimited")
-                            lvItem.SubItems[2].Text = (Int32.Parse(available) + 1).ToString();
+                            lvItem.SubItems[2].Text = (Int32.Parse(available) + decrementValue).ToString();
                         SetModuleState(productLicense, lvItem);
                     }
                     else
@@ -2288,7 +2296,8 @@ namespace Client.Creator
                         }
                     }
                 }
-                if (e.OldValue is LicenseVersion || e.OldValue is ProductLicenseState || e.OldValue is DateTime?) //Version, Status, Exp Date change reload.
+                //if (e.OldValue is LicenseVersion || e.OldValue is ProductLicenseState) 
+                if(DetailPropertyGrid.SelectedObject is ProductLicense)
                 {
                     LoadSelectedTabPage(PropertyGridTabControl.SelectedTab);
                 }
@@ -2778,6 +2787,10 @@ namespace Client.Creator
         #region Form Methods
         private int ConnectServer()
         {
+            MainToolStrip.Visible = false;
+            MainMenuStrip.Visible = false;
+            splitContainer2.Visible = false;
+            //MainTabControl.SelectedTab = ConnectServerTabPage;
             using (ConnectDialog cd = new ConnectDialog())
             {
                 customerToolStripStatusLabel.Text = string.Empty;
@@ -2802,6 +2815,9 @@ namespace Client.Creator
                 m_ServerList.Clear();
                 m_ServerList.AddRange(data.ServerList);
             }
+            MainToolStrip.Visible = true;
+            MainMenuStrip.Visible = true;
+            splitContainer2.Visible = true;
             return 0;
         }
 
@@ -3659,7 +3675,8 @@ namespace Client.Creator
                     //productNode.Nodes.Clear();
                     //always create a new node or update current list
                     //create new node removes need to update existing nodes and trim old nodes that no longer exist
-                    //issue is that 
+                    //issue is that        
+                    List<TreeNode> addNodeList = new List<TreeNode>();
                     foreach (ProductLicenseTable plt in plRecords)
                     {
                         plNode = null;
@@ -3670,15 +3687,15 @@ namespace Client.Creator
                             plNode.Tag = new ProductLicense(plt, m_Permissions);
                             if (plt.ParentProductLicenseID != null)
                             {
-                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ADDONORDER;// Enums.GetIconIndex("ADDONORDER");                                
+                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ADDONORDER;                                
                                 plParent = productNode.Nodes.Find(plt.ParentProductLicenseID, false).FirstOrDefault();
                                 if (plParent != null && !plParent.Nodes.ContainsKey(plNode.Name))
                                     plParent.Nodes.Add(plNode);                                
                             }
                             else
                             {
-                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ORDER;// Enums.GetIconIndex("ORDER");
-                                productNode.Nodes.Add(plNode);
+                                plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ORDER;
+                                addNodeList.Add(plNode);
                             }
                         }
                         else //update found product node
@@ -3689,6 +3706,7 @@ namespace Client.Creator
                         }
                         SetProductLicenseNodeDisplayStatus(plNode);
                     }
+                    productNode.Nodes.AddRange(addNodeList.ToArray());
 
                     /*watch.Stop();
                     MessageBox.Show(string.Format("DetailTreeView_AfterSelect Elapsed: {0}\nIn milliseconds: {1}\nIn timer ticks: {2}", watch.Elapsed, watch.ElapsedMilliseconds, watch.ElapsedTicks), "INFORMATION", MessageBoxButtons.OK);
@@ -4604,7 +4622,7 @@ namespace Client.Creator
                 //need to set plData read-only attributes
                 //gets all modules for a given product license and add-on product licenses
                 string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
-                List<ModuleTable> moduleList = plData.ModuleList;
+                List<ModuleTable> moduleList = plData.ModuleList; //Expensive to call modulelist everytime for SPDE
                 foreach (ModuleTable module in moduleList)
                 {   //totalValue = licensed module value + add-on module value;
                     //           = trial module value;
@@ -4634,12 +4652,14 @@ namespace Client.Creator
 
             public ListViewItem CreateModuleListViewItem(ProductLicense productLicense, ModuleTable module, uint totalValue)
             {
+                string moduleValue;
                 Module newModule = new Module(module);
                 newModule.ProductID = productLicense.ProductID;
-                ListViewItem lvItem = new ListViewItem();
+                ListViewItem lvItem = new ListViewItem();            
                 lvItem.Tag = newModule;
                 lvItem.Name = lvItem.Text = s_CommLink.GetModuleName(productLicense.ProductID, module.ModID);
-                lvItem.ImageIndex = (int)IconList.MODULE;//Enums.GetIconIndex("MODULE");
+                lvItem.ImageIndex = (int)IconList.MODULE;
+                
                 if (s_CommLink.IsDefaultModule(productLicense.ProductID, module.ModID))
                 {
                     lvItem.SubItems.Add("*");
@@ -4647,15 +4667,20 @@ namespace Client.Creator
                 }
                 else
                 {
-                    lvItem.SubItems.Add(module.Value.ToString());
+                    moduleValue = /*(module.AppInstance > 1) ? string.Format("{0} ({1})", module.Value, module.Value * module.AppInstance) : */module.Value.ToString();
+                    //Value
+                    lvItem.SubItems.Add(moduleValue);                  //lvItem.SubItems.Add(module.Value.ToString()); //show multiplied value string.format("{0} ({1})", module.Value, module.Value * module.AppInstance)
                     //perm, addon - total value is shared between these
                     //available units = maximum value - total value(perm/trial + addon)
                     //total value should never exceed max value
                     //bool bVal = false;
                     //if (module.ModID == 101)
                     //    bVal = true;
+                    //Available
                     if (newModule.UnlimitedValue == 0)
+                    {
                         lvItem.SubItems.Add("Unlimited");
+                    }
                     else
                     {
                         //int maxValue = s_CommLink.GetMaxModuleValue(productLicense.ProductID, module.ModID);
@@ -4663,6 +4688,7 @@ namespace Client.Creator
                         lvItem.SubItems.Add(units.ToString());
                     }
                 }
+                //State
                 SetModuleState(productLicense,lvItem);
                 return lvItem;
             }
@@ -4673,7 +4699,7 @@ namespace Client.Creator
         private void LoadTransactionItems(string licenseName)
         {
             IList<PacketTable> packets = null;
-            IList<TransactionTable> transactions = null, selectedTransactions = null;
+            IList<TransactionTable> transactions = null, selectedTransactions = null, newTransactions = null;
             IList<ProductLicenseTable> productLicenses = null;
             ProductLicenseTable pl = null;
             ListViewItem[] lvItems;
@@ -4684,29 +4710,30 @@ namespace Client.Creator
             storageListView.Items.Clear();
             Service<ICreator>.Use((client) =>
             {   //now two steps, given a license name, get all transactions for a license and sort by packet
-                transactions = client.GetNewTransactionsByLicenseName(licenseName).OrderByDescending(c => c.taDateCreated).ToList();
+                transactions = client.GetTransactionsByLicenseName(licenseName);
+                newTransactions = transactions.Where(t => !t.taPacketID.HasValue).ToList();
                 //filtered out add-ons, want to include add on information....
-                productLicenses = client.GetProductLicenses(licenseName, true);                
-                if (transactions.Count > 0)
+                productLicenses = client.GetProductLicenses(licenseName, true);
+                if (newTransactions.Count > 0)
                 {
-                    lvItems = new ListViewItem[transactions.Count];
-                    for (index = 0; index < transactions.Count; index++)
+                    lvItems = new ListViewItem[newTransactions.Count];
+                    for (index = 0; index < newTransactions.Count; index++)
                     {
-                        pl = productLicenses.Where(c => c.ID == transactions[index].taOrderID).FirstOrDefault();
+                        pl = productLicenses.Where(c => c.ID == newTransactions[index].taOrderID).FirstOrDefault();
                         productLicenseName = (pl != null) ? pl.plID : string.Empty;
-                        ListViewItem item = new ListViewItem();                        
-                        item.Tag = transactions[index];
-                        if(transactions[index].taType != (byte)TransactionType.PacketVerification)
+                        ListViewItem item = new ListViewItem();
+                        item.Tag = newTransactions[index];
+                        if(newTransactions[index].taType != (byte)TransactionType.PacketVerification)
                             item.ForeColor = System.Drawing.Color.SteelBlue;
-                        item.Text = transactions[index].taDateCreated.ToString();
+                        item.Text = newTransactions[index].taDateCreated.ToString();
                         subItems = new string[]
                         {
-                            Enum.GetName(typeof(TransactionType), transactions[index].taType),
-                            transactions[index].taDescription,
-                            transactions[index].taUnits,
-                            transactions[index].taPreviousValue,
+                            Enum.GetName(typeof(TransactionType), newTransactions[index].taType),
+                            newTransactions[index].taDescription,
+                            newTransactions[index].taUnits,
+                            newTransactions[index].taPreviousValue,
                             productLicenseName,
-                            transactions[index].taUser,
+                            newTransactions[index].taUser,
                             string.Empty
                         };
                         item.SubItems.AddRange(subItems);
@@ -4715,7 +4742,7 @@ namespace Client.Creator
                     storageListView.Items.AddRange(lvItems);
                 }
                 packets = client.GetPacketsByLicenseName(licenseName).OrderByDescending(c => c.DateCreated).ToList();
-                transactions = client.GetTransactionsByLicenseName(licenseName);
+                transactions = transactions.Where(t => t.taPacketID.HasValue).ToList();
                 foreach (var packet in packets)
                 {
                     selectedTransactions = transactions.Where(t => t.taPacketID == packet.ID).OrderByDescending(c => c.taDateCreated).ToList();

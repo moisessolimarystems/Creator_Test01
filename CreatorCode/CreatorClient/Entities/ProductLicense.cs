@@ -71,7 +71,7 @@ namespace Client.Creator
             get { return _plRec; }
             set 
             {
-                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient)// || (value.plID.StartsWith("100")))
+                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || (value.plID.StartsWith("100")))
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
                 else
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
@@ -157,7 +157,7 @@ namespace Client.Creator
         bool ValidModuleList()
         {
             if (_moduleList == null)
-                return false;
+                return true;
             bool bRetVal = true;
             List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = _commLink.GetModuleSpecForProductVersion(ProductID, ProductVersion.Major, ProductVersion.Minor);
             foreach (ModuleTable module in _moduleList)
@@ -298,11 +298,20 @@ namespace Client.Creator
                     {   //only set by client products since it is exposed only to them
                         if (ModuleList != null)
                         {
+                            int baseValue;
                             foreach (ModuleTable module in _moduleList)
                             {   //needs to update database
                                 //module.AppInstance = (Status != ProductLicenseState.AddOn ) ? value : (byte)0;
-                                if(module.Value > 0) 
-                                    module.AppInstance = value;
+                                if (module.Value > 0)
+                                {
+                                    if (!_commLink.IsClientType(ProductID)) //Don't need to multiply non-client module values
+                                    {
+                                        baseValue = (module.AppInstance > 1) ? module.Value / module.AppInstance : module.Value;
+                                        module.Value = (short)(module.Value + ((value - module.AppInstance) * baseValue));
+                                    }
+                                    //if value = mod.appinstance then no need to change
+                                    module.AppInstance = value; //multiply?
+                                }
                             }
                         }
                         _plRec.ProductConnection = value;
@@ -441,11 +450,17 @@ namespace Client.Creator
                         string errorMsg = string.Empty;
                         if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
                             !value.HasValue && !HasHardwareToken())
+                        {
                             errorMsg = "Can't remove expiration date for non-hardware token validation.";
+                        }
                         if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
+                        {
                             errorMsg = "Please set a valid expiration date.";
+                        }
                         if (value.HasValue && value.Value.CompareTo(DateTime.Today.AddDays(1).AddMonths(6).AddYears(1)) > 0)
+                        {
                             errorMsg = string.Format("{0} exceeds the expiration date limit of 18 months.", value.Value);
+                        }
                         if (errorMsg.Length == 0)
                         {
                             Service<ICreator>.Use((client) =>
@@ -552,8 +567,9 @@ namespace Client.Creator
                             {
                                 IList<ProductLicenseTable> plList = null;
                                 plList = client.GetProductLicenses(LicenseServer, false);
-                                if (HasHardwareToken() && plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
-                                    throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
+                                if (HasHardwareToken() && 
+                                    plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
+                                    throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed a hardware token.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                             }
                             _plRec.Activations = value;
                             ProductLicenseTable plt = client.GetProductLicense(ID);
@@ -868,13 +884,14 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {
                     List<ModuleTable> mtList = new List<ModuleTable>();
+                    int multiplier = _commLink.IsClientType(ProductID) ? 1 : ProductConnection;
                     foreach (ModuleTable module in ModuleList)
                     {
                         short moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);
                         ModuleTable mt = client.GetModule(ID, module.ModID);
                         if (mt != null)
                         {
-                            mt.Value = moduleValue;
+                            mt.Value = (short)(moduleValue * multiplier);
                             if (moduleValue == 0) mt.AppInstance = 0;
                             mtList.Add(mt);
                         }
@@ -898,13 +915,14 @@ namespace Client.Creator
                     Service<ICreator>.Use((client) =>
                     {
                         List<ModuleTable> mtList = new List<ModuleTable>();
+                        int multiplier = _commLink.IsClientType(ProductID) ? 1 : ProductConnection;
                         foreach (ModuleTable module in ModuleList)
                         {
                             ModuleTable mt = client.GetModule(ID, module.ModID);
                             if (mt != null)
                             {
-                                mt.Value = _commLink.GetModuleTrialValue(ProductID, module.ModID);                                
-                                mt.AppInstance = (byte)((mt.Value == 0) ? 0 : 1);
+                                mt.Value = (short)(_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
+                                mt.AppInstance = (byte)((mt.Value == 0) ? 0 : ProductConnection);
                                 mtList.Add(mt);
                             }
                             else
@@ -1068,7 +1086,8 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            return (module.UnlimitedValue - GetTotalModuleValue(module.ID));
+            uint multiplier = (uint)((_commLink.IsClientType(ProductID)) ? 1 : ProductConnection);
+            return ((module.UnlimitedValue * multiplier) - GetTotalModuleValue(module.ID));
         }
 
         public uint GetAvailableModuleUnits(Module module, uint totalModuleValue)
@@ -1079,7 +1098,8 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            return (module.UnlimitedValue - totalModuleValue);
+            uint multiplier = (uint)((_commLink.IsClientType(ProductID)) ? 1 : ProductConnection);
+            return ((module.UnlimitedValue * multiplier) - totalModuleValue);
         }
 
         public bool SetModule(Module module)
@@ -1090,10 +1110,11 @@ namespace Client.Creator
             {
                 if (totalModAppInstance == 0)
                 {
-                    if (ProductConnection > 0)
+                    module.AppInstance = ProductConnection; //always > 0
+                    /*if (ProductConnection > 0)
                         module.AppInstance = (_commLink.IsClientType(ProductID)) ? ProductConnection : (byte)1;
                     else
-                        module.AppInstance = 1;
+                        module.AppInstance = 1;*/
                 }
                 else //productconnections >= 1
                 {
@@ -1105,7 +1126,7 @@ namespace Client.Creator
                     {
                         if (totalModAppInstance > 1)
                         {
-                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : 1);
+                            module.AppInstance = (byte)((Status == ProductLicenseState.AddOn) ? 0 : ProductConnection);
                         }
                         else
                         {
@@ -1116,7 +1137,7 @@ namespace Client.Creator
                             }
                             else
                             {
-                                module.AppInstance = 1;
+                                module.AppInstance = ProductConnection;
                                 DecrementAddOnModuleAppInstance(module.ID); //decrement any add-on module product connection that may be > 0
                             }
                         }
