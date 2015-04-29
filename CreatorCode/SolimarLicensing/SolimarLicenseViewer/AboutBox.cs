@@ -24,6 +24,7 @@ namespace SolimarLicenseViewer
             this.labelCompanyName.Text = AssemblyCompany;
             this.textBoxDescription.Text = AssemblyDescription;
             */
+            InitializeInternal();
         }
 
         #region Assembly Attribute Accessors
@@ -112,6 +113,14 @@ namespace SolimarLicenseViewer
             }
         }
         #endregion
+
+        private void InitializeInternal()
+        {
+            // Use the current year so you don't have to keep manually updating the copyright date
+            String year = System.DateTime.Now.Year.ToString();
+            int index = (labelCopyright.Text).IndexOf("XXXX");
+            this.labelCopyright.Text = labelCopyright.Text.Remove(index, 4).Insert(index, year);
+        }
 
         public void SetServerVersion(String version){versionServer.Text = version;}
         public void SetManagerVersion(String version){versionLicensing.Text = version; }
