@@ -240,9 +240,10 @@ HRESULT CryptoHelper::Key::ExportPrivateKey(BYTE *pBuffer, DWORD buffer_size)
 	return S_OK;
 }
 
-
 CryptoHelper::CryptoHelper() : m_context(0), m_error(S_OK)
 {
+#ifdef _SOLIMAR_SERVICE_
+	// CR.FIX.19122 - Service cannon run as a "Mandatory Profile" because of it needs more than the limited functionality provides
 	wchar_t wstr_guid[64];
 	TCHAR tstr_guid[64];
 	
@@ -272,8 +273,15 @@ CryptoHelper::CryptoHelper() : m_context(0), m_error(S_OK)
 #endif
 
 	m_str_container[sizeof(m_str_container)/sizeof(TCHAR)-1] = 0;		// ensure null termination
-	
+
+	// CR.FIX.19122 - This creates the key tied to the profile on the system
 	if (!CryptAcquireContext(&m_context, m_str_container, PROVIDER, PROVIDER_TYPE, CRYPT_NEWKEYSET))
+#else
+	// CR.FIX.19122 - User running as a "Mandatory Profile" has to use CRYPT_VERIFYCONTEXT, but has limited functionality
+	// CR.FIX.19122 - This creates the key in memory, no key to delete from the profile when done
+	if (!CryptAcquireContext(&m_context, NULL, MS_DEF_PROV, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
+#endif
+
 	{
 		m_error = HRESULT_FROM_WIN32(::GetLastError());
 		m_context = 0;
@@ -285,9 +293,11 @@ CryptoHelper::~CryptoHelper()
 	HRESULT hr = S_OK;
 	if (m_context!=0)
 	{
+#ifdef _SOLIMAR_SERVICE_
 		HCRYPTPROV deleted_context(0);
 		if (!CryptAcquireContext(&deleted_context, m_str_container, PROVIDER, PROVIDER_TYPE, CRYPT_DELETEKEYSET))
 			hr = HRESULT_FROM_WIN32(::GetLastError());
+#endif
 		CryptReleaseContext(m_context, 0);
 		m_context=0;
 	}
@@ -326,8 +336,12 @@ HRESULT CryptoHelper::DecryptDataSize(const Key &key, DWORD data_size, DWORD *bu
 
 HRESULT CryptoHelper::EncryptData(BYTE *password, DWORD password_size, BYTE *pData, DWORD data_size)
 {
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
+
 	HRESULT hr = S_OK;
-	
+
 	// sanity check
 	if (!pData || !password)
 		return E_INVALIDARG;
@@ -385,6 +399,10 @@ HRESULT CryptoHelper::EncryptData(BYTE *password, DWORD password_size, BYTE *pDa
 
 HRESULT CryptoHelper::DecryptData(BYTE *password, DWORD password_size, BYTE *pData, DWORD data_size)
 {
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
+
 	HRESULT hr = S_OK;
 	
 	// sanity check
@@ -445,6 +463,10 @@ HRESULT CryptoHelper::DecryptData(BYTE *password, DWORD password_size, BYTE *pDa
 HRESULT CryptoHelper::HashData(const BYTE *pData, const DWORD data_size, Digest &digest)
 {
 	HRESULT hr = S_OK;
+
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
 	
 	digest = Digest(CALG_MD5);
 	
@@ -470,7 +492,6 @@ HRESULT CryptoHelper::HashData(const BYTE *pData, const DWORD data_size, Digest 
 		}
 		CryptDestroyHash(hHash);
 	}
-	
 	return hr;
 }
 
@@ -478,6 +499,10 @@ HRESULT CryptoHelper::SignHash(const Digest &digest, VARIANT *pvtSignature)
 {
 	HRESULT hr = S_OK;
 	
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
+
 	VariantInit(pvtSignature);
 	
 	// create a hash object (based on MD5)
@@ -518,6 +543,10 @@ HRESULT CryptoHelper::SignHash(const Digest &digest, VARIANT *pvtSignature)
 HRESULT CryptoHelper::VerifySignature(const Digest &digest, const VARIANT *pvtSignature, const Key &public_key)
 {
 	HRESULT hr = S_OK;
+
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
 	
 	if (!pvtSignature || !pvtSignature->parray || !(pvtSignature->vt & VT_ARRAY) || !(pvtSignature->vt & VT_UI1))
 		return E_INVALIDARG;
@@ -535,6 +564,10 @@ HRESULT CryptoHelper::VerifySignature(const Digest &digest, const VARIANT *pvtSi
 HRESULT CryptoHelper::VerifySignature(const Digest &digest, const BYTE *pSignatureBuffer, const DWORD signatureBufferSize, const Key &public_key)
 {
 	HRESULT hr = S_OK;
+
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
 	
 	// create a hash object (based on MD5)
 	HCRYPTHASH hHash=0;
@@ -561,7 +594,71 @@ HRESULT CryptoHelper::VerifySignature(const Digest &digest, const BYTE *pSignatu
 
 HRESULT CryptoHelper::GenerateRandomBytes(BYTE *pData, DWORD buffer_size)
 {
+	// CR.FIX.19122 - return initialization error
+	if (FAILED(GetLastError()))
+		return GetLastError();
+
 	if (!CryptGenRandom(m_context, buffer_size, pData))
 		return HRESULT_FROM_WIN32(::GetLastError());
 	return S_OK;
+}
+
+// CR.FIX.19122.v3 - Verify that the running user is not a ManagedProfile
+HRESULT CryptoHelper::VerifyProfileRights()
+{
+	HRESULT hr = S_OK;
+
+	TCHAR local_container[128];
+	HCRYPTPROV local_context;
+
+	wchar_t wstr_guid[64];
+	TCHAR tstr_guid[64];
+	
+	GUID guid_container;
+	CoCreateGuid(&guid_container);
+	
+	memset(local_container,0,sizeof(local_container));
+	memset(tstr_guid, 0, sizeof(tstr_guid));
+	memset(wstr_guid, 0, sizeof(wstr_guid));
+	StringFromGUID2(guid_container, wstr_guid, 64);
+	
+// suport for both UNICODE and non-unicode builds. 
+// Can't just use UNICODE because of the PROVIDER string definition being tied to the _UNICODE/UNICODE defines
+#if !defined(UNICODE) && !defined(_UNICODE)
+	wcstombs(tstr_guid, wstr_guid, sizeof(tstr_guid)/sizeof(TCHAR));
+	tstr_guid[sizeof(tstr_guid)/sizeof(TCHAR)-1]=0;
+#elif _MSC_VER < 1400
+	wcscpy(tstr_guid, wstr_guid);
+#else
+	wcscpy_s(tstr_guid, wstr_guid);
+#endif
+	
+#if _MSC_VER < 1400
+	_stprintf(m_str_container,TEXT("Solimar Key Container %s"),tstr_guid);
+#else
+	_stprintf_s(local_container,TEXT("Solimar Key Container %s"),tstr_guid);
+#endif
+
+	local_container[sizeof(local_container)/sizeof(TCHAR)-1] = 0;		// ensure null termination
+
+	// CR.FIX.19122.v3 - This creates the key tied to the profile on the system, it will fail if the user is a "Mandatory Profile"
+	if (!CryptAcquireContext(&local_context, local_container, PROVIDER, PROVIDER_TYPE, CRYPT_NEWKEYSET))
+	{
+		hr = HRESULT_FROM_WIN32(::GetLastError());
+		local_context = 0;
+	}
+
+	// Cleanup
+	if (local_context!=0)
+	{
+		HCRYPTPROV deleted_context(0);
+
+		// Try to delete key that was just created, ignore any errors.
+		CryptAcquireContext(&deleted_context, local_container, PROVIDER, PROVIDER_TYPE, CRYPT_DELETEKEYSET);
+
+		CryptReleaseContext(local_context, 0);
+		local_context=0;
+	}
+
+	return hr;
 }

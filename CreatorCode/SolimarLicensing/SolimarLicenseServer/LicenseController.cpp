@@ -66,6 +66,26 @@ LicenseController::LicenseController() :
 
 	_tzset();
 
+	HRESULT hr(S_OK);
+
+	// CR.FIX.19122.v3 - Verify that the running user is not a Mandatory Profile
+	hr = CryptoHelper::VerifyProfileRights();
+
+	if (FAILED(hr))
+	{
+		static const int MAX_MESSAGE_SIZE = 0x2000;
+		wchar_t event_log_msg[MAX_MESSAGE_SIZE];
+		_snwprintf_s(
+			event_log_msg, 
+			_countof(event_log_msg), 
+			MAX_MESSAGE_SIZE, 
+			L"Solimar Systems, Inc.\r\nProduct Licensing Error Message\r\nSolimar License Server is running with a user without enough rights.  Make sure that the Solimar License Server is not running with a Mandatory Profile."
+			);
+		GenerateMessage(L"", MT_ERROR, hr, time(0), MessageGenericError, event_log_msg);
+
+		ExitProcess(hr);
+	}
+
 	//CR.FIX.14360 - Delay the usb notification until after the class member finish initializing.
 	this->StartUSBNotification();
 

@@ -112,6 +112,9 @@ public:
 	HRESULT VerifySignature(const Digest &digest, const VARIANT *pvtSignature, const Key &public_key);
 	HRESULT VerifySignature(const Digest &digest, const BYTE *pSignatureBuffer, const DWORD signatureBufferSize, const Key &public_key);
 	HRESULT GenerateRandomBytes(BYTE *pData, const DWORD buffer_size);
+
+	// CR.FIX.19122.v3 - Verify that the running user is not a ManagedProfile
+	static HRESULT VerifyProfileRights();
 	
 public:
 	HRESULT m_error;
