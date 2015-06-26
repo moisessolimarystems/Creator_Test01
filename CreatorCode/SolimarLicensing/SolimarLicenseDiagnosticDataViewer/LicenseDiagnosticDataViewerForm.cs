@@ -407,7 +407,6 @@ namespace SolimarLicenseDiagnosticDataViewer
                     }
                     rootNode.Nodes.Add(childNode);
 
-
                     //Lic_SystemInfoAttribs_DisplayForm
                     childNode = new TreeNode("Lic_SystemInfoAttribs");
                     childNode.Tag = Guid.NewGuid().ToString();
@@ -478,6 +477,21 @@ namespace SolimarLicenseDiagnosticDataViewer
                     runningProcessesInfoAttribsForm.Show();
                     runningProcessesInfoAttribsForm.Activated += new EventHandler(General_MdiChildActivate);
                     m_guidToFormMap.Add(childNode.Tag as string, runningProcessesInfoAttribsForm);
+                    rootNode.Nodes.Add(childNode);
+
+                    //Lic_ProductConnectionAttribs_DisplayForm 
+                    childNode = new TreeNode("Lic_ProductConnectionAttribs");
+                    childNode.Tag = Guid.NewGuid().ToString();
+                    childNode.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    Lic_ClientSettingsAttribs tmpClientSettingsAttrib = new Lic_ClientSettingsAttribs();
+                    tmpClientSettingsAttrib.AssignMembersFromStream(m_loadedLicSysAttribs.Streamed_ClientSettingsAttribs);
+                    Lic_ProductConnectionAttribs_DisplayForm prodConnAttribsForm = new Lic_ProductConnectionAttribs_DisplayForm();
+                    prodConnAttribsForm.Tag = childNode.Tag;
+                    prodConnAttribsForm.SetData(tmpClientSettingsAttrib);
+                    prodConnAttribsForm.MdiParent = this;
+                    prodConnAttribsForm.Show();
+                    prodConnAttribsForm.Activated += new EventHandler(General_MdiChildActivate);
+                    m_guidToFormMap.Add(childNode.Tag as string, prodConnAttribsForm);
                     rootNode.Nodes.Add(childNode);
 
                     childNode = new TreeNode("List of Lic_KeyAttribs");
