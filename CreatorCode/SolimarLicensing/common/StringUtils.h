@@ -55,32 +55,35 @@ class StringUtils
 		static std::string WstringToStringErrorOnBinary(const std::wstring &ws, long* pErrorNo = 0)
 		{
 			size_t characters;
+			std::string ret = "";
 			long errorNo = 0;
 			#if _MSC_VER >= 1400	
 				errorNo = wcstombs_s(&characters, 0, 0, ws.c_str(), 256);
 			#else
 				characters = wcstombs(0, ws.c_str(), 256);
 			#endif
+			if (characters != 0)
+			{
+				char* s = new char[characters+1];
+				s[0]=0;
 
-			char* s = new char[characters+1];
-			s[0]=0;
-			
-			#if _MSC_VER >= 1400	
-				size_t tmpValue;
-				errorNo = wcstombs_s(	&tmpValue,
-							s, 
-							characters,	//size in words
-							ws.c_str(),
-							characters);
-			#else
-				wcstombs(s,ws.c_str(),characters);
-			#endif
+				#if _MSC_VER >= 1400	
+					size_t tmpValue;
+					errorNo = wcstombs_s(	&tmpValue,
+								s, 
+								characters,	//size in words
+								ws.c_str(),
+								characters);
+				#else
+					wcstombs(s,ws.c_str(),characters);
+				#endif
 
-			if(pErrorNo != 0)
+				s[characters]=0;
+				ret = s;
+				delete [] s;
+			}
+			if(errorNo != 0)
 				*pErrorNo = errorNo;
-			s[characters]=0;
-			std::string ret = s;
-			delete [] s;
 			return ret;
 		}
 		
