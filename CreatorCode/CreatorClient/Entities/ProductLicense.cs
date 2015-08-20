@@ -160,9 +160,16 @@ namespace Client.Creator
                 return true;
             bool bRetVal = true;
             List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = _commLink.GetModuleSpecForProductVersion(ProductID, ProductVersion.Major, ProductVersion.Minor);
-            foreach (ModuleTable module in _moduleList)
+            /*foreach (ModuleTable module in _moduleList)
             {
                 if(moduleSpecList.Where(m => m.moduleID == module.ModID).Count() == 0)
+                {
+                    return false;
+                }
+            }*/
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList)
+            {
+                if (_moduleList.Where(m => m.ModID == moduleSpec.moduleID).Count() == 0)
                 {
                     return false;
                 }
@@ -177,12 +184,13 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
+                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                     if (!ValidModuleList())
                     {
                         List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
                         UpdateModules(ProductVersion, productLicenses);
+                        _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                     }
-                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
                 });
                 return _moduleList;
             }
