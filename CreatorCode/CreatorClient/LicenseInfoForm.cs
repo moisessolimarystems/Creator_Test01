@@ -302,6 +302,12 @@ namespace Client.Creator
                                 MessageBox.Show(lvItem.Text + " has an empty value!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 break;
                             }
+                            if (lvItem.SubItems[1].Text.ToUpper() == "NULL")
+                            {
+                                m_Validated = false;
+                                MessageBox.Show(lvItem.Text + " has a \"NULL\" value!", "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                break;
+                            }
                             if (lvItem.Name == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttPartOfDomain.ToString())
                             {
                                 if (lvItem.SubItems[1].Text.ToLower() != Boolean.TrueString.ToLower())
