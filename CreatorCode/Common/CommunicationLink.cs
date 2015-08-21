@@ -227,7 +227,7 @@ namespace Client.Creator
         public Int64 ConvertFromBase36(string _base36Number)
         {
             string base36Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            char[] arrInput = _base36Number.ToCharArray();
+            char[] arrInput = _base36Number.ToUpper().ToCharArray();
             Array.Reverse(arrInput);
             Int64 returnValue = 0;
             for (int i = 0; i < arrInput.Length; i++)
