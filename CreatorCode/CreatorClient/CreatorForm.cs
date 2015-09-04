@@ -1858,8 +1858,8 @@ namespace Client.Creator
                         DetailTreeView.Nodes.Remove(productNode);
                     break;
                 case 2:            //level 2 - Product License
-                    //LoadProductNode(productNode);
-                    LoadProductLicenseNode(node);
+                    LoadProductNode(productNode); //Handles removal of licensed add-on PLs
+                    //LoadProductLicenseNode(node);
                     if (productNode.Tag != null)                    //remove self if holds no product licenses
                     {
                         if (productNode.Nodes.Find(node.Name, true).Count() > 0)
@@ -2139,7 +2139,7 @@ namespace Client.Creator
             ProductLicense productLicense = DetailPropertyGrid.SelectedObject as ProductLicense;           
             if(productLicense != null)
             {
-                short incrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) ? 1 : productLicense.ProductConnection);
+                short incrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) || productLicense.Status == ProductLicenseState.AddOn ? 1 : productLicense.ProductConnection);
                 foreach(ListViewItem lvItem in lvItems)
                 {
                     Module module = lvItem.Tag as Module;
@@ -2174,7 +2174,7 @@ namespace Client.Creator
             ProductLicense productLicense = DetailPropertyGrid.SelectedObject as ProductLicense;
             if(productLicense != null)
             {
-                short decrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) ? 1 : productLicense.ProductConnection);
+                short decrementValue = (short)(s_CommLink.IsClientType(productLicense.ProductID) || productLicense.Status == ProductLicenseState.AddOn ? 1 : productLicense.ProductConnection);
                 foreach(ListViewItem lvItem in lvItems)
                 {
                     Module module = lvItem.Tag as Module;
@@ -3685,17 +3685,19 @@ namespace Client.Creator
                             plNode = new TreeNode(plt.plID);
                             plNode.Name = plt.plID;
                             plNode.Tag = new ProductLicense(plt, m_Permissions);
-                            if (plt.ParentProductLicenseID != null)
+                            if (plt.ParentProductLicenseID != null) 
                             {
                                 plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ADDONORDER;                                
-                                plParent = productNode.Nodes.Find(plt.ParentProductLicenseID, false).FirstOrDefault();
+                                plParent = productNode.Nodes.Find(plt.ParentProductLicenseID, false).FirstOrDefault(); //Check existing product licenses
+                                if (plParent == null) //check addNodeList
+                                    plParent = addNodeList.Find(n => n.Name == plt.ParentProductLicenseID);
                                 if (plParent != null && !plParent.Nodes.ContainsKey(plNode.Name))
                                     plParent.Nodes.Add(plNode);                                
                             }
                             else
                             {
                                 plNode.ImageIndex = plNode.SelectedImageIndex = (int)IconList.ORDER;
-                                addNodeList.Add(plNode);
+                                addNodeList.Add(plNode); 
                             }
                         }
                         else //update found product node
@@ -4622,7 +4624,7 @@ namespace Client.Creator
                 //need to set plData read-only attributes
                 //gets all modules for a given product license and add-on product licenses
                 string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
-                List<ModuleTable> moduleList = plData.ModuleList; //Expensive to call modulelist everytime for SPDE
+                List<ModuleTable> moduleList = plData.AllModuleList; //Expensive to call modulelist everytime for SPDE
                 foreach (ModuleTable module in moduleList)
                 {   //totalValue = licensed module value + add-on module value;
                     //           = trial module value;

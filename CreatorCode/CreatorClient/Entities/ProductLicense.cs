@@ -196,6 +196,25 @@ namespace Client.Creator
             }
         }
 
+        [Browsable(false)]
+        public List<ModuleTable> AllModuleList
+        {
+            get
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, true);
+                    if (!ValidModuleList())
+                    {
+                        List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
+                        UpdateModules(ProductVersion, productLicenses);
+                        _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
+                    }
+                });
+                return _moduleList;
+            }
+        }
+
         public static List<string> ProductLicenseTypeList
         {
             get
@@ -1094,7 +1113,7 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            uint multiplier = (uint)((_commLink.IsClientType(ProductID)) ? 1 : ProductConnection);
+            uint multiplier = (uint)((_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
             return ((module.UnlimitedValue * multiplier) - GetTotalModuleValue(module.ID));
         }
 
@@ -1106,7 +1125,7 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            uint multiplier = (uint)((_commLink.IsClientType(ProductID)) ? 1 : ProductConnection);
+            uint multiplier = (uint)((_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
             return ((module.UnlimitedValue * multiplier) - totalModuleValue);
         }
 
