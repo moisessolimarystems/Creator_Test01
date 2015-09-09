@@ -1191,6 +1191,12 @@ void InititalizeProduct14()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(103, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(103))->second);
+	pTmpModSpec->moduleID = 103;
+	pTmpModSpec->moduleName = std::wstring(L"Parallel Input");
+	pTmpModSpec->moduleTrialLicense = 127;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(52, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(52))->second);
 	pTmpModSpec->moduleID = 52;
@@ -1542,11 +1548,16 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleName = std::wstring(L"Bus/Tag Output(PCI)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(103, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(103))->second);
-	pTmpModSpec->moduleID = 103;
-	pTmpModSpec->moduleName = std::wstring(L"Parallel Input");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(59, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(59))->second);
+	pTmpModSpec->moduleID = 59;
+	pTmpModSpec->moduleName = std::wstring(L"Emulation Selector");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 8;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 42;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(101, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(101))->second);
