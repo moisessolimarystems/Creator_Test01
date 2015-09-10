@@ -82,6 +82,8 @@ def ConvertSoftwareSpecToH(swSpec) :
 		fout_product.write('\tpTmpProdSpec = &((softwareSpec.productSpecMap->find(%s))->second);\n'% (prodSpecKey,))
 		fout_product.write('\tpTmpProdSpec->productID = %s;\n' % (prodSpecKey,))
 		fout_product.write('\tpTmpProdSpec->productName = std::wstring(L"%s");\n' % (prodSpecValue.attribsMap['productName'],))
+		if(prodSpecValue.attribsMap.has_key('productLabel')):
+			fout_product.write('\tpTmpProdSpec->productLabel = std::wstring(L"%s");\n' % (prodSpecValue.attribsMap['productLabel'],))
 		if(prodSpecValue.attribsMap.has_key('softwareSpec_Major')):
 			fout_product.write('\tpTmpProdSpec->softwareSpec_Major = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Major'],))
 		if(prodSpecValue.attribsMap.has_key('softwareSpec_Minor')):
@@ -179,6 +181,8 @@ def ConvertSoftwareSpecToCS(swSpec) :
 		fout.write('\t\t\ttmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();\n')
 		fout.write('\t\t\ttmpProdSpec.productID.TVal = %s;\n' % ( prodSpecKey,))
 		fout.write('\t\t\ttmpProdSpec.productName.TVal = "%s";\n' % (prodSpecValue.attribsMap['productName'],))
+		if(prodSpecValue.attribsMap.has_key('productLabel')):
+			fout.write('\t\t\ttmpProdSpec.productLabel.TVal = "%s";\n' % (prodSpecValue.attribsMap['productLabel'],))
 		if(prodSpecValue.attribsMap.has_key('softwareSpec_Major')):
 			fout.write('\t\t\ttmpProdSpec.softwareSpec_Major.TVal = %s;\n' % (prodSpecValue.attribsMap['softwareSpec_Major'],))
 		if(prodSpecValue.attribsMap.has_key('softwareSpec_Minor')):
