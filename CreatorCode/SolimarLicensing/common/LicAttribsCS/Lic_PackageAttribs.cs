@@ -487,6 +487,7 @@ namespace Solimar
 					public AttribsMemberDWORD sameModSpecProductID = new AttribsMemberDWORD("sMSpPI", 0);
 					public AttribsMemberDWORD prevSharedProductID = new AttribsMemberDWORD("pSPI", 0);
 					public AttribsMemberString productName = new AttribsMemberString("pN", "");
+                    			public AttribsMemberString productLabel = new AttribsMemberString("pL", "");
 					public AttribsMemberDWORD softwareSpec_Major = new AttribsMemberDWORD("vMj", 0);
 					public AttribsMemberDWORD softwareSpec_Minor = new AttribsMemberDWORD("vMn", 0);
 					public AttribsMemberDWORD softwareSpec_SubMajor = new AttribsMemberDWORD("vSMj", 0);
