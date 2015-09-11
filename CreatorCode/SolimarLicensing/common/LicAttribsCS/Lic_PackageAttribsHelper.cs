@@ -152,10 +152,11 @@ namespace Solimar.Licensing.Attribs
 			foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in paramSSoftwareSpec.productSpecMap.TVal.Values)
 			{
 				if (productSpec.productID.TVal == paramProductID)
-					productName = productSpec.productName;
+					productName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel : productSpec.productName;
 			}
 			return productName;
 		}
+
 		public static string GetModuleName(Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs paramSSoftwareSpec, uint paramProductID, uint paramModuleID)
 		{
 			string moduleName = "";

@@ -326,6 +326,7 @@ public:
 		SpdAttribs::DwordAttrib sameModSpecProductID;
 		SpdAttribs::DwordAttrib prevSharedProductID;
 		SpdAttribs::WStringAttrib productName;
+		SpdAttribs::WStringAttrib productLabel;
 		SpdAttribs::DwordAttrib softwareSpec_Major;
 		SpdAttribs::DwordAttrib softwareSpec_Minor;
 		SpdAttribs::DwordAttrib softwareSpec_SubMajor;
@@ -341,6 +342,7 @@ public:
 			sameModSpecProductID = c.sameModSpecProductID;
 			prevSharedProductID = c.prevSharedProductID;
 			productName = c.productName;
+			productLabel = c.productLabel;
 			softwareSpec_Major = c.softwareSpec_Major;
 			softwareSpec_Minor = c.softwareSpec_Minor;
 			softwareSpec_SubMajor = c.softwareSpec_SubMajor;
@@ -356,6 +358,7 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", 0),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", 0),
 			productName(m_mapAttribObjs, L"pN", SpdAttribs::WStringObj(L"")),
+			productLabel(m_mapAttribObjs, L"pL", SpdAttribs::WStringObj(L"")),
 			softwareSpec_Major(m_mapAttribObjs, L"vMj", 0),
 			softwareSpec_Minor(m_mapAttribObjs, L"vMn", 0),
 			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", 0),
@@ -369,6 +372,7 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", c.sameModSpecProductID),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", c.prevSharedProductID),
 			productName(m_mapAttribObjs, L"pN", c.productName),
+			productLabel(m_mapAttribObjs, L"pL", c.productLabel),
 			softwareSpec_Major(m_mapAttribObjs, L"vMj", c.softwareSpec_Major),
 			softwareSpec_Minor(m_mapAttribObjs, L"vMn", c.softwareSpec_Minor),
 			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", c.softwareSpec_SubMajor),
@@ -382,6 +386,7 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", 0),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", 0),
 			productName(m_mapAttribObjs, L"pN", SpdAttribs::WStringObj(L"")),
+			productLabel(m_mapAttribObjs, L"pL", SpdAttribs::WStringObj(L"")),
 			softwareSpec_Major(m_mapAttribObjs, L"vMj", 0),
 			softwareSpec_Minor(m_mapAttribObjs, L"vMn", 0),
 			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", 0),
@@ -395,6 +400,7 @@ public:
 			sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", c.sameModSpecProductID),
 			prevSharedProductID(m_mapAttribObjs, L"pSPI", c.prevSharedProductID),
 			productName(m_mapAttribObjs, L"pN", c.productName),
+			productLabel(m_mapAttribObjs, L"pL", c.productLabel),
 			softwareSpec_Major(m_mapAttribObjs, L"vMj", c.softwareSpec_Major),
 			softwareSpec_Minor(m_mapAttribObjs, L"vMn", c.softwareSpec_Minor),
 			softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", c.softwareSpec_SubMajor),
@@ -407,6 +413,7 @@ public:
 			const SpdAttribs::DwordAttrib &param_sameModSpecProductID,
 			const SpdAttribs::DwordAttrib &param_prevSharedProductID,
 			const SpdAttribs::WStringAttrib &param_productName,
+			const SpdAttribs::WStringAttrib &param_productLabel,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_Major,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_Minor,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMajor,
@@ -418,6 +425,7 @@ public:
 				sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", param_sameModSpecProductID),
 				prevSharedProductID(m_mapAttribObjs, L"pSPI", param_prevSharedProductID),
 				productName(m_mapAttribObjs, L"pN", param_productName),
+				productLabel(m_mapAttribObjs, L"pL", param_productLabel),
 				softwareSpec_Major(m_mapAttribObjs, L"vMj", param_softwareSpec_Major),
 				softwareSpec_Minor(m_mapAttribObjs, L"vMn", param_softwareSpec_Minor),
 				softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", param_softwareSpec_SubMajor),
@@ -430,6 +438,7 @@ public:
 			const SpdAttribs::DwordAttrib &param_sameModSpecProductID,
 			const SpdAttribs::DwordAttrib &param_prevSharedProductID,
 			const SpdAttribs::WStringAttrib &param_productName,
+			const SpdAttribs::WStringAttrib &param_productLabel,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_Major,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_Minor,
 			const SpdAttribs::DwordAttrib &param_softwareSpec_SubMajor,
@@ -441,6 +450,7 @@ public:
 				sameModSpecProductID(m_mapAttribObjs, L"sMSpPI", param_sameModSpecProductID),
 				prevSharedProductID(m_mapAttribObjs, L"pSPI", param_prevSharedProductID),
 				productName(m_mapAttribObjs, L"pN", param_productName),
+				productLabel(m_mapAttribObjs, L"pL", param_productLabel),
 				softwareSpec_Major(m_mapAttribObjs, L"vMj", param_softwareSpec_Major),
 				softwareSpec_Minor(m_mapAttribObjs, L"vMn", param_softwareSpec_Minor),
 				softwareSpec_SubMajor(m_mapAttribObjs, L"vSMj", param_softwareSpec_SubMajor),
