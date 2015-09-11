@@ -32,7 +32,7 @@ namespace SolimarLicenseViewer
             PROTECTIONKEYS,
             PROTECTIONKEY,
             RUBIKAPROCESSBUILDER,
-            SOLINDEXER,
+            SOLIMARINDEXINGTOOLS,
             USAGE,
             PRODUCTCONNECTIONSETTINGS,
             SOLITRACK,
