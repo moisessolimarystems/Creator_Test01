@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 42;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 43;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -56,6 +56,7 @@ namespace Solimar.Licensing
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 110;
 			tmpProdSpec.productName.TVal = "Test/Dev/DR SOLindexer";
+			tmpProdSpec.productLabel.TVal = "Test/Dev/DR Solimar Indexing Tools";
 			tmpProdSpec.sameModSpecProductID.TVal = 10;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
@@ -1263,6 +1264,7 @@ namespace Solimar.Licensing
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 10;
 			tmpProdSpec.productName.TVal = "SOLindexer";
+			tmpProdSpec.productLabel.TVal = "Solimar Indexing Tools";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();

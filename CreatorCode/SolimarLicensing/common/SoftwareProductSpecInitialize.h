@@ -64,6 +64,7 @@ void InititalizeProduct110()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(110))->second);
 	pTmpProdSpec->productID = 110;
 	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLindexer");
+	pTmpProdSpec->productLabel = std::wstring(L"Test/Dev/DR Solimar Indexing Tools");
 	pTmpProdSpec->sameModSpecProductID = 10;
 }
 
@@ -757,6 +758,7 @@ void InititalizeProduct10()
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(10))->second);
 	pTmpProdSpec->productID = 10;
 	pTmpProdSpec->productName = std::wstring(L"SOLindexer");
+	pTmpProdSpec->productLabel = std::wstring(L"Solimar Indexing Tools");
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
