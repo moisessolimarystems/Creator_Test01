@@ -121,10 +121,23 @@ namespace SolimarLicenseViewer
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (btnOk.Enabled && ImportLicense() == true)
-                DialogResult = DialogResult.OK;
-            else
-                DialogResult = DialogResult.None;   //continue running dialog
+            DialogResult tmpResult = DialogResult.None;   //continue running dialog
+            if (btnOk.Enabled)
+            {
+                // CR.FIX.20385 - Display a warning message
+               string warningMessage = "The packet you are applying will update the licensing for one or more of your Solimar products. This might require a restart of those products. Do you want to continue?";
+                if (MessageBox.Show(
+                    warningMessage,  // Text
+                    "Confirm Applying License Packet",  // Caption
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2) == System.Windows.Forms.DialogResult.Yes)
+                {
+                    if (ImportLicense())
+                        tmpResult = DialogResult.OK;
+                }
+            }
+            DialogResult = tmpResult;
         }
 
         //returns true if successfully imported new License.
