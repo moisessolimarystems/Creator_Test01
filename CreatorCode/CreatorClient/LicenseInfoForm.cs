@@ -130,6 +130,9 @@ namespace Client.Creator
                     }
                     if (!bSkip)
                      */
+                    if(productSpec.productLabel.TVal.Length > 0)
+                        productList.Add(productSpec.productLabel);
+                    else
                         productList.Add(productSpec.productName);
                 }
             });
@@ -558,6 +561,7 @@ namespace Client.Creator
             ProductLicenseDialogData storedObject = selectedObject as ProductLicenseDialogData;            
             //get current product version for product;
             string selectedProduct = ProductLicenseProductComboBox.SelectedItem.ToString();
+            string compareProduct;
             ProductLicenseTypeComboBox.Items.Clear();
             Service<ICreator>.Use((client) => 
             {
@@ -566,7 +570,8 @@ namespace Client.Creator
                 //List<ProductLicenseTable> productLicenses;
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
-                    if (productSpec.productName.TVal.Equals(selectedProduct))
+                    compareProduct = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
+                    if (compareProduct.Equals(selectedProduct))
                     {
                         /*productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)m_CommLink.GetProductID(productSpec.productName.TVal)).ToList();
                         if (!(productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient) &&

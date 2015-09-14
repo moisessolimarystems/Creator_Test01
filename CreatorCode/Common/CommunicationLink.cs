@@ -31,6 +31,7 @@ namespace Client.Creator
                 m_licServer.Disconnect();
                 m_licServer.Connect(serverName);
                 m_licenseWrapper.ConnectEx(serverName);
+                
                 m_ServerName = serverName;
             }
             catch (COMException ex)
@@ -301,8 +302,8 @@ namespace Client.Creator
             string productName = "Test/Dev/DR " + GetProductName(productID);
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                //want to find test dev product spec given base product id
-                if (productSpec.productName.TVal.Equals(productName))
+                //want to find test dev product spec given base product id                
+                if (productSpec.productName.TVal.Equals(productName) || productSpec.productLabel.TVal.Equals(productName))
                 {
                     return productSpec;                        
                 }
@@ -373,9 +374,11 @@ namespace Client.Creator
         public List<String> GetProductNameList()
         {
             List<String> productList = new List<string>();
+            string productName;
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                productList.Add(productSpec.productName.TVal);
+                productName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
+                productList.Add(productName);
             }
             return productList;
         }
@@ -385,7 +388,7 @@ namespace Client.Creator
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
                 if (productSpec.productID.TVal == productID)
-                    return productSpec.productName;
+                    return (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel : productSpec.productName;
             }
             return "Unknown";
         }
@@ -434,11 +437,13 @@ namespace Client.Creator
         }
 
         public short GetProductID(String productName)
-        {            
+        {
+            string compareProductName = string.Empty;     
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
+                compareProductName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
                 //if (productSpec.productName.TVal.ToLower() == productName.ToLower())
-                if (string.Compare(productSpec.productName.TVal, productName, true) == 0)
+                if (string.Compare(compareProductName, productName, true) == 0)
                     return (short)productSpec.productID.TVal;
             }
             //need to return a valid bad value

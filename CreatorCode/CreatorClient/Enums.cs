@@ -54,7 +54,7 @@ namespace Client.Creator
             RUBIKA,
             RUBIKAPROCESSBUILDER,
             SDXDESIGNER,
-            SOLINDEXER,
+            SOLIMARINDEXINGTOOLS,
             SOLSEARCHERENTERPRISESINGLEPLATFORM,
             SOLSEARCHERENTERPRISE,
             SOLFUSION,
