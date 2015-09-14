@@ -1133,8 +1133,8 @@ namespace SolimarLicenseViewer
         {
             foreach (Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
-                if (string.Compare(productSpec.productName, productName, true) == 0)
-                    return (int)productSpec.productID.TVal;
+                if (string.Compare(productSpec.productName.TVal, productName, true) == 0 || string.Compare(productSpec.productLabel.TVal, productName, true) == 0)
+                    return (int)productSpec.productID.TVal;                
             }
             return -1;
         }
