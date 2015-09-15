@@ -1579,7 +1579,7 @@ namespace Client.Creator
                             {
                                 if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
                                     errorMsg = "Specified value exceeds the available units allowed for {0}";
-                                else if ((newValue % module.AppInstance > 0) && !s_CommLink.IsClientType(plp.ProductID))
+                                else if ((newValue % plp.ProductConnection > 0) && !s_CommLink.IsClientType(plp.ProductID))
                                 {   //module value needs to be a multiple of product connections
                                     errorMsg = "Specified value is not valid for the number of product connections.";
                                 }
