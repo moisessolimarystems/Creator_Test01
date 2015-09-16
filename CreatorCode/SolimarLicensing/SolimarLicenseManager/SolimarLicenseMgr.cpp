@@ -575,10 +575,13 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 
 		wchar_t wstrBuff[1024];
 		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		std::wstring wstrProductLabel = std::wstring(L"");
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(calProdID);
 		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
-			wstrProductName = prodSpecIt->second.productName;
-
+		{
+			wstrProductLabel = prodSpecIt->second.productLabel;
+			wstrProductName =  (wstrProductLabel.length() > 0) ? wstrProductLabel : prodSpecIt->second.productName;		
+		}
 		swprintf_s(wstrBuff, _countof(wstrBuff), L"Product: %s", wstrProductName.c_str());
 		m_headerInformation = _bstr_t(wstrBuff);
 		hr = Connect3(((licenseServerSettings.serverName.length() !=0) ? licenseServerSettings.serverName : L"localhost"), connectionFlags);	//Try to connect to primary server
@@ -1139,9 +1142,13 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 		//Move variable wstrBuff to a class variable and use it for all messages with LIC_PROPAGATE_CUSTOM_ERROR_MESSAGE()
 		wchar_t wstrBuff[1024];
 		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		std::wstring wstrProductLabel = std::wstring(L"");
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
 		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
-			wstrProductName = prodSpecIt->second.productName;
+		{
+			wstrProductLabel = prodSpecIt->second.productLabel;
+			wstrProductName = (wstrProductLabel.length() > 0) ? wstrProductLabel : prodSpecIt->second.productName;
+		}
 
 		// This assumes at most only one License Server and one Backup License Server
 		wstrPrimaryLicenseServer = m_servers.begin()!=m_servers.end() ? m_servers.begin()->second.name : L"";
@@ -1167,10 +1174,13 @@ HRESULT CSolimarLicenseMgr::Initialize_Internal(
 		//Send a message that connection connects
 		wchar_t wstrBuff[1024];
 		std::wstring wstrProductName = std::wstring(L"Unknown Product");
+		std::wstring wstrProductLabel = std::wstring(L"");
 		Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
 		if(prodSpecIt != m_softwareSpec.productSpecMap->end())
-			wstrProductName = prodSpecIt->second.productName;
-
+		{
+			wstrProductLabel = prodSpecIt->second.productLabel;
+			wstrProductName = (wstrProductLabel.length() > 0) ? wstrProductLabel : prodSpecIt->second.productName;
+		}
 		// This assumes at most only one License Server and one Backup License Server
 		std::wstring wstrPrimaryLicenseServer = m_servers.begin()!=m_servers.end() ? m_servers.begin()->second.name : L"";
 		std::wstring wstrBackupLicenseServer = m_backupServers.begin()!=m_backupServers.end() ? m_backupServers.begin()->second.name : L"";
@@ -2776,10 +2786,14 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 		if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION || hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_LIC_EXPIRED)
 		{
 			std::wstring wstrProdName = L"Unknown";
+			std::wstring wstrProdLabel = L"";
 			Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::iterator prodSpecIt = m_softwareSpec.productSpecMap->find(m_product);
 			if(prodSpecIt != m_softwareSpec.productSpecMap->end())
-				wstrProdName = prodSpecIt->second.productName;
-
+			{
+				wstrProdLabel = prodSpecIt->second.productLabel;
+				wstrProdName = (wstrProdLabel.length() > 0) ? wstrProdLabel : prodSpecIt->second.productName;
+			}
+			
 			wchar_t errorBuf[1024];
 			if(hr == LicenseServerError::EHR_LIC_SOFTWARE_PRODUCT_NO_VERSION)
 			{
