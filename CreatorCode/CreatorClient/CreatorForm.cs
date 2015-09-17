@@ -1903,8 +1903,10 @@ namespace Client.Creator
             if (lsp != null)
             {
                 if(!DetailSplitContainer.Panel1Collapsed)
-                    if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
-                        DetailPropertyGrid.Enabled = false;
+                    DetailPropertyGrid.Enabled = lspNode.Text.ToLower().Contains(WindowsIdentity.GetCurrent().Name.ToLower());
+                    //if(lspNode.Text.ToLower().Contains(WindowsIdentity.GetCurrent().Name.ToLower())
+                    //if(!lsp.LockStatus || (lsp.UserLock != WindowsIdentity.GetCurrent().Name.ToLower()))
+                    //    DetailPropertyGrid.Enabled = false;
                 DetailPropertyGrid.SelectedObject = node.Tag;
             }
             EnableToolStripMenu();
@@ -4639,9 +4641,13 @@ namespace Client.Creator
                                 totalValue += (uint)mod.Value;
                         }
                     }
-                    ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
-                    if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
-                        storageListView.Items.Add(lvItem);
+                    //need to distiguish between add-on and regular PL
+                    if (module.ProductLicenseID == plData.ProductLicenseDatabaseID)
+                    {
+                        ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
+                        //if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
+                            storageListView.Items.Add(lvItem);
+                    }
                 }
                 if (moduleFilterToolStripComboBox.SelectedItem != null)               
                     ShowModuleListView(moduleFilterToolStripComboBox.Text);

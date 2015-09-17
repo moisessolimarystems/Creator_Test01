@@ -37,6 +37,7 @@ namespace Client.Creator
         CommunicationLink _commLink;
         List<ModuleTable> _moduleList;
         LicenseVersion _version;
+        byte _parentProductConnection;
 
         public static List<ProductLicenseType> _productLicenseTypes;
 
@@ -51,6 +52,15 @@ namespace Client.Creator
             Permissions = permissions;
             ProductLicenseData = plData;
             _version = new LicenseVersion(_plRec.ProductVersion);
+            _parentProductConnection = 0; //used by add-on product licenses to set module product connections.
+            if(Status == ProductLicenseState.AddOn)
+            {
+                Service<ICreator>.Use((client) =>
+                {
+                    ProductLicenseTable plt = client.GetProductLicense(_plRec.ParentProductLicenseID);
+                    _parentProductConnection = (plt != null) ? plt.ProductConnection : (byte)0;
+                });
+            }          
         }
 
 
@@ -58,7 +68,6 @@ namespace Client.Creator
 
         #region Properties
         #region NonBrowsable Properties
-
         [Browsable(false)]
         public byte ProductID
         {
@@ -119,6 +128,13 @@ namespace Client.Creator
         {
             get { return _plRec.plIndex; }
             set { _plRec.plIndex = value; }
+        }
+
+        [Browsable(false)]
+        public byte ParentProductConnection
+        {
+            get { return _parentProductConnection; }
+            set { _parentProductConnection = value; }
         }
 
         [Browsable(false)]
@@ -202,8 +218,11 @@ namespace Client.Creator
             get
             {
                 Service<ICreator>.Use((client) =>
-                {
-                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, true);
+                {                    
+                    _moduleList = client.GetModulesByProductLicense(
+                                                                    (ParentID != null) ? ParentID : ID, 
+                                                                    true
+                                                                    );
                     if (!ValidModuleList())
                     {
                         List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
@@ -1136,8 +1155,9 @@ namespace Client.Creator
             if (module.Value > 0)
             {
                 if (totalModAppInstance == 0)
-                {
-                    module.AppInstance = ProductConnection; //always > 0
+                {//need to use parent product connections if add-on and total product connections are 0
+                    //use parent product PC if add-on                     
+                    module.AppInstance = (Status == ProductLicenseState.AddOn) ?  ParentProductConnection : ProductConnection; //always > 0 except for add-on, then use parent product connection
                     /*if (ProductConnection > 0)
                         module.AppInstance = (_commLink.IsClientType(ProductID)) ? ProductConnection : (byte)1;
                     else
