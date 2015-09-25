@@ -862,7 +862,7 @@ namespace Client.Creator
             {
                 if (pltList != null)
                 {
-                    foreach (ProductLicenseTable plt in pltList)
+                    foreach (ProductLicenseTable plt in pltList.Where(p => p.IsActive)) //Add introduced modules to active product licenses.
                     {
                         bool bIntroduced = false, bDeprecated = false;
                         if (dbModuleList.Where(m => (m.ModID == (short)moduleSpec.moduleID.TVal) && (m.ProductLicenseID == plt.ID)).Count() == 0)
