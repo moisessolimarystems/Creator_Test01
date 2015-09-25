@@ -65,14 +65,14 @@ namespace CreatorData
                         list = (from t in db.TokenTables //5
                                 from c in db.CustomerTables
                                 where t.TokenType.Equals(token) &&
-                                     (c.SCRname.Contains(custName) && t.CustID.Equals(c.SCRnumber))
+                                     (c.SCRname.Equals(custName) && t.CustID.Equals(c.SCRnumber))
                                 select t).OrderBy(l => l.LicenseID).ToList();                        
                     }
                     else
                     {
                         list = (from t in db.TokenTables //5
                                 from c in db.CustomerTables
-                                where (c.SCRname.Contains(custName) && t.CustID.Equals(c.SCRnumber))
+                                where (c.SCRname.Equals(custName) && t.CustID.Equals(c.SCRnumber))
                                 select t).OrderBy(l => l.LicenseID).ToList();
                     }
                 }
