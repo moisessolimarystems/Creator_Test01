@@ -4726,7 +4726,7 @@ void CSolimarLicenseMgr::StartGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = time(NULL);
       }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_INFO, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodStarted], MT_WARNING, LicenseServerError::EC_SP_NO_SERVER_RESPONSE, MessageGracePeriodStarted);
 	}
 }
 void CSolimarLicenseMgr::StopGracePeriod()
@@ -4738,7 +4738,7 @@ void CSolimarLicenseMgr::StopGracePeriod()
 	   SafeMutex mutex(GracePeriodLock);
 	   m_dtGracePeriodStart = 0;
 	   }
-		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_INFO, 0, MessageGracePeriodEnded);
+		SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageGracePeriodEnded], MT_WARNING, 0, MessageGracePeriodEnded);
 	}
 }
 
