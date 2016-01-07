@@ -20,7 +20,7 @@ namespace SolimarLicenseViewer
         public static readonly String RegKey_SseInstallInfoSseSp64 = "ProductCode_57";
 
         //XML File/Folder Path
-        public static readonly String LocalConnectionFilePath = "\\Solimar\\SolimarLicenseServer\\";
+        public static readonly String LocalConnectionFilePath = "\\Solimar Systems\\Solimar Licensing\\SolimarLicenseServer\\";
         public static readonly String LocalConnectionFile = "LocalConnectionSettings.xml";
 
         //Form Constants

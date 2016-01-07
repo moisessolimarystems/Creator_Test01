@@ -50,7 +50,7 @@
 #include <ctype.h> // isalnum()
 #include <direct.h> // _getdrive()
 #include <locale> // std::locale
-
+#include <Shlwapi.h>	// For PathFileExists
 
 
 /* VerifyFolder() - Verifies that directory string exists.
@@ -1370,3 +1370,52 @@ SPDUTILS_IMP_EXP void __stdcall SpdUtils::GetWin32ErrorMessage(std::wstring &wsM
       }
    }
 }
+
+SPDUTILS_IMP_EXP DWORD __stdcall SpdUtils::DeleteFolderAndFiles(std::wstring &wsFolder) 
+{
+	DWORD lastError = 0;
+	WCHAR debug_buf[1024];
+	if(PathFileExists(wsFolder.c_str()) == true)
+	{
+		// Walk through all the files in the directory, remove Read-Only attribute and delete the files
+		WIN32_FIND_DATAW ffd;
+		WCHAR szPathFind[MAX_PATH];
+		wmemcpy_s(&szPathFind[0], MAX_PATH, wsFolder.c_str(), MAX_PATH);
+		PathAppend(szPathFind, L"*");
+
+		HANDLE hFind = FindFirstFile(szPathFind, &ffd);
+		do 
+		{
+			if (hFind != INVALID_HANDLE_VALUE)
+			{
+				if((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+				{
+//_snwprintf_s(debug_buf, 1024, L"SoftwareServerDataMgr::LoadFromFile() - File: '%s', A: %d", ffd.cFileName, ffd.dwFileAttributes);
+//OutputDebugStringW(debug_buf);
+
+					WCHAR szDeleteFile[MAX_PATH];
+					wmemcpy_s(&szDeleteFile[0], MAX_PATH, wsFolder.c_str(), MAX_PATH);
+					PathAppend(szDeleteFile, ffd.cFileName);
+
+					_wchmod(szDeleteFile, _S_IWRITE);	// Take off Read-Only Attr
+					if (!DeleteFile(szDeleteFile))
+					{
+_snwprintf_s(debug_buf, 1024, L"DeleteFile Failed, File: '%s', Error Code: %d", szDeleteFile, GetLastError());
+OutputDebugStringW(debug_buf);
+					}
+				}
+			}
+		} while (FindNextFile(hFind, &ffd) != 0);
+
+		if (hFind != INVALID_HANDLE_VALUE)
+			FindClose(hFind);
+
+		if(!RemoveDirectory(wsFolder.c_str()))
+		{
+_snwprintf_s(debug_buf, 1024, L"RemoveDirectory Failed, Directory: '%s', Error Code: %d", wsFolder.c_str(), GetLastError());
+OutputDebugStringW(debug_buf);
+		}
+	}
+	return lastError;
+}
+

@@ -23,8 +23,43 @@ HRESULT LicenseSettings::Initialize()
 		if(FAILED(hr))	
 			break;
 
+		// CR.FIX.20830 - Use "CSIDL_COMMON_APPDATA\\Solimar Systems\Solimar Licensing\SolimarLicenseServer" instead of "CSIDL_COMMON_APPDATA\\Solimar\SolimarLicenseServer".
+		// Check for "CSIDL_COMMON_APPDATA\\Solimar Systems\Solimar Licensing\SolimarLicenseServer", if it doesn't exist, check for "CSIDL_COMMON_APPDATA\\Solimar\SolimarLicenseServer" and move
+		// all of its contents to "CSIDL_COMMON_APPDATA\\Solimar Systems\Solimar Licensing\SolimarLicenseServer".  This will break any backward compatibly once the files are moved.
+
+		WCHAR szPathCr20830Post[MAX_PATH];
+		wmemcpy_s(&szPathCr20830Post[0], MAX_PATH, &szPath[0], MAX_PATH);
+		PathAppend(szPathCr20830Post, L"Solimar Systems");
+
+		// Create [ProgramData]\Solimar Systems if neccessary
+		if(PathFileExists(szPathCr20830Post) == false)
+			CreateDirectory(szPathCr20830Post, 0);
+
+		PathAppend(szPathCr20830Post, L"Solimar Licensing");
+		// Create [ProgramData]\Solimar Systems\Solimar Licensing if neccessary
+		if(PathFileExists(szPathCr20830Post) == false)
+			CreateDirectory(szPathCr20830Post, 0);
+
+		PathAppend(szPathCr20830Post, L"SolimarLicenseServer");
+
+		WCHAR szPathCr20830Pre[MAX_PATH];
+		wmemcpy_s(&szPathCr20830Pre[0], MAX_PATH, &szPath[0], MAX_PATH);
+		PathAppend(szPathCr20830Pre, L"Solimar\\SolimarLicenseServer");
+
+		if(PathFileExists(szPathCr20830Pre) == true)
+		{
+			if(PathFileExists(szPathCr20830Post) == true)
+				SpdUtils::DeleteFolderAndFiles(std::wstring(szPathCr20830Post));
+
+			if (MoveFile(szPathCr20830Pre, szPathCr20830Post) == false)
+			{
+//_snwprintf_s(debug_buf, 1024, L"SoftwareServerDataMgr::LoadFromFile() - Move Failed, Error Code: %d", GetLastError());
+//OutputDebugStringW(debug_buf);
+			}
+		}
+
 		//Append config file
-		if(!PathAppend(szPath, L"Solimar\\SolimarLicenseServer\\LocalConnectionSettings.xml")) 
+		if(!PathAppend(szPath, L"Solimar Systems\\Solimar Licensing\\SolimarLicenseServer\\LocalConnectionSettings.xml")) 
 			break;	
 	
 		//Open config file
@@ -118,9 +153,6 @@ HRESULT LicenseSettings::GetLiceseServerByProduct(long productID, LicenseServerS
 			hr = LoadVersionOnePointZeroXML(calProdID, &licServerSettingsList);
 			if(FAILED(hr))
 				throw hr;
-
-
-
 
 			bool bUseShared = (calProdID != productID);
 //swprintf_s(tmpbuf, 1024, L"LicenseSettings::GetLiceseServerByProduct calProdID: %d, bUseShared:%d", calProdID, bUseShared);

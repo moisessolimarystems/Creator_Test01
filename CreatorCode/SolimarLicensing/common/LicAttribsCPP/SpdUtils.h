@@ -178,5 +178,8 @@ namespace SpdUtils
       DWORD dwNtErr
       ) ;
 
+   SPDUTILS_IMP_EXP DWORD __stdcall DeleteFolderAndFiles(
+      std::wstring &wsFolder
+      );
 } 
 
