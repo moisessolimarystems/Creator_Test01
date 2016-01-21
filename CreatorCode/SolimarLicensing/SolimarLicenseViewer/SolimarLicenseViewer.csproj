@@ -31,7 +31,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <ApplicationIcon>LicenseServerProgram.ico</ApplicationIcon>
+    <ApplicationIcon>SolimarLicensing.ico</ApplicationIcon>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -255,6 +255,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="LicenseServerProgram.ico" />
+    <Content Include="SolimarLicensing.ico" />
     <None Include="Icons\eventLogError.ico" />
     <None Include="Icons\eventLogInfo.ico" />
     <None Include="Icons\eventLogWarning.ico" />
