@@ -90,10 +90,10 @@ namespace SolimarLicenseViewer
             this.remoteConnectToolStripMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
-            this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
             this.remoteSvrToolStrip = new System.Windows.Forms.ToolStrip();
             this.remoteSvrTSLabel = new System.Windows.Forms.ToolStripLabel();
+            this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
+            this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
             this.testConnBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1.SuspendLayout();
             this.formSplitContainer.Panel1.SuspendLayout();
@@ -107,8 +107,8 @@ namespace SolimarLicenseViewer
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
-            this.diagnosticDataToolStrip.SuspendLayout();
             this.remoteSvrToolStrip.SuspendLayout();
+            this.diagnosticDataToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -172,15 +172,15 @@ namespace SolimarLicenseViewer
             this.productIconList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("productIconList.ImageStream")));
             this.productIconList.TransparentColor = System.Drawing.Color.Transparent;
             this.productIconList.Images.SetKeyName(0, "SPDNT.ICO");
-            this.productIconList.Images.SetKeyName(1, "iconvert16.png");
-            this.productIconList.Images.SetKeyName(2, "rubika16.png");
-            this.productIconList.Images.SetKeyName(3, "sdx16.png");
-            this.productIconList.Images.SetKeyName(4, "SOLenterprise32.ico");
-            this.productIconList.Images.SetKeyName(5, "solfusion32.ico");
-            this.productIconList.Images.SetKeyName(6, "solscript16.png");
-            this.productIconList.Images.SetKeyName(7, "spde16.png");
-            this.productIconList.Images.SetKeyName(8, "spde16.png");
-            this.productIconList.Images.SetKeyName(9, "Queue Manager16.png");
+            this.productIconList.Images.SetKeyName(1, "IconvertAllFormats.ico");
+            this.productIconList.Images.SetKeyName(2, "RubikaAllFormats.ico");
+            this.productIconList.Images.SetKeyName(3, "SdxAllFormats.ico");
+            this.productIconList.Images.SetKeyName(4, "SOLsearcherAllFormats.ico");
+            this.productIconList.Images.SetKeyName(5, "SOLfusionAllFormats.ico");
+            this.productIconList.Images.SetKeyName(6, "SOLscriptAllFormats.ico");
+            this.productIconList.Images.SetKeyName(7, "SpdeAllFormats.ico");
+            this.productIconList.Images.SetKeyName(8, "SpdeAllFormats.ico");
+            this.productIconList.Images.SetKeyName(9, "SpdeAllFormats.ico");
             this.productIconList.Images.SetKeyName(10, "Licenses16x16.png");
             this.productIconList.Images.SetKeyName(11, "LicenseServer16x16.png");
             this.productIconList.Images.SetKeyName(12, "Machine16x16.png");
@@ -188,15 +188,15 @@ namespace SolimarLicenseViewer
             this.productIconList.Images.SetKeyName(14, "Usage16x16.png");
             this.productIconList.Images.SetKeyName(15, "ProtectionKeys16x16.png");
             this.productIconList.Images.SetKeyName(16, "protectionKey.ico");
-            this.productIconList.Images.SetKeyName(17, "rubika16.png");
-            this.productIconList.Images.SetKeyName(18, "solindexer16.png");
+            this.productIconList.Images.SetKeyName(17, "RubikaAllFormats.ico");
+            this.productIconList.Images.SetKeyName(18, "SOLindexerAllFormats.ico");
             this.productIconList.Images.SetKeyName(19, "Empty16x16.png");
             this.productIconList.Images.SetKeyName(20, "ConnectionSettings16x16.png");
-            this.productIconList.Images.SetKeyName(21, "solitrack16.png");
+            this.productIconList.Images.SetKeyName(21, "SOLitrackAllFormats.ico");
             this.productIconList.Images.SetKeyName(22, "SOLenterpriseSP32.ico");
             this.productIconList.Images.SetKeyName(23, "LibraryServices.ico");
             this.productIconList.Images.SetKeyName(24, "EventLog16x16.png");
-            this.productIconList.Images.SetKeyName(25, "XIMAGEpdf.ico");
+            this.productIconList.Images.SetKeyName(25, "XimagepdfAllFormats.ico");
             this.productIconList.Images.SetKeyName(26, "AlertEmail16x16.png");
             this.productIconList.Images.SetKeyName(27, "SolimarUtilities16.png");
             // 
@@ -658,26 +658,8 @@ namespace SolimarLicenseViewer
             // toolStripContainer1.TopToolStripPanel
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.menuStrip1);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.remoteSvrToolStrip);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.diagnosticDataToolStrip);
-            // 
-            // diagnosticDataToolStrip
-            // 
-            this.diagnosticDataToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.diagnosticDataToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.diagnosticDataTSLabel});
-            this.diagnosticDataToolStrip.Location = new System.Drawing.Point(3, 24);
-            this.diagnosticDataToolStrip.Name = "diagnosticDataToolStrip";
-            this.diagnosticDataToolStrip.Size = new System.Drawing.Size(105, 25);
-            this.diagnosticDataToolStrip.TabIndex = 2;
-            this.diagnosticDataToolStrip.Visible = false;
-            // 
-            // diagnosticDataTSLabel
-            // 
-            this.diagnosticDataTSLabel.Name = "diagnosticDataTSLabel";
-            this.diagnosticDataTSLabel.Size = new System.Drawing.Size(93, 22);
-            this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
-            this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.remoteSvrToolStrip);
             // 
             // remoteSvrToolStrip
             // 
@@ -696,6 +678,24 @@ namespace SolimarLicenseViewer
             this.remoteSvrTSLabel.Size = new System.Drawing.Size(158, 22);
             this.remoteSvrTSLabel.Text = "Remove Server Connections:";
             this.remoteSvrTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // diagnosticDataToolStrip
+            // 
+            this.diagnosticDataToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.diagnosticDataToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.diagnosticDataTSLabel});
+            this.diagnosticDataToolStrip.Location = new System.Drawing.Point(3, 24);
+            this.diagnosticDataToolStrip.Name = "diagnosticDataToolStrip";
+            this.diagnosticDataToolStrip.Size = new System.Drawing.Size(105, 25);
+            this.diagnosticDataToolStrip.TabIndex = 2;
+            this.diagnosticDataToolStrip.Visible = false;
+            // 
+            // diagnosticDataTSLabel
+            // 
+            this.diagnosticDataTSLabel.Name = "diagnosticDataTSLabel";
+            this.diagnosticDataTSLabel.Size = new System.Drawing.Size(93, 22);
+            this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
+            this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // testConnBackgroundWorker
             // 
@@ -737,10 +737,10 @@ namespace SolimarLicenseViewer
             this.toolStripContainer1.TopToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
-            this.diagnosticDataToolStrip.ResumeLayout(false);
-            this.diagnosticDataToolStrip.PerformLayout();
             this.remoteSvrToolStrip.ResumeLayout(false);
             this.remoteSvrToolStrip.PerformLayout();
+            this.diagnosticDataToolStrip.ResumeLayout(false);
+            this.diagnosticDataToolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
