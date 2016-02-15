@@ -233,11 +233,11 @@ namespace Client.Creator
                 LicenseServer lsProperty = GetLicenseServerFromSelectedNode(DetailTreeView.SelectedNode);
                 reactivateToolStripMenuItem.Enabled = deactivateToolStripMenuItem.Enabled = deleteToolStripMenuItem.Enabled = lsProperty.IsActive && m_Permissions.pt_create_modify_key.Value && lsProperty.LockStatus; //DB - 1
                 ProductLicense plProperty = DetailTreeView.SelectedNode.Tag as ProductLicense;
-                if (plProperty.Status != ProductLicenseState.AddOn)
-                {
+                //if (plProperty.Status != ProductLicenseState.AddOn)
+                //{
                     deactivateToolStripMenuItem.Visible = plProperty.IsActive;
                     reactivateToolStripMenuItem.Visible = !plProperty.IsActive;
-                }
+                //}
                 deleteToolStripMenuItem.Visible = !deactivateToolStripMenuItem.Visible;                    
             }
             lcmToolStripSeparator3.Visible = true;
@@ -3846,12 +3846,15 @@ namespace Client.Creator
                     else
                     {
                         if (plNode.Parent.Nodes.Count > 1)
-                        {   
+                        {
                             selectedIndex = (selectedIndex > 0) ? --selectedIndex : ++selectedIndex;
-                            DetailTreeView.SelectedNode = productNode.Nodes[selectedIndex];
+                            DetailTreeView.SelectedNode = plNode.Parent.Nodes[selectedIndex];//productNode.Nodes[selectedIndex];
                         }
                         else //delete last addon -> go to parent PL
+                        {
                             DetailTreeView.SelectedNode = plNode.Parent;
+                        }
+                        plNode.Remove();
                     }
                     if (DetailTreeView.SelectedNode != null)
                         SetLicenseServerState(DetailTreeView.SelectedNode, true);                    
