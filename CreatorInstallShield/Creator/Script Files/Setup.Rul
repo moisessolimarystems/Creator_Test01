@@ -108,10 +108,7 @@ begin
 
     // Initialization Steps.  
     InitLicensing();
-   	CheckRequirements();
-   	
-    // Initialize global structure for Uninstall information.
-    UNINSTALL_STRING = UNINSTALL_STRING + "UNINSTALL";     
+   	CheckRequirements();  
 end;
 //---------------------------------------------------------------------------
 // OnFirstUIBefore
