@@ -1328,8 +1328,8 @@ namespace Client.Creator
                 hexVersion = string.Format("{0:x}", decimalVersion);
                 minorVersion = hexVersion.Substring(hexVersion.Length - 3, 2);
                 majorVersion = hexVersion.Substring(0, hexVersion.Length - (minorVersion.Length + 1));
-                _major = UInt32.Parse(majorVersion, System.Globalization.NumberStyles.HexNumber);
-                _minor = UInt32.Parse(minorVersion, System.Globalization.NumberStyles.HexNumber);
+                _major = UInt32.Parse(majorVersion);//UInt32.Parse(majorVersion, System.Globalization.NumberStyles.HexNumber);
+                _minor = UInt32.Parse(minorVersion);//UInt32.Parse(minorVersion, System.Globalization.NumberStyles.HexNumber);
             }
         }
 
