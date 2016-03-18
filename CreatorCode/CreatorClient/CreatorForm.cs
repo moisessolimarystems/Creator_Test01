@@ -2282,9 +2282,16 @@ namespace Client.Creator
                         ProductLicenseState newStatus = (ProductLicenseState)e.ChangedItem.Value;
                         if (oldStatus == ProductLicenseState.AddOn && newStatus == ProductLicenseState.LicensedAddOn)
                         {
+                            ProductLicense productLicense = DetailTreeView.SelectedNode.Tag as ProductLicense;
                             TreeNode productNode = DetailTreeView.SelectedNode.Parent.Parent;
-                            ProductCollection pcp = productNode.Tag as ProductCollection;
-                            pcp.RemoveProductProperty(DetailTreeView.SelectedNode.Tag as ProductLicense);
+                            ProductCollection pcp = productNode.Tag as ProductCollection;                            
+                            pcp.RemoveProductProperty(productLicense);
+                            /*Service<ICreator>.Use((client) => //Remove LicensedAddon ProductLicense, keep for now to allow searching in reports.
+                            {
+                                ProductLicenseTable plt = client.GetProductLicense(productLicense.ID);
+                                if(plt != null)
+                                    client.DeleteProductLicense(plt); //Remove current PL
+                            });*/
                             //remove from product collection
                             int selectedIndex = DetailTreeView.SelectedNode.Index;
                             //set status of add-on to inactive.
@@ -3934,7 +3941,8 @@ namespace Client.Creator
             int destID = Int32.Parse(lsString[1]);
             Service<ICreator>.Use((client) =>
             {
-                if (client.GetProductLicense(selectedProductLicense) == null)
+                ProductLicenseTable plt = client.GetProductLicense(selectedProductLicense);
+                if (plt == null || plt.plState == (byte)ProductLicenseState.LicensedAddOn) //ignore Product Licenses with state of LicensedAddOn, should not exist in DB.
                 {
                     MessageBox.Show("Could not find Product License - " + selectedProductLicense, "Search Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     bFound = false;
