@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Tue Mar 08 11:38:44 2016
+/* at Tue Jul 26 16:08:31 2016
  */
 /* Compiler settings for _SolimarLicenseManager.idl:
     Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 7.00.0555 
