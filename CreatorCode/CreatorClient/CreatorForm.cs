@@ -580,6 +580,34 @@ namespace Client.Creator
             HardwareKeyListView.Items[HardwareKeyListView.Items.IndexOfKey(keyName)].Selected = true;
         }
 
+        private void MarkHardwareTokenDefective(string keyValue)
+        {
+            //Confirm mark defective
+            
+            Cursor storedCursor = this.Cursor;
+            this.Cursor = Cursors.WaitCursor;
+            Service<ICreator>.Use((client) =>
+            {
+                TokenTable selectedToken = client.GetHardwareTokenByKeyValue(keyValue);
+                if (selectedToken == null)
+                {
+                    MessageBox.Show(string.Format("Failed to find hardware key : {0} in database", keyValue), "Deactivate Hardware Key");
+                }
+                else
+                {
+                    selectedToken.LicenseID = -1;
+                    selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
+                    selectedToken.DeactivatedDate = DateTime.Now;
+                    client.UpdateToken(selectedToken);
+                    HardwareKeyListView.SelectedItems[0].SubItems[1].Text = string.Empty;
+                    HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
+                    HardwareKeyListView.SelectedItems[0].SubItems[3].Text = DateTime.Now.ToString();
+                }
+            });
+            HardwareKeyListView.Refresh();
+            this.Cursor = storedCursor;
+        }
+
         private void deactivateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
         {
             if (HardwareKeyListView.SelectedItems.Count > 0)
@@ -2410,12 +2438,29 @@ namespace Client.Creator
             if (HardwareKeyListView.SelectedItems.Count > 0)
                 LoadSelectedLicenseServer(HardwareKeyListView.SelectedItems[0].SubItems[1].Text);
         }
+
+        private void markDefectiveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (HardwareKeyListView.SelectedItems.Count > 0)
+            {
+                if (MessageBox.Show(string.Format("Please confirm marking hardware token : {0} defective. This will deactivate without clearing the hardware token.", HardwareKeyListView.SelectedItems[0].Text),
+                    "Mark Defective",
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Exclamation) == DialogResult.OK)
+                    MarkHardwareTokenDefective(HardwareKeyListView.SelectedItems[0].Text);
+            }
+        }
+
         private void validationTokenContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             viewLSToolStripMenuItem.Enabled = false;
+            markDefectiveToolStripMenuItem.Visible = false;
             if (HardwareKeyListView.SelectedItems.Count > 0)
                 if (HardwareKeyListView.SelectedItems[0].SubItems[1].Text.Length > 0)
+                {
                     viewLSToolStripMenuItem.Enabled = true;
+                    markDefectiveToolStripMenuItem.Visible = true;
+                }
         }
         #endregion
 
@@ -4279,12 +4324,14 @@ namespace Client.Creator
             ListViewItem[] lvItems = null;
             EnableHardwareKeyView();
             HardwareKeyListView.Items.Clear();
+            CustomerTable currentCustomer;
             Service<ICreator>.Use((client) =>
             {
                 tokens = client.GetAllTokensByCustomer(searchString, custName, Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttHardwareKeyID);
+                currentCustomer = client.GetCustomer(custName, false);
                 if (tokens.Count > 0)
-                {
-                    tokens = tokens.OrderBy(c => c.TokenValue).ToList();
+                {   //tokens returned may contain tokens from customers with the current customer name as a substring. Filtered out via CustID.
+                    tokens = tokens.OrderBy(c => c.TokenValue).Where(k => k.CustID == currentCustomer.SCRnumber).ToList();                    
                     lvItems = new ListViewItem[tokens.Count];
                     for (int index = 0; index < tokens.Count; index++)
                     {
