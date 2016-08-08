@@ -133,6 +133,10 @@
             this.reportsTreeView = new System.Windows.Forms.TreeView();
             this.ReportListView = new Shared.VisualComponents.NoFlickerListView();
             this.ConnectServerTabPage = new System.Windows.Forms.TabPage();
+            this.ConnectServerPanel = new System.Windows.Forms.Panel();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.loadingCircle1 = new Shared.VisualComponents.LoadingCircle();
             this.LogListView = new Shared.VisualComponents.NoFlickerListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
@@ -214,10 +218,7 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.ConnectServerPanel = new System.Windows.Forms.Panel();
+            this.markDefectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -254,6 +255,8 @@
             this.reportsSplitContainer.Panel2.SuspendLayout();
             this.reportsSplitContainer.SuspendLayout();
             this.ConnectServerTabPage.SuspendLayout();
+            this.ConnectServerPanel.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.LogWindowContextMenuStrip.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -262,8 +265,6 @@
             this.DetailListViewContextMenuStrip.SuspendLayout();
             this.LicenseContextMenuStrip.SuspendLayout();
             this.customerContextMenuStrip.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.ConnectServerPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenuStrip
@@ -294,32 +295,32 @@
             // connectToolStripMenuItem
             // 
             this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.connectToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
             this.connectToolStripMenuItem.Text = "Connect";
             this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(116, 6);
             // 
             // printToolStripMenuItem
             // 
             this.printToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("printToolStripMenuItem.Image")));
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
-            this.printToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.printToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
             this.printToolStripMenuItem.Text = "Print";
             this.printToolStripMenuItem.Click += new System.EventHandler(this.printToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(116, 6);
             // 
             // exitMainToolStripMenuItem
             // 
             this.exitMainToolStripMenuItem.Name = "exitMainToolStripMenuItem";
-            this.exitMainToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitMainToolStripMenuItem.Size = new System.Drawing.Size(119, 22);
             this.exitMainToolStripMenuItem.Text = "E&xit";
             this.exitMainToolStripMenuItem.Click += new System.EventHandler(this.exitMainToolStripMenuItem_Click);
             // 
@@ -335,7 +336,7 @@
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -351,7 +352,7 @@
             // 
             this.logToolStripMenuItem.CheckOnClick = true;
             this.logToolStripMenuItem.Name = "logToolStripMenuItem";
-            this.logToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.logToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.logToolStripMenuItem.Text = "Log Window";
             this.logToolStripMenuItem.CheckedChanged += new System.EventHandler(this.logToolStripMenuItem_CheckedChanged);
             // 
@@ -366,7 +367,7 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -936,10 +937,10 @@
             this.DetailListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DetailListView.FullRowSelect = true;
             this.DetailListView.GridLines = true;
-            this.DetailListView.Location = new System.Drawing.Point(0, 0);
+            this.DetailListView.Location = new System.Drawing.Point(0, 25);
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
-            this.DetailListView.Size = new System.Drawing.Size(604, 197);
+            this.DetailListView.Size = new System.Drawing.Size(604, 172);
             this.DetailListView.SmallImageList = this.CreatorImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
@@ -1069,11 +1070,11 @@
             this.TransactionListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TransactionListView.FullRowSelect = true;
             this.TransactionListView.GridLines = true;
-            this.TransactionListView.Location = new System.Drawing.Point(0, 0);
+            this.TransactionListView.Location = new System.Drawing.Point(0, 25);
             this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionListView.Name = "TransactionListView";
             this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(604, 396);
+            this.TransactionListView.Size = new System.Drawing.Size(604, 371);
             this.TransactionListView.TabIndex = 0;
             this.TransactionListView.UseCompatibleStateImageBehavior = false;
             this.TransactionListView.View = System.Windows.Forms.View.Details;
@@ -1325,9 +1326,10 @@
             // validationTokenContextMenuStrip
             // 
             this.validationTokenContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.viewLSToolStripMenuItem});
+            this.viewLSToolStripMenuItem,
+            this.markDefectiveToolStripMenuItem});
             this.validationTokenContextMenuStrip.Name = "validationTokenContextMenuStrip";
-            this.validationTokenContextMenuStrip.Size = new System.Drawing.Size(177, 26);
+            this.validationTokenContextMenuStrip.Size = new System.Drawing.Size(177, 70);
             this.validationTokenContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.validationTokenContextMenuStrip_Opening);
             // 
             // viewLSToolStripMenuItem
@@ -1431,6 +1433,46 @@
             this.ConnectServerTabPage.TabIndex = 6;
             this.ConnectServerTabPage.Text = "Connect Server";
             this.ConnectServerTabPage.UseVisualStyleBackColor = true;
+            // 
+            // ConnectServerPanel
+            // 
+            this.ConnectServerPanel.Controls.Add(this.groupBox1);
+            this.ConnectServerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ConnectServerPanel.Location = new System.Drawing.Point(3, 3);
+            this.ConnectServerPanel.Name = "ConnectServerPanel";
+            this.ConnectServerPanel.Size = new System.Drawing.Size(975, 422);
+            this.ConnectServerPanel.TabIndex = 6;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.comboBox1);
+            this.groupBox1.Controls.Add(this.button1);
+            this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.groupBox1.Location = new System.Drawing.Point(319, 93);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(337, 214);
+            this.groupBox1.TabIndex = 5;
+            this.groupBox1.TabStop = false;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(63, 82);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(211, 21);
+            this.comboBox1.TabIndex = 4;
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(63, 109);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(211, 23);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Connect";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // loadingCircle1
             // 
@@ -2084,45 +2126,12 @@
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
             // 
-            // groupBox1
+            // markDefectiveToolStripMenuItem
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.comboBox1);
-            this.groupBox1.Controls.Add(this.button1);
-            this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.groupBox1.Location = new System.Drawing.Point(319, 93);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(337, 214);
-            this.groupBox1.TabIndex = 5;
-            this.groupBox1.TabStop = false;
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(63, 109);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(211, 23);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Connect";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(63, 82);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(211, 21);
-            this.comboBox1.TabIndex = 4;
-            // 
-            // ConnectServerPanel
-            // 
-            this.ConnectServerPanel.Controls.Add(this.groupBox1);
-            this.ConnectServerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ConnectServerPanel.Location = new System.Drawing.Point(3, 3);
-            this.ConnectServerPanel.Name = "ConnectServerPanel";
-            this.ConnectServerPanel.Size = new System.Drawing.Size(975, 422);
-            this.ConnectServerPanel.TabIndex = 6;
+            this.markDefectiveToolStripMenuItem.Name = "markDefectiveToolStripMenuItem";
+            this.markDefectiveToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.markDefectiveToolStripMenuItem.Text = "Mark Defective";
+            this.markDefectiveToolStripMenuItem.Click += new System.EventHandler(this.markDefectiveToolStripMenuItem_Click);
             // 
             // CreatorForm
             // 
@@ -2189,6 +2198,8 @@
             this.reportsSplitContainer.Panel2.ResumeLayout(false);
             this.reportsSplitContainer.ResumeLayout(false);
             this.ConnectServerTabPage.ResumeLayout(false);
+            this.ConnectServerPanel.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.LogWindowContextMenuStrip.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -2199,8 +2210,6 @@
             this.DetailListViewContextMenuStrip.ResumeLayout(false);
             this.LicenseContextMenuStrip.ResumeLayout(false);
             this.customerContextMenuStrip.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.ConnectServerPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2395,6 +2404,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Panel ConnectServerPanel;
+        private System.Windows.Forms.ToolStripMenuItem markDefectiveToolStripMenuItem;
     }
 }
 
