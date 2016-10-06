@@ -43,6 +43,12 @@
 #ifndef RES_SKINNABLE_DIALOG_MSG
 #define RES_SKINNABLE_DIALOG_MSG				710 // ID of Sub-Header Message for Skinned SdWelcomeMaint
 #endif
+#ifndef RES_CHECKBOX1_MSG
+#define RES_CHECKBOX1_MSG				601 // ID of Sub-Header Message for Skinned SdWelcomeMaint
+#endif
+#ifndef RES_CHECKBOX2_MSG
+#define RES_CHECKBOX2_MSG				602 // ID of Sub-Header Message for Skinned SdWelcomeMaint
+#endif
 
 // Dialog and control IDs for the SdWelcomeMaintCustomDlg() - 102        
 #define RES_SDWELCOMEMAINT_REMOVEALL_RADIO		103
@@ -60,6 +66,7 @@
 #define RES_SDUSERLOGIN_DIALOG_ID				12019 //"SdUserLoginCustomDlg"
 #define RES_SDSKINNABLE_MAINT_DIALOG_ID			100 //SdMaintCustomDlg
 #define RES_SDUSERINFO_DIALOG_ID				12017 //SdUserInfoCustomDlg       
+#define RES_ASKOPTIONS2_DIALOG_ID               10105 //AskOptions2
        
 #define DLL_WINDOWSUTILS					"WindowsUtil.dll" 
 //
@@ -76,6 +83,7 @@ prototype INT SdUserLoginCustomDlg(BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle
 prototype INT SdUserInfoCustomDlg(BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle*/, BYVAL STRING);
 prototype INT SdWelcomeMaintCustomDlg (BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle*/);
 prototype INT SdMaintCustomDlg (BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle*/);
+prototype AskOptions2( number, BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle*/, byval string/*Msg*/, ... );
                    
 //function prototype from DLL_WINDOWSUTILS      
 prototype cdecl WindowsUtil.SSPLogonUser(BYREF STRING ,BYREF STRING, BYREF STRING);                   

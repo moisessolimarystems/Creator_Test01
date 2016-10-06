@@ -738,4 +738,190 @@ begin
 
           return nId;
 end;
+
+// Category Dialog Source
+// Event AskOptions2
+// AskOptions ---------------------------------------------------------------
+function AskOptions2(nValue, szTitle, szSubTitle, szMsg, Options)
+    number nOptions, nVal, i, nSel, nId, nStyle, nDlgAskOptions;
+    string szDontCare, szSel, szDlg;
+    BOOL bDone, bChecked;
+    HWND hDlg, hItem, hwndNext, hwndCheck1, hwndCheck2;
+begin
+
+    nOptions = SizeOf(Options);
+	szDlg = "AskOptions2";
+
+    if((nOptions % 2) != 0) then
+        return ISERR_GEN_FAILURE;
+    endif;
+
+    nOptions = nOptions / 2;
+
+    if(nOptions = 0) then
+        return ISERR_GEN_FAILURE;
+    endif;
+
+    if(MODE = SILENTMODE) then
+        SdMakeName(szAppKey, szDlg, "", nDlgAskOptions);
+        SilentReadData(szAppKey, "Result", DATA_NUMBER, szDontCare, nVal);
+
+        if(nVal = NEXT) then
+            for i = 0 to (nOptions - 1)
+                Sprintf(szSel, "Sel-%ld", i);
+                SilentReadData(szAppKey, szSel, DATA_NUMBER, szDontCare, nSel);
+                Options((2 * i) + 1) = nSel;
+            endfor;
+        endif;
+
+        return nVal;
+    endif;
+
+    // ensure general initialization is complete
+    if(!bSdInit) then
+        SdInit();
+    endif;
+
+    if(EzDefineDialog(szDlg, "", "", RES_ASKOPTIONS2_DIALOG_ID) = DLG_ERR) then
+        return ISERR_GEN_FAILURE;
+    endif;
+
+    // Loop in dialog until the user selects a standard button
+    bDone = FALSE;
+
+    while (!bDone)
+        nId = WaitOnDialog(szDlg);
+
+        switch (nId)
+
+        case DLG_INIT:
+
+            hDlg = CmdGetHwndDlg(szDlg);
+            hwndNext = CtrlGetDlgItem("",  hDlg, NEXT );  
+            hwndCheck1 = CtrlGetDlgItem("",  hDlg, RES_CHECKBOX1_MSG ); 
+            hwndCheck2 = CtrlGetDlgItem("",  hDlg, RES_CHECKBOX2_MSG );   
+      
+            i = nOptions;
+            hItem = CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i);
+
+            while (hItem)
+                ShowWindow(hItem, SW_HIDE);
+                i = i + 1;
+                hItem = CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i);
+            endwhile;
+
+            for i = 0 to (nOptions - 1)
+                SetWindowText(CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i), Options(2 * i));
+            endfor;
+
+            if(nValue = EXCLUSIVE) then
+                bChecked = FALSE;
+
+                for i = 0 to (nOptions - 1)
+                    hItem = CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i);
+                    nStyle = WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON;
+
+                    if(i = 0) then
+                        nStyle = nStyle | (WS_TABSTOP | WS_GROUP);
+                    endif;
+
+                    SetWindowLong(hItem, GWL_STYLE, nStyle);
+                    SetWindowPos(hItem, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+                    InvalidateRect(hItem, NULL, TRUE);
+
+                    if(bChecked = FALSE) then
+                        if(Options((2 * i) + 1) = TRUE) then
+                            SendMessage(hItem, BM_SETCHECK, TRUE, 0);
+                            SetFocus(hItem);
+                            bChecked = TRUE;
+                        endif;
+                    endif;
+                endfor;
+            else
+                for i = 0 to (nOptions - 1)
+                    hItem = CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i);
+                    SetWindowText(hItem, Options(2 * i));
+                    SendMessage(hItem, BM_SETCHECK, Options((2 * i) + 1), 0);
+                endfor;
+            endif;
+
+            if(szMsg != "") then
+                SetWindowText(CtrlGetDlgItem("", hDlg, STATIC_TEXT_ID), szMsg);
+            endif;
+
+   			CtrlSetText  (szDlg, RES_DIALOG_TITLE, szTitle);
+   			CtrlSetText	 (szDlg, RES_DIALOG_SUBTITLE, szSubTitle);      
+       			
+            SdGeneralInit(szDlg, hDlg, 0, szSdProduct);
+
+            SdSetDlgTitle(szDlg, hDlg, GetDialogTitle(RES_ASKOPTIONS2_DIALOG_ID));
+       
+			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED );
+			
+        case SD_PBUT_CONTINUE:
+
+            for i = 0 to (nOptions - 1)
+                Options((2 * i) + 1) = SendMessage(CtrlGetDlgItem("", hDlg, FIRST_BUTTON_ID + i), BM_GETCHECK, 0, 0);
+            endfor;
+
+            nId   = NEXT;
+            bDone = TRUE;
+
+		case RES_CHECKBOX1_MSG:
+		
+			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED);
+			EnableWindow( hwndCheck2, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) != BUTTON_CHECKED );
+			
+		case RES_CHECKBOX2_MSG:
+				
+			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED );		
+			EnableWindow( hwndCheck1, CtrlGetState(szDlg, RES_CHECKBOX2_MSG) != BUTTON_CHECKED);			
+			
+        case SD_PBUT_BACK:
+
+            nId    = BACK;
+            bDone  = TRUE;
+
+        case DLG_ERR:
+
+            nId   = ISERR_GEN_FAILURE;
+            bDone = TRUE;
+            SdError(nId, szDlg);
+
+        case DLG_CLOSE:
+
+            SdCloseDlg(hDlg, nId, bDone);
+
+        default:
+
+            // check standard handling
+            if(SdIsStdButton(nId) && SdDoStdButton(nId)) then
+                bDone = TRUE;
+            endif;
+
+        endswitch;
+
+    endwhile;
+
+    // Cleanup Dialog
+    EndDialog(szDlg);
+    ReleaseDialog(szDlg);
+
+    if(MODE = RECORDMODE) then
+
+        SdMakeName(szAppKey, szDlg, "", nDlgAskOptions);
+        SilentWriteData(szAppKey, "Result", DATA_NUMBER, "", nId);
+
+        if(nId = NEXT) then
+            for i = 0 to (nOptions - 1)
+                Sprintf(szSel, "Sel-%ld", i);
+                SilentWriteData(szAppKey, szSel, DATA_NUMBER, "", Options((2 * i) + 1));
+            endfor;
+        endif;
+
+    endif;
+
+    return nId;
+
+end;
 #endif //#ifndef _CUSTOMDIALOGS_RUL_
