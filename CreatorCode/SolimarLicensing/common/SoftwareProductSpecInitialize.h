@@ -1599,6 +1599,16 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 44;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(61, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(61))->second);
+	pTmpModSpec->moduleID = 61;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::IPDS(OC)");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 8;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 46;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;

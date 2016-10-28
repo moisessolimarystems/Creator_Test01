@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="45">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="46">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -344,7 +344,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="33"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="58" moduleName="PDF::PDF" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="38"/>  
 			<Lic_ModuleSoftwareSpecAttribs moduleID="59" moduleName="Emulation Selector" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="42"/>  
-			<Lic_ModuleSoftwareSpecAttribs moduleID="60" moduleName="IPDS::IPDS" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="44"/>  
+			<Lic_ModuleSoftwareSpecAttribs moduleID="60" moduleName="IPDS::IPDS" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="44"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="61" moduleName="PDF::IPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="46"/>    
       
       <!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
