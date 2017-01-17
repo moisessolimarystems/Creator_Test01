@@ -262,7 +262,9 @@ namespace Client.Creator
             get { return version; }
             set 
             {
-                string strVersion = (value.Minor > 9) ? string.Format("{0}{1}0", value.Major, value.Minor) : string.Format("{0}0{1}0", value.Major, value.Minor);
+                string major = string.Format("{0:x}", value.Major); 
+                string minor = string.Format("{0:x}", value.Minor);
+                string strVersion = (value.Minor > 9) ? string.Format("{0}{1}0", major, minor) : string.Format("{0}0{1}0", major, minor);
                 int newVersion = Int32.Parse(strVersion, System.Globalization.NumberStyles.HexNumber);
                 ServiceProxy.Service<ICreator>.Use((client) =>
                 {
