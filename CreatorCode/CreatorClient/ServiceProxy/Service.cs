@@ -51,6 +51,9 @@ namespace Client.Creator.ServiceProxy
             {
                 Console.WriteLine("Client FaultException");
             }
+            catch (Exception allException)
+            {
+            }
             finally
             {
                 if (!success)

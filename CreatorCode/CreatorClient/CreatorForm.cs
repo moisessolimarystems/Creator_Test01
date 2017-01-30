@@ -364,13 +364,16 @@ namespace Client.Creator
 
         private void CheckInLocksByUser(string user)
         {
-            //requires check since it may be called before connection to server.
-            if (Service<ICreator>._channelFactory.State == CommunicationState.Opened)
+            if (m_Permissions != null) //Confirms server has been connected since it has retrieved permissions from database.
             {
-                Service<ICreator>.Use((client) =>
-                    {
-                        client.CheckInUser(user);
-                    });
+                //requires check since it may be called before connection to server.
+                if (Service<ICreator>._channelFactory.State == CommunicationState.Opened)
+                {
+                    Service<ICreator>.Use((client) =>
+                        {
+                            client.CheckInUser(user);
+                        });
+                }
             }
         }
 
@@ -4690,16 +4693,16 @@ namespace Client.Creator
                 {   //totalValue = licensed module value + add-on module value;
                     //           = trial module value;
                     uint totalValue = 0;
-                    if (plData.Status == ProductLicenseState.Trial)
-                        totalValue = (uint)module.Value;
-                    else
-                    {
+                //    if (plData.Status == ProductLicenseState.Trial)
+                //        totalValue = (uint)module.Value;
+                //    else
+                //    {
                         foreach (ModuleTable mod in moduleList)
                         {
                             if (mod.ModID == module.ModID)
                                 totalValue += (uint)mod.Value;
                         }
-                    }
+                //    }
                     //need to distiguish between add-on and regular PL
                     if (module.ProductLicenseID == plData.ProductLicenseDatabaseID)
                     {

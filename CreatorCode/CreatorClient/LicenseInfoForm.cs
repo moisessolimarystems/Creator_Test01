@@ -587,10 +587,10 @@ namespace Client.Creator
                     ProductLicenseState state = (ProductLicenseState)dbProductLicenses[0].plState;
                     foreach (ProductLicenseTable plRec in dbProductLicenses)
                     {
-                        if (plRec.plState.Equals((byte)ProductLicenseState.Licensed))
-                        {
+                       // if (plRec.plState.Equals((byte)ProductLicenseState.Licensed))
+                       // {
                             ProductLicenseTypeComboBox.Items.Add(string.Format("{0} : {1}", ProductLicenseState.AddOn, plRec.plID));  
-                        }
+                       // }
                     }               
                 }
                 ProductLicenseTypeComboBox.SelectedIndex = 0;
