@@ -2454,16 +2454,57 @@ namespace Client.Creator
             }
         }
 
+
+        private void markLostValidationViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show(string.Format("Please confirm lost hardware token for {0}.",
+                                HardwareKeyListView.SelectedItems[0].Text),
+                                "Lost Hardware Token",
+                                MessageBoxButtons.OKCancel,
+                                MessageBoxIcon.Exclamation) == DialogResult.OK)
+            {
+                Cursor storedCursor = this.Cursor;
+                this.Cursor = Cursors.WaitCursor;
+                Service<ICreator>.Use((client) =>
+                {
+                    TokenTable selectedToken = client.GetHardwareTokenByKeyValue(HardwareKeyListView.SelectedItems[0].Text);
+                    if (selectedToken == null)
+                    {
+                        MessageBox.Show(string.Format("Failed to find hardware key : {0} in database", HardwareKeyListView.SelectedItems[0].Text), "Mark Lost Hardware Key");
+                    }
+                    else
+                    {
+                        selectedToken.TokenStatus = (byte)TokenStatus.Lost;
+                        client.UpdateToken(selectedToken);
+                        HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Lost.ToString(); //2nd subitem is token status
+                    }
+
+                });
+                HardwareKeyListView.Refresh();
+                this.Cursor = storedCursor;
+            }
+        } 
+
         private void validationTokenContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
             viewLSToolStripMenuItem.Enabled = false;
             markDefectiveToolStripMenuItem.Visible = false;
-            if (HardwareKeyListView.SelectedItems.Count > 0)
-                if (HardwareKeyListView.SelectedItems[0].SubItems[1].Text.Length > 0)
+            markLostValidationViewToolStripMenuItem.Enabled = false;
+            if (HardwareKeyListView.Columns[0].Text == "Key Value")
+            {
+                //verify that the current view has hardware tokens list. 
+                viewLSToolStripMenuItem.Enabled = false;
+                markDefectiveToolStripMenuItem.Visible = false;
+                markLostValidationViewToolStripMenuItem.Enabled = HardwareKeyListView.SelectedItems.Count > 0 && HardwareKeyListView.SelectedItems[0].SubItems[2].Text != "Lost";
+                if (HardwareKeyListView.SelectedItems.Count > 0)
                 {
-                    viewLSToolStripMenuItem.Enabled = true;
-                    markDefectiveToolStripMenuItem.Visible = true;
+                    if (HardwareKeyListView.SelectedItems[0].SubItems[1].Text.Length > 0)
+                    {
+                        viewLSToolStripMenuItem.Enabled = true;
+                        markDefectiveToolStripMenuItem.Visible = true;
+                    }
                 }
+            }              
         }
         #endregion
 
@@ -5723,6 +5764,6 @@ namespace Client.Creator
                 SetNodeStyle(node, ProductLicenseStatus.Expired);
             if (!(node.Tag as ProductLicense).IsActive)
                 SetNodeStyle(node, ProductLicenseStatus.InActive);
-        } 
+        }
     }
 }

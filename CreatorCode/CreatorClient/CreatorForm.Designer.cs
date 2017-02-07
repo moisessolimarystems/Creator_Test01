@@ -126,6 +126,7 @@
             this.HardwareKeyListView = new Shared.VisualComponents.NoFlickerListView();
             this.validationTokenContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.viewLSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.markDefectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ValidationKeyToolStrip = new System.Windows.Forms.ToolStrip();
             this.ValidationKeyCustomerLabel = new System.Windows.Forms.ToolStripLabel();
             this.ReportTabPage = new System.Windows.Forms.TabPage();
@@ -218,7 +219,7 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
-            this.markDefectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.markLostValidationViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -1327,7 +1328,8 @@
             // 
             this.validationTokenContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewLSToolStripMenuItem,
-            this.markDefectiveToolStripMenuItem});
+            this.markDefectiveToolStripMenuItem,
+            this.markLostValidationViewToolStripMenuItem});
             this.validationTokenContextMenuStrip.Name = "validationTokenContextMenuStrip";
             this.validationTokenContextMenuStrip.Size = new System.Drawing.Size(177, 70);
             this.validationTokenContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.validationTokenContextMenuStrip_Opening);
@@ -1338,6 +1340,13 @@
             this.viewLSToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.viewLSToolStripMenuItem.Text = "View License Server";
             this.viewLSToolStripMenuItem.Click += new System.EventHandler(this.viewLSToolStripMenuItem_Click);
+            // 
+            // markDefectiveToolStripMenuItem
+            // 
+            this.markDefectiveToolStripMenuItem.Name = "markDefectiveToolStripMenuItem";
+            this.markDefectiveToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.markDefectiveToolStripMenuItem.Text = "Mark Defective";
+            this.markDefectiveToolStripMenuItem.Click += new System.EventHandler(this.markDefectiveToolStripMenuItem_Click);
             // 
             // ValidationKeyToolStrip
             // 
@@ -2126,12 +2135,12 @@
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
             // 
-            // markDefectiveToolStripMenuItem
+            // markLostValidationViewToolStripMenuItem
             // 
-            this.markDefectiveToolStripMenuItem.Name = "markDefectiveToolStripMenuItem";
-            this.markDefectiveToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.markDefectiveToolStripMenuItem.Text = "Mark Defective";
-            this.markDefectiveToolStripMenuItem.Click += new System.EventHandler(this.markDefectiveToolStripMenuItem_Click);
+            this.markLostValidationViewToolStripMenuItem.Name = "markLostValidationViewToolStripMenuItem";
+            this.markLostValidationViewToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.markLostValidationViewToolStripMenuItem.Text = "Mark Lost";
+            this.markLostValidationViewToolStripMenuItem.Click += new System.EventHandler(this.markLostValidationViewToolStripMenuItem_Click);
             // 
             // CreatorForm
             // 
@@ -2405,6 +2414,7 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.Panel ConnectServerPanel;
         private System.Windows.Forms.ToolStripMenuItem markDefectiveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem markLostValidationViewToolStripMenuItem;
     }
 }
 
