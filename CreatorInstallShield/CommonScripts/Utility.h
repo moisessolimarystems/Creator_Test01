@@ -32,5 +32,6 @@ prototype BOOL IsMSMQEnabled();
 prototype EnableMSMQ(STRING,STRING);
 prototype DisableMSMQWorkgroup();
 prototype NUMBER GetSharedFileCount(STRING,BOOL);
+prototype EnableRemoteAccessCOMPlus();
 
 #endif //_UTILITY_H_

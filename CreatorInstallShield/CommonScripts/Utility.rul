@@ -15,7 +15,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef _UTILITY_RUL_
-#define _UTILITY_RUL_         
+#define _UTILITY_RUL_  
+
+function EnableRemoteAccessCOMPlus()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\COM3";
+	szName = "RemoteAccessEnabled";
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
+	Disable(LOGGING);	
+	if(RegDBGetKeyValueEx(szKey,  szName, nvType, svValue, nvSize) = 0) then 
+		StrToNum(nvValue, svValue);
+		if(nvValue = 0) then //0 means Remote Access is disabled for COMPlus
+			svValue = "1";			
+			RegDBSetKeyValueEx(szKey, szName, nvType, svValue, -1 );  	                                                         				
+		endif;
+	endif; 
+	
+	if(SYSINFO.bIsWow64) then		
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	  	
+		if(RegDBGetKeyValueEx(szKey,  szName, nvType, svValue, nvSize) = 0) then 
+			StrToNum(nvValue, svValue);
+			if(nvValue = 0) then //0 means Remote Access is disabled for COMPlus
+				svValue = "1";			
+				RegDBSetKeyValueEx(szKey, szName, nvType, svValue, -1 );  	                                                         				                                                         	
+			endif;
+		endif; 	
+		REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY;
+	endif;  
+	Enable(LOGGING);	
+end;         
 
 function NUMBER GetSharedFileCount(szFilePath, bIs64BitFile)
 	NUMBER nvRegType, nvRegValueSize, nvRetVal;
