@@ -887,12 +887,10 @@ namespace Client.Creator
                         }
                         if (bIntroduced && !bDeprecated)
                         {
-                            short moduleValue = 0;
-                            if(plt.plState == (byte)ProductLicenseState.Trial)
-                                moduleValue = (short)moduleSpec.moduleTrialLicense.TVal;
+                            uint moduleValue = (plt.plState == (byte)ProductLicenseState.Trial) ? moduleSpec.moduleTrialLicense.TVal : moduleSpec.moduleDefaultLicense.TVal;                      
                             ModuleTable mt = new ModuleTable();
                             mt.ModID = (short)moduleSpec.moduleID.TVal;
-                            mt.Value = moduleValue;
+                            mt.Value = (short)moduleValue;
                             mt.AppInstance = (moduleValue > 0) ? ProductConnection : (byte)0;
                             mt.ProductLicenseID = plt.ID;
                             addModuleList.Add(mt);
