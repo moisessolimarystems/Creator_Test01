@@ -3453,7 +3453,8 @@ HRESULT SoftwareServer::SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsL
 
 		mail.SetSMTPServer(
 			StringUtils::WstringToString(std::wstring(alertInfoAttribs.mailServer.mailServerName)).c_str(), 
-			alertInfoAttribs.mailServer.portNumber
+			alertInfoAttribs.mailServer.portNumber,
+			alertInfoAttribs.mailServer.authenticationType != Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttAnonymous
 			);
 
 		// CR.18713 - Add SSL & TSL
@@ -3464,6 +3465,7 @@ HRESULT SoftwareServer::SendAlertEMail(SpdAttribs::VectorStringAttrib recipentsL
 
 		if (alertInfoAttribs.mailServer.authenticationType == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttAnonymous)
 		{
+
 		}
 		else if (alertInfoAttribs.mailServer.authenticationType == Lic_ServerDataAttribs::Lic_AlertInfoAttribs::Lic_AlertMailServerAttribs::ttBasic)
 		{
