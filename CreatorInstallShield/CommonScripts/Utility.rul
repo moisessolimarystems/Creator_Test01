@@ -17,6 +17,26 @@
 #ifndef _UTILITY_RUL_
 #define _UTILITY_RUL_  
 
+function SetNetTCPPortSharing()
+	STRING szRegValue, szParam;
+	NUMBER nvExitCode, nvRegType, nvRegValueSize;
+begin
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	
+  	//detect if Net.Tcp Port Sharing Service is enabled.
+    if( RegDBGetKeyValueEx("\\SYSTEM\\ControlSet001\\Services\\NetTcpPortSharing", "Start", nvRegType, szRegValue, nvRegValueSize) = 0) then // In registry
+		if(szRegValue == "4") then //4 represents Disabled
+			if(AskYesNo("The Net.Tcp Port Sharing Service must be enabled before continuing. Click 'Yes' to enable the service. Clicking 'No' will cancel the setup.", YES) = YES) then
+				szParam = "config NetTcpPortSharing start= auto";
+				if (_LaunchAppEx(SystemFolder ^ "SC.exe", szParam, WAIT,SW_HIDE, -1, nvExitCode) < 0) then 
+					WriteErrorToLog(nvExitCode, "Error enabling Net.Tcp Port Sharing Service.");
+				endif; 				
+			else
+				abort;
+			endif; 
+		endif;
+	endif;	
+end;  
+
 function EnableRemoteAccessCOMPlus()
 	STRING szKey, szName, svValue;
 	NUMBER nvSize, nvType, nvValue;

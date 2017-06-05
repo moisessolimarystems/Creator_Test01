@@ -33,5 +33,6 @@ prototype EnableMSMQ(STRING,STRING);
 prototype DisableMSMQWorkgroup();
 prototype NUMBER GetSharedFileCount(STRING,BOOL);
 prototype EnableRemoteAccessCOMPlus();
+prototype SetNetTCPPortSharing();
 
 #endif //_UTILITY_H_
