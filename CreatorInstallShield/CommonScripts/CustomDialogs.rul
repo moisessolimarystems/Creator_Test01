@@ -86,11 +86,11 @@ end;
 //
 //=============================================================================
 function INT SdUserInfoCustomDlg(szTitle, szSubTitle, szMsg) 
-    NUMBER  nvType, nvSize, nResult;   
+    NUMBER  nvType, nvSize, nResult, nvPropertyBuffer;   
     STRING  szDialogName, szTemp;
     NUMBER  nDialog, nCmdValue, nvPos; 
     BOOL    bDone;
-    STRING  szUserName, szDomainName;  
+    STRING  szUserName, szDomainName, svProperty;  
     HWND    hwndCtrl, hwndDlg;
 begin  
    	//
@@ -152,7 +152,9 @@ begin
 						StrSub(szDomainName, szUserName, 0, nvPos);
 						StrSub(szUserName, szUserName, nvPos+1, StrLength(szUserName));
 					else
-						szDomainName = ".";
+						nvPropertyBuffer = 256;
+						MsiGetProperty(ISMSI_HANDLE, "ComputerName", svProperty, nvPropertyBuffer);								
+						szDomainName = svProperty; //".";
 					endif;      									
 				/*else          
 					//set to current user name	
