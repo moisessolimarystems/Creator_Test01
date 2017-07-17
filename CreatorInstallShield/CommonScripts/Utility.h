@@ -14,6 +14,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef _UTILITY_H_
+#define WIN_NET_COMMAND "NET"
+#define WIN_DISM_COMMAND "DISM"
 
 prototype SelfRegister(STRING, STRING);
 prototype SelfUnRegister(STRING, STRING);
@@ -34,5 +36,25 @@ prototype DisableMSMQWorkgroup();
 prototype NUMBER GetSharedFileCount(STRING,BOOL);
 prototype EnableRemoteAccessCOMPlus();
 prototype SetNetTCPPortSharing();
+prototype EnableSystemRegistrySetting(STRING, STRING);
+prototype BOOL AddStringToRegMultiSZ(NUMBER, STRING, STRING, STRING, BOOL);
+prototype BOOL RemoveStringFromRegMultiSZ(NUMBER, STRING, STRING, STRING);
+prototype AddUserToLocalGroupEx(STRING, STRING);
 
+//Enable Windows Components
+prototype EnableWebServerRole();
+
+//Set DCOM Protocols
+prototype AddDCOMProtocolTCPIP();
+prototype AddTCPIPPortRange();
+
+//Enable MSDTC settings
+prototype EnableNetworkDtcAccess();
+prototype EnableNetworkDtcAccessClients();
+prototype EnableNetworkDtcAccessInbound();
+prototype EnableNetworkDtcAccessOutbound();
+prototype EnableNetworkDtcAccessTransactions();
+
+//Setup Group Policy
+prototype DisableForceUnloadPolicy();
 #endif //_UTILITY_H_

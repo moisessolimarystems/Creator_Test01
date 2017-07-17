@@ -17,6 +17,50 @@
 #ifndef _UTILITY_RUL_
 #define _UTILITY_RUL_  
 
+function AddDCOMProtocolTCPIP()
+	STRING szKey, svName, svData, svValue, svString;
+	NUMBER nvSize, nvType, nResult;
+	LIST dcomList;
+	BOOL bFound;
+begin
+	szKey = "SOFTWARE\\Microsoft\\Rpc";
+	svName = "DCOM Protocols";
+	svData = "ncacn_ip_tcp";
+	bFound = FALSE;
+	if(!AddStringToRegMultiSZ(HKEY_LOCAL_MACHINE,szKey, svName, svData, FALSE)) then
+		WriteLog("AddDCOMProtocolTCPIP: Failed to set " + szKey ^ svName);	
+	endif;
+end;
+
+function AddTCPIPPortRange()
+	STRING svPropertyValue, szKey, svName, svData;
+	NUMBER nvBufferSize;
+begin
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	
+	szKey = "SOFTWARE\\Microsoft\\Rpc\\Internet";
+	if(RegDBKeyExist(szKey) < 0) then
+		svName = "PortsInternetAvailable";
+		svData = "N";
+		if(RegDBSetKeyValueEx(szKey, svName, REGDB_STRING, svData, -1) < 0) then
+			WriteLog("AddTCPIPPortRange: Failed to set " + szKey ^ svName);
+		endif;
+		svName = "UseInternetPorts";
+		svData = "N";
+		if(RegDBSetKeyValueEx(szKey, svName, REGDB_STRING, svData, -1) < 0) then
+			WriteLog("AddTCPIPPortRange: Failed to set " + szKey ^ svName);
+		endif;
+	endif;
+	
+	nvBufferSize = MAX_PATH;
+	MsiGetProperty(ISMSI_HANDLE, "PAR_PORT_RANGE", svPropertyValue, nvBufferSize);
+	szKey = "SOFTWARE\\Microsoft\\Rpc\\Internet";
+	svName = "Ports";
+	svData = svPropertyValue;
+	if(!AddStringToRegMultiSZ(HKEY_LOCAL_MACHINE, szKey, svName, svData, FALSE)) then
+		WriteLog("AddTCPIPPortRange: Failed to set " + szKey ^ svName);	
+	endif;
+end;
+
 function SetNetTCPPortSharing()
 	STRING szRegValue, szParam;
 	NUMBER nvExitCode, nvRegType, nvRegValueSize;
@@ -35,7 +79,189 @@ begin
 			endif; 
 		endif;
 	endif;	
+end; 
+
+function EnableWebServerRole()
+	STRING szParam, szTemp, szCommand, szCoreWebEngine, szNetFxExtensibility, szNetFxExtensibility45;
+	NUMBER nvRegType, nvRegValueSize;
+begin
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);	
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\InetStp\\Components", "CoreWebEngine", nvRegType, szCoreWebEngine, nvRegValueSize); // In registry		
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\InetStp\\Components", "NetFxExtensibility", nvRegType, szNetFxExtensibility, nvRegValueSize);		
+	RegDBGetKeyValueEx("\\SOFTWARE\\Microsoft\\InetStp\\Components", "NetFxExtensibility45", nvRegType, szNetFxExtensibility45, nvRegValueSize);	
+	if (GetEnvVar ("WINDIR", szTemp) >= 0) then
+		Disable(WOW64FSREDIRECTION);
+		WriteLog("EnableWebServerRole Start" );	 
+		Delay(1);
+		szCommand = szTemp^"System32\\DISM.exe";		
+		//check to see if necessary		
+		if(SYSINFO.nISOSL = ISOSL_WINVISTA_SERVER2008) then
+			if(szCoreWebEngine != "1" && szNetFxExtensibility != "1") then
+				szParam = "/online /enable-feature /featurename:IIS-WebServerRole /featurename:IIS-WebServer /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);					
+				
+				szParam = "/online /enable-feature /featurename:IIS-CommonHttpFeatures /featurename:IIS-StaticContent /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+
+				szParam = "/online /enable-feature /featurename:IIS-DefaultDocument /featurename:IIS-DirectoryBrowsing /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-HttpErrors /featurename:IIS-HttpRedirect /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-ApplicationDevelopment /featurename:IIS-ASP /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-CGI /featurename:IIS-ISAPIExtensions /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-ISAPIFilter /featurename:IIS-ServerSideIncludes /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-HealthAndDiagnostics /featurename:IIS-HttpLogging /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-LoggingLibraries /featurename:IIS-RequestMonitor /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-HttpTracing /featurename:IIS-CustomLogging /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-ODBCLogging /featurename:IIS-Security /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+					
+				szParam = "/online /enable-feature /featurename:IIS-BasicAuthentication /featurename:IIS-WindowsAuthentication /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+					
+				szParam = "/online /enable-feature /featurename:IIS-DigestAuthentication /featurename:IIS-ClientCertificateMappingAuthentication /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-IISCertificateMappingAuthentication /featurename:IIS-URLAuthorization /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-RequestFiltering /featurename:IIS-IPSecurity /featurename:IIS-Performance /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+					
+				szParam = "/online /enable-feature /featurename:IIS-HttpCompressionStatic /featurename:IIS-HttpCompressionDynamic /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-WebServerManagementTools /featurename:IIS-ManagementConsole /featurename:IIS-ManagementService /featurename:IIS-ManagementScriptingTools /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+					
+				szParam = "/online /enable-feature /featurename:IIS-IIS6ManagementCompatibility /featurename:IIS-Metabase /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-WMICompatibility /featurename:IIS-LegacyScripts /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+								
+				szParam = "/online /enable-feature /featurename:IIS-FTPPublishingService /featurename:IIS-FTPServer /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+
+				szParam = "/online /enable-feature /featurename:IIS-NetFxExtensibility /featurename:IIS-ASPNET /Quiet /NoRestart";
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+								
+				szParam = "/online /enable-feature /featurename:WAS-WindowsActivationService /featurename:WCF-HTTP-Activation /featurename:WAS-ProcessModel /NoRestart";		
+				WriteLog(szCommand + " " + szParam);	    
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);				
+			else
+				WriteLog("Skipping enabling of Web Server Role: Already enabled." );	
+			endif;
+		else
+			if(szCoreWebEngine != "1" && szNetFxExtensibility45 != "1") then
+				//windows 2012+
+				szParam = "/online /enable-feature /all /featurename:IIS-WebServerRole /featurename:IIS-ASPNET45 /NoRestart";
+				WriteLog(szCommand + " " + szParam);	 		
+				LaunchAppAndWait(szCommand, szParam, LAAW_OPTION_WAIT);					
+			else
+				WriteLog("Skipping enabling of Web Server Role: Already enabled." );			
+			endif;
+		endif;
+		WriteLog("EnableWebServerRole End");	
+		Enable(WOW64FSREDIRECTION); 			
+	endif;
+end;
+
+function AddUserToLocalGroupEx(szGroup, szUser)
+	STRING szParam;
+begin;
+	szParam = " localgroup " + szGroup + " " + szUser + " /add ";	
+	LaunchAppAndWait(WIN_NET_COMMAND, szParam, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN);	
+end;
+
+function DisableForceUnloadPolicy()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Policies\\Microsoft\\Windows\\System";
+	szName = "DisableForceUnload";
+	EnableSystemRegistrySetting(szKey, szName);
+end;
+
+function EnableNetworkDtcAccess()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\MSDTC\\Security";
+	szName = "NetworkDtcAccess";
+	EnableSystemRegistrySetting(szKey, szName);
 end;  
+
+function EnableNetworkDtcAccessClients()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\MSDTC\\Security";
+	szName = "NetworkDtcAccessClients";
+	EnableSystemRegistrySetting(szKey, szName);
+end;  
+
+function EnableNetworkDtcAccessInbound()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\MSDTC\\Security";
+	szName = "NetworkDtcAccessInbound";
+	EnableSystemRegistrySetting(szKey, szName);
+end; 
+
+function EnableNetworkDtcAccessOutbound()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\MSDTC\\Security";
+	szName = "NetworkDtcAccessOutbound";
+	EnableSystemRegistrySetting(szKey, szName);
+end; 
+
+function EnableNetworkDtcAccessTransactions()
+	STRING szKey, szName, svValue;
+	NUMBER nvSize, nvType, nvValue;
+begin
+	szKey = "SOFTWARE\\Microsoft\\MSDTC\\Security";
+	szName = "NetworkDtcAccessTransactions";
+	EnableSystemRegistrySetting(szKey, szName);
+end; 
 
 function EnableRemoteAccessCOMPlus()
 	STRING szKey, szName, svValue;
@@ -546,6 +772,217 @@ begin
 	svLine = "End";
 end;
               
+function EnableSystemRegistrySetting(szKey, szName)
+	STRING svValue;
+	NUMBER nvSize, nvType, nvValue;
+	BOOL bEnabled;
+begin
+	bEnabled = FALSE;
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
+	Disable(LOGGING);	
+	if(RegDBGetKeyValueEx(szKey,  szName, nvType, svValue, nvSize) = 0) then 
+		StrToNum(nvValue, svValue);
+		if(nvValue = 1) then //0 means Remote Access is disabled for COMPlus
+		    bEnabled = TRUE;  
+		    WriteLog("Skipping enabling of " + szKey + "\\" + szName + ": Already set." );	                                                      				
+		endif;
+	endif;
+	if(!bEnabled) then
+		WriteLog("Enabling " + szKey + "\\" + szName + "." );		
+		svValue = "1";			
+		if(RegDBSetKeyValueEx(szKey, szName, REGDB_NUMBER, svValue, -1 ) < 0) then
+			WriteLog("Failed to enable: " + szKey + "\\" + szName + "." );	
+		endif; 			
+	endif; 
+		
+	if(SYSINFO.bIsWow64) then		
+		bEnabled = FALSE;	
+		REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	  	
+		if(RegDBGetKeyValueEx(szKey,  szName, nvType, svValue, nvSize) = 0) then 
+			StrToNum(nvValue, svValue);
+			if(nvValue = 1) then //0 means Remote Access is disabled for COMPlus
+				bEnabled = TRUE;                                                        				
+				WriteLog("Skipping enabling of " + szKey + "\\" + szName + ": Already set." );				
+			endif;
+		endif;
+		if(!bEnabled) then
+			WriteLog("Enabling " + szKey + "\\" + szName + "." );			
+			svValue = "1";						
+			if(RegDBSetKeyValueEx(szKey, szName, REGDB_NUMBER, svValue, -1 ) < 0) then
+				WriteLog("Failed to enable: " + szKey + "\\" + szName + "." );	
+			endif; 				
+		endif; 	
+		REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY;			
+	endif;  
+	Enable(LOGGING);	
+end; 
+
+function BOOL AddStringToRegMultiSZ(nDefaultRoot, szRegistryKey, szRegistryValue, szString, bAllowDuplicates)
+	LIST	listStrings;
+	NUMBER	nType;
+	NUMBER	nvCurrentStringSize;
+	NUMBER	nvReturnCode;
+	NUMBER	nvResultCode;
+	NUMBER	nvNewStringSize;
+	NUMBER  nResult;
+	STRING	svCurrentStringValue;
+	STRING	szUpdatedStringValue[32000]; // I hate magic numbers, but I don't know the max size of a REG_MULTI_SZ value.
+	STRING	szTemp[32000];
+	STRING  svFoundString;
+begin
+	Disable(LOGGING);
+	nType = REGDB_STRING_MULTI;
+	listStrings = ListCreate(STRINGLIST);
+	nvCurrentStringSize = 0;
+	nvReturnCode = 0;
+	
+	RegDBSetDefaultRoot(nDefaultRoot);
+	nvReturnCode = RegDBGetKeyValueEx(szRegistryKey, szRegistryValue, nType, svCurrentStringValue, nvCurrentStringSize); 	
+	if (nvReturnCode = 0) then 
+		if (nvCurrentStringSize > 0) then
+			// Get current strings from value
+			nvReturnCode = StrGetTokens(listStrings, svCurrentStringValue, ""); 
+			if (nvReturnCode != 0) then
+				WriteLog("AddStringToRegMultiSZ(): StrGetTokens() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+			
+			if(!bAllowDuplicates) then
+				nResult = ListGetFirstString(listStrings, svFoundString);		
+				while(nResult != END_OF_LIST) 
+					if(svFoundString = szString) then
+						WriteLog("AddStringToRegMultiSZ(): " + szString + " already exists. Skip adding of " + szString);
+						ListDestroy(listStrings);
+						return FALSE;
+					endif;
+					nResult = ListGetNextString(listStrings, svFoundString);
+				endwhile;
+			endif;			
+
+			// Add our string to the list of strings
+			nvReturnCode = ListAddString(listStrings, szString, AFTER);
+			if (nvReturnCode < ISERR_SUCCESS) then
+				WriteLog("AddStringToRegMultiSZ(): ListAddString() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+		endif;
+	else 	// registry value does not exist, create our own
+			nvReturnCode = ListAddString(listStrings, szString, AFTER);
+			if (nvReturnCode < ISERR_SUCCESS) then
+				WriteLog("AddStringToRegMultiSZ(): ListAddString() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+	endif; 
+
+	// Prepare the string as a multi string registry value
+	nvReturnCode = StrPutTokens(listStrings, szUpdatedStringValue, "", TRUE);
+	if (nvReturnCode != 0) then
+		WriteLog("AddStringToRegMultiSZ(): StrPutTokens() returned an error: " + FormatMessage(nvReturnCode));
+		ListDestroy(listStrings);
+		return FALSE;
+	endif;
+	
+	// Get size of null delimited string
+	szTemp = szUpdatedStringValue;
+	CharReplace(szTemp, STRTOCHAR('\0'), STRTOCHAR('|'), 0);
+	nvNewStringSize = StrLengthChars(szTemp);
+	
+	// Update registry value with new strings 
+	nvReturnCode = RegDBSetKeyValueEx(szRegistryKey, szRegistryValue, nType, szUpdatedStringValue, (nvNewStringSize + 2)); // add two for the two null chars at the end
+	if (nvReturnCode != 0) then
+		WriteLog("AddStringToRegMultiSZ(): RegDBSetKeyValueEx() returned an error: " + FormatMessage(nvReturnCode));
+		ListDestroy(listStrings);
+		return FALSE;
+	endif;
+
+	ListDestroy(listStrings);
+	Enable(LOGGING);
+	
+	return TRUE;
+end;
+
+function BOOL RemoveStringFromRegMultiSZ(nDefaultRoot, szRegistryKey, szRegistryValue, szString)
+	LIST	listStrings;
+	NUMBER	nType;
+	NUMBER	nvCurrentStringSize;
+	NUMBER	nvReturnCode;
+	NUMBER	nvResultCode;
+	NUMBER	nvNewStringSize;
+	NUMBER	nvListCount;
+	STRING	svCurrentStringValue;
+	STRING	szUpdatedStringValue[32000]; // I hate magic numbers, but I don't know the max size of a REG_MULTI_SZ value.
+	STRING	svListString;
+	STRING	svCurrentListString;
+	STRING	szTemp[32000];
+begin
+	Disable(LOGGING);
+	nType = REGDB_STRING_MULTI;
+	listStrings = ListCreate(STRINGLIST);
+	nvCurrentStringSize = 0;
+	nvReturnCode = 0;
+	
+	RegDBSetDefaultRoot(nDefaultRoot);
+	nvReturnCode = RegDBGetKeyValueEx(szRegistryKey, szRegistryValue, nType, svCurrentStringValue, nvCurrentStringSize); 	
+	if (nvReturnCode = 0) then 
+		if (nvCurrentStringSize > 0) then
+			// Get current strings from value
+			nvReturnCode = StrGetTokens(listStrings, svCurrentStringValue, ""); 
+			if (nvReturnCode != 0) then
+				WriteLog("RemoveStringFromRegMultiSZ(): StrGetTokens() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+			nvListCount = ListCount(listStrings);
+			
+			// iterate through list of strings, deleting ones matching the incoming szString.
+			nvResultCode = ListGetFirstString(listStrings, svListString);
+			while (nvResultCode != END_OF_LIST)
+				ListCurrentString(listStrings, svCurrentListString); 
+				if (StrCompare(svCurrentListString, szString) = 0) then // strings are the same
+					nvReturnCode = ListDeleteString(listStrings);
+					if (nvReturnCode != 0) then
+						WriteLog("RemoveStringFromRegMultiSZ(): ListDeleteString() returned an error: " + FormatMessage(nvReturnCode));
+						ListDestroy(listStrings);
+						return FALSE;
+					endif;
+				endif;
+				nvResultCode = ListGetNextString(listStrings, svListString);
+			endwhile;
+            nvListCount = ListCount(listStrings);
+			// Prepare the string as a multi string registry value
+			nvReturnCode = StrPutTokens(listStrings, szUpdatedStringValue, "", TRUE);
+			if (nvReturnCode != 0) then
+				WriteLog("RemoveStringFromRegMultiSZ(): StrPutTokens() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+			
+			// Get size of null delimited string
+			szTemp = szUpdatedStringValue;
+			CharReplace(szTemp, STRTOCHAR('\0'), STRTOCHAR('|'), 0);
+			nvNewStringSize = StrLengthChars(szTemp);
+			
+			// Update registry value with new strings 
+			nvReturnCode = RegDBSetKeyValueEx(szRegistryKey, szRegistryValue, nType, szUpdatedStringValue, (nvNewStringSize + 2)); // add two for the two null chars at the end
+			if (nvReturnCode != 0) then
+				WriteLog("RemoveStringFromRegMultiSZ(): RegDBSetKeyValueEx() returned an error: " + FormatMessage(nvReturnCode));
+				ListDestroy(listStrings);
+				return FALSE;
+			endif;
+		endif;
+    else
+    	WriteLog("RemoveStringFromRegMultiSZ(): Unable to read current values from registry value. Error: " + FormatMessage(nvReturnCode));
+    	return FALSE;
+	endif;
+	
+	ListDestroy(listStrings);
+	Enable(LOGGING); 
+	
+	return TRUE;
+end;              
               
 #endif //_UTILITY_RUL_
   
