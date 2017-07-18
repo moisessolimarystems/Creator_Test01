@@ -257,7 +257,7 @@ namespace SolimarLicenseViewer
                     {
                         if (!m_CommLink.IsConnected())
                         {
-                            licSvrVer = string.Format(" - Licenese Server NOT installed{0}", m_CommLink.Exception != null ? (" - " + m_CommLink.Exception.Message) : "");
+                            licSvrVer = string.Format(" - License Server NOT installed{0}", m_CommLink.Exception != null ? (" - " + m_CommLink.Exception.Message) : "");
                         }
                         else
                         {
