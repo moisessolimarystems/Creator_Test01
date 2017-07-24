@@ -127,6 +127,7 @@
             this.validationTokenContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.viewLSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.markDefectiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.markLostValidationViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ValidationKeyToolStrip = new System.Windows.Forms.ToolStrip();
             this.ValidationKeyCustomerLabel = new System.Windows.Forms.ToolStripLabel();
             this.ReportTabPage = new System.Windows.Forms.TabPage();
@@ -219,7 +220,7 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
-            this.markLostValidationViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.detailListViewCopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -1348,6 +1349,13 @@
             this.markDefectiveToolStripMenuItem.Text = "Mark Defective";
             this.markDefectiveToolStripMenuItem.Click += new System.EventHandler(this.markDefectiveToolStripMenuItem_Click);
             // 
+            // markLostValidationViewToolStripMenuItem
+            // 
+            this.markLostValidationViewToolStripMenuItem.Name = "markLostValidationViewToolStripMenuItem";
+            this.markLostValidationViewToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.markLostValidationViewToolStripMenuItem.Text = "Mark Lost";
+            this.markLostValidationViewToolStripMenuItem.Click += new System.EventHandler(this.markLostValidationViewToolStripMenuItem_Click);
+            // 
             // ValidationKeyToolStrip
             // 
             this.ValidationKeyToolStrip.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -1790,10 +1798,11 @@
             this.dlvDeleteToolStripMenuItem,
             this.incrementToolStripMenuItem,
             this.decrementToolStripMenuItem,
+            this.detailListViewCopyToolStripMenuItem,
             this.toolStripSeparator2,
             this.dlvEditToolStripMenuItem});
             this.DetailListViewContextMenuStrip.Name = "DetailListViewContextMenuStrip";
-            this.DetailListViewContextMenuStrip.Size = new System.Drawing.Size(157, 120);
+            this.DetailListViewContextMenuStrip.Size = new System.Drawing.Size(157, 164);
             // 
             // dlvNewToolStripMenuItem
             // 
@@ -2135,12 +2144,12 @@
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
             // 
-            // markLostValidationViewToolStripMenuItem
+            // detailListViewCopyToolStripMenuItem
             // 
-            this.markLostValidationViewToolStripMenuItem.Name = "markLostValidationViewToolStripMenuItem";
-            this.markLostValidationViewToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.markLostValidationViewToolStripMenuItem.Text = "Mark Lost";
-            this.markLostValidationViewToolStripMenuItem.Click += new System.EventHandler(this.markLostValidationViewToolStripMenuItem_Click);
+            this.detailListViewCopyToolStripMenuItem.Name = "detailListViewCopyToolStripMenuItem";
+            this.detailListViewCopyToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.detailListViewCopyToolStripMenuItem.Text = "Copy";
+            this.detailListViewCopyToolStripMenuItem.Click += new System.EventHandler(this.detailListViewCopyToolStripMenuItem_Click);
             // 
             // CreatorForm
             // 
@@ -2415,6 +2424,7 @@
         private System.Windows.Forms.Panel ConnectServerPanel;
         private System.Windows.Forms.ToolStripMenuItem markDefectiveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem markLostValidationViewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem detailListViewCopyToolStripMenuItem;
     }
 }
 
