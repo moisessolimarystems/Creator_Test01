@@ -2005,6 +2005,11 @@ namespace Client.Creator
 
         #region DetailListView Events
 
+        private void detailListViewCopyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DetailListViewCopyToClipboard();
+        }
+
         private void DetailListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {        
             switch (DetailTreeView.SelectedNode.Level)
@@ -2045,6 +2050,8 @@ namespace Client.Creator
             {
                 ListViewItem item = DetailListView.GetItemAt(e.X, e.Y);
                 ResetContextMenu(DetailListViewContextMenuStrip.Items);
+                detailListViewCopyToolStripMenuItem.Visible = true;
+                detailListViewCopyToolStripMenuItem.Enabled = DetailListView.SelectedItems.Count > 0;
                 switch (DetailPropertyGrid.SelectedObject.GetType().Name)
                 {
                     case AppConstants.LicenseServerObjectName:
@@ -2080,8 +2087,8 @@ namespace Client.Creator
                         break;
                     default: break;
                 }
-                if(DetailPropertyGrid.Enabled && bShow) //if propertygrid isn't enabled, don't allow changes.
-                    DetailListViewContextMenuStrip.Show(DetailListView, e.X, e.Y);
+                //if(DetailPropertyGrid.Enabled && bShow) //if propertygrid isn't enabled, don't allow changes.
+                DetailListViewContextMenuStrip.Show(DetailListView, e.X, e.Y);
             }
         }
 
@@ -2090,6 +2097,21 @@ namespace Client.Creator
             _lvManager.SetSortIndexColumn(DetailListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             DetailListView.Sort();
+        }
+
+        private void DetailListViewCopyToClipboard()
+        {
+            var builder = new StringBuilder();
+            foreach (ListViewItem item in DetailListView.SelectedItems)
+            {
+                foreach (ListViewItem.ListViewSubItem subItem in item.SubItems)
+                {
+                    builder.Append(subItem.Text);
+		    builder.Append("  ");
+                }
+                builder.AppendLine();
+            }
+            Clipboard.SetText(builder.ToString());
         }
 
         private void DetailListView_KeyDown(object sender, KeyEventArgs e)
@@ -2119,6 +2141,17 @@ namespace Client.Creator
                         break;
                     default: break;
                 }
+            }
+            if (e.Control && e.KeyCode == Keys.C)
+                DetailListViewCopyToClipboard();
+            else if(e.Control && e.KeyCode == Keys.A)
+            {
+                DetailListView.BeginUpdate();
+                foreach (ListViewItem item in DetailListView.Items)
+                {
+                    item.Selected = true;
+                }
+                DetailListView.EndUpdate();                
             }
         }
 
@@ -5765,5 +5798,7 @@ namespace Client.Creator
             if (!(node.Tag as ProductLicense).IsActive)
                 SetNodeStyle(node, ProductLicenseStatus.InActive);
         }
+
+
     }
 }
