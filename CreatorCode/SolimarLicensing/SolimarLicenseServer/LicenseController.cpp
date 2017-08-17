@@ -504,7 +504,7 @@ void LicenseController::HeartbeatCheck()
 				_snwprintf_s(tmp_buf, sizeof(tmp_buf)/sizeof(wchar_t), L"Product: %s, Product Connection: %s, has timed out in responding to the license server. That client's licenses are revoked.", wstrProductName.c_str(), (wchar_t*)bstrAppInstance);
 				tmp_buf[1023] = 0;
 				OutputDebugStringW(tmp_buf);
-				GenerateSoftwareLicenseMessage(L"", productID, MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeoutProductAndAppInst, tmp_buf);
+				GenerateSoftwareLicenseMessage(L"", productID, MT_WARNING, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeoutProductAndAppInst, tmp_buf);
 
 				// Clean up
 				SysFreeString(bstrAppInstance);
@@ -513,7 +513,7 @@ void LicenseController::HeartbeatCheck()
 			else
 			{
 				// For Legacy
-				GenerateMessage(L"", MT_INFO, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
+				GenerateMessage(L"", MT_WARNING, LicenseServerError::EHR_CLIENT_TIMEOUT, time(0), MessageClientTimeout);
 			}
 						
 			hr = RemoveFromNotification(heartbeat->first);
