@@ -794,7 +794,7 @@ STDMETHODIMP CSolimarLicenseMgr::Disconnect()
 		{
 			//Log Message about RPC failure to Key
 			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::Disconnect() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 		}
 	}
 	catch (...)
@@ -920,7 +920,7 @@ STDMETHODIMP CSolimarLicenseMgr::KeyProductExists(long product, long prod_ver_ma
 					{
 						//Log Message about RPC failure to Key
 						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::KeyProductExists() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 				if(*p_bool_key_product_exists == VARIANT_TRUE)
@@ -2023,7 +2023,7 @@ STDMETHODIMP CSolimarLicenseMgr::ModuleLicenseSerialNumbers(long module_id, VARI
 			{
 				//Log Message about RPC failure to Key
 				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ModuleLicenseSerialNumbers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 		}
 	}
@@ -2313,7 +2313,7 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 					{
 						//Log Message about RPC failure to Key
 						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 
@@ -2335,7 +2335,7 @@ STDMETHODIMP CSolimarLicenseMgr::GetLicenseMessageList(VARIANT_BOOL clear_messag
 					{
 						//Log Message about RPC failure to Key
 						SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::GetSoftwareLicenseMessageList() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+						SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 					}
 				}
 			}
@@ -2444,7 +2444,7 @@ void CSolimarLicenseMgr::SendHeartbeat()
 				{
 					//Log Message about RPC failure to Key
 					SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::SendHeartbeat() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-					SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+					SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 				}
 			}
 		}
@@ -2772,7 +2772,7 @@ HRESULT CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers(bool _bLogError
 		{
 			//Log Message about RPC failure to Key
 			SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshSoftwareLicenseFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+			SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 		}
 	}
 	if(bFoundProductAndVersion == false && SUCCEEDED(hr))
@@ -2975,7 +2975,7 @@ HRESULT CSolimarLicenseMgr::RefreshKeyListFromLicServers(bool _bLogError)
 			{
 				//Log Message about RPC failure to Key
 				SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::RefreshKeyListFromLicServers() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+				SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 			}
 			hr = e.Error();
 		}
@@ -4511,7 +4511,7 @@ HRESULT CSolimarLicenseMgr::ObtainLicensesInternal(long module_id, long license_
 										{
 											//Log Message about RPC failure to Key
 											SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ObtainLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-											SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+											SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 										}
 									}
 									
@@ -4639,7 +4639,7 @@ HRESULT CSolimarLicenseMgr::ReleaseLicensesInternal(long module_id, long license
 									{
 										//Log Message about RPC failure to Key
 										SS_GENERATE_AND_DISPATCH_MESSAGE(L"CSolimarLicenseMgr::ReleaseLicensesInternal() - RPC Error", MT_INFO, LicenseServerError::EC_UNKNOWN, MessageGenericError);
-										SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_INFO, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
+										SS_GENERATE_AND_DISPATCH_MESSAGE(LicensingMessageStringTable[MessageClientTimeout], MT_WARNING, LicenseServerError::EC_CLIENT_TIMEOUT, MessageClientTimeout);
 									}
 								}
 							}
