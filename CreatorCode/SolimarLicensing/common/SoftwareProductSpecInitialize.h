@@ -1890,12 +1890,12 @@ void InititalizeProduct16()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(4, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
 	pTmpModSpec->moduleID = 4;
-	pTmpModSpec->moduleName = std::wstring(L"Armas");
+	pTmpModSpec->moduleName = std::wstring(L"Batching");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 2;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 47;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 48;
 }
 
 void InititalizeProduct19()
