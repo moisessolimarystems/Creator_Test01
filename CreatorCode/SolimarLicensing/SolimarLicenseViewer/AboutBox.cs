@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Resources;
 
 namespace SolimarLicenseViewer
 {
@@ -152,11 +153,11 @@ namespace SolimarLicenseViewer
             base.OnPaint(e);
         }
 
-        protected override void OnPaintBackground(PaintEventArgs pevent)
+        protected override void OnPaintBackground(PaintEventArgs e)
         {
-            System.Drawing.Graphics gfx = pevent.Graphics;
-            System.Drawing.Image backImage = this.BackgroundImage; //SPDSharedGUI.Resources.ResourceMethods.GetEmbeddedImage("Images.spdeSystemManager.png");
-            gfx.DrawImage(backImage, new System.Drawing.Rectangle(0, 0, this.Width, this.Height));
+            ResourceManager rm = new ResourceManager("SolimarLicenseViewer.Properties.Resources", Assembly.GetExecutingAssembly());
+            System.Drawing.Image backImage = rm.GetObject("AboutBox") as Image;
+            e.Graphics.DrawImage(backImage, new System.Drawing.Rectangle(0, 0, this.Width, this.Height));
         }
 
         private void InitializeDynamicData()
@@ -164,7 +165,7 @@ namespace SolimarLicenseViewer
             String year = System.DateTime.Now.Year.ToString();
             int index = (labelCopyright.Text).IndexOf("XXXX");
             labelCopyright.Text = labelCopyright.Text.Remove(index, 4).Insert(index, year);
-            versionLicensing.Text = String.Format("{0:0}.{1:00}.{2:000000}", VersionInfo.MAJOR_REVISION_NUMBER, VersionInfo.MINOR_REVISION_NUMBER, VersionInfo.BUILD_NUMBER);
+            versionLicensing.Text = String.Format("{0:0}.{1:00}.{2:000000}", Solimar.Licensing.VersionInfo.MAJOR_REVISION_NUMBER, Solimar.Licensing.VersionInfo.MINOR_REVISION_NUMBER, Solimar.Licensing.VersionInfo.BUILD_NUMBER);
         }
 
         private void AboutBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)

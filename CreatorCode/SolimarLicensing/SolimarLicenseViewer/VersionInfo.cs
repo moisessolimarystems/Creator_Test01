@@ -2,18 +2,18 @@ using System;
 
 namespace SolimarLicenseViewer
 {
-    public class VersionInfo
+    /*public class VersionInfo
     {
         public static int MAJOR_REVISION_NUMBER = 3;
         public static int MINOR_REVISION_NUMBER = 0;
-        public static int BUILD_NUMBER = 999999;
-    }
+        public static int BUILD_NUMBER = 0;
+    }*/
 
     public class InstanceVersionInfo
     {
-        public int major_revision_number = VersionInfo.MAJOR_REVISION_NUMBER;
-        public int minor_revision_number = VersionInfo.MINOR_REVISION_NUMBER;
-        public int build_number = VersionInfo.BUILD_NUMBER;
+        public int major_revision_number = Solimar.Licensing.VersionInfo.MAJOR_REVISION_NUMBER;
+        public int minor_revision_number = Solimar.Licensing.VersionInfo.MINOR_REVISION_NUMBER;
+        public int build_number = Solimar.Licensing.VersionInfo.BUILD_NUMBER;
         public InstanceVersionInfo(int _major_revision_number, int _minor_revision_number, int _build_number)
         {
             major_revision_number = _major_revision_number;
