@@ -5718,13 +5718,33 @@ namespace Client.Creator
                     if (e.Node.Tag is ProductLicense)
                     {
                         ProductLicense pl = e.Node.Tag as ProductLicense;
-                        e.Graphics.DrawString(pl.Type, this.Font, Brushes.LightSteelBlue, e.Bounds.Right + 2, e.Bounds.Top);
+                        string drawString = pl.Type;
+                        if (!pl.IsActive)
+                        {
+                            drawString = "Deactivated";
+                        }
+                        if (pl.IsExpired)
+                        {
+                            if (drawString == "Deactivated")
+                                drawString += " | Expired";
+                            else
+                                drawString = "Expired";
+                        }
+                        if(drawString == pl.Type)
+                            e.Graphics.DrawString(drawString, this.Font,  Brushes.Blue, e.Bounds.Right + 2, e.Bounds.Top);                        
+                        else
+                            e.Graphics.DrawString(drawString, new Font(this.Font, FontStyle.Italic), Brushes.Red, e.Bounds.Right + 2, e.Bounds.Top);
                     }
-                    /*if (e.Node.Tag is LicenseServer)
+                    if (e.Node.Tag is LicenseServer)
                     {
                         LicenseServer ls = e.Node.Tag as LicenseServer;
-                        e.Graphics.DrawString(string.Format("({0})", ls.ProductLicenseCount), this.Font, Brushes.Blue, e.Bounds.Right + 2, e.Bounds.Top);
-                    }*/
+                        string drawString = string.Empty;
+                        if (!ls.IsActive)
+                        {
+                            //e.Graphics.DrawString(string.Format("({0})", ls.ProductLicenseCount), this.Font, Brushes.Red, e.Bounds.Right + 2, e.Bounds.Top);
+                            e.Graphics.DrawString("Deactivated", new Font(this.Font, FontStyle.Italic), Brushes.Red, e.Bounds.Right + 2, e.Bounds.Top);
+                        }
+                    }
                 }
             
             // If the node has focus, draw the focus rectangle large, making 
@@ -5779,12 +5799,12 @@ namespace Client.Creator
                     node.NodeFont = this.Font;
                     break;
                 case ProductLicenseStatus.Expired:
-                    node.NodeFont = new Font(this.Font, FontStyle.Italic);
-                    node.ForeColor = Color.Red;
-                    break;
+//                    node.NodeFont = new Font(this.Font, FontStyle.Italic);
+//                    node.ForeColor = Color.Red;
+//                    break;
                 case ProductLicenseStatus.InActive:
                     node.NodeFont = new Font(this.Font, FontStyle.Italic);
-                    node.ForeColor = SystemColors.InactiveCaptionText;
+                    node.ForeColor = Color.Red;
                     break;
                 default: break;
             }
