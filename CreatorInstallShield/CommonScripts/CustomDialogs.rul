@@ -199,9 +199,9 @@ end;
 function INT SdUserLoginCustomDlg(szTitle, szSubTitle, szMsg) 
     NUMBER  nvType, nvSize, nResult;   
     STRING  szDialogName;
-    NUMBER  nDialog, nCmdValue, nvPos; 
+    NUMBER  nDialog, nCmdValue, nvPos, nvPropertyBuffer; 
     BOOL    bDone;
-    STRING  szUserName, szDomainName, szPassword;  
+    STRING  szUserName, szDomainName, szPassword, svProperty;  
     HWND    hwndCtrl, hwndDlg;
 begin  
    	//
@@ -258,12 +258,17 @@ begin
 				else                 
 					nvPos = StrFind(szUserName, "\\");
 					if(nvPos > 0) then
-						StrSub(szDomainName, szUserName, 0, nvPos);
+						StrSub(szDomainName, szUserName, 0, nvPos);						
 						StrSub(szUserName, szUserName, nvPos+1, StrLength(szUserName));
-					else
+					else			
 						szDomainName = ".";
 					endif;  
-					if(SSPLogonUser(szDomainName, szUserName, szPassword)) then			
+					if(szDomainName = ".") then
+						nvPropertyBuffer = 256;
+						MsiGetProperty(ISMSI_HANDLE, "ComputerName", svProperty, nvPropertyBuffer);								
+						szDomainName = svProperty;					
+					endif;
+					if(SSPLogonUser(szDomainName, szUserName, szPassword)) then									
 						IFX_NETAPI_USER_ACCOUNT = szDomainName + "\\" + szUserName;
 						IFX_NETAPI_PASSWORD = szPassword;        										
 						bDone = TRUE;					
