@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 49;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 50;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -3703,6 +3703,25 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 204;
+			tmpModSpec.moduleName.TVal = "Ink Estimator";
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 4;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 50;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
