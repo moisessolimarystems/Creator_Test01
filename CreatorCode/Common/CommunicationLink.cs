@@ -394,9 +394,11 @@ namespace Client.Creator
         }
 
         public string GetProductBaseName(string productName)
-        {
+        {           
             if (productName.Contains("Test"))
-                productName = productName.Replace("Test/Dev/DR", string.Empty).Trim();            
+                productName = productName.Replace("Test/Dev/DR", string.Empty).Trim();
+            if (productName.Contains("PLP"))
+                productName = productName.Replace("PLP", string.Empty).Trim();
             return productName;        
         }
 
@@ -405,6 +407,8 @@ namespace Client.Creator
             string productName = GetProductName(productID);
             if (productName.Contains("Test"))
                 productName = productName.Replace("Test/Dev/DR", string.Empty).Trim();
+            if (productName.Contains("PLP"))
+                productName = productName.Replace("PLP", string.Empty).Trim();
             return productName;
         }
 
@@ -517,7 +521,7 @@ namespace Client.Creator
             return false;
         }
 
-        public short GetDefaultModuleValue(uint productID, short moduleID)
+        public uint GetDefaultModuleValue(uint productID, short moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
@@ -531,17 +535,17 @@ namespace Client.Creator
                         {
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
-                                return (short)moduleSpec.moduleDefaultLicense.TVal;
+                                return moduleSpec.moduleDefaultLicense.TVal;
                             }
                         }
                     }
                 }
             }
             //need to return a valid bad value
-            return -1;
+            return 0;
         }
 
-        public int GetUnlimitedModuleValue(uint productID, uint moduleID)
+        public uint GetUnlimitedModuleValue(uint productID, uint moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
@@ -555,17 +559,17 @@ namespace Client.Creator
                         {
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
-                                return (int)moduleSpec.modUnlimitedValue.TVal;
+                                return moduleSpec.modUnlimitedValue.TVal;
                             }
                         }
                     }
                 }
             }
             //need to return a valid bad value
-            return -1;
+            return 0;
         }
 
-        public short GetModuleTrialValue(uint productID, short moduleID)
+        public uint GetModuleTrialValue(uint productID, short moduleID)
         {
             foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
             {
@@ -579,14 +583,14 @@ namespace Client.Creator
                         {
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
-                                return (short)moduleSpec.moduleTrialLicense.TVal;
+                                return moduleSpec.moduleTrialLicense.TVal;
                             }
                         }
                     }
                 }
             }
             //need to return a valid bad value
-            return -1;
+            return 0;
         }
 
         public void WriteEventLog(String EventLogMsg, EventLogEntryType LogType)

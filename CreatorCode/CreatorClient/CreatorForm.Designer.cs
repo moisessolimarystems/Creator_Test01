@@ -181,6 +181,7 @@
             this.dlvDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.incrementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.decrementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.detailListViewCopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.dlvEditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setModuleToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
@@ -220,7 +221,6 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
-            this.detailListViewCopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
@@ -1802,7 +1802,7 @@
             this.toolStripSeparator2,
             this.dlvEditToolStripMenuItem});
             this.DetailListViewContextMenuStrip.Name = "DetailListViewContextMenuStrip";
-            this.DetailListViewContextMenuStrip.Size = new System.Drawing.Size(157, 164);
+            this.DetailListViewContextMenuStrip.Size = new System.Drawing.Size(157, 142);
             // 
             // dlvNewToolStripMenuItem
             // 
@@ -1835,6 +1835,13 @@
             this.decrementToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.decrementToolStripMenuItem.Text = "Decrement";
             this.decrementToolStripMenuItem.Click += new System.EventHandler(this.decrementToolStripMenuItem_Click);
+            // 
+            // detailListViewCopyToolStripMenuItem
+            // 
+            this.detailListViewCopyToolStripMenuItem.Name = "detailListViewCopyToolStripMenuItem";
+            this.detailListViewCopyToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.detailListViewCopyToolStripMenuItem.Text = "Copy";
+            this.detailListViewCopyToolStripMenuItem.Click += new System.EventHandler(this.detailListViewCopyToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
@@ -2143,13 +2150,6 @@
             // 
             this.printDialog1.Document = this.printDocument1;
             this.printDialog1.UseEXDialog = true;
-            // 
-            // detailListViewCopyToolStripMenuItem
-            // 
-            this.detailListViewCopyToolStripMenuItem.Name = "detailListViewCopyToolStripMenuItem";
-            this.detailListViewCopyToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.detailListViewCopyToolStripMenuItem.Text = "Copy";
-            this.detailListViewCopyToolStripMenuItem.Click += new System.EventHandler(this.detailListViewCopyToolStripMenuItem_Click);
             // 
             // CreatorForm
             // 

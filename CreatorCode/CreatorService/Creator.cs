@@ -1110,7 +1110,7 @@ namespace Service.Creator
         public IList<ModuleTable> GetModulesByProductLicense(string productLicenseName, bool bAll)
         { return ModuleTable.GetModulesByProductLicense(productLicenseName, bAll); }
         [OperationBehavior(Impersonation = ImpersonationOption.NotAllowed)]
-        public short GetTotalModuleValue(string productLicenseID, byte productID, short modID)
+        public int GetTotalModuleValue(string productLicenseID, byte productID, short modID)
         {
             return ModuleTable.GetTotalModuleValue(productLicenseID, productID, modID);
         }

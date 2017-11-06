@@ -332,7 +332,7 @@ namespace Service.Creator
         [OperationContract]
         IList<ModuleTable> GetModulesByProductLicense(string productLicenseName, bool bAll);
         [OperationContract]
-        short GetTotalModuleValue(string licenseServer, byte productID, short modID);
+        int GetTotalModuleValue(string licenseServer, byte productID, short modID);
         #endregion
 
         [OperationContract]

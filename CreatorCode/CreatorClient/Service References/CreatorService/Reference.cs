@@ -619,7 +619,7 @@ namespace Client.Creator.CreatorService {
         private short ModIDField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private short ValueField;
+        private int ValueField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private byte AppInstanceField;
@@ -664,7 +664,7 @@ namespace Client.Creator.CreatorService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public short Value {
+        public int Value {
             get {
                 return this.ValueField;
             }

@@ -1595,20 +1595,19 @@ namespace Client.Creator
             {
                 if (DetailListView.SelectedItems.Count > 0)
                 {
-                    ushort oldValue, newValue;
+                    /*ushort*/ int oldValue, newValue;
                     ProductLicense plp = DetailPropertyGrid.SelectedObject as ProductLicense;
                     foreach (ListViewItem selectedItem in DetailListView.SelectedItems)
                     {
                         Module module = selectedItem.Tag as Module;
-                        oldValue = (ushort)module.Value;
+                        oldValue = /*(ushort)*/module.Value;
                         string errorMsg = string.Empty;
-                        if (!ushort.TryParse(setModuleToolStripTextBox.Text, out newValue))
+                        if (/*!ushort*/!Int32.TryParse(setModuleToolStripTextBox.Text, out newValue))
                             errorMsg = "Invalid format for {0} value";
                         else
                         {
                             if (oldValue != newValue)
                             {
-
                                 if (newValue > (plp.GetAvailableModuleUnits(module) + oldValue))
                                     errorMsg = "Specified value exceeds the available units allowed for {0}";
                                 else if ((newValue % ((plp.ProductConnection > 0) ? plp.ProductConnection : plp.ParentProductConnection) > 0) && !s_CommLink.IsClientType(plp.ProductID))
@@ -1617,7 +1616,7 @@ namespace Client.Creator
                                 }
                                 else
                                 {
-                                    module.Value = (short)newValue;
+                                    module.Value = /*(short)*/newValue;
                                     if (plp.SetModule(module))
                                     {
                                         selectedItem.SubItems[1].Text = module.Value.ToString(); //(module.AppInstance > 1) ? string.Format("{0} ({1})", module.Value, module.Value * module.AppInstance) : module.Value.ToString();
@@ -1633,7 +1632,7 @@ namespace Client.Creator
                         }
                         if (errorMsg.Length > 0)
                         {
-                            module.Value = (short)oldValue;
+                            module.Value = /*(short)*/oldValue;
                             MessageBox.Show(string.Format(errorMsg, module.Name), "Set Module Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             setModuleToolStripTextBox.SelectAll();
                         }
@@ -4701,7 +4700,7 @@ namespace Client.Creator
                     plt = client.GetProductLicense(productData.Collection[0].ID);
                     moduleList = client.GetAllActiveModulesByProduct(lsp.Name, productData.ProductID);
                 });
-                if (plt != null)
+                if (plt != null && moduleList != null)
                 {
                     LicenseVersion version = new LicenseVersion(plt.ProductVersion);
                     DetailListViewToolStripLabel2.Text = string.Format("Product Version : {0}", version.ToString());
@@ -4763,34 +4762,37 @@ namespace Client.Creator
                 //gets all modules for a given product license and add-on product licenses
                 string productLicense = (plData.ParentID == null) ? plData.ID : plData.ParentID;
                 List<ModuleTable> moduleList = plData.AllModuleList; //Expensive to call modulelist everytime for SPDE
-                foreach (ModuleTable module in moduleList)
-                {   //totalValue = licensed module value + add-on module value;
-                    //           = trial module value;
-                    uint totalValue = 0;
-                //    if (plData.Status == ProductLicenseState.Trial)
-                //        totalValue = (uint)module.Value;
-                //    else
-                //    {
+                if (moduleList != null)
+                {
+                    foreach (ModuleTable module in moduleList)
+                    {   //totalValue = licensed module value + add-on module value;
+                        //           = trial module value;
+                        uint totalValue = 0;
+                        //    if (plData.Status == ProductLicenseState.Trial)
+                        //        totalValue = (uint)module.Value;
+                        //    else
+                        //    {
                         foreach (ModuleTable mod in moduleList)
                         {
                             if (mod.ModID == module.ModID)
                                 totalValue += (uint)mod.Value;
                         }
-                //    }
-                    //need to distiguish between add-on and regular PL
-                    if (module.ProductLicenseID == plData.ProductLicenseDatabaseID)
-                    {
-                        ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
-                        //if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
+                        //    }
+                        //need to distiguish between add-on and regular PL
+                        if (module.ProductLicenseID == plData.ProductLicenseDatabaseID)
+                        {
+                            ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
+                            //if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
                             storageListView.Items.Add(lvItem);
+                        }
                     }
-                }
-                if (moduleFilterToolStripComboBox.SelectedItem != null)               
-                    ShowModuleListView(moduleFilterToolStripComboBox.Text);
-                else
-                {
-                    moduleFilterToolStripComboBox.SelectedIndex = 0;
-                    ShowModuleListView("All");
+                    if (moduleFilterToolStripComboBox.SelectedItem != null)
+                        ShowModuleListView(moduleFilterToolStripComboBox.Text);
+                    else
+                    {
+                        moduleFilterToolStripComboBox.SelectedIndex = 0;
+                        ShowModuleListView("All");
+                    }
                 }
             }
 

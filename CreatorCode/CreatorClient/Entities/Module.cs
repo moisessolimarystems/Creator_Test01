@@ -67,7 +67,7 @@ namespace Client.Creator
         /// <summary>
         /// Gets or sets the units for the module.
         /// </summary>
-        public short Value
+        public int Value
         {
             get { return _module.Value; }
             set { _module.Value = value; }
@@ -89,14 +89,14 @@ namespace Client.Creator
         {
             get 
             {
-                return (uint)_commLink.GetUnlimitedModuleValue(ProductID, (uint)ID);               
+                return _commLink.GetUnlimitedModuleValue(ProductID, (uint)ID);               
             }
         }
 
         /// <summary>
         /// Gets or sets the trial value for the module.
         /// </summary>
-        public short TrialValue
+        public uint TrialValue
         {
             get
             {

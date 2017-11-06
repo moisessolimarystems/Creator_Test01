@@ -71,9 +71,9 @@ namespace CreatorData
             }
         }
         //product license + add-on product license module values
-        public static short GetTotalModuleValue(string productLicenseID, byte productID, short modID)
+        public static int GetTotalModuleValue(string productLicenseID, byte productID, short modID)
         {
-            short totalValue = 0;
+            int totalValue = 0;
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 List<ModuleTable> moduleList = db.ModuleTables.Where(c => (c.ProductLicenseTable.plID == productLicenseID || c.ProductLicenseTable.ParentProductLicenseID == productLicenseID) &&
