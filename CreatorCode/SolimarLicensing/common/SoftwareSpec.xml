@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="50">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="51">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -430,6 +430,53 @@
       <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Solimar Compiler" modUnlimitedValue="1"/>
     </Lic_ModuleSoftwareSpecAttribsMap>
   </Lic_ProductSoftwareSpecAttribs>  
+	<Lic_ProductSoftwareSpecAttribs productID="23" productName="Rubika PLP">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Merge" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Address Cleanse" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Split" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Finishing" modUnlimitedValue="1"/>
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Concatenate" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Imposition" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Underlay/Overlay" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Insert" modUnlimitedValue="1"/>
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Segment" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="Archive Assistant" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="10" moduleName="Mark" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="11" moduleName="Barcode - ***Deprecated***" modUnlimitedValue="1" moduleVersionDeprecated_Major="2" moduleVersionDeprecated_Minor="1"/>
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="Text Marking - ***Deprecated***" modUnlimitedValue="1" moduleVersionDeprecated_Major="2" moduleVersionDeprecated_Minor="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Delete" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="14" moduleName="Replace" modUnlimitedValue="1" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="15" moduleName="Export/Import" modUnlimitedValue="1"/>
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="N to 1" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="Book Block" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="2-Up" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="Scale &amp; Shift" modUnlimitedValue="1"/>
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="Merge Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="22" moduleName="Assembly" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="23" moduleName="Barcode Reader" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="24" moduleName="Job Ticket Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="Encryption" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="2"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="26" moduleName="Annotation Stripper" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="3"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="27" moduleName="Commingle" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="10"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="28" moduleName="DPM Finishing" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="20"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="29" moduleName="Segment By List" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="27"/>
+      <Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="Engine Instances" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="Process Builders" moduleDefaultLicense="1" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="Rename" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="31"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="33" moduleName="Sort" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="9" moduleVersionIntroduced_SubMinor="37"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="34" moduleName="Page-Piece" modUnlimitedValue="1" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="9" moduleVersionIntroduced_SubMinor="40"/>	
+			
+      <!-- Limit Module -->
+      <Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="PLP" moduleVersionIntroduced_Major="4" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="51"/>	    
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>  
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -460,6 +507,9 @@
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="122" productName="Test/Dev/DR Solimar Utilities" sameModSpecProductID="22">
   </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="123" productName="Test/Dev/DR Rubika PLP" sameModSpecProductID="23">
+  </Lic_ProductSoftwareSpecAttribs>
+  Rubika PLP
 </Lic_SoftwareSpecAttribs>
 
 
