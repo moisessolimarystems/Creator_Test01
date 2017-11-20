@@ -406,8 +406,8 @@ void InititalizeProduct23()
 	pTmpModSpec->moduleName = std::wstring(L"PLP");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 4;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 51;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 52;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(11, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(11))->second);
