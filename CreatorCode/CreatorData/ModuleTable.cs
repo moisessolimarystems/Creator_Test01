@@ -36,9 +36,21 @@ namespace CreatorData
             using (CreatorDataContext db = new CreatorDataContext())
             {
                 db.ObjectTrackingEnabled = false;
-                return db.ModuleTables.Where(c => (c.ProductLicenseTable.LicenseTable.LicenseName == licenseServer &&
+                //Changes to speed up query
+                var productLicenseQuery = db.ProductLicenseTables.Where(p => p.IsActive == true
+                                            && p.plID.Contains(licenseServer)
+                                            && p.ProductID == productID)
+                                            .Select(x => x.ID).ToList();
+
+                var query = db.ModuleTables.Where(m => productLicenseQuery.Contains(m.ProductLicenseID)).ToList(); 
+                            
+                /*var query = db.ModuleTables.Where(c => (c.ProductLicenseTable.LicenseTable.LicenseName == licenseServer &&
                                                    c.ProductLicenseTable.ProductID == productID) &&
-                                                   c.ProductLicenseTable.IsActive == true).ToList();
+                                                   c.ProductLicenseTable.IsActive == true);*/
+                return query.ToList();
+               /* return db.ModuleTables.Where(c => (c.ProductLicenseTable.LicenseTable.LicenseName == licenseServer &&
+                                                   c.ProductLicenseTable.ProductID == productID) &&
+                                                   c.ProductLicenseTable.IsActive == true).ToList();*/
             }
         }
         
