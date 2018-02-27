@@ -2132,11 +2132,11 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(204, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(204))->second);
 	pTmpModSpec->moduleID = 204;
-	pTmpModSpec->moduleName = std::wstring(L"Ink Estimator");
+	pTmpModSpec->moduleName = std::wstring(L"Coverage Calculator");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 8;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 50;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 53;
 }
 
 void InititalizeProduct17()
