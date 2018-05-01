@@ -121,6 +121,80 @@ void InititalizeProduct118()
 	pTmpProdSpec->sameModSpecProductID = 18;
 }
 
+void InititalizeProduct24()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:24, ProdName: Solimar Indexing Tools PLP
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(24))->second);
+	pTmpProdSpec->productID = 24;
+	pTmpProdSpec->productName = std::wstring(L"Solimar Indexing Tools PLP");
+
+	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
+	pTmpModSpec->moduleID = 1;
+	pTmpModSpec->moduleName = std::wstring(L"Index Engine Instances");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
+	pTmpModSpec->moduleID = 0;
+	pTmpModSpec->moduleName = std::wstring(L"SDX Designer");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionDeprecated_Major = 3;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(3, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
+	pTmpModSpec->moduleID = 3;
+	pTmpModSpec->moduleName = std::wstring(L"Solimar Accessibility Engine");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
+	pTmpModSpec->moduleID = 2;
+	pTmpModSpec->moduleName = std::wstring(L"Solimar Redaction Engine");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(102, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(102))->second);
+	pTmpModSpec->moduleID = 102;
+	pTmpModSpec->moduleName = std::wstring(L"Solimar Redaction Engine PLP");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 55;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(103, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(103))->second);
+	pTmpModSpec->moduleID = 103;
+	pTmpModSpec->moduleName = std::wstring(L"Solimar Accessibility Engine PLP");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 55;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(101, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(101))->second);
+	pTmpModSpec->moduleID = 101;
+	pTmpModSpec->moduleName = std::wstring(L"Index Engine Instances PLP");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 55;
+}
+
 void InititalizeProduct20()
 {
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
@@ -1077,7 +1151,7 @@ void InititalizeProduct10()
 	pTmpModSpec->moduleID = 1;
 	pTmpModSpec->moduleName = std::wstring(L"Index Engine Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleDefaultLicense = 4;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
@@ -1092,20 +1166,36 @@ void InititalizeProduct10()
 	pTmpModSpec->moduleID = 3;
 	pTmpModSpec->moduleName = std::wstring(L"Solimar Accessibility Engine");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleDefaultLicense = 4;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 36;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"Solimar Redaction Engine");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleDefaultLicense = 4;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 7;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 35;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 54;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(5, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(5))->second);
+	pTmpModSpec->moduleID = 5;
+	pTmpModSpec->moduleName = std::wstring(L"XTree");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 56;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(4, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
+	pTmpModSpec->moduleID = 4;
+	pTmpModSpec->moduleName = std::wstring(L"PDF/A");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 56;
 }
 
 void InititalizeProduct13()
@@ -1919,6 +2009,15 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 46;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(62, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(62))->second);
+	pTmpModSpec->moduleID = 62;
+	pTmpModSpec->moduleName = std::wstring(L"Coverage Calculator");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 8;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 56;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
@@ -2128,15 +2227,6 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleID = 202;
 	pTmpModSpec->moduleName = std::wstring(L"PDF Interpreter(PDFL)");
 	pTmpModSpec->moduleTrialLicense = 127;
-	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(204, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(204))->second);
-	pTmpModSpec->moduleID = 204;
-	pTmpModSpec->moduleName = std::wstring(L"Coverage Calculator");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 53;
 }
 
 void InititalizeProduct17()
