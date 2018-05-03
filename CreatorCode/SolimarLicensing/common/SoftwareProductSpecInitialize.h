@@ -1182,20 +1182,20 @@ void InititalizeProduct10()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(5, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(5))->second);
 	pTmpModSpec->moduleID = 5;
-	pTmpModSpec->moduleName = std::wstring(L"XTree");
+	pTmpModSpec->moduleName = std::wstring(L"Solimar PDF Tag Export Engine");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 56;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 57;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(4, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
 	pTmpModSpec->moduleID = 4;
-	pTmpModSpec->moduleName = std::wstring(L"PDF/A");
+	pTmpModSpec->moduleName = std::wstring(L"Solimar PDF/A Engine");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 56;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 57;
 }
 
 void InititalizeProduct13()
