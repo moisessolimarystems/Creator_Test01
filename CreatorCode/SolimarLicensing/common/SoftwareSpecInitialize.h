@@ -3,7 +3,7 @@
 
 softwareSpec.softwareSpec_SubMajor = 0;
 softwareSpec.softwareSpec_Major = 1;
-softwareSpec.softwareSpec_SubMinor = 57;
+softwareSpec.softwareSpec_SubMinor = 58;
 softwareSpec.softwareSpec_Minor = 0;
 InititalizeProduct115();
 InititalizeProduct114();
