@@ -72,7 +72,12 @@ namespace Client.Creator
         [Browsable(false)]
         public byte ProductID
         {
-            get { return _plRec.ProductID; }
+            get 
+            { 
+                if(_plRec != null)
+                    return _plRec.ProductID;
+                return 0;
+            }
         }
 
         [Browsable(false)]
@@ -80,8 +85,10 @@ namespace Client.Creator
         {
             get { return _plRec; }
             set 
-            {
-                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || (value.plID.StartsWith("100")))
+            {   //Product connections can be modified if type is client, PLP, or an internal Solimar product license
+                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || 
+                   (value.plID.StartsWith("100")) ||
+                   (ProductName.ToUpper().EndsWith("PLP")))
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
                 else
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
@@ -351,7 +358,7 @@ namespace Client.Creator
                                 //module.AppInstance = (Status != ProductLicenseState.AddOn ) ? value : (byte)0;
                                 if (module.Value > 0)
                                 {
-                                    if (!_commLink.IsClientType(ProductID)) //Don't need to multiply non-client module values
+                                    if (!_commLink.IsClientType(ProductID) && !_commLink.IsPLPModule(ProductID, module.ModID)) //Don't need to multiply non-client or PLP module values
                                     {
                                         baseValue = (module.AppInstance > 1) ? module.Value / module.AppInstance : module.Value;
                                         module.Value = (module.Value + ((value - module.AppInstance) * baseValue));
@@ -950,6 +957,7 @@ namespace Client.Creator
             return bRetVal;
         }
 
+        //Need to not touch PLP modules, they need to stay fixed. Question is when there are multiple. 
         public bool SetLicensedToTrial()
         {
             bool bRetVal = true;
@@ -963,7 +971,7 @@ namespace Client.Creator
                         int multiplier = _commLink.IsClientType(ProductID) ? 1 : ProductConnection;
                         foreach (ModuleTable module in ModuleList)
                         {
-                            ModuleTable mt = client.GetModule(ID, module.ModID);
+                            ModuleTable mt = client.GetModule(ID, module.ModID);                            
                             if (mt != null)
                             {
                                 mt.Value = (int)(_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
