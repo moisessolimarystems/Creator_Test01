@@ -90,23 +90,31 @@ namespace Client.Creator
             {
                 pltList = client.GetProductLicenses(pltData.LicenseServerString, true);               
             });
-            SaveCurrentItem();
-            foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
+            if(m_CommLink.GetProductID(ProductLicenseProductComboBox.Text) < 0) //Validate product name
             {
-                if (pltList.Where(p => p.plID == plt.plID).Count() != 0)
+                MessageBox.Show(string.Format("{0} is not a valid product selection. Please try again.", ProductLicenseProductComboBox.Text), "Error", MessageBoxButtons.OK);
+                m_Validated = false;
+            }
+            else
+            {
+                SaveCurrentItem();
+                foreach (ProductLicenseTable plt in bindingNavigator1.BindingSource.List)
                 {
-                    string previousID = plt.plID;
-                    //retrieve the next available number 
-                    plt.plIndex = pltData.NextLicenseServerIndex;
-                    plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, pltData.NextLicenseServerIndex);
-                    pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex + 1;                    
-                    //can loop through and 
-                    MessageBox.Show(string.Format("{0} already exists! {0} will be updated to {1}. Please try again.", previousID, plt.plID), "Error", MessageBoxButtons.OK);
-                    m_Validated = false;
-                    InitializeProductLicenseTabPage(plt);
-                    break;
-                }
-            } 
+                    if (pltList.Where(p => p.plID == plt.plID).Count() != 0)
+                    {
+                        string previousID = plt.plID;
+                        //retrieve the next available number 
+                        plt.plIndex = pltData.NextLicenseServerIndex;
+                        plt.plID = Lic_LicenseInfoAttribsHelper.GenerateProductLicenseName(pltData.LicenseServerString, pltData.NextLicenseServerIndex);
+                        pltData.NextLicenseServerIndex = pltData.NextLicenseServerIndex + 1;                    
+                        //can loop through and 
+                        MessageBox.Show(string.Format("{0} already exists! {0} will be updated to {1}. Please try again.", previousID, plt.plID), "Error", MessageBoxButtons.OK);
+                        m_Validated = false;
+                        InitializeProductLicenseTabPage(plt);
+                        break;
+                    }
+                } 
+            }
         }
 
         void InitializeProductLicenseTabPage(ProductLicenseTable plt)
@@ -120,16 +128,37 @@ namespace Client.Creator
                 IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicenses(pltData.LicenseServerString, true);
                 foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
                 {
-                    bool bSkip = false;
-                    productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal).ToList();
+                    //bool bSkip = false;                   
+                    productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal && p.IsActive).ToList();
                     /*foreach (ProductLicenseTable pl in productLicenses)
                     {   //skip if client and not perm
                         if (pl.plState.Equals((byte)ProductLicenseState.Trial) &&
-                           productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
+                           productSpec.productLicType.TVal.Equals(Lic_PackageAttribs.Lic _ProductSoftwareSpecAttribs.TProductLicenseType.pltClient))
                             bSkip = true;
                     }
                     if (!bSkip)
                      */
+                    bool isPLPProduct = productSpec.productLabel.TVal.ToUpper().EndsWith("PLP") || productSpec.productName.TVal.ToUpper().EndsWith("PLP");
+                    if (isPLPProduct) //skip PLP product if active PLP exists or active non-plp product exists
+                    {
+                        short baseID = m_CommLink.GetProductID(productSpec.productName.TVal.TrimEnd("PLP".ToCharArray()));
+                        bool bPLPHasActiveBaseProduct = dbProductLicenses.Where(p => p.ProductID == baseID).Count() > 0;
+                        if (productLicenses.Count > 0 || bPLPHasActiveBaseProduct)
+                            continue;
+                    }
+                    else //check if PLP product exists before adding base product, relies on PLP product having name format : "PRODUCT PLP"
+                    {
+                        short plpProductID = m_CommLink.GetProductID(string.Format("{0} PLP", productSpec.productName.TVal));
+                        bool bHasActivePLPProduct = dbProductLicenses.Where(p => p.ProductID == plpProductID && p.IsActive).Count() > 0;
+                        if (bHasActivePLPProduct)
+                            continue;
+                    }
+                    //Skip PLP product licenses where an active product exists 
+                    /*if (productSpec.productLabel.TVal.ToUpper().EndsWith("PLP") || productSpec.productName.TVal.ToUpper().EndsWith("PLP") &&
+                       productLicenses.Count > 0)
+                    {
+                        continue;
+                    }*/
                     if(productSpec.productLabel.TVal.Length > 0)
                         productList.Add(productSpec.productLabel);
                     else
@@ -140,6 +169,9 @@ namespace Client.Creator
                 productList.Add("No Products Available");
             ProductLicenseProductComboBox.Items.Clear();
             ProductLicenseProductComboBox.Items.AddRange(productList.ToArray());
+            ProductLicenseProductComboBox.DropDownStyle = ComboBoxStyle.DropDown;
+            ProductLicenseProductComboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
+            ProductLicenseProductComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             
             //if plt.productID 
             //set to plt.productid 
