@@ -447,7 +447,7 @@ namespace Client.Creator
             {
                 compareProductName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
                 //if (productSpec.productName.TVal.ToLower() == productName.ToLower())
-                if (string.Compare(compareProductName, productName, true) == 0)
+                if (string.Compare(compareProductName, productName.Trim(), true) == 0)
                     return (short)productSpec.productID.TVal;
             }
             //need to return a valid bad value
@@ -468,6 +468,32 @@ namespace Client.Creator
             }   
             //need to return a valid bad value
             return -1;
+        }
+
+        public bool IsPLPModule(uint productID, short moduleID)
+        {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
+            {
+                if (productSpec.productID.TVal == productID)
+                {
+                    if (productSpec.sameModSpecProductID.TVal > 0)
+                        return IsPLPModule(productSpec.sameModSpecProductID.TVal, moduleID);
+                    else
+                    {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                        {
+                            //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
+                            if (moduleSpec.moduleID.TVal == moduleID)
+                            {
+                                if (moduleSpec.moduleName.TVal.ToUpper().EndsWith("PLP"))
+                                    return true;
+                            }
+                        }
+                    }
+                }
+            }
+            //need to return a valid bad value
+            return false;
         }
 
         public bool IsDefaultModule(uint productID, short moduleID)
