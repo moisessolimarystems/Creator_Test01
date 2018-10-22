@@ -84,7 +84,7 @@ begin
 	endif;	 	     		     		 	     		 
    	if(bValue) then  //true when not installed and older found 
      	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);
-     	szOpts = " /S /v\"ALLUSERS=1 /qn\"" + szParam;        			
+     	szOpts = " /S /v\"ALLUSERS=1 /norestart /qn\"" + szParam;        			
    		LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
    		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
 		  	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);
@@ -199,7 +199,7 @@ begin
    	endif;
     
     if(RegDBGetKeyValueEx("SOFTWARE\\Rainbow Technologies\\Sentinel System Driver", "CurrentVersion", nvSize, svValue, nvSize) >= 0) then
-    	if(VerCompare("7.5.8.0", svValue + ".0", VERSION) = GREATER_THAN) then    
+    	if(VerCompare("7.6.0.0", svValue + ".0", VERSION) = GREATER_THAN) then    
 			MessageBox("Please remove any USB keys before proceeding to install Sentinel Protection Installer.", WARNING);
 			if(!SYSINFO.bIsWow64) then    
 				sentPath = SRCDIR ^ "Common\\SolimarLicensing\\SPNComboInstaller.exe"; 
