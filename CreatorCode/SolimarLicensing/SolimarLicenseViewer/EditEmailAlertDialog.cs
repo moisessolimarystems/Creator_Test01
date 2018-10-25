@@ -20,7 +20,7 @@ namespace SolimarLicenseViewer
             this.imageList = null;
         }
         public EditEmailAlertDialog(
-            Func<int, string> _funcGetProductName,
+            Shared.VisualComponents.Func<int, string> _funcGetProductName,
             Action<string> _funcValidateName, 
             ImageList _imageList)
         {
@@ -30,8 +30,8 @@ namespace SolimarLicenseViewer
             this.actionValidateName = _funcValidateName;
             this.imageList = _imageList;
         }
-        
-        private Func<int, string> funcGetProductName = null;
+
+        private Shared.VisualComponents.Func<int, string> funcGetProductName = null;
         private Action<string> actionValidateName = null;
         //private Action
         private void InitializeInternal()
