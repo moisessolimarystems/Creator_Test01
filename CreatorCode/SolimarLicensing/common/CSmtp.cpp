@@ -681,7 +681,7 @@ void CSmtp::Send()
 			SendData(pEntry);
 
 			// opening the file:
-			hFile = fopen(FileName.c_str(), "rb");
+			hFile = fopen(Attachments[FileId].c_str(), "rb");
 			if(hFile == NULL)
 				throw ECSmtp(ECSmtp::FILE_NOT_EXIST);
 			
