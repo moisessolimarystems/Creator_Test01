@@ -46,7 +46,7 @@ prototype EnableWebServerRole();
 
 //Set DCOM Protocols
 prototype AddDCOMProtocolTCPIP();
-prototype AddTCPIPPortRange();
+prototype BOOL AddTCPIPPortRange();
 
 //Enable MSDTC settings
 prototype EnableNetworkDtcAccess();

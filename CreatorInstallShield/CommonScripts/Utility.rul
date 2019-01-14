@@ -32,7 +32,7 @@ begin
 	endif;
 end;
 
-function AddTCPIPPortRange()
+function BOOL AddTCPIPPortRange()
 	STRING svPropertyValue, szKey, svName, svData;
 	NUMBER nvBufferSize;
 begin
@@ -58,7 +58,9 @@ begin
 	svData = svPropertyValue;
 	if(!AddStringToRegMultiSZ(HKEY_LOCAL_MACHINE, szKey, svName, svData, FALSE)) then
 		WriteLog("AddTCPIPPortRange: Failed to set " + szKey ^ svName);	
+		return FALSE;
 	endif;
+	return TRUE;
 end;
 
 function SetNetTCPPortSharing()
