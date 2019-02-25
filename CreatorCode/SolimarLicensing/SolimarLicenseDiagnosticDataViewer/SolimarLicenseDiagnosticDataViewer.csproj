@@ -116,6 +116,12 @@
     <Compile Include="Lic_LicenseSystemAttribs_DisplayForm.Designer.cs">
       <DependentUpon>Lic_LicenseSystemAttribs_DisplayForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lic_ProductConnectionAttribs_DisplayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Lic_ProductConnectionAttribs_DisplayForm.Designer.cs">
+      <DependentUpon>Lic_ProductConnectionAttribs_DisplayForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Lic_RunningProcessesInfoAttribs_DisplayForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,6 +177,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Lic_LicenseSystemAttribs_DisplayForm.resx">
       <DependentUpon>Lic_LicenseSystemAttribs_DisplayForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lic_ProductConnectionAttribs_DisplayForm.resx">
+      <DependentUpon>Lic_ProductConnectionAttribs_DisplayForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Lic_RunningProcessesInfoAttribs_DisplayForm.resx">
       <DependentUpon>Lic_RunningProcessesInfoAttribs_DisplayForm.cs</DependentUpon>
