@@ -14,14 +14,14 @@
 
 // Version of the program
 #define MAJOR_REVISION_NUMBER 3
-#define MINOR_REVISION_NUMBER 3
+#define MINOR_REVISION_NUMBER 2
 
 //Build Number of the program
 #define BUILD_NUMBER 999999
 
-#define FILEVER 3,3,9999,0
-#define PRODUCTVER 3,3,9999,0
-#define STRFILEVER "3.3.9999.0"
-#define STRPRODUCTVER "3.3.9999.0"
+#define FILEVER 3,2,9999,0
+#define PRODUCTVER 3,2,9999,0
+#define STRFILEVER "3.2.9999.0"
+#define STRPRODUCTVER "3.2.9999.0"
 
 #endif
