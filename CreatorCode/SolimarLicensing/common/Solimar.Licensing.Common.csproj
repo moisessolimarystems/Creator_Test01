@@ -56,6 +56,7 @@
     <Compile Include="LicAttribsCS\ClassTypeInfo.cs" />
     <Compile Include="LicAttribsCS\CSpdAttribsBase.cs" />
     <Compile Include="LicAttribsCS\KeyMessages.cs" />
+    <Compile Include="LicAttribsCS\Lic_ClientSettingsAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_EmulationInfoAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_KeyAttribs.cs" />
     <Compile Include="LicAttribsCS\Lic_PackageAttribs.cs" />
