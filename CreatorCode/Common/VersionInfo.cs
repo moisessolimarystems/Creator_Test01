@@ -6,8 +6,8 @@ namespace Common
     {
         public static int MAJOR_REVISION_NUMBER = 3;
         public static int MINOR_REVISION_NUMBER = 0;
-        public static int BUILD_NUMBER =  9999;
-        public const string PRODUCT_VERSION = "3.0.9999.0";
+        public static int BUILD_NUMBER =  313;
+        public const string PRODUCT_VERSION = "3.0.313.0";
     }
 
     public class InstanceVersionInfo

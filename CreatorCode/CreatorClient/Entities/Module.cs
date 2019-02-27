@@ -70,7 +70,7 @@ namespace Client.Creator
         public int Value
         {
             get { return _module.Value; }
-            set { _module.Value = value; }
+            set { _module.Value = (short)value; }
         }
 
         /// <summary>

@@ -361,7 +361,7 @@ namespace Client.Creator
                                     if (!_commLink.IsClientType(ProductID) && !_commLink.IsPLPModule(ProductID, module.ModID)) //Don't need to multiply non-client or PLP module values
                                     {
                                         baseValue = (module.AppInstance > 1) ? module.Value / module.AppInstance : module.Value;
-                                        module.Value = (module.Value + ((value - module.AppInstance) * baseValue));
+                                        module.Value = (short)(module.Value + ((value - module.AppInstance) * baseValue));
                                     }
                                     //if value = mod.appinstance then no need to change
                                     module.AppInstance = value; //multiply?
@@ -898,7 +898,7 @@ namespace Client.Creator
                             uint moduleValue = (plt.plState == (byte)ProductLicenseState.Trial) ? moduleSpec.moduleTrialLicense.TVal : moduleSpec.moduleDefaultLicense.TVal;                      
                             ModuleTable mt = new ModuleTable();
                             mt.ModID = (short)moduleSpec.moduleID.TVal;
-                            mt.Value = (int)moduleValue;
+                            mt.Value = (short)moduleValue;
                             mt.AppInstance = (moduleValue > 0) ? ProductConnection : (byte)0;
                             mt.ProductLicenseID = plt.ID;
                             addModuleList.Add(mt);
@@ -943,7 +943,7 @@ namespace Client.Creator
                         ModuleTable mt = client.GetModule(ID, module.ModID);
                         if (mt != null)
                         {
-                            mt.Value = (int)(moduleValue * multiplier);
+                            mt.Value = (short)(moduleValue * multiplier);
                             if (moduleValue == 0) mt.AppInstance = 0;
                             mtList.Add(mt);
                         }
@@ -974,7 +974,7 @@ namespace Client.Creator
                             ModuleTable mt = client.GetModule(ID, module.ModID);                            
                             if (mt != null)
                             {
-                                mt.Value = (int)(_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
+                                mt.Value = (short)(_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
                                 mt.AppInstance = (byte)((mt.Value == 0) ? 0 : ProductConnection);
                                 mtList.Add(mt);
                             }
@@ -1221,7 +1221,7 @@ namespace Client.Creator
                                                           string.Format("Modify {0} - {1}", ProductName, module.Name),
                                                           module.Value.ToString(),
                                                           previousValue);
-                    mt.Value = (module.Value > 0) ? module.Value : 0;
+                    mt.Value = (short)((module.Value > 0) ? module.Value : 0);
                     mt.AppInstance = (module.Value > 0) ? module.AppInstance : (byte)0;
                     client.UpdateModule(mt);
                     client.MarkDirty(LicenseServer);
