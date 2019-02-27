@@ -54,21 +54,16 @@ begin
     //Re-initialize INSTALLDIR since PROGRAMFILES doesn't automatically account for 64bit folders.
     //don't allow install on systems that have solimar license server
     RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE); 
-    if(RegDBKeyExist("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer") = 1) then
-    	MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
-    	abort;
+    //if(RegDBKeyExist("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer") = 1) then
+	if(SYSINFO.bIsWow64) then
+		if(Is(FILE_EXISTS, PROGRAMFILES64 ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
+			MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+    	endif;
     else
-	   	if(SYSINFO.bIsWow64) then
-			REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY; 	
-		endif;     
-	    if(RegDBKeyExist("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer") = 1) then
-	        MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
-	        abort;
-	    endif;	
-	 	if(SYSINFO.bIsWow64) then
-	 		 REGDB_OPTIONS = REGDB_OPTIONS & ~REGDB_OPTION_WOW64_64KEY; 
-	 	endif;    	
-    endif;
+		if(Is(FILE_EXISTS, PROGRAMFILES ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
+			MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+    	endif;		
+	endif;    
 	
    	if(SYSINFO.bIsWow64) then            
    		//Set INSTALLDIR to use the correct program files folder for x64
