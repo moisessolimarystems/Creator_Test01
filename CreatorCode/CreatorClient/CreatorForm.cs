@@ -3849,16 +3849,22 @@ namespace Client.Creator
                     {   //Remove nodes that do not exist anymore
                         foreach (TreeNode removeNode in productNode.Nodes)
                         {
-                            if (removeNode.Nodes.Count > 0)
+                            if (removeNode != null)
                             {
-                                foreach (TreeNode addonNode in removeNode.Nodes)
-                                {                     
-                                    if (plRecords.Find(c => c.plID.Equals((addonNode.Name))) == null)
-                                        removeNode.Nodes.Remove(addonNode);
+                                if (removeNode.Nodes.Count > 0)
+                                {
+                                    foreach (TreeNode addonNode in removeNode.Nodes)
+                                    {
+                                        if (addonNode != null)
+                                        {
+                                            if (plRecords.Find(c => c.plID.Equals((addonNode.Name))) == null)
+                                                removeNode.Nodes.Remove(addonNode);
+                                        }
+                                    }
                                 }
-                            }
-                            if (plRecords.Find(c => c.plID.Equals((removeNode.Name))) == null)
-                                productNode.Nodes.Remove(removeNode);
+                                if (plRecords.Find(c => c.plID.Equals((removeNode.Name))) == null)
+                                    productNode.Nodes.Remove(removeNode);
+                            }   
                         }
                     }
                     else
