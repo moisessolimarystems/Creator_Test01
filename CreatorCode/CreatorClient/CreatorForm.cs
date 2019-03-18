@@ -4177,13 +4177,13 @@ namespace Client.Creator
         #region Packet Methods
         private void GenerateLicensePacket()
         {
-            m_selectedDirectory = string.Format("{0}\\{1}\\{2}.{3}.{4}", Directory.GetCurrentDirectory(), _selectedLicenseCustomer.Name, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
+            m_selectedDirectory = string.Format("{0}\\{1}\\{2}.{3}.{4}", Directory.GetCurrentDirectory(), _selectedLicenseCustomer.Name.Replace(" ", ""), DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
             //  Directory\\Company\\Date
             using (LicenseInfoForm dlg = new LicenseInfoForm("Generate License Packet for " + DetailTreeView.SelectedNode.Name, ref s_CommLink))
             {                
                 PacketDialogData data = new PacketDialogData()
                 {
-                    CustomerName = _selectedLicenseCustomer.Name,
+                    CustomerName = _selectedLicenseCustomer.Name.Replace(" ", ""),
                     PacketName = string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
                     SelectedDirectory = m_selectedDirectory,
                     LicenseName = DetailTreeView.SelectedNode.Name
@@ -5465,8 +5465,9 @@ namespace Client.Creator
                 packet.SaveLicensePackage(); //(1 DB)
                 if (newByteArrayLicensePacket != null)
                 {
-                    File.WriteAllBytes(string.Format("{0}\\{1}.{2}", data.SelectedDirectory/*outputPath*/, data.PacketName/*packetName*/, "packet"), newByteArrayLicensePacket);
-                    if (File.Exists(string.Format("{0}\\{1}.{2}", data.SelectedDirectory/*outputPath*/, data.PacketName/*packetName*/, "packet")))
+                    var packetPath = string.Format("{0}\\{1}.{2}", data.SelectedDirectory, data.PacketName, "packet");
+                    File.WriteAllBytes(packetPath, newByteArrayLicensePacket);
+                    if (File.Exists(packetPath))
                     {
                         PacketTable storedPacket = client.GetPacketByVerificationCode(verificationCode); //(1 DB)
                         if (storedPacket != null)
