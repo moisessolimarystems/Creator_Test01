@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 59;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 60;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -4730,8 +4730,8 @@ namespace Solimar.Licensing
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 5;
 			tmpModSpec.moduleName.TVal = "EQUIOS JDF/JMF";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modUnlimitedValue.TVal = 0;
+			tmpModSpec.moduleTrialLicense.TVal = 127;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
@@ -4739,7 +4739,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 49;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 60;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;

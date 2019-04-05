@@ -2311,11 +2311,10 @@ void InititalizeProduct16()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(5))->second);
 	pTmpModSpec->moduleID = 5;
 	pTmpModSpec->moduleName = std::wstring(L"EQUIOS JDF/JMF");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 2;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 49;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 60;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(4, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
