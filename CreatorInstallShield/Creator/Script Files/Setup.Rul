@@ -55,16 +55,6 @@ begin
     //don't allow install on systems that have solimar license server
     RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE); 
     //if(RegDBKeyExist("SOFTWARE\\Solimar\\Solimar Licensing\\SolimarLicenseServer") = 1) then
-	if(SYSINFO.bIsWow64) then
-		if(Is(FILE_EXISTS, PROGRAMFILES64 ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
-			MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
-    	endif;
-    else
-		if(Is(FILE_EXISTS, PROGRAMFILES ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
-			MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
-    	endif;		
-	endif;    
-	
    	if(SYSINFO.bIsWow64) then            
    		//Set INSTALLDIR to use the correct program files folder for x64
    		INSTALLDIR = PROGRAMFILES64 ^ "Solimar Systems\\License Creator";   		
@@ -103,7 +93,7 @@ begin
 
     // Initialization Steps.  
     InitLicensing();
-   	CheckRequirements();  
+    CheckRequirements();  
 end;
 //---------------------------------------------------------------------------
 // OnFirstUIBefore
@@ -188,6 +178,19 @@ Dlg_SetupType:
           	  	goto Dlg_SetupType;
         	endif; 
         endif;
+		if(FeatureIsItemSelected (MEDIA,  "Server")) then  	
+			if(SYSINFO.bIsWow64) then
+				if(Is(FILE_EXISTS, PROGRAMFILES64 ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
+					MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+					goto Dlg_SetupType;
+				endif;
+			else
+				if(Is(FILE_EXISTS, PROGRAMFILES ^ "Solimar Systems\\Solimar Licensing\\SolimarLicenseServer.exe") > 0)  then
+					MessageBox("Please remove the Solimar License Server before installing Creator.", WARNING);
+					goto Dlg_SetupType;			
+				endif;		
+			endif;    
+		endif;        
     endif;        
 
 Dlg_SdUserLoginCustomDlg:   
@@ -215,7 +218,6 @@ Dlg_SdStartCopy:
     		goto Dlg_SetupType;    
     	endif;
     endif;
-
     // setup default status
     Enable(STATUSEX);
  
