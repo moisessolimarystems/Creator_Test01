@@ -1758,10 +1758,11 @@ void InititalizeProduct14()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(111))->second);
 	pTmpModSpec->moduleID = 111;
 	pTmpModSpec->moduleName = std::wstring(L"IPP Input");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 8;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 45;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 61;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(110, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(110))->second);
@@ -1776,10 +1777,11 @@ void InititalizeProduct14()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(112))->second);
 	pTmpModSpec->moduleID = 112;
 	pTmpModSpec->moduleName = std::wstring(L"IPP Output");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 8;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 45;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 61;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(3, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
