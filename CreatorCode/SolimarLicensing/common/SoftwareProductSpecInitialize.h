@@ -2031,6 +2031,28 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 62;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(64, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(64))->second);
+	pTmpModSpec->moduleID = 64;
+	pTmpModSpec->moduleName = std::wstring(L"Dispatch File Input");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 63;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(65, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(65))->second);
+	pTmpModSpec->moduleID = 65;
+	pTmpModSpec->moduleName = std::wstring(L"Dispatch Spooler Output");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 63;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
@@ -2119,6 +2141,28 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(RIP)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(601, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(601))->second);
+	pTmpModSpec->moduleID = 601;
+	pTmpModSpec->moduleName = std::wstring(L"Dispatch Spooler Output");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 63;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(600, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(600))->second);
+	pTmpModSpec->moduleID = 600;
+	pTmpModSpec->moduleName = std::wstring(L"Dispatch File Input");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 63;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(48, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(48))->second);

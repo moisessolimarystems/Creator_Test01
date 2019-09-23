@@ -128,7 +128,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="62">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="63">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -350,6 +350,9 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="61" moduleName="PDF::IPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="46"/> 
 			<Lic_ModuleSoftwareSpecAttribs moduleID="62" moduleName="Coverage Calculator" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="58"/>             
 			<Lic_ModuleSoftwareSpecAttribs moduleID="63" moduleName="ReadyPDF Optimization" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="62"/>  
+			<Lic_ModuleSoftwareSpecAttribs moduleID="64" moduleName="Dispatch File Input" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="63"/><!--IsSharable-->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="65" moduleName="Dispatch Spooler Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="63"/>	
+			
       <!-- Module IDs identifying hardware -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Bus/Tag Input(polaris)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Bus/Tag Output(PCI)"/>
@@ -385,6 +388,9 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Concurrent Operator Sessions" modUnlimitedValue="255"  moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="0"/><!--IsSharable-->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="Named User Sessions" modUnlimitedValue="255" moduleVersionDeprecated_Major="7" moduleVersionDeprecated_Minor="0"/>
 			<!--<Lic_ModuleSoftwareSpecAttribs moduleID="402" moduleName="Concurrent Administrator Sessions" modUnlimitedValue="255"/>-->
+			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="600" moduleName="Dispatch File Input" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="63"/><!--IsSharable-->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="601" moduleName="Dispatch Spooler Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="63"/>			
 			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
