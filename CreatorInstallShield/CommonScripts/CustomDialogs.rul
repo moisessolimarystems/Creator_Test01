@@ -863,7 +863,11 @@ begin
 
             SdSetDlgTitle(szDlg, hDlg, GetDialogTitle(RES_ASKOPTIONS2_DIALOG_ID));
        
-			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED );
+            if(nValue = NONEXCLUSIVE) then
+				EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED );
+			else
+				EnableWindow( hwndNext, TRUE );
+			endif;
 			
         case SD_PBUT_CONTINUE:
 
@@ -874,16 +878,18 @@ begin
             nId   = NEXT;
             bDone = TRUE;
 
+
 		case RES_CHECKBOX1_MSG:
-		
-			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED);
-			EnableWindow( hwndCheck2, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) != BUTTON_CHECKED );
-			
+			if(nValue = NONEXCLUSIVE) then	
+				EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED);
+				EnableWindow( hwndCheck2, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) != BUTTON_CHECKED );
+			endif;	
 		case RES_CHECKBOX2_MSG:
-				
-			EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED );		
-			EnableWindow( hwndCheck1, CtrlGetState(szDlg, RES_CHECKBOX2_MSG) != BUTTON_CHECKED);			
-			
+			if(nValue = NONEXCLUSIVE) then		
+				EnableWindow( hwndNext, CtrlGetState(szDlg, RES_CHECKBOX1_MSG) = BUTTON_CHECKED || CtrlGetState(szDlg, RES_CHECKBOX2_MSG) = BUTTON_CHECKED );		
+				EnableWindow( hwndCheck1, CtrlGetState(szDlg, RES_CHECKBOX2_MSG) != BUTTON_CHECKED);			
+			endif;
+		
         case SD_PBUT_BACK:
 
             nId    = BACK;
