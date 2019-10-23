@@ -67,6 +67,8 @@ namespace Client.Creator
             LIBRARYSERVICES,
             XIMAGEPDF,
             SOLIMARUTILITIES,
+            READYPDFSERVER,
+            IPPSERVER,
             CUSTOMER,
             LICENSE,
             LICENSEUPDATE,
