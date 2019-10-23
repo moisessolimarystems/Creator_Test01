@@ -32,6 +32,10 @@
 <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
 <enum name="pid_XIMAGEpdf" value="21" alias="XIMAGEPDF_PRODUCT"/>
 <enum name="pid_SolimarUtilities" value="22" alias="SOLIMARUTILITIES_PRODUCT"/>
+<enum name="pid_RubikaPLP" value="23" alias="RUBIKA_PLP_PRODUCT"/>
+<enum name="pid_SolimarIndexingToolsPLP" value="24" alias="SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
+<enum name="pid_ReadyPDFServer" value="25" alias="READYPDF_PRODUCT"/>
+<enum name="pid_IPPServer" value="26" alias="IPPSERVER_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -128,7 +132,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="64">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="65">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -431,7 +435,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="FRM Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="25"/>
     </Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-  <Lic_ProductSoftwareSpecAttribs productID="22" productName="Solimar Utilities" productLicType="pltClient">
+    <Lic_ProductSoftwareSpecAttribs productID="22" productName="Solimar Utilities" productLicType="pltClient">
     <Lic_ModuleSoftwareSpecAttribsMap>
       <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Solimar Compiler" modUnlimitedValue="1"/>
     </Lic_ModuleSoftwareSpecAttribsMap>
@@ -483,17 +487,48 @@
       <Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="PLP" moduleVersionIntroduced_Major="4" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="52"/>	    
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-  <Lic_ProductSoftwareSpecAttribs productID="24" productName="Solimar Indexing Tools PLP">
-    <Lic_ModuleSoftwareSpecAttribsMap>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances" moduleVersionIntroduced_SubMinor="54"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Solimar Redaction Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Solimar Accessibility Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Index Engine Instances PLP" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Solimar Redaction Engine PLP"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Solimar Accessibility Engine PLP"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>      
-    </Lic_ModuleSoftwareSpecAttribsMap>
-  </Lic_ProductSoftwareSpecAttribs>  
+    <Lic_ProductSoftwareSpecAttribs productID="24" productName="Solimar Indexing Tools PLP">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances" moduleVersionIntroduced_SubMinor="54"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Solimar Redaction Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Solimar Accessibility Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="Index Engine Instances PLP" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="102" moduleName="Solimar Redaction Engine PLP"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="103" moduleName="Solimar Accessibility Engine PLP"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="55"/>      
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>  
+	<Lic_ProductSoftwareSpecAttribs productID="25" productName="ReadyPDF Server">
+		<Lic_ModuleSoftwareSpecAttribsMap>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Data Converter" modUnlimitedValue="1" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Disk Spooler" modUnlimitedValue="1" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="File Inserter" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="PDF::PostScript" modUnlimitedValue="1"/>											
+			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>		
+			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="33"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="62" moduleName="Coverage Calculator" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="58"/>             
+			<Lic_ModuleSoftwareSpecAttribs moduleID="63" moduleName="ReadyPDF Optimization" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="62"/>  
+      <!-- Module IDs identifying resources -->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="Adobe Normalizer" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="34"/>				
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>
+	<Lic_ProductSoftwareSpecAttribs productID="26" productName="IPP Server">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Data Converter" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="File Inserter" modUnlimitedValue="1" />							
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>				
+			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Output Selector" modUnlimitedValue="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="TCP/IP Input" modUnlimitedValue="1" moduleDefaultLicense="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="TCP/IP Output" modUnlimitedValue="1" moduleDefaultLicense="1"/>	
+			<!-- Module IDs identifying hardware -->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="111" moduleName="IPP Input" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="61"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="112" moduleName="IPP Output" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="61"/>
+			<!-- Output Pool module -->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" moduleDefaultLicense="10"/>		
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -526,6 +561,12 @@
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="123" productName="Test/Dev/DR Rubika PLP" sameModSpecProductID="23">
   </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="124" productName="Test/Dev/DR Solimar Indexing Tools PLP" sameModSpecProductID="24">
+  </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="125" productName="Test/Dev/DR ReadyPDF Server" sameModSpecProductID="25">
+  </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="126" productName="Test/Dev/DR IPP Server" sameModSpecProductID="26">
+  </Lic_ProductSoftwareSpecAttribs>  
 </Lic_SoftwareSpecAttribs>
 
 
