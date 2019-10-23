@@ -41,7 +41,9 @@ namespace SolimarLicenseViewer
             EVENTLOG,
             XIMAGEPDF,
             EMAILALERTS,
-            SOLIMARUTILITIES
+            SOLIMARUTILITIES,
+            READYPDFSERVER,
+            IPPSERVER
         }
 
 

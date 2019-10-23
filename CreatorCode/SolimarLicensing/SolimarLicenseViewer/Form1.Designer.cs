@@ -90,15 +90,17 @@ namespace SolimarLicenseViewer
             this.remoteConnectToolStripMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
-            this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
             this.remoteSvrToolStrip = new System.Windows.Forms.ToolStrip();
             this.remoteSvrTSLabel = new System.Windows.Forms.ToolStripLabel();
+            this.diagnosticDataToolStrip = new System.Windows.Forms.ToolStrip();
+            this.diagnosticDataTSLabel = new System.Windows.Forms.ToolStripLabel();
             this.testConnBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.formSplitContainer)).BeginInit();
             this.formSplitContainer.Panel1.SuspendLayout();
             this.formSplitContainer.Panel2.SuspendLayout();
             this.formSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.infoSplitContainer)).BeginInit();
             this.infoSplitContainer.Panel1.SuspendLayout();
             this.infoSplitContainer.Panel2.SuspendLayout();
             this.infoSplitContainer.SuspendLayout();
@@ -107,8 +109,8 @@ namespace SolimarLicenseViewer
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
-            this.diagnosticDataToolStrip.SuspendLayout();
             this.remoteSvrToolStrip.SuspendLayout();
+            this.diagnosticDataToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -199,6 +201,8 @@ namespace SolimarLicenseViewer
             this.productIconList.Images.SetKeyName(25, "XIMAGEpdf.ico");
             this.productIconList.Images.SetKeyName(26, "AlertEmail16x16.png");
             this.productIconList.Images.SetKeyName(27, "SolimarUtilities16.png");
+            this.productIconList.Images.SetKeyName(28, "SPD.ico");
+            this.productIconList.Images.SetKeyName(29, "SPD.ico");
             // 
             // infoSplitContainer
             // 
@@ -658,26 +662,8 @@ namespace SolimarLicenseViewer
             // toolStripContainer1.TopToolStripPanel
             // 
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.menuStrip1);
-            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.remoteSvrToolStrip);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.diagnosticDataToolStrip);
-            // 
-            // diagnosticDataToolStrip
-            // 
-            this.diagnosticDataToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.diagnosticDataToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.diagnosticDataTSLabel});
-            this.diagnosticDataToolStrip.Location = new System.Drawing.Point(3, 24);
-            this.diagnosticDataToolStrip.Name = "diagnosticDataToolStrip";
-            this.diagnosticDataToolStrip.Size = new System.Drawing.Size(105, 25);
-            this.diagnosticDataToolStrip.TabIndex = 2;
-            this.diagnosticDataToolStrip.Visible = false;
-            // 
-            // diagnosticDataTSLabel
-            // 
-            this.diagnosticDataTSLabel.Name = "diagnosticDataTSLabel";
-            this.diagnosticDataTSLabel.Size = new System.Drawing.Size(93, 22);
-            this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
-            this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.remoteSvrToolStrip);
             // 
             // remoteSvrToolStrip
             // 
@@ -696,6 +682,24 @@ namespace SolimarLicenseViewer
             this.remoteSvrTSLabel.Size = new System.Drawing.Size(158, 22);
             this.remoteSvrTSLabel.Text = "Remove Server Connections:";
             this.remoteSvrTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // diagnosticDataToolStrip
+            // 
+            this.diagnosticDataToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.diagnosticDataToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.diagnosticDataTSLabel});
+            this.diagnosticDataToolStrip.Location = new System.Drawing.Point(3, 24);
+            this.diagnosticDataToolStrip.Name = "diagnosticDataToolStrip";
+            this.diagnosticDataToolStrip.Size = new System.Drawing.Size(105, 25);
+            this.diagnosticDataToolStrip.TabIndex = 2;
+            this.diagnosticDataToolStrip.Visible = false;
+            // 
+            // diagnosticDataTSLabel
+            // 
+            this.diagnosticDataTSLabel.Name = "diagnosticDataTSLabel";
+            this.diagnosticDataTSLabel.Size = new System.Drawing.Size(93, 22);
+            this.diagnosticDataTSLabel.Text = "Diagnostic Data:";
+            this.diagnosticDataTSLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // testConnBackgroundWorker
             // 
@@ -723,11 +727,13 @@ namespace SolimarLicenseViewer
             this.statusStrip1.PerformLayout();
             this.formSplitContainer.Panel1.ResumeLayout(false);
             this.formSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.formSplitContainer)).EndInit();
             this.formSplitContainer.ResumeLayout(false);
             this.infoSplitContainer.Panel1.ResumeLayout(false);
             this.infoSplitContainer.Panel1.PerformLayout();
             this.infoSplitContainer.Panel2.ResumeLayout(false);
             this.infoSplitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.infoSplitContainer)).EndInit();
             this.infoSplitContainer.ResumeLayout(false);
             this.lvContextMenuStrip.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
@@ -737,10 +743,10 @@ namespace SolimarLicenseViewer
             this.toolStripContainer1.TopToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
-            this.diagnosticDataToolStrip.ResumeLayout(false);
-            this.diagnosticDataToolStrip.PerformLayout();
             this.remoteSvrToolStrip.ResumeLayout(false);
             this.remoteSvrToolStrip.PerformLayout();
+            this.diagnosticDataToolStrip.ResumeLayout(false);
+            this.diagnosticDataToolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
