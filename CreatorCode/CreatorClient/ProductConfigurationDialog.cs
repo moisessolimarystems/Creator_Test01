@@ -61,10 +61,13 @@ namespace Client.Creator
                 IList<ProductTable> products = client.GetProducts();
                 foreach (ProductTable product in products)
                 {
-                    if (!product.pName.Contains("Test") && commLink.GetProductName((byte)product.pId) != "Unknown")
+                    if (!product.pName.Contains("Test") &&
+                        !product.pName.Contains("PLP") &&
+                        commLink.GetProductName((byte)product.pId) != "Unknown")
                     {
                         version = new LicenseVersion(product.pVersion);
-                        productList.Add(new ProductContainer(product.pName, version, StaticImageList.Instance.GlobalImageList.Images[Enums.GetIconIndex(commLink.GetProductName((byte)product.pId))]));
+                        productList.Add(new ProductContainer(product.pName, version, 
+                                                             StaticImageList.Instance.GlobalImageList.Images[Enums.GetIconIndex(commLink.GetProductName((byte)product.pId))]));
                     }
                 }
             });            
