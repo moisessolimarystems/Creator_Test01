@@ -50,6 +50,10 @@ public:
 		pid_LibraryServices = 20,
 		pid_XIMAGEpdf = 21,
 		pid_SolimarUtilities = 22,
+		pid_RubikaPLP = 23,
+		pid_SolimarIndexingToolsPLP = 24,
+		pid_ReadyPDFServer = 25,
+		pid_IPPServer = 26,
 		pid_TestDevIconvert = 107,
 		pid_TestDevSolsearcherEp = 108,
 		pid_TestDevSolScript = 109,
@@ -65,6 +69,10 @@ public:
 		pid_TestDevLibraryServices = 120,
 		pid_TestDevXIMAGEpdf = 121,
 		pid_TestDevSolimarUtilities = 122,
+		pid_TestDevRubikaPLP = 123,
+		pid_TestDevSolimarIndexingToolsPLP = 124,
+		pid_TestDevReadyPDFServer = 125,
+		pid_TestDevIPPServer = 126,
 		pid_UnknownProduct = 0xFFFF,
 	} TLic_ProductID;
 	

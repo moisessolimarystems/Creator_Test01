@@ -107,6 +107,10 @@
       <enum name="pid_LibraryServices" value="20" alias="LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_XIMAGEpdf" value="21" alias="XIMAGEPDF_PRODUCT"/>
       <enum name="pid_SolimarUtilities" value="22" alias="SOLIMARUTILITIES_PRODUCT"/>
+	  <enum name="pid_RubikaPLP" value="23" alias="RUBIKA_PLP_PRODUCT"/>
+	  <enum name="pid_SolimarIndexingToolsPLP" value="24" alias="SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
+	  <enum name="pid_ReadyPDFServer" value="25" alias="READYPDF_PRODUCT"/>
+	  <enum name="pid_IPPServer" value="26" alias="IPPSERVER_PRODUCT"/>	  
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -122,8 +126,12 @@
       <enum name="pid_TestDevLibraryServices" value="120" alias="TEST_DEV_LIBRARY_SERVICES_PRODUCT"/>
       <enum name="pid_TestDevXIMAGEpdf" value="121" alias="TEST_DEV_XIMAGEPDF_PRODUCT"/>
       <enum name="pid_TestDevSolimarUtilities" value="122" alias="TEST_DEV_SOLIMARUTILITIES_PRODUCT"/>
+	  <enum name="pid_TestDevRubikaPLP" value="123" alias="TEST_DEV_RUBIKA_PLP_PRODUCT"/>
+	  <enum name="pid_TestDevSolimarIndexingToolsPLP" value="124" alias="TEST_DEV_SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
+	  <enum name="pid_TestDevReadyPDFServer" value="125" alias="TEST_DEV_READYPDF_PRODUCT"/>
+	  <enum name="pid_TestDevIPPServer" value="126" alias="TEST_DEV_IPPSERVER_PRODUCT"/>	 	  
       <!-- Dont include, these typedefs can never change, not sure what this is...
-			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
+			<enum name="pid_NumberOfProducts" value="27" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 		</typedef>
@@ -163,6 +171,7 @@
 			<attrib type="unsigned __int32" name="sameModSpecProductID" tagname="sMSpPI" default="0"/>
 			<attrib type="unsigned __int32" name="prevSharedProductID" tagname="pSPI" default="0"/>
 			<attrib type="string" name="productName" tagname="pN" default=""/>
+			<attrib type="string" name="productLabel" tagname="pL" default=""/>			
 			<attrib type="unsigned __int32" name="softwareSpec_Major" tagname="vMj" default="0"/>
 			<attrib type="unsigned __int32" name="softwareSpec_Minor" tagname="vMn" default="0"/>
 			<attrib type="unsigned __int32" name="softwareSpec_SubMajor" tagname="vSMj" default="0"/>
