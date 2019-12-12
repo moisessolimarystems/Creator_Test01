@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Thu Oct 24 17:21:19 2019
+/* at Thu Dec 12 14:45:24 2019
  */
 /* Compiler settings for _SolimarLicenseManager.idl:
     Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 7.00.0555 
@@ -112,7 +112,6 @@ typedef struct CSolimarLicenseMgr CSolimarLicenseMgr;
 
 
 /* header files for imported files */
-#include "prsht.h"
 #include "mshtml.h"
 #include "mshtmhst.h"
 #include "exdisp.h"
