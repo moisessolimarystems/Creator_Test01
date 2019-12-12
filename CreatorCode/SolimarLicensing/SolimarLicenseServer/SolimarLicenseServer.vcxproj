@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -34,37 +34,37 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v110_xp</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <UseOfAtl>Static</UseOfAtl>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -276,7 +276,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -296,7 +296,7 @@
 /NODEFAULTLIB:libcd.lib
 /NODEFAULTLIB:libcmtd.lib
 /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -343,7 +343,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -364,7 +364,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
 /NODEFAULTLIB:libcd.lib
 /NODEFAULTLIB:libcmtd.lib
 /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -405,7 +405,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -425,7 +425,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
 /NODEFAULTLIB:libcd.lib
 /NODEFAULTLIB:libcmtd.lib
 /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -469,7 +469,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_WIN32_WINNT 0x0400;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -489,7 +489,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
 /NODEFAULTLIB:libcd.lib
 /NODEFAULTLIB:libcmtd.lib
 /NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
       <GenerateDebugInformation>true</GenerateDebugInformation>
