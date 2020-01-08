@@ -132,7 +132,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="67">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="68">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -504,8 +504,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Data Converter" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Disk Spooler" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="File Inserter" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="PDF::PostScript" modUnlimitedValue="1"/>											
+			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>				
+			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::PostScript(PDFL)" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>		
 			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="33"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="62" moduleName="Coverage Calculator" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="58"/>             

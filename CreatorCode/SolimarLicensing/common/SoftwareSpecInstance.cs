@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 67;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 68;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -279,25 +279,6 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 17;
-			tmpModSpec.moduleName.TVal = "PDF::PostScript";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 46;
 			tmpModSpec.moduleName.TVal = "PDF::TIFF(PDFL)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
@@ -317,18 +298,18 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 57;
-			tmpModSpec.moduleName.TVal = "PostScript::PDF(Normalizer)";
+			tmpModSpec.moduleID.TVal = 44;
+			tmpModSpec.moduleName.TVal = "PDF::PostScript(PDFL)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 0;
 			tmpModSpec.bModuleIsCounter.TVal = false;
 			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 1;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 33;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -443,6 +424,25 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 57;
+			tmpModSpec.moduleName.TVal = "PostScript::PDF(Normalizer)";
+			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 1;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 33;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;

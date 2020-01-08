@@ -224,13 +224,6 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleDefaultLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(17, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(17))->second);
-	pTmpModSpec->moduleID = 17;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(46, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(46))->second);
 	pTmpModSpec->moduleID = 46;
@@ -238,15 +231,12 @@ void InititalizeProduct25()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(57, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(57))->second);
-	pTmpModSpec->moduleID = 57;
-	pTmpModSpec->moduleName = std::wstring(L"PostScript::PDF(Normalizer)");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(44, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(44))->second);
+	pTmpModSpec->moduleID = 44;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(PDFL)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 33;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(62, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(62))->second);
@@ -300,6 +290,16 @@ void InititalizeProduct25()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(57, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(57))->second);
+	pTmpModSpec->moduleID = 57;
+	pTmpModSpec->moduleName = std::wstring(L"PostScript::PDF(Normalizer)");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 8;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 33;
 }
 
 void InititalizeProduct26()
