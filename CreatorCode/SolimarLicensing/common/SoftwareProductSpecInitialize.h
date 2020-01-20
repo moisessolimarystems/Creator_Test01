@@ -338,6 +338,17 @@ void InititalizeProduct26()
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(112, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(112))->second);
+	pTmpModSpec->moduleID = 112;
+	pTmpModSpec->moduleName = std::wstring(L"IPP Output");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 8;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 61;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(111, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(111))->second);
 	pTmpModSpec->moduleID = 111;
@@ -371,16 +382,13 @@ void InititalizeProduct26()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(112, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(112))->second);
-	pTmpModSpec->moduleID = 112;
-	pTmpModSpec->moduleName = std::wstring(L"IPP Output");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(6, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(6))->second);
+	pTmpModSpec->moduleID = 6;
+	pTmpModSpec->moduleName = std::wstring(L"Disk Spooler");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 61;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(8, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(8))->second);

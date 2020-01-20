@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 68;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 69;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -514,6 +514,25 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 112;
+			tmpModSpec.moduleName.TVal = "IPP Output";
+			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 1;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 3;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 61;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 111;
 			tmpModSpec.moduleName.TVal = "IPP Input";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
@@ -590,18 +609,18 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 112;
-			tmpModSpec.moduleName.TVal = "IPP Output";
+			tmpModSpec.moduleID.TVal = 6;
+			tmpModSpec.moduleName.TVal = "Disk Spooler";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
 			tmpModSpec.moduleDefaultLicense.TVal = 1;
 			tmpModSpec.bModuleIsCounter.TVal = false;
 			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 3;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 61;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
