@@ -19,7 +19,12 @@ namespace SolimarLicenseViewer
         public void SetData(ConnectionSettings2[] _connSettingsArray, string _caption)
         {
             this.Text = _caption;
+            foreach(var setting in _connSettingsArray)
+            {
+                setting.IsDirty = false;
+            }
             singleProdPropertyGrid.SelectedObjects = _connSettingsArray;
+            
         }
         public ConnectionSettings2[] GetData( )
         {
