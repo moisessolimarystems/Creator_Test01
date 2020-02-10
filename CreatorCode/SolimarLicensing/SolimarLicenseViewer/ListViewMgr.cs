@@ -2030,16 +2030,24 @@ namespace SolimarLicenseViewer
 
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
+                    bool IsConnectionsDirty = false;
                     foreach (ConnectionSettings2 connSettings in dialog.GetData())
                     {
                         if (connSettings.IsDirty)
                         {
+                            IsConnectionsDirty = connSettings.IsDirty;
                             UpdateProdConnListView(connSettings);
                             m_connSettingsHelper.SetConnectionSetting(connSettings.ProductID, connSettings);
                         }
                     }
+                    if (IsConnectionsDirty)
+                    {
+                        string warningCaption = (objList.Count > 1) ?
+                            "The new product connection settings will not take effect until each selected product is restarted. If any selected product is running as a service, the service will need to be restarted." :
+                            string.Format("The new product connection settings will not take effect until {0} is restarted. If {0} is running as a service, the service will need to be restarted.", m_CommLink.GetProductName(objList[0].ProductID));
+                        MessageBox.Show(warningCaption, "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                 }
-
             }
         }
         private void prodConn_KeyDown(object sender, KeyEventArgs e)
