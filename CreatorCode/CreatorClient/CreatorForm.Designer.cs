@@ -276,6 +276,11 @@
             // MainMenuStrip
             // 
             this.MainMenuStrip.BackColor = System.Drawing.SystemColors.Control;
+            this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.toolsToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.helpToolStripMenuItem});
             this.MainMenuStrip.Location = new System.Drawing.Point(0, 0);
             this.MainMenuStrip.Name = "MainMenuStrip";
             this.MainMenuStrip.Size = new System.Drawing.Size(989, 24);
