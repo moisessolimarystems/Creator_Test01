@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 70;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 71;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -234,10 +234,10 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:25, ProdName: ReadyPDF Server
+			#region ProdID:25, ProdName: SPDE Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 25;
-			tmpProdSpec.productName.TVal = "ReadyPDF Server";
+			tmpProdSpec.productName.TVal = "SPDE Essentials";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
@@ -443,203 +443,6 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 1;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 33;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-			#endregion
-			
-			#region ProdID:26, ProdName: IPP Server
-			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 26;
-			tmpProdSpec.productName.TVal = "IPP Server";
-			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 13;
-			tmpModSpec.moduleName.TVal = "Output Selector";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 31;
-			tmpModSpec.moduleName.TVal = "TCP/IP Output";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 30;
-			tmpModSpec.moduleName.TVal = "TCP/IP Input";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 112;
-			tmpModSpec.moduleName.TVal = "IPP Output";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 3;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 61;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 111;
-			tmpModSpec.moduleName.TVal = "IPP Input";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 8;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 3;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 61;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 5;
-			tmpModSpec.moduleName.TVal = "Data Converter";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 240;
-			tmpModSpec.moduleName.TVal = "Output Pool";
-			tmpModSpec.modUnlimitedValue.TVal = 0;
-			tmpModSpec.moduleTrialLicense.TVal = 127;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 10;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = true;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 7;
-			tmpModSpec.moduleName.TVal = "File Inserter";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 0;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 6;
-			tmpModSpec.moduleName.TVal = "Disk Spooler";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
-			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
-
-			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 8;
-			tmpModSpec.moduleName.TVal = "Queue Reader";
-			tmpModSpec.modUnlimitedValue.TVal = 1;
-			tmpModSpec.moduleTrialLicense.TVal = 1;
-			tmpModSpec.modulePoolModuleID.TVal = 0;
-			tmpModSpec.moduleDefaultLicense.TVal = 1;
-			tmpModSpec.bModuleIsCounter.TVal = false;
-			tmpModSpec.bModuleIsPool.TVal = false;
-			tmpModSpec.moduleVersionIntroduced_Major.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -2523,19 +2326,11 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:125, ProdName: Test/Dev/DR ReadyPDF Server
+			#region ProdID:125, ProdName: Test/Dev/DR SPDE Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 125;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR ReadyPDF Server";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Essentials";
 			tmpProdSpec.sameModSpecProductID.TVal = 25;
-			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
-			#endregion
-			
-			#region ProdID:126, ProdName: Test/Dev/DR IPP Server
-			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
-			tmpProdSpec.productID.TVal = 126;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR IPP Server";
-			tmpProdSpec.sameModSpecProductID.TVal = 26;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
