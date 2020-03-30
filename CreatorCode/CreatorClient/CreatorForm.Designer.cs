@@ -221,6 +221,7 @@
             this.customerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
@@ -335,7 +336,7 @@
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             this.toolsToolStripMenuItem.DropDownOpening += new System.EventHandler(this.toolsToolStripMenuItem_DropDownOpening);
             // 
@@ -761,37 +762,36 @@
             this.CreatorImageList.Images.SetKeyName(14, "LibraryServices.ico");
             this.CreatorImageList.Images.SetKeyName(15, "XIMAGEpdf.ico");
             this.CreatorImageList.Images.SetKeyName(16, "SolimarUtilities.ico");
-            this.CreatorImageList.Images.SetKeyName(17, "SPD.ico");
-            this.CreatorImageList.Images.SetKeyName(18, "SPD.ico");
-            this.CreatorImageList.Images.SetKeyName(19, "Customer.ico");
-            this.CreatorImageList.Images.SetKeyName(20, "License.ico");
-            this.CreatorImageList.Images.SetKeyName(21, "LicenseUpdate.ico");
-            this.CreatorImageList.Images.SetKeyName(22, "LicenseDisabled.ico");
-            this.CreatorImageList.Images.SetKeyName(23, "LicenseDeactivated.ico");
-            this.CreatorImageList.Images.SetKeyName(24, "Order.ico");
-            this.CreatorImageList.Images.SetKeyName(25, "AppInstance.ico");
-            this.CreatorImageList.Images.SetKeyName(26, "Empty.ico");
-            this.CreatorImageList.Images.SetKeyName(27, "pass64.ico");
-            this.CreatorImageList.Images.SetKeyName(28, "fail64.ico");
-            this.CreatorImageList.Images.SetKeyName(29, "Explorer-32.png");
-            this.CreatorImageList.Images.SetKeyName(30, "Notepad-32.png");
-            this.CreatorImageList.Images.SetKeyName(31, "Dropbox-32.png");
-            this.CreatorImageList.Images.SetKeyName(32, "my computer-32.png");
-            this.CreatorImageList.Images.SetKeyName(33, "ttHardwareKeyID.ico");
-            this.CreatorImageList.Images.SetKeyName(34, "ttMacAddress.png");
-            this.CreatorImageList.Images.SetKeyName(35, "Bios-32.png");
-            this.CreatorImageList.Images.SetKeyName(36, "File-server-32.png");
-            this.CreatorImageList.Images.SetKeyName(37, "Windows-32.png");
-            this.CreatorImageList.Images.SetKeyName(38, "ttPartOfDomain.png");
-            this.CreatorImageList.Images.SetKeyName(39, "server-32.png");
-            this.CreatorImageList.Images.SetKeyName(40, "server-Vista_32.png");
-            this.CreatorImageList.Images.SetKeyName(41, "FileServer-Drive_32.png");
-            this.CreatorImageList.Images.SetKeyName(42, "Hard-Drive-blue-32.png");
-            this.CreatorImageList.Images.SetKeyName(43, "ttLicenseCode.png");
-            this.CreatorImageList.Images.SetKeyName(44, "Module.ico");
-            this.CreatorImageList.Images.SetKeyName(45, "ValidationTokens.png");
-            this.CreatorImageList.Images.SetKeyName(46, "Custom-reports-32.png");
-            this.CreatorImageList.Images.SetKeyName(47, "Unknown.ico");
+            this.CreatorImageList.Images.SetKeyName(17, "SPDE-Essentials.ico");
+            this.CreatorImageList.Images.SetKeyName(18, "Customer.ico");
+            this.CreatorImageList.Images.SetKeyName(19, "License.ico");
+            this.CreatorImageList.Images.SetKeyName(20, "LicenseUpdate.ico");
+            this.CreatorImageList.Images.SetKeyName(21, "LicenseDisabled.ico");
+            this.CreatorImageList.Images.SetKeyName(22, "LicenseDeactivated.ico");
+            this.CreatorImageList.Images.SetKeyName(23, "Order.ico");
+            this.CreatorImageList.Images.SetKeyName(24, "AppInstance.ico");
+            this.CreatorImageList.Images.SetKeyName(25, "Empty.ico");
+            this.CreatorImageList.Images.SetKeyName(26, "pass64.ico");
+            this.CreatorImageList.Images.SetKeyName(27, "fail64.ico");
+            this.CreatorImageList.Images.SetKeyName(28, "Explorer-32.png");
+            this.CreatorImageList.Images.SetKeyName(29, "Notepad-32.png");
+            this.CreatorImageList.Images.SetKeyName(30, "Dropbox-32.png");
+            this.CreatorImageList.Images.SetKeyName(31, "my computer-32.png");
+            this.CreatorImageList.Images.SetKeyName(32, "ttHardwareKeyID.ico");
+            this.CreatorImageList.Images.SetKeyName(33, "ttMacAddress.png");
+            this.CreatorImageList.Images.SetKeyName(34, "Bios-32.png");
+            this.CreatorImageList.Images.SetKeyName(35, "File-server-32.png");
+            this.CreatorImageList.Images.SetKeyName(36, "Windows-32.png");
+            this.CreatorImageList.Images.SetKeyName(37, "ttPartOfDomain.png");
+            this.CreatorImageList.Images.SetKeyName(38, "server-32.png");
+            this.CreatorImageList.Images.SetKeyName(39, "server-Vista_32.png");
+            this.CreatorImageList.Images.SetKeyName(40, "FileServer-Drive_32.png");
+            this.CreatorImageList.Images.SetKeyName(41, "Hard-Drive-blue-32.png");
+            this.CreatorImageList.Images.SetKeyName(42, "ttLicenseCode.png");
+            this.CreatorImageList.Images.SetKeyName(43, "Module.ico");
+            this.CreatorImageList.Images.SetKeyName(44, "ValidationTokens.png");
+            this.CreatorImageList.Images.SetKeyName(45, "Custom-reports-32.png");
+            this.CreatorImageList.Images.SetKeyName(46, "Unknown.ico");
             // 
             // findToolStrip
             // 
@@ -1675,28 +1675,28 @@
             // lsReportToolStripMenuItem
             // 
             this.lsReportToolStripMenuItem.Name = "lsReportToolStripMenuItem";
-            this.lsReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.lsReportToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.lsReportToolStripMenuItem.Text = "License Server Report";
             this.lsReportToolStripMenuItem.Click += new System.EventHandler(this.lsReportToolStripMenuItem_Click);
             // 
             // plReportToolStripMenuItem
             // 
             this.plReportToolStripMenuItem.Name = "plReportToolStripMenuItem";
-            this.plReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.plReportToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.plReportToolStripMenuItem.Text = "Product License Report";
             this.plReportToolStripMenuItem.Click += new System.EventHandler(this.plReportToolStripMenuItem_Click);
             // 
             // hardwareTokenReportToolStripMenuItem
             // 
             this.hardwareTokenReportToolStripMenuItem.Name = "hardwareTokenReportToolStripMenuItem";
-            this.hardwareTokenReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.hardwareTokenReportToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.hardwareTokenReportToolStripMenuItem.Text = "Hardware Token Report";
             this.hardwareTokenReportToolStripMenuItem.Click += new System.EventHandler(this.hardwareTokenReportToolStripMenuItem_Click);
             // 
             // licensePacketReportToolStripMenuItem
             // 
             this.licensePacketReportToolStripMenuItem.Name = "licensePacketReportToolStripMenuItem";
-            this.licensePacketReportToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
+            this.licensePacketReportToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
             this.licensePacketReportToolStripMenuItem.Text = "License Packet Report";
             this.licensePacketReportToolStripMenuItem.Click += new System.EventHandler(this.licensePacketReportToolStripMenuItem_Click);
             // 
@@ -2031,13 +2031,13 @@
             // verifiedToolStripMenuItem
             // 
             this.verifiedToolStripMenuItem.Name = "verifiedToolStripMenuItem";
-            this.verifiedToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.verifiedToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.verifiedToolStripMenuItem.Text = "Verified ";
             // 
             // unVerifiedToolStripMenuItem
             // 
             this.unVerifiedToolStripMenuItem.Name = "unVerifiedToolStripMenuItem";
-            this.unVerifiedToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
+            this.unVerifiedToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.unVerifiedToolStripMenuItem.Text = "UnVerified";
             // 
             // validationTokensToolStripMenuItem
@@ -2172,6 +2172,8 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CreatorForm_FormClosing);
             this.Load += new System.EventHandler(this.CreatorForm_Load);
             this.Shown += new System.EventHandler(this.connectToolStripMenuItem_Click);
+            this.MainMenuStrip.ResumeLayout(false);
+            this.MainMenuStrip.PerformLayout();
             this.MainToolStrip.ResumeLayout(false);
             this.MainToolStrip.PerformLayout();
             this.LicenseViewPanel.ResumeLayout(false);
