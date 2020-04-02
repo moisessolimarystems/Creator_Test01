@@ -109,8 +109,7 @@
       <enum name="pid_SolimarUtilities" value="22" alias="SOLIMARUTILITIES_PRODUCT"/>
 	  <enum name="pid_RubikaPLP" value="23" alias="RUBIKA_PLP_PRODUCT"/>
 	  <enum name="pid_SolimarIndexingToolsPLP" value="24" alias="SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
-	  <enum name="pid_ReadyPDFServer" value="25" alias="READYPDF_PRODUCT"/>
-	  <enum name="pid_IPPServer" value="26" alias="IPPSERVER_PRODUCT"/>	  
+	  <enum name="pid_SpdeEssentials" value="25" alias="SPDE_ESSENTIALS_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -128,8 +127,7 @@
       <enum name="pid_TestDevSolimarUtilities" value="122" alias="TEST_DEV_SOLIMARUTILITIES_PRODUCT"/>
 	  <enum name="pid_TestDevRubikaPLP" value="123" alias="TEST_DEV_RUBIKA_PLP_PRODUCT"/>
 	  <enum name="pid_TestDevSolimarIndexingToolsPLP" value="124" alias="TEST_DEV_SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
-	  <enum name="pid_TestDevReadyPDFServer" value="125" alias="TEST_DEV_READYPDF_PRODUCT"/>
-	  <enum name="pid_TestDevIPPServer" value="126" alias="TEST_DEV_IPPSERVER_PRODUCT"/>	 	  
+	  <enum name="pid_TestDevSpdeEssentials" value="125" alias="TEST_DEV_SPDE_ESSENTIALS_PRODUCT"/> 	  
       <!-- Dont include, these typedefs can never change, not sure what this is...
 			<enum name="pid_NumberOfProducts" value="27" alias="NUMBER_OF_PRODUCTS"/>
 			-->
