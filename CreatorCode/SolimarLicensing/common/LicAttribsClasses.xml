@@ -127,9 +127,9 @@
       <enum name="pid_TestDevSolimarUtilities" value="122" alias="TEST_DEV_SOLIMARUTILITIES_PRODUCT"/>
 	  <enum name="pid_TestDevRubikaPLP" value="123" alias="TEST_DEV_RUBIKA_PLP_PRODUCT"/>
 	  <enum name="pid_TestDevSolimarIndexingToolsPLP" value="124" alias="TEST_DEV_SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
-	  <enum name="pid_TestDevSpdeEssentials" value="125" alias="TEST_DEV_SPDE_ESSENTIALS_PRODUCT"/>
+	  <enum name="pid_TestDevSpdeEssentials" value="125" alias="TEST_DEV_SPDE_ESSENTIALS_PRODUCT"/> 	  
       <!-- Dont include, these typedefs can never change, not sure what this is...
-			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
+			<enum name="pid_NumberOfProducts" value="27" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 		</typedef>
@@ -169,7 +169,7 @@
 			<attrib type="unsigned __int32" name="sameModSpecProductID" tagname="sMSpPI" default="0"/>
 			<attrib type="unsigned __int32" name="prevSharedProductID" tagname="pSPI" default="0"/>
 			<attrib type="string" name="productName" tagname="pN" default=""/>
-			<attrib type="string" name="productLabel" tagname="pL" default=""/>
+			<attrib type="string" name="productLabel" tagname="pL" default=""/>			
 			<attrib type="unsigned __int32" name="softwareSpec_Major" tagname="vMj" default="0"/>
 			<attrib type="unsigned __int32" name="softwareSpec_Minor" tagname="vMn" default="0"/>
 			<attrib type="unsigned __int32" name="softwareSpec_SubMajor" tagname="vSMj" default="0"/>
@@ -596,23 +596,6 @@
 		</typedef>
 		<attrib type="Lic_ServicesInfoAttribsList" name="servicesList" tagname="sLt" default="" />
 	</AttribsClass>
-	
-	<!--CR.FIX.19025-->
-	<AttribsClass code_class_name="Lic_ClientSettingsAttribs" name="L_csA" descriptive_name="Client Settings Attributes" base="" filename="Lic_ClientSettingsAttribs">
-		<typedef type="class" name="Lic_ProductConnectionAttribs">
-		<AttribsClass code_class_name="Lic_ProductConnectionAttribs" name="L_pcA" descriptive_name="Product Connection Attributes" base="">
-			<attrib type="unsigned __int32" name="productID" tagname="pI" default="0"/>
-			<attrib type="string" name="serverName" tagname="sn" default="" />
-			<attrib type="string" name="backupServerName" tagname="bsn" default="" />
-			<attrib type="bool" name="bTestDev" tagname="bTd" default="false" />
-			<attrib type="bool" name="bInstalled" tagname="bI" default="false" />
-		</AttribsClass>
-		</typedef>
-		<typedef type="collection" name="Lic_ProductConnectionAttribsList">
-			<List value_type="Lic_ProductConnectionAttribs"/>
-		</typedef>
-		<attrib type="Lic_ProductConnectionAttribsList" name="prodConnList" tagname="pcLt" default="" />
-	</AttribsClass>
 
 	<AttribsClass code_class_name="Lic_LicenseSystemAttribs" name="L_LcSysA" descriptive_name="License System Attributes" base="" filename="Lic_LicenseSystemAttribs">
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
@@ -622,7 +605,6 @@
 		<attrib type="string" name="Streamed_UsageInfoAttribs" tagname="sU" default="" />
 		<attrib type="string" name="Streamed_SystemEventLogInfoAttribs" tagname="sE" default="" />
 		<attrib type="string" name="Streamed_RunningProcessesInfoAttribs" tagname="rP" default="" />
-		<attrib type="string" name="Streamed_ClientSettingsAttribs" tagname="cS" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>
