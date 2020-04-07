@@ -208,33 +208,90 @@ void InititalizeProduct25()
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(203, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(203))->second);
-	pTmpModSpec->moduleID = 203;
-	pTmpModSpec->moduleName = std::wstring(L"Adobe Normalizer");
-	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 34;
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(67, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(67))->second);
+	pTmpModSpec->moduleID = 67;
+	pTmpModSpec->moduleName = std::wstring(L"Job Ticket Inserter");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(13, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(13))->second);
+	pTmpModSpec->moduleID = 13;
+	pTmpModSpec->moduleName = std::wstring(L"Output Selector");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(202, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(202))->second);
 	pTmpModSpec->moduleID = 202;
 	pTmpModSpec->moduleName = std::wstring(L"PDF Interpreter(PDFL)");
 	pTmpModSpec->moduleTrialLicense = 127;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(59, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(59))->second);
+	pTmpModSpec->moduleID = 59;
+	pTmpModSpec->moduleName = std::wstring(L"Emulation Selector");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(46, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(46))->second);
-	pTmpModSpec->moduleID = 46;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::TIFF(PDFL)");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(57, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(57))->second);
+	pTmpModSpec->moduleID = 57;
+	pTmpModSpec->moduleName = std::wstring(L"PostScript::PDF(Normalizer)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(44, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(44))->second);
-	pTmpModSpec->moduleID = 44;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(PDFL)");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(66, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(66))->second);
+	pTmpModSpec->moduleID = 66;
+	pTmpModSpec->moduleName = std::wstring(L"Job Ticket Extractor");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(19, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(19))->second);
+	pTmpModSpec->moduleID = 19;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::TIFF");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(32, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(32))->second);
+	pTmpModSpec->moduleID = 32;
+	pTmpModSpec->moduleName = std::wstring(L"Trash Can");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(31, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(31))->second);
+	pTmpModSpec->moduleID = 31;
+	pTmpModSpec->moduleName = std::wstring(L"TCP/IP Output");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(30, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(30))->second);
+	pTmpModSpec->moduleID = 30;
+	pTmpModSpec->moduleName = std::wstring(L"TCP/IP Input");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(112, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(112))->second);
+	pTmpModSpec->moduleID = 112;
+	pTmpModSpec->moduleName = std::wstring(L"IPP Output");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(53, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(53))->second);
+	pTmpModSpec->moduleID = 53;
+	pTmpModSpec->moduleName = std::wstring(L"PDF Page Range Extractor");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
@@ -244,9 +301,6 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleName = std::wstring(L"Coverage Calculator");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 58;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(63, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(63))->second);
@@ -254,10 +308,6 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF Optimization");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleDefaultLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 62;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(5, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(5))->second);
@@ -291,15 +341,26 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleDefaultLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(57, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(57))->second);
-	pTmpModSpec->moduleID = 57;
-	pTmpModSpec->moduleName = std::wstring(L"PostScript::PDF(Normalizer)");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(111, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(111))->second);
+	pTmpModSpec->moduleID = 111;
+	pTmpModSpec->moduleName = std::wstring(L"IPP Input");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
-	pTmpModSpec->moduleVersionIntroduced_Major = 8;
-	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 33;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(106, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(106))->second);
+	pTmpModSpec->moduleID = 106;
+	pTmpModSpec->moduleName = std::wstring(L"SOLitrack Input");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(44, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(44))->second);
+	pTmpModSpec->moduleID = 44;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::PostScript(PDFL)");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 }
 
 void InititalizeProduct20()
