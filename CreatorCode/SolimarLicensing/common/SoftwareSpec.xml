@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="73">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="74">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -509,12 +509,12 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="Disk Spooler" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="File Inserter" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Queue Reader" modUnlimitedValue="1" moduleDefaultLicense="1"/>		
-			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Output Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="PDF::TIFF" modUnlimitedValue="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="13" moduleName="Output Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="30" moduleName="TCP/IP Input" modUnlimitedValue="1" moduleDefaultLicense="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="31" moduleName="TCP/IP Output" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="32" moduleName="Trash Can" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::PostScript(PDFL)" modUnlimitedValue="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="44" moduleName="PDF::PostScript(PDFL)" modUnlimitedValue="1"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PDF Page Range Extractor" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="59" moduleName="Emulation Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>  			

@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 73;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 74;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -355,8 +355,8 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
-			tmpModSpec.moduleID.TVal = 19;
-			tmpModSpec.moduleName.TVal = "PDF::TIFF";
+			tmpModSpec.moduleID.TVal = 46;
+			tmpModSpec.moduleName.TVal = "PDF::TIFF(PDFL)";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;

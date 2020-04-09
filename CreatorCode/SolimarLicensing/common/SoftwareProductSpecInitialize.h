@@ -251,10 +251,10 @@ void InititalizeProduct25()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(19, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(19))->second);
-	pTmpModSpec->moduleID = 19;
-	pTmpModSpec->moduleName = std::wstring(L"PDF::TIFF");
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(46, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(46))->second);
+	pTmpModSpec->moduleID = 46;
+	pTmpModSpec->moduleName = std::wstring(L"PDF::TIFF(PDFL)");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
