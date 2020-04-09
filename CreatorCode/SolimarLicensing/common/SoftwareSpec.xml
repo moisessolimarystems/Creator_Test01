@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="74">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="75">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -522,11 +522,15 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="63" moduleName="ReadyPDF Optimization" modUnlimitedValue="1"/>  
 			<Lic_ModuleSoftwareSpecAttribs moduleID="66" moduleName="Job Ticket Extractor" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="67" moduleName="Job Ticket Inserter" modUnlimitedValue="1"/>				
-			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" modUnlimitedValue="1"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" modUnlimitedValue="1"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="111" moduleName="IPP Input" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="112" moduleName="IPP Output" modUnlimitedValue="1"/>			
       <!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="203" moduleName="Adobe Normalizer"/>					
+			<!-- Output Pool module -->
+			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
