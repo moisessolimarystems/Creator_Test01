@@ -215,13 +215,6 @@ void InititalizeProduct25()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
-	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(62, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
-	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(62))->second);
-	pTmpModSpec->moduleID = 62;
-	pTmpModSpec->moduleName = std::wstring(L"Coverage Calculator");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
-	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(63, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(63))->second);
 	pTmpModSpec->moduleID = 63;
@@ -329,6 +322,14 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleName = std::wstring(L"SOLitrack Input");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(107, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(107))->second);
+	pTmpModSpec->moduleID = 107;
+	pTmpModSpec->moduleName = std::wstring(L"Viewer");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleDefaultLicense = 1;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(13, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(13))->second);

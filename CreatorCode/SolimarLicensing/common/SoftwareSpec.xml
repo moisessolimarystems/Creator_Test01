@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="75">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="76">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -517,12 +517,12 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="46" moduleName="PDF::TIFF(PDFL)" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PDF Page Range Extractor" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1"/>	
-			<Lic_ModuleSoftwareSpecAttribs moduleID="59" moduleName="Emulation Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>  			
-			<Lic_ModuleSoftwareSpecAttribs moduleID="62" moduleName="Coverage Calculator" modUnlimitedValue="1"/>             
+			<Lic_ModuleSoftwareSpecAttribs moduleID="59" moduleName="Emulation Selector" modUnlimitedValue="1" moduleDefaultLicense="1"/>  			         
 			<Lic_ModuleSoftwareSpecAttribs moduleID="63" moduleName="ReadyPDF Optimization" modUnlimitedValue="1"/>  
 			<Lic_ModuleSoftwareSpecAttribs moduleID="66" moduleName="Job Ticket Extractor" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="67" moduleName="Job Ticket Inserter" modUnlimitedValue="1"/>				
 			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" modUnlimitedValue="1"/>	
+			<Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="111" moduleName="IPP Input" modUnlimitedValue="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="112" moduleName="IPP Output" modUnlimitedValue="1"/>			
