@@ -87,4 +87,5 @@ prototype AskOptions2( number, BYVAL STRING/*Title*/, BYVAL STRING/*SubTitle*/, 
                    
 //function prototype from DLL_WINDOWSUTILS      
 prototype cdecl WindowsUtil.SSPLogonUser(BYREF STRING ,BYREF STRING, BYREF STRING);                   
+prototype cdecl LogonUserValidation.IsValidLogonUser(BYREF STRING ,BYREF STRING, BYREF STRING);     
 #endif //#ifndef _CUSTOMDIALOGS_H_
