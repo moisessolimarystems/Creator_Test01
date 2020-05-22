@@ -197,12 +197,13 @@ end;
 //
 //=============================================================================
 function INT SdUserLoginCustomDlg(szTitle, szSubTitle, szMsg) 
-    NUMBER  nvType, nvSize, nResult;   
+    NUMBER  nvType, nvSize, nResult, nvUserNameLength;   
     STRING  szDialogName;
     NUMBER  nDialog, nCmdValue, nvPos, nvPropertyBuffer; 
-    BOOL    bDone;
+    BOOL    bDone, bIsManagedUser;
     STRING  szUserName, szDomainName, szPassword, svProperty;  
     HWND    hwndCtrl, hwndDlg;
+    OBJECT oInstall;
 begin  
    	//
    	// Initialize variables to be used with this function...
@@ -218,6 +219,12 @@ begin
    	endif;   	// Initialize the indicator used to control the while loop. 
    	bDone = FALSE;   	
    	  
+	try
+		set oInstall = DotNetCoCreateObject(SUPPORTDIR ^ "LogonUserValidation.dll", "LogonUserValidation.LogonUserValidation", "LogonUserValidation");
+	catch
+		MessageBox("oInstall ERROR: " + Err.Number + " ERROR Description: " + Err.Description + " ERROR Source: " + Err.Source, SEVERE);
+		abort;
+	endcatch;       	  
    	//
    	// Define the dialog.  Pass a null string in the second parameter 
    	// to get the dialog from _isuser.dll or _isres.dll.  Pass a null 
@@ -228,7 +235,6 @@ begin
       		abort;                                          
    	endif;    
    	hwndDlg = CmdGetHwndDlg( szDialogName );
-    nResult = UseDLL(SUPPORTDIR ^ DLL_WINDOWSUTILS);
     repeat
     	// Display the dialog and return the next dialog event.
 		nCmdValue = WaitOnDialog(szDialogName);
@@ -252,10 +258,7 @@ begin
        		case RES_PBUT_NEXT:         	
 				// Do something
 				CtrlGetText(szDialogName, RES_SDUSERLOGIN_USERNAME, szUserName);
-				CtrlGetText(szDialogName, RES_SDUSERLOGIN_PASSWORD, szPassword);
-				if((StrLength(szUserName) = 0) || (StrLength(szPassword) = 0)) then  
-					MessageBox("Both username and password must be completed.", WARNING);
-				else                 
+				CtrlGetText(szDialogName, RES_SDUSERLOGIN_PASSWORD, szPassword);                
 					nvPos = StrFind(szUserName, "\\");
 					if(nvPos > 0) then
 						StrSub(szDomainName, szUserName, 0, nvPos);						
@@ -268,17 +271,20 @@ begin
 						MsiGetProperty(ISMSI_HANDLE, "ComputerName", svProperty, nvPropertyBuffer);								
 						szDomainName = svProperty;					
 					endif;
-					if(SSPLogonUser(szDomainName, szUserName, szPassword)) then									
+					if(oInstall.IsValidLogonUser(szDomainName, szUserName, szPassword) = 1) then			
 						IFX_NETAPI_USER_ACCOUNT = szDomainName + "\\" + szUserName;
 						IFX_NETAPI_PASSWORD = szPassword;        										
 						bDone = TRUE;					
 						nResult = RES_PBUT_NEXT;
+						if(IsGroupServiceAccount(szUserName)) then
+							MsiSetProperty(ISMSI_HANDLE, "ISSERVICEACCOUNT", "1");	 						
+						endif;
 					else 
 						MessageBox("Invalid user/password", WARNING);    //clear the text fields
 						hwndCtrl = GetDlgItem( hwndDlg, RES_SDUSERLOGIN_USERNAME );
 						SetFocus( hwndCtrl );										
 					endif;
-				endif;	  				      				
+				//endif;	  				      				
         	case RES_PBUT_BACK: 
 	        	// The user clicked the Back button 
 	        	bDone = TRUE;
@@ -292,7 +298,7 @@ begin
    //
    // Free the dialog box from memory.
    ReleaseDialog (szDialogName);  
-   UnUseDLL(SUPPORTDIR ^ DLL_WINDOWSUTILS);
+   DotNetUnloadAppDomain("LogonUserValidation"); // returns 0 
    return nResult;  
 	
 end;     
