@@ -40,6 +40,7 @@ prototype EnableSystemRegistrySetting(STRING, STRING);
 prototype BOOL AddStringToRegMultiSZ(NUMBER, STRING, STRING, STRING, BOOL);
 prototype BOOL RemoveStringFromRegMultiSZ(NUMBER, STRING, STRING, STRING);
 prototype AddUserToLocalGroupEx(STRING, STRING);
+prototype BOOL IsGroupServiceAccount(STRING);
 
 //Enable Windows Components
 prototype EnableWebServerRole();

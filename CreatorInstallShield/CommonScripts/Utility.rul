@@ -17,6 +17,21 @@
 #ifndef _UTILITY_RUL_
 #define _UTILITY_RUL_  
 
+function BOOL IsGroupServiceAccount(svUser)
+	NUMBER nUserLength;
+	STRING szSubStr;
+begin
+	nUserLength = StrLength(svUser);
+	if(nUserLength > 0) then			
+		if(StrSub(szSubStr, svUser, nUserLength - 1, 1) = 1) then
+			if(szSubStr = "$") then					
+				return TRUE;																																					
+			endif;
+		endif;
+	endif;	
+	return FALSE;
+end;
+
 function AddDCOMProtocolTCPIP()
 	STRING szKey, svName, svData, svValue, svString;
 	NUMBER nvSize, nvType, nResult;
