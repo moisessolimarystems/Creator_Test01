@@ -19,8 +19,8 @@
 
 prototype SelfRegister(STRING, STRING);
 prototype SelfUnRegister(STRING, STRING);
-prototype RegisterService(STRING, STRING, STRING);     
-prototype UnRegisterService(STRING, STRING);  
+prototype RegisterService(STRING, STRING);     
+prototype UnRegisterService(STRING);  
 prototype DisableService( STRING ); 
 prototype RegAsmRegister(STRING, STRING, BOOL);
 prototype RegAsmUnRegister(STRING, STRING, BOOL);   

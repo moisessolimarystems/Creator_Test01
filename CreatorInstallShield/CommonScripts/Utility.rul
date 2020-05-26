@@ -548,17 +548,14 @@ end;
 // Returns:		None
 //
 //=============================================================================  
-function RegisterService(svFilePath, svParam, svServiceName)  
+function RegisterService(svFilePath, svParam)  
 begin            	
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
 WriteLog("Register Service Start: " + svFilePath);	   		
    		if (LaunchAppAndWait (svFilePath, svParam , WAIT) < 0) then 
    			WriteLog("Failed to register " + svFilePath + " for " + @PRODUCT_NAME);
-   		endif;    
-   		if(ServiceExistsService(svServiceName) == FALSE) then
-   		   	WriteLog("Failed to register " + svServiceName);
-   		endif;                            
+   		endif;                                     
 WriteLog("Register Service End: " + svFilePath);	
 	else
 		WriteLog("Skipping RegisterService: " + svFilePath + " not found.");	   		
@@ -574,17 +571,14 @@ end;
 // Returns:		None
 //
 //=============================================================================  
-function UnRegisterService(svFilePath, svServiceName)   
+function UnRegisterService(svFilePath)   
 begin  
 	if(Is(FILE_EXISTS, svFilePath)) then
 		LongPathToQuote(svFilePath, TRUE);      
 WriteLog("UnRegister Service Start: " + svFilePath);   		
    		if (LaunchAppAndWait (svFilePath, "/UNREGSERVER" , WAIT) < 0) then 
    			WriteLog("Failed to unregister " + svFilePath + " for " + @PRODUCT_NAME);
-   		endif;   
-   		if(ServiceExistsService(svServiceName) == TRUE) then
-   		   	WriteLog("Failed to register " + svServiceName);
-   		endif;       		                                       
+   		endif;                                          
 WriteLog("UnRegister Service End: " + svFilePath);    		
 	else
 		WriteLog("Skipping UnRegisterService: " + svFilePath + " not found.");		

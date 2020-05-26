@@ -802,7 +802,7 @@ namespace Client.Creator
             return (plType != null) ? plType.ID : 1;
         }
 
-        private void UpdateModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
+        public void UpdateModules(LicenseVersion version, IList<ProductLicenseTable> pltList)
         {
             if (IsActive)
             {
@@ -1371,6 +1371,20 @@ namespace Client.Creator
                     return true;
             }
             return false;
+        }
+
+        //
+        // Returns:
+        //		< 0 : this is greater
+        //		= 0 : this == _compareVersion
+        //		> 0 : _compareVersion is greater
+        //
+        public int CompareTo(LicenseVersion _compareVersion)
+        {
+            int retVal = (int)(Major - _compareVersion.Major);
+            if (retVal == 0)
+                retVal = (int)(Minor - _compareVersion.Minor);
+            return retVal;
         }
 
         public override string ToString()
