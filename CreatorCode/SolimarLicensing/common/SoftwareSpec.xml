@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="76">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="78">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -431,7 +431,8 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip"  moduleTrialLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="11"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="PDF Renderer" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>
-      <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Job Ticket Manager" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="78"/>
     </Lic_ModuleSoftwareSpecAttribsMap>      
 	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="21" productName="XIMAGEpdf">
@@ -445,7 +446,7 @@
       <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Solimar Compiler" modUnlimitedValue="1"/>
     </Lic_ModuleSoftwareSpecAttribsMap>
   </Lic_ProductSoftwareSpecAttribs>  
-	<Lic_ProductSoftwareSpecAttribs productID="23" productName="Rubika PLP">
+	<Lic_ProductSoftwareSpecAttribs productID="23" productName="Rubika Essentials">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Merge" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Address Cleanse" modUnlimitedValue="1"/>
@@ -492,7 +493,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="101" moduleName="PLP" moduleVersionIntroduced_Major="4" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="52"/>	    
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-    <Lic_ProductSoftwareSpecAttribs productID="24" productName="Solimar Indexing Tools PLP">
+    <Lic_ProductSoftwareSpecAttribs productID="24" productName="Solimar Indexing Tools Essentials">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 		  <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="2"/>
 		  <Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances" moduleVersionIntroduced_SubMinor="54"/>
@@ -563,9 +564,9 @@
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="122" productName="Test/Dev/DR Solimar Utilities" sameModSpecProductID="22">
   </Lic_ProductSoftwareSpecAttribs>
-  <Lic_ProductSoftwareSpecAttribs productID="123" productName="Test/Dev/DR Rubika PLP" sameModSpecProductID="23">
+  <Lic_ProductSoftwareSpecAttribs productID="123" productName="Test/Dev/DR Rubika Essentials" sameModSpecProductID="23">
   </Lic_ProductSoftwareSpecAttribs>
-  <Lic_ProductSoftwareSpecAttribs productID="124" productName="Test/Dev/DR Solimar Indexing Tools PLP" sameModSpecProductID="24">
+  <Lic_ProductSoftwareSpecAttribs productID="124" productName="Test/Dev/DR Solimar Indexing Tools Essentials" sameModSpecProductID="24">
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="125" productName="Test/Dev/DR SPDE Essentials" sameModSpecProductID="25">
   </Lic_ProductSoftwareSpecAttribs>

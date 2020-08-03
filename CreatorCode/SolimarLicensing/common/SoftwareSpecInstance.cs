@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 76;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 78;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -94,10 +94,10 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:24, ProdName: Solimar Indexing Tools PLP
+			#region ProdID:24, ProdName: Solimar Indexing Tools Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 24;
-			tmpProdSpec.productName.TVal = "Solimar Indexing Tools PLP";
+			tmpProdSpec.productName.TVal = "Solimar Indexing Tools Essentials";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
@@ -742,6 +742,25 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
+			tmpModSpec.moduleID.TVal = 3;
+			tmpModSpec.moduleName.TVal = "Job Ticket Manager";
+			tmpModSpec.modUnlimitedValue.TVal = 1;
+			tmpModSpec.moduleTrialLicense.TVal = 1;
+			tmpModSpec.modulePoolModuleID.TVal = 0;
+			tmpModSpec.moduleDefaultLicense.TVal = 0;
+			tmpModSpec.bModuleIsCounter.TVal = false;
+			tmpModSpec.bModuleIsPool.TVal = false;
+			tmpModSpec.moduleVersionIntroduced_Major.TVal = 1;
+			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 4;
+			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 78;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
+			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
+
+			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 2;
 			tmpModSpec.moduleName.TVal = "PDF Page Range Extractor";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
@@ -833,10 +852,10 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:23, ProdName: Rubika PLP
+			#region ProdID:23, ProdName: Rubika Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 23;
-			tmpProdSpec.productName.TVal = "Rubika PLP";
+			tmpProdSpec.productName.TVal = "Rubika Essentials";
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
@@ -2565,10 +2584,10 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:124, ProdName: Test/Dev/DR Solimar Indexing Tools PLP
+			#region ProdID:124, ProdName: Test/Dev/DR Solimar Indexing Tools Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 124;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR Solimar Indexing Tools PLP";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Solimar Indexing Tools Essentials";
 			tmpProdSpec.sameModSpecProductID.TVal = 24;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
@@ -5442,10 +5461,10 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:123, ProdName: Test/Dev/DR Rubika PLP
+			#region ProdID:123, ProdName: Test/Dev/DR Rubika Essentials
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 123;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR Rubika PLP";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR Rubika Essentials";
 			tmpProdSpec.sameModSpecProductID.TVal = 23;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion

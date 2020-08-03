@@ -126,11 +126,11 @@ void InititalizeProduct24()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:24, ProdName: Solimar Indexing Tools PLP
+	// ProdID:24, ProdName: Solimar Indexing Tools Essentials
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(24, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(24))->second);
 	pTmpProdSpec->productID = 24;
-	pTmpProdSpec->productName = std::wstring(L"Solimar Indexing Tools PLP");
+	pTmpProdSpec->productName = std::wstring(L"Solimar Indexing Tools Essentials");
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -417,6 +417,16 @@ void InititalizeProduct20()
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 11;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(3, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
+	pTmpModSpec->moduleID = 3;
+	pTmpModSpec->moduleName = std::wstring(L"Job Ticket Manager");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 78;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
@@ -491,11 +501,11 @@ void InititalizeProduct23()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:23, ProdName: Rubika PLP
+	// ProdID:23, ProdName: Rubika Essentials
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(23, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(23))->second);
 	pTmpProdSpec->productID = 23;
-	pTmpProdSpec->productName = std::wstring(L"Rubika PLP");
+	pTmpProdSpec->productName = std::wstring(L"Rubika Essentials");
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
 	
@@ -1324,11 +1334,11 @@ void InititalizeProduct124()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:124, ProdName: Test/Dev/DR Solimar Indexing Tools PLP
+	// ProdID:124, ProdName: Test/Dev/DR Solimar Indexing Tools Essentials
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(124, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(124))->second);
 	pTmpProdSpec->productID = 124;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Solimar Indexing Tools PLP");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Solimar Indexing Tools Essentials");
 	pTmpProdSpec->sameModSpecProductID = 24;
 }
 
@@ -2681,11 +2691,11 @@ void InititalizeProduct123()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:123, ProdName: Test/Dev/DR Rubika PLP
+	// ProdID:123, ProdName: Test/Dev/DR Rubika Essentials
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(123, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(123))->second);
 	pTmpProdSpec->productID = 123;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Rubika PLP");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR Rubika Essentials");
 	pTmpProdSpec->sameModSpecProductID = 23;
 }
 
