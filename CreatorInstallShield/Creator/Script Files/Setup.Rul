@@ -16,6 +16,7 @@
 #include "..\..\CommonScripts\LaunchAppEx.h"  
 #include "..\..\CommonScripts\WriteLog.h"   
 #include "..\..\CommonScripts\CustomDialogs.h"
+#include "..\..\CommonScripts\Utility.h"
 
 // Note: In order to have your InstallScript function executed as a custom
 // action by the Windows Installer, it must be prototyped as an 
@@ -468,3 +469,4 @@ end;
 #include "..\..\CommonScripts\LaunchAppEx.rul"  
 #include "..\..\CommonScripts\WriteLog.rul"      
 #include "..\..\CommonScripts\CustomDialogs.rul"
+#include "..\..\CommonScripts\Utility.rul"
