@@ -96,7 +96,9 @@ namespace CreatorData
                                           d.DestName.Equals(destName) &&                                          
                                           (l.LicenseName.Contains(searchString) ||
                                           l.ProductLicenseTables.Count(o => (o.plID.Contains(searchString) &&
-                                                                                          o.LicenseID.Equals(l.ID))) > 0)
+                                                                             o.LicenseID.Equals(l.ID))) > 0 ||
+                                          l.TokenTables.Count(t => (t.TokenValue.Contains(searchString) &&
+                                                                    t.LicenseID.Equals(l.ID))) > 0)
                                     select l;
                 return licenseFilter.ToList();
             }
