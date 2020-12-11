@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using SolimarLicenseViewer.Properties;
 using System.IO;
+using System.Net;
 
 namespace SolimarLicenseViewer
 {
@@ -1356,7 +1357,10 @@ namespace SolimarLicenseViewer
                     licWrapper.ConnectByProductEx((int)productID, false);
                     try
                     {
-                        licWrapper.InitializeEx(System.Environment.MachineName.ToLower(),   //application_instance
+                        var hostName = Dns.GetHostEntry("LocalHost").HostName.ToLower();
+                        if (string.Compare(hostName, "localhost", true) == 0) 
+                            hostName = System.Environment.MachineName.ToLower();
+                        licWrapper.InitializeEx(hostName,   //application_instance
                                                 (int)productID, //product
                                                 0,              //prod_ver_major
                                                 1,              //prod_ver_minor - CR.FIX.12672 - Use version 0.1 instead of 0.0, 0.0 is not valid
