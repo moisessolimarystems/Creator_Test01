@@ -225,6 +225,16 @@ void InititalizeProduct25()
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(114, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(114))->second);
+	pTmpModSpec->moduleID = 114;
+	pTmpModSpec->moduleName = std::wstring(L"SLS JDF Manager");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 79;
+	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(63, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(63))->second);
 	pTmpModSpec->moduleID = 63;
@@ -446,6 +456,16 @@ void InititalizeProduct20()
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 15;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(4, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
+	pTmpModSpec->moduleID = 4;
+	pTmpModSpec->moduleName = std::wstring(L"SLS JDF Manager");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 1;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 81;
 }
 
 void InititalizeProduct21()
