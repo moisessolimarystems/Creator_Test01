@@ -142,21 +142,22 @@ namespace Client.Creator
                     return value.ToString();
             }
 
-            public static int GetIconIndex(String key)
+        public static int GetIconIndex(String key)
+        {
+            IconList iconIndex;
+            var cleanKey = key.Replace(" ", string.Empty);
+            if (!Enum.TryParse(cleanKey, true, out iconIndex))
             {
-                IconList iconIndex;
-                try
+                cleanKey = key.Replace("Essentials", string.Empty);
+                if (!Enum.TryParse(cleanKey, true, out iconIndex))
                 {
-                    iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", string.Empty), true);
+                    iconIndex = IconList.UNKNOWN;
                 }
-                catch (Exception ex)
-                {
-                    return (int)IconList.UNKNOWN;
-                }
-                return (int)iconIndex;
             }
+            return (int)iconIndex;
+        }
 
-            public static Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState GetProductState(ProductLicenseState plState)
+        public static Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState GetProductState(ProductLicenseState plState)
             {
                 Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState productLicenseState = Lic_PackageAttribs.Lic_ProductInfoAttribs.TProductState.psTrial;
                 switch (plState)
