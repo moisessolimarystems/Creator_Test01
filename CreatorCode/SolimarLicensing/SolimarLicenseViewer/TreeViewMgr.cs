@@ -68,7 +68,7 @@ namespace SolimarLicenseViewer
                 //remove " Text/Dev/DR" from key names...
                 string cleanKey = key.Replace("Test/Dev/DR ", "");
                 //Remove PLP from key names                
-                cleanKey = cleanKey.Replace("PLP", "");
+                cleanKey = cleanKey.Replace("Essentials", "");
                 iconIndex = (IconList)Enum.Parse(typeof(IconList), cleanKey.Replace(" ", ""), true);
                 //iconIndex = (IconList)Enum.Parse(typeof(IconList), key.Replace(" ", ""), true);
             }
