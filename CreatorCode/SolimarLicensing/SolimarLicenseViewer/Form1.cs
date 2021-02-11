@@ -1340,14 +1340,61 @@ namespace SolimarLicenseViewer
                     catch (Exception ex)
                     {
                         lastEx = ex;
+                        try
+                        {
+                            testConnectionToLicenseServerFQDN(new ConnectionSettings2()
+                            {
+                                ProductID = (int)lvItem.Tag,
+                                ServerName = lvItem.SubItems[1].Text,
+                                BackupName = lvItem.SubItems[2].Text,
+                                UseDevelopmentLic = (System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0),
+                            });
+                        }
+                        catch (Exception exFQDN)
+                        {
+                            lastEx = exFQDN;
+                        }
                     }
                     testConnBackgroundWorker.ReportProgress(0, new Solimar.Licensing.Common.Collections.Tuple<ListViewItem, Exception>(lvItem, lastEx));
                 }
             }
             e.Result = lviList;
         }
-        // throws an exception if fails to connect...
         private void testConnectionToLicenseServer(ConnectionSettings2 _connectionSettings)
+        {
+            if (_connectionSettings != null)
+            {
+                using (Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper licWrapper = new Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseWrapper())
+                {
+                    Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID productID = (Solimar.Licensing.Attribs.Lic_PackageAttribs.TLic_ProductID)_connectionSettings.ProductID;
+                    licWrapper.ConnectByProductEx((int)productID, false);
+                    try
+                    {
+                        licWrapper.InitializeEx(System.Environment.MachineName,   //application_instance
+                                                (int)productID, //product
+                                                0,              //prod_ver_major
+                                                1,              //prod_ver_minor - CR.FIX.12672 - Use version 0.1 instead of 0.0, 0.0 is not valid
+                                                false,          //single_key
+                                                "",             //specific_single_key_ident
+                                                false,          //lock_keys
+                                                0,              //ui_level
+                                                0,              //grace_period_minutes
+                                                false,          //application_instance_lock_keys
+                                                false);         //bypass_remote_key_restriction
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        licWrapper.DisconnectEx();
+                    }
+                }
+            }
+        }
+        // throws an exception if fails to connect...
+        private void testConnectionToLicenseServerFQDN(ConnectionSettings2 _connectionSettings)
         {
             if (_connectionSettings != null)
             {
