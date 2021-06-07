@@ -2725,6 +2725,16 @@ void InititalizeProduct16()
 	pTmpModSpec->moduleVersionIntroduced_Major = 2;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 59;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(8, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(8))->second);
+	pTmpModSpec->moduleID = 8;
+	pTmpModSpec->moduleName = std::wstring(L"Mail Tracking");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 2;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 84;
 }
 
 void InititalizeProduct19()
