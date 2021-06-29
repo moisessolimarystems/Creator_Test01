@@ -1349,6 +1349,7 @@ namespace SolimarLicenseViewer
                                 BackupName = lvItem.SubItems[2].Text,
                                 UseDevelopmentLic = (System.String.Compare(lvItem.SubItems[3].Text, "true", true) == 0),
                             });
+                            lastEx = null;
                         }
                         catch (Exception exFQDN)
                         {
@@ -1404,9 +1405,9 @@ namespace SolimarLicenseViewer
                     licWrapper.ConnectByProductEx((int)productID, false);
                     try
                     {
-                        var hostName = Dns.GetHostEntry("LocalHost").HostName.ToLower();
+                        var hostName = Dns.GetHostEntry("LocalHost").HostName.ToUpper();//.ToLower();
                         if (string.Compare(hostName, "localhost", true) == 0) 
-                            hostName = System.Environment.MachineName.ToLower();
+                            hostName = System.Environment.MachineName; 
                         licWrapper.InitializeEx(hostName,   //application_instance
                                                 (int)productID, //product
                                                 0,              //prod_ver_major
