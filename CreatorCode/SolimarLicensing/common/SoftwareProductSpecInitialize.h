@@ -228,12 +228,12 @@ void InititalizeProduct25()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(115, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(115))->second);
 	pTmpModSpec->moduleID = 115;
-	pTmpModSpec->moduleName = std::wstring(L"JMF Output");
+	pTmpModSpec->moduleName = std::wstring(L"JDF Output");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 83;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 86;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(114, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(114))->second);
@@ -244,6 +244,8 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 82;
+	pTmpModSpec->moduleVersionDeprecated_Major = 9;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(63, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(63))->second);
@@ -282,6 +284,8 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 82;
+	pTmpModSpec->moduleVersionDeprecated_Major = 9;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(46, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(46))->second);
@@ -486,6 +490,8 @@ void InititalizeProduct20()
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 82;
+	pTmpModSpec->moduleVersionDeprecated_Major = 1;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 4;
 }
 
 void InititalizeProduct21()
@@ -2053,12 +2059,12 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(115, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(115))->second);
 	pTmpModSpec->moduleID = 115;
-	pTmpModSpec->moduleName = std::wstring(L"JMF Output Manager");
+	pTmpModSpec->moduleName = std::wstring(L"JDF Output Manager");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 85;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 86;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(114, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(114))->second);
@@ -2069,6 +2075,8 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 82;
+	pTmpModSpec->moduleVersionDeprecated_Major = 9;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(111, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(111))->second);
@@ -2408,16 +2416,18 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
 	pTmpModSpec->moduleVersionIntroduced_SubMinor = 82;
+	pTmpModSpec->moduleVersionDeprecated_Major = 9;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 2;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(69, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(69))->second);
 	pTmpModSpec->moduleID = 69;
-	pTmpModSpec->moduleName = std::wstring(L"JMF Output");
+	pTmpModSpec->moduleName = std::wstring(L"JDF Output");
 	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 85;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 86;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);

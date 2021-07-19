@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 85;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 86;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -280,7 +280,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 115;
-			tmpModSpec.moduleName.TVal = "JMF Output";
+			tmpModSpec.moduleName.TVal = "JDF Output";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -290,7 +290,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 9;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 83;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 86;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -310,8 +310,8 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 82;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 9;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 2;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
@@ -405,8 +405,8 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 82;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 9;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 2;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
@@ -868,8 +868,8 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 4;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 82;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 1;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 4;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
@@ -4033,7 +4033,7 @@ namespace Solimar.Licensing
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 115;
-			tmpModSpec.moduleName.TVal = "JMF Output Manager";
+			tmpModSpec.moduleName.TVal = "JDF Output Manager";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -4043,7 +4043,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 9;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 85;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 86;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
@@ -4063,8 +4063,8 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 82;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 9;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 2;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
@@ -4842,15 +4842,15 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 82;
-			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
-			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
+			tmpModSpec.moduleVersionDeprecated_Major.TVal = 9;
+			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 2;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMinor.TVal = 0;
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 69;
-			tmpModSpec.moduleName.TVal = "JMF Output";
+			tmpModSpec.moduleName.TVal = "JDF Output";
 			tmpModSpec.modUnlimitedValue.TVal = 1;
 			tmpModSpec.moduleTrialLicense.TVal = 1;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -4860,7 +4860,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 9;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 2;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 85;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 86;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;
