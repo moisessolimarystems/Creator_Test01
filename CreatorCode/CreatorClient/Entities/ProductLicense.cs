@@ -1009,7 +1009,7 @@ namespace Client.Creator
                             ModuleTable mt = mtList.Where(m => m.ModID == module.ModID).First();
                             if (mt != null)
                             {
-                                if (module.Value > 0)
+                                if (module.Value > 0 && !_commLink.IsDefaultModule(ProductID, module.ModID))
                                 {
                                     previousValue = mt.Value.ToString();
                                     mt.Value += module.Value;
