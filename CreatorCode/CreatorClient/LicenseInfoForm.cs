@@ -377,7 +377,7 @@ namespace Client.Creator
                                     if (foundTokens.Count() > 0)
                                     {
                                         tokenValue = foundTokens[0].SubItems[1].Text;
-                                        if (tokenDB.TokenValue != tokenValue)
+                                        if (tokenDB.TokenValue.ToLower() != tokenValue.ToLower())
                                         {
                                             bMatch = false;
                                             break;
