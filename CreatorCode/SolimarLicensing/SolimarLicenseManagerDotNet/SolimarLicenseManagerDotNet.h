@@ -36,7 +36,13 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 			};
 
 			SolimarLicenseWrapper();
-			
+			SolimarLicenseWrapper(
+				String^ domain,
+				String^ username,
+				String^ password,
+				long authenticationLevel,
+				long impersonationLevel);
+
 			~SolimarLicenseWrapper();	//Destructor for cleaning up managed resources
 			!SolimarLicenseWrapper();	//Finalizer for cleaning up unmanaged resources
 
@@ -106,6 +112,8 @@ namespace Solimar {	namespace Licensing {		namespace LicenseManagerWrapper
 		
 		private:
 			SolimarLicenseManagerWrapper::LicensingWrapper* m_pLicenseWrapper;
+
+			void Initialize();
 
 			String^ GetLicenseServerVersion(String^ _server);
 			String^ GetLicenseManagerVersion();
