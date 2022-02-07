@@ -148,4 +148,16 @@ __interface ISolimarLicenseMgr7 : ISolimarLicenseMgr6
 	[id(23),helpstring("method GetInfoByProduct")] HRESULT GetInfoByProduct([in] long product, [in] VARIANT_BOOL use_shared_licenses_servers, [out] BSTR* p_server, [out] BSTR* p_backup_server, [out] VARIANT_BOOL* p_bool_use_test_dev_licensing);
 };
 
+// ISolimarLicenseMgr8
+[
+	object,
+	uuid("A575B758-4C33-4DF4-A110-F8BB712AB9ED"),
+	dual, helpstring("ISolimarLicenseMgr8 Interface"),
+	pointer_default(unique)
+]
+__interface ISolimarLicenseMgr8 : ISolimarLicenseMgr7
+{
+	[id(24), helpstring("method InitializeAuthInfo")] HRESULT InitializeAuthInfo([in] BSTR domain, [in] BSTR username, [in] BSTR password, [in] long authenticationLevel, [in] long impersonationLevel);
+};
+
 #endif

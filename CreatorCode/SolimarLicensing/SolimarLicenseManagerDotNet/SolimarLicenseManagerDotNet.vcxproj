@@ -213,6 +213,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\COMUtils.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="..\common\ChallengeResponse.cpp" />
     <ClCompile Include="..\common\ChallengeResponseHelper.cpp" />

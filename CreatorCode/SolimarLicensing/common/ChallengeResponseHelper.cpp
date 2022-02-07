@@ -1,6 +1,7 @@
 
 #include "ChallengeResponseHelper.h"
 #include "..\common\_IObjectAuthentication.h"
+#include "..\common\COMUtils.h"
 
 ChallengeResponseHelper::ChallengeResponseHelper(const BYTE* server_auth_this_private_key_buffer, const DWORD server_auth_this_private_key_buffer_size, const BYTE* this_auth_server_public_key_buffer, const DWORD this_auth_server_public_key_buffer_size) : 
 	m_server_auth_this_private_key_buffer(server_auth_this_private_key_buffer),
@@ -61,12 +62,21 @@ bool ChallengeResponseHelper::ChallengePassedByClient()
 // by requesting and responding to the server's challenge.
 HRESULT ChallengeResponseHelper::AuthenticateToServer(IDispatch *pServer)
 {
+	return AuthenticateToServer(pServer, NULL);
+}
+
+// Used by clients. Satisfies the server's client authentication requirements 
+// by requesting and responding to the server's challenge.
+HRESULT ChallengeResponseHelper::AuthenticateToServer(IDispatch *pServer, COAUTHINFO* pAuthInfo)
+{
 	HRESULT hr = S_OK;
 	IObjectAuthentication *pAuthentication = 0;
 	
 	hr = pServer->QueryInterface(__uuidof(IObjectAuthentication), (void**)&pAuthentication);
 	if (FAILED(hr)) return hr;
 	
+	COMUtils::SetProxyBlanket(pAuthentication, pAuthInfo);
+
 	VARIANT vtChallenge, vtResponse;
 	VariantInit(&vtChallenge);
 	VariantInit(&vtResponse);
@@ -102,9 +112,13 @@ HRESULT ChallengeResponseHelper::AuthenticateToServer(IDispatch *pServer)
 	return hr;
 }
 
+HRESULT ChallengeResponseHelper::AuthenticateServer(IDispatch *pServer)
+{
+	return AuthenticateServer(pServer, NULL);
+}
 
 // Called by clients to prove the identity of a server
-HRESULT ChallengeResponseHelper::AuthenticateServer(IDispatch *pServer)
+HRESULT ChallengeResponseHelper::AuthenticateServer(IDispatch *pServer, COAUTHINFO* pAuthInfo)
 {
 	HRESULT hr = S_OK;
 	IObjectAuthentication *pAuthentication = 0;
@@ -112,6 +126,8 @@ HRESULT ChallengeResponseHelper::AuthenticateServer(IDispatch *pServer)
 	hr = pServer->QueryInterface(__uuidof(IObjectAuthentication), (void**)&pAuthentication);
 	if (FAILED(hr)) return hr;
 	
+	COMUtils::SetProxyBlanket(pAuthentication, pAuthInfo);
+
 	VARIANT vtChallenge, vtResponse;
 	VariantInit(&vtChallenge);
 	VariantInit(&vtResponse);

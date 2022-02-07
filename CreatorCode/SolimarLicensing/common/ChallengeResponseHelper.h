@@ -19,6 +19,7 @@ public:
 
 	// Called by clients to prove identity to a server that supports IObjectAuthentication
 	HRESULT AuthenticateToServer(IDispatch *pServer);
+	HRESULT AuthenticateToServer(IDispatch *pServer, COAUTHINFO* pAuthInfo);
 	// Called by the server to help determine whether the client has successfully authenticated
 	HRESULT GetChallengeInternal(VARIANT *pvtChallenge);
 	// Called by the server to help determine whether the client has successfully authenticated
@@ -32,7 +33,8 @@ public:
 
 	// Called by clients to prove the identity of a server
 	HRESULT AuthenticateServer(IDispatch *pServer);
-		
+	HRESULT AuthenticateServer(IDispatch *pServer, COAUTHINFO* pAuthInfo);
+
 private:
 	const BYTE* m_server_auth_this_private_key_buffer;
 	const DWORD m_server_auth_this_private_key_buffer_size;

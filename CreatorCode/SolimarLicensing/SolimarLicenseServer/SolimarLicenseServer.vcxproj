@@ -518,6 +518,7 @@ echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\
     <ClCompile Include="..\common\base64.cpp" />
     <ClCompile Include="..\common\ChallengeResponse.cpp" />
     <ClCompile Include="..\common\ChallengeResponseHelper.cpp" />
+    <ClCompile Include="..\common\COMUtils.cpp" />
     <ClCompile Include="..\common\CryptoAndFlateHelper.cpp" />
     <ClCompile Include="..\common\CryptoHelper.cpp" />
     <ClCompile Include="..\common\CSmtp.cpp" />
