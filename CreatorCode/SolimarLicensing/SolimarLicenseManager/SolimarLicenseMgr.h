@@ -122,6 +122,7 @@
 				/* Query for interfaceType */ \
 				##interfaceType* pLocalInterface = NULL; \
 				hr = srvInfoObj.LicenseServer->QueryInterface(__uuidof(##interfaceType), (void**)&pLocalInterface); \
+				COMUtils::SetProxyBlanket(pLocalInterface, pAuthInfo); \
 				if(FAILED(hr)) throw hr; \
 				hr = pLocalInterface->##func##plist; \
 				pLocalInterface->Release(); \
@@ -221,7 +222,7 @@
 [
 	coclass,
 	threading(free),
-	support_error_info("ISolimarLicenseMgr7"),
+	support_error_info("ISolimarLicenseMgr8"),
 	vi_progid("SolimarLicenseManager.SolimarLicenseMgr"),
 	progid("SolimarLicenseManager.SolimarLicenseM.1"),
 	version(1.0),
@@ -229,7 +230,7 @@
 	helpstring("SolimarLicenseMgr Class")
 ]
 class ATL_NO_VTABLE CSolimarLicenseMgr : 
-	public ISolimarLicenseMgr7,
+	public ISolimarLicenseMgr8,
 	public IObjectAuthentication,
 	public ILicensingMessage,
 	public ChallengeResponseHelper
@@ -293,6 +294,9 @@ public:
 	STDMETHOD(SoftwareLicense_InitializeViewOnly)(BSTR application_instance, long product, long prod_ver_major, long prod_ver_minor);
 	STDMETHOD(GetInfoByProduct)(long product, VARIANT_BOOL use_shared_licenses_servers, BSTR* p_server, BSTR* p_backup_server, VARIANT_BOOL* p_bool_use_test_dev_licensing);
 
+	// ISolimarLicenseMgr8
+	STDMETHOD(InitializeAuthInfo)(BSTR domain, BSTR username, BSTR password, long authenticationLevel, long impersonationLevel);
+
 	// ILicensingMessage
 	STDMETHOD(GetLicenseMessageList)(VARIANT_BOOL clear_messages, VARIANT *pvtMessageList);
 	STDMETHOD(DispatchLicenseMessageList)(VARIANT_BOOL clear_messages);
@@ -315,7 +319,11 @@ private:
 	static BYTE challenge_key_manager_userauththis_private[];
 	static BYTE challenge_key_server_thisauthuser_private[];
 	static BYTE challenge_key_server_userauththis_public[];
-	
+
+	// Auth Info. Initialized by calling InitializeAuthInfo().
+	static COAUTHIDENTITY AuthIdentity;
+	static COAUTHINFO* pAuthInfo;
+
 	typedef std::map<long, long> ModuleLicenseMap;
 
 	class KeyInfo
