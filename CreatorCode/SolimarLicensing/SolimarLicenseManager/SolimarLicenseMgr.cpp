@@ -12,6 +12,7 @@
 #include "..\common\VersionInfo.h"
 #include "..\common\NetworkUtils.h"
 #include "..\common\LicenseSettings.h"
+#include "..\common\COMUtils.h"
 #include "..\SolimarLicenseServer\KeyMessages.h"
 #include "..\Common\LicAttribsCPP\Lic_PackageAttribs.h"
 #include "..\common\LicAttribsCPP\Lic_GenericAttribs.h"
@@ -25,6 +26,9 @@
 #include <math.h>
 #include <stdio.h>
 #define ENSURE_INITIALIZED if (!m_initialized) return LicenseServerError::EHR_MANAGER_NOT_INITIALIZED
+
+COAUTHIDENTITY CSolimarLicenseMgr::AuthIdentity;
+COAUTHINFO* CSolimarLicenseMgr::pAuthInfo = NULL;
 
 BYTE CSolimarLicenseMgr::challenge_key_manager_thisauthuser_public[] = {
 #include "..\common\keys\SolimarLicenseManager.ThisAuthUser.public.key.txt"
@@ -135,7 +139,7 @@ HRESULT CSolimarLicenseMgr::ServerInfo::Reconnect()
 {
 	//OutputFormattedDebugString(L"ServerInfo::Reconnect() - %s", (wchar_t*)this->name);
 	// Try to create an ISolimarLicenseServer proxy to the server
-	COSERVERINFO	serverInfo	= {0, this->name, NULL, 0};
+	COSERVERINFO	serverInfo	= {0, this->name, pAuthInfo, 0};
 	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr4), NULL, NOERROR};
 	HRESULT hr = S_OK;
 	ISolimarLicenseSvr4 *pILicenseServer = NULL;
@@ -150,20 +154,22 @@ HRESULT CSolimarLicenseMgr::ServerInfo::Reconnect()
 			&multiQI);
 		if(FAILED(hr))
 			throw hr;
-
-
+		
 		pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
+
+		COMUtils::SetProxyBlanket(pILicenseServer, pAuthInfo, true);
+
 		ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 									sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 									challenge_key_server_userauththis_public, 
 									sizeof(challenge_key_server_userauththis_public)/sizeof(BYTE));
 		// try to authenticate the license server
-		hr = CR.AuthenticateServer(pILicenseServer);
+		hr = CR.AuthenticateServer(pILicenseServer, CSolimarLicenseMgr::pAuthInfo);
 		if(FAILED(hr))
 			throw hr;
 
 		// let the license server authenticate this manager
-		hr = CR.AuthenticateToServer(pILicenseServer);
+		hr = CR.AuthenticateToServer(pILicenseServer, CSolimarLicenseMgr::pAuthInfo);
 		if(FAILED(hr))
 			throw hr;
 				
@@ -233,6 +239,11 @@ CSolimarLicenseMgr::~CSolimarLicenseMgr()
 		CloseHandle(GracePeriodLock);
 	if (MessageListLock!=INVALID_HANDLE_VALUE)
 		CloseHandle(MessageListLock);
+	if (pAuthInfo)
+	{
+		delete pAuthInfo;
+		pAuthInfo = NULL;
+	}
 //OutputDebugString(L"CSolimarLicenseMgr::~CSolimarLicenseMgr() - Leave");	
 }
 
@@ -292,7 +303,6 @@ STDMETHODIMP CSolimarLicenseMgr::Connect2(BSTR server, VARIANT_BOOL bUseOnlyShar
 	return Connect3(server, connectionFlags);
 }
 
-
 // ISolimarLicenseMgr6
 STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 {
@@ -320,10 +330,8 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 	}
 	
 	// Try to create an ISolimarLicenseServer proxy to the server
-	COSERVERINFO	serverInfo	= {0, server, NULL, 0};
+	COSERVERINFO	serverInfo	= {0, server, pAuthInfo, 0};
 	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr4), NULL, NOERROR};
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CoCreateInstanceEx() - Start");
-//OutputDebugString(tmpbuf); 
 	hr = CoCreateInstanceEx(
 		__uuidof(CSolimarLicenseSvr), 
 		NULL, 
@@ -331,30 +339,23 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 		&serverInfo, 
 		1, 
 		&multiQI);
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CoCreateInstanceEx() - End");
-//OutputDebugString(tmpbuf); 
 	if (SUCCEEDED(hr))
 	{	
 		//Any licensing server that supports remote licensing will have interface ISolimarLicenseSvr4.
 		ISolimarLicenseSvr4 *pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
+
+		COMUtils::SetProxyBlanket(pILicenseServer, pAuthInfo, true);
+
 		ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 									sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 									challenge_key_server_userauththis_public, 
 									sizeof(challenge_key_server_userauththis_public)/sizeof(BYTE));
 		// try to authenticate the license server
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CR.AuthenticateServer() - Start");
-//OutputDebugString(tmpbuf);
-		hr = CR.AuthenticateServer(pILicenseServer);
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CR.AuthenticateServer() - End");
-//OutputDebugString(tmpbuf);
+		hr = CR.AuthenticateServer(pILicenseServer, pAuthInfo);
 		if (SUCCEEDED(hr))
 		{
 			// let the license server authenticate this manager
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CR.AuthenticateToServer() - Start");
-//OutputDebugString(tmpbuf);
-			hr = CR.AuthenticateToServer(pILicenseServer);
-//swprintf_s(tmpbuf, 1024, L"    CSolimarLicenseMgr::Connect2 () - CR.AuthenticateToServer() - End");
-//OutputDebugString(tmpbuf);
+			hr = CR.AuthenticateToServer(pILicenseServer, pAuthInfo);
 			if (SUCCEEDED(hr))
 			{
 				//if((connectionFlags & CF_SOFTWARE_LICENSING) != 0)
@@ -367,6 +368,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 					{
 						pLocalSoftwareLicSvr->Release();
 					}
+
 					//else
 					//{
 					//	//The license server does not support software licensing, continue
@@ -419,7 +421,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 	{
 		//See if remote licensing is not supported - in this scenarios ISolimarLicenseSvr3 is not on the system, but ISolimarLicenseSvr2 is.
 		HRESULT tmpHr = S_OK;
-		COSERVERINFO	serverInfo	= {0, server, NULL, 0};
+		COSERVERINFO	serverInfo	= {0, server, pAuthInfo, 0};
 		MULTI_QI		multiQI3		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
 		tmpHr = CoCreateInstanceEx(
 			__uuidof(CSolimarLicenseSvr), 
@@ -432,7 +434,7 @@ STDMETHODIMP CSolimarLicenseMgr::Connect3(BSTR server, long connectionFlags)
 		{
 			//Try to call CoCreateInstanceEx() for ISolimarLicenseSvr2, if this succeeds then the machine has a license server installed,
 			//but the version of the license server doesn't support remote connections.
-			COSERVERINFO	serverInfoLegacy	= {0, server, NULL, 0};
+			COSERVERINFO	serverInfoLegacy	= {0, server, pAuthInfo, 0};
 			MULTI_QI		multiQILegacy		= {&__uuidof(ISolimarLicenseSvr2), NULL, NOERROR};
 			tmpHr = CoCreateInstanceEx(
 				__uuidof(CSolimarLicenseSvr), 
@@ -655,6 +657,32 @@ STDMETHODIMP CSolimarLicenseMgr::ConnectByProduct(long product, VARIANT_BOOL bUs
 	return hr;
 }
 
+STDMETHODIMP CSolimarLicenseMgr::InitializeAuthInfo(
+	BSTR domain,
+	BSTR username,
+	BSTR password,
+	long authenticationLevel,
+	long impersonationLevel)
+{
+	AuthIdentity.Domain = (unsigned short*)SysAllocString(domain);
+	AuthIdentity.DomainLength = wcslen(domain);
+	AuthIdentity.Password = (unsigned short*)SysAllocString(password);
+	AuthIdentity.PasswordLength = wcslen(password);
+	AuthIdentity.User = (unsigned short*)SysAllocString(username);
+	AuthIdentity.UserLength = wcslen(username);
+	AuthIdentity.Flags = SEC_WINNT_AUTH_IDENTITY_UNICODE;
+
+	pAuthInfo = new COAUTHINFO();
+	pAuthInfo->dwAuthnSvc = RPC_C_AUTHN_WINNT;
+	pAuthInfo->dwAuthzSvc = RPC_C_AUTHZ_NONE;
+	pAuthInfo->dwAuthnLevel = authenticationLevel;
+	pAuthInfo->dwImpersonationLevel = impersonationLevel;
+	pAuthInfo->pwszServerPrincName = NULL;
+	pAuthInfo->pAuthIdentityData = &AuthIdentity;
+	pAuthInfo->dwCapabilities = EOAC_NONE;
+
+	return S_OK;
+}
 
 STDMETHODIMP CSolimarLicenseMgr::GetInfoByProduct(	
 	long product, 
@@ -2237,7 +2265,7 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 
 		// Try to create an ISolimarLicenseServer proxy to the server
 		// ISolimarLicenseSvr3 contains GetVersionLicenseServer()
-		COSERVERINFO	serverInfo	= {0, server, NULL, 0};
+		COSERVERINFO	serverInfo	= {0, server, pAuthInfo, 0};
 		MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
 
 		hr = CoCreateInstanceEx(
@@ -2250,16 +2278,19 @@ STDMETHODIMP CSolimarLicenseMgr::GetVersionLicenseServer(BSTR server, long* p_ve
 		if (SUCCEEDED(hr))
 		{	
 			ISolimarLicenseSvr3 *pILicenseServer = (ISolimarLicenseSvr3*)multiQI.pItf;
+
+			COMUtils::SetProxyBlanket(pILicenseServer, pAuthInfo, true);
+
 			ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 										sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 										challenge_key_server_userauththis_public, 
 										sizeof(challenge_key_server_userauththis_public)/sizeof(BYTE));
 			// try to authenticate the license server
-			hr = CR.AuthenticateServer(pILicenseServer);
+			hr = CR.AuthenticateServer(pILicenseServer, pAuthInfo);
 			if (SUCCEEDED(hr))
 			{
 				// let the license server authenticate this manager
-				hr = CR.AuthenticateToServer(pILicenseServer);
+				hr = CR.AuthenticateToServer(pILicenseServer, pAuthInfo);
 				if (SUCCEEDED(hr))
 				{
 					hr = pILicenseServer->GetVersionLicenseServer(p_ver_major, p_ver_minor, p_ver_build);
