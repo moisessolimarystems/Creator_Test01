@@ -3,7 +3,7 @@
 		<Name>OpenSSL-1.0.2</Name>
 		<SharedPath>SolimarLicensingCode\3prty\project.pj</SharedPath>
 		<ProjecttPath>SolimarLicensingCode\3prty\OpenSSL-1.0.2\project.pj</ProjecttPath>
-		<Type Help="Normal eq Trunk, Variant eq Path, Build eq Label">Normal</Type>
-		<Label></Label>
+		<Type Help="Normal eq Trunk, Variant eq Path, Build eq Label">Build</Type>
+		<Label>OpenSSL1.0.2.0</Label>
 	</Project>
 </ProductConfiguration>
