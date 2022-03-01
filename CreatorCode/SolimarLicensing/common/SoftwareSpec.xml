@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="89">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="90">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -413,7 +413,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Sites" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="8"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Batching" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="48"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="EQUIOS JDF/JMF" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="60"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="JDF/JMF Printer" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="59"/>		
+			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="JDF/JMF Printer" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="90"/>		
 			<Lic_ModuleSoftwareSpecAttribs moduleID="7" moduleName="Proof and Approval" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="80"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="Mail Tracking" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="84"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="9" moduleName="Duplicate File Checking" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="88"/>

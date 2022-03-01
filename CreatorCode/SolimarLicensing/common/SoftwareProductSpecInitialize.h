@@ -2757,11 +2757,10 @@ void InititalizeProduct16()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(6))->second);
 	pTmpModSpec->moduleID = 6;
 	pTmpModSpec->moduleName = std::wstring(L"JDF/JMF Printer");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 2;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 59;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 90;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(9, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(9))->second);
