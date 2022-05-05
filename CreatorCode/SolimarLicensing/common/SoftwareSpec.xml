@@ -134,7 +134,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="90">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="91">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -533,7 +533,8 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="65" moduleName="Dispatch Spooler Output" modUnlimitedValue="1" moduleDefaultLicense="1"  moduleVersionIntroduced_SubMinor="87"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="66" moduleName="Job Ticket Extractor" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="67" moduleName="Job Ticket Inserter" modUnlimitedValue="1"/>				
-			<Lic_ModuleSoftwareSpecAttribs moduleID="68" moduleName="JDF Generator" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="2" modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="82"/>							
+			<Lic_ModuleSoftwareSpecAttribs moduleID="68" moduleName="JDF Generator" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="2" modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="82"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="69" moduleName="JDF Output"  modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="91"/>							
 			<Lic_ModuleSoftwareSpecAttribs moduleID="106" moduleName="SOLitrack Input" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1"/>			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1"/>
@@ -541,7 +542,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="112" moduleName="IPP Output" modUnlimitedValue="1"/>	
 			<Lic_ModuleSoftwareSpecAttribs moduleID="113" moduleName="SLS Job Ticket Manager"  modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="79"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="114" moduleName="SLS JDF Manager"  moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="2" modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="82"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="115" moduleName="JDF Output"  modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="86"/>			
+			<Lic_ModuleSoftwareSpecAttribs moduleID="115" moduleName="JDF Output Manager"  modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="91"/>			
 
 			<!-- Module IDs identifying resources -->
 			<Lic_ModuleSoftwareSpecAttribs moduleID="202" moduleName="PDF Interpreter(PDFL)"/>	
