@@ -229,11 +229,10 @@ void InititalizeProduct25()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(115))->second);
 	pTmpModSpec->moduleID = 115;
 	pTmpModSpec->moduleName = std::wstring(L"JDF Output Manager");
-	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 2;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 91;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 92;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(114, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(114))->second);
