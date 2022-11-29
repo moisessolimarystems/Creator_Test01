@@ -384,10 +384,11 @@ void InititalizeProduct25()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(70))->second);
 	pTmpModSpec->moduleID = 70;
 	pTmpModSpec->moduleName = std::wstring(L"XJDF Output");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 95;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 98;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(106, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(106))->second);
@@ -2705,11 +2706,11 @@ void InititalizeProduct14()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(204, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(204))->second);
 	pTmpModSpec->moduleID = 204;
-	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF(PDFL)");
+	pTmpModSpec->moduleName = std::wstring(L"PDF Interpreter(PDFL-ReadyPDF)");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 3;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 96;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 97;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(70, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(70))->second);
