@@ -611,7 +611,8 @@ namespace Client.Creator
             this.Cursor = storedCursor;
         }
 
-        private void deactivateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
+        //Requires HardwareKeyListView
+        void DeactivateHardwareKey()
         {
             if (HardwareKeyListView.SelectedItems.Count > 0)
             {   //deactivated or reserved
@@ -623,18 +624,26 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {
                     TokenTable selectedToken = client.GetHardwareTokenByKeyValue(keyValue);
-                    if (selectedToken == null)
+                    if (selectedToken == null) //Hardware Token to deactivate/delete not found
                     {
                         MessageBox.Show(string.Format("Failed to find hardware key : {0} in database", keyValue), "Deactivate Hardware Key");
                         return;
                     }
-                    if (keyStatus == TokenStatus.Deactivated.ToString() || keyStatus == TokenStatus.Reserved.ToString())
+                    if (keyStatus == TokenStatus.Deactivated.ToString() || keyStatus == TokenStatus.Reserved.ToString()) //Hardware token to remove - deactivated or reserved
                     {
+                        string licenseName = HardwareKeyListView.SelectedItems[0].SubItems[1].Text;
                         if (selectedToken.LicenseID > 0)
                         {
-                            string licenseName = HardwareKeyListView.SelectedItems[0].SubItems[1].Text;
                             MessageBox.Show(string.Format("Please remove from license server : {0} before deleting hardware key - {1}.", licenseName, keyValue), "Remove Hardware Key");
                             return;
+                        }
+                        else
+                        {
+                            if (MessageBox.Show(string.Format("Please confirm removal of hardware key : {0}", keyValue),
+                                            "Delete Hardware Key",
+                                            MessageBoxButtons.OKCancel,
+                                            MessageBoxIcon.Warning) == DialogResult.Cancel)
+                                return;
                         }
                         client.DeleteToken(selectedToken);
                         HardwareKeyListView.Items.RemoveByKey(keyValue);
@@ -646,7 +655,7 @@ namespace Client.Creator
                                 HardwareKeyListView.Items[selectedIndex - 1].Selected = true;
                         }
                     }
-                    else //active
+                    else //active hardware token to deactivate
                     {
                         IList<SolimarLicenseProtectionKeyInfo> pKeyList = client.KeyEnumerate();
                         bool bFound = false;
@@ -660,14 +669,20 @@ namespace Client.Creator
                         }
                         if (bFound)
                         {
-                            client.KeyFormat(keyValue);
-                            selectedToken.LicenseID = -1;
-                            selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
-                            selectedToken.DeactivatedDate = DateTime.Now;
-                            client.UpdateToken(selectedToken);
-                            HardwareKeyListView.SelectedItems[0].SubItems[1].Text = string.Empty;
-                            HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
-                            HardwareKeyListView.SelectedItems[0].SubItems[3].Text = DateTime.Now.ToString(); 
+                            if (MessageBox.Show(string.Format("Please confirm deactivation of hardware key : {0}", keyValue),
+                                                              "Deactivate Hardware Key",
+                                                MessageBoxButtons.OKCancel,
+                                                MessageBoxIcon.Warning) == DialogResult.OK)
+                            {
+                                client.KeyFormat(keyValue);
+                                selectedToken.LicenseID = -1;
+                                selectedToken.TokenStatus = (byte)TokenStatus.Deactivated;
+                                selectedToken.DeactivatedDate = DateTime.Now;
+                                client.UpdateToken(selectedToken);
+                                HardwareKeyListView.SelectedItems[0].SubItems[1].Text = string.Empty;
+                                HardwareKeyListView.SelectedItems[0].SubItems[2].Text = TokenStatus.Deactivated.ToString();
+                                HardwareKeyListView.SelectedItems[0].SubItems[3].Text = DateTime.Now.ToString();
+                            }
                         }
                         else
                         {
@@ -680,6 +695,11 @@ namespace Client.Creator
                 });
                 this.Cursor = storedCursor;
             }
+        }
+
+        private void deactivateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
+        {
+            DeactivateHardwareKey();
         }
 
         private void activateHardwareKeyToolStripButton_Click(object sender, EventArgs e)
@@ -1484,9 +1504,12 @@ namespace Client.Creator
         {
             extendLicenseServerToolStripMenuItem.Enabled = false;
             if (m_Permissions != null)
-                if (m_Permissions.pt_extension_pwd.HasValue)                    
-                    if(DetailTreeView.SelectedNode.Tag != null)
+                if (m_Permissions.pt_extension_pwd.HasValue)
+                    if (DetailTreeView.SelectedNode.Tag != null)
+                    {
                         extendLicenseServerToolStripMenuItem.Enabled = m_Permissions.pt_extension_pwd.Value && (DetailTreeView.SelectedNode.Tag as LicenseServer).LockedByCurrentUser();
+                        upgradeProductVersionToolStripMenuItem.Enabled = extendLicenseServerToolStripMenuItem.Enabled;                            
+                    }
         }
 
         private void extendLicenseServerToolStripTextBox_Leave(object sender, EventArgs e)
@@ -2465,9 +2488,19 @@ namespace Client.Creator
                     //LoadHardwareKeyListView(null);
                 }
             }
-        } 
-        
+        }
+
         #region ValidationTokenContextMenu Events
+
+        private void deactivateHardwareKeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DeactivateHardwareKey();
+        }
+
+        private void deleteHardwareKeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DeactivateHardwareKey();
+        }
         private void viewLSToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (HardwareKeyListView.SelectedItems.Count > 0)
@@ -2522,6 +2555,9 @@ namespace Client.Creator
             viewLSToolStripMenuItem.Enabled = false;
             markDefectiveToolStripMenuItem.Visible = false;
             markLostValidationViewToolStripMenuItem.Enabled = false;
+            deactivateHardwareKeyToolStripMenuItem.Visible = false;
+            deleteHardwareKeyToolStripMenuItem.Visible = false;
+            string keyStatus = HardwareKeyListView.SelectedItems[0].SubItems[2].Text;
             if (HardwareKeyListView.Columns[0].Text == "Key Value")
             {
                 //verify that the current view has hardware tokens list. 
@@ -2535,6 +2571,11 @@ namespace Client.Creator
                         viewLSToolStripMenuItem.Enabled = true;
                         markDefectiveToolStripMenuItem.Visible = true;
                     }
+                    //if active
+                    deactivateHardwareKeyToolStripMenuItem.Visible = deactivateHardwareKeyToolStripButton.Enabled &&
+                                                                     (keyStatus == TokenStatus.Active.ToString());
+                    deleteHardwareKeyToolStripMenuItem.Visible = deactivateHardwareKeyToolStripButton.Enabled &&
+                                                                 (keyStatus == TokenStatus.Deactivated.ToString() || keyStatus == TokenStatus.Reserved.ToString());
                 }
             }              
         }
@@ -5828,6 +5869,118 @@ namespace Client.Creator
                 SetNodeStyle(node, ProductLicenseStatus.InActive);
         }
 
+        private void upgradeProductVersionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string errorString = string.Empty, confirmationString = string.Empty;
 
+            LicenseContextMenuStrip.Close();
+            LicenseServer selectedLicense = DetailTreeView.SelectedNode.Tag as LicenseServer;
+            if (MessageBox.Show(string.Format("Please confirm upgrade of all product licenses in {0} to the latest release version", selectedLicense.Name),
+                                "Upgrade Version(s)",
+                                MessageBoxButtons.OKCancel,
+                                MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                Service<ICreator>.Use((client) =>
+                {
+                    LicenseVersion version;
+                    IList<ProductTable> products = client.GetProducts();
+                    Dictionary<int, LicenseVersion> productTable = new Dictionary<int, LicenseVersion>();
+                    //Compile list of products and release versions
+                    foreach (ProductTable product in products)
+                    {
+                        if (!product.pName.Contains("Test") &&
+                            !product.pName.Contains("PLP") &&
+                            s_CommLink.GetProductName((byte)product.pId) != "Unknown")
+                        {
+                            version = new LicenseVersion(product.pVersion);
+                            productTable.Add(product.pId, version);
+                        }
+                    }
+                    List<Transaction> transactionList = new List<Transaction>();
+                    List<ProductLicenseTable> updateList = new List<ProductLicenseTable>();
+                    IList<ProductLicenseTable> plList = client.GetProductLicenses(selectedLicense.Name, true);
+                    //Compile list of product licenses with version lower then release version
+                    foreach (ProductLicenseTable pl in plList)
+                    {
+                        if (pl.IsActive)
+                        {
+                            var baseName = s_CommLink.GetProductBaseName(pl.ProductID);
+                            var licenseVersion = productTable[s_CommLink.GetProductID(baseName)]; //need to use base product id for test/dev 
+                            var currentLicenseVersion = new LicenseVersion(pl.ProductVersion);
+                            if (licenseVersion != null)
+                            {
+                                if (currentLicenseVersion.CompareTo(licenseVersion) < 0)
+                                {
+                                    transactionList.Add(new Transaction()
+                                    {
+                                        Type = TransactionType.Version,
+                                        LicenseServerName = string.Empty,
+                                        ProductLicenseName = pl.plID,
+                                        Description = string.Format("Edit {0} Version", s_CommLink.GetProductName(pl.ProductID)),
+                                        Value = licenseVersion.ToString(),
+                                        PreviousValue = pl.ProductVersion.ToString()
+                                    });
+                                    //update version for product license
+                                    pl.ProductVersion = licenseVersion.ToString();
+                                    updateList.Add(pl);
+                                }
+                            }
+                        }
+                    }
+                    if (updateList.Count > 0)
+                    {
+                        //Record all transactions
+                        TransactionManager.CreateTransactions(transactionList);
+                        //Update all product licenses with version updates
+                        client.UpdateAllProductLicenses(updateList);
+                        //Mark license server dirty to indicate changes available for packet
+                        client.MarkDirty(selectedLicense.Name);
+                        //Update module list for distinct products for any deprecated or introducted modules with product version update
+                        var distinctProducts = updateList.Where(p => p.plID != null).GroupBy(p => p.ProductID).Select(grp => grp.FirstOrDefault()).ToList();
+                        foreach (var product in distinctProducts)
+                        {
+                            var updateProduct = new ProductLicense(product, m_Permissions);
+                            var productLicenses = client.GetProductLicensesByProduct(selectedLicense.Name, updateProduct.ProductID);
+                            updateProduct.UpdateModules(updateProduct.ProductVersion, productLicenses);
+                        }
+                        //Generate message to display of all product licenses updated
+                        string updateMessage = string.Empty;
+                        foreach (var entry in transactionList)
+                        {
+                            var productName = entry.Description.Replace("Edit", string.Empty).Replace("Version", string.Empty).Trim();
+                            updateMessage += string.Format("{0} - {1} upgraded {2} -> {3}\r\n", entry.ProductLicenseName,
+                                                                                                productName,
+                                                                                                entry.PreviousValue,
+                                                                                                entry.Value);
+                        }
+                        MessageBox.Show(updateMessage,
+                                        "Updated Version(s)",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                        //Write out message of all product licenses updated to text file 
+                        string path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "VersionUpdates";
+                        string fileName = string.Format("{0}\\{1}_{2}-{3}-{4}-{5}-{6}-{7}.txt", path, selectedLicense.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                        if (!Directory.Exists(path))
+                        {
+                            DirectoryInfo di = Directory.CreateDirectory(path);
+                        }
+                        FileInfo fi = new FileInfo(fileName);
+                        using (StreamWriter sw = fi.CreateText())
+                        {
+                            sw.WriteLine(updateMessage);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No product licenses were available to upgrade.",
+                                        "Updated Version(s)",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                    }
+                });
+                Cursor.Current = Cursors.Default;
+            }            
+        }
     }
 }
