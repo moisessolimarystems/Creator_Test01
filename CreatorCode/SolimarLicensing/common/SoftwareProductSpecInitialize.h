@@ -1262,6 +1262,15 @@ void InititalizeProduct9()
 	pTmpModSpec->moduleID = 0;
 	pTmpModSpec->moduleName = std::wstring(L"Distiller");
 	pTmpModSpec->moduleTrialLicense = 127;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
+	pTmpModSpec->moduleID = 2;
+	pTmpModSpec->moduleName = std::wstring(L"SOLscript Enabled Printer");
+	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_Major = 3;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 100;
 }
 
 void InititalizeProduct8()
