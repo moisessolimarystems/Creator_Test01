@@ -72,6 +72,7 @@
 //
 // Function prototype definitions 
 prototype SdAskDestPathDlg();   
+prototype SdAskDestPathLicensingDlg(); 
 prototype SdFeatureTreeDlg();
 prototype SdFinishUpgradeDlg(); 
 prototype SdLicenseDlg();

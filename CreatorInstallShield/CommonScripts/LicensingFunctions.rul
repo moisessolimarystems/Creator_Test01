@@ -62,7 +62,7 @@ end;
 //=============================================================================
 function InstallLicensing(szParam)
 	STRING szPath, szOpts, svValue, szLicPath;
-	STRING svLicenseName, svLicenseCode;
+	STRING svLicenseName, svLicenseCode, szDir, szInstallChanged;
 	INT nvSize, nResult, nvType, iCount;    
 	BOOL bValue;
 begin                                        
@@ -81,10 +81,20 @@ begin
 	//if licensing component exists check if need to remove/re-install
     if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then  
 		bValue = IsOldSolimarLicense(gbl_Array(2));    
-	endif;	 	     		     		 	     		 
-   	if(bValue) then  //true when not installed and older found 
-     	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);
-     	szOpts = " /S /v\"ALLUSERS=1 /norestart /qn\"" + szParam;        			
+	endif;	 
+	//Get value from registry instead of install properties
+    RegDBGetKeyValueEx("SOFTWARE\\Solimar","LicensingInstallDir", nvType, szDir, nvSize);	
+	nvSize = 256; 
+	MsiGetProperty(ISMSI_HANDLE, "INSTALLDIRECTORY_CHANGED", szInstallChanged, nvSize);  
+	  //value from properties are gone after install is finished. 
+	  //need to use registry to store value   		     		 	     		 
+   	if(bValue || szInstallChanged="1") then  //true when not installed and older found or install directory has changed
+     	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);			
+		if(szDir != "") then
+			szOpts = " /S /v\"ALLUSERS=1 INSTALLDIR=" + "\\\"" + szDir + "\\\"" + " /norestart /qn\"" + szParam;      	
+		else			      	
+			szOpts = " /S /v\"ALLUSERS=1 /norestart /qn\"" + szParam;        						
+		endif;
    		LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
    		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
 		  	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);

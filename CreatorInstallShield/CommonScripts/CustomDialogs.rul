@@ -74,6 +74,57 @@ begin
     return nResult;
 end; 
 
+//=============================================================================
+//
+// Function: 	SdAskDestPathDlg
+// Purpose: 	This function displays the custom component dialog.
+// Parameters:	None
+// Returns:		nResult                                                           
+//
+//=============================================================================
+function SdAskDestPathLicensingDlg()
+    NUMBER nResult;
+    STRING szTitle, szMsg, szDir, szKey, szName, svValue, svPropertyValue;
+    NUMBER nType, nSize, nvType, nvSize, nvBufferSize;
+
+begin           
+    szTitle   = "Destination Path For the Solimar License Server";
+    szMsg     = "Please specify the installation directory for the Solimar License Server.";
+    
+    		// get Version from the 64 bit registry area
+	REGDB_OPTIONS = REGDB_OPTIONS | REGDB_OPTION_WOW64_64KEY;
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	szKey = "SOFTWARE\\Solimar\\Solimar Licensing\\";   
+	szName = "InstallDir";    
+    if (RegDBGetKeyValueEx (szKey, szName, nvType, svValue, nvSize) = 0) then //already exists use installed get installdir from registry
+		szDir = svValue;
+    else  //use default
+    	//nvSize = 256; 
+		//MsiGetProperty(ISMSI_HANDLE, "LICENSINGINSTALLDIR", svPropertyValue, nvSize);  
+		szDir = ProgramFiles64Folder ^ "Solimar Systems\\Solimar Licensing";//@LICENSING_INSTALLDIR;//svPropertyValue;
+    endif;
+    
+    //Need to retain setting if user has pressed back
+    
+AskLicensing:    
+	MsiSetProperty(ISMSI_HANDLE, "INSTALLDIRECTORY_CHANGED", "0");	
+    nResult   = AskDestPath( szTitle, szMsg, szDir, 0 );
+    if(svValue != "") then //Check if different from existing
+		if(svValue != szDir) then
+		    if(MODE != SILENTMODE) then
+				if (AskYesNo("The specified installation directory for Solimar Licensing has changed from the existing installation directory." + 
+							 "Would you like to keep the changes?", YES)=NO) then
+					goto AskLicensing;
+				else
+					MsiSetProperty(ISMSI_HANDLE, "INSTALLDIRECTORY_CHANGED", "1");	 
+				endif;
+			endif;
+		endif;
+    endif;
+	MsiSetProperty(ISMSI_HANDLE, "LICENSINGINSTALLDIR", szDir);	 	
+    return nResult;
+end; 
+
 //=============================================================================  
 //
 // Function: 	SdUserLoginCustomDlg - 104
