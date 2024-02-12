@@ -2,7 +2,11 @@
 #include "EventLogHelper.h"
 
 
-HRESULT EventLogHelper::WriteEventLog(wchar_t* event_source, wchar_t *event_log_msg, unsigned int event_type, long event_id)
+HRESULT EventLogHelper::WriteEventLog(
+	const wchar_t* event_source,																		// CR.32662; modified. 
+	const wchar_t *event_log_msg, 																	// CR.32662; modified. 
+	unsigned int event_type, 
+	long event_id)
 {
 	HRESULT hr = S_OK;
     HANDLE h;

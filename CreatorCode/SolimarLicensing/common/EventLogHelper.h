@@ -12,7 +12,11 @@
 class EventLogHelper
 {
 public:
-    static HRESULT WriteEventLog(wchar_t* event_source, wchar_t *event_log_msg, unsigned int event_type, long event_id);
+    static HRESULT WriteEventLog(
+		 const wchar_t* event_source, 																// CR.32662; modified. 
+		 const wchar_t *event_log_msg, 																// CR.32662; modified. 
+		 unsigned int event_type, 
+		 long event_id);
     static HRESULT ReadEventLog_Helper();
 	 static HRESULT ReadEventLog(BSTR *pBstrEventLogAttribsListStream);
 //	 static LPWSTR GetMessageString(DWORD MessageId, DWORD argc, LPWSTR argv);
