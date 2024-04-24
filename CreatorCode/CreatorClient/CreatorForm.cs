@@ -814,7 +814,7 @@ namespace Client.Creator
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (ProductConfigurationDialog dlg = new ProductConfigurationDialog(s_CommLink))
+            using (ProductConfigurationDialog dlg = new ProductConfigurationDialog(s_CommLink, m_Permissions))
             {
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {

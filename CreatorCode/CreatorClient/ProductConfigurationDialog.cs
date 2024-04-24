@@ -16,13 +16,15 @@ namespace Client.Creator
     {
         #region Fields
         CommunicationLink commLink;
+        PermissionsTable permissions;
         #endregion
 
         #region Constructor
-        public ProductConfigurationDialog(CommunicationLink commLink)
+        public ProductConfigurationDialog(CommunicationLink commLink, PermissionsTable userPermissions)
         {
             InitializeComponent();
             this.commLink = commLink;
+            this.permissions = userPermissions;
             optionsTabControl.ImageList = StaticImageList.Instance.GlobalImageList;
             //versionTabPage.ImageIndex = (int)IconList.VERSIONTAB;// Enums.GetIconIndex("VERSIONTAB");
             //tokenTabPage.ImageIndex = (int)IconList.TOKENTAB; // Enums.GetIconIndex("TOKENTAB");
@@ -104,10 +106,10 @@ namespace Client.Creator
 
         private void EnableButtons()
         {
-            addButton.Enabled = availableListView.SelectedItems.Count > 0;
-            addAllButton.Enabled = availableListView.Items.Count > 0;
-            removeButton.Enabled = selectedListView.SelectedItems.Count > 0;
-            removeAllButton.Enabled = selectedListView.Items.Count > 0;
+            addButton.Enabled = permissions.pt_create_modify_key.Value && (availableListView.SelectedItems.Count > 0);
+            addAllButton.Enabled = permissions.pt_create_modify_key.Value && (availableListView.Items.Count > 0);
+            removeButton.Enabled = permissions.pt_create_modify_key.Value && (selectedListView.SelectedItems.Count > 0);
+            removeAllButton.Enabled = permissions.pt_create_modify_key.Value && (selectedListView.Items.Count > 0);
         }
 
         private void SaveSoftwareTokens()
