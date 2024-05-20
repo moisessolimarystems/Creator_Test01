@@ -1267,11 +1267,11 @@ void InititalizeProduct9()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"SOLscript Enabled Printer");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleDefaultLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 102;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 103;
 }
 
 void InititalizeProduct8()
