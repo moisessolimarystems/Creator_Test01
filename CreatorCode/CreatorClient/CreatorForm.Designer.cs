@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorForm));
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Reports");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Reports");
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -281,7 +281,6 @@
             // MainMenuStrip
             // 
             this.MainMenuStrip.BackColor = System.Drawing.SystemColors.Control;
-            this.MainMenuStrip.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.MainMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.MainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
@@ -837,7 +836,6 @@
             // 
             // findToolStripTextBox
             // 
-            this.findToolStripTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.findToolStripTextBox.Name = "findToolStripTextBox";
             this.findToolStripTextBox.Size = new System.Drawing.Size(125, 34);
             this.findToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.findToolStripTextBox_KeyUp);
@@ -1461,11 +1459,11 @@
             this.reportsTreeView.LabelEdit = true;
             this.reportsTreeView.Location = new System.Drawing.Point(0, 0);
             this.reportsTreeView.Name = "reportsTreeView";
-            treeNode1.ImageIndex = 44;
-            treeNode1.Name = "RootNode";
-            treeNode1.Text = "Reports";
+            treeNode2.ImageIndex = 44;
+            treeNode2.Name = "RootNode";
+            treeNode2.Text = "Reports";
             this.reportsTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode2});
             this.reportsTreeView.SelectedImageIndex = 44;
             this.reportsTreeView.Size = new System.Drawing.Size(233, 394);
             this.reportsTreeView.TabIndex = 0;
@@ -1917,7 +1915,6 @@
             // 
             // setModuleToolStripTextBox
             // 
-            this.setModuleToolStripTextBox.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.setModuleToolStripTextBox.Name = "setModuleToolStripTextBox";
             this.setModuleToolStripTextBox.Size = new System.Drawing.Size(100, 31);
             this.setModuleToolStripTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.setModuleToolStripTextBox_KeyUp);
@@ -1934,7 +1931,6 @@
             this.cloneToolStripMenuItem,
             this.reactivateToolStripMenuItem,
             this.deactivateToolStripMenuItem,
-            this.deleteToolStripMenuItem,
             this.lcmToolStripSeparator2,
             this.newLicenseToolStripMenuItem,
             this.newProductLicenseToolStripMenuItem,
@@ -1942,6 +1938,7 @@
             this.validationTokensToolStripMenuItem,
             this.lcmToolStripSeparator3,
             this.findToolStripMenuItem,
+            this.deleteToolStripMenuItem,
             this.lcmToolStripSeparator4,
             this.createPacketFileToolStripMenuItem});
             this.LicenseContextMenuStrip.Name = "LicenseContextMenuStrip";
