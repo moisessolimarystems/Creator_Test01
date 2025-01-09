@@ -42,7 +42,9 @@ namespace SolimarLicenseViewer
             XIMAGEPDF,
             EMAILALERTS,
             SOLIMARUTILITIES,
-            SPDEESSENTIALS
+            SPDEESSENTIALS,
+            READYPDFCLIENT,
+            SOLSEARCHERCLOUD
         }
 
 
