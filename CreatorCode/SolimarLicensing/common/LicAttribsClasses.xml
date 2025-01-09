@@ -110,6 +110,8 @@
 	  <enum name="pid_RubikaPLP" value="23" alias="RUBIKA_PLP_PRODUCT"/>
 	  <enum name="pid_SolimarIndexingToolsPLP" value="24" alias="SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
 	  <enum name="pid_SpdeEssentials" value="25" alias="SPDE_ESSENTIALS_PRODUCT"/>
+	  <enum name="pid_ReadyPDFClient" value="26" alias="READYPDF_CLIENT_PRODUCT"/>
+	  <enum name="pid_SOLsearcherCloud" value="27" alias="SOLSEARCHER_CLOUD_PRODUCT"/>
       <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
       <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
       <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -128,8 +130,10 @@
 	  <enum name="pid_TestDevRubikaPLP" value="123" alias="TEST_DEV_RUBIKA_PLP_PRODUCT"/>
 	  <enum name="pid_TestDevSolimarIndexingToolsPLP" value="124" alias="TEST_DEV_SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
 	  <enum name="pid_TestDevSpdeEssentials" value="125" alias="TEST_DEV_SPDE_ESSENTIALS_PRODUCT"/>
+	  <enum name="pid_TestDevReadyPDFClient" value="126" alias="TEST_DEV_READYPDF_CLIENT_PRODUCT"/>
+	  <enum name="pid_TestDevSOLsearcherCloud" value="127" alias="TEST_DEV_SOLSEARCHER_CLOUD_PRODUCT"/>
       <!-- Dont include, these typedefs can never change, not sure what this is...
-			<enum name="pid_NumberOfProducts" value="23" alias="NUMBER_OF_PRODUCTS"/>
+			<enum name="pid_NumberOfProducts" value="27" alias="NUMBER_OF_PRODUCTS"/>
 			-->
 		<enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 		</typedef>

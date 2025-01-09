@@ -53,6 +53,8 @@ public:
 		pid_RubikaPLP = 23,
 		pid_SolimarIndexingToolsPLP = 24,
 		pid_SpdeEssentials = 25,
+		pid_ReadyPDFClient = 26,
+		pid_SOLsearcherCloud = 27,
 		pid_TestDevIconvert = 107,
 		pid_TestDevSolsearcherEp = 108,
 		pid_TestDevSolScript = 109,
@@ -71,6 +73,8 @@ public:
 		pid_TestDevRubikaPLP = 123,
 		pid_TestDevSolimarIndexingToolsPLP = 124,
 		pid_TestDevSpdeEssentials = 125,
+		pid_TestDevReadyPDFClient = 126,
+		pid_TestDevSOLsearcherCloud = 127,
 		pid_UnknownProduct = 0xFFFF,
 	} TLic_ProductID;
 	

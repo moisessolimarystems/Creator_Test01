@@ -35,6 +35,8 @@
 <enum name="pid_RubikaPLP" value="23" alias="RUBIKA_PLP_PRODUCT"/>
 <enum name="pid_SolimarIndexingToolsPLP" value="24" alias="SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
 <enum name="pid_SpdeEssentials" value="25" alias="SPDE_ESSENTIALS_PRODUCT"/>
+<enum name="pid_ReadyPDFClient" value="26" alias="READYPDF_CLIENT_PRODUCT"/>
+<enum name="pid_SOLsearcherCloud" value="27" alias="SOLSEARCHER_CLOUD_PRODUCT"/>
 <enum name="pid_TestDevIconvert" value="107" alias="TEST_DEV_ICONVERT_PRODUCT"/>
 <enum name="pid_TestDevSolsearcherEp" value="108" alias="TEST_DEV_SOLSEARCHER_ENTERPRISE_PRODUCT"/>
 <enum name="pid_TestDevSolScript" value="109" alias="TEST_DEV_SOLSCRIPT_PRODUCT"/>
@@ -53,6 +55,8 @@
 <enum name="pid_TestDevRubikaPLP" value="123" alias="TEST_DEV_RUBIKA_PLP_PRODUCT"/>
 <enum name="pid_TestDevSolimarIndexingToolsPLP" value="124" alias="TEST_DEV_SOLIMAR_INDEXING_TOOLS_PLP_PRODUCT"/>
 <enum name="pid_TestDevSpdeEssentials" value="125" alias="TEST_DEV_SPDE_ESSENTIALS_PRODUCT"/>
+<enum name="pid_TestDevReadyPDFClient" value="126" alias="TEST_DEV_READYPDF_CLIENT_PRODUCT"/>
+<enum name="pid_TestDevSOLsearcherCloud" value="127" alias="TEST_DEV_SOLSEARCHER_CLOUD_PRODUCT"/>
 <enum name="pid_UnknownProduct" value="0xFFFF" alias="UNKNOWN_PRODUCT"/>
 </typedef>
 -->
@@ -134,7 +138,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="103">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="106">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -209,7 +213,7 @@
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Distiller"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="GhostScript"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="SOLscript Enabled Printer" moduleDefaultLicense="0" moduleTrialLicense="0" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="103"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="SOLscript Enabled Printer" modUnlimitedValue="1" moduleDefaultLicense="0" moduleTrialLicense="0" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="105"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="12" moduleName="PostScript::PostScript(RIP)"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="21" moduleName="PostScript::Metacode"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="25" moduleName="PostScript::IPDS"/>
@@ -443,12 +447,11 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="20" productName="Library Services">
 		<Lic_ModuleSoftwareSpecAttribsMap>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip"  moduleTrialLicense="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="11"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="PDF Rip" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="106"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="PDF Renderer" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="4"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="15"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Job Ticket Manager" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="78"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="JDF Manager" modUnlimitedValue="1" moduleVersionDeprecated_Major="1" moduleVersionDeprecated_Minor="4" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="82"/> 
-
 		</Lic_ModuleSoftwareSpecAttribsMap>      
 	</Lic_ProductSoftwareSpecAttribs>	
 	<Lic_ProductSoftwareSpecAttribs productID="21" productName="XIMAGEpdf">
@@ -561,6 +564,18 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="240" moduleName="Output Pool" bModuleIsPool="true" modUnlimitedValue="10"/>			
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>	
+	<Lic_ProductSoftwareSpecAttribs productID="26" productName="ReadyPDF Client" prevSharedProductID="14" productLicType="pltClient">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="ReadyPDF Sessions" modUnlimitedValue="255"/>
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs>	
+    <Lic_ProductSoftwareSpecAttribs productID="27" productName="SOLsearcher Cloud">
+		<Lic_ModuleSoftwareSpecAttribsMap>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Archive"/>
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Indexing Instances" />
+		  <Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="SDX Designer instance"/>
+		</Lic_ModuleSoftwareSpecAttribsMap>
+	</Lic_ProductSoftwareSpecAttribs> 	
 	<Lic_ProductSoftwareSpecAttribs productID="107" productName="Test/Dev/DR iCONVERT" sameModSpecProductID="7">
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="108" productName="Test/Dev/DR SOLsearcher Enterprise" sameModSpecProductID="8">
@@ -597,6 +612,10 @@
   </Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="125" productName="Test/Dev/DR SPDE Essentials" sameModSpecProductID="25">
   </Lic_ProductSoftwareSpecAttribs>
+  <Lic_ProductSoftwareSpecAttribs productID="126" productName="Test/Dev/DR ReadyPDF Client" sameModSpecProductID="26" productLicType="pltClient">
+   </Lic_ProductSoftwareSpecAttribs>    
+  <Lic_ProductSoftwareSpecAttribs productID="127" productName="Test/Dev/DR SOLsearcher Cloud" sameModSpecProductID="27">
+  </Lic_ProductSoftwareSpecAttribs>   
 </Lic_SoftwareSpecAttribs>
 
 

@@ -475,6 +475,61 @@ void InititalizeProduct25()
 	pTmpModSpec->moduleTrialLicense = 1;
 }
 
+void InititalizeProduct26()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:26, ProdName: ReadyPDF Client
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(26, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(26))->second);
+	pTmpProdSpec->productID = 26;
+	pTmpProdSpec->productName = std::wstring(L"ReadyPDF Client");
+	pTmpProdSpec->prevSharedProductID = 14;
+	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
+
+	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
+	pTmpModSpec->moduleID = 0;
+	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF Sessions");
+	pTmpModSpec->modUnlimitedValue = 255;
+	pTmpModSpec->moduleTrialLicense = 255;
+}
+
+void InititalizeProduct27()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:27, ProdName: SOLsearcher Cloud
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(27, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(27))->second);
+	pTmpProdSpec->productID = 27;
+	pTmpProdSpec->productName = std::wstring(L"SOLsearcher Cloud");
+
+	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
+	pTmpModSpec->moduleID = 1;
+	pTmpModSpec->moduleName = std::wstring(L"Indexing Instances");
+	pTmpModSpec->moduleTrialLicense = 127;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
+	pTmpModSpec->moduleID = 0;
+	pTmpModSpec->moduleName = std::wstring(L"Archive");
+	pTmpModSpec->moduleTrialLicense = 127;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
+	pTmpModSpec->moduleID = 2;
+	pTmpModSpec->moduleName = std::wstring(L"SDX Designer instance");
+	pTmpModSpec->moduleTrialLicense = 127;
+}
+
 void InititalizeProduct20()
 {
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
@@ -502,10 +557,10 @@ void InititalizeProduct20()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
 	pTmpModSpec->moduleID = 0;
 	pTmpModSpec->moduleName = std::wstring(L"PDF Rip");
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 0;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 11;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 106;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(3, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(3))->second);
@@ -1267,11 +1322,12 @@ void InititalizeProduct9()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"SOLscript Enabled Printer");
+	pTmpModSpec->modUnlimitedValue = 1;
 	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleDefaultLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 103;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 105;
 }
 
 void InititalizeProduct8()
@@ -1465,6 +1521,33 @@ void InititalizeProduct125()
 	pTmpProdSpec->productID = 125;
 	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Essentials");
 	pTmpProdSpec->sameModSpecProductID = 25;
+}
+
+void InititalizeProduct126()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:126, ProdName: Test/Dev/DR ReadyPDF Client
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(126, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(126))->second);
+	pTmpProdSpec->productID = 126;
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR ReadyPDF Client");
+	pTmpProdSpec->sameModSpecProductID = 26;
+	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
+}
+
+void InititalizeProduct127()
+{
+	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
+	
+	//
+	// ProdID:127, ProdName: Test/Dev/DR SOLsearcher Cloud
+	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(127, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
+	pTmpProdSpec = &((softwareSpec.productSpecMap->find(127))->second);
+	pTmpProdSpec->productID = 127;
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SOLsearcher Cloud");
+	pTmpProdSpec->sameModSpecProductID = 27;
 }
 
 void InititalizeProduct107()
