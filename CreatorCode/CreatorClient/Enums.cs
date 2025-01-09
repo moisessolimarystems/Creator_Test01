@@ -68,6 +68,8 @@ namespace Client.Creator
             XIMAGEPDF,
             SOLIMARUTILITIES,
             SPDEESSENTIALS,
+            READYPDFCLIENT,
+            SOLSEARCHERCLOUD,
             CUSTOMER,
             LICENSE,
             LICENSEUPDATE,
