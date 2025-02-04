@@ -138,7 +138,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="106">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="107">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -258,7 +258,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="N to 1" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="Book Block" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="2-Up" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="N-up" modUnlimitedValue="1" moduleVersionIntroduced_SubMinor="107"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="Scale &amp; Shift" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
@@ -489,7 +489,7 @@
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="16" moduleName="N to 1" modUnlimitedValue="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="17" moduleName="Book Block" modUnlimitedValue="1"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="2-Up" modUnlimitedValue="1"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="18" moduleName="N-Up" modUnlimitedValue="1" moduleVersionIntroduced_SubMinor="107"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="19" moduleName="Scale &amp; Shift" modUnlimitedValue="1"/>
 			
 			<Lic_ModuleSoftwareSpecAttribs moduleID="20" moduleName="Cleanse/Sort Counter" bModuleIsCounter="true" moduleDefaultLicense="0" moduleVersionDeprecated_Major="3" moduleVersionDeprecated_Minor="0"/>
