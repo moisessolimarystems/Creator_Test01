@@ -138,7 +138,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="107">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="108">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -151,8 +151,8 @@
 	<Lic_ProductSoftwareSpecAttribs productID="7" productName="iCONVERT">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="APPC" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionDeprecated_Major="9" moduleVersionDeprecated_Minor="7"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" modulePoolModuleID="128" moduleDefaultLicense="15"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" modulePoolModuleID="128" moduleDefaultLicense="15"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="LUA" moduleTrialLicense="0" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionIntroduced_SubMinor="108"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="TCP/IP" moduleTrialLicense="0" modulePoolModuleID="128" moduleDefaultLicense="15" moduleVersionIntroduced_SubMinor="108"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="PDF Object Container" modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="9" moduleVersionIntroduced_SubMinor="9"/>
 
 			<Lic_ModuleSoftwareSpecAttribs moduleID="8" moduleName="iCONVERT Job Events" modUnlimitedValue="1" moduleVersionIntroduced_Major="0" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="7"/>
@@ -230,7 +230,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Index Engine Instances" moduleVersionIntroduced_SubMinor="54"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Solimar Redaction Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Solimar Accessibility Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="7" moduleVersionIntroduced_SubMinor="54"/>
-		<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Solimar PDF/A Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="57"/>
+		<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Solimar PDF/A Engine"  moduleTrialLicense="0" moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="108"/>
 		<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="Solimar PDF Tag Export Engine"  moduleVersionIntroduced_Major="3" moduleVersionIntroduced_Minor="8" moduleVersionIntroduced_SubMinor="57"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
@@ -353,11 +353,11 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="51" moduleName="PDF::AFPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="52" moduleName="PDF::AFPDS(MO)" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="1"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="53" moduleName="PDF Page Range Extractor" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="13"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="54" moduleName="PDF::PDF/A" modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="18"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="54" moduleName="PDF::PDF/A" modUnlimitedValue="1" moduleTrialLicense="0" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="108"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="55" moduleName="File IO Manager" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="23"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="56" moduleName="AFPDS::AFPDS" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="24"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="57" moduleName="PostScript::PDF(Normalizer)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="33"/>	
-			<Lic_ModuleSoftwareSpecAttribs moduleID="58" moduleName="PDF::PDF" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="38"/>  
+			<Lic_ModuleSoftwareSpecAttribs moduleID="58" moduleName="PDF::PDF" modUnlimitedValue="1" moduleTrialLicense="0" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="108"/>  
 			<Lic_ModuleSoftwareSpecAttribs moduleID="59" moduleName="Emulation Selector" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="42"/>  
 			<Lic_ModuleSoftwareSpecAttribs moduleID="60" moduleName="IPDS::IPDS" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="44"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="61" moduleName="PDF::IPDS(OC)" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="46"/> 
@@ -380,7 +380,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="107" moduleName="Viewer" modUnlimitedValue="1" moduleDefaultLicense="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="6"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="108" moduleName="AFPDS Resource Checker" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="12"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="109" moduleName="SLS Queueing"  modUnlimitedValue="1" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="14"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="110" moduleName="PDF::PDF/A Manager" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="18"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="110" moduleName="PDF::PDF/A Manager" moduleTrialLicense="0" moduleVersionIntroduced_Major="7" moduleVersionIntroduced_Minor="5" moduleVersionIntroduced_SubMinor="108"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="111" moduleName="IPP Input" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="61"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="112" moduleName="IPP Output" modUnlimitedValue="1" moduleVersionIntroduced_Major="8" moduleVersionIntroduced_Minor="3" moduleVersionIntroduced_SubMinor="61"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="113" moduleName="SLS Job Ticket Manager"  modUnlimitedValue="1" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="79"/>
@@ -421,7 +421,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="Devices"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="1" moduleName="Operators"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="2" moduleName="Monitor Instances" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="26"/>
-			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Sites" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="8"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="3" moduleName="Sites" moduleTrialLicense="0" modUnlimitedValue="1" moduleVersionIntroduced_Major="1" moduleVersionIntroduced_Minor="1" moduleVersionIntroduced_SubMinor="108"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="4" moduleName="Batching" modUnlimitedValue="1" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="48"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="5" moduleName="EQUIOS JDF/JMF" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="0" moduleVersionIntroduced_SubMinor="60"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="6" moduleName="JDF/JMF Printer" moduleVersionIntroduced_Major="2" moduleVersionIntroduced_Minor="2" moduleVersionIntroduced_SubMinor="90"/>		
@@ -443,6 +443,7 @@
 	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Queue Manager" prevSharedProductID="14" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
+			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="ReadyPDF Utility Sessions" moduleDefaultLicense="0" modUnlimitedValue="255" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="108"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="20" productName="Library Services">

@@ -1073,9 +1073,10 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
 	pTmpModSpec->moduleName = std::wstring(L"LUA");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->modulePoolModuleID = 128;
 	pTmpModSpec->moduleDefaultLicense = 15;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
@@ -1101,9 +1102,10 @@ void InititalizeProduct7()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"TCP/IP");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->modulePoolModuleID = 128;
 	pTmpModSpec->moduleDefaultLicense = 15;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(9, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(9))->second);
@@ -1624,10 +1626,10 @@ void InititalizeProduct10()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(4))->second);
 	pTmpModSpec->moduleID = 4;
 	pTmpModSpec->moduleName = std::wstring(L"Solimar PDF/A Engine");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 3;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 8;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 57;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 }
 
 void InititalizeProduct13()
@@ -2126,10 +2128,10 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleID = 58;
 	pTmpModSpec->moduleName = std::wstring(L"PDF::PDF");
 	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 8;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 38;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(55, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(55))->second);
@@ -2146,10 +2148,10 @@ void InititalizeProduct14()
 	pTmpModSpec->moduleID = 54;
 	pTmpModSpec->moduleName = std::wstring(L"PDF::PDF/A");
 	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 18;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(57, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(57))->second);
@@ -2251,10 +2253,10 @@ void InititalizeProduct14()
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(110))->second);
 	pTmpModSpec->moduleID = 110;
 	pTmpModSpec->moduleName = std::wstring(L"PDF::PDF/A Manager");
-	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 7;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 18;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(113, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(113))->second);
@@ -2870,10 +2872,10 @@ void InititalizeProduct16()
 	pTmpModSpec->moduleID = 3;
 	pTmpModSpec->moduleName = std::wstring(L"Sites");
 	pTmpModSpec->modUnlimitedValue = 1;
-	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleTrialLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 1;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 1;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 8;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
@@ -2958,6 +2960,17 @@ void InititalizeProduct19()
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
 	Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs* pTmpModSpec;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(401, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(401))->second);
+	pTmpModSpec->moduleID = 401;
+	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF Utility Sessions");
+	pTmpModSpec->modUnlimitedValue = 255;
+	pTmpModSpec->moduleTrialLicense = 255;
+	pTmpModSpec->moduleDefaultLicense = 0;
+	pTmpModSpec->moduleVersionIntroduced_Major = 9;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(400, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(400))->second);
