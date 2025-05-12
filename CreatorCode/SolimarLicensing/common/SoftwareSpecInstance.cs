@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 108;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 109;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -77,10 +77,10 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:119, ProdName: Test/Dev/DR SPDE Queue Manager
+			#region ProdID:119, ProdName: Test/Dev/DR SPDE Remote Client Manager
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 119;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Queue Manager";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Remote Client Manager";
 			tmpProdSpec.sameModSpecProductID.TVal = 19;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
@@ -5943,17 +5943,17 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:19, ProdName: SPDE Queue Manager
+			#region ProdID:19, ProdName: SPDE Remote Client Manager
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 19;
-			tmpProdSpec.productName.TVal = "SPDE Queue Manager";
+			tmpProdSpec.productName.TVal = "SPDE Remote Client Manager";
 			tmpProdSpec.prevSharedProductID.TVal = 14;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 
 			tmpModSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs();
 			tmpModSpec.moduleID.TVal = 401;
-			tmpModSpec.moduleName.TVal = "ReadyPDF Utility Sessions";
+			tmpModSpec.moduleName.TVal = "ReadyPDF Prepress Console Sessions";
 			tmpModSpec.modUnlimitedValue.TVal = 255;
 			tmpModSpec.moduleTrialLicense.TVal = 255;
 			tmpModSpec.modulePoolModuleID.TVal = 0;
@@ -5963,7 +5963,7 @@ namespace Solimar.Licensing
 			tmpModSpec.moduleVersionIntroduced_Major.TVal = 9;
 			tmpModSpec.moduleVersionIntroduced_Minor.TVal = 4;
 			tmpModSpec.moduleVersionIntroduced_SubMajor.TVal = 0;
-			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 108;
+			tmpModSpec.moduleVersionIntroduced_SubMinor.TVal = 109;
 			tmpModSpec.moduleVersionDeprecated_Major.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_Minor.TVal = 0;
 			tmpModSpec.moduleVersionDeprecated_SubMajor.TVal = 0;

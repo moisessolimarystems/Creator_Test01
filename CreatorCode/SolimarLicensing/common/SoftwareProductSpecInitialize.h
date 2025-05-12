@@ -99,11 +99,11 @@ void InititalizeProduct119()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:119, ProdName: Test/Dev/DR SPDE Queue Manager
+	// ProdID:119, ProdName: Test/Dev/DR SPDE Remote Client Manager
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(119, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(119))->second);
 	pTmpProdSpec->productID = 119;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Queue Manager");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Remote Client Manager");
 	pTmpProdSpec->sameModSpecProductID = 19;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
@@ -2951,11 +2951,11 @@ void InititalizeProduct19()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:19, ProdName: SPDE Queue Manager
+	// ProdID:19, ProdName: SPDE Remote Client Manager
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(19, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(19))->second);
 	pTmpProdSpec->productID = 19;
-	pTmpProdSpec->productName = std::wstring(L"SPDE Queue Manager");
+	pTmpProdSpec->productName = std::wstring(L"SPDE Remote Client Manager");
 	pTmpProdSpec->prevSharedProductID = 14;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
@@ -2964,13 +2964,13 @@ void InititalizeProduct19()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(401, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(401))->second);
 	pTmpModSpec->moduleID = 401;
-	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF Utility Sessions");
+	pTmpModSpec->moduleName = std::wstring(L"ReadyPDF Prepress Console Sessions");
 	pTmpModSpec->modUnlimitedValue = 255;
 	pTmpModSpec->moduleTrialLicense = 255;
 	pTmpModSpec->moduleDefaultLicense = 0;
 	pTmpModSpec->moduleVersionIntroduced_Major = 9;
 	pTmpModSpec->moduleVersionIntroduced_Minor = 4;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 108;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 109;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(400, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(400))->second);
