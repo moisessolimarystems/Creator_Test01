@@ -98,6 +98,7 @@ namespace Client.Creator
             MODULE,
             VALIDATIONTOKENS,
             REPORTS,
+            SPDEREMOTECLIENTMANAGER,
             UNKNOWN
         }
 
