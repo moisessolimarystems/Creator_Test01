@@ -45,7 +45,7 @@ namespace SolimarLicenseViewer
             SPDEESSENTIALS,
             READYPDFCLIENT,
             SOLSEARCHERCLOUD,
-            SPDEREMOTECLIENTMANAGER
+            SPDEREMOTECLIENTS
         }
 
 

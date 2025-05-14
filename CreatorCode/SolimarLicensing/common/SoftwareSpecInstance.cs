@@ -13,7 +13,7 @@ namespace Solimar.Licensing
 			m_softwareSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
 			m_softwareSpec.softwareSpec_SubMajor.TVal = 0;
 			m_softwareSpec.softwareSpec_Major.TVal = 1;
-			m_softwareSpec.softwareSpec_SubMinor.TVal = 109;
+			m_softwareSpec.softwareSpec_SubMinor.TVal = 110;
 			m_softwareSpec.softwareSpec_Minor.TVal = 0;
 			
 			Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs tmpProdSpec;
@@ -77,10 +77,10 @@ namespace Solimar.Licensing
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
 			#endregion
 			
-			#region ProdID:119, ProdName: Test/Dev/DR SPDE Remote Client Manager
+			#region ProdID:119, ProdName: Test/Dev/DR SPDE Remote Clients
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 119;
-			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Remote Client Manager";
+			tmpProdSpec.productName.TVal = "Test/Dev/DR SPDE Remote Clients";
 			tmpProdSpec.sameModSpecProductID.TVal = 19;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);
@@ -5943,10 +5943,10 @@ namespace Solimar.Licensing
 			tmpProdSpec.moduleSpecMap.TVal.Add(tmpModSpec.moduleID.TVal, tmpModSpec);
 			#endregion
 			
-			#region ProdID:19, ProdName: SPDE Remote Client Manager
+			#region ProdID:19, ProdName: SPDE Remote Clients
 			tmpProdSpec = new Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs();
 			tmpProdSpec.productID.TVal = 19;
-			tmpProdSpec.productName.TVal = "SPDE Remote Client Manager";
+			tmpProdSpec.productName.TVal = "SPDE Remote Clients";
 			tmpProdSpec.prevSharedProductID.TVal = 14;
 			tmpProdSpec.productLicType.EVal = Solimar.Licensing.Attribs.Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient;
 			m_softwareSpec.productSpecMap.TVal.Add(tmpProdSpec.productID.TVal, tmpProdSpec);

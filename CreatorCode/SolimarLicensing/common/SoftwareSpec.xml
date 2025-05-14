@@ -138,7 +138,7 @@
 -->
 
 
-<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="109">
+<Lic_SoftwareSpecAttribs softwareSpec_Major="1" softwareSpec_Minor="0" softwareSpec_SubMajor="0" softwareSpec_SubMinor="110">
 
 <!--
 	<Lic_ProductSoftwareSpecAttribs productID="" productName="" sameModSpecProductID="">
@@ -440,7 +440,7 @@
 			<Lic_ModuleSoftwareSpecAttribs moduleID="0" moduleName="SDX Designer Instances" moduleDefaultLicense="1"/>
 		</Lic_ModuleSoftwareSpecAttribsMap>
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Remote Client Manager" prevSharedProductID="14" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="19" productName="SPDE Remote Clients" prevSharedProductID="14" productLicType="pltClient">
 		<Lic_ModuleSoftwareSpecAttribsMap>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="400" moduleName="Queue Manager Sessions" modUnlimitedValue="255"/>
 			<Lic_ModuleSoftwareSpecAttribs moduleID="401" moduleName="ReadyPDF Prepress Console Sessions" moduleDefaultLicense="0" modUnlimitedValue="255" moduleVersionIntroduced_Major="9" moduleVersionIntroduced_Minor="4" moduleVersionIntroduced_SubMinor="109"/>
@@ -599,7 +599,7 @@
 	</Lic_ProductSoftwareSpecAttribs>
 	<Lic_ProductSoftwareSpecAttribs productID="118" productName="Test/Dev/DR SDX Designer" sameModSpecProductID="18">
 	</Lic_ProductSoftwareSpecAttribs>
-	<Lic_ProductSoftwareSpecAttribs productID="119" productName="Test/Dev/DR SPDE Remote Client Manager" sameModSpecProductID="19" productLicType="pltClient">
+	<Lic_ProductSoftwareSpecAttribs productID="119" productName="Test/Dev/DR SPDE Remote Clients" sameModSpecProductID="19" productLicType="pltClient">
 	</Lic_ProductSoftwareSpecAttribs>
   <Lic_ProductSoftwareSpecAttribs productID="120" productName="Test/Dev/DR Library Services" sameModSpecProductID="20">
   </Lic_ProductSoftwareSpecAttribs>

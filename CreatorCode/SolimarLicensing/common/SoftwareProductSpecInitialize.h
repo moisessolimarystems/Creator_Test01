@@ -99,11 +99,11 @@ void InititalizeProduct119()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:119, ProdName: Test/Dev/DR SPDE Remote Client Manager
+	// ProdID:119, ProdName: Test/Dev/DR SPDE Remote Clients
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(119, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(119))->second);
 	pTmpProdSpec->productID = 119;
-	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Remote Client Manager");
+	pTmpProdSpec->productName = std::wstring(L"Test/Dev/DR SPDE Remote Clients");
 	pTmpProdSpec->sameModSpecProductID = 19;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 }
@@ -2951,11 +2951,11 @@ void InititalizeProduct19()
 	Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs* pTmpProdSpec;
 	
 	//
-	// ProdID:19, ProdName: SPDE Remote Client Manager
+	// ProdID:19, ProdName: SPDE Remote Clients
 	softwareSpec.productSpecMap->insert(Lic_PackageAttribs::Lic_SoftwareSpecAttribs::TMap_Lic_ProductSoftwareSpecAttribsMap::value_type(19, Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs()));
 	pTmpProdSpec = &((softwareSpec.productSpecMap->find(19))->second);
 	pTmpProdSpec->productID = 19;
-	pTmpProdSpec->productName = std::wstring(L"SPDE Remote Client Manager");
+	pTmpProdSpec->productName = std::wstring(L"SPDE Remote Clients");
 	pTmpProdSpec->prevSharedProductID = 14;
 	pTmpProdSpec->productLicType = Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::pltClient;
 
