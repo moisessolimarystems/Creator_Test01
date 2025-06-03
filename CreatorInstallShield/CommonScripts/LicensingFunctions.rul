@@ -91,14 +91,16 @@ begin
    	if(bValue || szInstallChanged="1") then  //true when not installed and older found or install directory has changed
      	MessageBox("Please close all Solimar Products. Updating the Solimar Licensing Server requires all Solimar Products to be shutdown.", WARNING);			
 		if(szDir != "") then
-			szOpts = " /S /v\"ALLUSERS=1 INSTALLDIR=" + "\\\"" + szDir + "\\\"" + " /norestart /qn\"" + szParam;      	
+			szOpts = " /S /v\"ALLUSERS=1 INSTALLDIR=\\\"" + szDir + "\\\" /norestart /qn\"" + szParam;      	
 		else			      	
 			szOpts = " /S /v\"ALLUSERS=1 /norestart /qn\"" + szParam;        						
 		endif;
+		//MessageBox(szLicPath + " " + szOpts, INFORMATION);
    		LaunchAppAndWait(szLicPath, szOpts, WAIT);   			
    		if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) < 0) then				
 		  	MessageBox("Failed to install Solimar Licensing. Please retry from source.",WARNING);
-		endif;	   			 		
+		endif;	  
+		//MessageBox("After " + szLicPath + " " + szOpts, INFORMATION); 			 		
 	endif;                                                        
 			
  	if(RegDBGetKeyValueEx(SOLIMAR_LICENSE_KEY ^ gbl_Array(2),"CurrentVersion", nvType, svValue, nvSize) = 0) then 	

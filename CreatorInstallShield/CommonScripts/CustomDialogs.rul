@@ -121,6 +121,7 @@ AskLicensing:
 			endif;
 		endif;
     endif;
+    StrRemoveLastSlash(szDir);
 	MsiSetProperty(ISMSI_HANDLE, "LICENSINGINSTALLDIR", szDir);	 	
     return nResult;
 end; 
