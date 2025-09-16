@@ -1,3 +1,7 @@
+// CommunicationLink.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -243,8 +247,8 @@ namespace Client.Creator
         {
             List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = new List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs>();
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecMap = GetModuleSpecList(productID);
-            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecMap.Values) // CR.34456; modified.
+			{
                 bool bDeprecated = false;
                 bool bValid = false;
                 if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
@@ -279,8 +283,8 @@ namespace Client.Creator
         {
             List<String> moduleList = new List<string>();
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleSpecList = GetModuleSpecList(productID);
-            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.Values) // CR.34456; modified.
+			{
                 moduleList.Add(moduleSpec.moduleName.TVal);
             }
             return moduleList;
@@ -290,8 +294,8 @@ namespace Client.Creator
         {
             List<String> moduleList = new List<string>();
             List<String> productList = new List<string>();
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 moduleList.AddRange(GetModuleNameList(productSpec.productID.TVal));
             }
             return moduleList;
@@ -300,11 +304,11 @@ namespace Client.Creator
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetTestDevProductSpec(byte productID)
         {
             string productName = "Test/Dev/DR " + GetProductName(productID);
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 //want to find test dev product spec given base product id                
-                if (productSpec.productName.TVal.Equals(productName) || productSpec.productLabel.TVal.Equals(productName))
-                {
+                if (productSpec.productName.Equals(productName) || productSpec.productLabel.Equals(productName)) // CR.34456; modified.
+				{
                     return productSpec;                        
                 }
             }
@@ -322,8 +326,8 @@ namespace Client.Creator
 
         public Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs GetProductSpec(ushort productID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
@@ -336,14 +340,14 @@ namespace Client.Creator
 
         public uint GetModuleSpecRevision(ushort productID, ushort modID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return GetModuleSpecRevision((ushort)productSpec.sameModSpecProductID.TVal, modID);
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                    {
+                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+					{
                         if (moduleSpec.moduleID.TVal == modID)
                             return moduleSpec.moduleVersionIntroduced_SubMinor.TVal;                            
                     }         
@@ -355,13 +359,13 @@ namespace Client.Creator
         public uint GetProductIDByModuleName(string moduleName)
         {
             uint productID = 0;
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs module in productSpec.moduleSpecMap.TVal.Values)
-                {
-                    //if (module.moduleName.TVal.ToLower() == moduleName.ToLower())
-                    if (string.Compare(module.moduleName.TVal, moduleName, true) == 0)
-                    {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs module in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+				{
+                    //if (module.moduleName.ToLower() == moduleName.ToLower())
+                    if (string.Compare(module.moduleName.TVal, moduleName, true) == 0) 
+					{
                         productID = productSpec.productID.TVal;
                         break;
                     }
@@ -375,9 +379,9 @@ namespace Client.Creator
         {
             List<String> productList = new List<string>();
             string productName;
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
-                productName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
+                productName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal; 
                 productList.Add(productName);
             }
             return productList;
@@ -385,8 +389,8 @@ namespace Client.Creator
 
         public string GetProductName(byte productID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                     return (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel : productSpec.productName;
             }
@@ -416,9 +420,9 @@ namespace Client.Creator
         {
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
             if (moduleList != null)
-            {
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
-                {
+            { 
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.Values) // CR.34456; modified.
+				{
                     if (moduleSpec.moduleID.TVal == moduleID)
                         return moduleSpec.moduleName;
                 }
@@ -431,8 +435,8 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
             if (moduleList != null)
             {
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
-                {
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.Values) // CR.34456; modified.
+				{
                     if (moduleSpec.moduleID.TVal == moduleID)
                         return moduleSpec;
                 }
@@ -443,10 +447,10 @@ namespace Client.Creator
         public short GetProductID(String productName)
         {
             string compareProductName = string.Empty;     
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 compareProductName = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
-                //if (productSpec.productName.TVal.ToLower() == productName.ToLower())
+                //if (productSpec.productName.ToLower() == productName.ToLower())
                 if (string.Compare(compareProductName, productName.Trim(), true) == 0)
                     return (short)productSpec.productID.TVal;
             }
@@ -459,8 +463,8 @@ namespace Client.Creator
             Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.Lic_ModuleSoftwareSpecAttribsMap moduleList = GetModuleSpecList(productID);
             if (moduleList != null)
             {
-                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.TVal.Values)
-                {
+                foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleList.Values) // CR.34456; modified.
+				{
                     //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
                     if (string.Compare(moduleSpec.moduleName.TVal, moduleName, true) == 0)
                         return (short)moduleSpec.moduleID.TVal;
@@ -472,20 +476,20 @@ namespace Client.Creator
 
         public bool IsPLPModule(uint productID, short moduleID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return IsPLPModule(productSpec.sameModSpecProductID.TVal, moduleID);
                     else
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
-                                if (moduleSpec.moduleName.TVal.ToUpper().EndsWith("PLP"))
+                                if (moduleSpec.moduleName.TVal.ToUpper().EndsWith("PLP")) 
                                     return true;
                             }
                         }
@@ -498,16 +502,16 @@ namespace Client.Creator
 
         public bool IsDefaultModule(uint productID, short moduleID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return IsDefaultModule(productSpec.sameModSpecProductID.TVal, moduleID);
                     else
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
                                 if (moduleSpec.moduleDefaultLicense.TVal > 0 && moduleSpec.moduleTrialLicense.TVal <= 1)
@@ -522,17 +526,17 @@ namespace Client.Creator
         }
 
         public bool IsDefaultModule(uint productID, string moduleName)
-        {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+        { 
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return IsDefaultModule(productSpec.sameModSpecProductID.TVal, moduleName);
                     else
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             //if (moduleSpec.moduleName.TVal.ToLower() == moduleName.ToLower())
                             if(string.Compare(moduleSpec.moduleName.TVal,  moduleName, true) == 0)
                             {
@@ -549,16 +553,16 @@ namespace Client.Creator
 
         public uint GetDefaultModuleValue(uint productID, short moduleID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return GetDefaultModuleValue(productSpec.sameModSpecProductID.TVal, moduleID);
                     else
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
                                 return moduleSpec.moduleDefaultLicense.TVal;
@@ -573,16 +577,16 @@ namespace Client.Creator
 
         public uint GetUnlimitedModuleValue(uint productID, uint moduleID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if(productSpec.sameModSpecProductID.TVal > 0)
                         return GetUnlimitedModuleValue(productSpec.sameModSpecProductID.TVal, moduleID);
                     else 
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
                                 return moduleSpec.modUnlimitedValue.TVal;
@@ -597,16 +601,16 @@ namespace Client.Creator
 
         public uint GetModuleTrialValue(uint productID, short moduleID)
         {
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == productID)
                 {
                     if (productSpec.sameModSpecProductID.TVal > 0)
                         return GetModuleTrialValue(productSpec.sameModSpecProductID.TVal, moduleID);
                     else
                     {
-                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values) // CR.34456; modified.
+						{
                             if (moduleSpec.moduleID.TVal == moduleID)
                             {
                                 return moduleSpec.moduleTrialLicense.TVal;

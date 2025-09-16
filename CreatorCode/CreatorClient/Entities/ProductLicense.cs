@@ -1,4 +1,9 @@
-﻿using System;
+﻿// LicensePacket.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,34 +36,34 @@ namespace Client.Creator
             ActivationAmountInDays
         }
 
-        string _licenseServer;
-        ProductLicenseTable _plRec;
-        PermissionsTable _permissions;
-        CommunicationLink _commLink;
-        List<ModuleTable> _moduleList;
-        LicenseVersion _version;
-        byte _parentProductConnection;
+        string m_licenseServer;														// CR.34456; modified.
+		ProductLicenseTable m_plRec;                                                // CR.34456; modified.
+		PermissionsTable m_permissions;                                             // CR.34456; modified.
+		CommunicationLink m_commLink;                                               // CR.34456; modified.
+		List<ModuleTable> m_moduleList;                                             // CR.34456; modified.
+		LicenseVersion m_version;													// CR.34456; modified.
+		byte m_parentProductConnection;                                             // CR.34456; modified.
 
-        public static List<ProductLicenseType> _productLicenseTypes;
+		public static List<ProductLicenseType> m_productLicenseTypes;               // CR.34456; modified.
 
-        #endregion
+		#endregion
 
-        #region Constructor
-        public ProductLicense(ProductLicenseTable plData, PermissionsTable permissions)
+		#region Constructor
+		public ProductLicense(ProductLicenseTable plData, PermissionsTable permissions)
         {
-            _commLink = CreatorForm.s_CommLink;
-            if (_productLicenseTypes == null)
+            m_commLink = CreatorForm.s_CommLink;
+            if (m_productLicenseTypes == null)
                 ListTypeConverter.SetList(ProductLicenseTypeList);            
             Permissions = permissions;
             ProductLicenseData = plData;
-            _version = new LicenseVersion(_plRec.ProductVersion);
-            _parentProductConnection = 0; //used by add-on product licenses to set module product connections.
+            m_version = new LicenseVersion(m_plRec.ProductVersion);
+            m_parentProductConnection = 0; //used by add-on product licenses to set module product connections.
             if(Status == ProductLicenseState.AddOn)
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    ProductLicenseTable plt = client.GetProductLicense(_plRec.ParentProductLicenseID);
-                    _parentProductConnection = (plt != null) ? plt.ProductConnection : (byte)0;
+                    ProductLicenseTable plt = client.GetProductLicense(m_plRec.ParentProductLicenseID);
+                    m_parentProductConnection = (plt != null) ? plt.ProductConnection : (byte)0;
                 });
             }          
         }
@@ -74,8 +79,8 @@ namespace Client.Creator
         {
             get 
             { 
-                if(_plRec != null)
-                    return _plRec.ProductID;
+                if(m_plRec != null)
+                    return m_plRec.ProductID;
                 return 0;
             }
         }
@@ -83,24 +88,24 @@ namespace Client.Creator
         [Browsable(false)]
         public ProductLicenseTable ProductLicenseData
         {
-            get { return _plRec; }
+            get { return m_plRec; }
             set 
             {   //Product connections can be modified if type is client, PLP, or an internal Solimar product license
-                if (_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || 
+                if (m_commLink.GetProductSpec(value.ProductID).productLicType.TVal == Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs.TProductLicenseType.pltClient || 
                    (value.plID.StartsWith("100")) ||
                    (ProductName.ToUpper().EndsWith("PLP")))
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, true);
                 else
                     SetBrowsableAttribStatus(ProductLicenseAttributes.ProductConnection, false);
-                _plRec = value; 
+                m_plRec = value; 
             }
         }
 
         [Browsable(false)]
         public int ProductLicenseDatabaseID
         {
-            get { return _plRec.ID; }
-            set { _plRec.ID = value; }
+            get { return m_plRec.ID; }
+            set { m_plRec.ID = value; }
         }
 
         [Browsable(false)]
@@ -113,8 +118,8 @@ namespace Client.Creator
         [RefreshProperties(RefreshProperties.All)]
         public PermissionsTable Permissions
         {
-            get { return _permissions; }
-            set { _permissions = value; }
+            get { return m_permissions; }
+            set { m_permissions = value; }
         }
 
         [Browsable(false)]
@@ -124,44 +129,44 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    LicenseTable lt = client.GetLicenseByID(_plRec.LicenseID, false);
-                    if (lt != null) _licenseServer = lt.LicenseName;
+                    LicenseTable lt = client.GetLicenseByID(m_plRec.LicenseID, false);
+                    if (lt != null) m_licenseServer = lt.LicenseName;
                 });
-                return _licenseServer;
+                return m_licenseServer;
             }
         }
 
         [Browsable(false)]
         public int Index
         {
-            get { return _plRec.plIndex; }
-            set { _plRec.plIndex = value; }
+            get { return m_plRec.plIndex; }
+            set { m_plRec.plIndex = value; }
         }
 
         [Browsable(false)]
         public byte ParentProductConnection
         {
-            get { return _parentProductConnection; }
-            set { _parentProductConnection = value; }
+            get { return m_parentProductConnection; }
+            set { m_parentProductConnection = value; }
         }
 
         [Browsable(false)]
         public string ParentID
         {
-            get { return _plRec.ParentProductLicenseID; }
-            set { _plRec.ParentProductLicenseID = value; }
+            get { return m_plRec.ParentProductLicenseID; }
+            set { m_plRec.ParentProductLicenseID = value; }
         }
 
         [Browsable(false)]
         public string FullDescription
         {
-            get { return _plRec.Description; }
+            get { return m_plRec.Description; }
         }
 
         [Browsable(false)]
         public bool IsActive
         {
-            get { return _plRec.IsActive; }
+            get { return m_plRec.IsActive; }
         }
        
         [Browsable(false)]
@@ -180,10 +185,10 @@ namespace Client.Creator
 
         bool ValidModuleList()
         {
-            if (_moduleList == null)
+            if (m_moduleList == null)
                 return true;
             bool bRetVal = true;
-            List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = _commLink.GetModuleSpecForProductVersion(ProductID, ProductVersion.Major, ProductVersion.Minor);
+            List<Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs> moduleSpecList = m_commLink.GetModuleSpecForProductVersion(ProductID, ProductVersion.Major, ProductVersion.Minor);
             /*foreach (ModuleTable module in _moduleList)
             {
                 if(moduleSpecList.Where(m => m.moduleID == module.ModID).Count() == 0)
@@ -193,7 +198,7 @@ namespace Client.Creator
             }*/
             foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList)
             {
-                if (_moduleList.Where(m => m.ModID == moduleSpec.moduleID).Count() == 0)
+                if (m_moduleList.Where(m => m.ModID == moduleSpec.moduleID).Count() == 0)
                 {
                     return false;
                 }
@@ -208,15 +213,15 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {
-                    _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
+                    m_moduleList = client.GetModulesByProductLicense(m_plRec.plID, false);
                     if (!ValidModuleList())
                     {
                         List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
                         UpdateModules(ProductVersion, productLicenses);
-                        _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
+                        m_moduleList = client.GetModulesByProductLicense(m_plRec.plID, false);
                     }
                 });
-                return _moduleList;
+                return m_moduleList;
             }
         }
 
@@ -227,7 +232,7 @@ namespace Client.Creator
             {
                 Service<ICreator>.Use((client) =>
                 {                    
-                    _moduleList = client.GetModulesByProductLicense(
+                    m_moduleList = client.GetModulesByProductLicense(
                                                                     (ParentID != null) ? ParentID : ID, 
                                                                     true
                                                                     );
@@ -235,10 +240,10 @@ namespace Client.Creator
                     {
                         List<ProductLicenseTable> productLicenses = client.GetProductLicensesByProduct(LicenseServer, ProductID);
                         UpdateModules(ProductVersion, productLicenses);
-                        _moduleList = client.GetModulesByProductLicense(_plRec.plID, false);
+                        m_moduleList = client.GetModulesByProductLicense(m_plRec.plID, false);
                     }
                 });
-                return _moduleList;
+                return m_moduleList;
             }
         }
 
@@ -246,14 +251,14 @@ namespace Client.Creator
         {
             get
             {
-                if(_productLicenseTypes == null)
+                if(m_productLicenseTypes == null)
                 {
                    Service<ICreator>.Use((client) =>
                     {
-                        _productLicenseTypes = client.GetAllProductLicenseTypes();               
+                        m_productLicenseTypes = client.GetAllProductLicenseTypes();               
                     });
                 }                
-                return _productLicenseTypes.OrderBy(p => p.Type).Select(t => t.Type).ToList();
+                return m_productLicenseTypes.OrderBy(p => p.Type).Select(t => t.Type).ToList();
             }
         }
 
@@ -266,8 +271,8 @@ namespace Client.Creator
         [ReadOnly(true)]
         public string ID
         {
-            get { return _plRec.plID; }
-            set { _plRec.plID = value; }
+            get { return m_plRec.plID; }
+            set { m_plRec.plID = value; }
         }
 
         [Category("Product License"), PropertyOrder(2)]
@@ -277,7 +282,7 @@ namespace Client.Creator
         {
             get
             {
-                return _commLink.GetProductName(ProductID);
+                return m_commLink.GetProductName(ProductID);
             }
         }
 
@@ -290,14 +295,14 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !_permissions.pt_version_pwd.Value);
-                return new LicenseVersion(_plRec.ProductVersion);
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductVersion, !m_permissions.pt_version_pwd.Value);
+                return new LicenseVersion(m_plRec.ProductVersion);
             }
             set
             {
                 if (IsActive)
                 {
-                    if (_version != value)
+                    if (m_version != value)
                     {
                         IList<ProductLicenseTable> productLicenses = null;
                         Service<ICreator>.Use((client) =>
@@ -321,8 +326,8 @@ namespace Client.Creator
                             client.MarkDirty(LicenseServer);
                         });
                         UpdateModules(value, productLicenses); //needs to reload module list
-                        _plRec.ProductVersion = value.ToString();
-                        _version = value;
+                        m_plRec.ProductVersion = value.ToString();
+                        m_version = value;
                     }
                 }
             }
@@ -336,8 +341,8 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !_permissions.pt_create_modify_key.Value);      
-                return _plRec.ProductConnection; //should match module's app instance
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ProductConnection, !m_permissions.pt_create_modify_key.Value);      
+                return m_plRec.ProductConnection; //should match module's app instance
             }
             set
             {
@@ -353,12 +358,12 @@ namespace Client.Creator
                         if (ModuleList != null)
                         {
                             int baseValue;
-                            foreach (ModuleTable module in _moduleList)
+                            foreach (ModuleTable module in m_moduleList)
                             {   //needs to update database
                                 //module.AppInstance = (Status != ProductLicenseState.AddOn ) ? value : (byte)0;
                                 if (module.Value > 0)
                                 {
-                                    if (!_commLink.IsClientType(ProductID) && !_commLink.IsPLPModule(ProductID, module.ModID)) //Don't need to multiply non-client or PLP module values
+                                    if (!m_commLink.IsClientType(ProductID) && !m_commLink.IsPLPModule(ProductID, module.ModID)) //Don't need to multiply non-client or PLP module values
                                     {
                                         baseValue = (module.AppInstance > 1) ? module.Value / module.AppInstance : module.Value;
                                         module.Value = (short)(module.Value + ((value - module.AppInstance) * baseValue));
@@ -368,10 +373,10 @@ namespace Client.Creator
                                 }
                             }
                         }
-                        _plRec.ProductConnection = value;
+                        m_plRec.ProductConnection = value;
                         Service<ICreator>.Use((client) =>
                         {
-                            client.UpdateAllModules(_moduleList);
+                            client.UpdateAllModules(m_moduleList);
                             ProductLicenseTable plt = client.GetProductLicense(ID);
                             if (plt != null)
                             {
@@ -381,7 +386,7 @@ namespace Client.Creator
                                                                       string.Format("Edit {0} Product Connection", ProductName),
                                                                       value.ToString(),
                                                                       plt.ProductConnection.ToString());
-                                plt.ProductConnection = _plRec.ProductConnection;
+                                plt.ProductConnection = m_plRec.ProductConnection;
                                 client.UpdateProductLicense(plt);
                                 client.MarkDirty(LicenseServer);
                             }
@@ -402,8 +407,8 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, !_permissions.pt_permanent_pwd.Value);
-                return (ProductLicenseState)_plRec.plState;
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.Status, !m_permissions.pt_permanent_pwd.Value);
+                return (ProductLicenseState)m_plRec.plState;
             }
             set
             {
@@ -411,7 +416,7 @@ namespace Client.Creator
                 //only set if value changed.
                 if (IsActive)
                 {
-                    if (!(_plRec.plState == (byte)value))
+                    if (!(m_plRec.plState == (byte)value))
                     {
                         DialogResult dlgResult = DialogResult.No;
                         if (value != ProductLicenseState.AddOn)
@@ -435,7 +440,7 @@ namespace Client.Creator
                                     break;
                                 case ProductLicenseState.AddOn:
                                     if (ParentID == null)
-                                        errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)_plRec.plState).ToString(), value.ToString());
+                                        errorMsg = string.Format("Status change from {0} to {1} is not valid.", ((ProductLicenseState)m_plRec.plState).ToString(), value.ToString());
                                     break;
                                 case ProductLicenseState.LicensedAddOn:
                                     if (!SetAddonToLicensed())
@@ -446,7 +451,7 @@ namespace Client.Creator
                             }
                             if (errorMsg.Length == 0)
                             {
-                                _plRec.plState = (byte)value;
+                                m_plRec.plState = (byte)value;
                                 if (value == ProductLicenseState.Licensed)
                                 {
                                     if (!(ProductName.Contains("Test")) && HasHardwareToken() && ParentID == null)
@@ -466,7 +471,7 @@ namespace Client.Creator
                                                                               string.Format("Edit {0} Status", ProductName),
                                                                               ((ProductLicenseState)value).ToString(),
                                                                               ((ProductLicenseState)plt.plState).ToString());
-                                        plt.plState = _plRec.plState;
+                                        plt.plState = m_plRec.plState;
                                         client.UpdateProductLicense(plt);
                                         client.MarkDirty(LicenseServer);
                                     }
@@ -490,24 +495,24 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !_permissions.pt_extension_pwd.Value);
-                if (_plRec.ExpirationDate.HasValue)
-                    return _plRec.ExpirationDate.Value.ToLocalTime();
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ExpirationDate, !m_permissions.pt_extension_pwd.Value);
+                if (m_plRec.ExpirationDate.HasValue)
+                    return m_plRec.ExpirationDate.Value.ToLocalTime();
                 return null;
             }
             set
             {
                 if (IsActive)
                 {
-                    if (_plRec.ExpirationDate != value)
+                    if (m_plRec.ExpirationDate != value)
                     {
                         string errorMsg = string.Empty;
-                        if (_plRec.plState == (byte)ProductLicenseState.Licensed &&
+                        if (m_plRec.plState == (byte)ProductLicenseState.Licensed &&
                             !value.HasValue && !HasHardwareToken())
                         {
                             errorMsg = "Can't remove expiration date for non-hardware token validation.";
                         }
-                        if ((ProductName.Contains("Test") || _plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
+                        if ((ProductName.Contains("Test") || m_plRec.plState == (byte)ProductLicenseState.Trial) && !value.HasValue)
                         {
                             errorMsg = "Please set a valid expiration date.";
                         }
@@ -539,7 +544,7 @@ namespace Client.Creator
                                         plt.ExpirationDate = value;
                                     client.UpdateProductLicense(plt);
                                     client.MarkDirty(LicenseServer);
-                                    _plRec.ExpirationDate = plt.ExpirationDate;
+                                    m_plRec.ExpirationDate = plt.ExpirationDate;
                                 }
                             });
                         }
@@ -558,7 +563,7 @@ namespace Client.Creator
         [ReadOnly(true)]
         public byte Extension
         {
-            get { return _plRec.Extensions; }
+            get { return m_plRec.Extensions; }
         }
 
         [Category("Product License"), PropertyOrder(8)]
@@ -567,7 +572,7 @@ namespace Client.Creator
         [Description("Type")]
         public string Type
         {
-            get { return GetProductLicenseType(_plRec.TypeID); }
+            get { return GetProductLicenseType(m_plRec.TypeID); }
             set 
             {
                 if (IsActive)
@@ -585,8 +590,8 @@ namespace Client.Creator
                                                                       string.Format("Edit {0} Type", ProductName),
                                                                       value,
                                                                       Type);
-                                _plRec.TypeID = GetProductLicenseTypeID(value);
-                                plt.TypeID = _plRec.TypeID;
+                                m_plRec.TypeID = GetProductLicenseTypeID(value);
+                                plt.TypeID = m_plRec.TypeID;
                                 client.UpdateProductLicense(plt);
                             }
                         });
@@ -604,8 +609,8 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationTotal, !_permissions.pt_extension_pwd.Value);
-                return _plRec.Activations;
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationTotal, !m_permissions.pt_extension_pwd.Value);
+                return m_plRec.Activations;
             }
             set
             {
@@ -617,7 +622,7 @@ namespace Client.Creator
                     {
                         Service<ICreator>.Use((client) =>
                         {
-                            if (_plRec.Activations == 0 && value > 0)
+                            if (m_plRec.Activations == 0 && value > 0)
                             {
                                 IList<ProductLicenseTable> plList = null;
                                 plList = client.GetProductLicenses(LicenseServer, false);
@@ -625,7 +630,7 @@ namespace Client.Creator
                                     plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses)
                                     throw new Exception(string.Format("License Server ({0}) has reached the maximum number of product licenses with activations allowed a hardware token.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                             }
-                            _plRec.Activations = value;
+                            m_plRec.Activations = value;
                             ProductLicenseTable plt = client.GetProductLicense(ID);
                             if (plt != null)
                             {
@@ -635,7 +640,7 @@ namespace Client.Creator
                                                                      string.Format("Modify {0} Activation Total", ProductName),
                                                                      value.ToString(),
                                                                      plt.Activations.ToString());
-                                plt.Activations = _plRec.Activations;
+                                plt.Activations = m_plRec.Activations;
                                 client.UpdateProductLicense(plt);
                                 client.MarkDirty(LicenseServer);
                             }
@@ -654,8 +659,8 @@ namespace Client.Creator
         {
             get
             {
-                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationAmountInDays, !_permissions.pt_extension_pwd.Value);
-                return _plRec.ActivationAmount;
+                SetReadOnlyAttribStatus(ProductLicenseAttributes.ActivationAmountInDays, !m_permissions.pt_extension_pwd.Value);
+                return m_plRec.ActivationAmount;
             }
             set
             {
@@ -671,14 +676,14 @@ namespace Client.Creator
                         {
                             Service<ICreator>.Use((client) =>
                             {
-                                if (_plRec.ActivationAmount == 0 && value > 0)
+                                if (m_plRec.ActivationAmount == 0 && value > 0)
                                 {
                                     IList<ProductLicenseTable> plList = null;
                                     plList = client.GetProductLicenses(LicenseServer, false);
                                     if (plList.Where(c => c.IsActive && c.Activations > 0).Count() >= AppConstants.MaxProductLicenses && ActivationTotal == 0)
                                         throw new Exception(string.Format("License Server ({0})} has reached the maximum number of product licenses with activations allowed.\nPlease remove another product license with activations before adding activations to product license ({1})", LicenseServer, ID));
                                 }
-                                _plRec.ActivationAmount = value;
+                                m_plRec.ActivationAmount = value;
                                 ProductLicenseTable plt = client.GetProductLicense(ID);
                                 if (plt != null)
                                 {
@@ -695,8 +700,8 @@ namespace Client.Creator
                             });
                         }
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception)												// CR.34456; modified.
+					{
                         throw new Exception("Invalid value for Activation Amount");
                     }
                 }
@@ -711,29 +716,29 @@ namespace Client.Creator
         {
             get
             {
-                if (_plRec.Description.Contains("|"))
+                if (m_plRec.Description.Contains("|"))
                 {                    //split return first half
-                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    string[] notes = m_plRec.Description.Split("|".ToCharArray());
                     return notes[0];
                 }
-                return _plRec.Description;
+                return m_plRec.Description;
             }
             set
             {
-                if (_plRec.Description != null && _plRec.Description.Contains("|"))
+                if (m_plRec.Description != null && m_plRec.Description.Contains("|"))
                 {
-                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    string[] notes = m_plRec.Description.Split("|".ToCharArray());
                     notes[0] = value;
-                    _plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]);
+                    m_plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]);
                 }
                 else
-                    _plRec.Description = value;
+                    m_plRec.Description = value;
                 Service<ICreator>.Use((client) =>
                 {
                     ProductLicenseTable plt = client.GetProductLicense(ID);
                     if (plt != null)
                     {
-                        plt.Description = _plRec.Description;
+                        plt.Description = m_plRec.Description;
                         client.UpdateProductLicense(plt);
                     }
                 });
@@ -748,26 +753,26 @@ namespace Client.Creator
         {
             get
             {
-                if (_plRec.Description.Contains("|"))
+                if (m_plRec.Description.Contains("|"))
                 {                    //split return first half
-                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    string[] notes = m_plRec.Description.Split("|".ToCharArray());
                     return notes[1];
                 }
                 return string.Empty;
             }
             set
             {
-                if (_plRec.Description.Contains("|"))
+                if (m_plRec.Description.Contains("|"))
                 {
-                    string[] notes = _plRec.Description.Split("|".ToCharArray());
+                    string[] notes = m_plRec.Description.Split("|".ToCharArray());
                     notes[1] = value;
-                    _plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]);
+                    m_plRec.Description = string.Format("{0}|{1}", notes[0], notes[1]);
                 }
                 else
                 {
                     if (value.Length > 0)
                     {
-                        _plRec.Description = string.Format("{0}|{1}", _plRec.Description, value);
+                        m_plRec.Description = string.Format("{0}|{1}", m_plRec.Description, value);
                     }
                 }
                 Service<ICreator>.Use((client) =>
@@ -775,7 +780,7 @@ namespace Client.Creator
                     ProductLicenseTable plt = client.GetProductLicense(ID);
                     if (plt != null)
                     {
-                        plt.Description = _plRec.Description;
+                        plt.Description = m_plRec.Description;
                         client.UpdateProductLicense(plt);
                     }
                 });
@@ -788,17 +793,17 @@ namespace Client.Creator
 
         public static string GetProductLicenseType(int typeID)
         {
-            if (_productLicenseTypes == null)
+            if (m_productLicenseTypes == null)
                 ListTypeConverter.SetList(ProductLicenseTypeList);  
-            ProductLicenseType type = _productLicenseTypes.Single(t => t.ID == typeID);
+            ProductLicenseType type = m_productLicenseTypes.Single(t => t.ID == typeID);
             return (type != null) ? type.Type : "";
         }
 
         public static int GetProductLicenseTypeID(string type)
         {
-            if (_productLicenseTypes == null)
+            if (m_productLicenseTypes == null)
                 ListTypeConverter.SetList(ProductLicenseTypeList);  
-            ProductLicenseType plType = _productLicenseTypes.Single(t => t.Type == type);
+            ProductLicenseType plType = m_productLicenseTypes.Single(t => t.Type == type);
             return (plType != null) ? plType.ID : 1;
         }
 
@@ -866,8 +871,8 @@ namespace Client.Creator
             List<ModuleTable> addModuleList = new List<ModuleTable>();
             List<ModuleTable> removeModuleList = new List<ModuleTable>();
 
-            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in moduleSpecList.Values) // CR.34456; modified.
+			{
                 if (pltList != null)
                 {
                     foreach (ProductLicenseTable plt in pltList.Where(p => p.IsActive)) //Add introduced modules to active product licenses.
@@ -936,10 +941,10 @@ namespace Client.Creator
                 Service<ICreator>.Use((client) =>
                 {
                     List<ModuleTable> mtList = new List<ModuleTable>();
-                    int multiplier = _commLink.IsClientType(ProductID) ? 1 : ProductConnection;
+                    int multiplier = m_commLink.IsClientType(ProductID) ? 1 : ProductConnection;
                     foreach (ModuleTable module in ModuleList)
                     {
-                        uint moduleValue = _commLink.GetDefaultModuleValue(ProductID, module.ModID);
+                        uint moduleValue = m_commLink.GetDefaultModuleValue(ProductID, module.ModID);
                         ModuleTable mt = client.GetModule(ID, module.ModID);
                         if (mt != null)
                         {
@@ -961,20 +966,20 @@ namespace Client.Creator
         public bool SetLicensedToTrial()
         {
             bool bRetVal = true;
-            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in CreatorForm.s_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-            {
+            foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in CreatorForm.s_CommLink.m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+			{
                 if (productSpec.productID.TVal == ProductID)
                 {
                     Service<ICreator>.Use((client) =>
                     {
                         List<ModuleTable> mtList = new List<ModuleTable>();
-                        int multiplier = _commLink.IsClientType(ProductID) ? 1 : ProductConnection;
+                        int multiplier = m_commLink.IsClientType(ProductID) ? 1 : ProductConnection;
                         foreach (ModuleTable module in ModuleList)
                         {
                             ModuleTable mt = client.GetModule(ID, module.ModID);                            
                             if (mt != null)
                             {
-                                mt.Value = (short)(_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
+                                mt.Value = (short)(m_commLink.GetModuleTrialValue(ProductID, module.ModID) * multiplier);                                
                                 mt.AppInstance = (byte)((mt.Value == 0) ? 0 : ProductConnection);
                                 mtList.Add(mt);
                             }
@@ -1002,19 +1007,19 @@ namespace Client.Creator
                 List<ModuleTable> updateModuleList = new List<ModuleTable>();
                 if (ModuleList != null)
                 {   //add-on module list = _moduleList, parent module list = mtlist
-                    foreach (ModuleTable module in _moduleList)
+                    foreach (ModuleTable module in m_moduleList)
                     {
                         if (module.Value > 0)
                         {
                             ModuleTable mt = mtList.Where(m => m.ModID == module.ModID).First();
                             if (mt != null)
                             {
-                                if (module.Value > 0 && !_commLink.IsDefaultModule(ProductID, module.ModID))
+                                if (module.Value > 0 && !m_commLink.IsDefaultModule(ProductID, module.ModID))
                                 {
                                     previousValue = mt.Value.ToString();
                                     mt.Value += module.Value;
                                     //bump product connection of parent module if it is currently 0
-                                    if (_commLink.IsClientType(ProductID))
+                                    if (m_commLink.IsClientType(ProductID))
                                     {    //client add-on must add product connections to modules and product license
                                         mt.AppInstance += module.AppInstance;
                                     }
@@ -1024,7 +1029,7 @@ namespace Client.Creator
                                             mt.AppInstance = 1;
                                     }
                                     updateModuleList.Add(mt);
-                                    moduleName = _commLink.GetModuleName(ProductID, mt.ModID);    
+                                    moduleName = m_commLink.GetModuleName(ProductID, mt.ModID);    
                                     //Create transaction for add-on PL modules being merged into parent PL 
                                     TransactionManager.CreateTransaction(TransactionType.Module,
                                                                           string.Empty,
@@ -1038,7 +1043,7 @@ namespace Client.Creator
                     }
                     if (updateModuleList.Count > 0)
                     {   //update product license product connections if it is a client type
-                        if (_commLink.IsClientType(ProductID))
+                        if (m_commLink.IsClientType(ProductID))
                         {
                             ProductLicenseTable plt = client.GetProductLicense(ParentID);
                             if (plt != null)
@@ -1139,7 +1144,7 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            uint multiplier = (uint)((_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
+            uint multiplier = (uint)((m_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
             return ((module.UnlimitedValue * multiplier) - GetTotalModuleValue(module.ID));
         }
 
@@ -1151,7 +1156,7 @@ namespace Client.Creator
             //need to better way to get total module value
             //total value = primary pl + any add on pl modules
             //should not contact database
-            uint multiplier = (uint)((_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
+            uint multiplier = (uint)((m_commLink.IsClientType(ProductID) || Status == ProductLicenseState.AddOn) ? 1 : ProductConnection);
             return ((module.UnlimitedValue * multiplier) - totalModuleValue);
         }
 
@@ -1172,7 +1177,7 @@ namespace Client.Creator
                 }
                 else //productconnections >= 1
                 {
-                    if (_commLink.IsClientType(ProductID)) //client type product connection can be > 1
+                    if (m_commLink.IsClientType(ProductID)) //client type product connection can be > 1
                     {
                         module.AppInstance = ProductConnection;
                     }
@@ -1235,7 +1240,7 @@ namespace Client.Creator
         {
             if (ModuleList != null)
             {
-                foreach (ModuleTable module in _moduleList)
+                foreach (ModuleTable module in m_moduleList)
                 {
                     if (module.ModID == modID)
                     {
@@ -1243,7 +1248,7 @@ namespace Client.Creator
                         {
                             if (Status == ProductLicenseState.Licensed)
                             {
-                                if (!_commLink.IsDefaultModule(ProductID, modID))
+                                if (!m_commLink.IsDefaultModule(ProductID, modID))
                                     return true;
                             }
                             else
@@ -1267,7 +1272,7 @@ namespace Client.Creator
             List<ModuleTable> mtList = new List<ModuleTable>();
             foreach (ModuleTable module in ModuleList)
             {
-                moduleValue = _commLink.GetModuleTrialValue(ProductID, module.ModID);
+                moduleValue = m_commLink.GetModuleTrialValue(ProductID, module.ModID);
                 if (module.Value != moduleValue)
                 {
                     bRetVal = false;
@@ -1280,12 +1285,12 @@ namespace Client.Creator
 
         public bool CanIncrementModule(Module module)
         {
-            return GetAvailableModuleUnits(module) > 0 && !_commLink.IsDefaultModule(ProductID, module.ID);
+            return GetAvailableModuleUnits(module) > 0 && !m_commLink.IsDefaultModule(ProductID, module.ID);
         }
 
         public bool CanDecrementModule(Module module)
         {
-            return (module.Value > 0) && !_commLink.IsDefaultModule(ProductID, module.ID);
+            return (module.Value > 0) && !m_commLink.IsDefaultModule(ProductID, module.ID);
         }
 
         public void SetReadOnlyAttribStatus(ProductLicenseAttributes property, bool value)
@@ -1407,8 +1412,8 @@ namespace Client.Creator
                 { 
                     return Byte.Parse((string)value); 
                 }
-                catch (FormatException ex) 
-                { 
+                catch (FormatException)												// CR.34456; modified. 
+				{ 
                     throw new Exception(string.Format("Invalid number format for {0}", context.PropertyDescriptor.DisplayName)); 
                 }
             }
@@ -1459,8 +1464,8 @@ namespace Client.Creator
                 else 
                 {   //user entered a new date value
                     try { return DateTime.Parse((string)value); }
-                    catch (FormatException ex) { throw new Exception("Invalid Date Format"); }
-                }        
+                    catch (FormatException) { throw new Exception("Invalid Date Format"); } // CR.34456; modified.
+				}        
             }
         }
 

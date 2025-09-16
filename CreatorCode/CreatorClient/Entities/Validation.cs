@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Validation.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,28 +12,29 @@ using Solimar.Licensing.Attribs;
 using Client.Creator.CreatorService;
 using Client.Creator.ServiceProxy;
 
+
 namespace Client.Creator
 {
     public class Validation : BaseGridItem
     {
 
         #region Fields
-        string _status;
-        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs _token;
-        #endregion
+        string m_status;															// CR.34456; modified.
+        Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs m_token; // CR.34456; modified.
+		#endregion
 
-        #region Constructor
-        /// <summary>
-        /// Initializes a new instance of the Validation class. 
-        /// Represents a validation token for a license server.
-        /// </summary>
-        /// <param name="token">TokenTable object from database.</param>
-        public Validation(TokenTable token)
+		#region Constructor
+		/// <summary>
+		/// Initializes a new instance of the Validation class. 
+		/// Represents a validation token for a license server.
+		/// </summary>
+		/// <param name="token">TokenTable object from database.</param>
+		public Validation(TokenTable token)
         {
-            _token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
-            _token.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType ;
-            _token.tokenValue.TVal = token.TokenValue;
-            _status = ((TokenStatus)token.TokenStatus).ToString(); //"Active";
+            m_token = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
+            m_token.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType ;
+            m_token.tokenValue.TVal = token.TokenValue;
+            m_status = ((TokenStatus)token.TokenStatus).ToString(); //"Active";
         }
         #endregion 
 
@@ -41,8 +47,8 @@ namespace Client.Creator
             get
             {
                 //return !_token.tokenType.TVal.Equals(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
-                if (!_token.tokenType.TVal.Equals(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode))
-                    return true;
+                if (!m_token.tokenType.Equals(Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)) // CR.34456; modified.
+					return true;
                 return false;
             }
         }
@@ -52,8 +58,8 @@ namespace Client.Creator
         /// </summary>
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs ValidationToken
         {
-            get { return _token; }
-            set { _token = value; }
+            get { return m_token; }
+            set { m_token = value; }
         }
 
         /// <summary>
@@ -61,8 +67,8 @@ namespace Client.Creator
         /// </summary>
         public Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType TokenType
         {
-            get { return _token.tokenType.TVal; }
-            set { _token.tokenType.TVal = value; }
+            get { return m_token.tokenType.TVal; }
+            set { m_token.tokenType.TVal = value; }
         }
 
         /// <summary>
@@ -70,8 +76,8 @@ namespace Client.Creator
         /// </summary>
         public string TokenValue
         {
-            get { return _token.tokenValue.TVal; }
-            set { _token.tokenValue.TVal = value; }
+            get { return m_token.tokenValue.TVal; }
+            set { m_token.tokenValue.TVal = value; }
         }
 
         /// <summary>
@@ -79,8 +85,8 @@ namespace Client.Creator
         /// </summary>
         public string Status
         {
-            get{ return _status;  }
-            set { _status = value; }
+            get{ return m_status;  }
+            set { m_status = value; }
         }
         #endregion
     }

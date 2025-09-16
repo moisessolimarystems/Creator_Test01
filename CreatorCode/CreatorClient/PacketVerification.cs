@@ -1,4 +1,10 @@
-﻿using System;
+﻿// ListViewMgr.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Removed some variable declarations which weren't being used (e.g catch() {} ex vars).
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,36 +22,38 @@ namespace Client.Creator
     {
         #region Fields
 
-        bool _validVerificationCode;
-        string _selectedPacketName, _licenseName, _licenseCode;      
-        PacketVerificationDialogData _pktData;
+        bool m_validVerificationCode;												// CR.34456; modified.
+		string m_selectedPacketName;                                                // CR.34456; modified.
+		string m_licenseName;														// CR.34456; modified.
+		string m_licenseCode;														// CR.34456; modified.
+		PacketVerificationDialogData m_pktData;                                     // CR.34456; modified.
 
-        #endregion
+		#endregion
 
-        public PacketVerification()
+		public PacketVerification()
         {
-            _validVerificationCode = false;
-            _pktData = null;
+            m_validVerificationCode = false;
+            m_pktData = null;
             InitializeComponent();
         }
 
         private void PacketVerification_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
         {
-            _pktData = e.Data as PacketVerificationDialogData;
+            m_pktData = e.Data as PacketVerificationDialogData;
         }
 
         private void PacketVerification_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
         {
             PacketVerificationDialogData data = e.Data as PacketVerificationDialogData;
-            data.Verified = _validVerificationCode;
-            data.SelectedPacketName = _selectedPacketName;
-            data.LicenseName = _licenseName;
+            data.Verified = m_validVerificationCode;
+            data.SelectedPacketName = m_selectedPacketName;
+            data.LicenseName = m_licenseName;
         }
 
         private void PacketVerification_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DialogResult == DialogResult.OK)
-                if (!_validVerificationCode)
+                if (!m_validVerificationCode)
                     e.Cancel = true;
         }
 
@@ -67,10 +75,10 @@ namespace Client.Creator
                     }
                     else
                     {
-                        _selectedPacketName = storedPacket.PacketName;
+                        m_selectedPacketName = storedPacket.PacketName;
                         LicenseTable lt = client.GetLicenseByID(storedPacket.LicenseID, false);
-                        _licenseName = lt.LicenseName;
-                        IList<PacketTable> packetList = client.GetPacketsByLicenseName(_licenseName);
+                        m_licenseName = lt.LicenseName;
+                        IList<PacketTable> packetList = client.GetPacketsByLicenseName(m_licenseName);
                         List<PacketTable> modifiedPacketList = new List<PacketTable>();
                         if (packetList != null)
                         {
@@ -84,14 +92,14 @@ namespace Client.Creator
                                 }
                             }                            
                             client.UpdatePackets(modifiedPacketList);
-                            if (_licenseCode != null)
+                            if (m_licenseCode != null)
                             {
-                                if (_licenseCode.Length > 0) //store licenseCode to allow reset when generating packets.
+                                if (m_licenseCode.Length > 0) //store licenseCode to allow reset when generating packets.
                                 {
-                                    TokenTable licCodeToken = client.GetTokenByLicenseName(_licenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
+                                    TokenTable licCodeToken = client.GetTokenByLicenseName(m_licenseName, (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode);
                                     if (licCodeToken != null)
                                     {
-                                        licCodeToken.TokenValue = _licenseCode;
+                                        licCodeToken.TokenValue = m_licenseCode;
                                         client.UpdateToken(licCodeToken);
                                     }
                                     else
@@ -101,18 +109,18 @@ namespace Client.Creator
                                             CustID = lt.SCRnumber,
                                             LicenseID = lt.ID,
                                             TokenType = (byte)Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode,
-                                            TokenValue = _licenseCode
+                                            TokenValue = m_licenseCode
                                         };
                                         client.CreateToken(licCodeToken);
                                     }
                                 }
                             }
                         }
-                        MessageBox.Show("Verified packet " + _selectedPacketName, 
+                        MessageBox.Show("Verified packet " + m_selectedPacketName, 
                                         "Successful Verification",
                                         MessageBoxButtons.OK,
                                         MessageBoxIcon.Information);
-                        _validVerificationCode = true;
+                        m_validVerificationCode = true;
                     }
                 }
                 else
@@ -145,28 +153,28 @@ namespace Client.Creator
                     {                        
                         Lic_PackageAttribs.Lic_LicenseInfoAttribs tmpLicInfoAttribs = new Lic_PackageAttribs.Lic_LicenseInfoAttribs();
                         tmpLicInfoAttribs.Stream = keyInfo;
-                        foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tmpLicInfoAttribs.licVerificationAttribs.TVal.validationTokenList.TVal)
-                        {
+                        foreach (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs token in tmpLicInfoAttribs.licVerificationAttribs.validationTokenList.TVal) // CR.34456; modified.
+						{
                             if (token.tokenType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode)
                             {
-                                _licenseCode = token.tokenValue;
+                                m_licenseCode = token.tokenValue;
                                 break;
                             }
                         }
                         string licenseName = Lic_LicenseInfoAttribsHelper.GetDisplayLabel(tmpLicInfoAttribs);
-                        if (licenseName == _pktData.LicenseName)
+                        if (licenseName == m_pktData.LicenseName)
                         {
                             int index = 0;
-                            if (tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count > 0) 
-                                index = tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal.Count - 1;
-                            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)tmpLicInfoAttribs.licVerificationAttribs.TVal.verificationCodeHistoryList.TVal[index];
+                            if (tmpLicInfoAttribs.licVerificationAttribs.verificationCodeHistoryList.Count > 0) 
+                                index = tmpLicInfoAttribs.licVerificationAttribs.verificationCodeHistoryList.Count - 1;
+                            Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs attrib = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_VerificationCodeAttribs)tmpLicInfoAttribs.licVerificationAttribs.verificationCodeHistoryList.TVal[index];
                             verificationCodeTextBox.Text = attrib.verificationValue;
                             break;
                         }
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception)													// CR.34456; modified.
+				{
                     MessageBox.Show("Error");
                 }
             }

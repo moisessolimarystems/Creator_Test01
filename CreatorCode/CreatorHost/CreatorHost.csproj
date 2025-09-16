@@ -75,6 +75,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{58e855a9-f959-496d-93be-2445da7b9c13}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CreatorService\CreatorService.csproj">
       <Project>{CA674CF8-2BF9-4FDE-883D-62C68033EF4F}</Project>
       <Name>CreatorService</Name>

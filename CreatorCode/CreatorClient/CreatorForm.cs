@@ -1,4 +1,10 @@
-﻿using System;
+﻿// CreatorForm.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Removed some variable declarations which weren't being used (e.g catch() {} ex vars).
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -52,8 +58,8 @@ namespace Client.Creator
 
         #region Fields
         //private Dictionary<string, bool> m_TreeState;
-        private ListViewMgr _lvManager; //manages standard listview functions
-        private ListView storageListView; //internal listview to store full contents 
+        private ListViewMgr m_lvManager; //manages standard listview functions
+        private ListView m_storageListView; //internal listview to store full contents 
         public static CommunicationLink s_CommLink; //link to license manager/server functions
         public static List<SoftwareTokenTable> s_AllSoftwareTokens;
         private PermissionsTable m_Permissions; //table to hold permissions
@@ -62,12 +68,12 @@ namespace Client.Creator
         private string m_searchString = string.Empty; //search string for filtering view
         private string m_CurrentLicenseName = string.Empty;   //current active license server        
         //used by hardware key view
-        private string _selectedHardwareKeyCustomer = string.Empty;   //current active hardware key customer
-        private Customer _selectedLicenseCustomer;  //current active license customer
-        private string _selectedTreeNodeKey = string.Empty;   // current active tree node
-        private ReportManager _reportManager;   //manages report functions
-        private TreeNode _copyNode; //node to copy for report tree view
-        private Bitmap memoryImage; //used to hold screen capture for printing
+        private string m_selectedHardwareKeyCustomer = string.Empty;   //current active hardware key customer
+        private Customer m_selectedLicenseCustomer;  //current active license customer
+        private string m_selectedTreeNodeKey = string.Empty;   // current active tree node
+        private ReportManager m_reportManager;   //manages report functions
+        private TreeNode m_copyNode; //node to copy for report tree view
+        private Bitmap m_memoryImage; //used to hold screen capture for printing
         #endregion
 
         #region Properties
@@ -87,7 +93,7 @@ namespace Client.Creator
                 {
                     bLicenseServer = (sc.Status != null);
                 }
-                catch (Exception ex)
+                catch (Exception )
                 {
                 }
                 return bLicenseServer;
@@ -108,22 +114,22 @@ namespace Client.Creator
 
             m_ServerList = new List<String>();
             s_CommLink = new CommunicationLink();
-            storageListView = new ListView();
-            _selectedLicenseCustomer = new Customer();
-            _reportManager = new ReportManager(s_CommLink);
+            m_storageListView = new ListView();
+            m_selectedLicenseCustomer = new Customer();
+            m_reportManager = new ReportManager(s_CommLink);
             StaticImageList.Instance.GlobalImageList = CreatorImageList;    
 
-            _lvManager = new ListViewMgr();
-            _lvManager.SetListViewColumnSorter(DetailListView);
-            _lvManager.SetListViewColumnSorter(TransactionListView);
-            _lvManager.SetListViewColumnSorter(CustomersListView);
-            _lvManager.SetListViewColumnSorter(LicensePacketListView);
-            _lvManager.SetListViewColumnSorter(HardwareKeyListView);
-            _lvManager.SetListViewColumnSorter(ReportListView);
-            _lvManager.SetListViewColumnSorter(LogListView);
-            _lvManager.AutoResizeColumns(LogListView);
+            m_lvManager = new ListViewMgr();
+            m_lvManager.SetListViewColumnSorter(DetailListView);
+            m_lvManager.SetListViewColumnSorter(TransactionListView);
+            m_lvManager.SetListViewColumnSorter(CustomersListView);
+            m_lvManager.SetListViewColumnSorter(LicensePacketListView);
+            m_lvManager.SetListViewColumnSorter(HardwareKeyListView);
+            m_lvManager.SetListViewColumnSorter(ReportListView);
+            m_lvManager.SetListViewColumnSorter(LogListView);
+            m_lvManager.AutoResizeColumns(LogListView);
             TransactionManager.LogListView = LogListView;
-            TransactionManager.ListViewManager = _lvManager;
+            TransactionManager.ListViewManager = m_lvManager;
             ResetMainToolStripMenu();                  
         }
         #endregion
@@ -308,7 +314,7 @@ namespace Client.Creator
             }
             else if (viewToolStripComboBox.SelectedIndex == AppConstants.TokensView)
             {
-                if (_selectedHardwareKeyCustomer.Length > 0)
+                if (m_selectedHardwareKeyCustomer.Length > 0)
                     EnableHardwareKeyView();
                 else
                     EnableHardwareCustomerView();
@@ -367,7 +373,7 @@ namespace Client.Creator
             if (m_Permissions != null) //Confirms server has been connected since it has retrieved permissions from database.
             {
                 //requires check since it may be called before connection to server.
-                if (Service<ICreator>._channelFactory.State == CommunicationState.Opened)
+                if (Service<ICreator>.s_channelFactory.State == CommunicationState.Opened)
                 {
                     Service<ICreator>.Use((client) =>
                         {
@@ -476,7 +482,7 @@ namespace Client.Creator
         private void navigateHomeToolStripButton_Click(object sender, EventArgs e)
         {
             navigateHomeToolStripButton.Enabled = true;
-            _selectedLicenseCustomer.Clear();
+            m_selectedLicenseCustomer.Clear();
             if (MainTabControl.SelectedTab == LicensesTabPage)
             {
                 viewToolStripComboBox.SelectedIndex = AppConstants.CustomersView;
@@ -510,7 +516,7 @@ namespace Client.Creator
         {
             if (searchToolStripTextBox.Text.Length == 0 && !searchToolStripTextBox.Focused)
             {
-                searchToolStripTextBox.Text = (CustomersListView.Visible || _selectedHardwareKeyCustomer.Length == 0) ? "Customer Filter" : "License Server Filter";
+                searchToolStripTextBox.Text = (CustomersListView.Visible || m_selectedHardwareKeyCustomer.Length == 0) ? "Customer Filter" : "License Server Filter";
                 searchToolStripTextBox.Font = new Font(this.Font, FontStyle.Italic);
                 searchToolStripTextBox.ForeColor = SystemColors.InactiveCaptionText;
             }
@@ -541,7 +547,7 @@ namespace Client.Creator
                             }
                             LoadHardwareKeyListView(string.Empty, custRec.SCRname);
                             index = HardwareKeyListView.Items.IndexOfKey(attachedKey.keyName);
-                            _selectedHardwareKeyCustomer = custRec.SCRname;
+                            m_selectedHardwareKeyCustomer = custRec.SCRname;
                             break;
                         }
                     }
@@ -561,10 +567,10 @@ namespace Client.Creator
             string keyName = string.Empty;
             Service<ICreator>.Use((client) =>
             {
-                CustomerTable custRec = client.GetCustomer(_selectedHardwareKeyCustomer, false);
+                CustomerTable custRec = client.GetCustomer(m_selectedHardwareKeyCustomer, false);
                 if (custRec == null)
                 {
-                    MessageBox.Show(string.Format("Failed to find customer : {0}", _selectedHardwareKeyCustomer), "Reserve Hardware Key");
+                    MessageBox.Show(string.Format("Failed to find customer : {0}", m_selectedHardwareKeyCustomer), "Reserve Hardware Key");
                     return;
                 }
                 keyName = string.Format("{0:x4}-{1:x4}", custRec.SCRnumber, client.GetNextHardwareTokenValue((uint)custRec.SCRnumber));
@@ -578,7 +584,7 @@ namespace Client.Creator
                 };
                 client.CreateToken(newToken);
             });
-            PopulateHardwareKeyListView(string.Empty, _selectedHardwareKeyCustomer);
+            PopulateHardwareKeyListView(string.Empty, m_selectedHardwareKeyCustomer);
             HardwareKeyListView.Focus();
             HardwareKeyListView.Items[HardwareKeyListView.Items.IndexOfKey(keyName)].Selected = true;
         }
@@ -843,7 +849,7 @@ namespace Client.Creator
                         LicenseViewSplitContainer.Parent = splitContainer2.Panel1;
                         break;
                     case AppConstants.ValidationKeysTabPage:
-                        _selectedHardwareKeyCustomer = (_selectedLicenseCustomer.Name != null) ? _selectedLicenseCustomer.Name : string.Empty;                        
+                        m_selectedHardwareKeyCustomer = (m_selectedLicenseCustomer.Name != null) ? m_selectedLicenseCustomer.Name : string.Empty;                        
                         SearchCurrentView(string.Empty);
                         HardwareKeyListView.Parent = splitContainer2.Panel1;
                         break;
@@ -869,8 +875,8 @@ namespace Client.Creator
                 ListViewItem item = CustomersListView.SelectedItems[0];
                 if (item.Equals(hitInfo.Item))
                 {
-                    _selectedLicenseCustomer.Name = item.SubItems[1].Text;
-                    _selectedLicenseCustomer.Id = Int32.Parse(item.SubItems[0].Text, System.Globalization.NumberStyles.HexNumber);
+                    m_selectedLicenseCustomer.Name = item.SubItems[1].Text;
+                    m_selectedLicenseCustomer.Id = Int32.Parse(item.SubItems[0].Text, System.Globalization.NumberStyles.HexNumber);
                     searchToolStripTextBox.Text = string.Empty;
                     CustomerToolStrip.Visible = true;
                     findToolStrip.Visible = false;
@@ -878,7 +884,7 @@ namespace Client.Creator
                     loadingCircle1.Parent = splitContainer2.Panel1;
                     loadingCircle1.Visible = true;
                     viewToolStripComboBox.SelectedIndex = AppConstants.LicensesView; //should load destnames
-                    LoadDestinationNameComboBox(_selectedLicenseCustomer);
+                    LoadDestinationNameComboBox(m_selectedLicenseCustomer);
                 }
             }
         }
@@ -899,7 +905,7 @@ namespace Client.Creator
         }
         private void CustomersListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(CustomersListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(CustomersListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             CustomersListView.Sort();
         }
@@ -1412,7 +1418,7 @@ namespace Client.Creator
                 else
                 {
                     try { newExpirationDate = DateTime.Parse(userValue); }
-                    catch (Exception ex) { errorString = "Please enter a valid expiration date."; }
+                    catch (Exception) { errorString = "Please enter a valid expiration date."; }
                 }
                 if (errorString != string.Empty)
                 {
@@ -1534,7 +1540,7 @@ namespace Client.Creator
 
         private void LogListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(LogListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(LogListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             LogListView.Sort();
         }
@@ -1676,13 +1682,13 @@ namespace Client.Creator
                 {
                     using (ItemNameDialog dlg = new ItemNameDialog("Create New Destination Name"))
                     {
-                        DestNameDialogData destNameData = new DestNameDialogData((uint)_selectedLicenseCustomer.Id);
+                        DestNameDialogData destNameData = new DestNameDialogData((uint)m_selectedLicenseCustomer.Id);
                         if (dlg.ShowDialog(this, destNameData) == DialogResult.OK)
                         {   //create the new destination name for this customer                                                    
                             DestinationNameTable newDestName = new DestinationNameTable()
                             {
-                                CustID = _selectedLicenseCustomer.Id,
-                                DestID = (int)client.GetNextDestinationID((uint)_selectedLicenseCustomer.Id),
+                                CustID = m_selectedLicenseCustomer.Id,
+                                DestID = (int)client.GetNextDestinationID((uint)m_selectedLicenseCustomer.Id),
                                 DestName = dlg.Name,
                             };
                             client.CreateDestinationName(newDestName);
@@ -1691,7 +1697,7 @@ namespace Client.Creator
                         }
                         else
                         {   //set back to last selected dest name.
-                            int selectedIndex = DestNameComboBox.Items.IndexOf(_selectedLicenseCustomer.Name);
+                            int selectedIndex = DestNameComboBox.Items.IndexOf(m_selectedLicenseCustomer.Name);
                             if (selectedIndex > 0)
                                 DestNameComboBox.SelectedIndex = (selectedIndex > 0) ? selectedIndex : 2;
                         }
@@ -1699,13 +1705,13 @@ namespace Client.Creator
                 }
                 else if (DestNameComboBox.Text == "<Edit...>")
                 {
-                    using (EditDestinationName dlg = new EditDestinationName(_selectedLicenseCustomer.Id, DestNameComboBox.Items))
+                    using (EditDestinationName dlg = new EditDestinationName(m_selectedLicenseCustomer.Id, DestNameComboBox.Items))
                     {
                         dlg.ShowDialog(this);
                         if (dlg.Modified)
                         {
                             DestNameComboBox.Items.Clear();
-                            IList<DestinationNameTable> destTables = client.GetDestNamesByCustID(_selectedLicenseCustomer.Id).OrderBy(c => c.DestID).ToList();
+                            IList<DestinationNameTable> destTables = client.GetDestNamesByCustID(m_selectedLicenseCustomer.Id).OrderBy(c => c.DestID).ToList();
                             foreach (DestinationNameTable table in destTables)
                             {
                                 DestNameComboBox.Items.Add(table.DestName);
@@ -1724,8 +1730,8 @@ namespace Client.Creator
                     //LoadLicenseServers(DestNameComboBox.Text);
                     //how to get choose the selected license server to highlight
                     //what resets _selectedtreenodekey
-                    LoadDBLicenses(string.Empty, _selectedTreeNodeKey, DestNameComboBox.Text, true);
-                    _selectedTreeNodeKey = string.Empty;
+                    LoadDBLicenses(string.Empty, m_selectedTreeNodeKey, DestNameComboBox.Text, true);
+                    m_selectedTreeNodeKey = string.Empty;
                 }
             });
         }
@@ -2116,7 +2122,7 @@ namespace Client.Creator
 
         private void DetailListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(DetailListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(DetailListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             DetailListView.Sort();
         }
@@ -2428,7 +2434,7 @@ namespace Client.Creator
         #region TransactionListView Events
         private void TransactionListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(TransactionListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(TransactionListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             TransactionListView.Sort();
             //SetSingleTransactionListViewItemBackColor();
@@ -2445,12 +2451,12 @@ namespace Client.Creator
         #region HardwareKeyListView Events
         private void HardwareKeyListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            if(_selectedHardwareKeyCustomer.Length > 0)
+            if(m_selectedHardwareKeyCustomer.Length > 0)
                 EnableHardwareKeyView();
         }
         private void HardwareKeyListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(HardwareKeyListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(HardwareKeyListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             HardwareKeyListView.Sort();
         }
@@ -2460,15 +2466,15 @@ namespace Client.Creator
             if (HardwareKeyListView.SelectedItems.Count > 0)
             {
                 ListViewItem item = HardwareKeyListView.SelectedItems[0];
-                if (!(_selectedHardwareKeyCustomer.Length > 0))
+                if (!(m_selectedHardwareKeyCustomer.Length > 0))
                 {
                     // Do a hit test for the current mouse position
                     // Test to see if the selected item and the hit test item are the same.
                     if (item.Equals(hitInfo.Item))
                     {
-                        _selectedHardwareKeyCustomer = item.SubItems[1].Text;
+                        m_selectedHardwareKeyCustomer = item.SubItems[1].Text;
                         //launch edit dialog
-                        LoadHardwareKeyListView(string.Empty, _selectedHardwareKeyCustomer);
+                        LoadHardwareKeyListView(string.Empty, m_selectedHardwareKeyCustomer);
                     }
                 }
                 else
@@ -2648,7 +2654,7 @@ namespace Client.Creator
         }
         private void LicensePacketListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(LicensePacketListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(LicensePacketListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             LicensePacketListView.Sort();
         }
@@ -2726,9 +2732,9 @@ namespace Client.Creator
             if (!e.CancelEdit)
             {
                 Report selectedReport = e.Node.Tag as Report;
-                _reportManager.DeleteReport(selectedReport);
+                m_reportManager.DeleteReport(selectedReport);
                 selectedReport.ID = (e.Label != null) ? e.Label : e.Node.Text;
-                _reportManager.SaveReport(selectedReport);
+                m_reportManager.SaveReport(selectedReport);
             }
         }
 
@@ -2808,7 +2814,7 @@ namespace Client.Creator
                         int index = reportsTreeView.SelectedNode.Index;
                         if(index > 0 && reportsTreeView.SelectedNode.Parent.Nodes.Count > 0)
                             nextNode = reportsTreeView.SelectedNode.Parent.Nodes[index - 1];
-                        _reportManager.DeleteReport(selectedReport);
+                        m_reportManager.DeleteReport(selectedReport);
                         reportsTreeView.Nodes.Remove(reportsTreeView.SelectedNode);
                         if(nextNode != null) reportsTreeView.SelectedNode = nextNode;
                     }
@@ -2826,10 +2832,10 @@ namespace Client.Creator
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
                     Report selectedReport = selectedNode.Tag as Report;
-                    _reportManager.DeleteReport(selectedReport);
+                    m_reportManager.DeleteReport(selectedReport);
                     reportsTreeView.SelectedNode = null;
                     selectedNode.Tag = data.Report;
-                    _reportManager.SaveReport(data.Report);
+                    m_reportManager.SaveReport(data.Report);
                     reportsTreeView.SelectedNode = selectedNode;
                 }
             }
@@ -2843,8 +2849,8 @@ namespace Client.Creator
             exportReportToolStripMenuItem.Enabled = isReportSelected;
             copyReportToolStripMenuItem.Enabled = isReportSelected;
             pasteReportToolStripMenuItem.Visible = false;
-            if (_copyNode != null)
-                if (_copyNode.Tag is Report)
+            if (m_copyNode != null)
+                if (m_copyNode.Tag is Report)
                     pasteReportToolStripMenuItem.Visible = true;
             renameReportToolStripMenuItem.Enabled = isReportSelected;
         }
@@ -2884,7 +2890,7 @@ namespace Client.Creator
             //create new report based off saved report 
             //set new report to be edited
             //option will only be available if a reportnode has been set to copy
-            Report copiedReport = _copyNode.Tag as Report;
+            Report copiedReport = m_copyNode.Tag as Report;
             Report newReport = new Report(s_CommLink);
             int untitledCount = 0;
             foreach (TreeNode node in reportsTreeView.Nodes[0].Nodes)
@@ -2901,13 +2907,13 @@ namespace Client.Creator
             reportsTreeView.Nodes[0].Nodes.Add(newReportNode);
             reportsTreeView.SelectedNode = newReportNode;
             reportsTreeView.SelectedNode.BeginEdit();
-            _copyNode = null;
+            m_copyNode = null;
         }
 
         private void copyReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //save report name to copy
-            _copyNode = reportsTreeView.SelectedNode;
+            m_copyNode = reportsTreeView.SelectedNode;
         }
         #endregion
 
@@ -2916,7 +2922,7 @@ namespace Client.Creator
         #region ReportListView Events
         private void ReportListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
-            _lvManager.SetSortIndexColumn(ReportListView.Handle, e.Column);
+            m_lvManager.SetSortIndexColumn(ReportListView.Handle, e.Column);
             // Perform the sort with these new sort options.
             ReportListView.Sort();
         }
@@ -2972,7 +2978,7 @@ namespace Client.Creator
                     try
                     {
                         this.Text = AppConstants.ClientTitle + " [" + data.ServerList.First() +"]"; //1st is last used server
-                        Service<ICreator>._channelFactory.Endpoint.Address = new EndpointAddress(new Uri("net.tcp://" + data.ServerList.First() + ":9091/Creator/tcp"));
+                        Service<ICreator>.s_channelFactory.Endpoint.Address = new EndpointAddress(new Uri("net.tcp://" + data.ServerList.First() + ":9091/Creator/tcp"));
                         Service<ICreator>.Use((client) =>
                         {
                             m_Permissions = client.GetPermissionsByUser(WindowsIdentity.GetCurrent().Name);
@@ -2980,7 +2986,7 @@ namespace Client.Creator
                         });
                         viewToolStripComboBox.SelectedIndex = AppConstants.CustomersView;
                     }
-                    catch (COMException ex)
+                    catch (COMException)
                     {
                     }
                 }                //save server list into settings again 
@@ -2997,9 +3003,9 @@ namespace Client.Creator
         {
             LicensePacketListView.BeginUpdate();
             LicensePacketListView.Items.Clear();
-            ListViewItem[] lvItems = new ListViewItem[storageListView.Items.Count];
+            ListViewItem[] lvItems = new ListViewItem[m_storageListView.Items.Count];
             int index = 0;
-            foreach (ListViewItem lvItem in storageListView.Items)
+            foreach (ListViewItem lvItem in m_storageListView.Items)
             {   //type length > 0 filter otherwise all
                 if (lvItem.ImageIndex == Enums.GetIconIndex(type) || type.Length == 0)
                 {
@@ -3009,7 +3015,7 @@ namespace Client.Creator
                 }
             }
             LicensePacketListView.Items.AddRange(lvItems);
-            _lvManager.AutoResizeColumns(LicensePacketListView);
+            m_lvManager.AutoResizeColumns(LicensePacketListView);
             LicensePacketListView.EndUpdate();
             splitContainer1.Panel2Collapsed = (LicensePacketListView.SelectedItems.Count > 0) ? false : true;
         }
@@ -3079,7 +3085,7 @@ namespace Client.Creator
            // ListViewItem[] items = new ListViewItem[storageListView.Items.Count];
             //int index = 0;
             
-            foreach (ListViewItem lvItem in storageListView.Items)
+            foreach (ListViewItem lvItem in m_storageListView.Items)
             {
                 if (ValidTransactionType(type, lvItem.Tag as TransactionTable))                    
                     //items[index++] = lvItem.Clone() as ListViewItem;
@@ -3088,7 +3094,7 @@ namespace Client.Creator
 
             }
             TransactionListView.Items.AddRange(items.ToArray());
-            _lvManager.AutoResizeColumns(TransactionListView);
+            m_lvManager.AutoResizeColumns(TransactionListView);
             TransactionListView.EndUpdate();
         }
 
@@ -3192,7 +3198,7 @@ namespace Client.Creator
             else if(MainTabControl.SelectedTab == LicensesTabPage)            
                 LoadDBLicenses(searchString, string.Empty, DestNameComboBox.Text, true);            
             else if (MainTabControl.SelectedTab == ValidationKeysTabPage)
-                LoadHardwareKeyListView(searchString, _selectedHardwareKeyCustomer);
+                LoadHardwareKeyListView(searchString, m_selectedHardwareKeyCustomer);
         }
         //Problem : remove/add conflicts with edit because module compare thinks edits are new/remove modules}
         private void LoadSelectedTabPage(TabPage selectedTab)
@@ -3227,14 +3233,14 @@ namespace Client.Creator
             LicenseServer newLicense = new LicenseServer();
             Service<ICreator>.Use((client) =>
             {
-                CustomerTable custRec = client.GetCustomer(_selectedLicenseCustomer.Name, false);
+                CustomerTable custRec = client.GetCustomer(m_selectedLicenseCustomer.Name, false);
                 if (custRec == null)
                 {
                     MessageBox.Show("Failed to initialize standard license", "Create License Server");
                     return;
                 }
                 newLicense.CustID = (uint)custRec.SCRnumber;
-                DestinationNameTable dnt = client.GetDestinationID(_selectedLicenseCustomer.Id, DestNameComboBox.Text);
+                DestinationNameTable dnt = client.GetDestinationID(m_selectedLicenseCustomer.Id, DestNameComboBox.Text);
                 newLicense.DestID = (uint)dnt.DestID;
                 newLicense.GroupID = client.GetNextGroupID(newLicense.CustID, newLicense.DestID);
             });
@@ -3252,7 +3258,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) =>
             {
                 Lic_PackageAttribs licInfo = new Lic_PackageAttribs();
-                licInfo.licLicenseInfoAttribs.TVal = licProperties.LicInfo; //licproperties has custid, destid, groupid set
+                licInfo.licLicenseInfoAttribs = licProperties.LicInfo; //licproperties has custid, destid, groupid set
                 LicenseTable licRecord = new LicenseTable()
                 {
                     GroupID = (int)licProperties.GroupID,
@@ -3550,12 +3556,12 @@ namespace Client.Creator
                 }
                 else
                 {
-                    _selectedLicenseCustomer = new Customer(client.GetCustomer(custID.ToString(), false));
+                    m_selectedLicenseCustomer = new Customer(client.GetCustomer(custID.ToString(), false));
                 }
             });
             if (bFound)
             {
-                _selectedTreeNodeKey = selectedLicense;
+                m_selectedTreeNodeKey = selectedLicense;
                 LoadDestinationNameComboBox(custID, destID);
                 viewToolStripComboBox.SelectedIndex = AppConstants.LicensesView;
             }
@@ -3649,8 +3655,8 @@ namespace Client.Creator
             IList<string> enabledLicenses = null;
             Service<ICreator>.Use((client) =>
             {
-                modifiedLicenses = client.GetModifiedLicensesByCustomer(_selectedLicenseCustomer.Name);
-                enabledLicenses = client.GetEnabledLicensesByCustomer(_selectedLicenseCustomer.Name);
+                modifiedLicenses = client.GetModifiedLicensesByCustomer(m_selectedLicenseCustomer.Name);
+                enabledLicenses = client.GetEnabledLicensesByCustomer(m_selectedLicenseCustomer.Name);
             });
             foreach (TreeNode node in DetailTreeView.Nodes)
             {
@@ -3767,10 +3773,10 @@ namespace Client.Creator
                                 MessageBoxButtons.OKCancel, 
                                 MessageBoxIcon.Warning)== DialogResult.OK)
             {
-                selectedLicense.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
+                selectedLicense.LicInfo.licVerificationAttribs.validationTokenList.Clear();
                 Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                 licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
-                selectedLicense.LicInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken);
+                selectedLicense.LicInfo.licVerificationAttribs.validationTokenList.Add(licCodeToken);
                 Service<ICreator>.Use((client) =>
                 {
                     foreach (TokenTable token in client.GetTokensByLicenseName(selectedLicense.Name))
@@ -4075,7 +4081,7 @@ namespace Client.Creator
                 Lic_PackageAttribs licPackage = new Lic_PackageAttribs();
                 licPackage.Stream = storedLicense.LicenseInfo;
                 List<Lic_PackageAttribs.Lic_ProductInfoAttribs> removeProductList = new List<Lic_PackageAttribs.Lic_ProductInfoAttribs>();
-                foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.TVal.productList.TVal)
+                foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs product in licPackage.licLicenseInfoAttribs.productList)
                 {
                     if(removeProductLicenses.Contains(product.contractNumber.TVal))
                     {
@@ -4084,7 +4090,7 @@ namespace Client.Creator
                 }
                 foreach (Lic_PackageAttribs.Lic_ProductInfoAttribs prod in removeProductList)
                 {
-                    licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Remove(prod);
+                    licPackage.licLicenseInfoAttribs.productList.Remove(prod);
                 }
                 storedLicense.LicenseInfo = licPackage.Stream;
                 storedLicense.IsDirty = true;
@@ -4116,12 +4122,12 @@ namespace Client.Creator
                     bFound = false;
                 }
                 else
-                    _selectedLicenseCustomer = new Customer(client.GetCustomer(custID.ToString(), false));
+                    m_selectedLicenseCustomer = new Customer(client.GetCustomer(custID.ToString(), false));
             });
             if (bFound)
             {
                 findToolStrip.Visible = false;
-                _selectedTreeNodeKey = selectedProductLicense;
+                m_selectedTreeNodeKey = selectedProductLicense;
                 LoadDestinationNameComboBox(custID, destID);
                 viewToolStripComboBox.SelectedIndex = AppConstants.LicensesView;
             }
@@ -4218,13 +4224,13 @@ namespace Client.Creator
         #region Packet Methods
         private void GenerateLicensePacket()
         {
-            m_selectedDirectory = string.Format("{0}\\{1}\\{2}.{3}.{4}", Directory.GetCurrentDirectory(), _selectedLicenseCustomer.Name.Replace(" ", ""), DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
+            m_selectedDirectory = string.Format("{0}\\{1}\\{2}.{3}.{4}", Directory.GetCurrentDirectory(), m_selectedLicenseCustomer.Name.Replace(" ", ""), DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
             //  Directory\\Company\\Date
             using (LicenseInfoForm dlg = new LicenseInfoForm("Generate License Packet for " + DetailTreeView.SelectedNode.Name, ref s_CommLink))
             {                
                 PacketDialogData data = new PacketDialogData()
                 {
-                    CustomerName = _selectedLicenseCustomer.Name.Replace(" ", ""),
+                    CustomerName = m_selectedLicenseCustomer.Name.Replace(" ", ""),
                     PacketName = string.Format("{0}-{1}-{2}-{3}-{4}-{5}-{6}", DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
                     SelectedDirectory = m_selectedDirectory,
                     LicenseName = DetailTreeView.SelectedNode.Name
@@ -4247,7 +4253,7 @@ namespace Client.Creator
                 packets = client.GetPacketsByLicenseName(licenseName);
             });
             //Need list view manager
-            storageListView.Items.Clear();
+            m_storageListView.Items.Clear();
             if (packets != null && packets.Count > 0)
             {
                 foreach (var packet in packets)
@@ -4266,13 +4272,13 @@ namespace Client.Creator
                     };
                     packetItem.SubItems.AddRange(subItems);
                     //add to stored packet list
-                    storageListView.Items.Add(packetItem);
+                    m_storageListView.Items.Add(packetItem);
                 }
-                storageListView.Items[storageListView.Items.Count - 1].Font = new Font(this.Font, FontStyle.Bold);
-                storageListView.Items[storageListView.Items.Count - 1].ForeColor = Color.SteelBlue;
+                m_storageListView.Items[m_storageListView.Items.Count - 1].Font = new Font(this.Font, FontStyle.Bold);
+                m_storageListView.Items[m_storageListView.Items.Count - 1].ForeColor = Color.SteelBlue;
             }
-            _lvManager.ResetListViewColumnSorter(LicensePacketListView);
-            _lvManager.SetSortIndexColumn(LicensePacketListView.Handle, 0);
+            m_lvManager.ResetListViewColumnSorter(LicensePacketListView);
+            m_lvManager.SetSortIndexColumn(LicensePacketListView.Handle, 0);
             packetToolStripComboBox.SelectedIndex = 0;
             ShowPacketListView(string.Empty);
             //needed outside of begin/end update to allow clearing of LicensePacketListView
@@ -4305,12 +4311,12 @@ namespace Client.Creator
         {
             DetailListView.BeginUpdate();
             DetailListView.Items.Clear();                        
-            foreach (ListViewItem lvItem in storageListView.Items)
+            foreach (ListViewItem lvItem in m_storageListView.Items)
             {                
                 if (IsModuleFiltered(lvItem.Tag as Module, type))
                     DetailListView.Items.Insert(0, lvItem.Clone() as ListViewItem);
             }
-            _lvManager.AutoResizeColumns(DetailListView);      
+            m_lvManager.AutoResizeColumns(DetailListView);      
             DetailListView.EndUpdate();
         }
         #endregion
@@ -4320,8 +4326,8 @@ namespace Client.Creator
         {
             Graphics myGraphics = this.CreateGraphics();
             Size s = this.Size;
-            memoryImage = new Bitmap(s.Width, s.Height, myGraphics);
-            Graphics memoryGraphics = Graphics.FromImage(memoryImage);
+            m_memoryImage = new Bitmap(s.Width, s.Height, myGraphics);
+            Graphics memoryGraphics = Graphics.FromImage(m_memoryImage);
             memoryGraphics.CopyFromScreen(this.Location.X, this.Location.Y, 0, 0, s);
         }
 
@@ -4330,21 +4336,21 @@ namespace Client.Creator
         {
             int x = e.MarginBounds.X;
             int y = e.MarginBounds.Y;
-            int width = memoryImage.Width;
-            int height = memoryImage.Height;
+            int width = m_memoryImage.Width;
+            int height = m_memoryImage.Height;
 
             if ((width / e.MarginBounds.Width) > (height / e.MarginBounds.Height))
             {
                 width = e.MarginBounds.Width;
-                height = memoryImage.Height * e.MarginBounds.Width / memoryImage.Width;
+                height = m_memoryImage.Height * e.MarginBounds.Width / m_memoryImage.Width;
             }
             else
             {
                 height = e.MarginBounds.Height;
-                width = memoryImage.Width * e.MarginBounds.Height / memoryImage.Height;
+                width = m_memoryImage.Width * e.MarginBounds.Height / m_memoryImage.Height;
             }
             System.Drawing.Rectangle destRect = new System.Drawing.Rectangle(x, y, width, height);
-            e.Graphics.DrawImage(memoryImage, destRect, 0, 0, memoryImage.Width, memoryImage.Height, System.Drawing.GraphicsUnit.Pixel);
+            e.Graphics.DrawImage(m_memoryImage, destRect, 0, 0, m_memoryImage.Width, m_memoryImage.Height, System.Drawing.GraphicsUnit.Pixel);
         }
         #endregion
 
@@ -4383,7 +4389,7 @@ namespace Client.Creator
             DetailListView.Columns.Clear();
             DetailListView.Columns.Add("Number");
             DetailListView.Columns.Add("Name");
-            _lvManager.ResetListViewColumnSorter(CustomersListView);
+            m_lvManager.ResetListViewColumnSorter(CustomersListView);
         }
         private void LoadCustomersListView(IList<CustomerTable> customerRecords)
         {
@@ -4404,7 +4410,7 @@ namespace Client.Creator
             }
             if (lvItems.Count() > 0)
                 this.CustomersListView.Items.AddRange(lvItems);
-            _lvManager.AutoResizeColumns(CustomersListView);
+            m_lvManager.AutoResizeColumns(CustomersListView);
             CustomersListView.EndUpdate();
         }
 
@@ -4510,7 +4516,7 @@ namespace Client.Creator
             HardwareKeyListView.Items.Clear();
             PopulateHardwareKeyListViewColumns(custName);
             PopulateHardwareKeyListView(searchString, custName);
-            _lvManager.AutoResizeColumns(HardwareKeyListView);
+            m_lvManager.AutoResizeColumns(HardwareKeyListView);
             HardwareKeyListView.EndUpdate();
         }
         public void PopulateHardwareKeyListViewColumns(string custName)
@@ -4538,11 +4544,11 @@ namespace Client.Creator
                     HardwareKeyListView.Columns.Add("Deactivated");
                 }
             }
-            _lvManager.ResetListViewColumnSorter(HardwareKeyListView);
+            m_lvManager.ResetListViewColumnSorter(HardwareKeyListView);
         }
         public void PopulateHardwareKeyListView(string searchString, string custName)
         {
-            customerToolStripStatusLabel.Text = (_selectedHardwareKeyCustomer.Length > 0) ? "Customer : " + _selectedHardwareKeyCustomer : string.Empty;
+            customerToolStripStatusLabel.Text = (m_selectedHardwareKeyCustomer.Length > 0) ? "Customer : " + m_selectedHardwareKeyCustomer : string.Empty;
             if (custName.Length > 0)
                 PopulateHardwareKeyView(searchString, custName);
             else
@@ -4563,7 +4569,7 @@ namespace Client.Creator
             }
             clearKeyToolStripButton.Enabled = true;
             ValidationKeyToolStrip.Visible = true;
-            ValidationKeyCustomerLabel.Text = _selectedHardwareKeyCustomer;
+            ValidationKeyCustomerLabel.Text = m_selectedHardwareKeyCustomer;
         }
 
         private void EnableHardwareCustomerView()
@@ -4580,7 +4586,7 @@ namespace Client.Creator
                 DetailListView.BeginUpdate();
                 PopulateDetailListViewColumns(item);
                 PopulateDetailListView(item);
-                _lvManager.AutoResizeColumns(DetailListView);
+                m_lvManager.AutoResizeColumns(DetailListView);
                 DetailListView.EndUpdate();
             }
             /// <summary>
@@ -4618,7 +4624,7 @@ namespace Client.Creator
                         }
                         break; 
                 };
-                _lvManager.ResetListViewColumnSorter(DetailListView);
+                m_lvManager.ResetListViewColumnSorter(DetailListView);
             }
             /// <summary>
             /// Populates the ListView column headers based upon the selected TreeNode of the License view.
@@ -4728,9 +4734,9 @@ namespace Client.Creator
                                                                             (hardwareToken == null || hardwareToken.TokenStatus != (byte)TokenStatus.Active) && 
                                                                             licenseData.LockedByCurrentUser();              
                 }               
-                _lvManager.SetSortIndexColumn(DetailListView.Handle, DetailListView.Columns.Count - 1);
+                m_lvManager.SetSortIndexColumn(DetailListView.Handle, DetailListView.Columns.Count - 1);
                 DetailListView.Sort();
-                _lvManager.AutoResizeColumns(DetailListView);
+                m_lvManager.AutoResizeColumns(DetailListView);
             }
             //CONTACT DB : 2
             public void PopulateDetailListView(ProductCollection productData)
@@ -4753,7 +4759,7 @@ namespace Client.Creator
                     DetailListViewToolStripLabel2.Text = string.Format("Product Version : {0}", version.ToString());
                     Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec = CreatorForm.s_CommLink.GetProductSpec(productData.ProductID);
                     List<ListViewItem> lvItems = new List<ListViewItem>();
-                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.TVal.Values)
+                    foreach (Lic_PackageAttribs.Lic_ModuleSoftwareSpecAttribs moduleSpec in productSpec.moduleSpecMap.Values)
                     {
                         bool bDeprecated = false, bIntroduced = false;
                         if (moduleSpec.moduleVersionDeprecated_Major.TVal > 0)
@@ -4800,7 +4806,7 @@ namespace Client.Creator
             private void PopulateDetailListView(ProductLicense plData)
             {
                 //clear previous items from storage and current view
-                storageListView.Items.Clear();
+                m_storageListView.Items.Clear();
                 SetupDetailListViewToolStrip(plData);
                 //test-dev image missing
                 totalModuleListToolStripButton.Enabled = m_Permissions.pt_create_modify_key.Value && DetailPropertyGrid.Enabled;
@@ -4830,7 +4836,7 @@ namespace Client.Creator
                         {
                             ListViewItem lvItem = CreateModuleListViewItem(plData, module, totalValue);
                             //if (storageListView.Items.Find(lvItem.Name, false).Count() == 0)
-                            storageListView.Items.Add(lvItem);
+                            m_storageListView.Items.Add(lvItem);
                         }
                     }
                     if (moduleFilterToolStripComboBox.SelectedItem != null)
@@ -4900,7 +4906,7 @@ namespace Client.Creator
             string[] subItems;
             string productLicenseName = string.Empty;
 
-            storageListView.Items.Clear();
+            m_storageListView.Items.Clear();
             Service<ICreator>.Use((client) =>
             {   //now two steps, given a license name, get all transactions for a license and sort by packet
                 transactions = client.GetTransactionsByLicenseName(licenseName);
@@ -4932,7 +4938,7 @@ namespace Client.Creator
                         item.SubItems.AddRange(subItems);
                         lvItems[index] = item;
                     }
-                    storageListView.Items.AddRange(lvItems);
+                    m_storageListView.Items.AddRange(lvItems);
                 }
                 packets = client.GetPacketsByLicenseName(licenseName).OrderByDescending(c => c.DateCreated).ToList();
                 transactions = transactions.Where(t => t.taPacketID.HasValue).ToList();
@@ -4962,12 +4968,12 @@ namespace Client.Creator
                             item.SubItems.AddRange(subItems);
                             lvItems[index] = item;
                         }
-                        storageListView.Items.AddRange(lvItems);
+                        m_storageListView.Items.AddRange(lvItems);
                     }
                 }
             });
-            _lvManager.ResetListViewColumnSorter(TransactionListView);
-            _lvManager.SetSortIndexColumn(TransactionListView.Handle, 0);
+            m_lvManager.ResetListViewColumnSorter(TransactionListView);
+            m_lvManager.SetSortIndexColumn(TransactionListView.Handle, 0);
             transactionToolStripComboBox.SelectedIndex = (DetailTreeView.SelectedNode.Level < 3) ? DetailTreeView.SelectedNode.Level : 2;
             TransactionListView.Sort();
         }
@@ -5045,7 +5051,7 @@ namespace Client.Creator
                 }
                 ReportListView.Items.AddRange(lvItems);
             }
-            _lvManager.AutoResizeColumns(ReportListView);
+            m_lvManager.AutoResizeColumns(ReportListView);
             ReportListView.EndUpdate();
         }
 
@@ -5104,7 +5110,7 @@ namespace Client.Creator
                 }
                 ReportListView.Items.AddRange(lvItems);
             }
-            _lvManager.AutoResizeColumns(ReportListView);
+            m_lvManager.AutoResizeColumns(ReportListView);
             ReportListView.EndUpdate();
         }
 
@@ -5149,7 +5155,7 @@ namespace Client.Creator
                     ReportListView.Items.AddRange(lvItems);
                 }
             });
-            _lvManager.AutoResizeColumns(ReportListView);
+            m_lvManager.AutoResizeColumns(ReportListView);
             ReportListView.EndUpdate();
         }
 
@@ -5195,7 +5201,7 @@ namespace Client.Creator
                     ReportListView.Items.AddRange(lvItems);
                 }
             });
-            _lvManager.AutoResizeColumns(ReportListView);
+            m_lvManager.AutoResizeColumns(ReportListView);
             ReportListView.EndUpdate();
         }
 
@@ -5271,7 +5277,7 @@ namespace Client.Creator
                 default:
                     break;
             }
-            _lvManager.ResetListViewColumnSorter(ReportListView);
+            m_lvManager.ResetListViewColumnSorter(ReportListView);
         }
 
         private int GetReportImageIndex(Report.ReportType reportType)
@@ -5299,7 +5305,7 @@ namespace Client.Creator
         //read xml for reports, load their conditions into report node tags
         private void LoadReportListView()
         {
-            List<Report> reportList = _reportManager.GetReports();
+            List<Report> reportList = m_reportManager.GetReports();
             ////populate tree node
             TreeNode reportNode = null;
             //RootNode not selectable, 
@@ -5400,7 +5406,7 @@ namespace Client.Creator
                 {
                     cust = client.GetAllCustomers(searchString, loadOption);
                 }
-                catch (Exception e) { }
+                catch (Exception) { }
             });
             return cust;
         }
@@ -5446,9 +5452,9 @@ namespace Client.Creator
                 try
                 {                    //needs to retrieve licenses by customer/destid or destname
                     //if (destName.Length == 0) destName = _selectedLicenseCustomer.Name;
-                    licenses = client.GetLicensesByDestination(_selectedLicenseCustomer.Name, destName, searchString, loadOption);
+                    licenses = client.GetLicensesByDestination(m_selectedLicenseCustomer.Name, destName, searchString, loadOption);
                 }
-                catch (Exception e) { }
+                catch (Exception) { }
             });
             return licenses.ToList();
         }
@@ -5464,7 +5470,7 @@ namespace Client.Creator
                 searchToolStripTextBox.Text = "License Server Filter";
             loadingCircle1.Active = false;
             loadingCircle1.Visible = false;      
-            customerToolStripStatusLabel.Text = "Customer : " + _selectedLicenseCustomer.Name;
+            customerToolStripStatusLabel.Text = "Customer : " + m_selectedLicenseCustomer.Name;
             //customerToolStripLabel.Text = _selectedLicenseCustomer.Name;
         }
         

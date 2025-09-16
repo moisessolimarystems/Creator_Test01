@@ -1,4 +1,9 @@
-﻿using System;
+﻿// LicensePacket.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,25 +16,27 @@ namespace Client.Creator
     class LicensePacket
     {
         #region Fields
-        private Lic_PackageAttribs _licPackage;
-        private LicenseTable _licenseTable;
-        private string _licenseServer;
-        private uint _highestModuleRevision;   //set by determining from the included products in a packet.
-        CommunicationLink _commLink;        
-        #endregion
+        private Lic_PackageAttribs m_licPackage;                                    // CR.34456; modified.
+		private LicenseTable m_licenseTable;										// CR.34456; modified.
+		private string m_licenseServer;                                             // CR.34456; modified.
 
-        #region Constructor
-        /// <summary>
-        /// Initializes a new instance of the LicensePacket class.
-        /// </summary>
-        /// <param name="licenseServer">The license server name that belongs to the license packet.</param>
-        public LicensePacket(CommunicationLink commLink, string licenseServer)        
+		//set by determining from the included products in a packet.
+		private uint m_highestModuleRevision;										// CR.34456; modified.   
+		CommunicationLink m_commLink;                                               // CR.34456; modified.
+		#endregion
+
+		#region Constructor
+		/// <summary>
+		/// Initializes a new instance of the LicensePacket class.
+		/// </summary>
+		/// <param name="licenseServer">The license server name that belongs to the license packet.</param>
+		public LicensePacket(CommunicationLink commLink, string licenseServer)        
         {            
-            _licPackage = new Lic_PackageAttribs();
-            _licenseTable = null;
-            _licenseServer = licenseServer;
-            _highestModuleRevision = 0;
-            _commLink = commLink;
+            m_licPackage = new Lic_PackageAttribs();
+            m_licenseTable = null;
+            m_licenseServer = licenseServer;
+            m_highestModuleRevision = 0;
+            m_commLink = commLink;
         }
         #endregion 
 
@@ -39,14 +46,14 @@ namespace Client.Creator
         /// </summary>
         public Lic_PackageAttribs LicPackage
         {
-            get { return _licPackage; }
+            get { return m_licPackage; }
         }
         /// <summary>
         /// Gets the license table containing database information on a license server.
         /// </summary>
         public LicenseTable DatabaseRecord
         {
-            get { return _licenseTable; }
+            get { return m_licenseTable; }
         }
         #endregion
 
@@ -60,26 +67,26 @@ namespace Client.Creator
             int major = 0, minor = 0, buildVersion = 0;
             Service<ICreator>.Use((client) =>
             {                
-                _licenseTable = client.GetLicenseByName(_licenseServer, true);
+                m_licenseTable = client.GetLicenseByName(m_licenseServer, true);
                 client.GetLicenseServerVersion(ref major, ref minor, ref buildVersion);
             });
-            if (_licenseTable != null)
+            if (m_licenseTable != null)
             {
-                _licPackage.Stream = _licenseTable.LicenseInfo;
+                m_licPackage.Stream = m_licenseTable.LicenseInfo;
                 if (PopulateProductInfo())  //add products, productlicenses, modules to _licPackage                
                 {                    
                     if (PopulateValidationTokens(data)) //add tokens to _licPackage 
                     {   //set software spec version based on the spec built with Creator
-                        Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = _licPackage.licLicenseInfoAttribs;
-                        _licPackage.licReplaceSoftwareSpecAttribs.TVal = _commLink.SoftwareSpec;
+                        Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = m_licPackage.licLicenseInfoAttribs;
+                        m_licPackage.licReplaceSoftwareSpecAttribs = m_commLink.SoftwareSpec; // CR.34456; modified.
                         //add current software spec
                         Lic_LicenseInfoAttribsHelper.GenerateActivitySlotHistoryInfo(ref licInfo);
-                        _licPackage.licLicenseInfoAttribs.TVal = licInfo;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Major.TVal = (uint)major;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_Minor.TVal = (uint)minor;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMajor.TVal = (uint)buildVersion;
-                        _licPackage.licSoftwareSpecAttribs.TVal.softwareSpec_SubMinor.TVal = _highestModuleRevision;   //value determined from included products highest revision
-                        _licenseTable.LicenseInfo = _licPackage.Stream;
+                        m_licPackage.licLicenseInfoAttribs = licInfo;                // CR.34456; modified.
+						m_licPackage.licSoftwareSpecAttribs.softwareSpec_Major.TVal = (uint)major; // CR.34456; modified.
+						m_licPackage.licSoftwareSpecAttribs.softwareSpec_Minor.TVal = (uint)minor; // CR.34456; modified.
+						m_licPackage.licSoftwareSpecAttribs.softwareSpec_SubMajor.TVal = (uint)buildVersion; // CR.34456; modified.
+						m_licPackage.licSoftwareSpecAttribs.softwareSpec_SubMinor.TVal = m_highestModuleRevision;   //value determined from included products highest revision
+                        m_licenseTable.LicenseInfo = m_licPackage.Stream;
                         bRetVal = true;
                     }
                 }
@@ -92,14 +99,14 @@ namespace Client.Creator
         public void SaveLicensePackage()
         {
             Lic_PackageAttribs.Lic_LicenseInfoAttribs licInfo = LicPackage.licLicenseInfoAttribs;
-            licInfo.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
-            licInfo.productList.TVal.Clear();
-            LicPackage.licSoftwareSpecAttribs.TVal = new Lic_PackageAttribs.Lic_SoftwareSpecAttribs();
-            Service<ICreator>.Use((client) =>
+            licInfo.licVerificationAttribs.validationTokenList.Clear();				// CR.34456; modified.
+			licInfo.productList.Clear();											// CR.34456; modified.
+			LicPackage.licSoftwareSpecAttribs = new Lic_PackageAttribs.Lic_SoftwareSpecAttribs();  // CR.34456; modified.
+			Service<ICreator>.Use((client) =>
             {
-                _licenseTable.LicenseInfo = LicPackage.Stream;
-                _licenseTable.IsDirty = false;
-                client.UpdateLicense(_licenseTable);
+                m_licenseTable.LicenseInfo = LicPackage.Stream;
+                m_licenseTable.IsDirty = false;
+                client.UpdateLicense(m_licenseTable);
             });            
         }
 
@@ -114,14 +121,14 @@ namespace Client.Creator
             bool bRetVal = true;
             IList<SoftwareTokenTable> softwareTokens = null;
             IList<TokenTable> tokenList = null;            
-            _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Clear();
+            m_licPackage.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList.Clear(); // CR.34456; modified.
 
-            Service<ICreator>.Use((client) =>
+			Service<ICreator>.Use((client) =>
             {
                 softwareTokens = CreatorForm.s_AllSoftwareTokens;
-                tokenList = client.GetTokensByLicenseName(_licenseServer).Where(t => t.TokenStatus != (byte)TokenStatus.Deactivated).ToList();
+                tokenList = client.GetTokensByLicenseName(m_licenseServer).Where(t => t.TokenStatus != (byte)TokenStatus.Deactivated).ToList();
             });       
-            if (_licenseTable.IsActive)
+            if (m_licenseTable.IsActive)
             {
                 bool bExistLicenseCode = false;
                 foreach (TokenTable token in tokenList)  //add validation tokens for licinfo object, tokentable may contain licensecode
@@ -148,14 +155,14 @@ namespace Client.Creator
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)token.TokenType;
                     newToken.tokenValue.TVal = token.TokenValue;
-                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
-                }
+                    m_licPackage.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList.Add(newToken); // CR.34456; modified.
+				}
                 if (!bExistLicenseCode)  //add empty licensecode token if it hasn't been added
                 {
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs licCodeToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     licCodeToken.tokenType.TVal = Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType.ttLicenseCode;
-                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(licCodeToken);
-                }
+                    m_licPackage.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList.Add(licCodeToken); // CR.34456; modified.
+				}
             }
             else //deactive ls
             {   //SW will have history of tokens, HW will be empty                 
@@ -166,8 +173,8 @@ namespace Client.Creator
                     Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs newToken = new Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs();
                     newToken.tokenType.TVal = (Lic_PackageAttribs.Lic_LicenseInfoAttribs.Lic_ValidationTokenAttribs.TTokenType)computerNameToken.TokenType;
                     newToken.tokenValue.TVal = computerNameToken.TokenValue;
-                    _licPackage.licLicenseInfoAttribs.TVal.licVerificationAttribs.TVal.validationTokenList.TVal.Add(newToken);
-                }
+                    m_licPackage.licLicenseInfoAttribs.licVerificationAttribs.validationTokenList.Add(newToken); // CR.34456; modified.
+				}
             }
             return bRetVal;
         }
@@ -181,9 +188,9 @@ namespace Client.Creator
             uint currentModuleRevision = 0;
             Service<ICreator>.Use((client) =>
             {
-                List<ProductLicenseTable> pltList = client.GetProductLicenses(_licenseServer,false);
-                List<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(_licenseServer);
-                List<ModuleTable> moduleList = client.GetAllModules(_licenseServer);
+                List<ProductLicenseTable> pltList = client.GetProductLicenses(m_licenseServer,false);
+                List<TransactionTable> transactionList = client.GetNewTransactionsByLicenseName(m_licenseServer);
+                List<ModuleTable> moduleList = client.GetAllModules(m_licenseServer);
                 foreach (ProductLicenseTable plt in pltList.Where(pl => pl.IsActive == true))
                 {
                     Lic_PackageAttribs.Lic_ProductInfoAttribs product = new Lic_PackageAttribs.Lic_ProductInfoAttribs();
@@ -222,14 +229,15 @@ namespace Client.Creator
                             mod.moduleAppInstance.TVal = module.AppInstance;
                             if (module.Value > 0) //only modules with value count towards spec revision
                             {
-                                currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);                     //get revision by setting to highest product revision while adding
-                                _highestModuleRevision = (currentModuleRevision > _highestModuleRevision) ? currentModuleRevision : _highestModuleRevision;
+								// get revision by setting to highest product revision while adding
+								currentModuleRevision = CreatorForm.s_CommLink.GetModuleSpecRevision(plt.ProductID, (ushort)module.ModID);  
+								m_highestModuleRevision = (currentModuleRevision > m_highestModuleRevision) ? currentModuleRevision : m_highestModuleRevision;
                             }
-                            product.moduleList.TVal.Add(mod);
-                        }
+                            product.moduleList.Add(mod);							// CR.34456; modified.
+						}
                     }
-                    _licPackage.licLicenseInfoAttribs.TVal.productList.TVal.Add(product);
-                }
+                    m_licPackage.licLicenseInfoAttribs.productList.Add(product);		// CR.34456; modified.
+				}
                 bRetVal = true;
             });
             return bRetVal;

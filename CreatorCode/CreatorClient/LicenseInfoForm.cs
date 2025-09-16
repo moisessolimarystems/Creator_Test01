@@ -1,4 +1,9 @@
-﻿using System;
+﻿// LicenseInfoForm.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Removed some variable declarations which weren't being used (e.g catch() {} ex vars).
+
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -126,7 +131,7 @@ namespace Client.Creator
             Service<ICreator>.Use((client) => 
             {
                 IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicenses(pltData.LicenseServerString, true);
-                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
+                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
                 {
                     //bool bSkip = false;                   
                     productLicenses = dbProductLicenses.Where(p => p.ProductID == (byte)productSpec.productID.TVal && p.IsActive).ToList();
@@ -148,8 +153,8 @@ namespace Client.Creator
                     }
                     else //check if PLP product exists before adding base product, relies on PLP product having name format : "PRODUCT PLP"
                     {
-                        short plpProductID = m_CommLink.GetProductID(string.Format("{0} PLP", productSpec.productName.TVal));
-                        bool bHasActivePLPProduct = dbProductLicenses.Where(p => p.ProductID == plpProductID && p.IsActive).Count() > 0;
+                        short plpProductID = m_CommLink.GetProductID(string.Format("{0} PLP", productSpec.productName)); // CR.34456; modified.
+						bool bHasActivePLPProduct = dbProductLicenses.Where(p => p.ProductID == plpProductID && p.IsActive).Count() > 0;
                         if (bHasActivePLPProduct)
                             continue;
                     }
@@ -455,8 +460,8 @@ namespace Client.Creator
                     Directory.CreateDirectory(packetOutputPathTextBox.Text);
                 m_Validated = true;
             }
-            catch(Exception e)
-            {
+            catch(Exception)														// CR.34456; modified.
+			{
                 m_Validated = false;
                 MessageBox.Show(packetOutputPathTextBox.Text + " is an invalid path.", "Packet Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -534,8 +539,8 @@ namespace Client.Creator
                     else
                         btnOk.Enabled = false;
                 }
-                catch (Exception ex)
-                {
+                catch (Exception)													// CR.34456; modified.
+				{
                     MessageBox.Show("Failed to import validation tokens from " + browseCSVOpenFileDialog.FileName, "Validation Token Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -600,8 +605,8 @@ namespace Client.Creator
                 //get all orders for a given product
                 IList<ProductLicenseTable> dbProductLicenses = client.GetProductLicensesByProduct(storedObject.LicenseServerString, (byte)m_CommLink.GetProductID(selectedProduct));
                 //List<ProductLicenseTable> productLicenses;
-                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.TVal.Values)
-                {
+                foreach (Lic_PackageAttribs.Lic_ProductSoftwareSpecAttribs productSpec in m_CommLink.m_softwareSpec.productSpecMap.Values) // CR.34456; modified.
+				{
                     compareProduct = (productSpec.productLabel.TVal.Length > 0) ? productSpec.productLabel.TVal : productSpec.productName.TVal;
                     if (compareProduct.Equals(selectedProduct))
                     {
@@ -647,8 +652,8 @@ namespace Client.Creator
                 Int32.Parse(expDateTextBox.Text);
                 longDateLabel.Text = "(" + CurrentExpirationDate.AddDays(Int32.Parse(expDateTextBox.Text)).ToUniversalTime().ToLongDateString() + ")";
             }
-            catch (Exception ex)
-            {
+            catch (Exception)														// CR.34456; modified.
+			{
                 System.Windows.Forms.MessageBox.Show("Please input a valid number");
                 expDateTextBox.SelectionStart = 0;
                 expDateTextBox.SelectionLength = expDateTextBox.Text.Length;

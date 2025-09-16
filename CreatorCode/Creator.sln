@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorData", "CreatorData\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorClient", "CreatorClient\CreatorClient.csproj", "{E664BA2E-3691-4BCB-9902-8A6C9C0177A6}"
 	ProjectSection(ProjectDependencies) = postProject
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71} = {04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497} = {9B660BFD-4C0F-4A65-81BC-4E65A6690497}
 		{D59ECD0E-29F6-4A91-8995-6977876BDAA7} = {D59ECD0E-29F6-4A91-8995-6977876BDAA7}
 	EndProjectSection
 EndProject
@@ -24,12 +26,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorHost", "CreatorHost\
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatorService", "CreatorService\CreatorService.csproj", "{CA674CF8-2BF9-4FDE-883D-62C68033EF4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71} = {04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497} = {9B660BFD-4C0F-4A65-81BC-4E65A6690497}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{3C45FC75-1F6A-483B-8A51-12EF869C4863}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{58E855A9-F959-496D-93BE-2445DA7B9C13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project2", "Project2\Project2.csproj", "{F4D78F6C-5512-4190-8AAB-00C91278F475}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicAttribsPublic", "SharedCode\SolimarLicensing\common\LicAttribsPublic\LicAttribsPublic.vcxproj", "{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LicAttribsTrusted", "SharedCode\SolimarLicensing\common\LicAttribsTrusted\LicAttribsTrusted.vcxproj", "{9B660BFD-4C0F-4A65-81BC-4E65A6690497}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FromLicensing", "FromLicensing", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,9 +151,45 @@ Global
 		{F4D78F6C-5512-4190-8AAB-00C91278F475}.Release|Win32.Build.0 = Release|Any CPU
 		{F4D78F6C-5512-4190-8AAB-00C91278F475}.Release|x64.ActiveCfg = Release|Any CPU
 		{F4D78F6C-5512-4190-8AAB-00C91278F475}.Release|x64.Build.0 = Release|Any CPU
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|Any CPU.Build.0 = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|test1.ActiveCfg = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|test1.Build.0 = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|Win32.ActiveCfg = Debug|Win32
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|Win32.Build.0 = Debug|Win32
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|x64.ActiveCfg = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Debug|x64.Build.0 = Debug|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|Any CPU.ActiveCfg = Release|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|Any CPU.Build.0 = Release|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|test1.ActiveCfg = Release|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|test1.Build.0 = Release|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|Win32.ActiveCfg = Release|Win32
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|Win32.Build.0 = Release|Win32
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|x64.ActiveCfg = Release|x64
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71}.Release|x64.Build.0 = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|Any CPU.Build.0 = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|test1.ActiveCfg = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|test1.Build.0 = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|Win32.Build.0 = Debug|Win32
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|x64.ActiveCfg = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Debug|x64.Build.0 = Debug|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|Any CPU.ActiveCfg = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|Any CPU.Build.0 = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|test1.ActiveCfg = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|test1.Build.0 = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|Win32.ActiveCfg = Release|Win32
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|Win32.Build.0 = Release|Win32
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|x64.ActiveCfg = Release|x64
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{04CCACAE-CEC3-4F14-A5D9-1F4BF1611E71} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9B660BFD-4C0F-4A65-81BC-4E65A6690497} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {722929C6-D2E2-49DB-A362-23EA1C454363}

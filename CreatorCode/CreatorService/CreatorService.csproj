@@ -42,13 +42,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Solimar.Licensing.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SolimarLicensing\Image\Solimar.Licensing.Common.dll</HintPath>
+    <Reference Include="Solimar.Licensing.Common">
+      <HintPath>..\SharedCode\SolimarLicensing\Image\AnyCPU\Release\Solimar.Licensing.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Solimar.Licensing.LicenseManagerWrapper, Version=9.9.9.9, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=x86">
+    <Reference Include="Solimar.Licensing.LicenseManagerWrapper, Version=3.3.453.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SolimarLicensing\Image\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
+      <HintPath>..\SharedCode\SolimarLicensing\Image\AnyCPU\Release\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -65,9 +64,6 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
-    <Compile Include="..\Common\VersionInfo.cs">
-      <Link>VersionInfo.cs</Link>
-    </Compile>
     <Compile Include="ICreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Creator.cs">
@@ -75,7 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{58E855A9-F959-496D-93BE-2445DA7B9C13}</Project>
+      <Project>{58e855a9-f959-496d-93be-2445da7b9c13}</Project>
       <Name>Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\CreatorData\CreatorData.csproj">
@@ -83,6 +79,7 @@
       <Name>CreatorData</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

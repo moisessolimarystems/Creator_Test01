@@ -1,4 +1,10 @@
-﻿using System;
+﻿// ListViewMgr.cs
+//
+// SLB 15.sep.2025 CR.34456; Changes for new attribs code (Licensing 3.4+) to work.
+// Removed some variable declarations which weren't being used (e.g catch() {} ex vars).
+// Renamed member variables to have m_ prefix vs. _. 
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,7 +55,7 @@ namespace Client.Creator
 
         #region Private Members
 
-        private ListViewColumnSorter _lvwColumnSorter;
+        private ListViewColumnSorter m_lvwColumnSorter;								// CR.34456; modified.
 
         #endregion
 
@@ -59,12 +65,12 @@ namespace Client.Creator
         #region ListViewColumn Methods
         public ListViewMgr()
         {
-            _lvwColumnSorter = new ListViewColumnSorter();
+            m_lvwColumnSorter = new ListViewColumnSorter();
         }
 
         public void SetListViewColumnSorter(ListView lv)
         {
-            lv.ListViewItemSorter = _lvwColumnSorter;
+            lv.ListViewItemSorter = m_lvwColumnSorter;
         }
 
         /// <summary>
@@ -74,22 +80,22 @@ namespace Client.Creator
         public void SetSortIndexColumn(IntPtr handle, int columnIndex)
         {
             // Determine if clicked column is already the column that is being sorted.
-            if (columnIndex == _lvwColumnSorter.SortColumn)
+            if (columnIndex == m_lvwColumnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.
-                if (_lvwColumnSorter.Order == SortOrder.Ascending )
-                    _lvwColumnSorter.Order = SortOrder.Descending;
-                else if (_lvwColumnSorter.Order == SortOrder.Descending || _lvwColumnSorter.Order == SortOrder.None)
-                    _lvwColumnSorter.Order = SortOrder.Ascending;                     
+                if (m_lvwColumnSorter.Order == SortOrder.Ascending )
+                    m_lvwColumnSorter.Order = SortOrder.Descending;
+                else if (m_lvwColumnSorter.Order == SortOrder.Descending || m_lvwColumnSorter.Order == SortOrder.None)
+                    m_lvwColumnSorter.Order = SortOrder.Ascending;                     
             }
             else
             {
-                SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
+                SetSortIcons(handle, m_lvwColumnSorter.SortColumn, columnIndex);
                 // Set the column number that is to be sorted; default to ascending.
-                _lvwColumnSorter.SortColumn = columnIndex;
-                _lvwColumnSorter.Order = SortOrder.Ascending;
+                m_lvwColumnSorter.SortColumn = columnIndex;
+                m_lvwColumnSorter.Order = SortOrder.Ascending;
             }
-            SetSortIcons(handle, _lvwColumnSorter.SortColumn, columnIndex);
+            SetSortIcons(handle, m_lvwColumnSorter.SortColumn, columnIndex);
             SetSelectedColumnColor(handle, columnIndex);
         }
 
@@ -123,7 +129,7 @@ namespace Client.Creator
             hdItem = new HDITEM();
             hdItem.mask = HDI_FORMAT;
             rtn = SendMessageITEM(hHeader, HDM_GETITEM, newColumn, ref hdItem);
-            if (_lvwColumnSorter.Order == SortOrder.Ascending || _lvwColumnSorter.Order == SortOrder.None)
+            if (m_lvwColumnSorter.Order == SortOrder.Ascending || m_lvwColumnSorter.Order == SortOrder.None)
             {
                 hdItem.fmt &= ~HDF_SORTDOWN;
                 hdItem.fmt |= HDF_SORTUP;
@@ -185,7 +191,7 @@ namespace Client.Creator
                     columnIndex = new IntPtr(column.Index);
                     ResetSortIcons(lv.Handle, columnIndex);
                 }
-                _lvwColumnSorter.ResetProperties();
+                m_lvwColumnSorter.ResetProperties();
                 SetSortIndexColumn(lv.Handle, 0);
             }
         }
@@ -215,7 +221,7 @@ namespace Client.Creator
         /// <summary>
         /// Declare a Hashtable array in which to store the groups.
         /// </summary>
-        private Hashtable[] groupTables;
+        //private Hashtable[] groupTables;											// CR.34456; commented.
 
 
         #endregion
