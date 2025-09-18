@@ -54,17 +54,19 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Shared.VisualComponents, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SolimarLicensing\Image\Shared.VisualComponents.dll</HintPath>
+      <HintPath>..\SharedCode\SolimarLicensing\Image\AnyCPU\Release\Shared.VisualComponents.dll</HintPath>
     </Reference>
-    <Reference Include="Solimar.Licensing.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SolimarLicensing\Image\Solimar.Licensing.Common.dll</HintPath>
+    <Reference Include="Solimar.Licensing.Common">
+      <HintPath>..\SharedCode\SolimarLicensing\Image\AnyCPU\Release\Solimar.Licensing.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Solimar.Licensing.LicenseManagerWrapper, Version=9.9.9.9, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=x86">
+    <Reference Include="Solimar.Licensing.LicenseManagerWrapper, Version=3.3.453.0, Culture=neutral, PublicKeyToken=b09c06e86be5f4f0, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SolimarLicensing\Image\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
+      <HintPath>..\SharedCode\SolimarLicensing\Image\AnyCPU\Release\Solimar.Licensing.LicenseManagerWrapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -87,7 +89,7 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
-    <Compile Include="..\SolimarLicensing\common\LicAttribsCS\Lic_LicenseSystemAttribs.cs">
+    <Compile Include="..\SharedCode\SolimarLicensing\common\LicAttribsCS\Lic_LicenseSystemAttribs.cs">
       <Link>Lic_LicenseSystemAttribs.cs</Link>
     </Compile>
     <Compile Include="AboutDialog.cs">
@@ -201,6 +203,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\DataSources\Solimar.Licensing.LicenseManagerWrapper.SolimarLicenseProtectionKeyInfo1.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
