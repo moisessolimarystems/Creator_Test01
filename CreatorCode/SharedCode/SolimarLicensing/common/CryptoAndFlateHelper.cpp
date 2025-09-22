@@ -349,8 +349,8 @@ HRESULT CryptoAndFlateHelper::EncryptCompressByteArrayToStream(
 	bool bExpectDateInByteArray)
 {
 	// CR.34040; tested.
-	CEnterExitMsg eem(__WFUNCTION__);
-	eem.SetHr();
+	//CEnterExitMsg eem(__WFUNCTION__);
+	//eem.SetHr();
 	
 	try
 	{

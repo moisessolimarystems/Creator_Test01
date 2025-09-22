@@ -75,7 +75,7 @@ bool CryptoHelper::Digest::operator!=(const Digest &d)
 // debug messages will have threadId and be formatted.
 CryptoHelper::Key::Key(const CryptoHelper &context) : m_error(0), m_pKey(0)
 {
-	CEnterExitMsg eem(L"EncryptKey1", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
+	//CEnterExitMsg eem(L"EncryptKey1", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
 
 	//HCRYPTKEY hkey;
 	//
@@ -113,7 +113,7 @@ CryptoHelper::Key::Key(
 	m_error(S_OK), 
 	m_pKey(NULL)
 {
-	CEnterExitMsg eem(L"EncryptKey2", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
+	//CEnterExitMsg eem(L"EncryptKey2", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
 
 	//HCRYPTKEY hkey;
 
@@ -167,7 +167,7 @@ CryptoHelper::Key::Key(
 	m_error(S_OK), 
 	m_pKey(NULL)
 {
-	CEnterExitMsg eem(L"EncryptKey4", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
+	//CEnterExitMsg eem(L"EncryptKey4", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
 
 	// Declare outside of try {} so they can be cleaned up in catch () {}.
 	HANDLE hFile(INVALID_HANDLE_VALUE);
@@ -617,7 +617,7 @@ HRESULT CryptoHelper::VerifySignature(
 	const VARIANT *pvtSignature, 
 	const Key &public_key) const
 {
-	CEnterExitMsg eem(L"VerifySignature1", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
+	//CEnterExitMsg eem(L"VerifySignature1", L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
 
 	// CR.FIX.19122 - return initialization error
 	if (FAILED(GetLastError())) return GetLastError();
@@ -694,14 +694,13 @@ HRESULT CryptoHelper::GenerateRandomBytes(BYTE *pData, DWORD buffer_size)
  * 
  * SLB 20.mar.2024 CR.32662.V01; created.
  * SLB 21.mar.2024 CR.32662.V01; tested/verified.
+ * SLB 22.sep.2025 CR.34426; tested/verified.
  -----------------------------------------------------------------------------------*/
 HRESULT CryptoHelper::SignHash(
 	const Digest& digest, 
 	PBYTE& pBuf, 
 	DWORD& dwBufLen) const
 {
-	CEnterExitMsg eem(L"SignHash2", L"CR.32662.V01 tested/used.");							// CR.34312.V01; modified.
-
 	// Clear outputs.
 	pBuf = NULL;
 	dwBufLen = 0;
@@ -742,7 +741,7 @@ HRESULT CryptoHelper::SignHash(
 // CR.FIX.19122.v3 - Verify that the running user is not a ManagedProfile
 HRESULT CryptoHelper::VerifyProfileRights()
 {
-	CEnterExitMsg eem(__WFUNCTION__, L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
+	//CEnterExitMsg eem(__WFUNCTION__, L"CR.32662.V01 tested/used.");						// CR.34312.V01; modified.
 
 	HRESULT hr = S_OK;
 

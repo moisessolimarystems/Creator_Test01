@@ -201,7 +201,7 @@ void SolimarLicenseManagerWrapper::LicensingWrapper::ConnectEx(
 	bool bUseAsBackup, 
 	bool bUseOnlyLicenseViewer)
 {
-	CEnterExitMsg eem(__WFUNCTION__, server.c_str());
+	//CEnterExitMsg eem(__WFUNCTION__, server.c_str());
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -276,7 +276,7 @@ void SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx(
 	bool& bTestDev, 
 	bool bUseSharedLicenseServers)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -298,7 +298,7 @@ void SolimarLicenseManagerWrapper::LicensingWrapper::GetInfoByProductEx(
 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::DisconnectEx()
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -318,7 +318,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(
 	DWORD ui_level, 
 	unsigned long grace_period_minutes)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 	
 	return InitializeEx(L"", product, prod_ver_major, prod_ver_minor, single_key, specific_single_key_ident, lock_keys, ui_level, grace_period_minutes);
 }
@@ -335,7 +335,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeEx(
 	bool app_instance_lock_keys, 
 	bool bypass_remote_key_restriction)
 {
-	CEnterExitMsg eem(__WFUNCTION__, app_instance.c_str());
+	//CEnterExitMsg eem(__WFUNCTION__, app_instance.c_str());
 
    SafeMutex mutex(m_MemberLock);
    ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -366,7 +366,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::InitializeViewOnly(
 	long prod_ver_major, 
 	long prod_ver_minor)
 {
-	CEnterExitMsg eem(__WFUNCTION__, app_instance.c_str());
+	//CEnterExitMsg eem(__WFUNCTION__, app_instance.c_str());
 
    SafeMutex mutex(m_MemberLock);
 
@@ -389,7 +389,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::KeyProductExistsEx(
 	long prod_ver_minor, 
 	bool* bKeyExists)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -407,7 +407,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterMessageCallback(
 	void* pContext, 
 	LicenseMessageCallbackPtr LicenseMessageCallback)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 
@@ -418,7 +418,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterMessageCallback(
 
 bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterMessageCallback()
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 
@@ -430,7 +430,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterInvalidLicenseCallb
 	void* pContext, 
 	LicenseInvalidCallbackPtr LicenseInvalidCallback)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 
@@ -441,7 +441,7 @@ bool SolimarLicenseManagerWrapper::LicensingWrapper::RegisterInvalidLicenseCallb
 
 bool SolimarLicenseManagerWrapper::LicensingWrapper::UnregisterInvalidLicenseCallback()
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	m_license_invalid_callback_context = 0;
@@ -454,7 +454,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseTotalEx(
 	long module, 
 	long* license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -468,7 +468,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseEx(
 	long module, 
 	long* license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -482,7 +482,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUse_ByApp
 	long module, 
 	long* license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -497,7 +497,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainEx(
 	long module, 
 	long license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -512,7 +512,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseCounterDecr
 	long module, 
 	long license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -527,7 +527,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseEx(
 	long module, 
 	long license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -541,7 +541,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseEx(
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ValidateLicenseEx(
 	bool* b_valid)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -557,7 +557,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ValidateLicenseEx(
 DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc(
 	LPVOID pWrapper)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 	DWORD thread_kill(0);
@@ -602,7 +602,7 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThre
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchThreadProc(
 	ILicensingMessage* pLicenseMessages)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	
 	HRESULT hr = S_OK;
@@ -646,7 +646,7 @@ LOG_ERROR_HR(L"SolimarLicenseManagerWrapper::LicensingWrapper::MessageDispatchTh
 
 DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadProc(LPVOID pWrapper)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 	HRESULT hr = S_OK;
@@ -678,7 +678,7 @@ DWORD WINAPI SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThre
 
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::LicenseValidityThreadProc()
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -800,7 +800,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseManager
 	long* p_ver_minor, 
 	long* p_ver_build)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -816,7 +816,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseServerE
 	long* p_ver_minor, 
 	long* p_ver_build)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	SafeMutex mutex(m_MemberLock);
 	ENSURE_LICENSING_CONSTRUCTED_SUCCESSFULLY(m_constructorHR)
@@ -832,7 +832,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::GetVersionLicenseServerE
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::StartLicensingSessionEx(
 	long* pSessionID)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	HRESULT hr(S_OK);
 	SafeMutex mutex(m_MemberLock);
@@ -853,7 +853,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseObtainLicen
 	long module, 
 	long license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
@@ -884,7 +884,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseReleaseLice
 	long module, 
 	long license_count)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
@@ -916,7 +916,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseLicens
 	long module, 
 	long* plicenseCount)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
@@ -939,7 +939,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::ModuleLicenseInUseLicens
 HRESULT SolimarLicenseManagerWrapper::LicensingWrapper::EndLicensingSessionEx(
 	long session_id)
 {
-	CEnterExitMsg eem(__WFUNCTION__);
+	//CEnterExitMsg eem(__WFUNCTION__);
 
 	HRESULT hr(E_INVALIDARG);
 	SafeMutex mutex(m_MemberLock);
