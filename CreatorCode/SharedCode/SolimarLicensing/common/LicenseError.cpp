@@ -65,7 +65,7 @@ namespace LicenseServerError
 				NULL,
 				tempHr,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				reinterpret_cast<LPTSTR>(&pwcsMsgBuf),												// CR.34040; modified.
+				reinterpret_cast<LPWSTR>(&pwcsMsgBuf),												// CR.34464; modified. CR.34040; modified.
 				0,
 				NULL);
 			DWORD le(GetLastError());
@@ -132,7 +132,7 @@ namespace LicenseServerError
 				NULL,
 				tempHr,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				reinterpret_cast<LPTSTR>(&pwcsMsgBuf),												// CR.34040; modified.
+				reinterpret_cast<LPWSTR>(&pwcsMsgBuf),												// CR.34464; modified. CR.34040; modified.
 				0,
 				NULL);
 			std::wstring wsTempMsg = pwcsMsgBuf;
