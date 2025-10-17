@@ -1,0 +1,351 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="SoftwareLicenseMgr">
+    <Position X="4.5" Y="0.5" Width="2.75" />
+    <Members>
+      <Method Name="~SoftwareLicenseMgr" Hidden="true" />
+      <Method Name="GetSoftwareLicenseName" Hidden="true" />
+      <Method Name="GetSoftwareSpec" Hidden="true" />
+      <Method Name="GetVerificationAttribs" Hidden="true" />
+      <Method Name="Initialize" Hidden="true" />
+      <Method Name="InternalGetKeyAttribs" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_iCONVERT" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_Rubika" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_RubikaProcessBuilder" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SDX" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SOLfusion" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SOLindexer" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SPDE" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SPDE_QueueManager" Hidden="true" />
+      <Method Name="TestingOnly_GenerateLicense_SSE" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>iEHQAAIgAAAxAQa4BQAgAAgJIKIAMIEICIBJIRAIUBA=</HashCode>
+      <FileName>SolimarSoftwareLicenseMgr.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_pKeyServer" />
+      <Field Name="m_pLicServerDataMgr" />
+      <Field Name="m_licenseFileAttribs" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="SoftwareServerDataMgr">
+    <Position X="9.25" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAgAAAgAgIAAiAAAACADADAAIAAAAAAIBAgEAA=</HashCode>
+      <FileName>SoftwareServerDataMgr.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Lic_PackageAttribs">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <NestedTypes>
+      <Typedef Name="Lic_PackageAttribs::TLic_ProductID" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Enum Name="Lic_PackageAttribs::__unnamed_enum_0069_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Lic_PackageAttribs::Lic_SoftwareSpecAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Lic_PackageAttribs::Lic_ModuleInfoAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Lic_PackageAttribs::Lic_ProductInfoAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="Lic_PackageAttribs::Lic_LicenseInfoAttribs" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAQAAgAAAAAAAAQAAAAAAAAIAAgAAAACAAgAIAAAAA=</HashCode>
+      <FileName>D:\Sandboxes\Next_Licensing\SolimarLicensingCode\common\LicAttribsCPP\Lic_PackageAttribs.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="KeyServer">
+    <Position X="3" Y="10" Width="2.25" />
+    <Members>
+      <Field Name="crypto_key_password_packet_password" Hidden="true" />
+      <Field Name="crypto_key_password_packet_private" Hidden="true" />
+      <Field Name="crypto_key_password_packet_public" Hidden="true" />
+      <Field Name="failed_password_attempts" Hidden="true" />
+      <Field Name="heartbeats" Hidden="true" />
+      <Method Name="KeyEnumerate" Hidden="true" />
+      <Method Name="KeyFormat" Hidden="true" />
+      <Method Name="KeyHeaderQuery" Hidden="true" />
+      <Method Name="KeyIsActive" Hidden="true" />
+      <Method Name="KeyIsPresent" Hidden="true" />
+      <Method Name="KeyIsProgrammed" Hidden="true" />
+      <Field Name="KeyListLock" Hidden="true" />
+      <Method Name="KeyLock" Hidden="true" />
+      <Method Name="KeyModuleEnumerate" Hidden="true" />
+      <Method Name="KeyModuleInUse" Hidden="true" />
+      <Method Name="KeyModuleLicenseCounterDecrement" Hidden="true" />
+      <Method Name="KeyModuleLicenseInUse" Hidden="true" />
+      <Method Name="KeyModuleLicenseInUse_ByApp" Hidden="true" />
+      <Method Name="KeyModuleLicenseObtain" Hidden="true" />
+      <Method Name="KeyModuleLicenseRelease" Hidden="true" />
+      <Method Name="KeyModuleLicenseTotal" Hidden="true" />
+      <Method Name="KeyModuleLicenseUnlimited" Hidden="true" />
+      <Method Name="KeyModuleQuery" Hidden="true" />
+      <Method Name="KeyObtain" Hidden="true" />
+      <Method Name="KeyProgram" Hidden="true" />
+      <Method Name="KeyReadRaw" Hidden="true" />
+      <Method Name="KeyRelease" Hidden="true" />
+      <Method Name="KeyServer" Hidden="true" />
+      <Method Name="KeyTrialExpires" Hidden="true" />
+      <Method Name="KeyTrialHours" Hidden="true" />
+      <Field Name="KeyTrialTimeInfoLock" Hidden="true" />
+      <Method Name="KeyUnlock" Hidden="true" />
+      <Method Name="KeyValidateLicense" Hidden="true" />
+      <Field Name="packet_magic_number_int" Hidden="true" />
+      <Field Name="password_packets" Hidden="true" />
+      <Method Name="PasswordEntryDelay" Hidden="true" />
+      <Method Name="PasswordPacketAppendPassword" Hidden="true" />
+      <Method Name="PasswordPacketFinalize" Hidden="true" />
+      <Method Name="PasswordPacketGetPacket" Hidden="true" />
+      <Method Name="PasswordPacketGetVerificationCode" Hidden="true" />
+      <Method Name="PasswordPacketInitialize" Hidden="true" />
+      <Field Name="PasswordPacketListLock" Hidden="true" />
+      <Field Name="trial_keys" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Typedef Name="KeyServer::ClientPasswordPacketList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::PasswordList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::TrialTimeInfoList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::StringList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::ExpirePasswordPair" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::StringToStringMap" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::HeartbeatList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="KeyServer::__unnamed_struct_00c6_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="KeyServer::TrialTimeInfo" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::KeyValueMap" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="KeyServer::KeyList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Class Name="KeyServer::PasswordPacket" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>KeyServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>iEAZSQUHEMIKQTAAAEgIATQIKQBD7gAQIEJoBgABAJE=</HashCode>
+      <FileName>KeyServer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="pRainbowDriver" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RainbowDriver">
+    <Position X="0.5" Y="6.5" Width="2" />
+    <Members>
+      <Method Name="~RainbowDriver" Hidden="true" />
+      <Field Name="accessCode" Hidden="true" />
+      <Field Name="accessCode_version1" Hidden="true" />
+      <Method Name="Activate" Hidden="true" />
+      <Field Name="ACTIVATE_PASSWORD1" Hidden="true" />
+      <Field Name="ACTIVATE_PASSWORD2" Hidden="true" />
+      <Method Name="AtLeastOneParallelKey" Hidden="true" />
+      <Field Name="CELL_CUSTOMER_NUMBER" Hidden="true" />
+      <Field Name="CELL_KEY_GUID" Hidden="true" />
+      <Field Name="CELL_KEY_NUMBER" Hidden="true" />
+      <Field Name="CELL_KEY_VERSION" Hidden="true" />
+      <Field Name="CELL_PASSWORD_NUMBER" Hidden="true" />
+      <Field Name="CELL_SERIAL_NUMBER" Hidden="true" />
+      <Method Name="ClearKeyTempGUID" Hidden="true" />
+      <Method Name="ClearKeyUnprogrammedIdentifier" Hidden="true" />
+      <Method Name="ComputeCurrentKeyIdent" Hidden="true" />
+      <Field Name="DEVELOPER_ID" Hidden="true" />
+      <Method Name="FormatCell" Hidden="true" />
+      <Method Name="GetKeyVersion" Hidden="true" />
+      <Method Name="GetSoftwareKeyCode" Hidden="true" />
+      <Field Name="OVERWRITE_PASSWORD1" Hidden="true" />
+      <Field Name="OVERWRITE_PASSWORD2" Hidden="true" />
+      <Method Name="ParsePassword" Hidden="true" />
+      <Method Name="Query" Hidden="true" />
+      <Method Name="RainbowDriver" Hidden="true" />
+      <Method Name="ReadCell" Hidden="true" />
+      <Method Name="ReadKeyTempGUID" Hidden="true" />
+      <Method Name="RefreshKeyList" Hidden="true" />
+      <Method Name="SetSoftwareKeyCode" Hidden="true" />
+      <Method Name="TranslateRainbowError" Hidden="true" />
+      <Field Name="WRITE_PASSWORD" Hidden="true" />
+      <Method Name="WriteCell" Hidden="true" />
+      <Method Name="WriteKeyTempGUID" Hidden="true" />
+      <Method Name="WriteKeyUnprogrammedIdentifier" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Typedef Name="RainbowDriver::KeyList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>RainbowDriver.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="RainbowDriver::ArgumentList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>RainbowDriver.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="RainbowDriver::__unnamed_struct_00d5_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>RainbowDriver.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="RainbowDriver::AccessCode" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>RainbowDriver.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Enum Name="RainbowDriver::__unnamed_enum_00d5_2" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>RainbowDriver.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>hIggAKAChAtIAKBAEAggAQAhAAAAAEgQAAqBEICEAAA=</HashCode>
+      <FileName>RainbowDriver.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SoftwareServer">
+    <Position X="9.25" Y="6" Width="3.5" />
+    <Members>
+      <Field Name="bFirstTime" Hidden="true" />
+      <Method Name="ConvertProtectionKeyToLicInfoAttribsInternal" Hidden="true" />
+      <Method Name="ConvertProtectionKeyToSoftwareLicense" Hidden="true" />
+      <Field Name="crypto_key_license_archive_password" Hidden="true" />
+      <Field Name="crypto_key_license_archive_private" Hidden="true" />
+      <Field Name="crypto_key_license_archive_public" Hidden="true" />
+      <Field Name="crypto_key_password_packet_password" Hidden="true" />
+      <Field Name="crypto_key_password_packet_private" Hidden="true" />
+      <Field Name="crypto_key_password_packet_public" Hidden="true" />
+      <Field Name="crypto_key_verify_data_password" Hidden="true" />
+      <Field Name="crypto_key_verify_data_private" Hidden="true" />
+      <Field Name="crypto_key_verify_data_public" Hidden="true" />
+      <Field Name="license_archive_code_int" Hidden="true" />
+      <Field Name="license_packet_code_int" Hidden="true" />
+      <Field Name="license_verify_data_code_int" Hidden="true" />
+      <Method Name="ModuleLicenseDecrementCounterByApp" Hidden="true" />
+      <Method Name="ModuleLicenseInUseByApp" Hidden="true" />
+      <Method Name="ModuleLicenseInUseByLicenseID" Hidden="true" />
+      <Method Name="ModuleLicenseInUseForAll" Hidden="true" />
+      <Method Name="ModuleLicenseObtainByApp" Hidden="true" />
+      <Method Name="ModuleLicenseReleaseByApp" Hidden="true" />
+      <Method Name="ModuleLicenseTotalForAll" Hidden="true" />
+      <Field Name="SendMailLock" Hidden="true" />
+      <Field Name="SoftwareLicenseLock" Hidden="true" />
+      <Method Name="SoftwareLicenseUseActivationToExtendTime_ByLicenseAndContractNumber" Hidden="true" />
+      <Method Name="StringToCustomerAndKeyNumberInternal" Hidden="true" />
+      <Field Name="swLicClockViolationMap" Hidden="true" />
+      <Field Name="swLicReminderMap" Hidden="true" />
+      <Field Name="swLicStreamedCacheMap" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Typedef Name="SoftwareServer::ModuleIdToExpirationDate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Typedef Name="SoftwareServer::ModuleIdToExpirationDateList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="SoftwareServer::ProductReminderClass" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="SoftwareServer::ProductReminderMap" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+      <Struct Name="SoftwareServer::SoftwareLicReminderClass" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Typedef Name="SoftwareServer::SoftwareLicList" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>SoftwareServer.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Typedef>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>SoooIyF1EAw2GaCAAYKAQQyVIOAGJQKdlQRUuoI0ETE=</HashCode>
+      <FileName>SoftwareServer.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="licServerDataMgr" />
+      <Field Name="pRainbowDriver" />
+      <Field Name="pKeyServer" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

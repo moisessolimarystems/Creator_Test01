@@ -1,0 +1,645 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SolimarInternalRelease|Win32">
+      <Configuration>SolimarInternalRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SolimarInternalRelease|x64">
+      <Configuration>SolimarInternalRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DD791949-C013-44C7-9044-0BD21F9AAB50}</ProjectGuid>
+    <RootNamespace>SolimarLicenseServer</RootNamespace>
+    <Keyword>AtlProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <UseOfAtl>Static</UseOfAtl>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60315.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Debug\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <LinkKeyFile />
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>true</LinkIncremental>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)\Image\</OutDir>
+    <IntDir>Release\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">
+    <OutDir>$(SolutionDir)\Image\SolimarInternalRelease\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>SolimarLicenseServerInternal</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <TargetName>SolimarLicenseServerInternal</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Fx %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:libcmt.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Performing registration</Message>
+      <Command>"$(TargetPath)" /RegServer</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/Fx %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_SOLIMAR_SERVICE_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:libcmt.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Performing registration</Message>
+      <Command>"$(TargetPath)" /RegServer</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Performing registration</Message>
+      <Command>"$(TargetPath)" /RegServer
+cp $(ProjectDir)_$(ProjectName).tlb $(OutDir)
+echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"
+ xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <GenerateXMLDocumentationFiles>true</GenerateXMLDocumentationFiles>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Copy files for the build process</Message>
+      <Command>echo xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"
+ xcopy /Y /R "$(ProjectDir)_SolimarLicenseServer.tlb" "$(SolutionDir)Shared\Source\"</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_ATL_SUPPORT_VT_I8;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib\MT\spromeps.lib;rainbow\lib\MT\AntiEmulator.lib;..\lib\flatelib.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\Win32</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Performing registration</Message>
+      <Command>"$(TargetPath)" /RegServer</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"
+ xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\Win32\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <GenerateStublessProxies>true</GenerateStublessProxies>
+      <TypeLibraryName>$(IntDir)SolimarLicenseServer.tlb</TypeLibraryName>
+      <HeaderFileName>SolimarLicenseServer.h</HeaderFileName>
+      <DllDataFileName />
+      <InterfaceIdentifierFileName>SolimarLicenseServer_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>SolimarLicenseServer_p.c</ProxyFileName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_ATL_ATTRIBUTES;_SOLIMAR_INTERNAL;UNICODE;_UNICODE;_SOLIMAR_SERVICE_;NTDDI_VERSION=0x05010000;_WIN32_WINNT=0x0501;WINVER=0x0501;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\3prty\openssl-1.0.2\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/NODEFAULTLIB:libc.lib
+/NODEFAULTLIB:msvcrt.lib
+/NODEFAULTLIB:libcd.lib
+/NODEFAULTLIB:libcmtd.lib
+/NODEFAULTLIB:msvcrtd.lib %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>Wbemuuid.lib;Ws2_32.lib;rainbow\lib(x64)\MT\spromeps.lib;rainbow\lib(x64)\MT\AntiEmulator.lib;..\lib\flatelib64.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <MergedIDLBaseFileName>_SolimarLicenseServer.idl</MergedIDLBaseFileName>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)SolimarLicenseServer.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>..\3prty\openssl-1.0.2\lib\x64</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Message>Performing registration</Message>
+      <Command>"$(TargetPath)" /RegServer</Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>echo xcopy /Y /R "$(SolutionDir)3prty\OpenSSL-1.0.2\bin\x64\*.dll" "$(OutDir)"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy files</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\apctimer.cpp" />
+    <ClCompile Include="..\common\base64.cpp" />
+    <ClCompile Include="..\common\ChallengeResponse.cpp" />
+    <ClCompile Include="..\common\ChallengeResponseHelper.cpp" />
+    <ClCompile Include="..\common\COMUtils.cpp" />
+    <ClCompile Include="..\common\CryptoAndFlateHelper.cpp" />
+    <ClCompile Include="..\common\CryptoHelper.cpp" />
+    <ClCompile Include="..\common\CSmtp.cpp" />
+    <ClCompile Include="..\common\EventLogHelper.cpp" />
+    <ClCompile Include="..\common\EventLogLicenseHelper.cpp" />
+    <ClCompile Include="..\common\FlateHelper.cpp" />
+    <ClCompile Include="..\common\LicAttribsCPP\SpdUtils.cpp" />
+    <ClCompile Include="..\common\md5.cpp" />
+    <ClCompile Include="KeyServer.cpp" />
+    <ClCompile Include="KeyServerInstance.cpp" />
+    <ClCompile Include="KeySpec.cpp" />
+    <ClCompile Include="LicenseCache.cpp" />
+    <ClCompile Include="LicenseController.cpp" />
+    <ClCompile Include="..\common\LicenseError.cpp" />
+    <ClCompile Include="LicenseObject.cpp" />
+    <ClCompile Include="..\common\LicensingMessage.cpp" />
+    <ClCompile Include="..\common\LicensingSoftwareMessage.cpp" />
+    <ClCompile Include="..\common\MultidimensionalSafeArray.cpp" />
+    <ClCompile Include="..\common\NetworkUtils.cpp" />
+    <ClCompile Include="ProtectionKey.cpp" />
+    <ClCompile Include="ProtectionKey_Version1.cpp" />
+    <ClCompile Include="RainbowDriver.cpp" />
+    <ClCompile Include="..\common\SafeMutex.cpp" />
+    <ClCompile Include="..\common\SecurityHelper.cpp" />
+    <ClCompile Include="SoftwareServer.cpp" />
+    <ClCompile Include="SoftwareServerDataMgr.cpp" />
+    <ClCompile Include="..\common\SoftwareSpecInstance.cpp" />
+    <ClCompile Include="SolimarLicenseServer.cpp" />
+    <ClCompile Include="SolimarLicenseSvr.cpp" />
+    <ClCompile Include="SolimarSoftwareLicenseMgr.cpp" />
+    <ClCompile Include="USBNotification.cpp" />
+    <ClCompile Include="..\common\Version.cpp" />
+    <ClCompile Include="..\common\WMIHelper.cpp" />
+    <ClCompile Include="ZZ_SoftwareServerInstance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="resources\KeySpec.xml">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|Win32'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">python.exe .\resources\KeySpecXMLCompiler.py
+</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">.\resources\KeySpec.xml;.\resources\KeySpecXMLCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='SolimarInternalRelease|x64'">.\resources\KeySpecInitialize.h;.\resources\KeySpecFunctions.h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\apctimer.h" />
+    <ClInclude Include="..\common\base64.h" />
+    <ClInclude Include="..\common\ChallengeResponse.h" />
+    <ClInclude Include="..\common\ChallengeResponseHelper.h" />
+    <ClInclude Include="..\common\CryptoHelper.h" />
+    <ClInclude Include="..\common\CSmtp.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\CSpdAttribsBase.h" />
+    <ClInclude Include="..\common\IObjectAuthentication.h" />
+    <ClInclude Include="KeyMessages.h" />
+    <ClInclude Include="KeyServer.h" />
+    <ClInclude Include="KeyServerInstance.h" />
+    <ClInclude Include="KeySpec.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\Lic_PackageAttribs.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\Lic_PackageAttribsHelper.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\Lic_TestMailServerAttribs.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\Lic_UsageInfoAttribs.h" />
+    <ClInclude Include="..\common\LicAttribsCPP\LicAttribsBase.h" />
+    <ClInclude Include="LicenseCache.h" />
+    <ClInclude Include="..\common\LicenseError.h" />
+    <ClInclude Include="LicenseObject.h" />
+    <ClInclude Include="..\common\LicensingMessage.h" />
+    <ClInclude Include="..\common\LicensingSoftwareMessage.h" />
+    <ClInclude Include="..\common\MultidimensionalSafeArray.h" />
+    <ClInclude Include="ProtectionKey.h" />
+    <ClInclude Include="ProtectionKey_Version1.h" />
+    <ClInclude Include="RainbowDriver.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="..\common\SafeMutex.h" />
+    <ClInclude Include="SoftwareServer.h" />
+    <ClInclude Include="SoftwareServerDataMgr.h" />
+    <ClInclude Include="..\common\SoftwareSpecInstance.h" />
+    <ClInclude Include="SolimarLicenseSvr.h" />
+    <ClInclude Include="SolimarSoftwareLicenseMgr.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="..\common\StringUtils.h" />
+    <ClInclude Include="..\common\TimeHelper.h" />
+    <ClInclude Include="USBNotification.h" />
+    <ClInclude Include="..\common\Version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SolimarLicenseServer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SolimarLicenseServer.rgs" />
+    <None Include="resources\KeySpecXMLCompiler.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Key Architecture.txt" />
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\flatelib\flatelib.vcxproj">
+      <Project>{e54415c2-dbb5-4711-89fb-b1ee46997d7e}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

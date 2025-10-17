@@ -1,0 +1,14 @@
+The SolimarLicenseManagerDotNet is a Managed C++ project.  
+It must be built with the 2.0 .NET framework because it is used by other products that use the 2.0 .NET framework, and the wrapper cannot be at a higher .NET version.
+Once all the other Solimar products are using the 4.0 framework, then this project can use the 4.0 framework.
+
+In Visual Studio 2012, through the UI you cannot set the framework version, but you can set it by manually editing the project file.
+http://msdn.microsoft.com/en-us/library/ff770576(v=vs.110).aspx
+
+Once you set the framework version, you have to set the plateform toolset to use the Visual Studio 2008.
+
+To get this project to compile correctly you need VS 2012 and VS 2008.  To have VS 2012 be able to find VS 2008 on the system correctly
+you need to have VS 2010 or the Windows7.1SDK installed
+
+If you have any issues installing Windows 7.1 SDK look at this link for help
+http://www.mathworks.com/matlabcentral/answers/101105-how-do-i-install-microsoft-windows-sdk-7-1
