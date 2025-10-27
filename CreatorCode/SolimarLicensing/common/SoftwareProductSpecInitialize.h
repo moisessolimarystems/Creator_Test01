@@ -514,20 +514,27 @@ void InititalizeProduct27()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
-	pTmpModSpec->moduleName = std::wstring(L"Indexing Instances");
+	pTmpModSpec->moduleName = std::wstring(L"Cloud Indexing Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 113;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
 	pTmpModSpec->moduleID = 0;
 	pTmpModSpec->moduleName = std::wstring(L"Archive");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 113;
+	pTmpModSpec->moduleVersionDeprecated_Major = 1;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(2, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(2))->second);
 	pTmpModSpec->moduleID = 2;
 	pTmpModSpec->moduleName = std::wstring(L"SDX Designer instance");
 	pTmpModSpec->moduleTrialLicense = 127;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 113;
+	pTmpModSpec->moduleVersionDeprecated_Major = 1;
+	pTmpModSpec->moduleVersionDeprecated_Minor = 0;
 }
 
 void InititalizeProduct20()
@@ -932,6 +939,16 @@ void InititalizeProduct23()
 	pTmpModSpec->moduleName = std::wstring(L"Engine Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
 	pTmpModSpec->moduleDefaultLicense = 1;
+	
+	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(36, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
+	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(36))->second);
+	pTmpModSpec->moduleID = 36;
+	pTmpModSpec->moduleName = std::wstring(L"De-Imposition");
+	pTmpModSpec->modUnlimitedValue = 1;
+	pTmpModSpec->moduleTrialLicense = 1;
+	pTmpModSpec->moduleVersionIntroduced_Major = 4;
+	pTmpModSpec->moduleVersionIntroduced_Minor = 5;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 111;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(35, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(35))->second);
