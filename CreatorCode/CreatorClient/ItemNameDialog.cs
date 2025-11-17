@@ -14,16 +14,16 @@ namespace Client.Creator
     {
         string _name = string.Empty;
         bool _bValidItem = true;
-        Object _selectedObject;        
+        Object _selectedObject;
 
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
+		public new string Name														// CR.34456.V01; Fix for CS0108 warning, added the new keyword.
+		{
+			get { return _name; }
+			set { _name = value; }
+		}
 
-        #region ItemNameDialog Methods
-        public ItemNameDialog()
+		#region ItemNameDialog Methods
+		public ItemNameDialog()
         {
             InitializeComponent();
         }
@@ -60,7 +60,7 @@ namespace Client.Creator
         private void ItemNameDialog_FinishDialog(object sender, Shared.VisualComponents.FinishDialogEventArgs e)
         {
             _name = itemNameTextBox.Text;
-        }
+		}
 
         private void ItemNameDialog_InitDialog(object sender, Shared.VisualComponents.InitDialogEventArgs e)
         {

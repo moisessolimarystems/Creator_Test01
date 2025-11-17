@@ -83,22 +83,25 @@ namespace Client.Creator
             get { return new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day, 10, 0, 0); }
         }
 
-        public bool LicenseServerAvailable
-        {
-            get
-            {
-                ServiceController sc = new ServiceController(AppConstants.LicenseServerName);
-                bool bLicenseServer = false;
-                try
-                {
-                    bLicenseServer = (sc.Status != null);
-                }
-                catch (Exception )
-                {
-                }
-                return bLicenseServer;
-            }
-        }
+		public bool LicenseServerAvailable
+		{
+			get
+			{
+				ServiceController sc = new ServiceController(AppConstants.LicenseServerName);
+				try
+				{
+					// Retrieve Status from ServiceController. If no exception is
+					// thrown, then it is a LicenseServer.
+					ServiceControllerStatus stat = sc.Status;						// CR.34556.V01; modified.
+					return true;													// CR.34556.V01; modified.
+				}
+				catch (Exception )
+				{
+				}
+				// exception occured.
+				return false;														// CR.34556.V01; modified.
+			}
+		}
 
         #endregion
 
@@ -325,48 +328,47 @@ namespace Client.Creator
 
         #region Form Events
 
-        private void CreatorForm_Load(object sender, EventArgs e)
-        {
-            //this.SetStyle(ControlStyles.DoubleBuffer, true);
-            /*int style = NativeWinAPI.GetWindowLong(DetailTreeView.Handle, NativeWinAPI.GWL_EXSTYLE);
-            style |= NativeWinAPI.WS_EX_COMPOSITE;
-            NativeWinAPI.SetWindowLong(/*this.HandlesplitContainer2.Handle, NativeWinAPI.GWL_EXSTYLE, style);*/
+		private void CreatorForm_Load(object sender, EventArgs e)
+		{
+			//this.SetStyle(ControlStyles.DoubleBuffer, true);
+			/*int style = NativeWinAPI.GetWindowLong(DetailTreeView.Handle, NativeWinAPI.GWL_EXSTYLE);
+			style |= NativeWinAPI.WS_EX_COMPOSITE;
+			NativeWinAPI.SetWindowLong(/*this.HandlesplitContainer2.Handle, NativeWinAPI.GWL_EXSTYLE, style);*/
 
-            viewToolStripComboBox.SelectedIndex = -1;
-            MainTabControl.Visible = false;
-            // Set Server Connection List
-            if (Settings.Default.ServerList != null)
-            {
-                String[] serverList = new String[Settings.Default.ServerList.Count];
-                Settings.Default.ServerList.CopyTo(serverList, 0);
-                this.m_ServerList.AddRange(serverList);
-            }
-            // Set window location
-            if (Settings.Default.WindowLocation != null)
-            {
-                this.Location = new Point(Settings.Default.WindowLocation.X , Settings.Default.WindowLocation.Y);
-            }
+			viewToolStripComboBox.SelectedIndex = -1;
+			MainTabControl.Visible = false;
+			// Set Server Connection List
+			if (Settings.Default.ServerList != null)
+			{
+				String[] serverList = new String[Settings.Default.ServerList.Count];
+				Settings.Default.ServerList.CopyTo(serverList, 0);
+				this.m_ServerList.AddRange(serverList);
+			}
+			// Set window location
+			if (Settings.Default.WindowLocation != null)
+			{
+				this.Location = new Point(Settings.Default.WindowLocation.X , Settings.Default.WindowLocation.Y);
+			}
 
-            // Set window size
-            if (Settings.Default.WindowSize != null)
-            {
-                this.Size = Settings.Default.WindowSize;
-            }
-            if (Settings.Default.SelectedDirectory != null)
-            {
-                m_selectedDirectory = Settings.Default.SelectedDirectory;
-            }
-            if (m_selectedDirectory.Length == 0)
-            {
-                m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            }
+			// Set window size
+			if (Settings.Default.WindowSize != null)
+			{
+				this.Size = Settings.Default.WindowSize;
+			}
+			if (Settings.Default.SelectedDirectory != null)
+			{
+				m_selectedDirectory = Settings.Default.SelectedDirectory;
+			}
+			if (m_selectedDirectory.Length == 0)
+			{
+				m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+			}
 
-            //Set Log Window
-            if (Settings.Default.ShowLogWindow != null)
-            {
-                this.logToolStripMenuItem.Checked = Settings.Default.ShowLogWindow;
-            }
-        }
+			//Set Log Window
+			// CR.34456.V01; deleted check for ShowLogWindow == null as that can
+			// never happen (it's a bool).
+			this.logToolStripMenuItem.Checked = Settings.Default.ShowLogWindow;
+		}
 
         private void CheckInLocksByUser(string user)
         {
@@ -2072,9 +2074,9 @@ namespace Client.Creator
         }
         private void DetailListView_MouseUp(object sender, MouseEventArgs e)
         {
-            bool bShow = false;
-            //needs to handle validation properties also
-            if (e.Button == MouseButtons.Right)
+			//bool bShow = false;													// CR.34456.V01; Commented, Not used.
+			//needs to handle validation properties also
+			if (e.Button == MouseButtons.Right)
             {
                 ListViewItem item = DetailListView.GetItemAt(e.X, e.Y);
                 ResetContextMenu(DetailListViewContextMenuStrip.Items);
@@ -2085,8 +2087,8 @@ namespace Client.Creator
                     case AppConstants.LicenseServerObjectName:
                         if ((DetailPropertyGrid.SelectedObject as LicenseServer).IsActive)
                         {
-                            bShow = true;
-                            if (m_Permissions.pt_module_pwd.Value)
+							//bShow = true;											// CR.34456.V01; Commented, Not used.
+							if (m_Permissions.pt_module_pwd.Value)
                             {
                                 dlvNewToolStripMenuItem.Visible = true;
                                 dlvNewToolStripMenuItem.Enabled = dlvAddToolStripButton.Enabled;
@@ -2096,8 +2098,8 @@ namespace Client.Creator
                         }
                         break;
                     case AppConstants.ProductLicenseObjectName:
-                        bShow = true;
-                        dlvEditToolStripMenuItem.Visible = true;
+						//bShow = true;												// CR.34456.V01; Commented, Not used.
+						dlvEditToolStripMenuItem.Visible = true;
                         toolStripSeparator2.Visible = true;
                         incrementToolStripMenuItem.Visible = true;
                         decrementToolStripMenuItem.Visible = true;

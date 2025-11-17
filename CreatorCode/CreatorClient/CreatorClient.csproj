@@ -89,9 +89,6 @@
     <Compile Include="..\Common\CommunicationLink.cs">
       <Link>CommunicationLink.cs</Link>
     </Compile>
-    <Compile Include="..\SharedCode\SolimarLicensing\common\LicAttribsCS\Lic_LicenseSystemAttribs.cs">
-      <Link>Lic_LicenseSystemAttribs.cs</Link>
-    </Compile>
     <Compile Include="AboutDialog.cs">
       <SubType>Form</SubType>
     </Compile>

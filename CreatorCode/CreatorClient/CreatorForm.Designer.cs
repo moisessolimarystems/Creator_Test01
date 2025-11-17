@@ -2310,8 +2310,8 @@
         #endregion
 
         private System.Windows.Forms.ImageList CreatorImageList;
-        private System.Windows.Forms.MenuStrip MainMenuStrip;
-        private System.Windows.Forms.ToolStrip MainToolStrip;
+        private new System.Windows.Forms.MenuStrip MainMenuStrip;                   // CR.34456.V01; Fix for CS0108 warning. Added new keyword.
+		private System.Windows.Forms.ToolStrip MainToolStrip;
         private System.Windows.Forms.ToolStripTextBox searchToolStripTextBox;
         private System.Windows.Forms.Panel LicenseViewPanel;
         private System.Windows.Forms.ContextMenuStrip LicenseContextMenuStrip;

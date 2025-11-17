@@ -1369,7 +1369,11 @@ namespace Client.Creator
 
         public override bool Equals(Object lv)
         {
-            LicenseVersion _lv = lv as LicenseVersion;
+			// SLB 17.nov.2025 CR.34556.V01; There are only 2 members to this class.
+			// Seems like default Equals() should be sufficient. If this method was
+			// deleted, then the CS0659 warning would go away.
+			// warning CS0659: 'LicenseVersion' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+			LicenseVersion _lv = lv as LicenseVersion;
             if (_lv != null)
             {
                 if (_lv.Major == _major && _lv.Minor == _minor)
