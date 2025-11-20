@@ -28,6 +28,7 @@ def EncodeBufferLiteral(s):
 	return (r,len(s)/2)
 
 # outputs the cs version of the derived attribs class header files
+# SLB 20.nov.2025 CR.34590; Fix for output function IsCustomHR(). 
 class HResultOutputCS(AttribsOutput):
 	def __init__(self):
 		AttribsOutput.__init__(self)
@@ -90,7 +91,7 @@ class HResultOutputCS(AttribsOutput):
                 #function : IsCustomHR(uint _hresult)
 		class_text += '\tpublic static bool IsCustomHR(uint _hresult)\n'
                 class_text += '\t{\n'
-                class_text += '\t\treturn (_hresult & ITF_LIC_MIN) > 0;\n'
+                class_text += '\t\treturn (_hresult & ITF_LIC_MIN) != ITF_LIC_MIN;\n' # CR.34590; modified.
                 class_text += '\t}\n'
 		
                 #function : GetHRMessage(uint _hresult)    
