@@ -514,9 +514,9 @@ void InititalizeProduct27()
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(1, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(1))->second);
 	pTmpModSpec->moduleID = 1;
-	pTmpModSpec->moduleName = std::wstring(L"Cloud Indexing Instances");
+	pTmpModSpec->moduleName = std::wstring(L"Cloud Processing Instances");
 	pTmpModSpec->moduleTrialLicense = 127;
-	pTmpModSpec->moduleVersionIntroduced_SubMinor = 113;
+	pTmpModSpec->moduleVersionIntroduced_SubMinor = 115;
 	
 	pTmpProdSpec->moduleSpecMap->insert(Lic_PackageAttribs::Lic_ProductSoftwareSpecAttribs::TMap_Lic_ModuleSoftwareSpecAttribsMap::value_type(0, Lic_PackageAttribs::Lic_ModuleSoftwareSpecAttribs()));
 	pTmpModSpec = &((pTmpProdSpec->moduleSpecMap->find(0))->second);
