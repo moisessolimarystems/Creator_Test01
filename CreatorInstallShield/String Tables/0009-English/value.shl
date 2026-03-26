@@ -1,0 +1,14 @@
+[General]
+Type=STRINGTABLESPECIFIC
+Version=1.00.000
+Language=0009
+
+[Data]
+TITLE_MAIN=Creator
+TITLE_CAPTIONBAR=Creator Setup
+COMPANY_NAME=Solimar
+PRODUCT_NAME=Creator
+PRODUCT_KEY=Creator.exe
+PRODUCT_VERSION=2.0E
+FOLDER_NAME=Creator
+

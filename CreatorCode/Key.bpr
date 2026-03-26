@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="libs\Key.lib"/>
+    <OBJFILES value="objs\SSKey.obj objs\Pkey.obj objs\Spdkey.obj objs\ssckey.obj 
+      objs\Keymanag.obj"/>
+    <RESFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value="KEY\3prty\RAINBOW\WINNT\Spromeps.lib"/>
+    <LIBRARIES value=""/>
+    <PACKAGES value=""/>
+    <PATHCPP value=".;KEY"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <LINKER value="TLib"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT"/>
+    <MAINSOURCE value="Key.bpf"/>
+    <INCLUDEPATH value="KEY;E:\spdmain_5_12\spdCode\Spdnt\KEY\;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;&quot;E:\spdmain_5_12\spdCode\spdnt\&quot;"/>
+    <LIBPATH value="KEY;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\spdCode\Spdnt\KEY\;&quot;E:\spdmain_5_12\&quot;"/>
+    <WARNINGS value="-w-par"/>
+    <LISTFILE value=""/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-N2objs -N0objs -$Y- -$L- -$D- -v -JPHNE -M"/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="$(OBJFILES)"/>
+    <ALLLIB value=""/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=17
+Item0=KEY;E:\spdmain_5_12\spdCode\Spdnt\KEY\;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\spdnt\
+Item1=E:\spdmain_5_12\spdCode\Spdnt\KEY\;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\spdnt\
+Item2=E:\spdmain_5_12\spdCode\Spdnt\KEY;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\spdnt\
+Item3=D:\spdmain_5_12t\spdCode\Spdnt\KEY;D:\spdmain_5_12nt\spdCode\Spdnt\KEY;D:\spdmain_5_12ant\spdCode\Spdnt\KEY;D:\spdmain_5_12iant\spdCode\Spdnt\KEY;D:\spdmain_5_12riant\spdCode\Spdnt\KEY;D:\spdmain_5_12ariant\spdCode\Spdnt\KEY;D:\spdmain_5_12variant\spdCode\Spdnt\KEY;D:\spdmain_5_12_variant\spdCode\Spdnt\KEY;D:\spdmain_5_1_variant\spdCode\Spdnt\KEY;D:\spdmain_5_11_variant\spdCode\Spdnt\KEY;D:\spdmain_5_12\spdCode\Spdnt\KEY;:\spdmain_5_12\spdCode\Spdnt\KEY;D:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;E:\spdmain_5_12\spdCode\Spdnt\KEY;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY\;e:\solimar\SpdNt\KEY\;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\spdnt\
+Item4=E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;e:\solimar\SpdNt\KEY\;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\spdnt;
+Item5=E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;e:\solimar\SpdNt\KEY\;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\
+Item6=e:\solimar\SpdNt\KEY\;e:\solimar\SpdNt\KEY;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\
+Item7=e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\
+Item8=e:\solimar\SpdNt\KEY;:\solimar\SpdNt\KEY;$(BCB)\include;$(BCB)\include\vcl;c:\spdnt\key\;c:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\
+Item9=e:\solimar\SpdNt\KEY;:\solimar\SpdNt\KEY;$(BCB)\include;$(BCB)\include\vcl;C:\spdnt\key\;C:\spdnt\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\
+Item10=$(BCB)\include;$(BCB)\include\vcl;C:\spdnt\key\;C:\spdnt\;d:\solimar;d:\solimar\spdnt;d:\solimar\spdnt\key;
+Item11=D:\solimar\SpdNt\KEY;D:\solimarSpdNt\KEY;D:\solimaSpdNt\KEY;D:\solimSpdNt\KEY;D:\soliSpdNt\KEY;D:\solSpdNt\KEY;D:\soSpdNt\KEY;D:\sSpdNt\KEY;D:\SpdNt\KEY;SpdNt\KEY;$(BCB)\include;$(BCB)\include\vcl;C:\spdnt\key\;C:\spdnt\
+Item12=$(BCB)\include;$(BCB)\include\vcl;C:\spdnt\key\;C:\spdnt\
+Item13=$(BCB)\include;$(BCB)\include\vcl;..\spdnt\key\;..\spdnt\
+Item14=$(BCB)\include;$(BCB)\include\vcl;C:\spdnt\key\
+Item15=$(BCB)\include;$(BCB)\include\vcl;..\spdnt\key
+Item16=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=16
+Item0=KEY;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\spdCode\Spdnt\KEY\;E:\spdmain_5_12\
+Item1=$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\spdCode\Spdnt\KEY\;E:\spdmain_5_12\
+Item2=$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\spdCode\Spdnt\KEY;E:\spdmain_5_12\
+Item3=D:\spdmain_5_12t\spdCode\Spdnt\KEY;D:\spdmain_5_12nt\spdCode\Spdnt\KEY;D:\spdmain_5_12ant\spdCode\Spdnt\KEY;D:\spdmain_5_12iant\spdCode\Spdnt\KEY;D:\spdmain_5_12riant\spdCode\Spdnt\KEY;D:\spdmain_5_12ariant\spdCode\Spdnt\KEY;D:\spdmain_5_12variant\spdCode\Spdnt\KEY;D:\spdmain_5_12_variant\spdCode\Spdnt\KEY;D:\spdmain_5_1_variant\spdCode\Spdnt\KEY;D:\spdmain_5_11_variant\spdCode\Spdnt\KEY;D:\spdmain_5_12\spdCode\Spdnt\KEY;:\spdmain_5_12\spdCode\Spdnt\KEY;D:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;E:\spdmain_5_12\spdCode\Spdnt\KEY;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY\;e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\
+Item4=E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\;
+Item5=E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\KEY;e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\
+Item6=e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\
+Item7=e:\solimar\SpdNt\KEY\;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;D:\solimarSpdNt\KEY\;D:\solimaSpdNt\KEY\;D:\solimSpdNt\KEY\;D:\soliSpdNt\KEY\;D:\solSpdNt\KEY\;D:\soSpdNt\KEY\;D:\sSpdNt\KEY\;SpdNt\KEY;C:\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\
+Item8=e:\solimar\SpdNt\KEY;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;D:\solimarSpdNt\KEY\;D:\solimaSpdNt\KEY\;D:\solimSpdNt\KEY\;D:\soliSpdNt\KEY\;D:\solSpdNt\KEY\;D:\soSpdNt\KEY\;D:\sSpdNt\KEY\;SpdNt\KEY;C:\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib;e:\solimar\;e:\solimar\spdnt\;
+Item9=e:\solimar\SpdNt\KEY;:\solimar\SpdNt\KEY;D:\solimar\SpdNt\KEY\;D:\solimarSpdNt\KEY\;D:\solimaSpdNt\KEY\;D:\solimSpdNt\KEY\;D:\soliSpdNt\KEY\;D:\solSpdNt\KEY\;D:\soSpdNt\KEY\;D:\sSpdNt\KEY\;SpdNt\KEY;C:\SpdNt\KEY\;d:\solimar\;d:\solimar\spdnt\;$(BCB)\lib\obj;$(BCB)\lib
+Item10=D:\solimar\SpdNt\KEY;D:\solimarSpdNt\KEY;D:\solimaSpdNt\KEY;D:\solimSpdNt\KEY;D:\soliSpdNt\KEY;D:\solSpdNt\KEY;D:\soSpdNt\KEY;D:\sSpdNt\KEY;SpdNt\KEY;C:\SpdNt\KEY;d:\solimar;d:\solimar\spdnt;d:\solimar\spdnt\key;;$(BCB)\lib\obj;$(BCB)\lib
+Item11=D:\solimar\SpdNt\KEY;D:\solimarSpdNt\KEY;D:\solimaSpdNt\KEY;D:\solimSpdNt\KEY;D:\soliSpdNt\KEY;D:\solSpdNt\KEY;D:\soSpdNt\KEY;D:\sSpdNt\KEY;SpdNt\KEY;C:\SpdNt\KEY;D:\SpdNt\KEY\;$(BCB)\lib\obj;$(BCB)\lib
+Item12=..\SpdNt\KEY\;$(BCB)\lib\obj;$(BCB)\lib
+Item13=C:\SpdNt\KEY\;$(BCB)\lib\obj;$(BCB)\lib
+Item14=C:\SpdNt\KEY;$(BCB)\lib\obj;$(BCB)\lib
+Item15=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=1
+Item0=_DEBUG
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=objs
+
+[HistoryLists\hlFinalOutputDir]
+Count=2
+Item0=libs\
+Item1=libs
+
+[HistoryLists\hlTlibPageSize]
+Count=1
+Item0=0x0010
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+
+  <FILES>
+    <FILE type="override" value="..\..\SpdNt\KEY\Keymanag.cpp" translator="Auto">
+      <CFLAG1 value=" -O2"/>
+      <INCLUDEPATH value=" $(BCB)\include;$(BCB)\include\vcl;..\spdnt\key\;&quot;..\spdnt\&quot;"/>
+    </FILE>
+  </FILES>
+</PROJECT>

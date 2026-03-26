@@ -1,0 +1,30 @@
+[Info]
+Type=ShellObject
+Version=2.10.000
+
+[Data]
+Folder0=<FOLDER_DESKTOP>
+Folder1=<FOLDER_STARTMENU>
+Folder2=<FOLDER_PROGRAMS>
+Folder3=<FOLDER_STARTUP>
+Group0=Main
+Group1=Startup
+Shortcut0=Folder2\Creator
+
+[Shortcut0]
+DisplayText=
+Target=<TARGETDIR>\creator.exe
+Parameters=
+StartIn=
+ShortcutKey=
+Run=Normal Window
+IconFile=<SUPPORTDIR>\tree.ico
+IconIndex=
+Replace=Yes
+SeparateMemorySpace=No
+InternetShortcut=No
+Uninstall=Yes
+Type=Automatic
+Comments=
+FileGroup0=App Executables
+

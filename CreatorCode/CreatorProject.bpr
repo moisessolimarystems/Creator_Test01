@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.05.03"/>
+    <PROJECT value="..\Image\CreatorProject.exe"/>
+    <OBJFILES value="objs\CreatorProject.obj objs\Keymaster.obj objs\Kyslevel.obj 
+      objs\customerform.obj objs\CreatorAbout.obj objs\CustQueryDlg.obj 
+      objs\CustUpdateDlg.obj objs\keyform.obj objs\VersionDlg.obj 
+      objs\ExtensionDlg.obj objs\setunitsdlg.obj objs\KeyWizard.obj 
+      objs\ModuleDetail.obj objs\clookups.obj objs\PasswordReportFrm.obj 
+      objs\keyMessageBox.obj objs\ModuleEditor.obj objs\ModuleEditorDlg.obj 
+      objs\ModuleEditorDetailDlg.obj objs\PPMDlg.obj 
+      objs\DevelopmentPasswordDlg.obj objs\keySearchDlg.obj 
+      objs\keyDateSearchDlg.obj objs\SolSearcherEnterpriseDetails.obj"/>
+    <RESFILES value="CreatorProject.res"/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES) customerform.dfm CreatorAbout.dfm CustQueryDlg.dfm 
+      CustUpdateDlg.dfm keyform.dfm VersionDlg.dfm ExtensionDlg.dfm 
+      setunitsdlg.dfm KeyWizard.dfm ModuleDetail.dfm PasswordReportFrm.dfm 
+      ModuleEditor.dfm ModuleEditorDlg.dfm ModuleEditorDetailDlg.dfm PPMDlg.dfm 
+      DevelopmentPasswordDlg.dfm keySearchDlg.dfm keyDateSearchDlg.dfm 
+      SolSearcherEnterpriseDetails.dfm"/>
+    <LIBFILES value="LIBS\Key.lib KEY\3prty\RAINBOW\WINNT\Spromeps.lib"/>
+    <LIBRARIES value="dclusr50.lib"/>
+    <SPARELIBS value="Vcl50.lib Qrpt50.lib vclx50.lib vclbde50.lib vcldb50.lib dclusr50.lib"/>
+    <PACKAGES value="Vcl50.bpi Vclx50.bpi bcbsmp50.bpi Qrpt50.bpi Vcldb50.bpi Vclbde50.bpi 
+      vcldbx50.bpi TeeUI50.bpi TeeDB50.bpi Tee50.bpi TeeQR50.bpi VCLIB50.bpi 
+      bcbie50.bpi vclie50.bpi Inetdb50.bpi Inet50.bpi NMFast50.bpi dclocx50.bpi 
+      bcb2kaxserver50.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="tlink32"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT;USEPACKAGES"/>
+    <MAINSOURCE value="CreatorProject.cpp"/>
+    <INCLUDEPATH value="$(BCB)\Projects;$BCB)\Bin;$(BCB)\Imports;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;&quot;E:\spdmain_5_12\&quot;"/>
+    <LIBPATH value="$(BCB)\Projects;&quot;C:\Program Files\Borland\CBuilder5\Bin\&quot;;$(BCB)\Projects\Lib;$(BCB)\Imports;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;&quot;E:\spdmain_5_12\spdCode\Spdnt\&quot;"/>
+    <WARNINGS value="-w-par"/>
+  </MACROS>
+  <OPTIONS>
+    <CFLAG1 value="-O2 -H=$(BCB)\lib\vcl50.csm -Hc -Vx -Ve -X- -a8 -b- -k- -vi -c -tW -tWM"/>
+    <PFLAGS value="-N2objs -N0objs -$Y- -$L- -$D- -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zn"/>
+    <LFLAGS value="-Iobjs -D&quot;&quot; -aa -Tpe -x -Gn"/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0w32.obj $(PACKAGES) sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib"/>
+  </LINKER>
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=17
+Item0=$(BCB)\Projects;$BCB)\Bin;$(BCB)\Imports;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\
+Item1=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\;E:\spdmain_5_12\
+Item2=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\
+Item3=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\;
+Item4=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\
+Item5=C:\bc5\Borland\CBuilder5\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\
+Item6=C:\bc5\Borland\CBuilder5\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\
+Item7=C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\;d:\solimar;d:\solimar\spdnt;d:\solimar\spdnt\key;
+Item8=C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\
+Item9=C:\Program Files\Borland\CBuilder5\Bin;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\
+Item10=$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;C:\SpdNT\
+Item11=$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl;..\SpdNT
+Item12=O:\;$(BCB)\Imports;KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl
+Item13=$(BCB)\Imports;KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl
+Item14=KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\include;$(BCB)\include\vcl
+Item15=KEY;C:\Program Files\Borland\CBuilder5\Projects;$(BCB)\include;$(BCB)\include\vcl
+Item16=$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=17
+Item0=$(BCB)\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\
+Item1=$(BCB)\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\
+Item2=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;E:\spdmain_5_12\;E:\spdmain_5_12\spdCode\;E:\spdmain_5_12\spdCode\Spdnt\
+Item3=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\
+Item4=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\;E:\spdmain_sandbox_5_11_variant\;E:\spdmain_sandbox_5_11_variant\spdCode\;E:\spdmain_sandbox_5_11_variant\spdCode\Spdnt\;
+Item5=C:\bc5\Borland\CBuilder5\Projects\;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\
+Item6=C:\bc5\Borland\CBuilder5\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\;e:\solimar\;e:\solimar\spdnt\;e:\solimar\spdnt\key\
+Item7=C:\bc5\Borland\CBuilder5\Projects;C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar\;d:\solimar\spdnt\;d:\solimar\spdnt\key\
+Item8=C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib;d:\solimar;d:\solimar\spdnt;d:\solimar\spdnt\key;
+Item9=C:\Program Files\Borland\CBuilder5\Bin\;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item10=C:\Program Files\Borland\CBuilder5\Bin;$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item11=$(BCB)\Projects\Lib;$(BCB)\Imports;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item12=O:\;$(BCB)\Projects\Lib;$(BCB)\Imports;KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item13=$(BCB)\Projects\Lib;$(BCB)\Imports;KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item14=KEY;C:\Program Files\Borland\CBuilder5\Projects\;$(BCB)\lib\obj;$(BCB)\lib
+Item15=KEY;C:\Program Files\Borland\CBuilder5\Projects;$(BCB)\lib\obj;$(BCB)\lib
+Item16=$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlConditionals]
+Count=2
+Item0=_DEBUG
+Item1=_DEBUG;__BORLANDC__
+
+[HistoryLists\hlIntOutputDir]
+Count=1
+Item0=objs
+
+[HistoryLists\hlFinalOutputDir]
+Count=2
+Item0=..\Image\
+Item1=..\Image
+
+[HistoryLists\hIBPIOutputDir]
+Count=4
+Item0=E:\creator_main\libs\
+Item1=libs
+Item2=D:\creatorupdate_2_15_02\libs\
+Item3=C:\Creator\libs\
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

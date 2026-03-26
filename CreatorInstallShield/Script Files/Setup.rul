@@ -1,0 +1,753 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:	Setup.rul                                                   
+//                                                                            
+//  Description:	InstallShield script for Creator Install Program                                       
+//                                                                            
+//  Comments:	This script was generated based on the selections you made in
+//           	the Project Wizard.  Refer to the help topic entitled "Modify      
+//           	the script that the Project Wizard generates" for information
+//				on possible next steps.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+// Include header files
+    
+#include "ifx.h"
+    
+////////////////////// string defines //////////////////////////// 
+
+//
+// Control IDs for all Dialog boxes
+#ifndef RES_PBUT_NEXT
+#define RES_PBUT_NEXT         					1   // ID of 'Next' push button
+#endif
+#ifndef RES_PBUT_CANCEL	
+#define RES_PBUT_CANCEL       					9   // ID of 'Cancel' push button
+#endif
+#ifndef RES_PBUT_BACK
+#define RES_PBUT_BACK        					12  // ID of 'Back' push button
+#endif
+#ifndef RES_DIALOG_TITLE
+#define RES_DIALOG_TITLE						50  // ID of Header Label
+#endif
+#ifndef RES_DIALOG_SUBTITLE
+#define RES_DIALOG_SUBTITLE						51  // ID of Header Message
+#endif
+#ifndef RES_DIALOG_SUBTITLE_MSG
+#define RES_DIALOG_SUBTITLE_MSG					711 // ID of Sub-Header Message
+#endif
+
+#define RES_SDFINISHCUSTOMDLG_DIALOG_ID			30000  // SdWelcomeMaintCustomDlg  
+
+
+
+
+//////////////////// installation declarations ///////////////////
+
+// ----- DLL function prototypes -----
+prototype cdecl LONG solstart.ProcessID(); 
+
+
+// ---- script function prototypes -----
+prototype SdFinishCustomDlg( STRING );
+
+
+
+//===== OS Type Structure =====
+typedef OSTYPE
+begin
+    BOOL IsWindowsXP;
+    BOOL IsWindowsME;
+    BOOL IsWindows2000;
+    BOOL IsWindows2000Workstation;
+    BOOL IsWindows2000Server;
+    BOOL IsWindowsNT4;
+    BOOL IsWindowsNT351;
+    BOOL IsWindows98;
+    BOOL IsWindows95;            
+end;                           
+
+//===== UNINSTALL Type Structure =====
+typedef UNINSTALLTYPE
+begin
+    BOOL AddRemove;
+    BOOL Program;
+end;  
+
+
+    // your script function prototypes
+    //prototype CreateODBC_SQLCreatorKey(); 
+    prototype SetupFolders();
+    prototype CheckRequirements(); 
+    prototype InstallSentinelDriver();
+    
+    // your global variables   
+    BOOL        	bIsShellExplorer;
+    STRING			szCmdLine;
+    VARIANT			vDllString;   
+    OSTYPE			gstructOSTYPE;
+    UNINSTALLTYPE 	gstructUNINSTALLTYPE;
+    BOOL            bInstallSentinel;
+
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   SetupFolders                                            
+//                                                                           
+//  EVENT:      Add folder to the desktop
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function SetupFolders() 
+    STRING svPath, svIconPath;
+begin
+	//Add Solimar.exe to desktop
+    svPath = TARGETDIR ^ "Creator.exe";
+    svIconPath = TARGETDIR ^ "tree.ico";
+    LongPathToQuote ( svPath , TRUE );
+    AddFolderIcon ( FOLDER_DESKTOP, "Creator" , svPath , TARGETDIR , svIconPath , 0 , "" , REPLACE );	
+
+end; 
+
+/*
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   CreateODBC_SQLCreatorKey                                            
+//                                                                           
+//  EVENT:      Creates the Registry entries needed for the BDE Administrator
+// 				in order to run Creator.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function CreateODBC_SQLCreatorKey()
+    NUMBER nResult, nvSize, nvType;
+ 	STRING szTitle, szMsg, szPath, szKey, szParams;
+ 	BOOL   nvCheck;
+ begin 
+ 
+ 	szKey = "SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator";
+  	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+  	nResult = RegDBKeyExist(szKey); 
+  	
+  	if (nResult > 0) then 
+  		return 0; // Key already exists
+  	endif;
+  	
+  	// Create the main registry key
+  	RegDBCreateKeyEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator", ""); 
+  	
+  	// Create the 1 of 2 Registry keys under main registry key...
+  	RegDBCreateKeyEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "");  
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "BATCH COUNT", REGDB_STRING, "200", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "BLOB SIZE", REGDB_STRING, "32", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "BLOBS TO CACHE", REGDB_STRING, "64", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "DATABASE NAME", REGDB_STRING, "", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "ENABLE BCD", REGDB_STRING, "FALSE", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "ENABLE SCHEMA CACHE", REGDB_STRING, "FALSE", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "LANGDRIVER", REGDB_STRING, "", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "MAX ROWS", REGDB_STRING, "-1", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "ODBC DSN", REGDB_STRING, "SQLCreator", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "OPEN MODE", REGDB_STRING, "READ/WRITE", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "ROWSET SIZE", REGDB_STRING, "20", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "SCHEMA CACHE DIR", REGDB_STRING, "", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "SCHEMA CACHE SIZE", REGDB_STRING, "8", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "SCHEMA CACHE TIME", REGDB_STRING, "-1", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "SQLPASSTHRU MODE", REGDB_STRING, "SHARED AUTOCOMMIT", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "SQLQRYMODE", REGDB_STRING, "", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\DB OPEN", "USER NAME", REGDB_STRING, "", -1);
+                                                                                                
+  	// Create the 1 of 2 Registry keys under main registry key...
+  	RegDBCreateKeyEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", ""); 
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "DLL", REGDB_STRING, "IDODBC01.DLL", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "DLL32", REGDB_STRING, "IDODBC32.DLL", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "DRIVER FLAGS", REGDB_STRING, "", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "ODBC DRIVER", REGDB_STRING, "SQL Server", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "TRACE MODE", REGDB_STRING, "0", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "TYPE", REGDB_STRING, "SERVER", -1);
+  	RegDBSetKeyValueEx("SOFTWARE\\Borland\\Database Engine\\Settings\\Drivers\\ODBC_SQLCreator\\INIT", "VERSION", REGDB_STRING, "5.0", -1);
+
+    return 0; 
+ end;
+*/
+
+ 	
+//////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   OnFirstUIBefore                                            
+//                                                                           
+//  EVENT:      FirstUIBefore event is sent when installation is run for the first
+//              time on given machine. In the handler installation usually displays
+//              UI allowing end user to specify installation parameters. After this
+//              function returns, ComponentTransferData is called to perform file
+//              transfer.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIBefore()
+    number  nResult,nSetupType;
+    string  szTitle, szMsg;
+    string  szDir;
+begin	
+    // TO DO: if you want to enable background, window title, and caption bar title                                                                     
+    // SetTitle( @TITLE_MAIN, 24, WHITE );                                        
+    // SetTitle( @TITLE_CAPTIONBAR, 0, BACKGROUNDCAPTION ); 	                   
+    // Enable( FULLWINDOWMODE );						   
+    // Enable( BACKGROUND );							  
+    // SetColor(BACKGROUND,RGB (0, 128, 128));					   
+   
+    TARGETDIR = PROGRAMFILES ^@COMPANY_NAME ^@PRODUCT_NAME;	
+    szDir = TARGETDIR;
+
+Dlg_Start:
+    // beginning of dialogs label
+
+Dlg_SdWelcome:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SdWelcome( szTitle, szMsg );
+    if (nResult = BACK) goto Dlg_Start;
+
+Dlg_SdAskDestPath:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SdAskDestPath( szTitle, szMsg, szDir, 0 );
+    TARGETDIR = szDir;
+    if (nResult = BACK) goto Dlg_SdWelcome;
+
+Dlg_ObjDialogs:
+    nResult = ShowObjWizardPages(nResult);
+    if (nResult = BACK) goto Dlg_SdAskDestPath;
+    
+    // Add shortcuts
+   	SetupFolders();
+   
+    // setup default status
+    SetStatusWindow(0, "");
+    Enable(STATUSEX);
+    StatusUpdate(ON, 100);
+    bInstallSentinel = TRUE;    //-EM
+    return 0;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnMoving
+//
+//  EVENT:      Moving event is sent when file transfer is started as a result of
+//              ComponentTransferData call, before any file transfer operations 
+//              are performed.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnMoving()
+    string szAppPath;
+begin
+    // Set LOGO Compliance Application Path 
+    // TO DO : if your application .exe is in a subfolder of TARGETDIR then add subfolder 
+    szAppPath = TARGETDIR;
+    RegDBSetItem(REGDB_APPPATH, szAppPath);
+    RegDBSetItem(REGDB_APPPATH_DEFAULT, szAppPath ^ @PRODUCT_KEY);   
+end;
+ 
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnMaintUIBefore
+//
+//  EVENT:      MaintUIBefore event is sent when end user runs installation that
+//              has already been installed on the machine. Usually this happens 
+//              through Add/Remove Programs applet. In the handler installation 
+//              usually displays UI allowing end user to modify existing installation
+//              or uninstall application. After this function returns, 
+//              ComponentTransferData is called to perform file transfer.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnMaintUIBefore()
+    NUMBER nResult, nType;
+    STRING szTitle, szMsg, svDir, svResult, szCaption;  
+    BOOL   bRemove;
+begin
+	if (CMDLINE = "UNINSTALL") then 
+    	gstructUNINSTALLTYPE.AddRemove = TRUE;
+        svResult = SdLoadString(IFX_MAINTUI_MSG);
+        szCaption = SdLoadString(IFX_ONMAINTUI_CAPTION);
+        nResult = SprintfBox(MB_OKCANCEL,szCaption,"%s",svResult);
+        if (nResult = IDCANCEL) then
+            goto Dlg_Start;
+        elseif(nResult = IDOK) then
+            // setup default status
+            SetStatusWindow(0, "");
+            Enable(STATUSEX);
+            StatusUpdate(ON, 100);
+            ComponentRemoveAll();
+        endif;
+    else   	
+	Dlg_Start:   
+		bRemove = FALSE;
+		Disable(BACKBUTTON);
+		nType = SdWelcomeMaint(szTitle, szMsg, REMOVEALL);
+		Enable(BACKBUTTON);
+	
+    	if (nType = REMOVEALL) then  
+    		bRemove = TRUE; 
+    		gstructUNINSTALLTYPE.Program = TRUE;
+			svResult = SdLoadString(IFX_MAINTUI_MSG);
+			szCaption = SdLoadString(IFX_ONMAINTUI_CAPTION);
+			nResult = SprintfBox(MB_OKCANCEL,szCaption,"%s",svResult);
+			if (nResult = BACK) goto Dlg_Start;
+		endif;
+
+   	 nResult = NEXT;
+
+	Dlg_SdComponentTree:
+		if (nType = MODIFY) then
+			szTitle = "";
+			szMsg = "";
+			nResult = SdComponentTree(szTitle, szMsg, TARGETDIR, "", 2);
+			if (nResult = BACK) goto Dlg_Start;
+    	endif;
+
+	Dlg_ObjDialogs:
+    	nResult = ShowObjWizardPages(nResult);
+    	if ((nResult = BACK) && (nType != MODIFY)) goto Dlg_Start;
+    	if ((nResult = BACK) && (nType = MODIFY)) goto Dlg_SdComponentTree;
+
+		switch(nType)
+        	case REMOVEALL: ComponentRemoveAll();
+        	case REPAIR:    ComponentReinstall();
+        					bRemove = TRUE;
+    	endswitch;
+    
+    	if (!bRemove) then
+    		SetupFolders();
+    	endif;
+    
+    	// setup default status 
+ 		SetStatusWindow(0, "");    
+ 		
+ 		//want to install the rainbow driver - set for unconditional installation -EM
+ 		//if(ComponentIsItemSelected(MEDIA,"                                         
+ 		bInstallSentinel = TRUE;
+ 		
+		Enable(STATUSEX);
+		StatusUpdate(ON, 100); 
+	endif;
+end;
+ 
+//////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnBegin
+//
+//  EVENT:      Begin event is always sent as the first event during installation.
+//
+//////////////////////////////////////////////////////////////////////////////
+function OnBegin()
+     /* Need an object variable to hold a reference to the object. */
+     OBJECT oObj, oObj2; 
+     STRING szAttributes, szDriverName, szMsg;
+     NUMBER nvResult;
+     NUMBER nProcessID;  
+begin        
+       
+    CheckRequirements(); 
+    gstructUNINSTALLTYPE.Program = FALSE;
+    gstructUNINSTALLTYPE.AddRemove = FALSE;
+    UNINSTALL_STRING = UNINSTALL_STRING + "UNINSTALL";                                                                       
+                                                                            
+    // Get the processID for the setup, so the user doesn't have to restart.
+	UseDLL( SUPPORTDIR ^ "solstart.dll" );
+    vDllString = ProcessID(); 
+    UnUseDLL( SUPPORTDIR ^ "solstart.dll" ); 
+       
+       
+    // Get a reference to an BDE 5.1 object named "New BDE 5.1 Object 1".
+    set oObj = GetObject("New BDE 5.11 1");  
+    set oObj2 = GetObject("New ODBC 3.51 1");
+     
+    while( oObj.IsBDERunning() ) 
+         szMsg = "Borland Database Engine is running, please shutdown BDE.";
+         nvResult = SprintfBox( MB_RETRYCANCEL, "BDE in use", szMsg );
+         if( nvResult = 2 ) then
+             abort;
+         endif;
+    endwhile;  
+                                     
+	//Create the ODBC_SQLCreator bde key...                                     
+    //CreateODBC_SQLCreatorKey();         
+    bInstallSentinel = FALSE;
+end;
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+//
+// Function:  CheckRequirements
+//
+//  Purpose:  This function checks all minimum requirements for the
+//            application being installed.  If any fail, then the user
+//            is informed and the setup is terminated.
+//
+///////////////////////////////////////////////////////////////////////////////
+function CheckRequirements()
+    NUMBER  nvResult, nvResultMaj, nvResultMin;
+    STRING  svResult;
+	BOOL	bIs32BitSetup;
+begin 
+    // Initialize Global Struct   	
+   	gstructOSTYPE.IsWindowsXP = FALSE;
+   	gstructOSTYPE.IsWindows2000Server = FALSE;
+   	gstructOSTYPE.IsWindows2000Workstation = FALSE;
+   	gstructOSTYPE.IsWindows2000 = FALSE;
+   	gstructOSTYPE.IsWindowsNT4 = FALSE;
+   	gstructOSTYPE.IsWindowsNT351 = FALSE;
+   	gstructOSTYPE.IsWindowsME = FALSE;
+   	gstructOSTYPE.IsWindows98 = FALSE;
+   	gstructOSTYPE.IsWindows95 = FALSE;    	
+   	
+   	// Local Variables
+   	bIsShellExplorer = FALSE;
+
+    // Set 'setup' operation mode
+    bIs32BitSetup = TRUE;
+    GetSystemInfo( ISTYPE, nvResult, svResult );
+    if (nvResult = 16) then
+        bIs32BitSetup = FALSE; 		// running 16-bit setup
+        return 0; 					// no additional information required
+    endif;
+
+    // --- 32-bit testing after this point ---
+
+    // Determine the target system's operating system.
+    if (SYSINFO.WINNT.bWin2000) then 
+    	gstructOSTYPE.IsWindows2000 = TRUE;  
+    elseif (SYSINFO.WIN9X.bWin95) then 
+    	gstructOSTYPE.IsWindows95 = TRUE;   
+    elseif (SYSINFO.WIN9X.bWin98) then
+    	gstructOSTYPE.IsWindows98 = TRUE;
+    elseif (SYSINFO.WIN9X.bWinMe)then
+        gstructOSTYPE.IsWindowsME = TRUE;  
+    elseif (SYSINFO.WINNT.bWinNT ) then  //check for Windows NT type
+		
+		// ex. 3.52...Major = 3...Minor = 52  
+		// Get the major and minor values in the version number
+		nvResultMaj = SYSINFO.nWinMajor; 
+		nvResultMin = SYSINFO.nWinMinor;    
+	     	
+		// check for Windows NT 3.X and not Windows NT4
+		if ( (nvResultMaj < 4) && (!SYSINFO.WINNT.bWinNT4) ) then 
+			gstructOSTYPE.IsWindowsNT351 = TRUE;
+		endif;                                            
+		
+		// check for Windows NT 4
+		if (SYSINFO.WINNT.bWinNT4) then 
+    		gstructOSTYPE.IsWindowsNT4 = TRUE;
+    	endif;   
+		
+		//check for Windows NT 5.1, which is Windows XP
+		if ( nvResultMaj = 5 ) && ( nvResultMin = 1 ) then		             
+			gstructOSTYPE.IsWindowsXP = TRUE;           
+		endif; 
+		
+	endif;         
+    
+    // Now find out if we are on a Workstation and a Server
+    //if (gstructOSTYPE.IsWindows2000) then
+    //	CheckFor2000Workstation_Server();
+    //endif;      
+          
+    // Ensure that we are only working on a Windows NT, 2000, or XP machine.
+    if ( (gstructOSTYPE.IsWindowsNT351 || gstructOSTYPE.IsWindows95 || gstructOSTYPE.IsWindows98 || gstructOSTYPE.IsWindowsME) = TRUE ) then	
+    	MessageBox(@PRODUCT_NAME + " can only be installed on a machine with a Windows NT 4.0 or a Windows 2000 platform.", SEVERE);		
+        abort;
+    endif;
+    
+    // then if so....Ensure that the user is an Administrator
+    if ( (gstructOSTYPE.IsWindowsNT351 || gstructOSTYPE.IsWindows2000 || gstructOSTYPE.IsWindowsNT4 || gstructOSTYPE.IsWindowsXP) = TRUE ) then
+		if (!SYSINFO.WINNT.bAdmin_Logged_On) then
+			MessageBox ("You must have administrator rights to install " + @PRODUCT_NAME +
+					    " on this computer.  Please log off and log on as the administrator", SEVERE);
+			abort;  
+		endif;
+	endif; 
+end;
+
+ 
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnFirstUIAfter
+//
+//  EVENT:      FirstUIAfter event is sent after file transfer, when installation 
+//              is run for the first time on given machine. In this event handler 
+//              installation usually displays UI that will inform end user that
+//              installation has been completed successfully.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szOption1, szOption2;
+    NUMBER bOpt1, bOpt2, nResult;
+begin
+    Disable(STATUSEX);
+
+    ShowObjWizardPages(NEXT);
+
+    if(bInstallSentinel) then 
+  		SdShowMsg("Installing Sentinel Driver...Please wait.", TRUE);
+        InstallSentinelDriver();                   
+  		SdShowMsg("Sentinel Driver has been installed", TRUE);
+	endif;    
+
+	bOpt1  = FALSE;
+    bOpt2  = TRUE;
+    szMsg2 = "Setup has finished installing Creator on your system.\n\nSetup can launch the Read Me file if you wish.";                           
+    szOption2 = "View Readme file";
+    szMsg1 = SdLoadString(IFX_SDFINISH_MSG1);
+    nResult = SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);   
+    if (bOpt2) then
+    	LaunchApp("notepad.exe", SUPPORTDIR ^ "readme.txt");
+  	endif;  
+end;
+ 
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnMaintUIAfter
+//
+//  EVENT:      MaintUIAfter event is sent after file transfer, when end user runs 
+//              installation that has already been installed on the machine. Usually 
+//              this happens through Add/Remove Programs applet. 
+//              In the handler installation usually displays UI that will inform 
+//              end user that maintenance/uninstallation has been completed successfully.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnMaintUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szOption1, szOption2;
+    NUMBER bOpt1, bOpt2;
+begin
+	Disable(STATUSEX);
+
+    ShowObjWizardPages(NEXT);
+ 	bOpt1   = FALSE;
+   	bOpt2   = FALSE;
+   
+    //Not sure if this should go in here or not
+    //if(bInstallSentinel) then
+    //    InstallSentinelDriver();  
+	//endif;    
+   	   
+    if ( gstructUNINSTALLTYPE.AddRemove ) then
+    	szMsg1  = "Setup has finished removing " + @PRODUCT_NAME + " from your system.";
+    	szTitle = "Uninstallation Complete.";
+    	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
+    elseif ( gstructUNINSTALLTYPE.Program ) then
+        //szMsg1 =  "Setup has finished removing " + @PRODUCT_NAME + " from your system.\n\n" + 
+        //		  "You must restart Setup to upgrade your application.";
+		//szTitle = "Uninstallation Complete."; 
+		szMsg1 = "UNINSTALLATION COMPLETE\n\n\nPart I of the 'Remove and Upgrade' process has finished. The application has been removed.\n\nClick 'Upgrade' to restart setup and continue with the upgrade process.";
+		SdFinishCustomDlg(szMsg1);  
+	else
+		szMsg1  = SdLoadString(IFX_SDFINISH_MAINT_MSG1);
+    	szTitle = SdLoadString(IFX_SDFINISH_MAINT_TITLE);                       
+    	SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
+	endif;
+	 
+	
+   	
+  
+end;
+ 
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnEnd
+//
+//  EVENT:      End event is the last event. It is not sent if the installation
+//              has been aborted. In this case Abort event is sent
+//                  
+//				Status - This property contains information about errors that 
+//				this object may encounter. Status.Number is the error number and
+//				Status.Description has the error description.
+///////////////////////////////////////////////////////////////////////////////
+function OnEnd()
+	OBJECT oObj, oObj2; 
+	STRING svArgument, szSourceDir, szOperatingSystem; 
+begin      
+	
+   	set oObj = GetObject("New BDE 5.11 1");
+   	if !IsEmpty(oObj) then
+        if oObj.Status.Number != OBJ_STATUS_SUCCESS then
+            MessageBox("BDE Object Error: " + oObj.Status.Description, SEVERE);
+            abort; 
+        endif;
+   	endif;    
+   
+   	set oObj2 = GetObject("New ODBC 3.51 1");
+   	if !IsEmpty(oObj2) then
+        if oObj2.Status.Number != OBJ_STATUS_SUCCESS then
+            MessageBox("ODBC Object Error: " + oObj2.Status.Description, SEVERE);
+            abort; 
+        endif;
+   	endif;       
+    
+    // Since there is a problem with the OpenProcess function in Windows98,
+	// I have put in a delay before the startup...a solution that is rarely used
+	// If 2000 or NT then we will wait for the process to finish
+	// otherwise we set a delay (rarely used).
+	/*
+	if (gstructOSTYPE.IsWindowsNT4 || gstructOSTYPE.IsWindows2000 || gstructOSTYPE.IsWindowsXP) then
+		szOperatingSystem = "WindowsNT2000";
+	else
+		szOperatingSystem = "NOTWindowsNT2000";
+	endif;
+	
+   
+   	szSourceDir = SRCDIR + "setup.exe";
+   	svArgument = vDllString + "," + szOperatingSystem + "," + szSourceDir;  
+    // Argument passed into setuputil.exe which will contain the
+	// PID, operating system type, and the source directory for setup.exe      
+    if ( (MAINTENANCE) && (gstructUNINSTALLTYPE.Program) && (!BATCH_INSTALL) ) then
+    	if (AskYesNo("Would you like to restart the setup?",YES) = YES) then     	
+    		if ((!gstructUNINSTALLTYPE.AddRemove) && (gstructUNINSTALLTYPE.Program)) then
+    			SdShowMsg("Setup will now restart...", TRUE);                              
+    			Delay(4);
+    		endif;
+        
+			if ((MAINTENANCE) && (gstructUNINSTALLTYPE.Program)) then  
+				SRCDIR = SRCDIR + "setuputil.exe";
+				LaunchApp(SRCDIR, svArgument);
+			endif; 			
+		endif; 
+	endif;
+	*/  
+ 
+end;
+
+//=============================================================================  
+//
+// Function: 	SdFinishCustomDlg - 30000
+// Purpose: 	The purpose of this dialog is so that the user the option to 
+//				continue with the upgrade process and restart the setup.exe or
+//				he/she can exit now and have the software uninstalled.
+// Parameters:	STRING - szTitle; title of the dialog box
+//				STRING - szMsg; subtitle of the dialog box
+// Returns:		INT - nResult; returns the value of REMOVEALL if the radio box 
+//				is selected.
+//
+//=============================================================================
+function SdFinishCustomDlg (szMsg1)
+    NUMBER  nvType, nvSize;   
+    STRING  szDialogName, szSourceDir, svArgument, szTitle;
+    NUMBER  nDialog, nCmdValue; 
+    BOOL    bDone;
+begin 
+	//
+   	// Initialize variables to be used with this function...
+   	szDialogName = "SdFinishCustomDlg";       
+   	// Initialize the indicator used to control the while loop. 
+   	bDone = FALSE;   	
+   	    
+   	//
+   	// Define the dialog.  Pass a null string in the second parameter 
+   	// to get the dialog from _isuser.dll or _isres.dll.  Pass a null 
+   	// string in the third parameter because the dialog is identified 
+   	// by its ID in the fourth parameter.                             
+   	if (EzDefineDialog (szDialogName, "", "", RES_SDFINISHCUSTOMDLG_DIALOG_ID) < 0) then                              
+      		// Report an error; then terminate.
+      		MessageBox ("Error in defining the " + szDialogName, SEVERE);
+      		abort;                                          
+   	endif;    
+   	
+    
+    repeat
+    	// Display the dialog and return the next dialog event.
+		nCmdValue = WaitOnDialog(szDialogName);
+		
+    	// Respond to the event.
+    	switch (nCmdValue)
+	    	case IDCANCEL:
+          		// The user clicked the window's close button.
+	           	Do (EXIT);  
+       		case DLG_ERR: 
+           		MessageBox ("Unable to display dialog. Setup canceled.", SEVERE);  
+	           	abort; 
+       		case DLG_INIT:
+       			// Do some initialization                                             
+       			CtrlSetText  (szDialogName, RES_DIALOG_TITLE, szMsg1);
+       			bDone = FALSE;
+    		case RES_PBUT_CANCEL:   // Click EXIT                                                  
+           		// The user clicked the Cancel button.
+           		bDone = TRUE;              		                                    
+       		case RES_PBUT_NEXT:  	// Click FINISH       	
+				// Do something
+				bDone = TRUE;	
+				szSourceDir = SRCDIR; 
+				//szSourceDir = "\"" + szSourceDir + "setup.exe";
+				szSourceDir = szSourceDir + "setup.exe";	
+    			svArgument =vDllString + "," + szSourceDir; 
+    
+    			if ( (MAINTENANCE) && (gstructUNINSTALLTYPE.Program) && (!gstructUNINSTALLTYPE.AddRemove)&& (!BATCH_INSTALL) ) then
+    				SdShowMsg("Setup will now restart...", TRUE);                              
+    				Delay(4);
+  					SRCDIR = SRCDIR + "setuputil.exe";
+					LaunchApp(SRCDIR, svArgument);		
+				endif; 
+				
+				//if (BATCH_INSTALL) then   
+				//	szTitle = "Uninstallation Complete";
+				//	szMsg1 = "This installation requires you to reboot your machine.";
+				//  SdFinishReboot(szTitle, szMsg1, SYS_BOOTMACHINE, "", 0); 
+				//endif;     
+   		endswitch;  	
+   until bDone;
+   //
+   // Close the dialog box. 
+   EndDialog (szDialogName);          
+     
+   //
+   // Free the dialog box from memory.
+   ReleaseDialog (szDialogName);   
+  	
+end;
+
+
+//=============================================================================  
+//
+// Function: InstallSentinelDriver()
+// Purpose:
+// Parameters:
+// Returns:
+//
+//=============================================================================  
+function InstallSentinelDriver()
+	STRING sentPath, sentOpts, svValue ;
+	INT nvSize;
+	BOOL bDeleteOldSentDrv;  
+begin
+	//install windows installer, if windows installer is already installed, this does nothing
+  	sentPath = SRCDIR + "System\\instmsiw.exe";
+    sentOpts = " /q";
+    LaunchAppAndWait(sentPath, sentOpts, WAIT);
+
+	//Check for previous versions of the sentinel driver
+	bDeleteOldSentDrv = FALSE;
+	RegDBSetDefaultRoot (HKEY_LOCAL_MACHINE);
+    //Checks for sentinel versions 5.38 and versions 5.30
+    if( RegDBGetKeyValueEx("System\\CurrentControlSet\\Services\\Sentinel", "Group", nvSize, svValue, nvSize)=0 && RegDBGetKeyValueEx ("software\\rainbow technologies\\sentinel system driver", "CurrentVersion", nvSize, svValue, nvSize)<0) then
+		bDeleteOldSentDrv = TRUE;    
+    endif;
+    
+	//remove the old sentinel driver 5.38
+	if(bDeleteOldSentDrv) then
+		//this path is the location that the Windows Operating system copies the old Sentinel EXE  
+		sentPath = WINSYSDISK + "\\Winnt\\System32\\Rnbosent\\setupx86.exe";
+   		sentOpts = " /q /U";
+   		LaunchAppAndWait(sentPath, sentOpts, WAIT);
+   	endif;
+
+	//install new sentinel driver if necessary  	
+//    sentPath = INSTALLDIR + "\source\\Rainbow\\SPNComboInst1.0.2.exe";  
+    //MessageBox("The sent path is " + sentPath, MB_OK);
+	sentPath = SRCDIR + "\System\\SPNComboInst1.0.2.exe";
+    sentOpts = " /v\"/q REBOOT=ReallySuppress REBOOTPROMPT=Suppress CONFIRMUPGRADE=TRUE\"";
+    LaunchAppAndWait(sentPath, sentOpts, WAIT);
+end;
+
+
+
+
+// --- include script file section ---
+
+

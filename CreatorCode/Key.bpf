@@ -1,0 +1,15 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+USEUNIT("KEY\SSKey.cpp");
+USEUNIT("KEY\Pkey.cpp");
+USEUNIT("KEY\Spdkey.cpp");
+USEUNIT("KEY\ssckey.cpp");
+USEUNIT("KEY\Keymanag.cpp");
+USELIB("KEY\3prty\RAINBOW\WINNT\Spromeps.lib");
+//---------------------------------------------------------------------------
+#define Library
+
+// To add a file to the library use the Project menu 'Add to Project'.
+
