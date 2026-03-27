@@ -1,0 +1,297 @@
+// SolimarLicenseSvr.cpp : Implementation of CSolimarLicenseSvr
+
+#include "SolimarLicenseSvr.h"
+#include "KeyServer.h"
+#include "..\common\ChallengeResponse.h"
+
+// The macro SOLIMAR_INTERNAL_PROTECTED_FUNCTION will return from a function immediately for release builds.
+// The purpose of this is to protect some licensing functions from being accessable to the customer.
+#if !defined(_Solimar_Internal) && !defined(_DEBUG)
+#define SOLIMAR_INTERNAL_PROTECTED_FUNCTION return HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED)
+#else
+#define SOLIMAR_INTERNAL_PROTECTED_FUNCTION 
+#endif
+
+// if the client hasn't authenticated, return an error
+#define CHECK_CLIENT_AUTHENTICATION  if (!ChallengePassedByClient()) return HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED);
+//#define CHECK_CLIENT_AUTHENTICATION {}
+
+BYTE CSolimarLicenseSvr::challenge_key_server_thisauthuser_public[] = {
+#include "..\common\keys\SolimarLicenseServer.ThisAuthUser.public.key.txt"
+};
+
+BYTE CSolimarLicenseSvr::challenge_key_server_userauththis_private[] = {
+#include "..\common\keys\SolimarLicenseServer.UserAuthThis.private.key.txt"
+};
+
+
+//KeyServer CSolimarLicenseSvr::keyserver;
+
+CSolimarLicenseSvr::CSolimarLicenseSvr() : 
+	ChallengeResponseHelper(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private), challenge_key_server_thisauthuser_public, sizeof(challenge_key_server_thisauthuser_public))
+{
+	keyserver.ResynchronizeKeys();
+}
+
+CSolimarLicenseSvr::~CSolimarLicenseSvr()
+{
+	keyserver.LicenseReleaseAll(m_licenseId);
+}
+
+// CSolimarLicenseSvr
+STDMETHODIMP CSolimarLicenseSvr::Challenge(VARIANT vtChallenge, VARIANT *pvtResponse)
+{
+	HRESULT hr = S_OK;
+	
+	VariantClear(pvtResponse);
+	
+	// Initialize the ChallengeResponse class with the private key, to decrypt the message
+	ChallengeResponse CR(challenge_key_server_userauththis_private, sizeof(challenge_key_server_userauththis_private));
+	ChallengeResponse::Message challenge(vtChallenge), response;
+	
+	hr = CR.GenerateResponse(challenge,response);
+	
+	if (SUCCEEDED(hr))
+	{
+		*pvtResponse = response;
+	}
+	
+	return hr;
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GetChallenge(VARIANT *pvtChallenge)
+{
+	return GetChallengeInternal(pvtChallenge);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::PutResponse(VARIANT vtResponse)
+{
+	return PutResponseInternal(vtResponse);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::Heartbeat()
+{
+	return keyserver.Heartbeat(m_licenseId);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyEnumerate(VARIANT *keylist)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyEnumerate(keylist);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::EnterPassword(BSTR password)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.EnterPassword(password);
+}
+
+HRESULT CSolimarLicenseSvr::EnterPasswordPacket(VARIANT vtPasswordPacket, BSTR *verification_code)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.EnterPasswordPacket(vtPasswordPacket,verification_code);
+}
+
+
+STDMETHODIMP CSolimarLicenseSvr::GenerateBasePassword(long customer_number, long key_number, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateBasePassword(customer_number, key_number, password);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GenerateVersionPassword(long customer_number, long key_number, long ver_major, long ver_minor, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateVersionPassword(customer_number, key_number, ver_major, ver_minor, password);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GenerateExtensionPassword(long customer_number, long key_number, long extend_days, long extension_num, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateExtensionPassword(customer_number, key_number, extend_days, extension_num, password);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GenerateModulePassword(long customer_number, long key_number, long product_ident, long module_ident, long license_count, BSTR *password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GenerateModulePassword(customer_number, key_number, product_ident, module_ident, license_count, password);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GetLicenseServerTime(VARIANT *pvtSystemTime)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GetLicenseServerTime(pvtSystemTime);
+}
+
+// Password packet management
+STDMETHODIMP CSolimarLicenseSvr::PasswordPacketInitialize()
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.PasswordPacketInitialize(m_licenseId);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::PasswordPacketAppendPassword(VARIANT vtExpires, BSTR password)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.PasswordPacketAppendPassword(m_licenseId, vtExpires, password);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::PasswordPacketFinalize()
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.PasswordPacketFinalize(m_licenseId);
+}	
+
+STDMETHODIMP CSolimarLicenseSvr::PasswordPacketGetPacket(VARIANT *pvtPacketData)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.PasswordPacketGetPacket(m_licenseId, pvtPacketData);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::PasswordPacketGetVerificationCode(BSTR *verification_code)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.PasswordPacketGetVerificationCode(m_licenseId, verification_code);
+}
+
+
+STDMETHODIMP CSolimarLicenseSvr::KeyTrialExpires(BSTR key_ident, VARIANT *expire_date)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyTrialExpires(key_ident, expire_date);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyTrialHours(BSTR key_ident, long *trial_hours)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyTrialHours(key_ident, trial_hours);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyIsActive(BSTR key_ident, VARIANT_BOOL *key_active)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyIsActive(key_ident, key_active);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyIsProgrammed(BSTR key_ident, VARIANT_BOOL *key_programmed)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyIsProgrammed(key_ident, key_programmed);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyHeaderQuery(BSTR key_ident, long header_ident, VARIANT *value)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyHeaderQuery(key_ident, header_ident, value);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyIsPresent(BSTR key_ident, VARIANT_BOOL *key_present)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyIsPresent(key_ident, key_present);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyLock(BSTR key_ident)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyLock(m_licenseId, key_ident);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyUnlock(BSTR key_ident)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyUnlock(m_licenseId, key_ident);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyObtain(BSTR key_ident)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyObtain(m_licenseId, key_ident);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyRelease(BSTR key_ident)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyRelease(m_licenseId, key_ident);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyValidateLicense(BSTR key_ident, VARIANT_BOOL *license_valid)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyValidateLicense(m_licenseId, key_ident, license_valid);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleEnumerate(BSTR key_ident, VARIANT *key_module_list)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleEnumerate(key_ident, key_module_list);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleQuery(BSTR key_ident, long module_ident, VARIANT *vtValue)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleQuery(key_ident, module_ident, vtValue);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseTotal(BSTR key_ident, long module_ident, long* license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseTotal(m_licenseId, key_ident, module_ident, license_count);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseInUse(BSTR key_ident, long module_ident, long* license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseInUse(m_licenseId, key_ident, module_ident, license_count);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseObtain(BSTR key_ident, long module_ident, long license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseObtain(m_licenseId, key_ident, module_ident, license_count);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::KeyModuleLicenseRelease(BSTR key_ident, long module_ident, long license_count)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyModuleLicenseRelease(m_licenseId, key_ident, module_ident, license_count);
+}
+
+// Sets all writable cells on a key to zero
+STDMETHODIMP CSolimarLicenseSvr::KeyFormat(BSTR key_ident, BSTR *new_key_ident)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyFormat(key_ident, new_key_ident);
+}
+
+// Programs a key
+STDMETHODIMP CSolimarLicenseSvr::KeyProgram(BSTR key_ident, long customer_number, long key_number, long product_ident, long ver_major, long ver_minor, long key_type, long days, VARIANT module_value_list, BSTR *new_key_ident)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyProgram(key_ident, customer_number, key_number, product_ident, ver_major, ver_minor, key_type, days, module_value_list, new_key_ident);
+}
+
+// Reads raw data off of the key
+STDMETHODIMP CSolimarLicenseSvr::KeyReadRaw(BSTR key_ident, VARIANT *pvtKeyData)
+{
+	SOLIMAR_INTERNAL_PROTECTED_FUNCTION;
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.KeyReadRaw(key_ident, pvtKeyData);
+}
+
+STDMETHODIMP CSolimarLicenseSvr::GetLicenseMessageList(VARIANT *pvtMessageList)
+{
+	CHECK_CLIENT_AUTHENTICATION;
+	return keyserver.GetLicenseMessageList(m_licenseId, pvtMessageList);
+}

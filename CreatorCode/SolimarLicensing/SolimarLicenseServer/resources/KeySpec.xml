@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--<?xml-stylesheet type="text/xsl" href="KeySpec.xsl"?>-->
+
+<!--
+	Instructions for what to do after modifying this file, 
+	as well as rules for modification and an explanation of 
+	what it is for and the ramifications for changes.
+-->
+
+<!--
+		// storage sizes in bits must be a power of 2 and no greater than 32 {1,2,...16,32}
+		// offsets must be aligned to an integral multiple of bits
+-->
+
+<!-- default means that when going permanent, the module gets a certain number of licenses -->
+
+<!--
+#define KEY_START_ADDRESS        0x08
+#define INITIAL_COUNTER_CELL     0x12
+#define EXTENDED_COUNTER_CELL    0x13
+#define PRIMARY_ALG_CELL         0x14
+#define PRIMARY_PASSWD_CELL      0x16
+#define EXPIRATION_DATE_CELL     0x18
+#define SECONDARY_ALG_CELL       0x22
+#define KEY_TYPE_CELL            0x30
+#define PRODUCT_ID_CELL          0x31
+#define PRODUCT_VERSION_CELL     0x32
+#define KEY_VERSION_CELL         0x33
+#define KEY_USES_CELL            0x34
+#define KEY_STATUS_CELL          0x35
+#define CUSTOMER_NUMBER_CELL     0x36
+#define KEY_NUMBER_CELL          0x37
+
+   if (RNBOsproRead(p_packet, KEY_START_ADDRESS+KEY_STATUS_CELL, RBP_WORD(&status)) ||
+         RNBOsproRead(p_packet, KEY_START_ADDRESS+CUSTOMER_NUMBER_CELL, RBP_WORD(&customer_number)) ||
+         RNBOsproRead(p_packet, KEY_START_ADDRESS+PRODUCT_ID_CELL, RBP_WORD(&product_id)))
+
+enum ProductId {
+0	SPD_PRODUCT
+1	XIMAGE_PRODUCT
+2	XIMAGENT_PRODUCT
+3	SOLPCLNT_PRODUCT
+4	NOT_AVAILABLE
+5	INDEX_PLUGIN
+6	CONNECT_PRODUCT
+7	ICONVERT_PRODUCT
+8	SOLSEARCHER_ENTERPRISE_PRODUCT
+9	SOLSCRIPT_PRODUCT
+10	SDX_DESIGNER_PRODUCT
+11	QUANTUM_PRODUCT
+12	NUMBER_OF_PRODUCTS
+0xFFFF	UNKNOWN_PRODUCT
+};
+-->
+
+
+<!-- 
+TODO:
+Take in to account on/off (same as unlimited?), pooled, limited and unlimited licenses
+Fill out the Ximage SolScript and other non-'SPD Style Module' keys with module information
+Write a description of the key layout to aid with adding/modifying entries
+Find a solution for pages per minute that is somewhat transparent to the upper layers (maybe add an attribute to modules that specify storage location (registry vs key))
+Examine the idea of using the key for just a hash of the licensing info and storing all the licensing in a file/registry
+Add a way to take in to account enumeration types or multiplied fields (eg.: Concurrent Sesssions in SolSearcher)
+-->
+
+<!-- 
+	ModuleInclude optional attributes:
+	
+	default			integer		(default: 0)
+					A default module is one that gets licensed by default when moving a key from 
+					a trial state to a permanent state. The value specified in default is the number
+					of licenses that this module recieves when moving to a permanent state.
+					
+	licenseRead		string		(default: '')
+					For modules that have special interpretation of the value stored on the key, this 
+					attribute defines a function that maps the value on the key to a number of licenses.
+					(This function should be the inverse of licenseWrite)
+					
+					The syntax of this string is the code in a C language function with the following 
+					prototype:	long LicenseReadFunction(const long value);
+					
+					So a function that multiplies the number on the key by 100 is modelled by the 
+					following function:
+					
+					unsigned int LicenseReadFunction(const unsigned int value)
+					{
+						return (value * 100);
+					}
+					
+					the string specified for licenseRead would be the string 'value * 100'		
+					
+					A module that makes use of this is the 'Concurrent Users' of SOLSearcher.
+					Special case: Empty string indicates the identity function.
+					
+	licenseWrite	string		(default: '')
+					For modules that have special interpretation of the value stored on the key, this 
+					attribute defines a function that maps a number of licenses to a value on the key.
+					(This function should be the inverse of licenseWrite)
+					
+					The syntax of this string is the code in a C language function with the following 
+					prototype:	unsigned int LicenseWriteFunction(const unsigned int value);
+					
+					So a function that divides the number of licenses by 100 is modelled by the 
+					following function:
+					
+					unsigned int LicenseWriteFunction(const unsigned int value)
+					{
+						return (value / 100);
+					}
+					
+					the string specified for licenseRead would be the string 'value / 100'
+					
+					A module that makes use of this is the 'Concurrent Users' of SOLSearcher.
+					Special case: Empty string indicates the identity function.
+				
+	isLicense		true | false	(default: true)
+					Determines whether a module is interpreted as a license count or an arbitrary integer 
+					to be interpreted by the client. Most modules are license counts, so most (if not all)
+					modules will have isLicense set to true.
+				
+	unlimited		integer		(default: 0)
+					An unlimited module license is a license that can be obtained an infinite number of 
+					times. This attribute specifies the minimum number of licenses at which a license 
+					becomes an unlimited license. For instance, if unlimited="10" is specified, and the key 
+					specifies 9 as the number of licenses, then up to 9 licenses can be obtained at once.
+					If the key specifies 10, the license satisfies the unlimited threshold and is then 
+					treated as an unlimited license, and thus an infinite number of licenses can be obtained.
+					Special case: 0 indicates that the module license is never treated as infinite.
+					
+	isPool			true | false	(default: false)
+					A pooled module is one that shares a set of licenses with one or more modules.
+					If isPool is true on a module, this indicates that this module serves as the storage space
+					for the shared license. Any modules participating in the pool will use the 'pool' attribute
+					to indicate that they participate in this pool, and the participating module's storage
+					specification (offset,bits) indicate then whether that module is enabled or not.
+					
+	pool			integer	(default: 0)
+					A pooled module is one that shares a set of licenses with one or more modules. This value
+					indicates the id of a Pool to associate this module with.
+					Special case: 0 indicates that a module is not a pooled license module.
+-->
+
+
+<KeyFormat>
+	<!--	offset is measured in bits (decimal or hex) from address 0 on the key, and bits is the size of the field in bits -->
+	<KeyStorage bits="1096">
+		<KeyStorageRegion type="serial" offset="0x000" bits="32"/>
+		<KeyStorageRegion type="inaccessible" offset="0x020" bits="96"/>
+		<KeyStorageRegion type="module" offset="0x080" bits="288"/>
+		<KeyStorageRegion type="header" offset="0x1A0" bits="224"/>
+		<KeyStorageRegion type="module" offset="0x280" bits="16"/>
+		<KeyStorageRegion type="header" offset="0x290" bits="112"/>		
+		<KeyStorageRegion type="module" offset="0x300" bits="64"/>
+		<KeyStorageRegion type="header" offset="0x340" bits="192"/>
+	</KeyStorage>
+	<KeyHeader>
+		<HeaderField id="10000" offset="0x000" bits="16" name="Serial Number"/>
+		<HeaderField id="10001" offset="0x010" bits="16" name="Developer ID"/>
+		<HeaderField id="10002"	offset="0x1A0" bits="16" name="Initial Counter"/>
+		<HeaderField id="10003"	offset="0x1B0" bits="16" name="Extended Counter"/>
+		<HeaderField id="10004"	offset="0x1C0" bits="32" name="Primary Descriptor" default="0x9AAB6B01"/>
+		<HeaderField id="10005"	offset="0x1E0" bits="32" name="Primary Password" default="0x1A00FED1"/>
+		<HeaderField id="10006"	offset="0x200" bits="32" name="Expiration Date"/>
+		<HeaderField id="10007"	offset="0x2A0" bits="32" name="Secondary Descriptor" default="0xBF0A1143"/>
+		<!-- We may need to move this field if it's in the way of counter/algorithm cells -->
+		<HeaderField id="10030" offset="0x340" bits="16" name="Key Host"/>
+		<HeaderField id="10020"	offset="0x380" bits="16" name="Key Type"/>
+		<HeaderField id="10021"	offset="0x390" bits="16" name="Product ID"/>
+		<HeaderField id="10022"	offset="0x3A0" bits="16" name="Product Version"/>
+		<HeaderField id="10023"	offset="0x3B0" bits="16" name="Key Version"/>
+		<HeaderField id="10024"	offset="0x3C0" bits="16" name="Uses"/>
+		<HeaderField id="10025"	offset="0x3D0" bits="16" name="Status"/>
+		<HeaderField id="10026"	offset="0x3E0" bits="16" name="Customer Number"/>
+		<HeaderField id="10027"	offset="0x3F0" bits="16" name="Key Number"/>
+	</KeyHeader>
+	<KeyLayouts>
+		<KeyLayout name="SPD">
+			<ModuleList>
+				<!-- regular modules -->
+				<Module id="2"	offset="0x084" bits="4" name="XCHANGE::IPDS"/>
+				<Module id="3"	offset="0x080" bits="4" name="Job Separator"/>
+				<Module id="4"	offset="0x09c" bits="4" name="XCHANGE::Metacode"/>
+				<Module id="5"	offset="0x098" bits="4" name="3211::ASCII"/>
+				<Module id="6"	offset="0x094" bits="4" name="Twinax Input"/>
+				<Module id="7"	offset="0x090" bits="4" name="SCSI SDI Output"/>
+				<Module id="8"	offset="0x0ac" bits="4" name="Parallel Input"/>
+				<Module id="9"	offset="0x0a8" bits="4" name="ASCII::3211"/>
+				<Module id="10"	offset="0x0a4" bits="4" name="SCS::3211"/>
+				<Module id="11"	offset="0x0a0" bits="4" name="SCS::Metacode"/>
+				<Module id="12" offset="0x0bc" bits="4" name="PostScript::PostScript (Rip)"/>
+				<Module id="13" offset="0x0b8" bits="4" name="PDF::PostScript (Rip)"/>
+				<Module id="14"	offset="0x0b4" bits="4" name="PCL::Metacode"/>
+				<Module id="15"	offset="0x0b0" bits="4" name="Bus/Tag Output (PCI)"/>
+				<Module id="16"	offset="0x0cc" bits="4" name="Bus/Tag Output (AT)"/>
+				<Module id="17"	offset="0x0c8" bits="4" name="File Queuer"/>
+				<Module id="18"	offset="0x0c4" bits="4" name="Disk Spooler"/>
+				<Module id="19"	offset="0x0c0" bits="4" name="Data Converter"/>
+				<Module id="20"	offset="0x0dc" bits="4" name="XRocks Printer Controller"/>
+				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
+				<Module id="22"	offset="0x0d4" bits="4" name="Novell Queuer"/>
+				<Module id="23"	offset="0x0d0" bits="4" name="Novell Spooler" pool="128" unlimited="1"/>
+				<Module id="24"	offset="0x0ec" bits="4" name="Blocker"/>
+				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
+				<Module id="26"	offset="0x0e4" bits="4" name="Windows Printer Spooler" pool="128" unlimited="1"/>
+				<Module id="27"	offset="0x0e0" bits="4" name="FTP Queuer"/>
+				<Module id="28"	offset="0x0fc" bits="4" name="TCP/IP lpd Input"/>
+				<Module id="29"	offset="0x0f8" bits="4" name="TCP/IP lpr Output" pool="128" unlimited="1"/>
+				<Module id="30"	offset="0x0f4" bits="4" name="TCP/IP Input (DOS)"/>
+				<Module id="31"	offset="0x0f0" bits="4" name="TCP/IP Output (DOS)"/>
+				<Module id="32"	offset="0x10c" bits="4" name="Dummy"/>
+				<Module id="33"	offset="0x108" bits="4" name="Trash Can"/>
+				<Module id="34"	offset="0x104" bits="4" name="PostScript Printer"/>
+				<Module id="35"	offset="0x100" bits="4" name="XCHANGE::PCL"/>
+				<Module id="36"	offset="0x11c" bits="4" name="RJE/SNA::3211"/>
+				<Module id="37"	offset="0x118" bits="4" name="Parallel Output"/>
+				<Module id="38"	offset="0x114" bits="4" name="Bus/Tag Input (polaris)"/>
+				<Module id="39"	offset="0x110" bits="4" name="XCHANGE::PS"/>
+				<Module id="40"	offset="0x12c" bits="4" name="XCHANGE::PDF"/>
+				<Module id="41"	offset="0x128" bits="4" name="IPDS Output"/>
+				<Module id="42"	offset="0x124" bits="4" name="Line Data::AFPDS"/>
+				<!-- pages per minute extensions -->
+				<Module id="43" offset="0x120" bits="4" name="Pages Per Minute Extensions" isLicense="false"/>
+				<Module id="44"	offset="0x13c" bits="4" name="XCHANGE::PS (DBCS)"/>
+				<Module id="45"	offset="0x138" bits="4" name="File Inserter"/>
+				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
+				<Module id="47"	offset="0x130" bits="4" name="AFPDS::PS"/>
+				<Module id="48"	offset="0x14c" bits="4" name="PDF::Metacode"/>
+				<Module id="49"	offset="0x148" bits="4" name="PDF::IPDS"/>
+				<Module id="50"	offset="0x144" bits="4" name="PDF::TIFF"/>
+				<Module id="51"	offset="0x140" bits="4" name="AFPDS::PDF"/>
+				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF"/>
+				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
+				<Module id="54"	offset="0x154" bits="4" name="Output Selector"/>
+				<Module id="55" offset="0x150" bits="4" name="PDF::PostScript"/>				
+				<Module id="56" offset="0x16c" bits="4" name="SMART"/>
+				
+				<!-- regular modules -->
+				<Module id="62"	offset="0x174" bits="4" name="Tape Input"/>
+				<Module id="63"	offset="0x170" bits="4" name="3770so"/>
+				
+				<!-- Output Pool module -->
+				<Module id="128" offset="0x280" bits="16" name="Output Pool" isPool="true" unlimited="10"/>
+				
+				<!-- pages per minute modules -->
+				<Module id="64" offset="0x180" bits="8" name="XCHANGE::PS (DBCS) PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="66" offset="0x188" bits="8" name="AFPDS::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				
+				<!-- pages per minute modules -->
+				<Module id="68" offset="0x190" bits="8" name="XCHANGE::IPDS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="70" offset="0x198" bits="8" name="XCHANGE::PCL PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+				<Module id="160" offset="0x300" bits="8" name="XCHANGE::PS PPM" licenseRead="(value * 2)" licenseWrite="((value / 2) + (value % 2))" unlimited="500"/>
+			</ModuleList>
+			<ProductList>
+				<Product id="0" name="SPD">					
+					<ModuleInclude id="2" default="0"/>
+					<ModuleInclude id="3" default="15"/>
+					<ModuleInclude id="4" default="0"/>
+					<ModuleInclude id="5" default="15"/>
+					<ModuleInclude id="6" default="0"/>
+					<ModuleInclude id="7" default="0"/>
+					<ModuleInclude id="8" default="0"/>
+					<ModuleInclude id="9" default="15"/>
+					<ModuleInclude id="10" default="0"/>
+					<ModuleInclude id="11" default="0"/>
+					<ModuleInclude id="12" default="0"/>
+					<ModuleInclude id="13" default="0"/>
+					<ModuleInclude id="14" default="0"/>
+					<ModuleInclude id="15" default="0"/>
+					<ModuleInclude id="16" default="0"/>
+					<ModuleInclude id="17" default="15"/>
+					<ModuleInclude id="18" default="15"/>
+					<ModuleInclude id="19" default="15"/>
+					<ModuleInclude id="20" default="15"/>
+					<ModuleInclude id="21" default="0"/>
+					<ModuleInclude id="22" default="0"/>
+					<ModuleInclude id="23" default="0"/>
+					<ModuleInclude id="24" default="15"/>
+					<ModuleInclude id="25" default="0"/>
+					<ModuleInclude id="26" default="0"/>
+					<ModuleInclude id="27" default="0"/>
+					<ModuleInclude id="28" default="0"/>
+					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="30" default="0"/>
+					<ModuleInclude id="31" default="0"/>
+					<ModuleInclude id="33" default="15"/>
+					<ModuleInclude id="34" default="0"/>
+					<ModuleInclude id="35" default="0"/>
+					<ModuleInclude id="36" default="0"/>
+					<ModuleInclude id="37" default="0"/>
+					<ModuleInclude id="38" default="0"/>
+					<ModuleInclude id="39" default="0"/>
+					<ModuleInclude id="40" default="0"/>
+					<ModuleInclude id="41" default="0"/>
+					<ModuleInclude id="42" default="0"/>
+					<ModuleInclude id="44" default="0"/>
+					<ModuleInclude id="45" default="15"/>
+					<ModuleInclude id="46" default="0"/>
+					<ModuleInclude id="47" default="0"/>
+					<ModuleInclude id="48" default="0"/>
+					<ModuleInclude id="49" default="0"/>
+					<ModuleInclude id="50" default="0"/>
+					<ModuleInclude id="51" default="0"/>
+					<ModuleInclude id="52" default="0"/>
+					<ModuleInclude id="53" default="0"/>
+					<ModuleInclude id="54" default="15"/>
+					<ModuleInclude id="55" default="0"/>
+					<ModuleInclude id="56" default="0"/>
+					<ModuleInclude id="62" default="0"/>
+					<ModuleInclude id="63" default="0"/>
+					
+					<!-- output pool and pages per minute stuff -->
+					<ModuleInclude id="128" default="0"/>
+					<ModuleInclude id="43" default="0"/>
+					<ModuleInclude id="68" default="0"/>
+					<ModuleInclude id="70" default="0"/>
+					<ModuleInclude id="160" default="0"/>
+					<ModuleInclude id="64" default="0"/>
+					<ModuleInclude id="66" default="0"/>
+				</Product>
+				<Product id="6" name="Connectivity Server">
+					<ModuleInclude id="3" default="15"/>
+					<ModuleInclude id="5" default="15"/>
+					<ModuleInclude id="6" default="0"/>
+					<ModuleInclude id="7" default="0"/>
+					<ModuleInclude id="8" default="0"/>
+					<ModuleInclude id="9" default="15"/>
+					<ModuleInclude id="10" default="15"/>
+					<ModuleInclude id="11" default="0"/>
+					<ModuleInclude id="14" default="15"/>
+					<ModuleInclude id="15" default="0"/>
+					<ModuleInclude id="17" default="15"/>
+					<ModuleInclude id="18" default="15"/>
+					<ModuleInclude id="19" default="15"/>
+					<ModuleInclude id="20" default="15"/>
+					<ModuleInclude id="21" default="0"/>
+					<ModuleInclude id="22" default="0"/>
+					<ModuleInclude id="23" default="0"/>
+					<ModuleInclude id="24" default="15"/>
+					<ModuleInclude id="26" default="0"/>
+					<ModuleInclude id="27" default="0"/>
+					<ModuleInclude id="28" default="15"/>
+					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="33" default="15"/>
+					<ModuleInclude id="36" default="0"/>
+					<ModuleInclude id="37" default="0"/>
+					<ModuleInclude id="38" default="0"/>
+					<ModuleInclude id="45" default="15"/>
+					<ModuleInclude id="54" default="15"/>
+					<ModuleInclude id="63" default="0"/>
+					
+					<!-- output pool and pages per minute stuff -->
+					<ModuleInclude id="128" default="0"/>
+					<ModuleInclude id="43" default="0"/>
+					<ModuleInclude id="68" default="0"/>
+					<ModuleInclude id="70" default="0"/>
+					<ModuleInclude id="160" default="0"/>
+					<ModuleInclude id="64" default="0"/>
+					<ModuleInclude id="66" default="0"/>
+				</Product>
+				<Product id="11" name="Quantum Server">
+					<ModuleInclude id="3" default="15"/>
+					<ModuleInclude id="12" default="0"/>
+					<ModuleInclude id="13" default="0"/>
+					<ModuleInclude id="17" default="15"/>
+					<ModuleInclude id="18" default="15"/>
+					<ModuleInclude id="19" default="15"/>
+					<ModuleInclude id="26" default="0"/>
+					<ModuleInclude id="27" default="0"/>
+					<ModuleInclude id="28" default="0"/>
+					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="33" default="15"/>
+					<ModuleInclude id="45" default="15"/>
+					<ModuleInclude id="52" default="0"/>
+					<ModuleInclude id="53" default="0"/>
+					<ModuleInclude id="54" default="15"/>
+					<ModuleInclude id="55" default="0"/>
+					<ModuleInclude id="56" default="0"/>
+					
+					<!-- output pool and pages per minute stuff -->
+					<ModuleInclude id="128" default="0"/>
+					<ModuleInclude id="43" default="0"/>
+					<ModuleInclude id="68" default="0"/>
+					<ModuleInclude id="70" default="0"/>
+					<ModuleInclude id="160" default="0"/>
+					<ModuleInclude id="64" default="0"/>
+					<ModuleInclude id="66" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="SolScript">
+			<ModuleList>
+				<!-- regular modules -->
+				<Module id="0" offset="0x08c" bits="4" name="Distiller"/>
+				<Module id="1" offset="0x088" bits="4" name="GhostScript"/>
+				<Module id="21"	offset="0x0d8" bits="4" name="PostScript::Metacode"/>
+				<Module id="25"	offset="0x0e8" bits="4" name="PostScript::IPDS"/>
+				<Module id="46"	offset="0x134" bits="4" name="PostScript::TIFF"/>
+				<Module id="52"	offset="0x15c" bits="4" name="PostScript::PDF"/>
+				<Module id="53"	offset="0x158" bits="4" name="PostScript::PostScript"/>
+			</ModuleList>
+			<ProductList>
+				<Product id="9" name="SolScript">
+					<ModuleInclude id="0" default="0"/>
+					<ModuleInclude id="1" default="0"/>
+					<ModuleInclude id="21" default="0"/>
+					<ModuleInclude id="25" default="0"/>
+					<ModuleInclude id="46" default="0"/>
+					<ModuleInclude id="52" default="0"/>
+					<ModuleInclude id="53" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="XImage">
+			<ModuleList>
+			</ModuleList>
+			<ProductList>
+				<Product id="1" name="XImage">
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="XImage NT">
+			<ModuleList>
+			</ModuleList>
+			<ProductList>
+				<Product id="2" name="XImage NT">
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="PCL Driver">
+			<ModuleList>
+			</ModuleList>
+			<ProductList>
+				<Product id="3" name="PCL Driver">
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="Index Plugin">
+			<ModuleList>
+			</ModuleList>
+			<ProductList>
+				<Product id="5" name="Index Plugin">
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="iConvert">
+			<ModuleList>
+				<Module id="0"	offset="0x08c" bits="4" name="APPC" pool="128"/>
+				<Module id="1"	offset="0x088" bits="4" name="LUA" pool="128"/>
+				<Module id="2"	offset="0x084" bits="4" name="TCP/IP" pool="128"/>
+				<Module id="8"	offset="0x0ac" bits="4" name="Docserver Job Event"/>
+				<Module id="12"	offset="0x0bc" bits="4" name="IPDS::PCL"/>
+				<Module id="13"	offset="0x0b8" bits="4" name="IPDS::PDF"/>
+				<Module id="14"	offset="0x0b4" bits="4" name="IPDS::PS"/>
+				<Module id="15"	offset="0x0b0" bits="4" name="IPDS::TIFF"/>
+				<Module id="29"	offset="0x0f8" bits="4" name="AFP Job Event"/>
+				<Module id="32"	offset="0x10c" bits="4" name="AFP::PCL"/>
+				<Module id="33"	offset="0x108" bits="4" name="AFP::PDF"/>
+				<Module id="34"	offset="0x104" bits="4" name="AFP::PS"/>
+				<Module id="35"	offset="0x100" bits="4" name="AFP::TIFF"/>
+				<Module id="40"	offset="0x12c" bits="4" name="IConvertEncryption"/>
+				<Module id="41"	offset="0x128" bits="4" name="IConvertURL"/>
+				<Module id="42"	offset="0x124" bits="4" name="IConvertOverlay"/>
+				<Module id="43"	offset="0x120" bits="4" name="IConvertType1"/>
+				<Module id="48"	offset="0x14c" bits="4" name="AFPEncryption"/>
+				<Module id="49"	offset="0x148" bits="4" name="AFPURL"/>
+				<Module id="50"	offset="0x144" bits="4" name="AFPOverlay"/>
+				<Module id="51"	offset="0x140" bits="4" name="AFPType1"/>
+				<Module id="56"	offset="0x16c" bits="4" name="Emailer"/>
+				<!-- Max LU pool cell -->
+				<Module id="128" offset="0x280" bits="16" name="Max LU" isPool="true"/>
+			</ModuleList>
+			<ProductList>
+				<Product id="7" name="iConvert">
+					<ModuleInclude id="0" default="15"/>
+					<ModuleInclude id="1" default="15"/>
+					<ModuleInclude id="2" default="15"/>
+					<ModuleInclude id="8" default="0"/>
+					<ModuleInclude id="12" default="0"/>
+					<ModuleInclude id="13" default="0"/>
+					<ModuleInclude id="14" default="0"/>
+					<ModuleInclude id="15" default="0"/>
+					<ModuleInclude id="29" default="0"/>
+					<ModuleInclude id="32" default="0"/>
+					<ModuleInclude id="33" default="0"/>
+					<ModuleInclude id="34" default="0"/>
+					<ModuleInclude id="35" default="0"/>
+					<ModuleInclude id="40" default="0"/>
+					<ModuleInclude id="41" default="0"/>
+					<ModuleInclude id="42" default="0"/>
+					<ModuleInclude id="43" default="0"/>
+					<ModuleInclude id="48" default="0"/>
+					<ModuleInclude id="49" default="0"/>
+					<ModuleInclude id="50" default="0"/>
+					<ModuleInclude id="51" default="0"/>
+					<ModuleInclude id="56" default="0"/>
+					<ModuleInclude id="128" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="SolSearcher Enterprise">
+			<ModuleList>
+				<Module id="0"	offset="0x080" bits="16" name="Index Servers"/>
+				<Module id="1"	offset="0x090" bits="16" name="Report Servers"/>
+				<Module id="2"	offset="0x0A0" bits="16" name="Concurrent Users" licenseRead="(value * 25)" licenseWrite="(value / 25)"/>
+				<Module id="3"	offset="0x0B0" bits="16" name="Application Databases"/>
+			</ModuleList>
+			<ProductList>
+				<Product id="8" name="SolSearcher Enterprise">
+					<ModuleInclude id="0" default="0"/>
+					<ModuleInclude id="1" default="0"/>
+					<ModuleInclude id="2" default="0"/>
+					<ModuleInclude id="3" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+		<KeyLayout name="SDX Designer">
+			<ModuleList>
+				<Module id="0"	offset="0x08c" bits="4" name="SDX Designer"/>
+				<Module id="1"	offset="0x088" bits="4" name="Sol Indexer"/>
+			</ModuleList>
+			<ProductList>
+				<Product id="10" name="SDX Designer">
+					<ModuleInclude id="0" default="0"/>
+					<ModuleInclude id="1" default="0"/>
+				</Product>
+			</ProductList>
+		</KeyLayout>
+	</KeyLayouts>
+</KeyFormat>

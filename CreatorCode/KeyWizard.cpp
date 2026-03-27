@@ -180,7 +180,7 @@ void __fastcall TKeyWizardFrm::ProductComboBoxChange(TObject *Sender)
          SPD_LEGACY = false;
       }
    }
-   else if (m_selectedProduct == SOLSCRIPT_PRODUCT) {
+   else if (m_selectedProduct == SOLSCRIPT_PRODUCT || m_selectedProduct == SDX_DESIGNER_PRODUCT) {
       WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
       key_type_flag = ktfSPD;
       m_bModules    = true;
@@ -390,6 +390,7 @@ void __fastcall TKeyWizardFrm::ui_daysChange(TObject *Sender)
       }
 
       edited_days_value = number_of_days;
+      key_record->num_days = edited_days_value;
    }
 }
 
@@ -637,6 +638,23 @@ void __fastcall TKeyWizardFrm::NextBtnClick(TObject *Sender)
                   m_selectedProduct == CONNECT_PRODUCT   ||
                   m_selectedProduct == QUANTUM_PRODUCT   ||
                   m_selectedProduct == ICONVERT_PRODUCT) {
+            //Select Modules
+            state.push( wsModuleSelection );
+            active_panel = ModuleProgramPanel;
+
+            ///if(MODULE_STATE_CHANGE) {
+               WizardModuleFrame->initialize(MODE_3, m_selectedProduct);
+               WizardModuleFrame->load(key_record, true);
+               OutputUnits->Position = ((SpdProtectionKey*)(key_record->pkey))->outputUnits;
+            ///}
+
+            //enable NextBtn - user is not required to make any chages
+            NextBtn->Enabled = true;
+            active_panel->BringToFront();
+            active_panel->Visible = true;
+         }
+         else if (m_selectedProduct == SDX_DESIGNER_PRODUCT )
+         {
             //Select Modules
             state.push( wsModuleSelection );
             active_panel = ModuleProgramPanel;
@@ -1208,7 +1226,8 @@ void __fastcall TKeyWizardFrm::keyTypeComboBoxChange(TObject *Sender)
             m_selectedProduct == CONNECT_PRODUCT   ||
             m_selectedProduct == QUANTUM_PRODUCT   ||
             m_selectedProduct == ICONVERT_PRODUCT  ||
-            m_selectedProduct == SOLSCRIPT_PRODUCT) {
+            m_selectedProduct == SOLSCRIPT_PRODUCT ||
+            m_selectedProduct == SDX_DESIGNER_PRODUCT) {
       if (moduleState == msMax) {
          //initialize uses productId and productVersion
          key_record->pkey->productId = getSelectedProduct();
