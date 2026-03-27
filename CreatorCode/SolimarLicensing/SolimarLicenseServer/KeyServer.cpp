@@ -15,7 +15,7 @@ typedef std::vector<String> StringList;
 
 // only include the password packet signing PRIVATE key on debug and solimar internal builds
 BYTE KeyServer::crypto_key_password_packet_private[] = {
-#if defined(_Solimar_Internal) || defined(_DEBUG)
+#if defined(_SOLIMAR_INTERNAL) || defined(_DEBUG)
 #include "..\common\keys\SolimarLicensingPacket.private.key.txt"
 #else
 #include "..\common\keys\SolimarLicensingPacket.public.key.txt"

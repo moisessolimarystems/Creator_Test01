@@ -6,7 +6,7 @@
 
 // The macro SOLIMAR_INTERNAL_PROTECTED_FUNCTION will return from a function immediately for release builds.
 // The purpose of this is to protect some licensing functions from being accessable to the customer.
-#if !defined(_Solimar_Internal) && !defined(_DEBUG)
+#if !defined(_SOLIMAR_INTERNAL) && !defined(_DEBUG)
 #define SOLIMAR_INTERNAL_PROTECTED_FUNCTION return HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED)
 #else
 #define SOLIMAR_INTERNAL_PROTECTED_FUNCTION 

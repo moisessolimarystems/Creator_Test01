@@ -711,6 +711,10 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 				}
 				catch (_com_error &e)
 				{
+					//xxx debug message
+					wchar_t buf[128];
+					swprintf(buf, L"ProtectionKey::Program() Invalid Argument: WriteLicense or WriteModule (%d, %d)", module_id, module_value);
+					OutputDebugStringW(buf);
 					return e.Error();
 				}
 			}
@@ -718,6 +722,10 @@ HRESULT ProtectionKey::Program(long customer_number, long key_number, long produ
 	}
 	else if (module_value_list.vt != VT_EMPTY)
 	{
+		//xxx debug message
+		wchar_t buf[128];
+		swprintf(buf, L"ProtectionKey::Program() Invalid Argument: module_value_list.vt == %08x", module_value_list.vt);
+		OutputDebugStringW(buf);
 		return E_INVALIDARG;
 	}
 	
@@ -1023,12 +1031,9 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 					// SolScript legacy code (based on SPD keys for older modules)
 					if (product_id==9)
 					{
-						// for spd modules
-						if (password_arguments.module==21 || password_arguments.module==25 || password_arguments.module==46 || password_arguments.module==52 || password_arguments.module==53 || password_arguments.module==0 || password_arguments.module==1)
-						{
-							if (EnterSPDModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
-								return S_OK;
-						}
+						// for spd modules (all modules are currently legacy spd style modules)
+						if (EnterSPDModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, password_arguments.module, password_arguments.units_licensed))
+							return S_OK;
 					}
 					
 					// Generic module password code
@@ -1085,12 +1090,9 @@ HRESULT ProtectionKey::EnterPassword(BSTR password)
 				// foreach solscript module
 				for (KeySpec::Product::data_list_t::iterator module = m_keyspec->products[product_id].data.begin(); module != m_keyspec->products[product_id].data.end(); ++module)
 				{
-					// for spd modules
-					if (module->id==21 || module->id==25 || module->id==46 || module->id==52 || module->id==53 || module->id==0 || module->id==1)
-					{
-						if (EnterSPDModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, module->id, password_arguments.units_licensed))
-							return S_OK;
-					}
+					// for spd modules (all modules are currently legacy spd style modules)
+					if (EnterSPDModulePassword(user_password, trial_key, base_key, permanent_allowed_key, customer_number, key_number, module->id, password_arguments.units_licensed))
+						return S_OK;
 				}
 			}
 			
@@ -1648,13 +1650,10 @@ HRESULT ProtectionKey::GenerateModulePassword(long customer_number, long key_num
 		// SolScript
 		case 9:	
 		{
-			// for spd modules
-			if (module.id==21 || module.id==25 || module.id==46 || module.id==52 || module.id==53 || module.id==0 || module.id==1)
-			{
-				password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
-				swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
-				password_generated = true;
-			}
+			// for spd modules (all modules are currently legacy spd style modules)
+			password_hash = GetSPDModulePassword((unsigned short)customer_number, (unsigned short)key_number, (unsigned int)module.id, (unsigned int)license_count);
+			swprintf(password_string, L"%x-%d-4-%x-%x-%d", password_hash, license_count, customer_number, key_number, module.id);
+			password_generated = true;
 			break;
 		}
 	}
