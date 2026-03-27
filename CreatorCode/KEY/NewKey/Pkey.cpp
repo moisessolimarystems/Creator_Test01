@@ -94,6 +94,9 @@
 //                               decremented based on time running.        *
 //                                                                         *
 //-------------------------------------------------------------------------*
+#include <vcl.h>
+#pragma hdrstop
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>     // rand()
@@ -124,6 +127,8 @@
 #include "spdkey.h"
 #include "SSKey.h"
 #include "ssckey.hpp"
+#include "sdxkey.h"
+#include "pdfkey.hpp"
 
 // protection key passwords and developer ID
 const ushort WRITE_PASSWORD = 0x4AFC;
@@ -163,6 +168,7 @@ const char* ProductText[] =
    "SOLscript",                                                 // SOLSCRIPT_PRODUCT = 9
    "SDX Designer",                                              // SDX_DESIGNER_PRODUCT = 10
    "Quantum Server",															 // QUANTUM_PRODUCT = 11
+   "PDF Utility",                                               // PDF Utility = 12
 // "123456789" <-- Maximum product name length is 9
 };
 
@@ -185,6 +191,7 @@ const char* longProductText[] =
    "SOLscript ",                                                // SOLSCRIPT_PRODUCT = 9
    "SDX Designer ",                                             // SDX_DESIGNER_PRODUCT = 10
 	"Solimar Print/Director, Quantum Server Edition ",           // QUANTUM_PRODUCT = 11
+   "PDF Utility ",                                              // PDF Utility = 12
 };
 
 /* productText[]
@@ -205,6 +212,7 @@ const char* mediumProductText[] =
    "SOLscript ",                             // SOLSCRIPT_PRODUCT = 9
    "SDX Designer ",                          // SDX_DESIGNER_PRODUCT = 10
    "SP/D, Quantum Server",							// QUANTUM_PRODUCT = 11
+   "PDF Utility",                            // PDF Utility = 12
 };
 
 /* KDPasswordText[]
@@ -480,7 +488,10 @@ ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr* pServer,
                                 )
 {
    if(!pServer)
+   {
+      Application->MessageBox("Not connected to the server.", "Information", MB_OK);
       return 1;
+   }
 
    long ProductVersion = keyDataBlock.data[PRODUCT_VERSION_CELL];
 
@@ -505,10 +516,17 @@ ulong ProtectionKey::ProgramKey(ISolimarLicenseSvr* pServer,
                             pTheKeyID       //the key id after being programmed
                            );
 
-   if(SUCCEEDED(hr))
-      return 0;
+   if(FAILED(hr))
+   {
+      char  buffer[200];
+      char  s[] = "PKey::ProgramKey Failed.";
+      sprintf( buffer,"%s %08x\n", s, hr);
 
-   return 1;
+      Application->MessageBox(buffer, "Information", MB_OK);
+      return 1;
+   }
+
+   return 0;
 }
 
 
@@ -795,11 +813,16 @@ ProtectionKey* ProtectionKey::newKey(ProductId product_id)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
+         break;
       default:
          new_key = new ProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
+         break;
+      case PDF_UTILITY:
+         new_key = new PDFUtilityProtectionKey();
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
@@ -848,11 +871,16 @@ ProtectionKey* ProtectionKey::newKey(BSTR* KeyID, ISolimarLicenseSvr* pServer)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey();
+         break;
       default:
          new_key = new ProtectionKey();
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey();
+         break;
+      case PDF_UTILITY:
+         new_key = new PDFUtilityProtectionKey();
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
@@ -886,11 +914,16 @@ ProtectionKey* ProtectionKey::newKey(const ProtectionKey* pkey)
       case SOLPCLNT_PRODUCT:
       case INDEX_PLUGIN:
       case SDX_DESIGNER_PRODUCT:
+         new_key = new SDXDesignerProtectionKey(*(SDXDesignerProtectionKey*)pkey);
+         break;
       default:
          new_key = new ProtectionKey(*pkey);
          break;
       case SOLSEARCHER_ENTERPRISE_PRODUCT:
          new_key = new SSProtectionKey(*(SSProtectionKey*)pkey);
+         break;
+      case PDF_UTILITY:
+         new_key = new PDFUtilityProtectionKey(*(PDFUtilityProtectionKey*)pkey);
          break;
 #ifndef __NO_SOLSCRIPT_KEY__
       case SOLSCRIPT_PRODUCT:
@@ -917,8 +950,9 @@ short ProtectionKey::readKeyData(ISolimarLicenseSvr* pServer, BSTR* KeyID)
    DWORD FirstDataCell;
    DWORD NumberOfCells;
 
+   HRESULT hr;
    //reads the raw data from the key and returns a safe array of bytes
-   if(!SUCCEEDED(pServer->KeyReadRaw(*KeyID, pKeyData)))
+   if(!SUCCEEDED(hr = pServer->KeyReadRaw(*KeyID, pKeyData)))
       return FAILURE;
 
    // SafeArrayAccessData and SafeArrayUnaccessData are win32 functions

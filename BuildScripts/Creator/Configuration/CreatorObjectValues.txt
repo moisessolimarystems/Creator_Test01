@@ -1,0 +1,43 @@
+'SolimarLicenseServer: Depends on nothing
+DependencyList = Null
+CompilerType = mvsNet_Program
+CompilerOption =  /build release /project "SolimarLicenseServer"
+ProjectLocation = \\CreatorCode\\SolimarLicensing\\
+ProjectFile = SolimarLicensing.sln
+SourceLocation = \CreatorCode\SolimarLicensing\Image\
+DestinationLocation = \CreatorCode\SolimarLicensing\
+FilesArray = SolimarLicenseServer.exe
+Name = SolimarLicenseServer
+
+'SolimarLicenseManager: Depends on nothing
+DependencyList = Null
+CompilerType = mvsNet_Program
+CompilerOption = /build release /project "SolimarLicenseManager"
+ProjectLocation = \\CreatorCode\\SolimarLicensing\\
+ProjectFile = SolimarLicensing.sln
+SourceLocation = \CreatorCode\SolimarLicensing\Image\
+DestinationLocation = \CreatorCode\SolimarLicensing\
+FilesArray = SolimarLicenseManager.dll
+Name = SolimarLicenseManager
+
+'LicenseViewer: Depends on nothing
+DependencyList = Null
+CompilerType = mvsNet_Program
+CompilerOption = /build release /project "KeyReaderGUI"
+ProjectLocation = \\CreatorCode\\SolimarLicensing\\
+ProjectFile = SolimarLicensing.sln
+SourceLocation = \CreatorCode\SolimarLicensing\Image\
+DestinationLocation = \CreatorCode\SolimarLicensing\
+FilesArray = KeyReaderGUI.exe
+Name = LicenseViewer
+
+'Creator: Depends on nothing
+DependencyList = Null
+CompilerType = builder6Program
+CompilerOption = -b -ns 
+ProjectLocation = \\CreatorCode\\
+ProjectFile = CreatorProjectGroup.bpg
+SourceLocation = \CreatorCode\Image\
+DestinationLocation = \CreatorInstallSource\
+FilesArray = CreatorProject.exe
+Name = Creator

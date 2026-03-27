@@ -151,9 +151,9 @@ void SSProtectionKey::setApplications(ushort units_licensed)
  *    customer, with this key, and with this many index servers licensed.
 ------------------------------------------------------------------------------*/
 const long INDEX_SERVERS_MODULE_ID = 0;
-ulong SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+AnsiString SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
 {
-   ulong ret = 0;
+   AnsiString* pwd  = NULL;
 
    if(pServer)
    {
@@ -168,14 +168,12 @@ ulong SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLi
                                                  )))
       {
          //convert the password from BSTR to and int
-         AnsiString* pwd = new AnsiString(password);
-         ret = pwd->ToInt();
-         delete pwd;
+         pwd = new AnsiString(password);
 
          SysFreeString(password);
       }
    }
-   return ret;
+   return *pwd;
 }
 
 
@@ -191,9 +189,9 @@ ulong SSProtectionKey::getIndexServersPassword(ushort units_licensed, ISolimarLi
  *    customer, with this key, and with this many report servers licensed.
 ------------------------------------------------------------------------------*/
 const long REPORT_SERVERS_MODULE_ID = 1;
-ulong SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+AnsiString SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
 {
-   ulong ret = 0;
+   AnsiString* pwd = NULL;
 
    if(pServer)
    {
@@ -208,14 +206,11 @@ ulong SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarL
                                                  )))
       {
          //convert the password from BSTR to and int
-         AnsiString* pwd = new AnsiString(password);
-         ret = pwd->ToInt();
-         delete pwd;
-
+         pwd = new AnsiString(password);
          SysFreeString(password);
       }
    }
-   return ret;
+   return *pwd;
 }
 
 
@@ -236,9 +231,9 @@ ulong SSProtectionKey::getReportServersPassword(ushort units_licensed, ISolimarL
  *    overlap.
 ------------------------------------------------------------------------------*/
 const long CONCURRENT_USERS_MODULE_ID = 2;
-ulong SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+AnsiString SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
 {
-   ulong ret = 0;
+   AnsiString* pwd = 0;
 
    if(pServer)
    {
@@ -253,14 +248,12 @@ ulong SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolima
                                                  )))
       {
          //convert the password from BSTR to and int
-         AnsiString* pwd = new AnsiString(password);
-         ret = pwd->ToInt();
-         delete pwd;
+         pwd = new AnsiString(password);
 
          SysFreeString(password);
       }
    }
-   return ret;
+   return *pwd;
 }
 
 
@@ -275,9 +268,9 @@ ulong SSProtectionKey::getConcurrentUsersPassword(ushort units_licensed, ISolima
  *    customer, with this key, and with this many applications licensed.
 ------------------------------------------------------------------------------*/
 const uchar APPLICATION_DATABASES_MODULE_ID = 3;
-ulong SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
+AnsiString SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer)
 {
-   ulong ret = 0;
+   AnsiString* pwd = 0;
 
    if(pServer)
    {
@@ -292,12 +285,9 @@ ulong SSProtectionKey::getApplicationsPassword(ushort units_licensed, ISolimarLi
                                                  )))
       {
          //convert the password from BSTR to and int
-         AnsiString* pwd = new AnsiString(password);
-         ret = pwd->ToInt();
-         delete pwd;
-
+         pwd = new AnsiString(password);
          SysFreeString(password);
       }
    }
-   return ret;
+   return *pwd;
 }

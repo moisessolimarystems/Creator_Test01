@@ -15,6 +15,9 @@
 #ifndef __SSKEY_H
 #define __SSKEY_H
 
+#include <windows.h>
+#include <classes.hpp>
+
 // Key cell numbers
 const short INDEX_SERVERS_CELL = 0x00;
 const short REPORT_SERVERS_CELL = 0x01;
@@ -61,10 +64,10 @@ public:
    void setApplications(ushort units_licensed);
 
    // Key I/O functions.
-   ulong getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   ulong getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   ulong getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
-   ulong getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   AnsiString getIndexServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   AnsiString getReportServersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   AnsiString getConcurrentUsersPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
+   AnsiString getApplicationsPassword(ushort units_licensed, ISolimarLicenseSvr* pServer);
 
 protected:
    // Protection key data (references into keyDataBlock).
