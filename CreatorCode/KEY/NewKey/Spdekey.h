@@ -16,6 +16,8 @@
 #ifndef __SPDEKEY_H
 #define __SPDEKEY_H
 
+#define SPDE_MAX_OUTPUT_UNITS         0x00001000 //4096
+
 // Pages Per Minute specifications
 #define SPDE_MAX_PPM_EXTENSIONS       15
 #define SPDE_MAX_PPM_ELEMENTS         5
@@ -28,8 +30,6 @@
 
 // key cell specifications
 #define SPDE_OUTPUT_UNIT_CELL           0x28
-#define SPDE_OPERATOR_SESSION_CELL      0xB0
-#define SPDE_USER_SESSION_CELL          0xB8
 #define SPDE_TOTAL_MODULE_CELLS         3
 #define SPDE_MODS_PER_CELL              16
 #define SPDE_TOTAL_KEY_MODULES           SPDE_TOTAL_MODULE_CELLS*SPDE_MODS_PER_CELL
@@ -70,8 +70,6 @@ public:
 
    // protection key data (references into keyDataBlock)
    ushort& outputUnits;
-   ushort& operatorSessionUnits;
-   ushort& userSessionUnits;
 
    // functions that do not perform key I/O
    uchar getLicense(ushort mod_id) const;
@@ -82,9 +80,6 @@ public:
    void setLicenses(ushort* buffer, bool hardware);
 
    ushort getOutputUnits();
-   ushort getOperatorSessionUnits();
-   ushort getUserSessionUnits();
-
    // simple key I/O functions
    void getModulePassword(uchar mod_id,
                            uchar units_licensed,
@@ -95,13 +90,8 @@ public:
                            );
 
 
-   //---Get Unit Functions
+   //---Output Unit Functions
   void getOutputPassword(ushort, ISolimarLicenseSvr*, char*);
-  void getOperatorSessionPassword(ushort, ISolimarLicenseSvr*, char*);
-  void getUserSessionPassword(ushort, ISolimarLicenseSvr*, char*);
-
-  //---Set Unit Functions
-
    //--- Pages Per Minute Functions
    void getPagesPerMinutePassword(ushort, ushort, ISolimarLicenseSvr*, char*, long);
 
