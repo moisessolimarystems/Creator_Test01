@@ -226,6 +226,9 @@
 				RelativePath="..\common\IObjectAuthentication.h">
 			</File>
 			<File
+				RelativePath=".\ISolimarLicenseMgr.h">
+			</File>
+			<File
 				RelativePath="..\SolimarLicenseServer\KeyError.h">
 			</File>
 			<File

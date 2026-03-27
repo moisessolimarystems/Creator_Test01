@@ -749,23 +749,23 @@ bool TModuleFrame::createPagesPerMinutePassword()
    {
         case XCH_IPDS_ID:
                 key_record->xch_ipds_ppm = pages;
-                ppmModID =  56;
+                ppmModID = 68; //56;
                 break;
         case XCH_PCL_ID:
                 key_record->xch_pcl_ppm = pages;
-                ppmModID = 58;
+                ppmModID = 70; //58;
                 break;
         case XCH_PS_ID:
                 key_record->xch_ps_ppm = pages;
-                ppmModID = 60;
+                ppmModID = 160; //60;
                 break;
         case XCH_PS_DBCS_ID:
                 key_record->xch_ps_dbcs_ppm = pages;
-                ppmModID = 64;
+                ppmModID = 64; //64;
                 break;
         case AFPDS_PS_ID:
                 key_record->afpds_ps_ppm = pages;
-                ppmModID = 66;
+                ppmModID = 66; //66;
                 break;
         default:
                 break;
