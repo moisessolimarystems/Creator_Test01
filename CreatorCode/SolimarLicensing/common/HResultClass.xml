@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+-->
+<HResultClasses>
+<HResultClass name="SolLicHRESULT" filename="LicenseError" code_class_name="CSolLicHRESULT">
+	<!--	-->
+	<!-- Base -->
+	<!-- -->
+	<Base name="HRESULT_BASE"	value="0x80040000"/>
+	<!--	-->
+	<!-- Offset defines -->
+	<!--	-->
+	<Offset name="ITF_MIN"		      value="0x0000"  base="HRESULT_BASE"/>
+	<Offset name="ITF_CR_MIN"	      value="0x9000"  base="ITF_MIN"/>
+	<Offset name="ITF_LIC_SVR_OFFSET" value="0x0000"  base="ITF_CR_MIN"/>
+	<Offset name="ITF_RNBO_OFFSET"    value="0x0100"  base="ITF_CR_MIN"/>    
+	<Offset name="ITF_MAX"			  value="0xFFFF"  base=""/>	
+	<!--	-->
+	<!-- Rainbow Error Codes -->
+	<RNBO name="SP_INVALID_FUNCTION_CODE"		 value="1"/>
+	<RNBO name="SP_INVALID_PACKET"				 value="2"/>
+	<RNBO name="SP_UNIT_NOT_FOUND"				 value="3"/>	
+	<RNBO name="SP_ACCESS_DENIED"				 value="4"/>
+	<RNBO name="SP_INVALID_MEMORY_ADDRESS"		 value="5"/>		
+	<RNBO name="SP_INVALID_ACCESS_CODE"			 value="6"/>
+	<RNBO name="SP_PORT_IS_BUSY"				 value="7"/>
+	<RNBO name="SP_WRITE_NOT_READY"				 value="8"/>
+	<RNBO name="SP_NO_PORT_FOUND"				 value="9"/>
+	<RNBO name="SP_ALREADY_ZERO"				 value="10"/>
+	<RNBO name="SP_DRIVER_NOT_INSTALLED"		 value="12"/>
+	<RNBO name="SP_COMMUNICATIONS_ERROR"		 value="13"/>
+	<RNBO name="SP_VERSION_NOT_SUPPORTED"		 value="18"/>
+	<RNBO name="SP_OS_ENVIRONMENT_NOT_SUPPORTED" value="19"/>
+	<RNBO name="SP_QUERY_TOO_LONG"				 value="20"/>
+	<RNBO name="SP_DRIVER_IS_BUSY"				 value="30"/>
+	<RNBO name="SP_PORT_ALLOCATION_FAILURE"				 value="31"/>
+	<RNBO name="SP_PORT_RELEASE_FAILURE"		 value="32"/>
+	<RNBO name="SP_ACQUIRE_PORT_TIMEOUT"		 value="39"/>
+	<RNBO name="SP_SIGNAL_NOT_SUPPORTED"		 value="42"/>
+	<RNBO name="SP_INIT_NOT_CALLED"				 value="57"/>
+	<RNBO name="SP_DRIVER_TYPE_NOT_SUPPORTED"	 value="58"/>
+	<RNBO name="SP_FAIL_ON_DRIVER_COMM"			 value="59"/>
+	<RNBO name="SP_SERVER_PROBABLY_NOT_UP"		 value="60"/>
+	<RNBO name="SP_UNKNOWN_HOST"				 value="61"/>
+	<RNBO name="SP_SENDTO_FAILED"				 value="62"/>
+	<RNBO name="SP_SOCKET_CREATION_FAILED"	     value="63"/>
+	<RNBO name="SP_NORESOURCES"		 value="64"/>
+	<RNBO name="SP_BROADCAST_NOT_SUPPORTED"		 value="65"/>
+	<RNBO name="SP_BAD_SERVER_MESSAGE"			 value="66"/>
+	<RNBO name="SP_NO_SERVER_RUNNING"			 value="67"/>
+	<RNBO name="SP_NO_NETWORK"					 value="68"/>
+	<RNBO name="SP_NO_SERVER_RESPONSE"			 value="69"/>
+	<RNBO name="SP_NO_LICENSE_AVAILABLE"		 value="70"/>
+	<RNBO name="SP_INVALID_LICENSE"				 value="71"/>
+	<RNBO name="SP_INVALID_OPERATION"			 value="72"/>
+	<RNBO name="SP_BUFFER_TOO_SMALL"			 value="73"/>
+	<RNBO name="SP_INTERNAL_ERROR"				 value="74"/>
+	<RNBO name="SP_PACKET_ALREADY_INITIALIZED"	 value="75"/>
+	<RNBO name="SP_INVALID_STATUS"				 value="255"/>											
+	<!--	-->
+	<!-- HResults with offset ITF_MIN -->
+	<!--	-->
+	<HResultType offset="ITF_LIC_SVR_OFFSET">
+		<HResult name="EHR_UNKNOWN"					ecode="EC_UNKNOWN"			        value="1"  alias="Unknown error (Key server)" /> 
+		<HResult name="EHR_DRIVER_INIT_FAILURE"	    ecode="EC_DRIVER_INIT_FAILURE"		value="2"  alias="Driver initialization failure (Key server)"/> 
+		<HResult name="EHR_PASSWORD_NO_MATCH"       ecode="EC_PASSWORD_NO_MATCH"		value="3"  alias="Passwords do not match (Key server)"/>
+		<HResult name="EHR_PASSWORD_INVALID_FORMAT"	ecode="EC_PASSWORD_INVALID_FORMAT"	value="4"  alias="Invalid password format (Key server)"/>
+		<HResult name="EHR_LICENSE_INSUFFICIENT"    ecode="EC_LICENSE_INSUFFICIENT"		value="5"  alias="Insufficient license (Key server)"/>
+		<HResult name="EHR_LICENSE_INVALID"         ecode="EC_LICENSE_INVALID"			value="6"  alias="Invalid license (Key server)"/>
+		<HResult name="EHR_LICENSE_EXPRIED"         ecode="EC_LICENSE_EXPRIED"			value="7"  alias="License expired (Key server)"/>
+		<HResult name="EHR_KEY_TRIAL_EXPIRED"       ecode="EC_KEY_TRIAL_EXPIRED"		value="8"  alias="Trial Key expired (Key server)"/>
+		<HResult name="EHR_KEY_NOT_PRESENT"         ecode="EC_KEY_NOT_PRESENT"			value="9"  alias="Key not present (Key server)"/>
+		<HResult name="EHR_CLOCK_ERROR"				ecode="EC_CLOCK_ERROR"				value="10" alias="Clock error (Key server)"/>
+		<HResult name="EHR_KEY_WRITE_FAILURE"       ecode="EC_KEY_WRITE_FAILURE"		value="11" alias="Failed writing to the key (Key server)"/>
+		<HResult name="EHR_KEY_WRITE_ACCESS_DENIED" ecode="EC_KEY_WRITE_ACCESS_DENIED"	value="12" alias="Failed writing to the key, access is denied (Key server)"/>
+		<HResult name="EHR_KEY_NOT_ACTIVATED"       ecode="EC_KEY_NOT_ACTIVATED"		value="13" alias="Key not active (Key server)"/>
+		<HResult name="EHR_AUTHENTICATION_FAILURE"  ecode="EC_AUTHENTICATION_FAILURE"	value="14" alias="Authentication failure (Key server)"/>
+		<HResult name="EHR_MANAGER_NOT_INITIALIZED" ecode="EC_MANAGER_NOT_INITIALIZED"	value="15" alias="Manager not initialized (Key server)"/>
+		<HResult name="EHR_KEY_NO_SUITABLE_KEY"     ecode="EC_KEY_NO_SUITABLE_KEY"		value="16" alias="No suitable key found (Key server)"/>
+		<HResult name="EHR_KEY_LOCKED"				ecode="EC_KEY_LOCKED"				value="17" alias="Key locked (Key server)"/>
+		<HResult name="EHR_CLIENT_TIMEOUT"          ecode="EC_CLIENT_TIMEOUT"			value="18" alias="Client timeout (Key server)"/>
+		<HResult name="EHR_PACKET_EXPIRED"			ecode="EC_PACKET_EXPIRED"			value="19" alias="Packet expired (Key server)"/>		
+	</HResultType>
+	<!--	-->
+	<!-- HResults with offset ITF_CR_APP_MIN -->
+	<!--	-->
+	<HResultType offset="ITF_RNBO_OFFSET">
+		<HResult name="EHR_SP_INVALID_FUNCTION_CODE"	  ecode="EC_SP_INVALID_FUNCTION_CODE"		value="SP_INVALID_FUNCTION_CODE"		alias="Invalid function code (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_PACKET"			  ecode="EC_SP_INVALID_PACKET"				value="SP_INVALID_PACKET"				alias="Invalid packet (Rainbow driver)"/>	
+		<HResult name="EHR_SP_UNIT_NOT_FOUND"			  ecode="EC_SP_UNIT_NOT_FOUND"				value="SP_UNIT_NOT_FOUND"				alias="Unit not found (Rainbow driver)"/>
+		<HResult name="EHR_SP_ACCESS_DENIED"			  ecode="EC_SP_ACCESS_DENIED"				value="SP_ACCESS_DENIED"				alias="Access is denied (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_MEMORY_ADDRESS"	  ecode="EC_SP_INVALID_MEMORY_ADDRESS"		value="SP_INVALID_MEMORY_ADDRESS"		alias="Invalid memory address (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_ACCESS_CODE"		  ecode="EC_SP_INVALID_ACCESS_CODE"			value="SP_INVALID_ACCESS_CODE"		alias="Invalid access code (Rainbow driver)"/>
+		<HResult name="EHR_SP_PORT_IS_BUSY"				  ecode="EC_SP_PORT_IS_BUSY"				value="SP_PORT_IS_BUSY"				alias="Port is busy (Rainbow driver)"/>
+		<HResult name="EHR_SP_WRITE_NOT_READY"			  ecode="EC_SP_WRITE_NOT_READY"				value="SP_WRITE_NOT_READY"			alias="Write not ready (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_PORT_FOUND"			  ecode="EC_SP_NO_PORT_FOUND"				value="SP_NO_PORT_FOUND"				alias="No parallel ports found (Rainbow driver)"/>
+		<HResult name="EHR_SP_ALREADY_ZERO"				  ecode="EC_SP_ALREADY_ZERO"				value="SP_ALREADY_ZERO"				alias="Counter already zero (Rainbow driver)"/>
+		<HResult name="EHR_SP_DRIVER_NOT_INSTALLED"		  ecode="EC_SP_DRIVER_NOT_INSTALLED"		value="SP_DRIVER_NOT_INSTALLED"		alias="System device driver not installed or detected (Rainbow driver)"/>
+		<HResult name="EHR_SP_VERSION_NOT_SUPPORTED"	  ecode="EC_SP_VERSION_NOT_SUPPORTED"		value="SP_VERSION_NOT_SUPPORTED"		alias="System device driver is outdated, update the driver (Rainbow driver)"/>
+		<HResult name="EHR_SP_QUERY_TOO_LONG"			  ecode="EC_SP_QUERY_TOO_LONG"				value="SP_QUERY_TOO_LONG"				alias="Query to long (Rainbow driver)"/>
+		<HResult name="EHR_SP_DRIVER_IS_BUSY"			  ecode="EC_SP_DRIVER_IS_BUSY"				value="SP_DRIVER_IS_BUSY"				alias="System driver is busy (Rainbow driver)"/>
+		<HResult name="EHR_SP_PORT_ALLOCATION_FAILURE"	  ecode="EC_SP_PORT_ALLOCATION_FAILURE"		value="SP_PORT_ALLOCATION_FAILURE"	alias="Failure to allocate parallel port (Rainbow driver)"/>
+		<HResult name="EHR_SP_PORT_RELEASE_FAILURE"		  ecode="EC_SP_PORT_RELEASE_FAILURE"		value="SP_PORT_RELEASE_FAILURE"		alias="Failure to release previously allocated parallel port (Rainbow driver)"/>
+		<HResult name="EHR_SP_ACQUIRE_PORT_TIMEOUT"		  ecode="EC_SP_ACQUIRE_PORT_TIMEOUT"		value="SP_ACQUIRE_PORT_TIMEOUT"		alias="Failure to aquire access to parallel port with time-out period (Rainbow driver)"/>
+		<HResult name="EHR_SP_SIGNAL_NOT_SUPPORTED"		  ecode="EC_SP_SIGNAL_NOT_SUPPORTED"		value="SP_SIGNAL_NOT_SUPPORTED"		alias="Machine does not support a signal line (Rainbow driver)"/>
+		<HResult name="EHR_SP_INIT_NOT_CALLED"			  ecode="EC_SP_INIT_NOT_CALLED"				value="SP_INIT_NOT_CALLED"			alias="Key is not initialized (Rainbow driver)"/>
+		<HResult name="EHR_SP_FAIL_ON_DRIVER_COMM"		  ecode="EC_SP_FAIL_ON_DRIVER_COMM"			value="SP_FAIL_ON_DRIVER_COMM"		alias="Client library failed on communication with the Rainbow system driver (Rainbow driver)"/>
+		<HResult name="EHR_SP_SERVER_PROBABLY_NOT_UP"	  ecode="EC_SP_SERVER_PROBABLY_NOT_UP"		value="SP_SERVER_PROBABLY_NOT_UP"		alias="The server is not responding, the client has timed out (Rainbow driver)"/>
+		<HResult name="EHR_SP_UNKNOWN_HOST"				  ecode="EC_SP_UNKNOWN_HOST"				value="SP_UNKNOWN_HOST"				alias="The server host is unknown; the server is not on the network or an invalid host name was specified (Rainbow driver)"/>
+		<HResult name="EHR_SP_SENDTO_FAILED"			  ecode="EC_SP_SENDTO_FAILED"				value="SP_SENDTO_FAILED"				alias="Unable to send a message to the server (Rainbow driver)"/>
+		<HResult name="EHR_SP_SOCKET_CREATION_FAILED"	  ecode="EC_SP_SOCKET_CREATION_FAILED"		value="SP_SOCKET_CREATION_FAILED"		alias="Unable able to open a network socket (Rainbow driver)"/>
+		<HResult name="EHR_SP_NORESOURCES"				  ecode="EC_SP_NORESOURCES"					value="SP_NORESOURCES"				alias="Insufficient resources (such as memory) to complete the request (Rainbow driver)"/>
+		<HResult name="EHR_SP_BROADCAST_NOT_SUPPORTED"	  ecode="EC_SP_BROADCAST_NOT_SUPPORTED"		value="SP_BROADCAST_NOT_SUPPORTED"	alias="Broadcast is not supported by the network interface on the system (Rainbow driver)"/>
+		<HResult name="EHR_SP_BAD_SERVER_MESSAGE"		  ecode="EC_SP_BAD_SERVER_MESSAGE"			value="SP_BAD_SERVER_MESSAGE"			alias="Could not understand a message received from the server (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_SERVER_RUNNING"		  ecode="EC_SP_NO_SERVER_RUNNING"			value="SP_NO_SERVER_RUNNING"			alias="Could not communicate with the server; verify the server is running (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_NETWORK"				  ecode="EC_SP_NO_NETWORK"					value="SP_NO_NETWORK"					alias="Unable to talk to the specified host; network communication problems encountered (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_SERVER_RESPONSE"		  ecode="EC_SP_NO_SERVER_RESPONSE"			value="SP_NO_SERVER_RESPONSE"			alias="No server responded to the client broadcast. There is no server running in the subnet (Rainbow driver)"/>
+		<HResult name="EHR_SP_NO_LICENSE_AVAILABLE"		  ecode="EC_SP_NO_LICENSE_AVAILABLE"		value="SP_NO_LICENSE_AVAILABLE"		alias="All licenses are currently in use (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_LICENSE"			  ecode="EC_SP_INVALID_LICENSE"				value="SP_INVALID_LICENSE"			alias="License is no longer valid (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_OPERATION"		  ecode="EC_SP_INVALID_OPERATION"			value="SP_INVALID_OPERATION"			alias="Specified operation cannot be performed (Rainbow driver)"/>
+		<HResult name="EHR_SP_BUFFER_TOO_SMALL"			  ecode="EC_SP_BUFFER_TOO_SMALL"			value="SP_BUFFER_TOO_SMALL"			alias="The size of the buffer is not sufficient to hold the expected data (Rainbow driver)"/>
+		<HResult name="EHR_SP_INTERNAL_ERROR"			  ecode="EC_SP_INTERNAL_ERROR"				value="SP_INTERNAL_ERROR"				alias="An internal error (Rainbow driver)"/>
+		<HResult name="EHR_SP_PACKET_ALREADY_INITIALIZED" ecode="EC_SP_PACKET_ALREADY_INITIALIZED"	value="SP_PACKET_ALREADY_INITIALIZED" alias="The packet being initialized was already initialized (Rainbow driver)"/>
+		<HResult name="EHR_SP_INVALID_STATUS"			  ecode="EC_SP_INVALID_STATUS"				value="SP_INVALID_STATUS"			    alias="An invalid status code was returned (Rainbow driver)"/>
+	</HResultType>
+	<!--	-->	
+</HResultClass>
+</HResultClasses>
