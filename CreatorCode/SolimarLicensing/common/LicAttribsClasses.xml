@@ -326,7 +326,6 @@
 		<attrib type="list(string)" name="ListOfStreamed_KeyAttribs" tagname="kLt" default="" />
 		<attrib type="string" name="Streamed_ServerDataAttribs" tagname="sD" default="" />
 		<attrib type="string" name="Streamed_SystemInfoAttribs" tagname="sI" default="" />
-		<attrib type="string" name="Streamed_SoftwareSpecAttribs" tagname="sS" default="" />
 		<attrib type="list(string)" name="ListOfStreamed_InfoAttribs" tagname="iLt" default="" />
 		<attrib type="DateTime" name="createdDate" tagname="cDt" default="1900-01-01 00:00:00.0000"/>
 	</AttribsClass>

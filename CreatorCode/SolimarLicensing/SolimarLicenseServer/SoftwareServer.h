@@ -145,8 +145,4 @@ class SoftwareServer //: public USBNotification //Derive to get USB calls
 		static BYTE crypto_key_license_archive_private[];
 		static BYTE crypto_key_license_archive_public[];
 		static BYTE crypto_key_license_archive_password[];
-
-		static unsigned int license_packet_code_int[];
-		static unsigned int license_archive_code_int[];
-		static unsigned int license_verify_data_code_int[];
 };

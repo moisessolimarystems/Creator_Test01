@@ -30,7 +30,6 @@ public:
 	SpdAttribs::VectorStringAttrib ListOfStreamed_KeyAttribs;
 	SpdAttribs::WStringAttrib Streamed_ServerDataAttribs;
 	SpdAttribs::WStringAttrib Streamed_SystemInfoAttribs;
-	SpdAttribs::WStringAttrib Streamed_SoftwareSpecAttribs;
 	SpdAttribs::VectorStringAttrib ListOfStreamed_InfoAttribs;
 	SpdAttribs::WStringAttrib createdDate;
 
@@ -41,7 +40,6 @@ public:
 		ListOfStreamed_KeyAttribs = c.ListOfStreamed_KeyAttribs;
 		Streamed_ServerDataAttribs = c.Streamed_ServerDataAttribs;
 		Streamed_SystemInfoAttribs = c.Streamed_SystemInfoAttribs;
-		Streamed_SoftwareSpecAttribs = c.Streamed_SoftwareSpecAttribs;
 		ListOfStreamed_InfoAttribs = c.ListOfStreamed_InfoAttribs;
 		createdDate = c.createdDate;
 		return *this ;
@@ -52,7 +50,6 @@ public:
 		ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", SpdAttribs::VectorStringObj()),
 		Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", SpdAttribs::WStringObj(L"")),
 		Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", SpdAttribs::WStringObj(L"")),
-		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", SpdAttribs::WStringObj(L"")),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", SpdAttribs::VectorStringObj()),
 		createdDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")){;}
 	
@@ -61,7 +58,6 @@ public:
 		ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", c.ListOfStreamed_KeyAttribs),
 		Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", c.Streamed_ServerDataAttribs),
 		Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", c.Streamed_SystemInfoAttribs),
-		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", c.Streamed_SoftwareSpecAttribs),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", c.ListOfStreamed_InfoAttribs),
 		createdDate(m_mapAttribObjs, L"cDt", c.createdDate){;}
 	
@@ -70,7 +66,6 @@ public:
 		ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", SpdAttribs::VectorStringObj()),
 		Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", SpdAttribs::WStringObj(L"")),
 		Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", SpdAttribs::WStringObj(L"")),
-		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", SpdAttribs::WStringObj(L"")),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", SpdAttribs::VectorStringObj()),
 		createdDate(m_mapAttribObjs, L"cDt", SpdAttribs::WStringObj(L"1900-01-01 00:00:00.0000")){;}
 	
@@ -79,7 +74,6 @@ public:
 		ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", c.ListOfStreamed_KeyAttribs),
 		Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", c.Streamed_ServerDataAttribs),
 		Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", c.Streamed_SystemInfoAttribs),
-		Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", c.Streamed_SoftwareSpecAttribs),
 		ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", c.ListOfStreamed_InfoAttribs),
 		createdDate(m_mapAttribObjs, L"cDt", c.createdDate){;}
 	
@@ -87,14 +81,12 @@ public:
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_KeyAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_ServerDataAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_SystemInfoAttribs,
-		const SpdAttribs::WStringAttrib &param_Streamed_SoftwareSpecAttribs,
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_InfoAttribs,
 		const SpdAttribs::WStringAttrib &param_createdDate) : 
 			SpdAttribs::CAttribsBase(wsAttribsClassName),
 			ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", param_ListOfStreamed_KeyAttribs),
 			Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", param_Streamed_ServerDataAttribs),
 			Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", param_Streamed_SystemInfoAttribs),
-			Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", param_Streamed_SoftwareSpecAttribs),
 			ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", param_ListOfStreamed_InfoAttribs),
 			createdDate(m_mapAttribObjs, L"cDt", param_createdDate){;}
 	
@@ -102,14 +94,12 @@ public:
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_KeyAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_ServerDataAttribs,
 		const SpdAttribs::WStringAttrib &param_Streamed_SystemInfoAttribs,
-		const SpdAttribs::WStringAttrib &param_Streamed_SoftwareSpecAttribs,
 		const SpdAttribs::VectorStringAttrib &param_ListOfStreamed_InfoAttribs,
 		const SpdAttribs::WStringAttrib &param_createdDate) : 
 			SpdAttribs::CAttribsBase(mapAttribObjs,wsAttribsClassName,wsAttribsKeyName),
 			ListOfStreamed_KeyAttribs(m_mapAttribObjs, L"kLt", param_ListOfStreamed_KeyAttribs),
 			Streamed_ServerDataAttribs(m_mapAttribObjs, L"sD", param_Streamed_ServerDataAttribs),
 			Streamed_SystemInfoAttribs(m_mapAttribObjs, L"sI", param_Streamed_SystemInfoAttribs),
-			Streamed_SoftwareSpecAttribs(m_mapAttribObjs, L"sS", param_Streamed_SoftwareSpecAttribs),
 			ListOfStreamed_InfoAttribs(m_mapAttribObjs, L"iLt", param_ListOfStreamed_InfoAttribs),
 			createdDate(m_mapAttribObjs, L"cDt", param_createdDate){;}
 	

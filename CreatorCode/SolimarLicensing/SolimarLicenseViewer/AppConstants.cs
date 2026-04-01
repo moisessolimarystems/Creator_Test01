@@ -8,7 +8,6 @@ namespace SolimarLicenseViewer
     {
         //initial key created when installed
         public static readonly String SolimarRegKey     = "SOFTWARE\\Solimar";
-        public static readonly String SolimarRegKey32On64 = "SOFTWARE\\Wow6432Node\\Solimar";
         public static readonly String LicenseProduct    = "Solimar Licensing";        
         
         //XML File/Folder Path

@@ -304,7 +304,7 @@ namespace Client.Creator
             selectedObject = packetData.PacketInfo as Object;
             packetNameTextBox.Text = packetData.PacketInfo.Name;
             packetDateTextBox.Text = packetData.PacketInfo.Date.ToShortDateString();
-            packetOutputPathTextBox.Text = packetData.PacketInfo.OutputPath;
+            packetOutputPathTextBox.Text = Directory.GetCurrentDirectory();
             packetDescriptTextBox.Text = packetData.PacketInfo.Description;
         }
         private void SavePacketTabPage(PacketDialogData packetData)

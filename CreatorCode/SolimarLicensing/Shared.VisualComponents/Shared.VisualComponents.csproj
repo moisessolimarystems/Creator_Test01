@@ -29,8 +29,8 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\Image\</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -68,17 +68,17 @@
     <Compile Include="ListView_Scroll.designer.cs">
       <DependentUpon>ListView_Scroll.cs</DependentUpon>
     </Compile>
+    <Compile Include="LoadingCircle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LoadingCircle.Designer.cs">
+      <DependentUpon>LoadingCircle.cs</DependentUpon>
+    </Compile>
     <Compile Include="NoFlickerListView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="NoFlickerListView.designer.cs">
       <DependentUpon>NoFlickerListView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="SoftwareSpecViewerControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="SoftwareSpecViewerControl.Designer.cs">
-      <DependentUpon>SoftwareSpecViewerControl.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

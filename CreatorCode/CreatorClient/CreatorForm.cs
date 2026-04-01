@@ -15,7 +15,6 @@ using System.Threading;
 using System.Windows.Forms.VisualStyles;
 using System.ServiceModel;
 using Client.Creator.ServiceProxy;
-using Client.Creator.Properties;
 
 /*
  * TODO : - Apply rules to license types - std,bkup,dr,testdev
@@ -43,9 +42,6 @@ namespace Client.Creator
         public static CommunicationLink s_CommLink;
         private PermissionsTable m_Permissions;
         private Font _formFont;
-        private string m_selectedDirectory = "";
-        private List<String> m_ServerList;
-
 
         #region Enums
 
@@ -133,25 +129,18 @@ namespace Client.Creator
         #endregion
 
         #region Properties
-        public string CurrentServer
-        {
-            get { return m_ServerList.First(); }           
-        }
         #endregion
 
         public CreatorForm()
         {
             InitializeComponent();
-            m_ServerList = new List<String>();
-            s_CommLink = new CommunicationLink();
-            storedPacketListView = new ListView();
-            _lvManager = new ListViewMgr();
-            _lvManager.SetListViewColumnSorter(DetailListView);
-            _lvManager.SetListViewColumnSorter(TransactionListView);
-            _lvManager.SetListViewColumnSorter(PacketListView);
-            ResetMainToolStripMenu();
-            //set to make read-only items not greyed-out            
-            DetailPropertyGrid.ViewForeColor = Color.FromArgb(254, 0, 0, 0);
+
+            //Service<CreatorClient>.address = new EndpointAddress(new Uri(string.Format("net.tcp://{0}:{1}/Creator/tcp", "achou2", "9091")), EndpointIdentity.CreateSpnIdentity("Creator"));       
+            //Uri tcpUri = new Uri(string.Format("net.tcp://{0}:{1}/Service1", "achou2", "8080"));
+            //EndpointAddress address = new EndpointAddress(tcpUri, EndpointIdentity.CreateSpnIdentity("Service1"));
+            //NetTcpBinding binding = new NetTcpBinding();
+            //ChannelFactory<IService1> factory = new ChannelFactory<IService1>(binding, address);
+            //client = factory.CreateChannel();
         }
 
         #region Enable/Disable ContextMenu
@@ -238,7 +227,7 @@ namespace Client.Creator
                 //add license items
                 if (licData.LicType == Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltStandard)
                 {
-                    int failOverLicenseCount = 0;                    
+                    int failOverLicenseCount = 0;
                     Service<ICreator>.Use((client) =>
                     {
                         failOverLicenseCount = client.GetLicenseCountByType(licData.CustID, licData.DestID, licData.GroupID, Lic_PackageAttribs.Lic_LicenseInfoAttribs.TSoftwareLicenseType.sltFailover);
@@ -384,21 +373,21 @@ namespace Client.Creator
 
         private void CreatorForm_Load(object sender, EventArgs e)
         {
-            // Set Server Connection List
-            if (Settings.Default.ServerList != null)
+            s_CommLink = new CommunicationLink();
+            storedPacketListView = new ListView();
+            _lvManager = new ListViewMgr();
+            _lvManager.SetListViewColumnSorter(DetailListView);
+            _lvManager.SetListViewColumnSorter(TransactionListView);
+            _lvManager.SetListViewColumnSorter(PacketListView);
+            ResetMainToolStripMenu();
+            Service<ICreator>.Use((client) =>
             {
-                String[] serverList = new String[Settings.Default.ServerList.Count];
-                Settings.Default.ServerList.CopyTo(serverList, 0);
-                this.m_ServerList.AddRange(serverList);
-            }
-            if (Settings.Default.SelectedDirectory != null)
-            {
-                m_selectedDirectory = Settings.Default.SelectedDirectory;
-            }
-            if (m_selectedDirectory.Length == 0)
-            {
-                m_selectedDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            }
+                m_Permissions = client.GetPermissionsByUser(WindowsIdentity.GetCurrent().Name);
+            });         
+            //set to make read-only items not greyed-out
+            DetailPropertyGrid.ViewForeColor = Color.FromArgb(254, 0, 0, 0);
+            MainTreeView.ExpandAll();
+            MainTreeView.SelectedNode = MainTreeView.Nodes.Find("LicenseNode", true).FirstOrDefault();
         }
 
         private void toolStripSearchButton_Click(object sender, EventArgs e)
@@ -433,7 +422,7 @@ namespace Client.Creator
           //ignore top level root nodes
             if (e.Node.Level > 0)
             {
-                //countToolStripStatusLabel.Text = "";
+                countToolStripStatusLabel.Text = "";
                 if (MainTreeView.SelectedNode.Text == "Licenses")
                 {
                     ResetMainToolStripMenu();
@@ -792,50 +781,6 @@ namespace Client.Creator
         }
         #endregion
 
-
-        private int ConnectServer()
-        {
-            //using keyword forces scope onto object, so it will be disposed after it is done.
-            using (ConnectDialog cd = new ConnectDialog())
-            {
-                ConnectDialogData data = new ConnectDialogData(m_ServerList.ToArray());
-                if (cd.ShowDialog(this, data) == DialogResult.OK)
-                {
-                    try
-                    {
-                        ////create treeview manager
-                        //m_listViewMgr = new ListViewMgr(this.infoSplitContainer, this.noFlickerListView, this.bottomNoFlickerListView, m_CommLink);
-                        ////create listview manager
-                        //m_treeViewMgr = new TreeViewMgr(this.treeView, m_CommLink);
-                        ////fill listview/treeview
-                        //PopulateAllViews();
-                        ////Enable Menu Items
-                        //EnableFormItems(true);
-                        ////Update Status
-                        //ConnectionStatusLabel.Text = String.Empty;
-                        string hostName = data.ServerList.First();
-                        this.Text = AppConstants.ClientTitle + " [" + hostName + "]";
-                        Service<ICreator>._channelFactory.Endpoint.Address = new EndpointAddress(new Uri("net.tcp://" + hostName + ":9091/Creator/tcp"));
-                        Service<ICreator>.Use((client) =>
-                        {
-                            m_Permissions = client.GetPermissionsByUser(WindowsIdentity.GetCurrent().Name);
-                        });
-                        MainTreeView.ExpandAll();
-                        MainTreeView.SelectedNode = null;
-                        MainTreeView.SelectedNode = MainTreeView.Nodes.Find("LicenseNode", true).FirstOrDefault();
-                    }
-                    catch (COMException ex)
-                    {
-                    }
-                }
-                //save server list into settings again 
-                String[] serverList = new string[data.ServerList.Count];
-                data.ServerList.CopyTo(serverList, 0);
-                m_ServerList.Clear();
-                m_ServerList.AddRange(serverList);
-            }
-            return 0;
-        }
         //any change made by standard needs to be applied to backup/disaster
         private void SaveLicense()
         {          
@@ -1093,12 +1038,10 @@ namespace Client.Creator
 
         private void GenerateLicensePacket()
         {
-            if (!(m_selectedDirectory.Length > 0))
-                m_selectedDirectory = Directory.GetCurrentDirectory();
             PacketProperty newPacket = new PacketProperty(string.Format("{0}_{1}-{2}-{3}-{4}-{5}-{6}-{7}", DetailTreeView.SelectedNode.Parent.Name, DetailTreeView.SelectedNode.Name, DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second),
                                                   "",
                                                   DateTime.Today,
-                                                  m_selectedDirectory,
+                                                  Directory.GetCurrentDirectory(),
                                                   "");
 
             using (LicenseInfoForm dlg = new LicenseInfoForm("New Packet", ref s_CommLink))
@@ -1106,7 +1049,6 @@ namespace Client.Creator
                 PacketDialogData data = new PacketDialogData(newPacket);
                 if (dlg.ShowDialog(this, data) == DialogResult.OK)
                 {
-                    m_selectedDirectory = data.PacketInfo.OutputPath;
                     GeneratePacket(data.PacketInfo.Name, DetailTreeView.SelectedNode.Name, data.PacketInfo.Description, data.PacketInfo.OutputPath);
                     //restore license text to normal from modified
                     DetailTreeView.SelectedNode.NodeFont = new Font(this.Font, FontStyle.Regular);
@@ -1120,6 +1062,8 @@ namespace Client.Creator
 
         private void dlvNewToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //if (DetailPropertyGrid.SelectedObject is LicenseProperty)
+            //    CreateNewValidationToken(DetailPropertyGrid.SelectedObject as LicenseProperty);
             if (DetailTreeView.SelectedNode.Tag is LicenseProperty)
                 CreateNewValidationToken(DetailTreeView.SelectedNode.Tag as LicenseProperty);
         }
@@ -2550,7 +2494,7 @@ namespace Client.Creator
                     bool b = false;
                     ListViewGroup licenseGroup = null;
                     string custName;
-                    //countToolStripStatusLabel.Text = license.PacketTables.Count() + " Packets";
+                    countToolStripStatusLabel.Text = license.PacketTables.Count() + " Packets";
                     foreach (var packet in license.PacketTables)
                     {
                         custName = packet.PacketName.Remove(packet.PacketName.IndexOf("_"));
@@ -2659,14 +2603,16 @@ namespace Client.Creator
 
         private void LoadTransactionItems(string licenseName)
         {
-            IList<PacketTable> packets = null;
-            IList<TransactionTable> transactions = null;
-            TransactionListView.BeginUpdate();            
+            //given packet id display transactions or
+            //given license display transactions
+            IList<PacketTable> packets;
+            IList<TransactionTable> transactions;
             Service<ICreator>.Use((client) => 
             {
                 //now two steps, given a license name, get all transactions for a license and sort by packet
                 packets = client.GetPacketsByLicenseName(licenseName).OrderByDescending(c => c.DateCreated).ToList();;
                 //Need list view manager
+                TransactionListView.BeginUpdate();
                 TransactionListView.Items.Clear();
                 TransactionListView.Groups.Clear();
                 transactions = client.GetNewTransactionsByLicenseName(licenseName).OrderByDescending(c => c.taDateCreated).ToList();
@@ -2696,7 +2642,7 @@ namespace Client.Creator
                 }
                 foreach (var packet in packets)
                 {
-                    transactions = client.GetTransactionsByPacketID(packet.ID).OrderByDescending(c => c.taDateCreated).ToList();;
+                    transactions = client.GetTransactionsByPacketID(packet.ID).OrderBy(c => c.taDateCreated).ToList();;
                     if (transactions.Count > 0)
                     {
                         bool b = false;
@@ -3185,7 +3131,7 @@ namespace Client.Creator
             if (data != null)
             {
                 LoadLicenseView(data);
-                //countToolStripStatusLabel.Text = data.Count() + " Customers";
+                countToolStripStatusLabel.Text = data.Count() + " Customers";
             }
             loadingCircle1.Active = false;
             loadingCircle1.Visible = false;
@@ -3231,6 +3177,7 @@ namespace Client.Creator
 
         private void OnGeneratedPacket(string licenseName)
         {
+            progressBarStatusLabel.Text = "";
             loadingCircle1.Active = false;
             loadingCircle1.Visible = false;
             LoadTransactionItems(licenseName);
@@ -3622,26 +3569,6 @@ namespace Client.Creator
         private void addOrderMainToolStripDropDownBtn_DropDownOpening(object sender, EventArgs e)
         {
             EnableOrderMainToolStripDropDownMenuItems();
-        }
-
-        private void connectToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ConnectServer();
-        }
-
-        private void CreatorForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //Copy ServerConnection List to app settings
-            if (this.m_ServerList.Count > 0)
-            {
-                Settings.Default.ServerList.Clear();
-                Settings.Default.ServerList.AddRange(this.m_ServerList.ToArray());
-            }
-
-            Settings.Default.SelectedDirectory = m_selectedDirectory;
-
-            // Save settings
-            Settings.Default.Save();
         }
 
         //// Create a Font object for the node tags.

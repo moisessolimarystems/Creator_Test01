@@ -48,7 +48,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::Connect(std::wstri
 {
 	// Try to create an ISolimarLicenseServer proxy to the server
 	COSERVERINFO	serverInfo	= {0, BSTR(server.c_str()), NULL, 0};
-	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr4), NULL, NOERROR};
+	MULTI_QI		multiQI		= {&__uuidof(ISolimarLicenseSvr3), NULL, NOERROR};
 	
 	//Close any previous connections
 	Disconnect();
@@ -62,7 +62,7 @@ HRESULT SolimarLicenseManagerWrapper::LicensingServerWrapper::Connect(std::wstri
 		&multiQI);
 	if (SUCCEEDED(hr))
 	{
-		ISolimarLicenseSvr4 *pILicenseServer = (ISolimarLicenseSvr4*)multiQI.pItf;
+		ISolimarLicenseSvr3 *pILicenseServer = (ISolimarLicenseSvr3*)multiQI.pItf;
 		ChallengeResponseHelper CR(	challenge_key_server_thisauthuser_private, 
 									sizeof(challenge_key_server_thisauthuser_private)/sizeof(BYTE), 
 									challenge_key_server_userauththis_public, 

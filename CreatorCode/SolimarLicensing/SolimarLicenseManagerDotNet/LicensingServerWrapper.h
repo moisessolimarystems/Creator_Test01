@@ -136,7 +136,7 @@ namespace SolimarLicenseManagerWrapper
 			static BYTE challenge_key_server_thisauthuser_private[];
 			static BYTE challenge_key_server_userauththis_public[];
 
-			GITPtr<ISolimarLicenseSvr4> licenseServer;
+			GITPtr<ISolimarLicenseSvr3> licenseServer;
 			GITPtr<ISolimarSoftwareLicenseSvr> licenseSoftwareServer;
 			bool bConnected;
 			std::wstring licServerName;

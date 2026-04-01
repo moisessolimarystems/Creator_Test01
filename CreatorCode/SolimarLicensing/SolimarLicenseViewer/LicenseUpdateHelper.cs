@@ -211,14 +211,9 @@ namespace SolimarLicenseViewer
                         {
                             Byte[] licPktBytes = System.IO.File.ReadAllBytes(fileName);
                             string licStream = "";
-                            if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage || 
-                                m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
+                            if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicPackage || m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeUpdateCurrentLicPackage)
                             {
                                 m_CommLink.GenerateLicPackage_BySoftwareLicPacket(licPktBytes, ref licStream);
-                            }
-                            else if (m_LicUpdateHelperData.action == LicenseUpdateActionEnum.luaeImportNewLicArchive)
-                            {
-                                m_CommLink.GenerateLicPackage_BySoftwareLicArchive(licPktBytes, ref licStream);
                             }
 
                             try

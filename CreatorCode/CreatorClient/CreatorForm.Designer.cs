@@ -40,8 +40,6 @@
             System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Reports", 0, 0);
             this.MainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.connectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.newReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.exitMainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,8 +64,10 @@
             this.removeOrderMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.toggleViewMainToolStripBtn = new System.Windows.Forms.ToolStripButton();
+            this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
+            this.progressBarStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.countToolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.LicenseViewPanel = new System.Windows.Forms.Panel();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.MainSplitContainer = new System.Windows.Forms.SplitContainer();
             this.MainTreeView = new System.Windows.Forms.TreeView();
             this.MainTreeViewImageList = new System.Windows.Forms.ImageList(this.components);
@@ -156,9 +156,8 @@
             this.createPacketFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenuStrip.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
+            this.MainStatusStrip.SuspendLayout();
             this.LicenseViewPanel.SuspendLayout();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
             this.MainSplitContainer.Panel1.SuspendLayout();
             this.MainSplitContainer.Panel2.SuspendLayout();
             this.MainSplitContainer.SuspendLayout();
@@ -203,26 +202,12 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.connectToolStripMenuItem,
-            this.toolStripSeparator1,
             this.newReportToolStripMenuItem,
             this.toolStripSeparator3,
             this.exitMainToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this.fileToolStripMenuItem.Text = "&File";
-            // 
-            // connectToolStripMenuItem
-            // 
-            this.connectToolStripMenuItem.Name = "connectToolStripMenuItem";
-            this.connectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.connectToolStripMenuItem.Text = "Connect";
-            this.connectToolStripMenuItem.Click += new System.EventHandler(this.connectToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // newReportToolStripMenuItem
             // 
@@ -449,31 +434,36 @@
             this.toggleViewMainToolStripBtn.ToolTipText = "Toggle View";
             this.toggleViewMainToolStripBtn.CheckedChanged += new System.EventHandler(this.toggleViewMainToolStripBtn_CheckedChanged);
             // 
+            // MainStatusStrip
+            // 
+            this.MainStatusStrip.BackColor = System.Drawing.SystemColors.Control;
+            this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.progressBarStatusLabel,
+            this.countToolStripStatusLabel});
+            this.MainStatusStrip.Location = new System.Drawing.Point(0, 507);
+            this.MainStatusStrip.Name = "MainStatusStrip";
+            this.MainStatusStrip.Size = new System.Drawing.Size(993, 22);
+            this.MainStatusStrip.TabIndex = 2;
+            // 
+            // progressBarStatusLabel
+            // 
+            this.progressBarStatusLabel.Name = "progressBarStatusLabel";
+            this.progressBarStatusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // countToolStripStatusLabel
+            // 
+            this.countToolStripStatusLabel.Name = "countToolStripStatusLabel";
+            this.countToolStripStatusLabel.Size = new System.Drawing.Size(58, 17);
+            this.countToolStripStatusLabel.Text = "ItemCount";
+            // 
             // LicenseViewPanel
             // 
-            this.LicenseViewPanel.Controls.Add(this.splitContainer2);
+            this.LicenseViewPanel.Controls.Add(this.MainSplitContainer);
             this.LicenseViewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LicenseViewPanel.Location = new System.Drawing.Point(0, 49);
             this.LicenseViewPanel.Name = "LicenseViewPanel";
-            this.LicenseViewPanel.Size = new System.Drawing.Size(993, 480);
+            this.LicenseViewPanel.Size = new System.Drawing.Size(993, 458);
             this.LicenseViewPanel.TabIndex = 8;
-            // 
-            // splitContainer2
-            // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
-            this.splitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.MainSplitContainer);
-            this.splitContainer2.Panel2Collapsed = true;
-            this.splitContainer2.Panel2MinSize = 55;
-            this.splitContainer2.Size = new System.Drawing.Size(993, 480);
-            this.splitContainer2.SplitterDistance = 422;
-            this.splitContainer2.SplitterWidth = 2;
-            this.splitContainer2.TabIndex = 2;
             // 
             // MainSplitContainer
             // 
@@ -492,8 +482,8 @@
             this.MainSplitContainer.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.MainSplitContainer.Panel2.Controls.Add(this.MainTabControl);
             this.MainSplitContainer.Panel2.Controls.Add(this.loadingCircle1);
-            this.MainSplitContainer.Size = new System.Drawing.Size(993, 480);
-            this.MainSplitContainer.SplitterDistance = 171;
+            this.MainSplitContainer.Size = new System.Drawing.Size(993, 458);
+            this.MainSplitContainer.SplitterDistance = 172;
             this.MainSplitContainer.SplitterWidth = 1;
             this.MainSplitContainer.TabIndex = 1;
             // 
@@ -535,7 +525,7 @@
             this.MainTreeView.SelectedImageIndex = 0;
             this.MainTreeView.ShowLines = false;
             this.MainTreeView.ShowRootLines = false;
-            this.MainTreeView.Size = new System.Drawing.Size(167, 476);
+            this.MainTreeView.Size = new System.Drawing.Size(168, 454);
             this.MainTreeView.TabIndex = 0;
             this.MainTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.MainTreeView_AfterLabelEdit);
             this.MainTreeView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainTreeView_MouseUp);
@@ -564,7 +554,7 @@
             this.MainTabControl.Multiline = true;
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(817, 476);
+            this.MainTabControl.Size = new System.Drawing.Size(816, 454);
             this.MainTabControl.TabIndex = 2;
             this.MainTabControl.Visible = false;
             // 
@@ -574,7 +564,7 @@
             this.LicensesTabPage.Location = new System.Drawing.Point(4, 22);
             this.LicensesTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.LicensesTabPage.Name = "LicensesTabPage";
-            this.LicensesTabPage.Size = new System.Drawing.Size(809, 450);
+            this.LicensesTabPage.Size = new System.Drawing.Size(808, 428);
             this.LicensesTabPage.TabIndex = 1;
             this.LicensesTabPage.Text = "Licenses";
             this.LicensesTabPage.UseVisualStyleBackColor = true;
@@ -595,8 +585,8 @@
             // SubSplitContainer.Panel2
             // 
             this.SubSplitContainer.Panel2.Controls.Add(this.PropertyGridTabControl);
-            this.SubSplitContainer.Size = new System.Drawing.Size(809, 450);
-            this.SubSplitContainer.SplitterDistance = 313;
+            this.SubSplitContainer.Size = new System.Drawing.Size(808, 428);
+            this.SubSplitContainer.SplitterDistance = 314;
             this.SubSplitContainer.SplitterWidth = 1;
             this.SubSplitContainer.TabIndex = 1;
             // 
@@ -610,7 +600,7 @@
             this.DetailTreeView.Location = new System.Drawing.Point(0, 0);
             this.DetailTreeView.Name = "DetailTreeView";
             this.DetailTreeView.SelectedImageIndex = 0;
-            this.DetailTreeView.Size = new System.Drawing.Size(309, 446);
+            this.DetailTreeView.Size = new System.Drawing.Size(310, 424);
             this.DetailTreeView.StateImageList = this.DetailTreeViewImageList;
             this.DetailTreeView.TabIndex = 2;
             this.DetailTreeView.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.DetailTreeView_BeforeExpand);
@@ -654,7 +644,7 @@
             this.PropertyGridTabControl.Multiline = true;
             this.PropertyGridTabControl.Name = "PropertyGridTabControl";
             this.PropertyGridTabControl.SelectedIndex = 0;
-            this.PropertyGridTabControl.Size = new System.Drawing.Size(491, 446);
+            this.PropertyGridTabControl.Size = new System.Drawing.Size(489, 424);
             this.PropertyGridTabControl.TabIndex = 0;
             this.PropertyGridTabControl.TabIndexChanged += new System.EventHandler(this.PropertyGridTabControl_TabIndexChanged);
             // 
@@ -665,7 +655,7 @@
             this.PropertyGridTabPage.Location = new System.Drawing.Point(4, 4);
             this.PropertyGridTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.PropertyGridTabPage.Name = "PropertyGridTabPage";
-            this.PropertyGridTabPage.Size = new System.Drawing.Size(483, 419);
+            this.PropertyGridTabPage.Size = new System.Drawing.Size(481, 397);
             this.PropertyGridTabPage.TabIndex = 0;
             this.PropertyGridTabPage.Text = "Properties";
             this.PropertyGridTabPage.UseVisualStyleBackColor = true;
@@ -686,8 +676,8 @@
             // 
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListView);
             this.DetailSplitContainer.Panel2.Controls.Add(this.DetailListViewToolStrip);
-            this.DetailSplitContainer.Size = new System.Drawing.Size(483, 419);
-            this.DetailSplitContainer.SplitterDistance = 194;
+            this.DetailSplitContainer.Size = new System.Drawing.Size(481, 397);
+            this.DetailSplitContainer.SplitterDistance = 185;
             this.DetailSplitContainer.SplitterWidth = 2;
             this.DetailSplitContainer.TabIndex = 0;
             // 
@@ -700,7 +690,7 @@
             this.DetailPropertyGrid.Location = new System.Drawing.Point(0, 0);
             this.DetailPropertyGrid.Margin = new System.Windows.Forms.Padding(0);
             this.DetailPropertyGrid.Name = "DetailPropertyGrid";
-            this.DetailPropertyGrid.Size = new System.Drawing.Size(483, 194);
+            this.DetailPropertyGrid.Size = new System.Drawing.Size(481, 185);
             this.DetailPropertyGrid.TabIndex = 2;
             this.DetailPropertyGrid.ToolbarVisible = false;
             this.DetailPropertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.DetailPropertyGrid_PropertyValueChanged);
@@ -715,7 +705,7 @@
             this.DetailListView.MultiSelect = false;
             this.DetailListView.Name = "DetailListView";
             this.DetailListView.ShowItemToolTips = true;
-            this.DetailListView.Size = new System.Drawing.Size(483, 198);
+            this.DetailListView.Size = new System.Drawing.Size(481, 185);
             this.DetailListView.SmallImageList = this.ListViewImageList;
             this.DetailListView.TabIndex = 2;
             this.DetailListView.UseCompatibleStateImageBehavior = false;
@@ -750,7 +740,7 @@
             this.DetailListViewToolStripLabel});
             this.DetailListViewToolStrip.Location = new System.Drawing.Point(0, 0);
             this.DetailListViewToolStrip.Name = "DetailListViewToolStrip";
-            this.DetailListViewToolStrip.Size = new System.Drawing.Size(483, 25);
+            this.DetailListViewToolStrip.Size = new System.Drawing.Size(481, 25);
             this.DetailListViewToolStrip.TabIndex = 5;
             // 
             // ImageToolStripLabel
@@ -775,7 +765,7 @@
             this.ListViewTabPage.Location = new System.Drawing.Point(4, 4);
             this.ListViewTabPage.Margin = new System.Windows.Forms.Padding(0);
             this.ListViewTabPage.Name = "ListViewTabPage";
-            this.ListViewTabPage.Size = new System.Drawing.Size(483, 361);
+            this.ListViewTabPage.Size = new System.Drawing.Size(481, 397);
             this.ListViewTabPage.TabIndex = 1;
             this.ListViewTabPage.Text = "Transactions";
             this.ListViewTabPage.UseVisualStyleBackColor = true;
@@ -795,7 +785,7 @@
             this.TransactionListView.Margin = new System.Windows.Forms.Padding(0);
             this.TransactionListView.Name = "TransactionListView";
             this.TransactionListView.NoItemsMessage = "";
-            this.TransactionListView.Size = new System.Drawing.Size(483, 336);
+            this.TransactionListView.Size = new System.Drawing.Size(481, 372);
             this.TransactionListView.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.TransactionListView.TabIndex = 0;
             this.TransactionListView.UseCompatibleStateImageBehavior = false;
@@ -829,7 +819,7 @@
             this.SingleToolStripButton});
             this.TransactionsToolStrip.Location = new System.Drawing.Point(0, 0);
             this.TransactionsToolStrip.Name = "TransactionsToolStrip";
-            this.TransactionsToolStrip.Size = new System.Drawing.Size(483, 25);
+            this.TransactionsToolStrip.Size = new System.Drawing.Size(481, 25);
             this.TransactionsToolStrip.TabIndex = 1;
             this.TransactionsToolStrip.Text = "toolStrip1";
             // 
@@ -862,7 +852,7 @@
             this.PacketTabPage.ImageIndex = 4;
             this.PacketTabPage.Location = new System.Drawing.Point(4, 4);
             this.PacketTabPage.Name = "PacketTabPage";
-            this.PacketTabPage.Size = new System.Drawing.Size(483, 361);
+            this.PacketTabPage.Size = new System.Drawing.Size(481, 397);
             this.PacketTabPage.TabIndex = 2;
             this.PacketTabPage.Text = "Packets";
             this.PacketTabPage.UseVisualStyleBackColor = true;
@@ -885,7 +875,7 @@
             this.splitContainer1.Panel2.BackColor = System.Drawing.SystemColors.Control;
             this.splitContainer1.Panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel2_Paint);
             this.splitContainer1.Panel2Collapsed = true;
-            this.splitContainer1.Size = new System.Drawing.Size(483, 336);
+            this.splitContainer1.Size = new System.Drawing.Size(481, 372);
             this.splitContainer1.SplitterDistance = 311;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 6;
@@ -906,7 +896,7 @@
             this.LicensePacketListView.MultiSelect = false;
             this.LicensePacketListView.Name = "LicensePacketListView";
             this.LicensePacketListView.NoItemsMessage = "";
-            this.LicensePacketListView.Size = new System.Drawing.Size(481, 334);
+            this.LicensePacketListView.Size = new System.Drawing.Size(479, 370);
             this.LicensePacketListView.StateImageList = this.ListViewImageList;
             this.LicensePacketListView.TabIndex = 4;
             this.LicensePacketListView.UseCompatibleStateImageBehavior = false;
@@ -963,7 +953,7 @@
             this.showUnVerifiedToolStripButton});
             this.PacketListToolStrip.Location = new System.Drawing.Point(0, 0);
             this.PacketListToolStrip.Name = "PacketListToolStrip";
-            this.PacketListToolStrip.Size = new System.Drawing.Size(483, 25);
+            this.PacketListToolStrip.Size = new System.Drawing.Size(481, 25);
             this.PacketListToolStrip.TabIndex = 5;
             // 
             // toolStripLabel1
@@ -1024,7 +1014,7 @@
             this.PacketsTabPage.Location = new System.Drawing.Point(4, 22);
             this.PacketsTabPage.Name = "PacketsTabPage";
             this.PacketsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.PacketsTabPage.Size = new System.Drawing.Size(809, 392);
+            this.PacketsTabPage.Size = new System.Drawing.Size(808, 428);
             this.PacketsTabPage.TabIndex = 2;
             this.PacketsTabPage.Text = "Packets";
             this.PacketsTabPage.UseVisualStyleBackColor = true;
@@ -1043,7 +1033,7 @@
             this.PacketListView.FullRowSelect = true;
             this.PacketListView.Location = new System.Drawing.Point(3, 3);
             this.PacketListView.Name = "PacketListView";
-            this.PacketListView.Size = new System.Drawing.Size(803, 386);
+            this.PacketListView.Size = new System.Drawing.Size(802, 422);
             this.PacketListView.TabIndex = 0;
             this.PacketListView.UseCompatibleStateImageBehavior = false;
             this.PacketListView.View = System.Windows.Forms.View.Details;
@@ -1083,7 +1073,7 @@
             this.ReportTabPage.Location = new System.Drawing.Point(4, 22);
             this.ReportTabPage.Name = "ReportTabPage";
             this.ReportTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.ReportTabPage.Size = new System.Drawing.Size(809, 392);
+            this.ReportTabPage.Size = new System.Drawing.Size(808, 428);
             this.ReportTabPage.TabIndex = 3;
             this.ReportTabPage.Text = "Report";
             this.ReportTabPage.UseVisualStyleBackColor = true;
@@ -1097,7 +1087,7 @@
             this.ReportListView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ReportListView.Location = new System.Drawing.Point(3, 3);
             this.ReportListView.Name = "ReportListView";
-            this.ReportListView.Size = new System.Drawing.Size(803, 386);
+            this.ReportListView.Size = new System.Drawing.Size(802, 422);
             this.ReportListView.TabIndex = 0;
             this.ReportListView.UseCompatibleStateImageBehavior = false;
             this.ReportListView.View = System.Windows.Forms.View.Details;
@@ -1117,7 +1107,7 @@
             this.HardwareKeyTabPage.Controls.Add(this.panel1);
             this.HardwareKeyTabPage.Location = new System.Drawing.Point(4, 22);
             this.HardwareKeyTabPage.Name = "HardwareKeyTabPage";
-            this.HardwareKeyTabPage.Size = new System.Drawing.Size(809, 392);
+            this.HardwareKeyTabPage.Size = new System.Drawing.Size(808, 428);
             this.HardwareKeyTabPage.TabIndex = 4;
             this.HardwareKeyTabPage.Text = "Hardware Keys";
             this.HardwareKeyTabPage.UseVisualStyleBackColor = true;
@@ -1129,7 +1119,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(809, 392);
+            this.panel1.Size = new System.Drawing.Size(808, 428);
             this.panel1.TabIndex = 0;
             // 
             // HardwareKeyListView
@@ -1144,7 +1134,7 @@
             this.HardwareKeyListView.GridLines = true;
             this.HardwareKeyListView.Location = new System.Drawing.Point(0, 25);
             this.HardwareKeyListView.Name = "HardwareKeyListView";
-            this.HardwareKeyListView.Size = new System.Drawing.Size(809, 367);
+            this.HardwareKeyListView.Size = new System.Drawing.Size(808, 403);
             this.HardwareKeyListView.TabIndex = 1;
             this.HardwareKeyListView.UseCompatibleStateImageBehavior = false;
             this.HardwareKeyListView.View = System.Windows.Forms.View.Details;
@@ -1170,7 +1160,7 @@
             this.addHardwareKeyToolStripButton});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(809, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(808, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -1196,7 +1186,7 @@
             this.loadingCircle1.NumberSpoke = 12;
             this.loadingCircle1.OuterCircleRadius = 11;
             this.loadingCircle1.RotationSpeed = 100;
-            this.loadingCircle1.Size = new System.Drawing.Size(817, 476);
+            this.loadingCircle1.Size = new System.Drawing.Size(816, 454);
             this.loadingCircle1.SpokeThickness = 2;
             this.loadingCircle1.StylePreset = Shared.VisualComponents.LoadingCircle.StylePresets.MacOSX;
             this.loadingCircle1.TabIndex = 6;
@@ -1388,21 +1378,20 @@
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(993, 529);
             this.Controls.Add(this.LicenseViewPanel);
+            this.Controls.Add(this.MainStatusStrip);
             this.Controls.Add(this.MainToolStrip);
             this.Controls.Add(this.MainMenuStrip);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Name = "CreatorForm";
             this.Text = "Creator";
             this.Load += new System.EventHandler(this.CreatorForm_Load);
-            this.Shown += new System.EventHandler(this.connectToolStripMenuItem_Click);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CreatorForm_FormClosing);
             this.MainMenuStrip.ResumeLayout(false);
             this.MainMenuStrip.PerformLayout();
             this.MainToolStrip.ResumeLayout(false);
             this.MainToolStrip.PerformLayout();
+            this.MainStatusStrip.ResumeLayout(false);
+            this.MainStatusStrip.PerformLayout();
             this.LicenseViewPanel.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.ResumeLayout(false);
             this.MainSplitContainer.Panel1.ResumeLayout(false);
             this.MainSplitContainer.Panel2.ResumeLayout(false);
             this.MainSplitContainer.ResumeLayout(false);
@@ -1450,6 +1439,7 @@
         private System.Windows.Forms.MenuStrip MainMenuStrip;
         private System.Windows.Forms.ToolStrip MainToolStrip;
         private System.Windows.Forms.ToolStripTextBox toolStripSearchBox;
+        private System.Windows.Forms.StatusStrip MainStatusStrip;
         private System.Windows.Forms.Panel LicenseViewPanel;
         private System.Windows.Forms.ContextMenuStrip LicenseContextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
@@ -1495,6 +1485,7 @@
         private System.Windows.Forms.TabPage PacketTabPage;
         private System.Windows.Forms.ToolStripMenuItem verifyToolStripMenuItem;
         private System.Windows.Forms.ImageList ListViewImageList;
+        private System.Windows.Forms.ToolStripStatusLabel progressBarStatusLabel;
         private System.Windows.Forms.ToolStrip PacketListToolStrip;
         private System.Windows.Forms.ToolStripButton showAllToolStripButton;
         private System.Windows.Forms.ToolStripButton showVerifiedToolStripButton;
@@ -1527,6 +1518,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripButton toggleViewMainToolStripBtn;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
+        private System.Windows.Forms.ToolStripStatusLabel countToolStripStatusLabel;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripLabel ImageToolStripLabel;
         private System.Windows.Forms.TabPage HardwareKeyTabPage;
@@ -1560,9 +1552,6 @@
         private System.Windows.Forms.ToolStripSplitButton addOrderMainToolStripDropDownBtn;
         private System.Windows.Forms.ToolStripMenuItem existingOrderMainToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newOrderMainToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem connectToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.SplitContainer splitContainer2;
 
     }
 }

@@ -27,7 +27,6 @@ namespace LicensingTest_SoftwareLicense
 		private ToolStripMenuItem tActObtainMenuItem;
 		private ToolStripMenuItem tActReleaseMenuItem;
 		private ToolStripMenuItem tActInuseMenuItem;
-		private ToolStripMenuItem tActInuseByAppMenuItem;
 		private ToolStripMenuItem tActTotalMenuItem;
 		private ToolStripButton tValidateButton;
 		private ToolStripButton tDisconnectButton;
@@ -64,10 +63,6 @@ namespace LicensingTest_SoftwareLicense
 			tActInuseMenuItem.Text = "In Use";
 			tActInuseMenuItem.Click += new EventHandler(tActInuseMenuItem_Click);
 			tActionDropdown.DropDownItems.Add(tActInuseMenuItem);
-			tActInuseByAppMenuItem = new ToolStripMenuItem();
-			tActInuseByAppMenuItem.Text = "In Use By App";
-			tActInuseByAppMenuItem.Click += new EventHandler(tActInuseByAppMenuItem_Click);
-			tActionDropdown.DropDownItems.Add(tActInuseByAppMenuItem);
 			tActTotalMenuItem = new ToolStripMenuItem();
 			tActTotalMenuItem.Text = "Total";
 			tActTotalMenuItem.Click += new EventHandler(tActTotalMenuItem_Click);
@@ -124,21 +119,6 @@ namespace LicensingTest_SoftwareLicense
 				LogMessage(ex.Message);
 			}
 		}
-		void tActInuseByAppMenuItem_Click(object sender, EventArgs e)
-		{
-			try
-			{
-				int modID = System.Convert.ToInt32(tModIdTextbox.TextBox.Text);
-				int licenseCount = 0;
-				licenseCount = m_licWrapper.ModuleLicenseInUse_ByAppEx(modID);
-				LogMessage("Success m_licWrapper.ModuleLicenseInUse_ByAppEx(" + modID.ToString() + ") licenseInUse = " + licenseCount.ToString());
-			}
-			catch (COMException ex)
-			{
-				LogMessage(ex.Message);
-			}
-		}
-		
 
 		void tActReleaseMenuItem_Click(object sender, EventArgs e)
 		{

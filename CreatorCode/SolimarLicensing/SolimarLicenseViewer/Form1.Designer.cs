@@ -78,12 +78,12 @@ namespace SolimarLicenseViewer
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sep1ToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.genVerificationOnLicenseDropDownMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.genDiagnosticDataDropDownMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sep2ToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.sep3ToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.genLicArchiveOnLicenseDropDownMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importLicArchiveOnLicenseDropDownMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.genDiagnosticDataDropDownMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.formSplitContainer.Panel1.SuspendLayout();
@@ -255,7 +255,6 @@ namespace SolimarLicenseViewer
             this.productIconList.Images.SetKeyName(14, "Empty.ico");
             this.productIconList.Images.SetKeyName(15, "protectionKeys.ico");
             this.productIconList.Images.SetKeyName(16, "protectionKey.ico");
-            this.productIconList.Images.SetKeyName(17, "Rubika Process Builder32.ico");
             // 
             // TreeViewMenuStrip
             // 
@@ -535,13 +534,6 @@ namespace SolimarLicenseViewer
             this.genVerificationOnLicenseDropDownMenuItem.Size = new System.Drawing.Size(319, 22);
             this.genVerificationOnLicenseDropDownMenuItem.Text = "Generate Verification Data for Solimar...";
             // 
-            // genDiagnosticDataDropDownMenuItem
-            // 
-            this.genDiagnosticDataDropDownMenuItem.Name = "genDiagnosticDataDropDownMenuItem";
-            this.genDiagnosticDataDropDownMenuItem.Size = new System.Drawing.Size(319, 22);
-            this.genDiagnosticDataDropDownMenuItem.Text = "Generate License Diagnostic Data for Solimar...";
-            this.genDiagnosticDataDropDownMenuItem.Click += new System.EventHandler(this.genDiagnosticDataDropDownMenuItem_Click);
-            // 
             // sep2ToolStripMenuItem
             // 
             this.sep2ToolStripMenuItem.Name = "sep2ToolStripMenuItem";
@@ -567,6 +559,13 @@ namespace SolimarLicenseViewer
             this.importLicArchiveOnLicenseDropDownMenuItem.ToolTipText = "Import License Archive from another computer";
             this.importLicArchiveOnLicenseDropDownMenuItem.Click += new System.EventHandler(this.importLicArchiveOnLicenseDropDownMenuItem_Click);
             // 
+            // genDiagnosticDataDropDownMenuItem
+            // 
+            this.genDiagnosticDataDropDownMenuItem.Name = "genDiagnosticDataDropDownMenuItem";
+            this.genDiagnosticDataDropDownMenuItem.Size = new System.Drawing.Size(319, 22);
+            this.genDiagnosticDataDropDownMenuItem.Text = "Generate License Diagnostic Data for Solimar...";
+            this.genDiagnosticDataDropDownMenuItem.Click += new System.EventHandler(this.genDiagnosticDataDropDownMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -579,7 +578,7 @@ namespace SolimarLicenseViewer
             this.Controls.Add(this.menuStrip1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "License Viewer [Disconnected]";
+            this.Text = "License Viewer";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.ConnectMenuItem_Click);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
