@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1B63AAE8-F2DF-4495-A7E1-2277ED836BF1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shared.VisualComponents</RootNamespace>
+    <AssemblyName>Shared.VisualComponents</AssemblyName>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Image\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Compile Include="DialogBaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DialogBaseForm.Designer.cs">
+      <DependentUpon>DialogBaseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DifferenceLicenseInfoControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DifferenceLicenseInfoControl.Designer.cs">
+      <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LicenseInfoViewerControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LicenseInfoViewerControl.Designer.cs">
+      <DependentUpon>LicenseInfoViewerControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ListViewHelper.cs" />
+    <Compile Include="ListView_Scroll.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ListView_Scroll.designer.cs">
+      <DependentUpon>ListView_Scroll.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingCircle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LoadingCircle.Designer.cs">
+      <DependentUpon>LoadingCircle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NoFlickerListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="NoFlickerListView.designer.cs">
+      <DependentUpon>NoFlickerListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SoftwareSpecViewerControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SoftwareSpecViewerControl.Designer.cs">
+      <DependentUpon>SoftwareSpecViewerControl.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DialogBaseForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DialogBaseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DifferenceLicenseInfoControl.resx">
+      <DependentUpon>DifferenceLicenseInfoControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LicenseInfoViewerControl.resx">
+      <DependentUpon>LicenseInfoViewerControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NoFlickerListView.resx">
+      <DependentUpon>NoFlickerListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\Solimar.Licensing.Common.csproj">
+      <Project>{8FB109FF-36E9-4A3F-A2D6-9DE37EFA2C78}</Project>
+      <Name>Solimar.Licensing.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

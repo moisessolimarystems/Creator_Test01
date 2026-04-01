@@ -1,0 +1,20 @@
+
+License Server Number
+	Validation Key 
+		- One possible Validation Token for a License Server
+		- Values written to cells on the Key, and why.
+			- Key Type = 0xFF
+			- Product ID = 0xFF
+			- The GUID is used a rotating GUID, everytime any thing is done to the License Server File, such as apply a License Packet, create/appy License Archive or use a Product Activation, the GUID will change.  The changing GUID will prevent Validation of older Licnese Server Files, and only allow the latest one to work.
+			- Last Modified Date
+				- A License Server will not accept a License Packet/License Archive with a creation date less than the Last Modified Date of the cell on a key.  This prevents rolling back the clock on computers and applying old License Packets, or deleting a License Server information, and reapplying License Packets.
+				- Everytime a License Packet is applied, its Creation date is applied to the Key's Modified Date.  
+
+
+
+
+
+
+
+
+	
