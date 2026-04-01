@@ -1,0 +1,20 @@
+[Global] 
+FreshMode = Custom 
+MaintanenceMode = RemoveAll 
+UpgradeMode =  UpgradeOnly 
+
+[msmq] 
+ControllerServer=
+ServerAuthenticationOnly = FALSE 
+
+[Components] 
+msmq_Core=ON
+msmq_LocalStorage=ON 
+msmq_HTTPSupport=OFF 
+msmq_RoutingSupport=OFF 
+msmq_ADIntegrated=OFF
+msmq_MQDSService=OFF 
+msmq_TriggersService=OFF 
+ 
+
+

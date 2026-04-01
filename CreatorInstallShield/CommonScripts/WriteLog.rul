@@ -1,0 +1,38 @@
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:		WriteLog.rul
+//                                                                            
+//  Description:	InstallShield script                                        
+//                                                                            
+//  Comments:		This file is to house the COM+ Functions
+//
+//  Copyright:		Solimar Systems, Inc. 
+//					Copyright 2003  
+//
+//  Author:			Jeff Lan
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#ifndef _WRITELOG_RUL_
+#define _WRITELOG_RUL_
+
+function CreateLog()
+begin
+	//Not used anymore, remove at some point
+end;
+
+function WriteLog(szMsg)
+begin
+	//Write the value to MSI log;
+	SprintfMsiLog("CustomAction::Message - %s", szMsg);
+end;
+
+
+
+function WriteErrorToLog(errNum, szMsg)
+begin
+	//Write the value to MSI log;
+	SprintfMsiLog("CustomAction::Error: %d - %s", errNum, szMsg);
+end;
+
+#endif //_WRITELOG_RUL_

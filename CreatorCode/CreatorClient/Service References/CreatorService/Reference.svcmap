@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="a0c37e1f-1642-4b66-938c-0529892d8782" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.Generic.List`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="net.tcp://localhost:9090/Creator/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="63ef6613-30a9-4fd2-a892-d48b68ce8432" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="cb4f7bec-6f21-4007-8bb8-ae942d89adfd" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="1393f6c4-6369-4038-8a0e-7cb3502a0eb4" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="CreatorData.xsd" MetadataType="Schema" ID="26268390-096a-4ea3-afbf-e2d27340fe3d" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="Solimar.Licensing.Attribs.xsd" MetadataType="Schema" ID="dfa3bea4-4878-492c-af71-a750ec9d6e09" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="Service.Creator.xsd" MetadataType="Schema" ID="e7d9a3fd-24e7-4b7c-8f3c-b9c0e3f85d8f" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+    <MetadataFile FileName="Solimar.Licensing.LicenseManagerWrapper.xsd" MetadataType="Schema" ID="d85f6d88-5c7e-4ace-a779-4e16e2449ed9" SourceId="1" SourceUrl="net.tcp://localhost:9090/Creator/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

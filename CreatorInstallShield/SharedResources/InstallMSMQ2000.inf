@@ -1,0 +1,14 @@
+[Version]
+Signature = "$Windows NT$"
+
+[Global]
+FreshMode = Custom
+MaintenanceMode = RemoveAll
+UpgradeMode =  UpgradeOnly
+
+[Components]
+msmq = on 
+
+[Msmq]
+Type = IND 
+DisableAD = true

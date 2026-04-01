@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/CreatorData" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/CreatorData" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="TransactionTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="taType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="taDescription" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="taUnits" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="taDateCreated" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="taUser" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="taPacketID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="taLicenseID" type="xs:int" />
+      <xs:element minOccurs="0" name="taOrderID" nillable="true" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TransactionTable" nillable="true" type="tns:TransactionTable" />
+  <xs:complexType name="ArrayOfOrderTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="OrderTable" nillable="true" type="tns:OrderTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfOrderTable" nillable="true" type="tns:ArrayOfOrderTable" />
+  <xs:complexType name="OrderTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="OrderIndex" type="xs:int" />
+      <xs:element minOccurs="0" name="OrderNumber" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="OrderState" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
+      <xs:element minOccurs="0" name="ExpirationDate" nillable="true" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProductName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ProductVersion" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ParentOrderNumber" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OrderTable" nillable="true" type="tns:OrderTable" />
+  <xs:complexType name="ArrayOfTokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TokenTable" nillable="true" type="tns:TokenTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTokenTable" nillable="true" type="tns:ArrayOfTokenTable" />
+  <xs:complexType name="TokenTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
+      <xs:element minOccurs="0" name="TokenType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="TokenValue" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CustID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TokenTable" nillable="true" type="tns:TokenTable" />
+  <xs:complexType name="ArrayOfDestinationNameTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DestinationNameTable" nillable="true" type="tns:DestinationNameTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDestinationNameTable" nillable="true" type="tns:ArrayOfDestinationNameTable" />
+  <xs:complexType name="DestinationNameTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="CustID" type="xs:int" />
+      <xs:element minOccurs="0" name="DestID" type="xs:int" />
+      <xs:element minOccurs="0" name="DestName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DestinationNameTable" nillable="true" type="tns:DestinationNameTable" />
+  <xs:complexType name="PermissionsTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="pt_login" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="pt_create_modify_key" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_extension_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_version_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_module_pwd" nillable="true" type="xs:boolean" />
+      <xs:element minOccurs="0" name="pt_permanent_pwd" nillable="true" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PermissionsTable" nillable="true" type="tns:PermissionsTable" />
+  <xs:complexType name="ArrayOfCustomerTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CustomerTable" nillable="true" type="tns:CustomerTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCustomerTable" nillable="true" type="tns:ArrayOfCustomerTable" />
+  <xs:complexType name="CustomerTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="SCRnumber" type="xs:int" />
+      <xs:element minOccurs="0" name="SCRname" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SCRoperator" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LicenseTables" nillable="true" type="tns:ArrayOfLicenseTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CustomerTable" nillable="true" type="tns:CustomerTable" />
+  <xs:complexType name="ArrayOfLicenseTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="LicenseTable" nillable="true" type="tns:LicenseTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLicenseTable" nillable="true" type="tns:ArrayOfLicenseTable" />
+  <xs:complexType name="LicenseTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="SCRnumber" type="xs:int" />
+      <xs:element minOccurs="0" name="DestinationID" type="xs:int" />
+      <xs:element minOccurs="0" name="GroupID" type="xs:int" />
+      <xs:element minOccurs="0" name="LicenseName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LicenseType" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="LicenseInfo" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LicenseComments" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="OrderIndex" type="xs:int" />
+      <xs:element minOccurs="0" name="TransactionTables" nillable="true" type="tns:ArrayOfTransactionTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="PacketTables" nillable="true" type="tns:ArrayOfPacketTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="OrderTables" nillable="true" type="tns:ArrayOfOrderTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="TokenTables" nillable="true" type="tns:ArrayOfTokenTable">
+        <xs:annotation>
+          <xs:appinfo>
+            <DefaultValue EmitDefaultValue="false" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+            </DefaultValue>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LicenseTable" nillable="true" type="tns:LicenseTable" />
+  <xs:complexType name="ArrayOfTransactionTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TransactionTable" nillable="true" type="tns:TransactionTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfTransactionTable" nillable="true" type="tns:ArrayOfTransactionTable" />
+  <xs:complexType name="ArrayOfPacketTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PacketTable" nillable="true" type="tns:PacketTable" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfPacketTable" nillable="true" type="tns:ArrayOfPacketTable" />
+  <xs:complexType name="PacketTable">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="DateCreated" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="PacketVerificationCode" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="IsVerified" type="xs:boolean" />
+      <xs:element minOccurs="0" name="PacketComments" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PacketName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="LicenseID" type="xs:int" />
+      <xs:element minOccurs="0" name="UserName" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PacketTable" nillable="true" type="tns:PacketTable" />
+</xs:schema>

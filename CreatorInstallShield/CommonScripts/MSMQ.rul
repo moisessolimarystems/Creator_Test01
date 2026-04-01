@@ -1,0 +1,338 @@
+prototype MSMQCreate(STRING, STRING, BYREF STRING);
+prototype MSMQFindExisting(STRING, STRING);            
+prototype MSMQFindPrivateExisting(STRING, STRING);
+prototype MSMQDeleteExisting(STRING, STRING);           
+prototype MSMQDeletePrivateExisting(STRING, STRING);
+prototype MSMQCreateQueue(STRING, STRING, BYREF STRING);
+prototype MSMQDetect();
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//	USEAGE:		This module contains the following functions that can be "exported"
+//
+//				MSMQCreate([Server Name], [Queue Name], [Queue GUID])
+//				MSMQCreateQueue([Server Name], [Queue Name], [Queue GUID])
+//				MSMQFindExisting("QUEUE_NAME" or "QUEUE_ID", [Queue Name])
+//				MSMQDeleteExisting("QUEUE_NAME" or "QUEUE_ID", [Queue Name])
+//				MSMQDetect()
+//
+//				Return codes for each of these are:
+//					0	Passed
+//					-1	Failed
+//
+//				For MSMQFindExisting & MSMQDeleteExisting, in parameter 1, you must
+//				pass the type of value you are passing in parameter 2.
+//					QUEUE_NAME
+//						[Queue Name]	Name of queue "Test queue"
+//					QUEUE_ID
+//						[Queue Name]	ID of queue "{84749392-1645-465D-B1C7-51CBB9E4C4D9}"
+//
+//////////////////////////////////////////////////////////////////////////////
+        
+#include "..\..\Common Script\WriteLog.h"
+   
+///////////////////////////////////////////////////////////////////////////////
+//
+//	Function:	MSMQCreate
+//
+//	Purpose:	Delete queue if exists and create new queue
+//
+//				0	Passed
+//				-1	Failed
+//
+//				MSMQCreate ([SERVER], [QUEUE NAME], [QUEUE ID])
+//
+//				example:
+//					nResult  = CreateMSMQ ("SERVER1", "Test Queue", szQueueID);
+//
+//				Some testing code that sends a message to a queue label.
+//				set myq = oMSMQInfo.Open (2, 0);
+//				if myq.IsOpen = 1 then
+//					set m = CreateObject("MSMQ.MSMQMessage");//Server.
+//					m.Body = "String message body.";
+//					m.Label = "Test Message";
+//					m.Send (myq);
+//				endif;
+//				myq.Close;
+//
+///////////////////////////////////////////////////////////////////////////////
+function MSMQCreate(svServerName, svQueueName, svQueueID)
+	NUMBER	nResult;
+begin
+	// Don't care about return.  Just removing if same name exists.
+	nResult = MSMQDeletePrivateExisting(svServerName, svQueueName);
+	// We care about this return
+	nResult = MSMQCreateQueue(svServerName, svQueueName, svQueueID);
+	return nResult;
+end;
+
+function MSMQFindPrivateExisting(QUEUEIDTYPE, svQueueIdentifier)
+begin
+end;  
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//	Function:	MSMQFindExisting
+//
+//	Purpose:	Find out if queue name exists already
+//
+//				0	Passed
+//				-1	Failed
+//
+///////////////////////////////////////////////////////////////////////////////
+function MSMQFindExisting(QUEUEIDTYPE, svQueueIdentifier)
+	OBJECT	oMSMQInfos, oMSMQInfo, oMSMQQuery;
+	STRING	svResult;
+	NUMBER	nResult;
+begin
+	try
+		//	Create the MSMQ object
+		set oMSMQInfos = CreateObject ("MSMQ.MSMQQueueInfos");
+		set oMSMQInfo = CreateObject ("MSMQ.MSMQQueueInfo");
+		set oMSMQQuery = CreateObject ("MSMQ.MSMQQuery");
+
+    	//  If Objects Cannot be Instantiated, MSMQ is Not Properly Installed.
+    	if (!IsObject(oMSMQInfos)) || (!IsObject(oMSMQInfo)) || (!IsObject(oMSMQQuery)) then
+    		Err.Raise(1000, "Creating MSMQ", "MSMQ is not present on target machine.\nNOT FOUND: MSMQ.MSMQQueueInfos");
+    	endif;       
+		
+		//	Get the collection of existing queues
+		set oMSMQInfos = oMSMQQuery.LookupQueue;
+		oMSMQInfos.Reset;
+		set oMSMQInfo = oMSMQInfos.Next;
+
+		//	Cycle through all existing queues looking for your queue name
+		nResult = -1; // Initialize this to not found
+		while IsObject(oMSMQInfo)
+			//	Set the comparison string to the type of string provided by user
+			switch (QUEUEIDTYPE)
+				case "QUEUE_NAME"	:
+					svResult = oMSMQInfo.Label;
+				case "QUEUE_ID"		:
+					svResult = oMSMQInfo.QueueGuid;
+				default				:
+					MessageBox("Need to identify passed parameter!", WARNING);
+					return -1;
+			endswitch;
+			if svResult = svQueueIdentifier then
+				//	We have to double check. Sometimes queues don't get all the way deleted
+				try
+					//	If it can't update it, it doesn't exist anymore
+					//	If there is an error, it will go to next catch
+					oMSMQInfo.Update;
+					nResult = 0;
+				catch
+					// Do nothing for now.  Continue cycling through
+					//MessageBox(Err.Description, SEVERE);
+					Err.Clear;
+				endcatch;
+			endif;
+			set oMSMQInfo = oMSMQInfos.Next;
+		endwhile;
+
+	catch
+    	if Err.Description = "" then
+    		Err.Description = "Could not find existing queues!\nMSMQFindExisting()";
+    	endif;
+		MessageBox(Err.Description, SEVERE);
+		Err.Clear;
+    	return -1;
+	endcatch;
+
+	oMSMQInfos.Reset;
+
+	return nResult;
+end;
+
+function MSMQDeletePrivateExisting(svServerName, svQueueName)
+	OBJECT	oMSMQInfo;
+	STRING	svResult;   
+begin
+	try
+		//	Create the MSMQ object
+		set oMSMQInfo = CreateObject ("MSMQ.MSMQQueueInfo");
+
+    	//  If Objects Cannot be Instantiated, MSMQ is Not Properly Installed.
+    	if (!IsObject(oMSMQInfo)) then
+    		Err.Raise(1000, "Creating MSMQ", "MSMQ is not present on target machine.\nNOT FOUND: MSMQ.MSMQQueueInfos");
+    	endif;       
+		
+		//	Set the path name of the queue
+		//	PRIVATE QUEUE eg. iq.PathName = "[SERVER]\PRIVATE$\[QUEUE NAME]" 
+		oMSMQInfo.PathName = svServerName+ "\\private$\\" + svQueueName;
+		oMSMQInfo.Label = svQueueName;
+		
+		//	Delete the queue.  
+		oMSMQInfo.Delete;
+
+	catch
+    	/*if Err.Description = "" then
+    		Err.Description = "Could not delete queue!\nMSMQCreateQueue()";
+    	endif;
+		MessageBox(Err.Description, SEVERE);
+		Err.Clear;
+    	return -1;
+    	*/
+    	WriteErrorToLog(Err.Number, "Could not delete queue!" + Err.Description);  
+    	Err.Clear;
+    	return -1;
+	endcatch;
+
+	return 0;	
+end;
+///////////////////////////////////////////////////////////////////////////////
+//
+//	Function:	MSMQDeleteExisting
+//
+//	Purpose:	Delete existing queue
+//
+//				0	Passed
+//				-1	Failed
+//
+///////////////////////////////////////////////////////////////////////////////
+function MSMQDeleteExisting(QUEUEIDTYPE, svQueueIdentifier)
+	OBJECT	oMSMQInfos, oMSMQInfo, oMSMQQuery;
+	STRING	svResult;
+	NUMBER	nResult;
+begin
+	try
+		//	Create the MSMQ object
+		set oMSMQInfos = CreateObject ("MSMQ.MSMQQueueInfos");
+		set oMSMQInfo = CreateObject ("MSMQ.MSMQQueueInfo");
+		set oMSMQQuery = CreateObject ("MSMQ.MSMQQuery");
+		
+    	//  If Objects Cannot be Instantiated, MSMQ is Not Properly Installed.
+    	if (!IsObject(oMSMQInfos)) || (!IsObject(oMSMQInfo)) || (!IsObject(oMSMQQuery)) then
+    		Err.Raise(1000, "Creating MSMQ", "MSMQ is not present on target machine.\nNOT FOUND: MSMQ.MSMQQueueInfos");
+    	endif;       
+		
+		//	Get the collection of existing queues
+		set oMSMQInfos = oMSMQQuery.LookupQueue;
+		oMSMQInfos.Reset;
+		set oMSMQInfo = oMSMQInfos.Next;
+
+		//	Cycle through all existing queues looking for your queue name
+		nResult = -1; // Initialize this to not found
+		while IsObject(oMSMQInfo)
+			switch (QUEUEIDTYPE)
+				case "QUEUE_NAME"	:
+					svResult = oMSMQInfo.Label;
+				case "QUEUE_ID"		:
+					svResult = oMSMQInfo.QueueGuid;
+				default				:
+					MessageBox("Need to identify passed parameter!", WARNING);
+					return -1;
+			endswitch;
+			if svResult = svQueueIdentifier then
+				//	We have to double check. Sometimes queues don't get all the way deleted.
+				try
+					oMSMQInfo.Delete; // If there is an error, it will go to next catch
+					oMSMQInfo.Refresh;
+					nResult = 0;
+				catch
+					// Do nothing for now.  Continue cycling through
+					//MessageBox(Err.Description, SEVERE);
+					Err.Clear;
+				endcatch;
+			endif;
+			set oMSMQInfo = oMSMQInfos.Next;
+		endwhile;
+
+	catch
+    	if Err.Description = "" then
+    		Err.Description = "Could not delete existing queue!\nMSMQDeleteExisting()";
+    	endif;
+		MessageBox(Err.Description, SEVERE);
+		Err.Clear;
+    	return -1;
+	endcatch;
+
+	oMSMQInfos.Reset;
+
+	return nResult;
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//	Function:	MSMQCreateQueue
+//
+//	Purpose:	Create a new queue
+//
+//				0	Passed
+//				-1	Failed
+//
+///////////////////////////////////////////////////////////////////////////////
+function MSMQCreateQueue(svServerName, svQueueName, svQueueID)
+	OBJECT	oMSMQInfo;
+	STRING	svResult;  
+	SHORT   sVal;
+begin
+	try
+		//	Create the MSMQ object
+		set oMSMQInfo = CreateObject ("MSMQ.MSMQQueueInfo");
+
+    	//  If Objects Cannot be Instantiated, MSMQ is Not Properly Installed.
+    	if (!IsObject(oMSMQInfo)) then
+    		Err.Raise(1000, "Creating MSMQ", "MSMQ is not present on target machine.\nNOT FOUND: MSMQ.MSMQQueueInfos");
+    	endif;       
+		sVal = 1;
+		//	Set the path name of the queue
+		//	PRIVATE QUEUE eg. iq.PathName = "[SERVER]\PRIVATE$\[QUEUE NAME]"
+		oMSMQInfo.PathName = svServerName + "\\PRIVATE$\\" + svQueueName;
+		oMSMQInfo.Label = svQueueName;
+		//	Create the queue.  FORMAT: oMSMQInfo.Create (BOOLIsTransactional, BOOLIsWorldReadable)
+		oMSMQInfo.Create(FALSE, TRUE);
+		oMSMQInfo.Refresh;
+
+		svQueueID = svQueueName; //oMSMQInfo.QueueGuid;
+
+	catch
+    	/*if Err.Description = "" then
+    		Err.Description = "Could not create new queue!\nMSMQCreateQueue()";
+    	endif;
+		MessageBox(Err.Description, SEVERE);
+		*/
+		WriteErrorToLog(Err.Number, "Could not create queue!" + Err.Description);  
+    	Err.Clear;
+    	return -1;
+	endcatch;
+
+	return 0;
+end;
+
+
+//////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   MSMQDetect
+//
+//  EVENT:      This will instantiated the MSMQ object.
+//
+//				0	Passed	Found MSMQ object
+//				-1	Failed	Error, couldn't find MSMQ object
+//
+//////////////////////////////////////////////////////////////////////////////
+function MSMQDetect()
+	OBJECT	oMSMQInfo;
+begin    
+	try
+		//	First, we create the catalog object
+		set oMSMQInfo = CreateObject ("MSMQ.MSMQQueueInfo");
+    	
+    	//  If Object Cannot be Instantiated, MSMQ is Not Properly Installed.
+    	if (!IsObject(oMSMQInfo)) then
+    		Err.Raise(1000, "Creating MSMQ", "MSMQ is not present on target machine.\nNOT FOUND: MSMQ.MSMQQueueInfo");
+    	endif;       
+
+    catch
+    	if Err.Description = "" then
+    		Err.Description = "Could not detect MSMQ on this computer!\nMSMQ.MSMQQueueInfo";
+    	endif;
+        MessageBox(Err.Description, SEVERE);
+		return -1;
+    endcatch;
+
+	return 0;
+end;
+
+#include "..\..\Common Script\WriteLog.rul"

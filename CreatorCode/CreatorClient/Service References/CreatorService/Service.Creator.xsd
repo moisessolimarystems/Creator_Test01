@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Service.Creator" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Service.Creator" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="ArrayOfCondition">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Condition" nillable="true" type="tns:Condition" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCondition" nillable="true" type="tns:ArrayOfCondition" />
+  <xs:complexType name="Condition">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ConditionName" type="tns:Name" />
+      <xs:element minOccurs="0" name="ConditionOperator" type="tns:Operator" />
+      <xs:element minOccurs="0" name="ConditionValue" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Condition" nillable="true" type="tns:Condition" />
+  <xs:simpleType name="Name">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Customer" />
+      <xs:enumeration value="DestinationID" />
+      <xs:enumeration value="GroupID" />
+      <xs:enumeration value="LicenseType" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Name" nillable="true" type="tns:Name" />
+  <xs:simpleType name="Operator">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Equals" />
+      <xs:enumeration value="LessThan" />
+      <xs:enumeration value="GreaterThan" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="Operator" nillable="true" type="tns:Operator" />
+</xs:schema>

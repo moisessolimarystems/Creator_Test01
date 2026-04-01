@@ -1,0 +1,584 @@
+
+#include "SoftwareServerDataMgr.h"
+#include "..\common\StringUtils.h"
+#include "..\common\FlateHelper.h"
+#include "..\common\CryptoHelper.h"
+#include "..\common\CryptoAndFlateHelper.h"
+#include "..\common\SafeMutex.h"
+#include "..\common\TimeHelper.h"
+#include <shlobj.h> //For SHGetFolderPath
+#include <shlwapi.h> //For PathAppend
+#include <math.h>			//For abs
+
+
+#include <sys/stat.h>	//For _S_IWRITE that _wchmod uses
+
+#define LICENSE_FILE_CODE	L"C9379DA6077646588738518B3EBD67AF"
+BYTE SoftwareLicenseFile::crypto_license_file_password[] = {
+#include "..\common\keys\SolimarLicenseFile.password.txt"
+};
+BYTE SoftwareLicenseFile::crypto_license_file_public[] = {
+#include "..\common\keys\SolimarLicenseFile.public.key.txt"
+};
+BYTE SoftwareLicenseFile::crypto_license_file_private[] = {
+#include "..\common\keys\SolimarLicenseFile.private.key.txt"
+};
+//static BYTE crypto_license_file_public[];
+//static BYTE crypto_license_file_private[];
+//
+//SoftwareServerDataMgr
+//
+
+//Public
+SoftwareServerDataMgr::SoftwareServerDataMgr()
+ :	pServerDataAttribs(NULL),
+	softwareServerDataMgrLock(CreateMutex(0,0,0)),
+	lastTouchDateTimeT(NULL)
+{
+}
+
+SoftwareServerDataMgr::~SoftwareServerDataMgr()
+{
+	if(pServerDataAttribs)
+		delete pServerDataAttribs;
+	
+	if (softwareServerDataMgrLock!=NULL)
+		CloseHandle(softwareServerDataMgrLock);
+}
+
+HRESULT SoftwareServerDataMgr::GetAllFileInfoList(Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribsList* pFileInfoList)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+		//pFileInfoList->InitFromString(pServerDataAttribs->fileInfoList.ToString().c_str());
+		*pFileInfoList = pServerDataAttribs->fileInfoList;
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+HRESULT SoftwareServerDataMgr::GetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pFileInfo)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		hr = E_INVALIDARG;
+		for(	Lic_ServerDataAttribs::TVector_Lic_ServerDataFileInfoAttribsList::iterator licSrvFileInfoListIt = pServerDataAttribs->fileInfoList->begin();
+				licSrvFileInfoListIt != pServerDataAttribs->fileInfoList->end();
+				licSrvFileInfoListIt++)
+		{
+			if(_wcsicmp(licSrvFileInfoListIt->LicName->c_str(), bstrLicenseNameValue) == 0)
+			{
+				pFileInfo->InitFromString(licSrvFileInfoListIt->ToString().c_str());
+				hr = S_OK;
+				break;
+			}
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+//Will add bstrLicenseNameValue if it doesn't already exist.
+HRESULT SoftwareServerDataMgr::SetFileInfoFor(_bstr_t bstrLicenseNameValue, Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pFileInfo)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		//Look for existing bstrLicenseNameValue to update
+		bool bFound = false;
+		for(	Lic_ServerDataAttribs::TVector_Lic_ServerDataFileInfoAttribsList::iterator licSrvFileInfoListIt = pServerDataAttribs->fileInfoList->begin();
+				licSrvFileInfoListIt != pServerDataAttribs->fileInfoList->end();
+				licSrvFileInfoListIt++)
+		{
+			if(_wcsicmp(licSrvFileInfoListIt->LicName->c_str(), bstrLicenseNameValue) == 0)
+			{
+				bFound = true;
+				licSrvFileInfoListIt->InitFromString(pFileInfo->ToString().c_str());
+				//	pFileInfo->InitFromString(licSrvFileInfoListIt->ToString().c_str());
+				break;
+			}
+		}
+
+		if(!bFound)
+		{
+			pServerDataAttribs->fileInfoList->push_back(*pFileInfo);
+		}
+		SaveToFile();
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+HRESULT SoftwareServerDataMgr::Touch()
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+
+		if(pServerDataAttribs == NULL)
+			hr = LoadFromFile();
+		if(FAILED(hr))
+			throw hr;
+
+		time_t timeNowTimeT = time(NULL);	//Retrieves Universal Time
+		double timeDiffSeconds = difftime(lastTouchDateTimeT, timeNowTimeT);
+		if(abs(timeDiffSeconds) > (60.0*5))		//Don't touch if have touched within last 5 minutes...
+		{
+			lastTouchDateTimeT = timeNowTimeT;
+			_variant_t vtCurTime;
+			vtCurTime = TimeHelper::TimeTToVariant(timeNowTimeT, true);
+			SYSTEMTIME curTimeSystime;
+			VariantTimeToSystemTime(vtCurTime.date, &curTimeSystime);
+			wchar_t curTimeStamp[256];
+			TimeHelper::SystemTimeToString(curTimeStamp, sizeof(curTimeStamp)/sizeof(wchar_t), curTimeSystime);
+			pServerDataAttribs->lastTouchDate = std::wstring(curTimeStamp);
+
+			hr = SaveToFile();
+			if(FAILED(hr))
+				throw hr;
+		}
+
+
+		//SYSTEMTIME currentSystime;
+		//GetSystemTime(&currentSystime);
+		//wchar_t timestamp[256];
+		//TimeHelper::SystemTimeToString(timestamp, sizeof(timestamp)/sizeof(wchar_t), currentSystime);
+		//pServerDataAttribs->lastTouchDate = std::wstring(timestamp);
+
+		////hr = SaveToFile();
+		////if(FAILED(hr))
+		////	throw hr;
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+
+
+// Up to caller to free pBstrSoftwareStream
+HRESULT SoftwareServerDataMgr::GetLicServerDataAttrbsStream(BSTR* pBstrSoftwareStream)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+		*pBstrSoftwareStream = SysAllocString(pServerDataAttribs->ToString().c_str());
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+//#define GENERATE_LIC
+#ifdef GENERATE_LIC
+#include "SolimarSoftwareLicenseMgr.h"
+HRESULT CreateNew_Lic_ServerDataFileInfoAttribs(Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs* pLicServerData, SoftwareServerDataMgr* pSoftwareServerDataMgr)
+{
+	SoftwareLicenseMgr* pNewSwLicMgr;
+	pNewSwLicMgr = new SoftwareLicenseMgr();
+	WCHAR szPath[MAX_PATH];
+	
+	//Find CSIDL_COMMON_APPDATA on local system
+	HRESULT hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPath );
+	PathAppend(szPath, L"Solimar\\Licensing\\");
+
+	_bstr_t newLicenseFile = _bstr_t(L"");
+	GUID key_guid;
+	hr = CoCreateGuid(&key_guid);
+	if (FAILED(hr))
+		throw hr;
+	
+	wchar_t tmp_code[128];
+	StringFromGUID2(key_guid, tmp_code, 128);
+	tmp_code[127]=0;
+	newLicenseFile = _bstr_t(tmp_code).Detach();
+
+	pNewSwLicMgr->Initialize(_bstr_t(szPath) + newLicenseFile, NULL, pSoftwareServerDataMgr);
+	pLicServerData->LicFileName = std::wstring(SpdAttribs::WStringObj(_bstr_t(szPath) + newLicenseFile));
+	pLicServerData->LicFileVerificationCode = std::wstring(L"{D98A3C30-02DB-43D8-AF5F-CAEC61EC076B}");
+	//pLicServerData->LicFileVerificationCode = pNewSwLicMgr->
+	pLicServerData->LicName = std::wstring(SpdAttribs::WStringObj(newLicenseFile));
+	//softwareLicMgrMap.insert(SoftwareLicList::value_type(_bstr_t(szPath) + newLicenseFile, pSoftwareLicMgr));
+
+
+	return S_OK;
+}
+#endif
+//Private
+HRESULT SoftwareServerDataMgr::LoadFromFile()
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+		WCHAR szPathAndFile[MAX_PATH];
+
+		//Find CSIDL_COMMON_APPDATA on local system
+		hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPathAndFile );
+		if(FAILED(hr))
+			throw hr;
+
+		//Append solimar licensing location.
+		if(!PathAppend(szPathAndFile, L"Solimar\\Licensing\\SolimarLicenseServer.dat")) 
+			throw E_FAIL;
+
+		BSTR bstrSoftwareStream = NULL;
+		bool bNoFile(false);
+		//bool bNoDataInFile(false);
+		bool bNoPath(false);
+		hr = SoftwareLicenseFile::LoadFromLicenseFile(szPathAndFile, &bstrSoftwareStream);
+		if(hr == 0x80070002)	//File not Found
+			bNoFile = true;
+		if(hr == 0x80070003)	//Path not Found
+		{
+			bNoFile = true;
+			bNoPath = true;
+		}
+		else if(FAILED(hr))
+			throw hr;
+
+		if(bNoPath)
+		{
+			WCHAR szCreatePathAndFile[MAX_PATH];
+			hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szCreatePathAndFile );
+			if(FAILED(hr))
+				throw hr;
+			PathAppend(szCreatePathAndFile, L"Solimar");
+			if(PathFileExists(szCreatePathAndFile) == false)
+				CreateDirectory(szCreatePathAndFile, 0);
+			PathAppend(szCreatePathAndFile, L"Licensing");
+			if(PathFileExists(szCreatePathAndFile) == false)
+				CreateDirectory(szCreatePathAndFile, 0);
+		}
+
+		if(pServerDataAttribs == NULL)
+			pServerDataAttribs = new Lic_ServerDataAttribs();
+
+		if(bstrSoftwareStream != NULL)
+		{
+			pServerDataAttribs->InitFromString(bstrSoftwareStream);
+			SysFreeString(bstrSoftwareStream);	//Clean up
+		}
+
+		if(bNoFile)
+		{
+			#ifdef GENERATE_LIC
+			//Initialize For Testing...
+			Lic_ServerDataAttribs::Lic_ServerDataFileInfoAttribs newLicServerData;
+			if(SUCCEEDED(CreateNew_Lic_ServerDataFileInfoAttribs(&newLicServerData, NULL)))
+				pServerDataAttribs->fileInfoList->push_back(newLicServerData);
+			#endif
+
+			SaveToFile();
+		}
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+HRESULT SoftwareServerDataMgr::SaveToFile()
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		SafeMutex mutex(softwareServerDataMgrLock);
+		if(pServerDataAttribs == NULL)
+			throw E_FAIL;
+
+		WCHAR szPathAndFile[MAX_PATH];
+
+		//Find CSIDL_COMMON_APPDATA on local system
+		hr = SHGetFolderPath( NULL, CSIDL_COMMON_APPDATA, NULL, 0, szPathAndFile );
+		if(FAILED(hr))
+			throw hr;
+
+		//Append solimar licensing location.
+		if(!PathAppend(szPathAndFile, L"Solimar\\Licensing\\SolimarLicenseServer.dat")) 
+			throw E_FAIL;
+
+		BSTR bstrLicPacketStream = SysAllocString(pServerDataAttribs->ToString().c_str());
+		hr = SoftwareLicenseFile::SaveToLicenseFile(szPathAndFile, bstrLicPacketStream);
+		SysFreeString(bstrLicPacketStream);
+		if(FAILED(hr))
+			throw hr;
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
+
+
+
+//
+// class SoftwareLicenseFile
+//
+
+
+//static
+HRESULT SoftwareLicenseFile::SaveToLicenseFile(_bstr_t licenseFileName, BSTR bstrSoftwareStream)
+{
+//	SafeMutex mutex(softwareLicenseFileLock);
+	HRESULT hr(S_OK);
+	HANDLE hFile(INVALID_HANDLE_VALUE); 
+	
+	try
+	{
+		//change from read-only file mode
+		//		returns -1 and errno == ENOENT if file can't be found, doesn't matter, continue
+      _wchmod(licenseFileName, _S_IWRITE);
+		
+		hFile = CreateFileW(
+			licenseFileName, 
+			GENERIC_WRITE | GENERIC_READ,	//DWORD dwDesiredAccess,
+			0,	//DWORD dwShareMode,
+			NULL,				//LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+			OPEN_ALWAYS,	//DWORD dwCreationDisposition,
+			FILE_ATTRIBUTE_HIDDEN|FILE_ATTRIBUTE_READONLY,	//DWORD dwFlagsAndAttributes,
+			NULL);			//HANDLE hTemplateFile
+		if (hFile == INVALID_HANDLE_VALUE) 
+		{
+			throw HRESULT_FROM_WIN32(GetLastError());
+		}
+
+
+		//New Code
+		VARIANT vtByteArray;
+		VariantInit(&vtByteArray);
+		hr = CryptoAndFlateHelper::StreamToEncryptCompressByteArray(LICENSE_FILE_CODE, crypto_license_file_private, sizeof(crypto_license_file_private)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), bstrSoftwareStream, &vtByteArray);
+		if(FAILED(hr))
+			throw hr;
+
+		BYTE *pSAData=0;
+		if (vtByteArray.vt!=(VT_ARRAY | VT_UI1) || vtByteArray.parray==0)
+			throw E_INVALIDARG;
+
+		hr = SafeArrayAccessData(vtByteArray.parray, (void**)&pSAData);
+		if(FAILED(hr))
+			throw hr;
+
+		DWORD bytesWritten;
+		if( !WriteFile(
+							hFile,
+							pSAData,
+							vtByteArray.parray->rgsabound[0].cElements,
+							&bytesWritten,
+							NULL) )
+		{
+			hr = HRESULT_FROM_WIN32(GetLastError());
+			CloseHandle(hFile);
+			SafeArrayUnaccessData(vtByteArray.parray);
+			throw hr;
+		}
+
+		//truncate whatever data was aready in the file.
+		if( !SetEndOfFile(hFile))
+		{
+			hr = HRESULT_FROM_WIN32(GetLastError());
+			CloseHandle(hFile);
+			throw hr;
+		}
+
+		SafeArrayUnaccessData(vtByteArray.parray);
+		VariantClear(&vtByteArray);
+		CloseHandle(hFile);
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	//change to read-only file mode
+	//		returns -1 and errno == ENOENT if file can't be found, doesn't matter, continue
+   _wchmod(licenseFileName, _S_IREAD);
+
+
+	return hr;
+}
+
+//static
+HRESULT SoftwareLicenseFile::LoadFromLicenseFile(_bstr_t licenseFileName, BSTR* pBstrSoftwareStream)
+{
+//	GetLastAccessTime
+//wchar_t debug_buf[1024];
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseFile::LoadFromLicenseFile() - Enter - licenseFileName: %s", (wchar_t*)licenseFileName);
+//OutputDebugStringW(debug_buf);	
+
+
+//	SafeMutex mutex(softwareLicenseFileLock);
+	HRESULT hr(S_OK);
+	HANDLE hFile(INVALID_HANDLE_VALUE);
+
+	try
+	{
+		hFile = CreateFileW(
+			licenseFileName, 
+			GENERIC_READ,	//DWORD dwDesiredAccess,
+			0,	//DWORD dwShareMode,
+			NULL,				//LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+			OPEN_EXISTING,	//DWORD dwCreationDisposition,
+			0,					//DWORD dwFlagsAndAttributes,
+			NULL);			//HANDLE hTemplateFile
+		if (hFile == INVALID_HANDLE_VALUE) 
+		{
+			throw HRESULT_FROM_WIN32(GetLastError());
+		}
+
+		char *buffer;
+		DWORD bw, buffersize;
+		buffersize = GetFileSize(hFile, NULL);
+		if (buffersize==INVALID_FILE_SIZE)
+		{
+			CloseHandle(hFile);
+			throw E_ACCESSDENIED;
+		}
+
+		if (buffersize==0)
+		{
+			CloseHandle(hFile);
+			throw S_OK;
+		}
+		buffer=new char[buffersize+1];
+
+		if (!ReadFile(hFile, buffer, buffersize, &bw, NULL))
+		{
+			hr = HRESULT_FROM_WIN32(GetLastError());
+			CloseHandle(hFile);
+			delete [] buffer;
+			throw hr;
+		}
+		CloseHandle(hFile);
+		buffer[buffersize]='\0';
+
+
+		VARIANT vtByteArray;
+		VariantInit(&vtByteArray);
+
+		// package the string in to a variant
+		vtByteArray.vt = VT_ARRAY | VT_UI1;
+		vtByteArray.parray = SafeArrayCreateVector(VT_UI1, 0, (buffersize)*sizeof(char));
+
+		BYTE *pPacketData = 0;
+		if (FAILED(hr = SafeArrayAccessData(vtByteArray.parray, (void**)&pPacketData))) 
+		{
+			VariantClear(&vtByteArray);
+			delete [] buffer;
+			throw hr;
+		}
+		memcpy(pPacketData, buffer, (buffersize)*sizeof(char));
+		SafeArrayUnaccessData(vtByteArray.parray);
+
+
+		hr = CryptoAndFlateHelper::EncryptCompressByteArrayToStream(LICENSE_FILE_CODE, crypto_license_file_public, sizeof(crypto_license_file_public)/sizeof(BYTE), crypto_license_file_password, sizeof(crypto_license_file_password)/sizeof(BYTE), vtByteArray, pBstrSoftwareStream);
+		if(FAILED(hr))
+		{
+			VariantClear(&vtByteArray);
+			delete [] buffer;
+			throw hr;
+		}
+
+		VariantClear(&vtByteArray);
+		delete [] buffer;
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+//_snwprintf_s(debug_buf, 1024, L"SoftwareLicenseFile::LoadFromLicenseFile() - Leave - licenseFileName: %s", (wchar_t*)*pBstrSoftwareStream);
+//OutputDebugStringW(debug_buf);	
+	return hr;
+}
+
+//static
+HRESULT SoftwareLicenseFile::DeleteLicenseFile(_bstr_t licenseFileName)
+{
+	HRESULT hr(S_OK);
+	try
+	{
+		//Remove readonly attribute or will get access denied.
+		_wchmod(licenseFileName, _S_IWRITE);
+		if(!DeleteFile(licenseFileName))
+			throw HRESULT_FROM_WIN32(GetLastError());
+	}
+	catch(HRESULT &eHr)
+	{
+		hr = eHr;
+	}
+	catch (...)
+	{
+		hr = E_FAIL;
+	}
+	return hr;
+}
