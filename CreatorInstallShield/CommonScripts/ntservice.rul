@@ -1,0 +1,510 @@
+//////////////////////////////////////////////////////////////////////////////// 
+//
+//  File Name:  	NTService.rul
+//  Revision:   	1.05
+//
+//  Description:  	How to install, start, stop and remove services under NT
+//
+//  Authors:  		Mike Hegyi <mikeh@epicsys.com> - Original
+//            		Stephan Hagedorn <shagedorn@dspace.de> - Revisions
+//            		Alan F. Barksdale <afbarksd@ingr.com> - Extensions
+//            		Giorgio Cognigni <giocogni@hotmail.com> - IS3 Support
+//            		Troy Engel <tengel@abtcorp.com> - Rewrite, Extensions
+//
+//  Other:    		Ken Dyck <kdyck@go-dsp.com> - Reading his code helped ;-)
+//            		Stefan Krueger <skrueger@installsite.org> - InstallSite guru  
+//
+//	Note:			_PauseNTService(), _ResumeNTService(), & _CreateNTService()
+//					are not used.
+//
+////////////////////////////////////////////////////////////////////////////////
+#ifndef _NTSERVICE_RUL_
+#define _NTSERVICE_RUL_
+
+//=============================================================================
+//  Function:  		_InitServiceConnections(szServiceName)
+// 	Purpose:  		Initalizes connections to services and manager
+//  Parameters:  	szServiceName = String containing the service
+//                               name on the local computer. Pass
+//                               a "" here to open a simple
+//                               SCManager connection only
+//
+//  Returns:		0 If function is successful in connecting
+//              	-1 If function fails to connect
+//=============================================================================
+function _InitServiceConnections(szServiceName)
+	NUMBER nReturn, nResult;
+begin
+  // Initialize global variables
+  schService = NULL;
+  schSCManager = NULL;
+  ptrMcName = NULL;     // use local machine
+  ptrDBName = NULL;     // open services active database
+
+  // Locals
+  nReturn = 0;
+  nResult = 0;
+
+  // Load ADVAPI32.DLL, which is necessary for Service Manager-
+  // related functions.
+  if (UseDLL("AdvAPI32.dll") < 0) then
+#ifdef _NTS_DEBUG
+    MessageBox ("Couldn't load AdvAPI32.dll.", SEVERE);
+#endif
+    nReturn = -1;
+  endif;
+
+  // First establish the connection with the Service Manager
+  if (nReturn = 0) then
+    schSCManager = OpenSCManagerA(ptrMcName, ptrDBName, SC_MANAGER_ALL_ACCESS);
+    if (schSCManager = NULL) then
+      nResult = GetLastError();
+#ifdef _NTS_DEBUG
+      SprintfBox(INFORMATION, "OpenSCManagerA Error",
+                 "Error connecting to Service Manager.\n\n" +
+                 "Error number = %ld.", nResult);
+#endif
+      nReturn = -1;
+    endif;
+  endif;
+
+  if (szServiceName != "") then
+    pszSStartName = AddressString(szServiceName);  //FIX IS3
+    if (nReturn = 0) then
+      // Now open the service.
+      schService = OpenServiceA(schSCManager, pszSStartName, SERVICE_ALL_ACCESS);  //FIX IS3
+      if (schService = NULL) then
+        nResult = GetLastError();
+#ifdef _NTS_DEBUG
+        SprintfBox(INFORMATION, "OpenService Error",
+                   "Error opening service.\n\n"+
+                   "Error number = %ld.", nResult);
+#endif
+        nReturn = -1;
+      endif;
+    endif;
+  endif;
+
+  return nReturn;
+end;
+
+//=============================================================================
+//	Function:  		_CloseServiceConnections()
+//  Purpose:		Closes connections to services and manager
+//  Parameters:		None
+//  Returns:  		0 If function is successful in connecting
+//              	-1 If function fails to connect
+//=============================================================================
+function _CloseServiceConnections()
+	NUMBER nResult;
+begin
+  // Close connection to Service Manager
+  if (schSCManager != NULL) then
+    nResult = CloseServiceHandle(schSCManager);
+  endif;
+
+  // Close handle of the service installed
+  if (schService != NULL) then
+    nResult = CloseServiceHandle(schService);
+  endif;
+
+  // Deinitialize global variables, just in case
+  schService = NULL;
+  schSCManager = NULL;
+  ptrMcName = NULL;     // use local machine
+  ptrDBName = NULL;     // open services active database
+
+  UnUseDLL("AdvAPI32.dll");
+
+  return nResult;
+end;
+
+
+//=============================================================================
+// Function: 	_IsServiceAvailable(szServiceName)
+// Purpose:  	Checks to see if a service is installed
+// Parameters:  szServiceName = service name to check for
+// Returns:  	0 If service is available
+//              -1 If service is unavailable
+//=============================================================================
+function _IsServiceAvailable(szServiceName)
+	NUMBER nvResult;
+begin
+  nvResult = _InitServiceConnections(szServiceName);
+  _CloseServiceConnections();
+  return nvResult;
+end;
+
+//=============================================================================
+//  Function:   _StartNTService(szSStartName)
+//  Purpose:  	Starts a service on an NT system
+//  Parameters: szSStartName = String containing the service name on
+//                              the local computer
+//  Returns:  	0 If function is successful in starting service
+//             	-1 If function fails to start the service
+//
+//  Note:  		Make sure that all the parameters necessary for setting
+//              the service are set. If you modify any string parameters,
+//              make sure that you use the address-of operator (&) to get
+//              the pointer to the string variable.
+//
+//              Also, if you want, make appropriate changes to the access
+//              rights.
+//
+//              If a default parameter is to be selected, use the NULL
+//              parameter to pass a NULL pointer to the function.
+//=============================================================================
+function _StartNTService(szSStartName)
+	NUMBER nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+	POINTER pssServiceStatus;  //FIX IS3
+begin
+  // Initialize variables.
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  pssServiceStatus=AddressString(ssServiceStatus);  //FIX IS3
+  if (nReturn = 0) then
+    // Check to see if the service is already running
+    nResult = QueryServiceStatus(schService, pssServiceStatus);  //FIX IS3
+    if (ssServiceStatus.dwCurrentState = SERVICE_STOPPED) then
+      // Start the service
+      if (StartServiceA(schService, 0, NULL) = 0) then
+        nResult = GetLastError();
+#ifdef _NTS_DEBUG
+        SprintfBox(INFORMATION, "StartService Error",
+                   "Error starting service.\n\n" +
+                   "Error number = %ld.", nResult);
+#endif
+        nReturn = -1;
+      endif;
+    endif;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  return nReturn;
+
+end;
+
+
+//=============================================================================
+//  Function:  	 _StopNTService(szSStartName)
+//  Purpose:  	 Stops a service on an NT system
+//  Parameters:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      Returns:  0 If function is successful in stopping service
+//              -1 If function fails to stop the service
+//=============================================================================
+function _StopNTService(szSStartName)
+	NUMBER nTimer, nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+	POINTER pssServiceStatus;  //FIX IS3
+begin
+  // Initialize variables.
+  nTimer = 0;
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  pssServiceStatus=AddressString(ssServiceStatus);  //FIX IS3
+  if (nReturn = 0) then
+    // Check to see if the service is already stopped
+    nResult = ControlService(schService, SERVICE_CONTROL_STOP, pssServiceStatus);  //FIX IS3
+    while !(ssServiceStatus.dwCurrentState = SERVICE_STOPPED) && (nTimer < 20)
+      nTimer = nTimer + 1;
+      Delay (1);
+      nResult = QueryServiceStatus(schService, pssServiceStatus);  //FIX IS3
+    endwhile;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  if (nTimer = 20) then
+    // Could not stop service within 20 seconds.
+    nReturn = -1;
+  endif;
+
+  return nReturn;
+
+end;
+
+
+//=============================================================================
+//    FUNCTION:  _IsNTServiceStopped(szSStartName)
+//
+// DESCRIPTION:  Checks to see if a service is stopped
+//
+//       INPUT:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      OUTPUT:  0 If service is stopped
+//              -1 If service is not stopped
+//=============================================================================
+function _IsNTServiceStopped(szSStartName)
+	NUMBER nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+	POINTER pssServiceStatus;  //FIX IS3
+begin
+  // Initialize variables.
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  pssServiceStatus=AddressString(ssServiceStatus);  //FIX IS3
+  if (nReturn = 0) then
+    // Check to see if the service is already running
+    nResult = QueryServiceStatus(schService, pssServiceStatus);  //FIX IS3
+    if (ssServiceStatus.dwCurrentState != SERVICE_STOPPED) then
+      nReturn = -1;
+    endif;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  return nReturn;
+
+end;
+
+
+//=============================================================================
+//    FUNCTION:  _DeleteNTService(szSStartName)
+//
+// DESCRIPTION:  deletes a service on an NT system
+//
+//       INPUT:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      OUTPUT:  0 If function is successful in deleting service
+//              -1 If function fails to deleting the service
+//=============================================================================
+function _DeleteNTService(szSStartName)
+	NUMBER nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+begin
+  // Initialize variables.
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  if (nReturn = 0) then
+    // delete the service
+    if (FALSE = DeleteService(schService)) then
+      nResult = GetLastError();
+#ifdef _NTS_DEBUG
+      SprintfBox(INFORMATION, "DeleteService Error",
+                 "Error deleting service.\n\n" +
+                 "Error number = %ld.", nResult);
+#endif
+      nReturn = -1;
+    endif;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  return nReturn;
+
+end;
+
+
+//=============================================================================
+//    FUNCTION:  _CreateNTService(szServiceName, szDisplayName,
+//                    nServiceType, nStartType, nErrorType,
+//                    szPath, szLoadOrderGroup, pTagID,
+//                    szDependancies, szStartName, szPassword)
+//
+// DESCRIPTION:  Creates an NT service
+//
+//       INPUT:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      OUTPUT:  0 If function is successful in deleting service
+//              -1 If function fails to deleting the service
+//=============================================================================
+/*
+function _CreateNTService(szServiceName, szDisplayName,
+                    nServiceType, nStartType, nErrorType,
+                    szPath, szLoadOrderGroup, pTagID,
+                    szDependancies, szStartName, szPassword)
+	NUMBER nReturn, nResult;
+	POINTER pszServiceName, pszDisplayName, pszPath, pszLoadOrderGroup, pszDependancies, pszStartName, pszPassword;
+begin
+  // Initialize variables.
+  nReturn = 0;
+
+  // Open all our handles
+  _InitServiceConnections("");  
+
+  pszServiceName = AddressString(szServiceName);
+  pszDisplayName = AddressString(szDisplayName);
+  pszPath = AddressString(szPath);
+  if (szLoadOrderGroup = "") then
+    pszLoadOrderGroup = NULL;
+  else
+    pszLoadOrderGroup = AddressString(szLoadOrderGroup);
+  endif;
+  if (szDependancies = "") then
+    pszDependancies = NULL;
+  else
+    pszDependancies = AddressString(szDependancies);
+  endif;
+  if (szStartName = "") then
+    pszStartName = NULL;
+  else
+    pszStartName = AddressString(szStartName);
+  endif;
+  if (szPassword = "") then
+    pszPassword = NULL;
+  else
+    pszPassword = AddressString(szPassword);
+  endif;
+
+  schService = CreateServiceA(
+       schSCManager,         // SCManager database
+       pszServiceName,       // name of service
+       pszDisplayName,       // name to display
+       SERVICE_ALL_ACCESS,   // desired access
+       nServiceType,         // service type
+       nStartType,           // start type
+       nErrorType,           // error control type
+       pszPath,              // service's binary
+       pszLoadOrderGroup,    // load ordering group
+       pTagID,               // tag identifier
+       pszDependancies,      // dependencies
+       pszStartName,         // localSystem account
+       pszPassword);         // password
+
+  if (schService = NULL) then
+    nResult = GetLastError();
+#ifdef _NTS_DEBUG
+    SprintfBox(INFORMATION, "CreateService Error",
+               "Error creating service.\n\n"+
+               "Error number = %ld.", nResult);
+#endif
+    nReturn = -1;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  return nReturn;
+
+end;
+*/
+
+//=============================================================================
+//    FUNCTION:  _PauseNTService(szSStartName)
+//
+// DESCRIPTION:  Pauses a service on an NT system
+//
+//       INPUT:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      OUTPUT:  0 If function is successful in pausing service
+//              -1 If function fails to pause the service
+//=============================================================================  
+/*
+function _PauseNTService(szSStartName)
+	NUMBER nTimer, nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+	POINTER pssServiceStatus;  //FIX IS3
+begin
+  // Initialize variables.
+  nTimer = 0;
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  pssServiceStatus=AddressString(ssServiceStatus);  //FIX IS3
+  if (nReturn = 0) then
+    // Check to see if the service is already paused
+    nResult = ControlService(schService, SERVICE_CONTROL_PAUSE, pssServiceStatus);  //FIX IS3
+    while !(ssServiceStatus.dwCurrentState = SERVICE_PAUSED) && (nTimer < 20)
+      nTimer = nTimer + 1;
+      Delay (1);
+      nResult = QueryServiceStatus(schService, pssServiceStatus);  //FIX IS3
+    endwhile;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  if (nTimer = 20) then
+    // Could not pause service within 20 seconds.
+    nReturn = -1;
+  endif;
+
+  return nReturn;
+
+end;  
+*/
+
+//=============================================================================
+//    FUNCTION:  _ResumeNTService(szSStartName)
+//
+// DESCRIPTION:  Resumes a paused service on an NT system
+//
+//       INPUT:  szSStartName = String containing the service name on
+//                              the local computer
+//
+//      OUTPUT:  0 If function is successful in pausing service
+//              -1 If function fails to pause the service
+//============================================================================= 
+/*
+function _ResumeNTService(szSStartName)
+	NUMBER nTimer, nReturn, nResult;
+	SERVICE_STATUS ssServiceStatus;
+	POINTER pssServiceStatus;  //FIX IS3
+begin
+  // Initialize variables.
+  nTimer = 0;
+  nReturn = 0;
+  nResult = 0;
+
+  // Open all our handles
+  _InitServiceConnections(szSStartName);
+
+  pssServiceStatus=AddressString(ssServiceStatus);  //FIX IS3
+  if (nReturn = 0) then
+    // Check to see if the service is already resumed
+    nResult = ControlService(schService, SERVICE_CONTROL_CONTINUE, pssServiceStatus);  //FIX IS3
+    while !(ssServiceStatus.dwCurrentState = SERVICE_RUNNING) && (nTimer < 20)
+      nTimer = nTimer + 1;
+      Delay (1);
+      nResult = QueryServiceStatus(schService, pssServiceStatus);  //FIX IS3
+    endwhile;
+  endif;
+
+  // close and NULL our handles
+  _CloseServiceConnections();
+
+  if (nTimer = 20) then
+    // Could not resume service within 20 seconds.
+    nReturn = -1;
+  endif;
+
+  return nReturn;
+
+end;
+*/
+
+
+#endif // _NTSERVICE_RUL_
+
+
