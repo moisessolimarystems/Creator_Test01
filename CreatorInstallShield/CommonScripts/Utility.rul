@@ -1,0 +1,184 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:		WriteLog.rul
+//                                                                            
+//  Description:	InstallShield script                                        
+//                                                                            
+//  Comments:		This file is to house the COM+ Functions
+//
+//  Copyright:		Solimar Systems, Inc. 
+//					Copyright 2003  
+//
+//  Author:			Jeff Lan
+//
+////////////////////////////////////////////////////////////////////////////////
+
+#ifndef _UTILITY_RUL_
+#define _UTILITY_RUL_    
+
+#include "..\..\Common Script\ntservice.h" 
+
+//=============================================================================  
+//
+// Function: 	_CActionSelfRegister()
+// Purpose:   	This function registers x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function SelfRegister(svRegSvrPath ,svFilePath)
+	STRING szCmd;   
+begin           
+	szCmd = svRegSvrPath ^ "RegSvr32.exe";		
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      
+		if(LaunchAppAndWait(szCmd," /s " +  svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+			WriteLog("Failed to register " + svFilePath + " for " + PRODUCT_NAME);
+		endif;	
+	endif;       	                    
+end; 
+
+//=============================================================================  
+//
+// Function: 	_CActionSelfUnRegister()
+// Purpose:   	This function unregisters x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function SelfUnRegister(szRegSvrPath, svFilePath)
+	STRING szCmd;     
+begin  
+	szCmd = szRegSvrPath ^ "RegSvr32.exe";
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      			
+		if(LaunchAppAndWait(szCmd, "/u /s " + svFilePath, LAAW_OPTION_WAIT|LAAW_OPTION_HIDDEN) < ISERR_SUCCESS) then
+			WriteLog("Failed to unregister " + svFilePath + " for " + PRODUCT_NAME);
+		endif;
+	endif;				
+end;  
+
+//=============================================================================  
+//
+// Function: 	_CActionSelfRegister()
+// Purpose:   	This function registers x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function RegisterService(svFilePath, svParam)  
+begin            	
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      
+   		if (LaunchAppAndWait (svFilePath, svParam , WAIT) < 0) then 
+   			WriteLog("Failed to register " + svFilePath + " for " + PRODUCT_NAME);
+   		endif;
+	endif;       	                    
+end; 
+
+//=============================================================================  
+//
+// Function: 	_CActionSelfUnRegister()
+// Purpose:   	This function unregisters x64 dlls.
+//				In-Script Execution set to Immediate Execution
+// Parameters:	HWND hMSI - seems to be needed to be seen from a custom action
+// Returns:		None
+//
+//=============================================================================  
+function UnRegisterService(svFilePath)   
+begin  
+	if(Is(FILE_EXISTS, svFilePath)) then
+		LongPathToQuote(svFilePath, TRUE);      
+   		if (LaunchAppAndWait (svFilePath, "/UNREGSERVER" , WAIT) < 0) then 
+   			WriteLog("Failed to unregister " + svFilePath + " for " + PRODUCT_NAME);
+   		endif;
+	endif;   				
+end; 
+
+function RegAsmRegister(svFilePath, svSystemPath, bHasTypeLib)
+	STRING szCmdLine, svRegAsmPath;
+	NUMBER nvExitCode;
+begin
+	svRegAsmPath = svSystemPath ^ "..\\Microsoft.Net\\Framework\\v2.0.50727\\regasm.exe";
+	LongPathToQuote(svFilePath,TRUE);  
+	if(bHasTypeLib) then
+		szCmdLine = " /tlb /codebase " + svFilePath;
+	else
+		szCmdLine = " /codebase " + svFilePath;
+	endif; 	    
+	if(Is(FILE_EXISTS, svFilePath)) then      
+	   WriteLog("Registering " + svFilePath);     
+	   if (_LaunchAppEx(svRegAsmPath,
+	 	 				szCmdLine , 
+	  	 				WAIT, 
+	   					SW_HIDE, 
+	   					-1, 
+	   					nvExitCode) < 0) then 
+	       WriteErrorToLog(nvExitCode, "Error registering " + svFilePath);
+	   else
+	       WriteLog("Registered " + svFilePath + " successfully.");     
+	   endif;	
+	endif;	
+end;   
+
+function RegAsmUnRegister(svFilePath, svSystemPath, bHasTypeLib)
+	STRING svRegAsmPath, svCmdLine;
+	NUMBER nvExitCode;
+begin 
+	svRegAsmPath = svSystemPath ^ "Microsoft.Net\\Framework\\v2.0.50727\\regasm.exe";
+	if(bHasTypeLib) then		
+		svCmdLine = "/unregister /tlb /codebase " + svFilePath;
+	else
+		svCmdLine = "/unregister /codebase " + svFilePath;
+	endif;
+	LongPathToQuote(svFilePath,TRUE); 
+	if(Is(FILE_EXISTS, svFilePath)) then 	
+		WriteLog("UnRegistering " + svFilePath);            	
+		if (_LaunchAppEx(svRegAsmPath,
+						 svCmdLine , 
+						 WAIT, 
+						 SW_HIDE, 
+						 -1, 
+					 	nvExitCode) < 0) then 
+			WriteErrorToLog(nvExitCode, "Error unregistering " + svFilePath);
+		else
+			WriteLog("UnRegistered " + svFilePath + " successfully."); 	
+		endif;   
+	endif; 
+end;    
+
+//============================================================================= 
+//
+// Function:	DisableService
+// Purpose:  	Configures the Service to the specifications necessary for
+//				the Docserver.
+// Parameters:  STRING szService
+// Returns:  	0 if successful
+//				-1 if failure
+//
+//=============================================================================
+function DisableService(szService)       	
+begin                                               
+	// check for the service availability
+    if (_IsServiceAvailable(szService) = 0) then 
+    	// check for service stopped. 
+		if ( _IsNTServiceStopped(szService) != 0) then
+    		_StopNTService(szService);
+    	endif;   
+        // remove the service
+		if ( _DeleteNTService(szService) != 0 ) then
+//			MessageBox(szService + " Service NOT Disabled", INFORMATION);
+			return -1;
+		endif;		   
+	endif;  	
+	return 0;
+end;       
+              
+#include "..\..\Common Script\ntservice.rul" 
+              
+#endif //_UTILITY_RUL_
+  
