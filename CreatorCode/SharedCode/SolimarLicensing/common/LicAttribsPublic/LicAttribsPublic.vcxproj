@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{04ccacae-cec3-4f14-a5d9-1f4bf1611e71}</ProjectGuid>
+    <RootNamespace>LicAttribsFiles</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>LicAttribsPublic</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\HResultClass.xml">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">python.exe ..\HRESULTClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">python.exe ..\HRESULTClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">python.exe ..\HRESULTClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">python.exe ..\HRESULTClassesCompiler.py \%(Directory)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling input with HESULTClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling input with HESULTClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling input with HESULTClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling input with HESULTClassesCompiler.py</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\%(Directory)LicenseError_py.h;\%(Directory)LicenseError_py.cpp;\%(Directory)LicenseError.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\%(Directory)LicenseError_py.h;\%(Directory)LicenseError_py.cpp;\%(Directory)LicenseError.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\%(Directory)LicenseError_py.h;\%(Directory)LicenseError_py.cpp;\%(Directory)LicenseError.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\%(Directory)LicenseError_py.h;\%(Directory)LicenseError_py.cpp;\%(Directory)LicenseError.cs</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\%(Directory)HRESULTClassesCompiler.py;\%(Directory)HRESULTOutputCPP.py;\%(Directory)HRESULTOutputH.py;\%(Directory)HRESULTOutputCS.py</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\%(Directory)HRESULTClassesCompiler.py;\%(Directory)HRESULTOutputCPP.py;\%(Directory)HRESULTOutputH.py;\%(Directory)HRESULTOutputCS.py</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\%(Directory)HRESULTClassesCompiler.py;\%(Directory)HRESULTOutputCPP.py;\%(Directory)HRESULTOutputH.py;\%(Directory)HRESULTOutputCS.py</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\%(Directory)HRESULTClassesCompiler.py;\%(Directory)HRESULTOutputCPP.py;\%(Directory)HRESULTOutputH.py;\%(Directory)HRESULTOutputCS.py</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\LicAttribsClasses.xml">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">python.exe ..\AttribsClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">python.exe ..\AttribsClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">python.exe ..\AttribsClassesCompiler.py \%(Directory)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">python.exe ..\AttribsClassesCompiler.py \%(Directory)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling input with AttribsClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling input with AttribsClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compiling input with AttribsClassesCompiler.py</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling input with AttribsClassesCompiler.py</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\%(Directory)AttribsClassesCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\%(Directory)AttribsClassesCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\%(Directory)AttribsClassesCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\%(Directory)AttribsClassesCompiler.py;%(AdditionalInputs)</AdditionalInputs>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\%(Directory)</RootFolder>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\%(Directory)</RootFolder>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\%(Directory)</RootFolder>
+      <RootFolder Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\%(Directory)</RootFolder>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">\%(Directory)LicAttribsCPP\Lic_KeyAttribs.h;\%(Directory)LicAttribsCPP\Lic_ClientSettingsAttribs.h;\%(Directory)LicAttribsCPP\Lic_GenericAttribs.h;\%(Directory)LicAttribsCS\Lic_ServerDataAttribs.cs;\%(Directory)LicAttribsCS\Lic_PackageAttribs.cs;\%(Directory)LicAttribsCS\Lic_ClientSettingsAttribs.cs;\%(Directory)LicAttribsCS\Lic_GenericAttribs.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">\%(Directory)LicAttribsCPP\Lic_KeyAttribs.h;\%(Directory)LicAttribsCPP\Lic_ClientSettingsAttribs.h;\%(Directory)LicAttribsCPP\Lic_GenericAttribs.h;\%(Directory)LicAttribsCS\Lic_ServerDataAttribs.cs;\%(Directory)LicAttribsCS\Lic_PackageAttribs.cs;\%(Directory)LicAttribsCS\Lic_ClientSettingsAttribs.cs;\%(Directory)LicAttribsCS\Lic_GenericAttribs.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">\%(Directory)LicAttribsCPP\Lic_KeyAttribs.h;\%(Directory)LicAttribsCPP\Lic_ClientSettingsAttribs.h;\%(Directory)LicAttribsCPP\Lic_GenericAttribs.h;\%(Directory)LicAttribsCS\Lic_ServerDataAttribs.cs;\%(Directory)LicAttribsCS\Lic_PackageAttribs.cs;\%(Directory)LicAttribsCS\Lic_ClientSettingsAttribs.cs;\%(Directory)LicAttribsCS\Lic_GenericAttribs.cs</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">\%(Directory)LicAttribsCPP\Lic_KeyAttribs.h;\%(Directory)LicAttribsCPP\Lic_ClientSettingsAttribs.h;\%(Directory)LicAttribsCPP\Lic_GenericAttribs.h;\%(Directory)LicAttribsCS\Lic_ServerDataAttribs.cs;\%(Directory)LicAttribsCS\Lic_PackageAttribs.cs;\%(Directory)LicAttribsCS\Lic_ClientSettingsAttribs.cs;\%(Directory)LicAttribsCS\Lic_GenericAttribs.cs</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
